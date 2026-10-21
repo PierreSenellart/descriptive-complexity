@@ -220,7 +220,7 @@ end Characterizations
 
 /-- Correctness of the reduction: a CNF structure is a yes-instance of 3SAT
 iff the interpreted CNF structure is satisfiable. -/
-private theorem threeSatisfiable_iff_satisfiable (A : Type) [Language.sat.Structure A] :
+theorem threeSatisfiable_iff_satisfiable (A : Type) [Language.sat.Structure A] :
     ThreeSatisfiable A ↔ Satisfiable (threeSatToSat.Map A) := by
   by_cases hw : Wide A
   · -- wide input: both sides fail
@@ -268,7 +268,7 @@ open ThreeSatToSat in
 `ThreeSatToSat.threeSatToSat`, gated on the first-order width check, maps a
 CNF structure to a satisfiable CNF instance iff it is a yes-instance of
 3SAT. -/
-private noncomputable def threeSat_fo_reduction_sat : ThreeSAT ≤ᶠᵒ SAT where
+noncomputable def threeSat_fo_reduction_sat : ThreeSAT ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := threeSatToSat

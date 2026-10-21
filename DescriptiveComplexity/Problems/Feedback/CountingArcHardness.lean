@@ -504,7 +504,7 @@ end Promise
 
 /-- **#1-in-SAT reduces parsimoniously to #Feedback Arc Set**: the clique
 instance of the formula, then its conflict split graph. -/
-private noncomputable def sharpOneInSat_ordered_parsimonious_sharpFeedbackArcSet :
+noncomputable def sharpOneInSat_ordered_parsimonious_sharpFeedbackArcSet :
     SharpOneInSAT ≤ᵖ[≤] SharpFeedbackArcSet :=
   sharpOneInSat_ordered_parsimonious_sharpClique.transPromise CliqueFas.cliqueFasInterp
     fun A _ _ _ _ => by

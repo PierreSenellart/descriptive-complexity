@@ -674,7 +674,7 @@ noncomputable def solEquiv :
   right_inv S := Subtype.ext (cliqueOf_modelOf S.2)
 
 /-- **Correctness of the interpretation, for counting.** -/
-private theorem sharpClique_map : SharpClique (oneInToClique.Map A) = SharpOneInSAT A := by
+theorem sharpClique_map : SharpClique (oneInToClique.Map A) = SharpOneInSAT A := by
   rw [sharpClique_apply, sharpOneInSat_apply]
   exact (Nat.card_congr (solEquiv A)).symm
 
@@ -684,7 +684,7 @@ end OneInToClique
 
 open OneInToClique in
 /-- **#1-in-SAT reduces parsimoniously to #Clique.** -/
-private noncomputable def sharpOneInSat_ordered_parsimonious_sharpClique :
+noncomputable def sharpOneInSat_ordered_parsimonious_sharpClique :
     SharpOneInSAT ≤ᵖ[≤] SharpClique where
   Tag := SatCliqueTag
   dim := 2

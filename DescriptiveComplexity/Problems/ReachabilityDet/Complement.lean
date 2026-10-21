@@ -689,7 +689,7 @@ private theorem dtcDefinable_compl {L : Language.{0, 0}} [L.IsRelational] {P : D
   exact unreachd_dtcDefinable.of_orderedReduction f.compl
 
 /-- Membership in LOGSPACE is closed under complement. -/
-private theorem mem_LOGSPACE_compl_iff
+theorem mem_LOGSPACE_compl_iff
     {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ LOGSPACE ↔ P ∈ LOGSPACE := by
   refine ⟨fun h => ?_, fun h => dtcDefinable_compl h⟩

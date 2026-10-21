@@ -517,7 +517,7 @@ theorem Agree.succPos (h : Agree u N M) {b b' : B} :
   · rcases hs (u a) ((h.posn a).mp ha) ((h.le _ _).mp h₁) ((h.le _ _).mp h₂) with h' | h' <;>
       [left; right] <;> exact u.injective h'
 
-private theorem Agree.initTape (h : Agree u N M) {b b' : B} :
+theorem Agree.initTape (h : Agree u N M) {b b' : B} :
     N.InitTape b b' ↔ M.InitTape (u b) (u b') := by
   refine or_congr (h.inp _ _) (and_congr ⟨fun hn a ha => ?_, fun hn a ha => ?_⟩ (h.blank _))
   · exact hn (u.symm a) ((h.inp _ _).mpr (by rwa [Equiv.apply_symm_apply]))

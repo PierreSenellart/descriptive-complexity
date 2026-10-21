@@ -374,7 +374,7 @@ noncomputable def h0Interp :
 
 /-- **#PP2DNF reduces parsimoniously to counting the worlds of `h₀`**
 ([Dalvi and Suciu 2012][dalvi2012dichotomy], Proposition 5.2). -/
-private noncomputable def sharpPP2DNF_parsimonious_possibleWorlds_h0 :
+noncomputable def sharpPP2DNF_parsimonious_possibleWorlds_h0 :
     SharpPP2DNF ≤ᵖ PossibleWorlds h0 where
   Tag := Unit
   dim := 1

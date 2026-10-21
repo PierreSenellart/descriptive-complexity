@@ -398,7 +398,7 @@ on any other instance it is zero. -/
 noncomputable def WeightedWorlds (φ : L.Sentence) : CountingProblem (weightedLang L) :=
   CountingProblem.ofKernel (weightBlock L) (weightKernel φ)
 
-private theorem weightedWorlds_apply (φ : L.Sentence) (A : Type) [(weightedLang L).Structure A] :
+theorem weightedWorlds_apply (φ : L.Sentence) (A : Type) [(weightedLang L).Structure A] :
     WeightedWorlds φ A =
       Nat.card {σ : (weightBlock L).Assignment A //
         IsLinOrd (WLe L A) ∧
@@ -709,7 +709,7 @@ noncomputable def worldProb [Finite A] (φ : L.Sentence)
 /-- The probability of a first-order sentence is a ratio of two `#P` numbers:
 `DescriptiveComplexity.funcProb_holdsEvent_eq_ratio`, for the packaged
 probability. -/
-private theorem worldProb_eq_ratio [Finite A] (hlin : IsLinOrd (WLe L A)) (φ : L.Sentence)
+theorem worldProb_eq_ratio [Finite A] (hlin : IsLinOrd (WLe L A)) (φ : L.Sentence)
     (hpos : ∀ x : {q : Fact L A // IsOpen q}, 0 < presWeight x + absWeight x) :
     worldProb φ hpos = (WeightedWorlds φ A : ℚ) / (WeightedWorlds (⊤ : L.Sentence) A : ℚ) :=
   funcProb_holdsEvent_eq_ratio hlin hpos φ

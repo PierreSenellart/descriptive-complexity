@@ -666,7 +666,7 @@ private theorem satisfiable_of_oneInProper (hw : ¬ThreeSatToSat.Wide A)
 
 /-- Correctness of the reduction: a CNF structure is a yes-instance of 3SAT
 iff its gadget is exactly-one satisfiable. -/
-private theorem threeSatisfiable_iff_oneInSatisfiable_map :
+theorem threeSatisfiable_iff_oneInSatisfiable_map :
     ThreeSatisfiable A ↔ OneInSatisfiable (oiInterp.Map A) := by
   by_cases hw : ThreeSatToSat.Wide A
   · -- on a wide input every element is a clause, and none has a literal
@@ -696,7 +696,7 @@ private theorem threeSatisfiable_iff_oneInSatisfiable_map :
 end Correctness
 
 /-- **3SAT ordered-FO-reduces to 1-in-SAT**: the three-slot gadget. -/
-private noncomputable def threeSat_ordered_fo_reduction_oneInSat : ThreeSAT ≤ᶠᵒ[≤] OneInSAT where
+noncomputable def threeSat_ordered_fo_reduction_oneInSat : ThreeSAT ≤ᶠᵒ[≤] OneInSAT where
   Tag := OITag
   dim := 1
   toInterpretation := oiInterp

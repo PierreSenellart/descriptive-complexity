@@ -363,7 +363,7 @@ noncomputable def DP : ComplexityClass :=
     (fun h => dpDefinable_congr h)
 
 /-- Membership in DP is exactly DP definability, by definition. -/
-private theorem mem_DP_iff (P : DecisionProblem L) : P ∈ DP ↔ DPDefinable P :=
+theorem mem_DP_iff (P : DecisionProblem L) : P ∈ DP ↔ DPDefinable P :=
   Iff.rfl
 
 /-! ### NP and coNP inside DP

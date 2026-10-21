@@ -110,7 +110,7 @@ private theorem transpose_hMarked :
 
 /-- Correctness of the transposition, hitting-set-to-set-cover direction: a
 hitting set of a set system is a cover of its transpose. -/
-private theorem hasSmallHittingSet_iff_map :
+theorem hasSmallHittingSet_iff_map :
     HasSmallHittingSet A ↔ HasSmallSetCover (transposeInterp.Map A) :=
   and_congr ((transposeInterp.mapEquivSelf A).finite_iff).symm
     (CoversOn.equiv_iff (transposeInterp.mapEquivSelf A) (transpose_hElem A)
@@ -118,7 +118,7 @@ private theorem hasSmallHittingSet_iff_map :
 
 /-- Correctness of the transposition, set-cover-to-hitting-set direction: a
 cover of a set system is a hitting set of its transpose. -/
-private theorem hasSmallSetCover_iff_map :
+theorem hasSmallSetCover_iff_map :
     HasSmallSetCover A ↔ HasSmallHittingSet (transposeInterp.Map A) :=
   and_congr ((transposeInterp.mapEquivSelf A).finite_iff).symm
     (CoversOn.equiv_iff (transposeInterp.mapEquivSelf A) (transpose_hFam A)
@@ -129,7 +129,7 @@ end TransposeCorrectness
 
 /-- **Set Cover FO-reduces to Hitting Set**, by transposing the incidence
 relation. -/
-private def setCover_fo_reduction_hittingSet : SetCover ≤ᶠᵒ HittingSet where
+def setCover_fo_reduction_hittingSet : SetCover ≤ᶠᵒ HittingSet where
   Tag := Unit
   dim := 1
   toInterpretation := transposeInterp
@@ -137,7 +137,7 @@ private def setCover_fo_reduction_hittingSet : SetCover ≤ᶠᵒ HittingSet whe
 
 /-- **Hitting Set FO-reduces to Set Cover**, by transposing the incidence
 relation. -/
-private def hittingSet_fo_reduction_setCover : HittingSet ≤ᶠᵒ SetCover where
+def hittingSet_fo_reduction_setCover : HittingSet ≤ᶠᵒ SetCover where
   Tag := Unit
   dim := 1
   toInterpretation := transposeInterp

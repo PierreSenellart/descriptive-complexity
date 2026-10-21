@@ -122,7 +122,7 @@ theorem sharpFeedbackArcSet_support_iff (A : Type) [Language.markedArcGraph.Stru
 fails when the threshold exceeds the number of arcs.
 Registered in the Lax archive as
 [`Lax280166.FeedbackArcSetComplete.feedbackArcSet_of_sharpFeedbackArcSet_support`](https://laxarchive.org/lax-280166/Lax280166.FeedbackArcSetComplete.html#s-Lax280166.FeedbackArcSetComplete.feedbackArcSet_of_sharpFeedbackArcSet_support). -/
-private theorem feedbackArcSet_of_sharpFeedbackArcSet_support (A : Type)
+theorem feedbackArcSet_of_sharpFeedbackArcSet_support (A : Type)
     [Language.markedArcGraph.Structure A] [Finite A] (h : SharpFeedbackArcSet.support A) :
     FeedbackArcSet A := by
   obtain ⟨F, hfin, -, hac, hcard⟩ := (sharpFeedbackArcSet_support_iff A).mp h

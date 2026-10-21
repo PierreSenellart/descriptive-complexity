@@ -67,7 +67,7 @@ theorem sArc_iff (a b : A) : DGArc (sPt a) (sPt b) ↔ DGEdge a b := by
 
 /-- **Correctness**: a graph has a Hamilton circuit exactly when its
 symmetrization has a directed one. -/
-private theorem hasHamCircuit_iff (A : Type) [Language.digraph.Structure A] :
+theorem hasHamCircuit_iff (A : Type) [Language.digraph.Structure A] :
     HasHamCircuit A ↔ HasDirHamCircuit (symInterp.Map A) := by
   constructor
   · rintro ⟨hfin, htour⟩
@@ -85,7 +85,7 @@ end HamRed
 open HamRed in
 /-- **HAMILTON CIRCUIT FO-reduces to DIRECTED HAMILTON CIRCUIT**: replace each
 edge by its two arcs, the universe unchanged. -/
-private def hamCircuit_fo_reduction_dirHamCircuit : HamCircuit ≤ᶠᵒ DirHamCircuit where
+def hamCircuit_fo_reduction_dirHamCircuit : HamCircuit ≤ᶠᵒ DirHamCircuit where
   Tag := Unit
   dim := 1
   toInterpretation := symInterp

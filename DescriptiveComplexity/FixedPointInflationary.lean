@@ -131,7 +131,7 @@ def IFPDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
 
 /-- Order-free FO(IFP) definability only depends on the finite instances of a
 problem. -/
-private theorem ifpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
+theorem ifpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     IFPDefinableFree P ↔ IFPDefinableFree Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _

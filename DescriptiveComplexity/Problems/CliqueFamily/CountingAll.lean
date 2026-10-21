@@ -112,7 +112,7 @@ noncomputable def SharpAllIndependentSets : CountingProblem Language.graph where
     rw [card_indepSet_eq_witnessCount A, card_indepSet_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock indepKernel e
 
-private theorem sharpAllIndependentSets_apply (A : Type) [Language.graph.Structure A] :
+theorem sharpAllIndependentSets_apply (A : Type) [Language.graph.Structure A] :
     SharpAllIndependentSets A =
       Nat.card {S : A → Prop // IndepSet (fun x y : A => RelMap Language.adj ![x, y]) S} :=
   rfl
@@ -195,7 +195,7 @@ noncomputable def mgUnmarkedAt {α : Type} (x : α) : Language.markedGraph.Formu
 noncomputable def unmarkedCount : PolyTerm Language.markedGraph :=
   .count (LHom.sumInl.onFormula (mgUnmarkedAt (0 : Fin 1)))
 
-private theorem eval_unmarkedCount : unmarkedCount.eval A = Nat.card {v : A // ¬MGMarked v} := by
+theorem eval_unmarkedCount : unmarkedCount.eval A = Nat.card {v : A // ¬MGMarked v} := by
   rw [unmarkedCount, PolyTerm.eval_count_one]
   refine Nat.card_congr (Equiv.subtypeEquivRight fun a => ?_)
   rw [LHom.realize_onFormula, mgUnmarkedAt]
@@ -203,7 +203,7 @@ private theorem eval_unmarkedCount : unmarkedCount.eval A = Nat.card {v : A // �
 
 /-- The independent sets of the interpreted graph are those of the graph with
 pendant leaves. -/
-private theorem sharpAllIndependentSets_pend :
+theorem sharpAllIndependentSets_pend :
     SharpAllIndependentSets (pendInterp.MapRel A) =
       Nat.card {T : A ⊕ A × A → Prop // IndepSet (pendAdj fun a b : A => MGAdj a b) T} :=
   Nat.card_congr (Equiv.subtypeEquiv (Equiv.arrowCongr pendEquiv (Equiv.refl Prop))
@@ -217,7 +217,7 @@ end Pend
 call**: in the graph with `n` pendant leaves at each of its `n` vertices, the
 independent sets of size `k` of the graph are counted by the digit of rank
 `n - k` of the number of independent sets, in base `2 ^ n`. -/
-private noncomputable def sharpIndependentSet_oneCall_sharpAllIndependentSets :
+noncomputable def sharpIndependentSet_oneCall_sharpAllIndependentSets :
     SharpIndependentSet ≤ᶜ[≤] SharpAllIndependentSets where
   Tag := Bool
   dim := 2

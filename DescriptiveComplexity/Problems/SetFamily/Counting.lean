@@ -81,7 +81,7 @@ private theorem sharpExactCover_apply (A : Type) [Language.setSystem.Structure A
 /-- **The support of #ExactCover is Exact Cover.**
 Registered in the Lax archive as
 [`Lax280166.ExactCoverComplete.sharpExactCover_support_iff`](https://laxarchive.org/lax-280166/Lax280166.ExactCoverComplete.html#s-Lax280166.ExactCoverComplete.sharpExactCover_support_iff). -/
-private theorem sharpExactCover_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
+theorem sharpExactCover_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
     SharpExactCover.support A ↔ ExactCover A := by
   rw [CountingProblem.support_iff, sharpExactCover_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨G, hG⟩, _⟩ => ⟨G, hG⟩, fun ⟨G, hG⟩ => ⟨⟨⟨G, hG⟩⟩, inferInstance⟩⟩

@@ -415,7 +415,7 @@ private theorem realize_edgeSteinerKernel {A : Type} [Language.steinerGraph.Stru
 /-- **The edge-weighted Steiner Tree is `Σ₁`-definable**: guess the edge set,
 the vertices it spans, a root, an order certifying connectivity, and an
 injection of the chosen edges into the marked set. -/
-private theorem edgeSteinerTree_sigmaSODefinable : SigmaSODefinable 1 EdgeSteinerTree := by
+theorem edgeSteinerTree_sigmaSODefinable : SigmaSODefinable 1 EdgeSteinerTree := by
   refine ⟨[edgeSteinerGuessBlock], rfl, edgeSteinerKernel, ?_⟩
   intro A _ _ _
   constructor

@@ -182,7 +182,7 @@ noncomputable def SharpSAT : CountingProblem Language.sat where
     rw [card_satModel_eq_witnessCount A, card_satModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock sharpSatKernel e
 
-private theorem sharpSat_apply (A : Type) [Language.sat.Structure A] :
+theorem sharpSat_apply (A : Type) [Language.sat.Structure A] :
     SharpSAT A = Nat.card {ν : A → Prop // SatModel A ν} :=
   rfl
 

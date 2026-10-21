@@ -195,7 +195,7 @@ private theorem pfpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L
 problem.
 Registered in the Lax archive as
 [`Lax134656.PartialFixedPointClosure.pfpDefinable_congr_finite`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointClosure.html#s-Lax134656.PartialFixedPointClosure.pfpDefinable_congr_finite). -/
-private theorem pfpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
+theorem pfpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     PFPDefinable P ↔ PFPDefinable Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _ _

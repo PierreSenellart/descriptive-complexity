@@ -274,7 +274,7 @@ private theorem sharpSteinerTree_apply (A : Type) [Language.steinerGraph.Structu
 number of non-terminals.
 Registered in the Lax archive as
 [`Lax280166.SteinerTreeComplete.sharpSteinerTree_support_iff`](https://laxarchive.org/lax-280166/Lax280166.SteinerTreeComplete.html#s-Lax280166.SteinerTreeComplete.sharpSteinerTree_support_iff). -/
-private theorem sharpSteinerTree_support_iff (A : Type) [Language.steinerGraph.Structure A]
+theorem sharpSteinerTree_support_iff (A : Type) [Language.steinerGraph.Structure A]
     [Finite A] : SharpSteinerTree.support A ↔ ∃ S : A → Prop, SteinerOfSize A S := by
   rw [CountingProblem.support_iff, sharpSteinerTree_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨S⟩, _⟩ => ⟨S.1, S.2⟩, fun ⟨S, hS⟩ => ⟨⟨⟨S, hS⟩⟩, inferInstance⟩⟩
@@ -282,7 +282,7 @@ private theorem sharpSteinerTree_support_iff (A : Type) [Language.steinerGraph.S
 /-- The support of #Steiner Tree implies Steiner Tree.
 Registered in the Lax archive as
 [`Lax280166.SteinerTreeComplete.steinerTree_of_sharpSteinerTree_support`](https://laxarchive.org/lax-280166/Lax280166.SteinerTreeComplete.html#s-Lax280166.SteinerTreeComplete.steinerTree_of_sharpSteinerTree_support). -/
-private theorem steinerTree_of_sharpSteinerTree_support (A : Type)
+theorem steinerTree_of_sharpSteinerTree_support (A : Type)
     [Language.steinerGraph.Structure A] [Finite A] (h : SharpSteinerTree.support A) :
     SteinerTree A := by
   obtain ⟨S, hfin, hterm, hconn, hcard⟩ := (sharpSteinerTree_support_iff A).mp h

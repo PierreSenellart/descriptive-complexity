@@ -349,7 +349,7 @@ theorem OneCallHard.of_parsimonious {C : CountingProblem L} {D : CountingProblem
 
 /-- One-call hardness only depends on the values of a counting problem on
 finite structures. -/
-private theorem oneCallHard_congr_finite {C D : CountingProblem L}
+theorem oneCallHard_congr_finite {C D : CountingProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], C A = D A) :
     K.OneCallHard C ↔ K.OneCallHard D :=
   ⟨fun hC _ _ E hE => ⟨(hC E hE).some.congrTarget h⟩,

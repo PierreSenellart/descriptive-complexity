@@ -52,7 +52,7 @@ variable (A : Type) [Language.markedGraph.Structure A] [LinearOrder A] [Finite A
 /-- **The definable domain is inhabited.** A marked vertex gives a selector, an
 edge gives a gadget vertex, and the degenerate input with no marks and no edges
 gives the hub, at the minimum. -/
-private theorem hamInterp_dom_nonempty :
+theorem hamInterp_dom_nonempty :
     ∃ (t : HTag) (w : Fin 2 → A), (hamInterp.domFormula t).Realize w := by
   by_cases hm : ∃ m : A, MGMarked m
   · obtain ⟨m, hm⟩ := hm
@@ -140,7 +140,7 @@ neighbor list, with the marked vertices as selectors and a degenerate-case
 hub. The domain formula cuts the target universe down to the real gadget,
 selector and hub vertices – Immerman's definable-subset reduction, needed
 because HAMILTON CIRCUIT is a spanning problem. -/
-private noncomputable def vertexCover_rel_ordered_fo_reduction_hamCircuit :
+noncomputable def vertexCover_rel_ordered_fo_reduction_hamCircuit :
     VertexCover ≤ʳᶠᵒ[≤] HamCircuit where
   Tag := HTag
   dim := 2

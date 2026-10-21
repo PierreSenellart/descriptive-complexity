@@ -55,7 +55,7 @@ def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
     rw [← ipPt_surj q]
 
 /-- **Correctness of the interpretation, for counting.** -/
-private theorem sharpZeroOneIP_map : SharpZeroOneIP (ipInterp.Map A) = SharpKnapsack A := by
+theorem sharpZeroOneIP_map : SharpZeroOneIP (ipInterp.Map A) = SharpKnapsack A := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   rw [sharpZeroOneIP_apply, sharpKnapsack_apply]
   exact (Nat.card_congr (solEquiv A ha₀)).symm
@@ -64,7 +64,7 @@ end IPRed
 
 open IPRed in
 /-- **#Knapsack reduces parsimoniously to #0-1 integer programming.** -/
-private noncomputable def sharpKnapsack_ordered_parsimonious_sharpZeroOneIP :
+noncomputable def sharpKnapsack_ordered_parsimonious_sharpZeroOneIP :
     SharpKnapsack ≤ᵖ[≤] SharpZeroOneIP where
   Tag := Unit
   dim := 1

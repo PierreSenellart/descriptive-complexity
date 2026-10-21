@@ -266,7 +266,7 @@ private theorem stretch_edge (x y : stretchInterp.MapRel A) :
 
 /-- The independent sets of the interpreted bipartite graph are those of the
 stretched graph. -/
-private theorem sharpBIS_stretch :
+theorem sharpBIS_stretch :
     SharpBIS (stretchInterp.MapRel A) =
       Nat.card {T : A ⊕ EdgePair (fun a b : A => RelMap Language.adj ![a, b]) × (Bool × A) →
         Prop // StretchIndep (fun a b : A => RelMap Language.adj ![a, b]) T} :=
@@ -280,7 +280,7 @@ end Stretch
 /-- **Counting the independent sets of a graph reduces to #BIS with one
 call**: the number of independent sets of the stretched graph, modulo
 `2 ^ (2n)`, is the number of independent sets of the graph. -/
-private noncomputable def sharpAllIndependentSets_oneCall_sharpBIS :
+noncomputable def sharpAllIndependentSets_oneCall_sharpBIS :
     SharpAllIndependentSets ≤ᶜ[≤] SharpBIS where
   Tag := Option Bool
   dim := 3
@@ -372,7 +372,7 @@ theorem sharpBIS_add_sharpPP2DNF (A : Type) [Language.bipGraph.Structure A] [Fin
 
 /-- **#BIS reduces to #PP2DNF with one call**, on the same instance:
 `#BIS = 2 ^ n - #PP2DNF`. -/
-private noncomputable def sharpBIS_oneCall_sharpPP2DNF : SharpBIS ≤ᶜ[≤] SharpPP2DNF :=
+noncomputable def sharpBIS_oneCall_sharpPP2DNF : SharpBIS ≤ᶜ[≤] SharpPP2DNF :=
   (ParsimoniousReduction.refl SharpPP2DNF).toOneCall.ofPost (.sub (.pow2 .univ) .oracle)
     fun A _ _ _ _ => by
       change SharpBIS A =

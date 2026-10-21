@@ -83,7 +83,7 @@ section Points
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- The pair `(c, x)` is a point of tag `t`. -/
-private def CDom : CTag → A → A → Prop
+def CDom : CTag → A → A → Prop
   | .pal _, c, x => (∀ y, c ≤ y) ∧ x = c
   | .lit _, c, x => x = c ∧ SatOccurs A c
   | .gate s _, c, x => Chained c x s
@@ -231,7 +231,7 @@ private theorem realize_isMinF {c : α} : (isMinF c).Realize v ↔ ∀ y, v c �
   simp only [isMinF, Formula.realize_iAlls, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩
 
-private theorem realize_domF
+theorem realize_domF
     (t : CTag) (w : Fin 2 → A) : (domF t).Realize w ↔ CDom t (w 0) (w 1) := by
   cases t <;>
     simp [domF, CDom, realize_isMinF, realize_eqF, realize_occursF, realize_chainedF,
@@ -512,7 +512,7 @@ private theorem adj_drawEquiv_symm (u w : V A) :
 omit [Fintype A] in
 /-- **The number of proper 3-colorings of the drawing** is that of the gadget
 graph. -/
-private theorem sharpThreeCol_draw [Finite A] :
+theorem sharpThreeCol_draw [Finite A] :
     SharpThreeCol (drawInterp.MapRel A) = Nat.card {χ : V A → Fin 3 // Proper χ} := by
   have := Fintype.ofFinite A
   rw [sharpThreeCol_apply]
@@ -559,7 +559,7 @@ def gateEquiv (A : Type) [Language.sat.Structure A] [LinearOrder A] :
     rintro ⟨⟨c, x, s⟩, h⟩
     cases s <;> rfl
 
-private theorem eval_gateCount (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
+theorem eval_gateCount (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
     gateCount.eval A = Nat.card (Gate A) := by
   rw [gateCount, PolyTerm.eval, PolyTerm.eval_count, PolyTerm.eval_count,
     Nat.card_congr (gateSignEquiv A false), Nat.card_congr (gateSignEquiv A true),
@@ -571,7 +571,7 @@ open SatToColCount in
 /-- **#SAT reduces to #3-Colorability with one call**: the count of the
 drawing is divided by `6 · 8 ^ g`, `g` the number of non-first
 occurrences. -/
-private noncomputable def sharpSat_oneCall_sharpThreeCol : SharpSAT ≤ᶜ[≤] SharpThreeCol where
+noncomputable def sharpSat_oneCall_sharpThreeCol : SharpSAT ≤ᶜ[≤] SharpThreeCol where
   Tag := CTag
   dim := 2
   toRelInterpretation := drawInterp

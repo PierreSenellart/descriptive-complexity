@@ -356,7 +356,7 @@ private theorem dgArc_split (p q : splitInterp.Map A) :
 variable (A) [Finite A] [Nonempty A]
 
 /-- **Correctness of the interpretation, for counting.** -/
-private theorem sharpHamCircuit_split :
+theorem sharpHamCircuit_split :
     SharpHamCircuit (splitInterp.Map A) = SharpDirHamCircuit A := by
   have := splitInterp.map_finite A
   have hW : Finite (T3 × A) := inferInstance
@@ -376,7 +376,7 @@ open Split in
 /-- **#Directed Hamilton Circuit reduces parsimoniously to #Hamilton Circuit**,
 by splitting each vertex in three; no order and no domain formula are
 needed. -/
-private def sharpDirHamCircuit_parsimonious_sharpHamCircuit :
+def sharpDirHamCircuit_parsimonious_sharpHamCircuit :
     SharpDirHamCircuit ≤ᵖ SharpHamCircuit where
   Tag := T3
   dim := 1

@@ -698,7 +698,7 @@ variable (A) in
 /-- **Correctness of the reduction**: the set system has an exact cover iff the
 interpreted binary-weighted instance has a set of items summing to the
 target. -/
-private theorem hasExactCover_iff_hasSubsetSum [Nonempty A] :
+theorem hasExactCover_iff_hasSubsetSum [Nonempty A] :
     HasExactCover A ↔ HasSubsetSum (kInterp.Map A) := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   have : Finite (kInterp.Map A) := kInterp.map_finite A
@@ -718,7 +718,7 @@ open KnapRed in
 one item per set, one digit block of `|A|` bits per ground element, weights
 carrying a `1` in the block of each of their elements and the target a `1` in
 every block. -/
-private noncomputable def exactCover_ordered_fo_reduction_knapsack
+noncomputable def exactCover_ordered_fo_reduction_knapsack
     : ExactCover ≤ᶠᵒ[≤] Knapsack where
   Tag := KTag
   dim := 2

@@ -477,7 +477,7 @@ walks, one along the chosen items and one along the others, and check
 first-order that they end on the same number. Since NP is defined as
 `Σ₁`-definability, this is the membership half of the NP-completeness of
 Partition. -/
-private theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
+theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
   refine ⟨[partitionGuessBlock], rfl, partitionKernel, ?_⟩
   intro A _ _ _
   constructor

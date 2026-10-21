@@ -109,10 +109,10 @@ theorem eval_count_one (A : Type) [L.Structure A] [LinearOrder A]
       right_inv := fun _ => rfl }
 
 /-- The number of elements of the instance. -/
-private def univ : PolyTerm L :=
+def univ : PolyTerm L :=
   count (⊤ : (L.sum Language.order).Formula (Fin 1))
 
-private theorem eval_univ (A : Type) [L.Structure A] [LinearOrder A] :
+theorem eval_univ (A : Type) [L.Structure A] [LinearOrder A] :
     (univ : PolyTerm L).eval A = Nat.card A := by
   rw [univ, eval_count_one]
   exact Nat.card_congr (Equiv.subtypeUnivEquiv fun _ => Formula.realize_top.mpr trivial)

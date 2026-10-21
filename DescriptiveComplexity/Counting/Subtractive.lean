@@ -281,7 +281,7 @@ theorem StrongSubtractiveReduction.subtractiveReducible
   .strong f (.refl D)
 
 /-- A relativized parsimonious reduction is a subtractive reduction. -/
-private theorem RelOrderedParsimoniousReduction.subtractiveReducible (f : C ≤ʳᵖ[≤] D) : C ≤ˢ D :=
+theorem RelOrderedParsimoniousReduction.subtractiveReducible (f : C ≤ʳᵖ[≤] D) : C ≤ˢ D :=
   .parsimonious f (.refl D)
 
 /-- An ordered parsimonious reduction is a subtractive reduction. -/
@@ -341,7 +341,7 @@ theorem Hard.of_subtractive {C : CountingProblem L} {D : CountingProblem L'}
 end CountingClass
 
 /-- **Membership in `#P` travels backward along subtractive reductions.** -/
-private theorem mem_sharpP_of_subtractive [L.IsRelational] [L'.IsRelational] {C : CountingProblem L}
+theorem mem_sharpP_of_subtractive [L.IsRelational] [L'.IsRelational] {C : CountingProblem L}
     {D : CountingProblem L'} (h : C ≤ˢ D) (hD : D ∈ SharpP) : C ∈ SharpP :=
   SharpPDefinable.of_subtractive h hD
 

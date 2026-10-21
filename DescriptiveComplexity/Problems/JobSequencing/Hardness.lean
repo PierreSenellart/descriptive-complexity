@@ -1583,7 +1583,7 @@ private theorem exists_occ_selected
 
 /-- **Correctness of the reduction**: a CNF structure is a yes-instance of
 NAE-3SAT iff the interpreted job-sequencing instance has a good schedule. -/
-private theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structure A]
+theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     NAEThreeSatisfiable A ↔ HasGoodSchedule (jInterp.Map A) := by
   classical
@@ -1764,7 +1764,7 @@ digit-wise half of the total execution time. A variable block totals `2` and
 the block of a clause of width `w` totals `2 (w − 1)`, so a schedule whose
 late jobs stay within the bound is a balanced split of the blocks, that is, a
 not-all-equal satisfying assignment. -/
-private noncomputable def nae3Sat_ordered_fo_reduction_jobSequencing
+noncomputable def nae3Sat_ordered_fo_reduction_jobSequencing
     : NAE3SAT ≤ᶠᵒ[≤] JobSequencing where
   Tag := JTag
   dim := 2

@@ -59,7 +59,7 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 (`DescriptiveComplexity.piP_zero_eq`, restated as an equality of classes).
 Registered in the Lax archive as
 [`Lax535992.PTIMEEqCoPTIME.PTIME_eq_coPTIME`](https://laxarchive.org/lax-535992/Lax535992.PTIMEEqCoPTIME.html#s-Lax535992.PTIMEEqCoPTIME.PTIME_eq_coPTIME). -/
-private theorem PTIME_compl_eq : PTIME.compl = PTIME := piP_zero_eq
+theorem PTIME_compl_eq : PTIME.compl = PTIME := piP_zero_eq
 
 /-- Polynomial space is closed under complement
 (`DescriptiveComplexity.PSPACE_eq_coPSPACE`, restated the same way). -/
@@ -82,14 +82,14 @@ theorem EXPSPACE_eq_coEXPSPACE : EXPSPACE = coEXPSPACE := by
 /-- A problem is in EXPTIME exactly when its complement is.
 Registered in the Lax archive as
 [`Lax480241.ExponentialComplements.mem_EXPTIME_compl_iff`](https://laxarchive.org/lax-480241/Lax480241.ExponentialComplements.html#s-Lax480241.ExponentialComplements.mem_EXPTIME_compl_iff). -/
-private theorem mem_EXPTIME_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPTIME ↔ P ∈ EXPTIME := by
+theorem mem_EXPTIME_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPTIME ↔ P ∈ EXPTIME := by
   conv_rhs => rw [EXPTIME_eq_coEXPTIME]
   exact Iff.rfl
 
 /-- A problem is in EXPSPACE exactly when its complement is.
 Registered in the Lax archive as
 [`Lax480241.ExponentialComplements.mem_EXPSPACE_compl_iff`](https://laxarchive.org/lax-480241/Lax480241.ExponentialComplements.html#s-Lax480241.ExponentialComplements.mem_EXPSPACE_compl_iff). -/
-private theorem mem_EXPSPACE_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPSPACE ↔ P ∈ EXPSPACE := by
+theorem mem_EXPSPACE_compl_iff (P : DecisionProblem L) : Pᶜ ∈ EXPSPACE ↔ P ∈ EXPSPACE := by
   conv_rhs => rw [EXPSPACE_eq_coEXPSPACE]
   exact Iff.rfl
 
@@ -129,14 +129,14 @@ private theorem PSPACE_subset_coEXPTIME : PSPACE ⊆ coEXPTIME :=
 exponential ones are lifted from.
 Registered in the Lax archive as
 [`Lax134656.HierarchyInPSPACE.PTIME_subset_PSPACE`](https://laxarchive.org/lax-134656/Lax134656.HierarchyInPSPACE.html#s-Lax134656.HierarchyInPSPACE.PTIME_subset_PSPACE). -/
-private theorem PTIME_subset_PSPACE : PTIME ⊆ PSPACE :=
+theorem PTIME_subset_PSPACE : PTIME ⊆ PSPACE :=
   fun _ _ _ h => NP_subset_PSPACE (PTIME_subset_NP h)
 
 /-- **`EXPTIME ⊆ EXPSPACE`**, i.e., **SO(LFP) ⊆ SO(PFP)** – the second-order
 shadow of `PTIME ⊆ PSPACE`.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.EXPTIME_subset_EXPSPACE`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.EXPTIME_subset_EXPSPACE). -/
-private theorem EXPTIME_subset_EXPSPACE : EXPTIME ⊆ EXPSPACE := by
+theorem EXPTIME_subset_EXPSPACE : EXPTIME ⊆ EXPSPACE := by
   rw [EXPTIME_eq_PTIME_exp, EXPSPACE_eq_PSPACE_exp]
   exact ComplexityClass.exp_mono PTIME_subset_PSPACE
 
@@ -147,14 +147,14 @@ private theorem coEXPTIME_subset_EXPSPACE : coEXPTIME ⊆ EXPSPACE :=
 /-- **`EXPTIME ⊆ NEXPTIME`**, the second-order shadow of `PTIME ⊆ NP`.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.EXPTIME_subset_NEXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.EXPTIME_subset_NEXPTIME). -/
-private theorem EXPTIME_subset_NEXPTIME : EXPTIME ⊆ NEXPTIME := by
+theorem EXPTIME_subset_NEXPTIME : EXPTIME ⊆ NEXPTIME := by
   rw [EXPTIME_eq_PTIME_exp, NEXPTIME_eq_NP_exp]
   exact ComplexityClass.exp_mono PTIME_subset_NP
 
 /-- **`NEXPTIME ⊆ EXPSPACE`**, the second-order shadow of `NP ⊆ PSPACE`.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.NEXPTIME_subset_EXPSPACE`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.NEXPTIME_subset_EXPSPACE). -/
-private theorem NEXPTIME_subset_EXPSPACE : NEXPTIME ⊆ EXPSPACE := by
+theorem NEXPTIME_subset_EXPSPACE : NEXPTIME ⊆ EXPSPACE := by
   rw [NEXPTIME_eq_NP_exp, EXPSPACE_eq_PSPACE_exp]
   exact ComplexityClass.exp_mono NP_subset_PSPACE
 
@@ -163,7 +163,7 @@ private theorem NEXPTIME_subset_EXPSPACE : NEXPTIME ⊆ EXPSPACE := by
 PSPACE and EXPTIME.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.NL_exp_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.NL_exp_subset_EXPTIME). -/
-private theorem NL_exp_subset_EXPTIME : NL.exp ⊆ EXPTIME := by
+theorem NL_exp_subset_EXPTIME : NL.exp ⊆ EXPTIME := by
   rw [EXPTIME_eq_PTIME_exp]
   exact ComplexityClass.exp_mono NL_subset_PTIME
 
@@ -175,26 +175,26 @@ this development with content. -/
 /-- PTIME ⊆ EXPTIME.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.PTIME_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PTIME_subset_EXPTIME). -/
-private theorem PTIME_subset_EXPTIME : PTIME ⊆ EXPTIME :=
+theorem PTIME_subset_EXPTIME : PTIME ⊆ EXPTIME :=
   fun _ _ _ h => PSPACE_subset_EXPTIME (PTIME_subset_PSPACE h)
 
 /-- NP ⊆ NEXPTIME.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.NP_subset_NEXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.NP_subset_NEXPTIME). -/
-private theorem NP_subset_NEXPTIME : NP ⊆ NEXPTIME :=
+theorem NP_subset_NEXPTIME : NP ⊆ NEXPTIME :=
   fun _ _ _ h => EXPTIME_subset_NEXPTIME (PSPACE_subset_EXPTIME (NP_subset_PSPACE h))
 
 /-- PSPACE ⊆ EXPSPACE.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.PSPACE_subset_EXPSPACE`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PSPACE_subset_EXPSPACE). -/
-private theorem PSPACE_subset_EXPSPACE : PSPACE ⊆ EXPSPACE :=
+theorem PSPACE_subset_EXPSPACE : PSPACE ⊆ EXPSPACE :=
   fun _ _ _ h => EXPTIME_subset_EXPSPACE (PSPACE_subset_EXPTIME h)
 
 /-- The whole polynomial hierarchy sits inside EXPTIME, through
 `DescriptiveComplexity.PH_subset_PSPACE`.
 Registered in the Lax archive as
 [`Lax480241.ExponentialInclusions.PH_subset_EXPTIME`](https://laxarchive.org/lax-480241/Lax480241.ExponentialInclusions.html#s-Lax480241.ExponentialInclusions.PH_subset_EXPTIME). -/
-private theorem PH_subset_EXPTIME : PH ⊆ EXPTIME :=
+theorem PH_subset_EXPTIME : PH ⊆ EXPTIME :=
   fun _ _ _ h => PSPACE_subset_EXPTIME (PH_subset_PSPACE h)
 
 end DescriptiveComplexity

@@ -111,7 +111,7 @@ private theorem symmetrize_hK :
   exact symmetrize_marked w
 
 /-- Correctness of the symmetrizing interpretation. -/
-private theorem hasSmallVertexCover_iff_feedback_map :
+theorem hasSmallVertexCover_iff_feedback_map :
     HasSmallVertexCover A ↔ HasSmallFeedbackSet (symmetrizeInterp.Map A) := by
   refine and_congr ((symmetrizeInterp.mapEquivSelf A).finite_iff).symm ?_
   rw [coverOn_iff_feedbackOn]
@@ -123,7 +123,7 @@ end SymmetrizeCorrectness
 /-- **Vertex Cover FO-reduces to Feedback Vertex Set**, by symmetrizing the
 adjacency relation: every edge becomes a 2-cycle, so the feedback vertex sets
 are exactly the vertex covers. -/
-private def vertexCover_fo_reduction_feedbackVertexSet : VertexCover ≤ᶠᵒ FeedbackVertexSet where
+def vertexCover_fo_reduction_feedbackVertexSet : VertexCover ≤ᶠᵒ FeedbackVertexSet where
   Tag := Unit
   dim := 1
   toInterpretation := symmetrizeInterp
@@ -371,7 +371,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 /-- Correctness of the vertex splitting: a graph has a feedback vertex set at
 most as large as its marked set iff the split digraph has a feedback arc set
 at most as large as its marked relation. -/
-private theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
+theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
     [Language.markedGraph.Structure A] :
     HasSmallFeedbackSet A ↔ HasSmallFeedbackArcSet (splitInterp.Map A) := by
   have hmarked : ∀ [Finite A],
@@ -454,7 +454,7 @@ end SplitCorrectness
 
 /-- **Feedback Vertex Set FO-reduces to Feedback Arc Set**, by vertex
 splitting: deleting a vertex becomes cutting its internal arc. -/
-private def feedbackVertexSet_fo_reduction_feedbackArcSet :
+def feedbackVertexSet_fo_reduction_feedbackArcSet :
     FeedbackVertexSet ≤ᶠᵒ FeedbackArcSet where
   Tag := Bool
   dim := 1

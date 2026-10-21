@@ -199,7 +199,7 @@ variable (A : Type) [Language.sat.Structure A]
 
 /-- Correctness of the reduction: a CNF structure is not-all-equal satisfiable
 iff its literal set system can be split. -/
-private theorem naeSatisfiable_iff_hasSetSplitting :
+theorem naeSatisfiable_iff_hasSetSplitting :
     NAESatisfiable A ↔ HasSetSplitting (splInterp.Map A) := by
   constructor
   · -- the true literals of a not-all-equal assignment are a splitting color
@@ -267,7 +267,7 @@ open SetSplitRed in
 /-- **NAE-SAT FO-reduces to Set Splitting**: the ground elements are the
 literals, the family holds one pair set per variable and one set per clause.
 No order, no gadget and no counting. -/
-private noncomputable def naeSat_fo_reduction_setSplitting : NAESAT ≤ᶠᵒ SetSplitting where
+noncomputable def naeSat_fo_reduction_setSplitting : NAESAT ≤ᶠᵒ SetSplitting where
   Tag := SplTag
   dim := 1
   toInterpretation := splInterp

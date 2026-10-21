@@ -124,7 +124,7 @@ private theorem sharpClique_apply (A : Type) [Language.markedGraph.Structure A] 
 marked set contains one of exactly that size.
 Registered in the Lax archive as
 [`Lax280166.CliqueComplete.sharpClique_support_iff`](https://laxarchive.org/lax-280166/Lax280166.CliqueComplete.html#s-Lax280166.CliqueComplete.sharpClique_support_iff). -/
-private theorem sharpClique_support_iff (A : Type) [Language.markedGraph.Structure A] [Finite A] :
+theorem sharpClique_support_iff (A : Type) [Language.markedGraph.Structure A] [Finite A] :
     SharpClique.support A ↔ Clique A := by
   rw [CountingProblem.support_iff, sharpClique_apply, Nat.card_pos_iff]
   constructor

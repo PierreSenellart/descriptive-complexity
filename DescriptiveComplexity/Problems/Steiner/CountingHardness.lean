@@ -128,7 +128,7 @@ end Shape
 
 /-- **#Vertex Cover reduces parsimoniously to #Steiner Tree**, by the incidence
 structure of the graph with a root. -/
-private noncomputable def sharpVertexCover_ordered_parsimonious_sharpSteinerTree :
+noncomputable def sharpVertexCover_ordered_parsimonious_sharpSteinerTree :
     SharpVertexCover ≤ᵖ[≤] SharpSteinerTree where
   Tag := SteinerTag
   dim := 2

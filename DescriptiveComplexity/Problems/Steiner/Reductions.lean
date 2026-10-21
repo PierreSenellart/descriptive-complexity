@@ -322,7 +322,7 @@ variable (A : Type) [Language.markedGraph.Structure A] [LinearOrder A] [Finite A
 /-- Correctness of the interpretation: a graph has a vertex cover at most as
 large as its marked set iff the associated incidence structure has a Steiner
 tree of the same budget. -/
-private theorem hasSmallVertexCover_iff_steiner_map :
+theorem hasSmallVertexCover_iff_steiner_map :
     HasSmallVertexCover A ↔ HasSmallSteinerTree (steinerInterp.Map A) := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   have : Finite (steinerInterp.Map A) := steinerInterp.map_finite A
@@ -373,7 +373,7 @@ end Correctness
 /-- **Vertex Cover ordered-FO-reduces to Steiner Tree**: the edges become the
 terminals, the vertices the available Steiner points, and the minimum of a
 spare copy the root joining them all. -/
-private noncomputable def vertexCover_ordered_fo_reduction_steinerTree :
+noncomputable def vertexCover_ordered_fo_reduction_steinerTree :
     VertexCover ≤ᶠᵒ[≤] SteinerTree where
   Tag := SteinerTag
   dim := 2
@@ -605,7 +605,7 @@ variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
 /-- Correctness of the edge-weighted interpretation: a graph has a vertex
 cover at most as large as its marked set iff the associated incidence
 structure has an edge-weighted Steiner tree within the enlarged budget. -/
-private theorem hasSmallVertexCover_iff_edgeSteiner_map (A : Type)
+theorem hasSmallVertexCover_iff_edgeSteiner_map (A : Type)
     [Language.markedGraph.Structure A] [LinearOrder A] [Finite A] [Nonempty A] :
     HasSmallVertexCover A ↔ HasSmallEdgeSteinerTree (steinerEdgeInterp.Map A) := by
   classical
@@ -735,7 +735,7 @@ end EdgeCorrectness'
 /-- **Vertex Cover ordered-FO-reduces to the edge-weighted Steiner Tree**:
 Karp's original reading of the problem, with the budget enlarged by one unit
 per edge point – the price of attaching each terminal to the tree. -/
-private noncomputable def vertexCover_ordered_fo_reduction_edgeSteinerTree :
+noncomputable def vertexCover_ordered_fo_reduction_edgeSteinerTree :
     VertexCover ≤ᶠᵒ[≤] EdgeSteinerTree where
   Tag := SteinerTag
   dim := 2

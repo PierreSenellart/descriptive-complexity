@@ -242,7 +242,7 @@ variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q :
 /-- **PTIME is closed under relativized ordered reductions.**
 Registered in the Lax archive as
 [`Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction`](https://laxarchive.org/lax-535992/Lax535992.PTIMEClosure.html#s-Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction). -/
-private theorem mem_PTIME_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
+theorem mem_PTIME_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
   (ifpDefinable_iff_mem_PTIME P).mp
     (((ifpDefinable_iff_mem_PTIME Q).mpr h).of_relOrderedReduction f)
 
@@ -251,7 +251,7 @@ private theorem mem_NP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q 
   SigmaSODefinable.of_relOrderedReduction f h
 
 /-- **coNP is closed under relativized ordered reductions.** -/
-private theorem mem_coNP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ coNP) : P ∈ coNP :=
+theorem mem_coNP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ coNP) : P ∈ coNP :=
   PiSODefinable.of_relOrderedReduction f h
 
 end RelOrdered

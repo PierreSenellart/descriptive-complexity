@@ -1224,7 +1224,7 @@ private theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) {S T : pInte
 /-- **Correctness of the reduction**: a CNF structure is not-all-equal
 satisfiable iff the interpreted binary-weighted instance splits into two
 halves of equal weight. -/
-private theorem naeSatisfiable_iff_hasEqualSplit
+theorem naeSatisfiable_iff_hasEqualSplit
     (A : Type) [Language.sat.Structure A] [LinearOrder A]
     [Finite A] [Nonempty A] : NAESatisfiable A ↔ HasEqualSplit (pInterp.Map A) := by
   classical
@@ -1352,7 +1352,7 @@ positions per variable and per clause. A variable block totals `2`, so a
 balanced split is an assignment; a clause block of width `w` totals
 `w + (w − 2)`, so a balanced split takes between `1` and `w − 1` true
 literals, which is not-all-equal satisfaction. -/
-private noncomputable def naeSat_ordered_fo_reduction_partition : NAESAT ≤ᶠᵒ[≤] Partition where
+noncomputable def naeSat_ordered_fo_reduction_partition : NAESAT ≤ᶠᵒ[≤] Partition where
   Tag := PTag
   dim := 2
   toInterpretation := pInterp

@@ -334,15 +334,15 @@ theorem sigmaP_subset_sigmaP_succ (k : ℕ) : SigmaP (k + 1) ⊆ SigmaP (k + 2) 
   fun _ _ _ hP => SigmaSODefinable.succ hP
 
 /-- `Σₖ₊₁ᵖ ⊆ Πₖ₊₂ᵖ`. -/
-private theorem sigmaP_subset_piP_succ (k : ℕ) : SigmaP (k + 1) ⊆ PiP (k + 2) :=
+theorem sigmaP_subset_piP_succ (k : ℕ) : SigmaP (k + 1) ⊆ PiP (k + 2) :=
   fun _ _ _ hP => SigmaSODefinable.piSucc hP
 
 /-- `Πₖ₊₁ᵖ ⊆ Σₖ₊₂ᵖ`. -/
-private theorem piP_subset_sigmaP_succ (k : ℕ) : PiP (k + 1) ⊆ SigmaP (k + 2) :=
+theorem piP_subset_sigmaP_succ (k : ℕ) : PiP (k + 1) ⊆ SigmaP (k + 2) :=
   fun _ _ _ hP => PiSODefinable.sigmaSucc hP
 
 /-- `Πₖ₊₁ᵖ ⊆ Πₖ₊₂ᵖ`. -/
-private theorem piP_subset_piP_succ (k : ℕ) : PiP (k + 1) ⊆ PiP (k + 2) :=
+theorem piP_subset_piP_succ (k : ℕ) : PiP (k + 1) ⊆ PiP (k + 2) :=
   fun _ _ _ hP => PiSODefinable.succ hP
 
 /-- The polynomial hierarchy: union of all the levels. A problem is PH-hard
@@ -358,19 +358,19 @@ noncomputable def PH : ComplexityClass where
   mem_congr_finite h := exists_congr fun k => (SigmaP k).mem_congr_finite h
   hard_congr_finite h := forall_congr' fun k => (SigmaP k).hard_congr_finite h
 
-private theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
+theorem sigmaP_subset_PH (k : ℕ) : SigmaP k ⊆ PH :=
   fun _ _ _ hP => ⟨k, hP⟩
 
 /-- `Πₖ₊₁ᵖ ⊆ PH`. (At level 0 this is
 `DescriptiveComplexity.piP_zero_subset_PH`, which needs `PTIME ⊆ NP` and so lives
 downstream, with HORN-SAT.) -/
-private theorem piP_subset_PH (k : ℕ) : PiP (k + 1) ⊆ PH :=
+theorem piP_subset_PH (k : ℕ) : PiP (k + 1) ⊆ PH :=
   fun _ _ _ hP => ⟨k + 2, piP_subset_sigmaP_succ k hP⟩
 
 /-- A problem's complement is in coNP iff the problem is in NP.
 Registered in the Lax archive as
 [`Lax564036.HierarchyDuality.compl_mem_coNP_iff`](https://laxarchive.org/lax-564036/Lax564036.HierarchyDuality.html#s-Lax564036.HierarchyDuality.compl_mem_coNP_iff). -/
-private theorem compl_mem_coNP_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
+theorem compl_mem_coNP_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ coNP ↔ P ∈ NP := by
   rw [mem_piP_iff, DecisionProblem.compl_compl]
 

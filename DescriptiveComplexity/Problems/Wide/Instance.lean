@@ -126,12 +126,12 @@ theorem wideAccept_nonvacuous : WideAccept (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.accepts⟩
 
 /-- **`DescriptiveComplexity.WideAcceptSpace` has a yes-instance.** -/
-private theorem wideAcceptSpace_nonvacuous : WideAcceptSpace (Fin 2) :=
+theorem wideAcceptSpace_nonvacuous : WideAcceptSpace (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.acceptsSpace⟩
 
 /-- **`DescriptiveComplexity.DWideAcceptSpace` has a yes-instance**: the instance
 has no transitions, so it is deterministic. -/
-private theorem dwideAcceptSpace_nonvacuous : DWideAcceptSpace (Fin 2) :=
+theorem dwideAcceptSpace_nonvacuous : DWideAcceptSpace (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.deterministic, WideSmoke.acceptsSpace⟩
 
 end DescriptiveComplexity

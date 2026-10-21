@@ -256,7 +256,7 @@ variable (A)
 
 /-- Correctness of the reduction: a set system has a small cover iff its
 incidence graph has a small dominating set. -/
-private theorem hasSmallSetCover_iff_hasSmallDominatingSet :
+theorem hasSmallSetCover_iff_hasSmallDominatingSet :
     HasSmallSetCover A ↔ HasSmallDominatingSet (dsInterp.Map A) := by
   by_cases hno : NoElem A
   · -- no ground element at all: the empty cover works, and everything is marked
@@ -394,7 +394,7 @@ end Correctness
 /-- **Set Cover FO-reduces to Dominating Set**: elements and sets become
 vertices, the sets form a clique, and each set is joined to its elements – and
 to the junk, which domination cannot ignore. -/
-private noncomputable def setCover_fo_reduction_dominatingSet : SetCover ≤ᶠᵒ DominatingSet where
+noncomputable def setCover_fo_reduction_dominatingSet : SetCover ≤ᶠᵒ DominatingSet where
   Tag := DSTag
   dim := 1
   toInterpretation := dsInterp

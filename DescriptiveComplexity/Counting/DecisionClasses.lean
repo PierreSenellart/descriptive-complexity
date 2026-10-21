@@ -196,7 +196,7 @@ private theorem countClass_subset {S R S' R' : ℕ → ℕ → Prop} (hS : ∀ c
 /-- `UP ⊆ ⊕P`: at most one witness, and one is an odd number of them.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.UP_subset_parityP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.UP_subset_parityP). -/
-private theorem UP_subset_parityP : UP ⊆ ParityP :=
+theorem UP_subset_parityP : UP ⊆ ParityP :=
   countClass_subset (fun _ _ _ => trivial) fun c _ hc => by
     rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hc with rfl | rfl <;> simp
 
@@ -204,7 +204,7 @@ private theorem UP_subset_parityP : UP ⊆ ParityP :=
 witness, and the order the kernel reads is re-quantified.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.UP_subset_NP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.UP_subset_NP). -/
-private theorem UP_subset_NP : UP ⊆ NP := by
+theorem UP_subset_NP : UP ⊆ NP := by
   rintro L _ P ⟨B, φ, B', φ', hφ⟩
   refine sigmaSODefinable_of_orderPull (k := 0) [B] rfl φ ?_
   intro A _ _ _
@@ -224,7 +224,7 @@ private theorem UP_subset_NP : UP ⊆ NP := by
 `⊥` has, namely none.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.NP_subset_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.NP_subset_PP). -/
-private theorem NP_subset_PP : NP ⊆ PP := by
+theorem NP_subset_PP : NP ⊆ PP := by
   intro L _ P hP
   obtain ⟨C, hC, hCP⟩ := (mem_NP_iff_exists_sharpP_support P).mp hP
   refine mem_countClass_of_sharpP hC (ofKernel_mem_sharpP SOBlock.trivial ⊥) fun A _ _ _ => ?_
@@ -296,7 +296,7 @@ theorem compl_mem_PP {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem
 /-- `coNP ⊆ PP`.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.coNP_subset_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.coNP_subset_PP). -/
-private theorem coNP_subset_PP : coNP ⊆ PP := by
+theorem coNP_subset_PP : coNP ⊆ PP := by
   intro L _ P hP
   rw [← DecisionProblem.compl_compl P]
   exact compl_mem_PP (NP_subset_PP ((mem_piP_iff 1 P).mp hP))

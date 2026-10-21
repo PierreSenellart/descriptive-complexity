@@ -481,7 +481,7 @@ variable (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
 /-- Correctness of the reduction: a CNF structure is a yes-instance of
 NAE-3SAT iff its gadget graph has a cut at least as large as its marked
 relation. -/
-private theorem naeThreeSatisfiable_iff_hasLargeCut :
+theorem naeThreeSatisfiable_iff_hasLargeCut :
     NAEThreeSatisfiable A ↔ HasLargeCut (mcInterp.Map A) := by
   have : Finite (mcInterp.Map A) := mcInterp.map_finite A
   by_cases hw : ThreeSatToSat.Wide A
@@ -599,7 +599,7 @@ end Correctness
 
 /-- **NAE-3SAT ordered-FO-reduces to Max Cut**: the gadget graph, whose cut
 reaches the threshold exactly when the clauses are not-all-equal satisfiable. -/
-private noncomputable def nae3Sat_ordered_fo_reduction_maxCut : NAE3SAT ≤ᶠᵒ[≤] MaxCut where
+noncomputable def nae3Sat_ordered_fo_reduction_maxCut : NAE3SAT ≤ᶠᵒ[≤] MaxCut where
   Tag := MCTag
   dim := 2
   toInterpretation := mcInterp

@@ -1031,7 +1031,7 @@ section Correct
 
 /-- **Correctness**: a CNF structure is satisfiable exactly when the
 interpreted triple system has a matching. -/
-private theorem satisfiable_iff_hasThreeDimMatching (A : Type) [Language.sat.Structure A]
+theorem satisfiable_iff_hasThreeDimMatching (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     Satisfiable A ↔ HasThreeDimMatching (tdmInterp.Map A) := by
   classical
@@ -1088,7 +1088,7 @@ non-first occurrence. The truth-setting gadget of a variable runs cyclically
 through its occurrences, so it admits exactly two matchings – the variable's
 two truth values – and the pair of a clause can only be covered through the
 tip of a true literal. -/
-private noncomputable def sat_ordered_fo_reduction_threeDimMatching
+noncomputable def sat_ordered_fo_reduction_threeDimMatching
     : SAT ≤ᶠᵒ[≤] ThreeDimMatching where
   Tag := TTag
   dim := 2

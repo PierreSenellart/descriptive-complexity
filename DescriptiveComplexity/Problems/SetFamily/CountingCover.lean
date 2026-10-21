@@ -155,7 +155,7 @@ theorem sharpSetCover_support_iff [Finite A] :
 size.
 Registered in the Lax archive as
 [`Lax280166.HittingSetComplete.sharpHittingSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.sharpHittingSet_support_iff). -/
-private theorem sharpHittingSet_support_iff [Finite A] :
+theorem sharpHittingSet_support_iff [Finite A] :
     SharpHittingSet.support A ↔ ∃ H : A → Prop, HittingSetOfSize A H := by
   rw [CountingProblem.support_iff, sharpHittingSet_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨H⟩, _⟩ => ⟨H.1, H.2⟩, fun ⟨H, hH⟩ => ⟨⟨⟨H, hH⟩⟩, inferInstance⟩⟩
@@ -172,7 +172,7 @@ theorem setCover_of_sharpSetCover_support [Finite A] (h : SharpSetCover.support 
 /-- The support of #Hitting Set implies Hitting Set.
 Registered in the Lax archive as
 [`Lax280166.HittingSetComplete.hittingSet_of_sharpHittingSet_support`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.hittingSet_of_sharpHittingSet_support). -/
-private theorem hittingSet_of_sharpHittingSet_support [Finite A] (h : SharpHittingSet.support A) :
+theorem hittingSet_of_sharpHittingSet_support [Finite A] (h : SharpHittingSet.support A) :
     HittingSet A := by
   obtain ⟨H, hfin, helem, hhit, hcard⟩ := (sharpHittingSet_support_iff A).mp h
   exact ⟨hfin, H, helem, hhit, hcard.le⟩
@@ -205,7 +205,7 @@ private theorem transpose_marked_iff :
   exact transpose_marked w
 
 /-- The hitting sets of the transposed system are the covers. -/
-private theorem sharpHittingSet_transpose_map :
+theorem sharpHittingSet_transpose_map :
     SharpHittingSet (transposeInterp.Map A) = SharpSetCover A :=
   Nat.card_congr (coverFamOfSizeEquiv (transposeInterp.mapEquivSelf A)
     (transpose_fam_iff A) (transpose_elem_iff A) (fun b b' => transpose_mem_iff A b' b)
@@ -343,7 +343,7 @@ end Hardness
 
 /-- **#Vertex Cover reduces parsimoniously to #Set Cover**, by the
 edge-incidence interpretation. -/
-private noncomputable def sharpVertexCover_parsimonious_sharpSetCover :
+noncomputable def sharpVertexCover_parsimonious_sharpSetCover :
     SharpVertexCover ≤ᵖ SharpSetCover where
   Tag := Unit
   dim := 2
@@ -351,7 +351,7 @@ private noncomputable def sharpVertexCover_parsimonious_sharpSetCover :
   correct A _ _ _ := Nat.card_congr (coverEquiv A)
 
 /-- **#Set Cover reduces parsimoniously to #Hitting Set**, by transposition. -/
-private noncomputable def sharpSetCover_parsimonious_sharpHittingSet :
+noncomputable def sharpSetCover_parsimonious_sharpHittingSet :
     SharpSetCover ≤ᵖ SharpHittingSet where
   Tag := Unit
   dim := 1

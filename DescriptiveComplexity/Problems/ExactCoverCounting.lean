@@ -64,7 +64,7 @@ def modelEquiv (A : Type) [Language.sat.Structure A] :
       exact ⟨s, x, rfl, (exactCoverBy_lit hG hocc s).mp h, hocc⟩
 
 /-- **Correctness of the interpretation, for counting.** -/
-private theorem sharpExactCover_map (A : Type) [Language.sat.Structure A] :
+theorem sharpExactCover_map (A : Type) [Language.sat.Structure A] :
     SharpExactCover (ecInterp.Map A) = SharpOneInSAT A := by
   rw [sharpExactCover_apply, sharpOneInSat_apply]
   exact (Nat.card_congr (modelEquiv A)).symm
@@ -73,7 +73,7 @@ end ExactCoverRed
 
 open ExactCoverRed in
 /-- **#1-in-SAT reduces parsimoniously to #ExactCover**, without an order. -/
-private noncomputable def sharpOneInSat_parsimonious_sharpExactCover :
+noncomputable def sharpOneInSat_parsimonious_sharpExactCover :
     SharpOneInSAT ≤ᵖ SharpExactCover where
   Tag := ECTag
   dim := 1

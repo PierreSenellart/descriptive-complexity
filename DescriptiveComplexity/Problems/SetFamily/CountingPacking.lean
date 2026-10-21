@@ -98,7 +98,7 @@ private theorem sharpSetPacking_apply (A : Type) [Language.setSystem.Structure A
 as the marked set contains one of exactly that size.
 Registered in the Lax archive as
 [`Lax280166.SetPackingComplete.sharpSetPacking_support_iff`](https://laxarchive.org/lax-280166/Lax280166.SetPackingComplete.html#s-Lax280166.SetPackingComplete.sharpSetPacking_support_iff). -/
-private theorem sharpSetPacking_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
+theorem sharpSetPacking_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
     SharpSetPacking.support A ↔ SetPacking A := by
   rw [CountingProblem.support_iff, sharpSetPacking_apply, Nat.card_pos_iff]
   constructor
@@ -224,7 +224,7 @@ end Hardness
 
 /-- **#Independent Set reduces parsimoniously to #Set Packing**, by the
 edge-incidence interpretation. -/
-private noncomputable def sharpIndependentSet_parsimonious_sharpSetPacking :
+noncomputable def sharpIndependentSet_parsimonious_sharpSetPacking :
     SharpIndependentSet ≤ᵖ SharpSetPacking where
   Tag := Unit
   dim := 2

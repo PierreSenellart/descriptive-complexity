@@ -188,7 +188,7 @@ private theorem ncard_marked :
 /-- Correctness of the edge-incidence interpretation: a graph has a vertex
 cover at most as large as its marked set iff the associated set system has a
 cover at most as large as its marked set. -/
-private theorem hasSmallVertexCover_iff_setCover_map :
+theorem hasSmallVertexCover_iff_setCover_map :
     HasSmallVertexCover A ↔ HasSmallSetCover (edgeIncidenceInterp.Map A) := by
   constructor
   · rintro ⟨hfin, C, hcov, hcard⟩
@@ -228,7 +228,7 @@ end EdgeIncidenceCorrectness
 
 /-- **Vertex Cover FO-reduces to Set Cover**: the edges are the ground
 elements, the vertices the sets that cover them. -/
-private def vertexCover_fo_reduction_setCover : VertexCover ≤ᶠᵒ SetCover where
+def vertexCover_fo_reduction_setCover : VertexCover ≤ᶠᵒ SetCover where
   Tag := Unit
   dim := 2
   toInterpretation := edgeIncidenceInterp
@@ -274,7 +274,7 @@ theorem exists_elem_mem_both_iff {u v : A} (huv : u ≠ v) :
 Independent Set: a graph has an independent set at least as large as its
 marked set iff the associated set system has a packing at least as large as
 its marked set. -/
-private theorem hasLargeIndependentSet_iff_setPacking_map (A : Type)
+theorem hasLargeIndependentSet_iff_setPacking_map (A : Type)
     [Language.markedGraph.Structure A] :
     HasLargeIndependentSet A ↔ HasLargeSetPacking (edgeIncidenceInterp.Map A) := by
   constructor
@@ -307,7 +307,7 @@ end Correctness
 
 /-- **Independent Set FO-reduces to Set Packing**: the vertices become the
 sets of edges they are incident to, and independence becomes disjointness. -/
-private def indSet_fo_reduction_setPacking : IndependentSet ≤ᶠᵒ SetPacking where
+def indSet_fo_reduction_setPacking : IndependentSet ≤ᶠᵒ SetPacking where
   Tag := Unit
   dim := 2
   toInterpretation := edgeIncidenceInterp

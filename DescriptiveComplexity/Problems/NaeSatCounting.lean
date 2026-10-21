@@ -337,7 +337,7 @@ end NaeCount
 open NaeCount in
 /-- **#SAT reduces to #NAE-SAT with one call**: add one fresh variable to every
 clause, and halve the count, rounding up. -/
-private noncomputable def sharpSat_oneCall_sharpNaeSat : SharpSAT ≤ᶜ[≤] SharpNAESAT where
+noncomputable def sharpSat_oneCall_sharpNaeSat : SharpSAT ≤ᶜ[≤] SharpNAESAT where
   Tag := Bool
   dim := 1
   toRelInterpretation := naeInterp.toRel
@@ -508,7 +508,7 @@ polynomial term. -/
 noncomputable def nonVarCount : PolyTerm Language.sat :=
   .count (∼satOccursFormula)
 
-private theorem eval_nonVarCount (A : Type) [Language.sat.Structure A] [LinearOrder A] :
+theorem eval_nonVarCount (A : Type) [Language.sat.Structure A] [LinearOrder A] :
     nonVarCount.eval A = Nat.card {x : A // ¬SatOccurs A x} := by
   rw [nonVarCount, PolyTerm.eval_count_one]
   exact Nat.card_congr (Equiv.subtypeEquivRight fun a => by
@@ -518,7 +518,7 @@ open NaeCount SetSplitRed in
 /-- **#NAE-SAT reduces to #Set Splitting with one call**: the literal set
 system, its count divided by `2` to the number of elements that are no
 variable of the formula. -/
-private noncomputable def sharpNaeSat_oneCall_sharpSetSplitting
+noncomputable def sharpNaeSat_oneCall_sharpSetSplitting
     : SharpNAESAT ≤ᶜ[≤] SharpSetSplitting :=
   (SharpSetSplitting.pullbackReduction splInterp).toOneCall.ofPost
     (.div .oracle (.pow2 nonVarCount)) fun A _ _ _ _ => by

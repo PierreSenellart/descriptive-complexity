@@ -351,7 +351,7 @@ private noncomputable def sharpSat_strongSubtractive_sharpDnf :
 /-- #SAT reduces to #DNF by a subtractive reduction.
 Registered in the Lax archive as
 [`Lax859101.DnfComplete.sharpSat_subtractive_sharpDnf`](https://laxarchive.org/lax-859101/Lax859101.DnfComplete.html#s-Lax859101.DnfComplete.sharpSat_subtractive_sharpDnf). -/
-private theorem sharpSat_subtractive_sharpDnf : SharpSAT ≤ˢ SharpDNF :=
+theorem sharpSat_subtractive_sharpDnf : SharpSAT ≤ˢ SharpDNF :=
   sharpSat_strongSubtractive_sharpDnf.subtractiveReducible
 
 /-- **#DNF is `#P`-hard**: every problem of `#P` reduces to #SAT

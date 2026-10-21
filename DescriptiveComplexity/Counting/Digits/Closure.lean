@@ -220,11 +220,11 @@ theorem Dig.of_base {a : ℕ} (F : Fam K a)
     (h A w p)
 
 /-- The family constantly zero. -/
-private theorem Dig.zero (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 0 : Fam K a) :=
+theorem Dig.zero (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 0 : Fam K a) :=
   Dig.of_base _ ⊥ fun _ _ _ _ _ _ _ => iff_of_false id (bitsOf_zero _)
 
 /-- The family constantly one. -/
-private theorem Dig.one (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 1 : Fam K a) :=
+theorem Dig.one (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 1 : Fam K a) :=
   Dig.of_base _ (minTupF Sum.inr) fun _ _ _ _ _ w p =>
     ((realize_minTupF (L := K) (v := Sum.elim w p) Sum.inr).trans
       (tup_isBot_iff (t := p)).symm).trans (tupBits_one p).symm

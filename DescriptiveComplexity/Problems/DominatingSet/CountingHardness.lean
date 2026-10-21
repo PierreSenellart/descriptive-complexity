@@ -506,7 +506,7 @@ end SatToDom
 
 open SatToDom in
 /-- **#SAT reduces parsimoniously to #Dominating Set**, without an order. -/
-private noncomputable def sharpSat_parsimonious_sharpDominatingSet :
+noncomputable def sharpSat_parsimonious_sharpDominatingSet :
     SharpSAT ≤ᵖ SharpDominatingSet where
   Tag := SDTag
   dim := 1

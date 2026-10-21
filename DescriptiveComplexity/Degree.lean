@@ -98,26 +98,26 @@ theorem mem_below_iff (P : DecisionProblem L) :
 /-- Hardness for a degree, spelled out: everything reducing to `Q₀` reduces to
 `P`. (An instance of `DescriptiveComplexity.cofinalHard_iff`, whose relativized
 conclusion `≤ʳᶠᵒ[≤]` is what cofinal hardness yields in general.) -/
-private theorem hard_below_iff (P : DecisionProblem L) :
+theorem hard_below_iff (P : DecisionProblem L) :
     (below Q₀).Hard P ↔
       ∀ {L' : Language.{0, 0}} [L'.IsRelational] (Q : DecisionProblem L'),
         Nonempty (Q ≤ᶠᵒ[≤] Q₀) → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
 /-- A problem belongs to its own degree. -/
-private theorem mem_below_self (Q₀ : DecisionProblem L₀) : Q₀ ∈ below Q₀ :=
+theorem mem_below_self (Q₀ : DecisionProblem L₀) : Q₀ ∈ below Q₀ :=
   ⟨(FOReduction.refl Q₀).toOrdered⟩
 
 /-- A problem is hard for its own degree: everything reducing to it reduces to
 it. -/
-private theorem hard_below_self (Q₀ : DecisionProblem L₀) : (below Q₀).Hard Q₀ :=
+theorem hard_below_self (Q₀ : DecisionProblem L₀) : (below Q₀).Hard Q₀ :=
   (hard_below_iff Q₀).mpr fun _ h => ⟨h.some.toRel⟩
 
 /-- **A problem is complete for its own degree** – the statement that makes
 `below` the right construction.
 Registered in the Lax archive as
 [`Lax604544.DegreeOfAProblem.below_complete_self`](https://laxarchive.org/lax-604544/Lax604544.DegreeOfAProblem.html#s-Lax604544.DegreeOfAProblem.below_complete_self). -/
-private theorem below_complete_self (Q₀ : DecisionProblem L₀) : (below Q₀).Complete Q₀ :=
+theorem below_complete_self (Q₀ : DecisionProblem L₀) : (below Q₀).Complete Q₀ :=
   ⟨mem_below_self Q₀, hard_below_self Q₀⟩
 
 /-- **`Q₀`-completeness is mutual reducibility**: `P` is complete for the degree

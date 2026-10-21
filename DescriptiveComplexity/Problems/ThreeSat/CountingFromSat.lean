@@ -671,7 +671,7 @@ end Width
 
 /-- **Correctness of the interpretation, for counting**: the split has as many
 models as the input. -/
-private theorem sharpThreeSat_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
+theorem sharpThreeSat_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
     SharpThreeSAT (interp.Map A) = SharpSAT A := by
   rw [sharpThreeSat_eq_sharpSat widthAtMostThree_map, sharpSat_apply, sharpSat_apply]
   exact (Nat.card_congr (modelEquiv A)).symm
@@ -682,7 +682,7 @@ open SharpSatToThreeSat in
 /-- **#SAT reduces parsimoniously to #3SAT**: the clause-splitting
 interpretation with determined prefix variables preserves the number of
 models. -/
-private noncomputable def sharpSat_ordered_parsimonious_sharpThreeSat :
+noncomputable def sharpSat_ordered_parsimonious_sharpThreeSat :
     SharpSAT ≤ᵖ[≤] SharpThreeSAT where
   Tag := PTag
   dim := 2

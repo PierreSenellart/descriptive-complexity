@@ -153,7 +153,7 @@ theorem KromLit.holds_equiv (e : M ≃[L] N) (l : KromLit B k) (ρ : B.Assignmen
   | false => exact not_congr (l.atom.holds_equiv e ρ v)
   | true => exact l.atom.holds_equiv e ρ v
 
-private theorem KromLit.slotHolds_equiv (e : M ≃[L] N) (o : Option (KromLit B k))
+theorem KromLit.slotHolds_equiv (e : M ≃[L] N) (o : Option (KromLit B k))
     (ρ : B.Assignment M) (v : Fin k → M) :
     KromLit.slotHolds o (B.mapAssign e.toEquiv ρ) (fun j => e (v j)) ↔
       KromLit.slotHolds o ρ v := by

@@ -107,7 +107,7 @@ open ThreeSatToSat
 NAE-3SAT iff the interpreted structure – a faithful copy of it if no clause is
 wide, a structure made of empty clauses otherwise – is not-all-equal
 satisfiable. -/
-private theorem naeThreeSatisfiable_iff_naeSatisfiable (A : Type) [Language.sat.Structure A] :
+theorem naeThreeSatisfiable_iff_naeSatisfiable (A : Type) [Language.sat.Structure A] :
     NAEThreeSatisfiable A ↔ NAESatisfiable (threeSatToSat.Map A) := by
   by_cases hw : Wide A
   · -- wide input: both sides fail
@@ -163,7 +163,7 @@ open NaeThreeSatToNaeSat ThreeSatToSat in
 `ThreeSatToSat.threeSatToSat`, gated on the first-order width check, maps a
 CNF structure to a not-all-equal satisfiable instance iff it is a yes-instance
 of NAE-3SAT. -/
-private noncomputable def nae3Sat_fo_reduction_naeSat : NAE3SAT ≤ᶠᵒ NAESAT where
+noncomputable def nae3Sat_fo_reduction_naeSat : NAE3SAT ≤ᶠᵒ NAESAT where
   Tag := Unit
   dim := 1
   toInterpretation := threeSatToSat
@@ -367,7 +367,7 @@ private theorem naeSatisfiable_iff_map :
 
 /-- Correctness of the reduction: an ordered CNF structure is not-all-equal
 satisfiable iff its width-three split is a yes-instance of NAE-3SAT. -/
-private theorem naeSatisfiable_iff_naeThreeSatisfiable (A : Type) [Language.sat.Structure A]
+theorem naeSatisfiable_iff_naeThreeSatisfiable (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] :
     NAESatisfiable A ↔ NAEThreeSatisfiable (satToThreeSat.Map A) := by
   rw [NAEThreeSatisfiable, and_iff_right widthAtMostThree_map]
@@ -380,7 +380,7 @@ open NaeSatToNaeThreeSat SatToThreeSat in
 interpretation `SatToThreeSat.satToThreeSat`, applied unchanged: read as
 not-all-equal clauses, the chain of pieces of a clause carries the value of
 its first literal forward until an occurrence disagrees. -/
-private noncomputable def naeSat_ordered_fo_reduction_nae3Sat : NAESAT ≤ᶠᵒ[≤] NAE3SAT where
+noncomputable def naeSat_ordered_fo_reduction_nae3Sat : NAESAT ≤ᶠᵒ[≤] NAE3SAT where
   Tag := SplitTag
   dim := 2
   toInterpretation := satToThreeSat

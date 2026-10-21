@@ -87,7 +87,7 @@ private theorem realize_occS {s : Bool} {c x : α} {v : α → A} :
     (occS s c x).Realize v ↔ OccIn (v c) (v x) s := by
   cases s <;> simp [occS, OccIn, IsCl, PosIn, NegIn, Formula.realize_rel₁, Formula.realize_rel₂]
 
-private theorem realize_widthTwoS : A ⊨ widthTwoS ↔ WidthAtMostTwo A := by
+theorem realize_widthTwoS : A ⊨ widthTwoS ↔ WidthAtMostTwo A := by
   simp only [widthTwoS, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iInf,
     Formula.realize_imp, Formula.realize_iSup, realize_occS, Formula.realize_equal,
     Term.realize_var, Sum.elim_inr]
@@ -99,7 +99,7 @@ private theorem realize_widthTwoS : A ⊨ widthTwoS ↔ WidthAtMostTwo A := by
     obtain ⟨i, j, hij, hx, hs⟩ := h (w 0) (fun i => w i.succ) s hocc
     exact ⟨⟨⟨i, j⟩, hij, hs⟩, hx⟩
 
-private theorem realize_hornS : A ⊨ hornS ↔ AtMostOnePositive A := by
+theorem realize_hornS : A ⊨ hornS ↔ AtMostOnePositive A := by
   simp only [hornS, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
     Sum.elim_inr, AtMostOnePositive]
@@ -113,7 +113,7 @@ private theorem realize_hornS : A ⊨ hornS ↔ AtMostOnePositive A := by
 def NoNegative (A : Type) [Language.sat.Structure A] : Prop :=
   ∀ c x : A, RelMap satIsClause ![c] → ¬RelMap satNegIn ![c, x]
 
-private theorem realize_monotoneS : A ⊨ monotoneS ↔ NoNegative A := by
+theorem realize_monotoneS : A ⊨ monotoneS ↔ NoNegative A := by
   simp only [monotoneS, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_not, Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var,
     Sum.elim_inr, NoNegative]
@@ -519,7 +519,7 @@ private theorem edge_occIn {c p : (edgeInterp s).MapRel A} {t : Bool} (h : OccIn
   · obtain ⟨hs, -, hf, h0⟩ := (edge_posIn c p).mp h
     exact ⟨hs.symm, eq_varPt p hf, h0⟩
 
-private theorem edge_widthAtMostTwo : WidthAtMostTwo ((edgeInterp s).MapRel A) := by
+theorem edge_widthAtMostTwo : WidthAtMostTwo ((edgeInterp s).MapRel A) := by
   intro c x t hocc
   have h := fun i => edge_occIn (hocc i)
   have hx : ∀ i, x i = varPt s ((x i).1.2 0) := fun i => (h i).2.1
@@ -533,10 +533,10 @@ private theorem edge_widthAtMostTwo : WidthAtMostTwo ((edgeInterp s).MapRel A) :
     | exact ⟨0, 2, by decide, hv 0 2 (h0.trans h2.symm), hst 0 2⟩
     | exact ⟨1, 2, by decide, hv 1 2 (h1.trans h2.symm), hst 1 2⟩
 
-private theorem edge_atMostOnePositive : AtMostOnePositive ((edgeInterp false).MapRel A) :=
+theorem edge_atMostOnePositive : AtMostOnePositive ((edgeInterp false).MapRel A) :=
   fun _ _ _ _ h => absurd ((edge_posIn _ _).mp h).1 Bool.false_ne_true
 
-private theorem edge_noNegative : NoNegative ((edgeInterp true).MapRel A) :=
+theorem edge_noNegative : NoNegative ((edgeInterp true).MapRel A) :=
   fun _ _ _ h => Bool.noConfusion ((edge_negIn _ _).mp h).1
 
 end Edge

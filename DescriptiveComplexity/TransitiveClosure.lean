@@ -205,7 +205,7 @@ def TCDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
       P A ↔ spec.Accepts A
 
 /-- FO(TC) definability only depends on the finite instances of a problem. -/
-private theorem tcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
+theorem tcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     TCDefinable P ↔ TCDefinable Q := by
   constructor <;> rintro ⟨spec, hspec⟩ <;> refine ⟨spec, ?_⟩ <;> intro A _ _ _ _

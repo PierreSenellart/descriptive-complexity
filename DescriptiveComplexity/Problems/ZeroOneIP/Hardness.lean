@@ -320,7 +320,7 @@ variable (A) in
 /-- **Correctness of the reduction**: a binary-weighted instance has a set of
 items summing to the target iff the one-equation program interpreted in it has
 a `0-1` solution. -/
-private theorem hasSubsetSum_iff_hasZeroOneSolution [Nonempty A] :
+theorem hasSubsetSum_iff_hasZeroOneSolution [Nonempty A] :
     HasSubsetSum A ↔ HasZeroOneSolution (ipInterp.Map A) := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   have : Finite (ipInterp.Map A) := ipInterp.map_finite A
@@ -341,7 +341,7 @@ open IPRed in
 on the input: the items become the columns, the target the right-hand side,
 and the whole instance a single equation, carried by the minimum of the
 order. -/
-private noncomputable def knapsack_ordered_fo_reduction_zeroOneIP : Knapsack ≤ᶠᵒ[≤] ZeroOneIP where
+noncomputable def knapsack_ordered_fo_reduction_zeroOneIP : Knapsack ≤ᶠᵒ[≤] ZeroOneIP where
   Tag := Unit
   dim := 1
   toInterpretation := ipInterp

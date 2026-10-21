@@ -165,7 +165,7 @@ section Apply
 
 variable (A : Type) [Language.markedGraph.Structure A]
 
-private theorem sharpIndependentSet_apply :
+theorem sharpIndependentSet_apply :
     SharpIndependentSet A = Nat.card {S : A → Prop // IndepOfSize A S} :=
   rfl
 
@@ -176,7 +176,7 @@ private theorem sharpVertexCover_apply :
 /-- **The support of #Independent Set is Independent Set.**
 Registered in the Lax archive as
 [`Lax280166.IndependentSetComplete.sharpIndependentSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.IndependentSetComplete.html#s-Lax280166.IndependentSetComplete.sharpIndependentSet_support_iff). -/
-private theorem sharpIndependentSet_support_iff [Finite A] :
+theorem sharpIndependentSet_support_iff [Finite A] :
     SharpIndependentSet.support A ↔ IndependentSet A := by
   rw [CountingProblem.support_iff, sharpIndependentSet_apply, Nat.card_pos_iff]
   constructor
@@ -239,7 +239,7 @@ private theorem sharpClique_complEdge_map :
     (complEdge_marked_iff A))
 
 /-- The independent sets of the complement graph are the cliques. -/
-private theorem sharpIndependentSet_complEdge_map :
+theorem sharpIndependentSet_complEdge_map :
     SharpIndependentSet (complEdgeInterp.Map A) = SharpClique A :=
   Nat.card_congr (cliqueOfSizeEquiv (complEdgeInterp.mapEquivSelf A)
     (fun b b' hne => (not_congr ((complEdge_adj_iff A b b').trans
@@ -257,7 +257,7 @@ private theorem sharpIndependentSet_complMark_map :
 
 /-- The vertex covers of the threshold size, the marked set being complemented,
 are the complements of the independent sets of the threshold size. -/
-private theorem sharpVertexCover_complMark_map :
+theorem sharpVertexCover_complMark_map :
     SharpVertexCover (complMarkInterp.Map A) = SharpIndependentSet A :=
   (Nat.card_congr (coverComplEquiv _ _)).trans
     (Nat.card_congr (cliqueOfSizeEquiv (complMarkInterp.mapEquivSelf A)
@@ -279,7 +279,7 @@ private noncomputable def sharpIndependentSet_parsimonious_sharpClique :
 
 /-- **#Clique reduces parsimoniously to #Independent Set**, by complementing
 the edges. -/
-private noncomputable def sharpClique_parsimonious_sharpIndependentSet :
+noncomputable def sharpClique_parsimonious_sharpIndependentSet :
     SharpClique ≤ᵖ SharpIndependentSet where
   Tag := Unit
   dim := 1
@@ -297,7 +297,7 @@ private noncomputable def sharpVertexCover_parsimonious_sharpIndependentSet :
 
 /-- **#Independent Set reduces parsimoniously to #Vertex Cover**, by
 complementing the marked set. -/
-private noncomputable def sharpIndependentSet_parsimonious_sharpVertexCover :
+noncomputable def sharpIndependentSet_parsimonious_sharpVertexCover :
     SharpIndependentSet ≤ᵖ SharpVertexCover where
   Tag := Unit
   dim := 1

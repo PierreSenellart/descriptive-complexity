@@ -513,7 +513,7 @@ end Satisfiability
 
 /-- Correctness of the reduction: an ordered CNF structure is satisfiable iff
 its width-three split is a yes-instance of 3SAT. -/
-private theorem satisfiable_iff_threeSatisfiable (A : Type) [Language.sat.Structure A]
+theorem satisfiable_iff_threeSatisfiable (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] :
     Satisfiable A ↔ ThreeSatisfiable (satToThreeSat.Map A) := by
   rw [ThreeSatisfiable, and_iff_right widthAtMostThree_map]
@@ -527,7 +527,7 @@ interpretation `SatToThreeSat.satToThreeSat`, over the ordered expansion of
 the language of CNF instances, maps a finite CNF structure to a yes-instance
 of 3SAT iff it is satisfiable. Together with `threeSat_fo_reduction_sat`, SAT
 and 3SAT are FO-interreducible. -/
-private noncomputable def sat_ordered_fo_reduction_threeSat : SAT ≤ᶠᵒ[≤] ThreeSAT where
+noncomputable def sat_ordered_fo_reduction_threeSat : SAT ≤ᶠᵒ[≤] ThreeSAT where
   Tag := SplitTag
   dim := 2
   toInterpretation := satToThreeSat

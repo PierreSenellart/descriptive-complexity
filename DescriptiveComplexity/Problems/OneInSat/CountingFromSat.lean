@@ -731,7 +731,7 @@ end Models
 
 /-- **Correctness of the interpretation, for counting**: the interpreted
 instance has as many exactly-one models as the input has models. -/
-private theorem sharpOneInSat_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
+theorem sharpOneInSat_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
     SharpOneInSAT (interp.Map A) = SharpSAT A := by
   rw [sharpOneInSat_apply, sharpSat_apply]
   exact (Nat.card_congr (modelEquiv A)).symm
@@ -740,7 +740,7 @@ end SharpSatToOneIn
 
 open SharpSatToOneIn in
 /-- **#SAT reduces parsimoniously to #1-in-SAT.** -/
-private noncomputable def sharpSat_ordered_parsimonious_sharpOneInSat :
+noncomputable def sharpSat_ordered_parsimonious_sharpOneInSat :
     SharpSAT ≤ᵖ[≤] SharpOneInSAT where
   Tag := OTag
   dim := 2

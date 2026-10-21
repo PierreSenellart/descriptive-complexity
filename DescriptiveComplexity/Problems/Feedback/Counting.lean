@@ -332,7 +332,7 @@ private theorem symmetrize_marked_iff :
   exact symmetrize_marked w
 
 /-- The feedback vertex sets of the symmetrized graph are the vertex covers. -/
-private theorem sharpFeedbackVertexSet_symmetrize_map :
+theorem sharpFeedbackVertexSet_symmetrize_map :
     SharpFeedbackVertexSet (symmetrizeInterp.Map A) = SharpVertexCover A :=
   (Nat.card_congr (feedbackOfSizeEquiv (symmetrizeInterp.mapEquivSelf A)
     (AdjA := fun x y : A => x ≠ y ∧ (MGAdj x y ∨ MGAdj y x)) (symmetrize_adj_iff A)
@@ -344,7 +344,7 @@ end Hardness
 
 /-- **#Vertex Cover reduces parsimoniously to #Feedback Vertex Set**, by
 symmetrizing the adjacency relation. -/
-private noncomputable def sharpVertexCover_parsimonious_sharpFeedbackVertexSet :
+noncomputable def sharpVertexCover_parsimonious_sharpFeedbackVertexSet :
     SharpVertexCover ≤ᵖ SharpFeedbackVertexSet where
   Tag := Unit
   dim := 1

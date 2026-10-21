@@ -290,7 +290,7 @@ variable (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonem
 /-- Correctness of the interpretation: a CNF formula is satisfiable iff the
 formula obtained by adding one fresh variable positively to every clause is
 not-all-equal satisfiable. -/
-private theorem satisfiable_iff_naeSatisfiable_map :
+theorem satisfiable_iff_naeSatisfiable_map :
     Satisfiable A ↔ NAESatisfiable (naeInterp.Map A) := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   constructor
@@ -329,7 +329,7 @@ end Correctness
 
 /-- **SAT ordered-FO-reduces to NAE-SAT**: add one fresh variable, the minimum
 of a spare copy of the universe, positively to every clause. -/
-private noncomputable def sat_ordered_fo_reduction_naeSat : SAT ≤ᶠᵒ[≤] NAESAT where
+noncomputable def sat_ordered_fo_reduction_naeSat : SAT ≤ᶠᵒ[≤] NAESAT where
   Tag := Bool
   dim := 1
   toInterpretation := naeInterp
@@ -396,7 +396,7 @@ private theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
 /-- **NAE-SAT is `Σ₁`-definable**: guess the assignment, then check
 first-order that every clause has a true literal – SAT's kernel – and a false
 one. -/
-private theorem naeSat_sigmaSODefinable : SigmaSODefinable 1 NAESAT := by
+theorem naeSat_sigmaSODefinable : SigmaSODefinable 1 NAESAT := by
   refine ⟨[satAssignBlock], rfl, naeKernel, ?_⟩
   intro A _ _ _
   constructor

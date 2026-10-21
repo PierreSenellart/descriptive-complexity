@@ -219,7 +219,7 @@ theorem mem_parityP_iff_le_parity_sharpNtmAccept {L : Language.{0, 0}} [L.IsRela
 /-- **The machine characterization of `Mod_k P`**.
 Registered in the Lax archive as
 [`Lax175070.ParitySatComplete.mem_modP_iff_le_mod_sharpNtmAccept`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.mem_modP_iff_le_mod_sharpNtmAccept). -/
-private theorem mem_modP_iff_le_mod_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational] (k : ℕ)
+theorem mem_modP_iff_le_mod_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ ModP k ↔ Nonempty (P ≤ᶠᵒ[≤] SharpNTMAccept.decide fun c => ¬ k ∣ c) :=
   mem_countClass₁_iff_le_decide_sharpNtmAccept _ P

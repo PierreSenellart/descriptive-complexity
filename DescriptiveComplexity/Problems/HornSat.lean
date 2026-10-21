@@ -136,7 +136,7 @@ theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
     hornSat_compl_mem_NP
 
 /-- `PiP 0 ⊆ PH`, the level-0 case of `DescriptiveComplexity.piP_subset_PH`. -/
-private theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
+theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
   fun _ _ _ hP => ⟨1, coPTIME_subset_NP hP⟩
 
 /-! ### Monotonicity of the hierarchy
@@ -184,7 +184,7 @@ theorem piP_mono {j k : ℕ} (h : j ≤ k) : PiP j ⊆ PiP k := by
 level, so `DescriptiveComplexity.sigmaP_mono` does not apply as it stands.
 Registered in the Lax archive as
 [`Lax564036.PolynomialTimeInHierarchy.PTIME_subset_sigmaP`](https://laxarchive.org/lax-564036/Lax564036.PolynomialTimeInHierarchy.html#s-Lax564036.PolynomialTimeInHierarchy.PTIME_subset_sigmaP). -/
-private theorem PTIME_subset_sigmaP (k : ℕ) : PTIME ⊆ SigmaP k :=
+theorem PTIME_subset_sigmaP (k : ℕ) : PTIME ⊆ SigmaP k :=
   sigmaP_mono (Nat.zero_le k)
 
 /-- **`co-PTIME ⊆ Πₖᵖ`** at every level, the mirror of

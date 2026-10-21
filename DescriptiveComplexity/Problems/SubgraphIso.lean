@@ -339,7 +339,7 @@ end Correctness
 
 /-- **Clique FO-reduces to Subgraph Isomorphism**: the pattern is the
 complete graph on the marked set, the host is the input graph. -/
-private def clique_fo_reduction_subgraphIso : Clique ≤ᶠᵒ SubgraphIso where
+def clique_fo_reduction_subgraphIso : Clique ≤ᶠᵒ SubgraphIso where
   Tag := Bool
   dim := 1
   toInterpretation := cliquePatternInterp
@@ -407,7 +407,7 @@ private theorem realize_subgraphKernel {A : Type} [Language.twoGraphs.Structure 
 /-- **Subgraph Isomorphism is `Σ₁`-definable**: existentially guess the map,
 then check first-order that it sends pattern vertices to host vertices,
 injectively, carrying pattern edges to host edges. -/
-private theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
+theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
   refine ⟨[isoGuessBlock], rfl, subgraphKernel, ?_⟩
   intro A _ _ _
   constructor

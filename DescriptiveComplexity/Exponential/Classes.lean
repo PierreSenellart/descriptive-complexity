@@ -112,13 +112,13 @@ noncomputable abbrev coNEXPTIME : ComplexityClass := NEXPTIME.compl
 
 /-! ### Membership, unfolded -/
 
-private theorem mem_EXPTIME_iff (P : DecisionProblem L) : P ∈ EXPTIME ↔ SOLFPDefinable P :=
+theorem mem_EXPTIME_iff (P : DecisionProblem L) : P ∈ EXPTIME ↔ SOLFPDefinable P :=
   Iff.rfl
 
-private theorem mem_EXPSPACE_iff (P : DecisionProblem L) : P ∈ EXPSPACE ↔ SOPFPDefinable P :=
+theorem mem_EXPSPACE_iff (P : DecisionProblem L) : P ∈ EXPSPACE ↔ SOPFPDefinable P :=
   Iff.rfl
 
-private theorem mem_NEXPTIME_iff (P : DecisionProblem L) : P ∈ NEXPTIME ↔ ExpDefinable NP P :=
+theorem mem_NEXPTIME_iff (P : DecisionProblem L) : P ∈ NEXPTIME ↔ ExpDefinable NP P :=
   Iff.rfl
 
 /-! ### The bridge theorems

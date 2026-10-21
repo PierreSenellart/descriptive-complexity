@@ -473,7 +473,7 @@ end SigmaOne
 check first-order that it covers every ground element and that no element is
 covered twice. Since NP is defined as `Σ₁`-definability, this is the
 membership half of the NP-completeness of Exact Cover. -/
-private theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
+theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
   refine ⟨[familyGuessBlock], rfl, exactCoverKernel, ?_⟩
   intro A _ _ _
   constructor
@@ -492,7 +492,7 @@ private theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := b
 /-- **Set Splitting is `Σ₁`-definable**: existentially guess one color class
 and check first-order that every set of the family meets it and its
 complement. -/
-private theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by
+theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by
   refine ⟨[familyGuessBlock], rfl, setSplittingKernel, ?_⟩
   intro A _ _ _
   constructor

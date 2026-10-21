@@ -295,7 +295,7 @@ variable [Finite A] [Nonempty A]
 pair kernel whose selector is `b`.**
 Registered in the Lax archive as
 [`Lax175070.CountingValues.sharpSelSat_eq`](https://laxarchive.org/lax-175070/Lax175070.CountingValues.html#s-Lax175070.CountingValues.sharpSelSat_eq). -/
-private theorem sharpSelSat_eq (b : Bool) :
+theorem sharpSelSat_eq (b : Bool) :
     SharpSelSAT b ((pairTseitinInterp B B' φ φ').Map A) =
       Nat.card {w : Witness (PB B B') (PK B B' φ φ') A // pairSel w.1 ↔ b = true} := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)

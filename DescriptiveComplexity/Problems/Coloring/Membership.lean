@@ -215,7 +215,7 @@ private theorem palette_sigmaSODefinable (positive : Bool)
 /-- **Chromatic Number is `Σ₁`-definable**: guess a coloring of the vertices
 by the marked elements, and check first-order that every vertex has a marked
 color and that no two adjacent vertices share one. -/
-private theorem chromaticNumber_sigmaSODefinable : SigmaSODefinable 1 ChromaticNumber :=
+theorem chromaticNumber_sigmaSODefinable : SigmaSODefinable 1 ChromaticNumber :=
   palette_sigmaSODefinable true ChromaticNumber fun A _ _ => by
     rw [show ChromaticNumber A ↔ HasSmallChromaticNumber A from Iff.rfl, HasSmallChromaticNumber,
       ← paletteColorableOn_iff]
@@ -223,7 +223,7 @@ private theorem chromaticNumber_sigmaSODefinable : SigmaSODefinable 1 ChromaticN
 
 /-- **Clique Cover is `Σ₁`-definable**: the same definition with the
 adjacency atom negated – covering by cliques is coloring the complement. -/
-private theorem cliqueCover_sigmaSODefinable : SigmaSODefinable 1 CliqueCover :=
+theorem cliqueCover_sigmaSODefinable : SigmaSODefinable 1 CliqueCover :=
   palette_sigmaSODefinable false CliqueCover fun A _ _ => by
     rw [show CliqueCover A ↔ HasSmallCliqueCover A from Iff.rfl, HasSmallCliqueCover,
       ← paletteColorableOn_iff]

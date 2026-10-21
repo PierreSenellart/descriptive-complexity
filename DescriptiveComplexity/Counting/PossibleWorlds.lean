@@ -209,7 +209,7 @@ instance in which the sentence `φ` of the schema holds. -/
 noncomputable def PossibleWorlds (φ : L.Sentence) : CountingProblem (L.sum L) :=
   CountingProblem.ofKernel (worldBlock L) (worldKernel φ)
 
-private theorem possibleWorlds_apply (φ : L.Sentence) (A : Type) [(L.sum L).Structure A] :
+theorem possibleWorlds_apply (φ : L.Sentence) (A : Type) [(L.sum L).Structure A] :
     PossibleWorlds φ A =
       Nat.card {ρ : (worldBlock L).Assignment A //
         IsWorld ρ ∧ @Sentence.Realize L A (worldStructure ρ) φ} :=

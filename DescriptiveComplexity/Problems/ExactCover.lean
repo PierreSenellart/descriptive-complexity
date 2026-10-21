@@ -312,7 +312,7 @@ theorem oneInProper_assignOf {G : ecInterp.Map A → Prop}
 variable (A) in
 /-- Correctness of the reduction: a CNF structure is exactly-one satisfiable
 iff its literal set system has an exact cover. -/
-private theorem oneInSatisfiable_iff_hasExactCover :
+theorem oneInSatisfiable_iff_hasExactCover :
     OneInSatisfiable A ↔ HasExactCover (ecInterp.Map A) :=
   ⟨fun ⟨ν, hν⟩ => ⟨coverOf ν, exactCoverBy_coverOf hν⟩,
     fun ⟨G, hG⟩ => ⟨assignOf G, oneInProper_assignOf hG⟩⟩
@@ -325,7 +325,7 @@ open ExactCoverRed in
 /-- **1-in-SAT FO-reduces to Exact Cover**: the ground elements are the
 variables and the clauses, and the family has one set per literal. No order,
 no gadget and no counting. -/
-private noncomputable def oneInSat_fo_reduction_exactCover : OneInSAT ≤ᶠᵒ ExactCover where
+noncomputable def oneInSat_fo_reduction_exactCover : OneInSAT ≤ᶠᵒ ExactCover where
   Tag := ECTag
   dim := 1
   toInterpretation := ecInterp

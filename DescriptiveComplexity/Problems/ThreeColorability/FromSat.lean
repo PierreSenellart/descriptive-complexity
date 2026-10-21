@@ -133,7 +133,7 @@ variable (A : Type) [Language.sat.Structure A] [LinearOrder A]
 
 /-- Correctness of the reduction: an ordered CNF structure is satisfiable iff
 its interpreted gadget graph is 3-colorable. -/
-private theorem satisfiable_iff_threeColorable [Finite A] :
+theorem satisfiable_iff_threeColorable [Finite A] :
     Satisfiable A ↔ ThreeColorable (satToCol.Map A) := by
   rw [satisfiable_iff_gadColoring A]
   unfold ThreeColorable
@@ -160,7 +160,7 @@ open SatToCol in
 over the ordered expansion of the language of CNF instances, maps a finite
 CNF structure to a 3-colorable graph iff it is satisfiable. Together with
 `threeCol_fo_reduction_sat`, SAT and 3-colorability are FO-interreducible. -/
-private noncomputable def sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol where
+noncomputable def sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol where
   Tag := SatTag
   dim := 2
   toInterpretation := satToCol
