@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameRun
+import all DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Exponential.GameTape
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The sweep, read back
@@ -202,7 +205,7 @@ theorem sweepCfg_cases (h₀ : IsBot a₀) {c c' : Config (GamePt B V M A)}
 
 /-- **A rewind wins if its continuation does.** It changes nothing and its
 phase is existential, so the whole walk back is one guarded chain. -/
-theorem altWin_rewind (h₀ : IsBot a₀) {ρ' σ' : B.Assignment A} {d : Config (GamePt B V M A)}
+private theorem altWin_rewind (h₀ : IsBot a₀) {ρ' σ' : B.Assignment A} {d : Config (GamePt B V M A)}
     (hstate : d.state = phasePt (MachPh.rewindPh r tgt cont false) (fun _ => a₀))
     (hpos : (𝕄).Posn d.head) (hne : d.head ≠ rightPt a₀) (hlow : d.head ≠ leftPt a₀ false)
     (htape : ∀ q : GamePt B V M A, machPosn q → machDom (ctrlArity vars) q →

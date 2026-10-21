@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Problems.FinSat.Hardness
 import DescriptiveComplexity.RecursivelyEnumerable
 import DescriptiveComplexity.Problems.FinSat.Fixpoint
+import all DescriptiveComplexity.Problems.FinSat.Defs
+import all DescriptiveComplexity.Problems.FinSat.Fixpoint
+import all DescriptiveComplexity.Problems.FinSat.Hardness
+import all DescriptiveComplexity.Problems.FinSat.Interp
+import all DescriptiveComplexity.Problems.FinSat.Kernel
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # The reduction to FINSAT, and its correctness
@@ -59,7 +65,7 @@ variable {a₀ : A} {M : Type}
 
 /-- Realization of a one-block `∃SO` sentence is realization of its kernel in
 the expansion by an assignment. -/
-theorem sorealize_head_iff {A' : Type} [(newLang L).Structure A'] :
+private theorem sorealize_head_iff {A' : Type} [(newLang L).Structure A'] :
     SORealize (newLang L) A' [B] φ true ↔
       ∃ μ : B.Assignment A', Tseitin.RealizeWith μ φ finZeroElim := by
   refine exists_congr fun μ => ?_
@@ -92,7 +98,7 @@ theorem relMap_ext_old' [L.IsRelational] {m : ℕ} (u : Fin 1 → A ⊕ Fin m) :
 /-- **The image of a yes-instance is finitely satisfiable**: the extended
 universe carrying the assignment is a model of `σ_A`, with `Sum.inl` as the
 intended assignment of the prefix variables. -/
-theorem finSatOn_of_realizeWith [L.IsRelational] [Finite A] [Nonempty A] {m : ℕ}
+private theorem finSatOn_of_realizeWith [L.IsRelational] [Finite A] [Nonempty A] {m : ℕ}
     (μ : B.Assignment (A ⊕ Fin m)) (hμ : Tseitin.RealizeWith μ φ finZeroElim) :
     FinSatOn ((finsatInterp B φ).Map A) := by
   classical
@@ -113,7 +119,7 @@ conjunction, and a distinctness literal of the diagram. As everywhere, the
 clauses that cannot fire are ruled out by the tag. -/
 
 /-- A tag no positive equality literal is defined at carries none. -/
-theorem not_eqG_tag (ha₀ : IsBot a₀) (t : FTag B φ)
+private theorem not_eqG_tag (ha₀ : IsBot a₀) (t : FTag B φ)
     (ht : ∀ t' t'' : FTag B φ, eqBodyF B φ t t' t'' = ⊥)
     (w : Fin (tagDim B φ t) → A) (x y : (finsatInterp B φ).Map A) :
     ¬EqG (ptOf B φ a₀ t w) x y := by
@@ -124,7 +130,7 @@ theorem not_eqG_tag (ha₀ : IsBot a₀) (t : FTag B φ)
   exact not_eqG_ptOf B φ ha₀ _ _ _ (ht t' t'') w w' w'' h
 
 /-- The same for the negated equality literals. -/
-theorem not_neqG_tag (ha₀ : IsBot a₀) (t : FTag B φ)
+private theorem not_neqG_tag (ha₀ : IsBot a₀) (t : FTag B φ)
     (ht : ∀ t' t'' : FTag B φ, neqBodyF B φ t t' t'' = ⊥)
     (w : Fin (tagDim B φ t) → A) (x y : (finsatInterp B φ).Map A) :
     ¬NeqG (ptOf B φ a₀ t w) x y := by
@@ -135,7 +141,7 @@ theorem not_neqG_tag (ha₀ : IsBot a₀) (t : FTag B φ)
   exact not_neqG_ptOf B φ ha₀ _ _ _ (ht t' t'') w w' w'' h
 
 /-- **A node of the prefix binds its own variable, and nothing else.** -/
-theorem bindG_pre_iff (ha₀ : IsBot a₀) (a : A) (x : (finsatInterp B φ).Map A) :
+private theorem bindG_pre_iff (ha₀ : IsBot a₀) (a : A) (x : (finsatInterp B φ).Map A) :
     BindG (prePt B φ a₀ a) x ↔ x = pvarPt B φ a₀ a := by
   constructor
   · intro h
@@ -151,7 +157,7 @@ theorem bindG_pre_iff (ha₀ : IsBot a₀) (a : A) (x : (finsatInterp B φ).Map 
 
 /-- **A distinctness literal of the diagram, inverted**: it exists only for a
 distinct pair, and relates the two prefix variables of that pair. -/
-theorem neqG_neq_iff (ha₀ : IsBot a₀) (a b : A) (x y : (finsatInterp B φ).Map A) :
+private theorem neqG_neq_iff (ha₀ : IsBot a₀) (a b : A) (x y : (finsatInterp B φ).Map A) :
     NeqG (neqPt B φ a₀ a b) x y ↔
       a ≠ b ∧ x = pvarPt B φ a₀ a ∧ y = pvarPt B φ a₀ b := by
   constructor
@@ -173,7 +179,7 @@ theorem neqG_neq_iff (ha₀ : IsBot a₀) (a b : A) (x y : (finsatInterp B φ).M
 
 /-- The truth definition at a node of the existential prefix: it binds its own
 variable, so the only clause that can fire hands over a value for it. -/
-theorem gstep_pre (ha₀ : IsBot a₀)
+private theorem gstep_pre (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (a : A) :
@@ -199,7 +205,7 @@ theorem gstep_pre (ha₀ : IsBot a₀)
         (bindG_pre_iff B φ ha₀ a _).mpr rfl, d, c, hc, hr⟩)))
 
 /-- The truth definition at the top conjunction. -/
-theorem gstep_body (ha₀ : IsBot a₀)
+private theorem gstep_body (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) :
@@ -220,7 +226,7 @@ theorem gstep_body (ha₀ : IsBot a₀)
     exact Or.inl ⟨(andG_ptOf B φ ha₀ Tag.body _).mpr trivial, h⟩
 
 /-- The truth definition at a distinctness literal of the diagram. -/
-theorem gstep_neq (ha₀ : IsBot a₀)
+private theorem gstep_neq (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (a b : A) :
@@ -246,7 +252,7 @@ theorem gstep_neq (ha₀ : IsBot a₀)
 
 variable [L.IsRelational] [Finite A] [Nonempty A]
 
-theorem gval_pre_iff (ha₀ : IsBot a₀)
+private theorem gval_pre_iff (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (a : A) :
     Gval I v (prePt B φ a₀ a) ↔
@@ -255,14 +261,14 @@ theorem gval_pre_iff (ha₀ : IsBot a₀)
   have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   exact (Gval_isEval (image_isWF B φ) I v _).trans (gstep_pre B φ ha₀ I (Gval I) v a)
 
-theorem gval_body_iff (ha₀ : IsBot a₀)
+private theorem gval_body_iff (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) :
     Gval I v (bodyPt B φ a₀) ↔ ∀ c, ChildG (bodyPt B φ a₀) c → Gval I v c := by
   have : Finite ((finsatInterp B φ).Map A) := FOInterpretation.map_finite _ _
   exact (Gval_isEval (image_isWF B φ) I v _).trans (gstep_body B φ ha₀ I (Gval I) v)
 
-theorem gval_neq_iff (ha₀ : IsBot a₀)
+private theorem gval_neq_iff (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (a b : A) :
     Gval I v (neqPt B φ a₀ a b) ↔
@@ -274,7 +280,7 @@ theorem gval_neq_iff (ha₀ : IsBot a₀)
 truth definition hands over a value for `x_a` and passes to the next node, so an
 induction along the input order produces an environment satisfying the top
 conjunction and agreeing with the given one below `a`. -/
-theorem exists_body_env (ha₀ : IsBot a₀)
+private theorem exists_body_env (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop) :
     ∀ (a : A) (v : (finsatInterp B φ).Map A → M), Gval I v (prePt B φ a₀ a) →
       ∃ v' : (finsatInterp B φ).Map A → M,
@@ -343,7 +349,7 @@ theorem gval_congr_I
 omit [L.Structure A] [L.IsRelational] [Finite A] [Nonempty A] in
 /-- An element canonical at dimension zero carrying the tag of an argument
 position *is* that position. -/
-theorem eq_aposPt (ha₀ : IsBot a₀) {x : (finsatInterp B φ).Map A}
+private theorem eq_aposPt (ha₀ : IsBot a₀) {x : (finsatInterp B φ).Map A}
     {j : Fin (finsatDim B φ)} (ht : x.1 = Tag.apos j) (h : Canon 0 x.2) :
     x = aposPt B φ a₀ j :=
   Prod.ext_iff.mpr ⟨ht, eq_of_canon_zero B φ h (canon_ptOf B φ ha₀ (Tag.apos j) _)⟩
@@ -357,7 +363,7 @@ open Classical in
 /-- **The block assignment a model's interpretation carries**: the relation of a
 variable is its symbol's, read at an assignment of the argument positions
 holding the tuple. -/
-noncomputable def blockOf (a₀ : A)
+private noncomputable def blockOf (a₀ : A)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop) (junk : M) :
     B.Assignment M :=
   fun i u => I (symPt B φ a₀ i) fun q =>
@@ -368,7 +374,7 @@ omit [L.IsRelational] [Finite A] [Nonempty A] in
 /-- It reads the interpretation back: at the symbol of a relation variable whose
 arity fits in the dimension, the interpretation induced by that assignment is
 the interpretation itself. -/
-theorem blockOf_agree (ha₀ : IsBot a₀)
+private theorem blockOf_agree (ha₀ : IsBot a₀)
     {I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop}
     (hloc : Local I) (junk : M) (i : B.ι) (hari : B.arity i ≤ finsatDim B φ)
     (w : (finsatInterp B φ).Map A → M) :
@@ -398,7 +404,7 @@ the image of one where it holds. This is the shape an extended universe has
 (`DescriptiveComplexity.relMap_ext_iff`), and all the kernel recursion asks
 of a model. -/
 @[instance_reducible]
-def viaIotaBase (ι : A → M) : L.Structure M where
+private def viaIotaBase (ι : A → M) : L.Structure M where
   funMap f := isEmptyElim f
   RelMap {_k} r u := ∃ y, RelMap r y ∧ ∀ j, u j = ι (y j)
 
@@ -409,12 +415,12 @@ def viaIotaOld (ι : A → M) : Language.oldMark.Structure M where
 
 /-- The model as a structure over `DescriptiveComplexity.newLang L`. -/
 @[instance_reducible]
-def viaIota (ι : A → M) : (newLang L).Structure M :=
+private def viaIota (ι : A → M) : (newLang L).Structure M :=
   @sumStructure L Language.oldMark M (viaIotaBase ι) (viaIotaOld ι)
 
 /-- **A model of the encoded sentence is an extended universe**: the intended
 assignment is injective, so its complement is the invented part. -/
-theorem realizeWith_of_finSatOn (hfs : FinSatOn ((finsatInterp B φ).Map A)) :
+private theorem realizeWith_of_finSatOn (hfs : FinSatOn ((finsatInterp B φ).Map A)) :
     ∃ m : ℕ, SORealize (newLang L) (A ⊕ Fin m) [B] φ true := by
   classical
   obtain ⟨-, M, hMfin, hMne, I, hloc, hroot⟩ := hfs

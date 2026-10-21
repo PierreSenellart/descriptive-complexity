@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Turing machines over a universe, without a vocabulary
@@ -196,7 +197,7 @@ theorem StepsIn.trans_step : ∀ {n : ℕ} {c d e : Config A},
 one. `DescriptiveComplexity.TMData.StepsIn` recurses at the near end; inductions along
 the *time order* – the fixed-point description of a deterministic run – need
 this reading. -/
-theorem stepsIn_succ_iff : ∀ {n : ℕ} {c e : Config A},
+private theorem stepsIn_succ_iff : ∀ {n : ℕ} {c e : Config A},
     M.StepsIn (n + 1) c e ↔ ∃ d, M.StepsIn n c d ∧ M.Step d e := by
   intro n
   induction n with
@@ -219,7 +220,7 @@ theorem stepsIn_succ_iff : ∀ {n : ℕ} {c e : Config A},
 /-- **A run splits anywhere**: `m + k` steps decompose into `m` and then `k`,
 through the configuration reached halfway. This is what lets two runs from the
 same configuration be compared at a common time. -/
-theorem stepsIn_split : ∀ {m k : ℕ} {c e : Config A},
+private theorem stepsIn_split : ∀ {m k : ℕ} {c e : Config A},
     M.StepsIn (m + k) c e → ∃ d, M.StepsIn m c d ∧ M.StepsIn k d e := by
   intro m
   induction m with
@@ -237,7 +238,7 @@ theorem stepsIn_split : ∀ {m k : ℕ} {c e : Config A},
 /-- **Runs compose.** Phases of a constructed machine are proved one at a time
 and chained with this; the step counts add, which is the form the budget
 obligation of a reduction takes. -/
-theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
+private theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
     M.StepsIn n c d → M.StepsIn m d e → M.StepsIn (n + m) c e := by
   intro n
   induction n with
@@ -254,7 +255,7 @@ theorem StepsIn.trans : ∀ {n m : ℕ} {c d e : Config A},
 the count, so every lemma stated with `DescriptiveComplexity.TMData.StepsIn` – the
 sweep primitives of `DescriptiveComplexity.Problems.Machine.Program`, in
 particular – feeds straight into it. -/
-theorem reflTransGen_of_stepsIn : ∀ {n : ℕ} {c d : Config A},
+private theorem reflTransGen_of_stepsIn : ∀ {n : ℕ} {c d : Config A},
     M.StepsIn n c d → Relation.ReflTransGen M.Step c d := by
   intro n
   induction n with
@@ -266,7 +267,7 @@ theorem reflTransGen_of_stepsIn : ∀ {n : ℕ} {c d : Config A},
 carries no count, but a chain of steps has one, so a phase proved without a
 budget can still be handed to a caller that needs one – the count is whatever
 the chain happens to be. -/
-theorem exists_stepsIn_of_reflTransGen {c d : Config A}
+private theorem exists_stepsIn_of_reflTransGen {c d : Config A}
     (h : Relation.ReflTransGen M.Step c d) : ∃ n : ℕ, M.StepsIn n c d := by
   induction h with
   | refl => exact ⟨0, rfl⟩
@@ -277,7 +278,7 @@ theorem exists_stepsIn_of_reflTransGen {c d : Config A}
 /-! ### The algebra of budgets -/
 
 /-- A run of exactly `n` steps is a run within `n`. -/
-theorem StepsIn.reachesIn {n : ℕ} {c d : Config A} (h : M.StepsIn n c d) :
+private theorem StepsIn.reachesIn {n : ℕ} {c d : Config A} (h : M.StepsIn n c d) :
     M.ReachesIn n c d :=
   ⟨n, Nat.le_refl n, h⟩
 
@@ -296,29 +297,31 @@ theorem ReachesIn.mono {n m : ℕ} {c d : Config A} (hnm : n ≤ m) (h : M.Reach
   exact ⟨k, hk.trans hnm, hrun⟩
 
 /-- Standing still costs nothing. -/
-theorem reachesIn_refl {n : ℕ} {c : Config A} : M.ReachesIn n c c :=
+private theorem reachesIn_refl {n : ℕ} {c : Config A} : M.ReachesIn n c c :=
   ⟨0, Nat.zero_le n, rfl⟩
 
 /-- One step costs one. -/
-theorem reachesIn_of_step {c d : Config A} (h : M.Step c d) : M.ReachesIn 1 c d :=
+private theorem reachesIn_of_step {c d : Config A} (h : M.Step c d) : M.ReachesIn 1 c d :=
   ⟨1, Nat.le_refl 1, ⟨d, h, rfl⟩⟩
 
 /-- **Budgeted runs compose, and their budgets add.** This is the whole reason
 for the notion: a program's cost is read off its phases as a sum, and compared
 with the clock once. -/
-theorem ReachesIn.trans {n m : ℕ} {c d e : Config A}
+private theorem ReachesIn.trans {n m : ℕ} {c d e : Config A}
     (hcd : M.ReachesIn n c d) (hde : M.ReachesIn m d e) : M.ReachesIn (n + m) c e := by
   obtain ⟨k, hk, hrun⟩ := hcd
   obtain ⟨l, hl, hrun'⟩ := hde
   exact ⟨k + l, Nat.add_le_add hk hl, hrun.trans hrun'⟩
 
 /-- A budgeted run extended by one step at its end. -/
-theorem ReachesIn.tail {n : ℕ} {c d e : Config A} (h : M.ReachesIn n c d) (hstep : M.Step d e) :
+private theorem ReachesIn.tail
+    {n : ℕ} {c d e : Config A} (h : M.ReachesIn n c d) (hstep : M.Step d e) :
     M.ReachesIn (n + 1) c e :=
   h.trans (reachesIn_of_step hstep)
 
 /-- A budgeted run extended by one step at its start. -/
-theorem ReachesIn.head {n : ℕ} {c d e : Config A} (hstep : M.Step c d) (h : M.ReachesIn n d e) :
+theorem ReachesIn.head
+    {n : ℕ} {c d e : Config A} (hstep : M.Step c d) (h : M.ReachesIn n d e) :
     M.ReachesIn (n + 1) c e :=
   (Nat.add_comm 1 n) ▸ (reachesIn_of_step hstep).trans h
 
@@ -337,7 +340,7 @@ theorem reachesIn_five {n : ℕ} {c₀ c₁ c₂ c₃ c₄ c₅ : Config A}
 /-- **A budgeted run is a run.** The erasure that turns every statement of a
 clocked program into the corresponding statement of a space-bounded one, which is
 why the two models share their phase lemmas. -/
-theorem ReachesIn.reflTransGen {n : ℕ} {c d : Config A} (h : M.ReachesIn n c d) :
+private theorem ReachesIn.reflTransGen {n : ℕ} {c d : Config A} (h : M.ReachesIn n c d) :
     Relation.ReflTransGen M.Step c d := by
   obtain ⟨_, -, hrun⟩ := h
   exact reflTransGen_of_stepsIn hrun
@@ -345,7 +348,7 @@ theorem ReachesIn.reflTransGen {n : ℕ} {c d : Config A} (h : M.ReachesIn n c d
 /-- **A budgeted run that ends accepting makes the machine accept**, provided the
 budget is below the clock. The one place a program's arithmetic meets
 `DescriptiveComplexity.TMData.Accepts`. -/
-theorem accepts_of_reachesIn {n : ℕ} {c₀ c : Config A} (hinit : M.IsInit c₀)
+private theorem accepts_of_reachesIn {n : ℕ} {c₀ c : Config A} (hinit : M.IsInit c₀)
     (hrun : M.ReachesIn n c₀ c) (hlt : n < Nat.card {p : A // M.Posn p})
     (hacc : M.Acc c.state) : M.Accepts := by
   obtain ⟨k, hk, hrun⟩ := hrun
@@ -384,7 +387,7 @@ variable {M}
 /-- **A well-formed initial tape is functional**: a cell holds either its
 unique input symbol or the unique blank, and the two cases exclude each
 other. -/
-theorem initTape_functional (hwf : M.WellFormed) {p a b : A}
+private theorem initTape_functional (hwf : M.WellFormed) {p a b : A}
     (ha : M.InitTape p a) (hb : M.InitTape p b) : a = b := by
   rcases ha with ha | ⟨hna, ha⟩ <;> rcases hb with hb | ⟨hnb, hb⟩
   · exact hwf.2.2.1 p _ _ ha hb
@@ -395,7 +398,7 @@ theorem initTape_functional (hwf : M.WellFormed) {p a b : A}
 /-- **A machine with one start state has at most one initial configuration**:
 the start state and the lowest position are pinned, and well-formedness makes
 the initial tape functional. -/
-theorem isInit_unique (hwf : M.WellFormed)
+private theorem isInit_unique (hwf : M.WellFormed)
     (hstart : ∀ q q', M.Start q → M.Start q' → q = q')
     {c c' : Config A} (h : M.IsInit c) (h' : M.IsInit c') : c = c' := by
   refine Config.ext (hstart _ _ h.1 h'.1) ?_ (funext fun p => ?_)
@@ -487,7 +490,7 @@ theorem _root_.DescriptiveComplexity.Config.map_surjective (u : B ≃ A) :
   exact ⟨⟨u.symm c.state, u.symm c.head, fun b => u.symm (c.tape (u b))⟩, by
     simp [Config.map, Equiv.apply_symm_apply]⟩
 
-theorem _root_.DescriptiveComplexity.Config.map_injective (u : B ≃ A) :
+private theorem _root_.DescriptiveComplexity.Config.map_injective (u : B ≃ A) :
     Function.Injective (Config.map u) := by
   rintro ⟨s, hd, t⟩ ⟨s', hd', t'⟩ hc
   simp only [Config.map, Config.mk.injEq] at hc
@@ -502,7 +505,7 @@ theorem Agree.minPos (h : Agree u N M) {b : B} :
     rwa [(h.le _ _), Equiv.apply_symm_apply] at this
   · exact (h.le _ _).mpr (hm (u a) ((h.posn a).mp ha))
 
-theorem Agree.succPos (h : Agree u N M) {b b' : B} :
+private theorem Agree.succPos (h : Agree u N M) {b b' : B} :
     SuccPos N.Le N.Posn b b' ↔ SuccPos M.Le M.Posn (u b) (u b') := by
   refine and_congr (h.posn b) (and_congr (h.posn b') (and_congr (h.le _ _)
     (and_congr u.injective.ne_iff.symm ⟨fun hs a ha h₁ h₂ => ?_, fun hs a ha h₁ h₂ => ?_⟩)))
@@ -514,20 +517,20 @@ theorem Agree.succPos (h : Agree u N M) {b b' : B} :
   · rcases hs (u a) ((h.posn a).mp ha) ((h.le _ _).mp h₁) ((h.le _ _).mp h₂) with h' | h' <;>
       [left; right] <;> exact u.injective h'
 
-theorem Agree.initTape (h : Agree u N M) {b b' : B} :
+private theorem Agree.initTape (h : Agree u N M) {b b' : B} :
     N.InitTape b b' ↔ M.InitTape (u b) (u b') := by
   refine or_congr (h.inp _ _) (and_congr ⟨fun hn a ha => ?_, fun hn a ha => ?_⟩ (h.blank _))
   · exact hn (u.symm a) ((h.inp _ _).mpr (by rwa [Equiv.apply_symm_apply]))
   · exact hn (u a) ((h.inp _ _).mp ha)
 
-theorem Agree.isInit (h : Agree u N M) {c : Config B} :
+private theorem Agree.isInit (h : Agree u N M) {c : Config B} :
     N.IsInit c ↔ M.IsInit (c.map u) := by
   refine and_congr (h.start _) (and_congr h.minPos ⟨fun hi p => ?_, fun hi b => ?_⟩)
   · have := (h.initTape (u := u)).mp (hi (u.symm p))
     rwa [Equiv.apply_symm_apply] at this
   · exact (h.initTape (u := u)).mpr (by simpa using hi (u b))
 
-theorem Agree.step (h : Agree u N M) {c c' : Config B} :
+private theorem Agree.step (h : Agree u N M) {c c' : Config B} :
     N.Step c c' ↔ M.Step (c.map u) (c'.map u) := by
   constructor
   · rintro ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩
@@ -558,7 +561,7 @@ theorem Agree.step (h : Agree u N M) {c c' : Config B} :
         rw [← Equiv.apply_symm_apply u τ]
         exact (h.right _).mp hcon
 
-theorem Agree.stepsIn (h : Agree u N M) :
+private theorem Agree.stepsIn (h : Agree u N M) :
     ∀ (n : ℕ) (c c' : Config B), N.StepsIn n c c' ↔ M.StepsIn n (c.map u) (c'.map u) := by
   intro n
   induction n with
@@ -590,7 +593,7 @@ theorem Agree.accepts (h : Agree u N M) : N.Accepts ↔ M.Accepts := by
       (h.stepsIn n d₀ d).mpr hrun, (h.acc _).mpr hacc⟩
 
 /-- Reachability in the configuration graph transports along an equivalence. -/
-theorem Agree.reach (h : Agree u N M) (c c' : Config B) :
+private theorem Agree.reach (h : Agree u N M) (c c' : Config B) :
     Relation.ReflTransGen N.Step c c' ↔ Relation.ReflTransGen M.Step (c.map u) (c'.map u) := by
   constructor
   · intro hr

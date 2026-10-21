@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.HeadArith
 import DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.HeadArith
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The bit of a rank, as a head program
@@ -238,32 +243,32 @@ namespace BitHeads
 
 variable {ih xh y cnt cand w tmk a b mk : Fin K} {p S m : ℕ}
 
-theorem lt_m_y (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (y : ℕ) < m := by
+private theorem lt_m_y (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (y : ℕ) < m := by
   have := h.hy; have := h.hm; omega
 
-theorem lt_m_cnt (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (cnt : ℕ) < m := by
+private theorem lt_m_cnt (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (cnt : ℕ) < m := by
   have := h.hcnt; have := h.hm; omega
 
-theorem lt_m_cand (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (cand : ℕ) < m := by
+private theorem lt_m_cand (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (cand : ℕ) < m := by
   have := h.hcand; have := h.hm; omega
 
-theorem lt_m_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (w : ℕ) < m := by
+private theorem lt_m_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (w : ℕ) < m := by
   have := h.hw; have := h.hm; omega
 
-theorem lt_m_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (tmk : ℕ) < m := by
+private theorem lt_m_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (tmk : ℕ) < m := by
   have := h.htmk; have := h.hm; omega
 
-theorem lt_m_ih (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (ih : ℕ) < m := by
+private theorem lt_m_ih (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (ih : ℕ) < m := by
   have := h.hih; have := h.hm; have := h.hpS; omega
 
-theorem lt_m_xh (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (xh : ℕ) < m := by
+private theorem lt_m_xh (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : (xh : ℕ) < m := by
   have := h.hxh; have := h.hm; have := h.hpS; omega
 
-theorem le_pm (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : p ≤ m := by
+private theorem le_pm (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : p ≤ m := by
   have := h.hm; have := h.hpS; omega
 
 /-- The even probe has the head layout an addition asks for. -/
-theorem plusE (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) :
+private theorem plusE (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) :
     PlusHeads cand cand y a b mk m where
   hi := h.lt_m_cand
   hj := h.lt_m_cand
@@ -276,7 +281,7 @@ theorem plusE (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) :
   hbmk := fun he => by have h1 := h.hb; have h2 := h.hmk; rw [he] at h1; omega
 
 /-- The odd probe has it too. -/
-theorem plusO (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) :
+private theorem plusO (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) :
     PlusHeads cand w y a b mk m where
   hi := h.lt_m_cand
   hj := h.lt_m_w
@@ -290,38 +295,39 @@ theorem plusO (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) :
 
 /-! #### The distinctness of the working heads, read off their positions -/
 
-theorem ne_y_cnt (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ cnt :=
+private theorem ne_y_cnt (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ cnt :=
   fun he => by have h1 := h.hy; have h2 := h.hcnt; rw [he] at h1; omega
 
-theorem ne_y_cand (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ cand :=
+private theorem ne_y_cand (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ cand :=
   fun he => by have h1 := h.hy; have h2 := h.hcand; rw [he] at h1; omega
 
-theorem ne_y_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ w :=
+private theorem ne_y_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ w :=
   fun he => by have h1 := h.hy; have h2 := h.hw; rw [he] at h1; omega
 
-theorem ne_y_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ tmk :=
+private theorem ne_y_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : y ≠ tmk :=
   fun he => by have h1 := h.hy; have h2 := h.htmk; rw [he] at h1; omega
 
-theorem ne_cnt_cand (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cnt ≠ cand :=
+private theorem ne_cnt_cand (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cnt ≠ cand :=
   fun he => by have h1 := h.hcnt; have h2 := h.hcand; rw [he] at h1; omega
 
-theorem ne_cnt_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cnt ≠ w :=
+private theorem ne_cnt_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cnt ≠ w :=
   fun he => by have h1 := h.hcnt; have h2 := h.hw; rw [he] at h1; omega
 
-theorem ne_cnt_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cnt ≠ tmk :=
+private theorem ne_cnt_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cnt ≠ tmk :=
   fun he => by have h1 := h.hcnt; have h2 := h.htmk; rw [he] at h1; omega
 
-theorem ne_cand_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cand ≠ w :=
+private theorem ne_cand_w (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cand ≠ w :=
   fun he => by have h1 := h.hcand; have h2 := h.hw; rw [he] at h1; omega
 
-theorem ne_cand_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cand ≠ tmk :=
+private theorem ne_cand_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : cand ≠ tmk :=
   fun he => by have h1 := h.hcand; have h2 := h.htmk; rw [he] at h1; omega
 
-theorem ne_w_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : w ≠ tmk :=
+private theorem ne_w_tmk (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) : w ≠ tmk :=
   fun he => by have h1 := h.hw; have h2 := h.htmk; rw [he] at h1; omega
 
 /-- An interface head is none of the working ones. -/
-theorem ne_int (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) {q : Fin K} (hq : (q : ℕ) < p) :
+private theorem ne_int
+    (h : BitHeads ih xh y cnt cand w tmk a b mk p S m) {q : Fin K} (hq : (q : ℕ) < p) :
     q ≠ y ∧ q ≠ cnt ∧ q ≠ cand ∧ q ≠ w ∧ q ≠ tmk := by
   have hpS := h.hpS
   refine ⟨fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_, fun he => ?_⟩
@@ -368,7 +374,7 @@ noncomputable def bitFamRel (ih xh y cnt cand w tmk : Fin K) (m : ℕ) :
   | .parStep => fun x c z => c = true ∧
       ∀ q : Fin K, (q : ℕ) < m → (bitStepMoves cand q).Holds x q (z q)
 
-theorem runs_bitFam (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : m ≤ K)
+private theorem runs_bitFam (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : m ≤ K)
     (c : BitNode) :
     (bitFam (L := L) ih xh y cnt cand w tmk a b mk c).Runs A m
       (bitFamRel ih xh y cnt cand w tmk m c) := by
@@ -489,7 +495,7 @@ theorem headLocal2_bitFamRel (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m)
 omit [Finite A] in
 /-- **A bit is deterministic**: every node of its control graph is – the two
 probes because an addition is. -/
-theorem deterministic_bitP (ih xh y cnt cand w tmk a b mk : Fin K) :
+private theorem deterministic_bitP (ih xh y cnt cand w tmk a b mk : Fin K) :
     (bitP (L := L) ih xh y cnt cand w tmk a b mk).Deterministic A := by
   refine deterministic_wireP _ _ _ ?_
   rintro (_ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _ | _)
@@ -540,7 +546,7 @@ def NoEven (y cand : Fin K) (z : Fin K → A) : Prop :=
   ∀ c : A, c < z cand → orank c + orank c ≠ orank (z y)
 
 /-- The invariant of the control walk of a bit, node by node. -/
-def BitInv (ih xh y cnt cand w tmk : Fin K) (m : ℕ) (x : Fin K → A) :
+private def BitInv (ih xh y cnt cand w tmk : Fin K) (m : ℕ) (x : Fin K → A) :
     BitNode → (Fin K → A) → Prop
   | .init => fun z => z = x
   | .outer => fun z => BitBase ih xh y cnt cand w tmk m x z
@@ -715,7 +721,7 @@ variable {ih xh y cnt cand w tmk a b mk : Fin K} {p S m : ℕ}
 
 /-- **The invariant holds all along the control walk**: this is the whole
 soundness argument, the two exits being read off it. -/
-theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin K → A) :
+private theorem bitInv_of_walk (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin K → A) :
     ∀ u : BitNode × (Fin K → A),
       Relation.ReflTransGen
           (wireStep (bitFamRel (A := A) ih xh y cnt cand w tmk m) bitWire) (.init, x) u →
@@ -1067,7 +1073,7 @@ abbrev BWalk (ih xh y cnt cand w tmk : Fin K) (m : ℕ) :
 
 /-- **One turn of the halving scan**: a candidate strictly below the half is
 rejected by both probes, so the scan steps on. -/
-theorem walk_scan_step (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
+private theorem walk_scan_step (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
     (hlt : orank (z cand) + orank (z cand) + 1 < orank (z y))
     (htop : ∀ e : A, e ≤ z tmk) :
     ∃ z' : Fin K → A, BWalk ih xh y cnt cand w tmk m (.probeE, z) (.probeE, z') ∧
@@ -1129,7 +1135,7 @@ theorem walk_scan_step (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : 
 
 /-- **The halving scan reaches the half**: the candidate walks up to `v / 2`,
 every earlier candidate being rejected. -/
-theorem walk_scan (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
+private theorem walk_scan (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
     (hmin : ∀ e : A, z cand ≤ e) (htop : ∀ e : A, e ≤ z tmk) :
     ∀ t : ℕ, t ≤ orank (z y) / 2 →
       ∃ z' : Fin K → A, BWalk ih xh y cnt cand w tmk m (.probeE, z) (.probeE, z') ∧
@@ -1154,7 +1160,7 @@ theorem walk_scan (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K
 
 /-- **The scan commits**: at the half, one of the two probes succeeds and the
 round is closed. -/
-theorem walk_commit (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
+private theorem walk_commit (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
     (hcandh : orank (z cand) = orank (z y) / 2) (htop : ∀ e : A, e ≤ z tmk) :
     ∃ z' : Fin K → A, BWalk ih xh y cnt cand w tmk m (.probeE, z) (.commit, z') ∧
       ∀ q : Fin K, (q : ℕ) < m → q ≠ w → z' q = z q := by
@@ -1205,7 +1211,7 @@ theorem walk_commit (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin
 
 /-- **The outer loop runs**: after `t` rounds the working head carries the value
 halved `t` times, and the counter has counted them. -/
-theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin K → A) :
+private theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin K → A) :
     ∀ t : ℕ, t ≤ orank (x ih) →
       ∃ z : Fin K → A, BWalk ih xh y cnt cand w tmk m (.init, x) (.outer, z) ∧
         orank (z cnt) = t ∧ orank (z y) = orank (x xh) / 2 ^ t ∧
@@ -1349,7 +1355,7 @@ theorem walk_outer (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (x : Fin 
 
 /-- **One turn of the parity scan**: a candidate that does not halve the value,
 and is not at the marker, steps on. -/
-theorem walk_par_step (_hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
+private theorem walk_par_step (_hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
     (hprobe : orank (z cand) + orank (z cand) ≠ orank (z y))
     (hlt : orank (z cand) < orank (z tmk)) :
     ∃ z' : Fin K → A, BWalk ih xh y cnt cand w tmk m (.parProbe, z) (.parProbe, z') ∧
@@ -1384,7 +1390,7 @@ theorem walk_par_step (_hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : 
 
 /-- **The parity scan walks**: as long as no candidate below has halved the
 value, the scan reaches every index up to the marker. -/
-theorem walk_par (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
+private theorem walk_par (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) {z : Fin K → A}
     (hmin : ∀ e : A, z cand ≤ e) :
     ∀ t : ℕ, t ≤ orank (z tmk) → (∀ d : ℕ, d < t → d + d ≠ orank (z y)) →
       ∃ z' : Fin K → A, BWalk ih xh y cnt cand w tmk m (.parProbe, z) (.parProbe, z') ∧
@@ -1419,7 +1425,7 @@ private theorem testBit_iff_mod {X I : ℕ} : X.testBit I = true ↔ X / 2 ^ I %
 /-- **The bit fragment decides the bit**, with no side condition: the marker is
 parked by the fragment itself, the halvings are exact, and the parity scan is
 exhaustive. -/
-theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : m ≤ K) :
+private theorem decides_bitP (hh : BitHeads ih xh y cnt cand w tmk a b mk p S m) (hmK : m ≤ K) :
     (bitP (L := L) ih xh y cnt cand w tmk a b mk).Decides A p
       (fun x => (orank (x xh)).testBit (orank (x ih)) = true) := by
   classical

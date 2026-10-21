@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.FixedPointInflationaryLFP
 public import DescriptiveComplexity.FixedPointPartialMachine
+import all DescriptiveComplexity.Complexity
 
 /-!
 # Abiteboul–Vianu, the ordered case

@@ -10,6 +10,9 @@ public import DescriptiveComplexity.Problems.Partition.Defs
 public import DescriptiveComplexity.Problems.Knapsack.Chain
 public import DescriptiveComplexity.Numbers.Wide
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.Wide
+import all DescriptiveComplexity.Problems.Knapsack.Chain
 
 /-!
 # Partition is in NP
@@ -119,96 +122,96 @@ variable {α : Type}
 def ptItemF (x : α) : ptSOLang.Formula α := Relations.formula₁ ptItemSym (Term.var x)
 
 /-- `x` is a bit position, as a formula. -/
-def ptPosnF (x : α) : ptSOLang.Formula α := Relations.formula₁ ptPosnSym (Term.var x)
+private def ptPosnF (x : α) : ptSOLang.Formula α := Relations.formula₁ ptPosnSym (Term.var x)
 
 /-- The weight of `i` has bit 1 at `p`, as a formula. -/
-def ptBitF (i p : α) : ptSOLang.Formula α :=
+private def ptBitF (i p : α) : ptSOLang.Formula α :=
   Relations.formula₂ ptBitSym (Term.var i) (Term.var p)
 
 /-- `x ≤ y`, as a formula. -/
-def ptLeF (x y : α) : ptSOLang.Formula α :=
+private def ptLeF (x y : α) : ptSOLang.Formula α :=
   Relations.formula₂ ptLeSym (Term.var x) (Term.var y)
 
 /-- `x = y`, as a formula. -/
-def ptEqF (x y : α) : ptSOLang.Formula α := Term.equal (Term.var x) (Term.var y)
+private def ptEqF (x y : α) : ptSOLang.Formula α := Term.equal (Term.var x) (Term.var y)
 
 /-- `x` is chosen, as a formula. -/
 def ptSelF (x : α) : ptSOLang.Formula α := Relations.formula₁ ptSelSym (Term.var x)
 
 /-- Bit `(x, p)` of the running total of the side `b` at `i`, as a formula. -/
-def ptPSF (b : Bool) (i x p : α) : ptSOLang.Formula α :=
+private def ptPSF (b : Bool) (i x p : α) : ptSOLang.Formula α :=
   (ptPSSym b).formula ![Term.var i, Term.var x, Term.var p]
 
 /-- The carry at `(x, p)` of the step appending `i`, as a formula. -/
-def ptCyF (b : Bool) (i x p : α) : ptSOLang.Formula α :=
+private def ptCyF (b : Bool) (i x p : α) : ptSOLang.Formula α :=
   (ptCySym b).formula ![Term.var i, Term.var x, Term.var p]
 
 /-- `i` belongs to the side `b`, as a formula. -/
-def ptSideF (b : Bool) (i : α) : ptSOLang.Formula α :=
+private def ptSideF (b : Bool) (i : α) : ptSOLang.Formula α :=
   match b with
   | true => ptSelF i
   | false => ptItemF i ⊓ ∼(ptSelF i)
 
 /-- `x` is a minimum of the order, as a formula. -/
-noncomputable def ptBotF (x : α) : ptSOLang.Formula α :=
+private noncomputable def ptBotF (x : α) : ptSOLang.Formula α :=
   fo%[x] ∀ y, ptLeF⟨x, y⟩
 
 /-- `x` is a maximum of the order, as a formula. -/
-noncomputable def ptTopF (x : α) : ptSOLang.Formula α :=
+private noncomputable def ptTopF (x : α) : ptSOLang.Formula α :=
   fo%[x] ∀ y, ptLeF⟨y, x⟩
 
 /-- The bit that the item `i` contributes at the wide position `(x, p)`: its
 weight's bit, in the lowest block, if it is on the side `b`. -/
-noncomputable def ptAddF (b : Bool) (i x p : α) : ptSOLang.Formula α :=
+private noncomputable def ptAddF (b : Bool) (i x p : α) : ptSOLang.Formula α :=
   ptSideF b i ⊓ (ptBotF x ⊓ ptBitF i p)
 
 /-- The exclusive or of three formulas, as `x ↔ (y ↔ z)`. -/
-def ptXor3F (x y z : ptSOLang.Formula α) : ptSOLang.Formula α := x.iff (y.iff z)
+private def ptXor3F (x y z : ptSOLang.Formula α) : ptSOLang.Formula α := x.iff (y.iff z)
 
 /-- The majority of three formulas. -/
-def ptMaj3F (x y z : ptSOLang.Formula α) : ptSOLang.Formula α :=
+private def ptMaj3F (x y z : ptSOLang.Formula α) : ptSOLang.Formula α :=
   (x ⊓ y) ⊔ ((x ⊓ z) ⊔ (y ⊓ z))
 
 /-- `i` is the first item, as a formula. -/
-noncomputable def ptMinItemF (i : α) : ptSOLang.Formula α :=
+private noncomputable def ptMinItemF (i : α) : ptSOLang.Formula α :=
   fo%[i] ptItemF⟨i⟩ ∧ ∀ y, ptItemF⟨y⟩ → ptLeF⟨i, y⟩
 
 /-- `i` is the last item, as a formula. -/
-noncomputable def ptMaxItemF (i : α) : ptSOLang.Formula α :=
+private noncomputable def ptMaxItemF (i : α) : ptSOLang.Formula α :=
   fo%[i] ptItemF⟨i⟩ ∧ ∀ y, ptItemF⟨y⟩ → ptLeF⟨y, i⟩
 
 /-- `j` is the item right after `i`, as a formula. -/
-noncomputable def ptSuccItemF (i j : α) : ptSOLang.Formula α :=
+private noncomputable def ptSuccItemF (i j : α) : ptSOLang.Formula α :=
   fo%[i, j] ptItemF⟨i⟩ ∧ ptItemF⟨j⟩ ∧ ptLeF⟨i, j⟩ ∧ ¬ ptEqF⟨i, j⟩ ∧
     ∀ y, ptItemF⟨y⟩ → ptLeF⟨i, y⟩ → ptLeF⟨y, j⟩ → ptEqF⟨y, i⟩ ∨ ptEqF⟨y, j⟩
 
 /-- `p` is the lowest position, as a formula. -/
-noncomputable def ptMinPosnF (p : α) : ptSOLang.Formula α :=
+private noncomputable def ptMinPosnF (p : α) : ptSOLang.Formula α :=
   fo%[p] ptPosnF⟨p⟩ ∧ ∀ q, ptPosnF⟨q⟩ → ptLeF⟨p, q⟩
 
 /-- `p` is the highest position, as a formula. -/
-noncomputable def ptMaxPosnF (p : α) : ptSOLang.Formula α :=
+private noncomputable def ptMaxPosnF (p : α) : ptSOLang.Formula α :=
   fo%[p] ptPosnF⟨p⟩ ∧ ∀ q, ptPosnF⟨q⟩ → ptLeF⟨q, p⟩
 
 /-- `q` is the position right above `p`, as a formula. -/
-noncomputable def ptSuccPosnF (p q : α) : ptSOLang.Formula α :=
+private noncomputable def ptSuccPosnF (p q : α) : ptSOLang.Formula α :=
   fo%[p, q] ptPosnF⟨p⟩ ∧ ptPosnF⟨q⟩ ∧ ptLeF⟨p, q⟩ ∧ ¬ ptEqF⟨p, q⟩ ∧
     ∀ r, ptPosnF⟨r⟩ → ptLeF⟨p, r⟩ → ptLeF⟨r, q⟩ → ptEqF⟨r, p⟩ ∨ ptEqF⟨r, q⟩
 
 /-- `y` is the element right after `x` in the whole universe, as a formula. -/
-noncomputable def ptSuccAllF (x y : α) : ptSOLang.Formula α :=
+private noncomputable def ptSuccAllF (x y : α) : ptSOLang.Formula α :=
   fo%[x, y] ptLeF⟨x, y⟩ ∧ ¬ ptEqF⟨x, y⟩ ∧
     ∀ r, ptLeF⟨x, r⟩ → ptLeF⟨r, y⟩ → ptEqF⟨r, x⟩ ∨ ptEqF⟨r, y⟩
 
 /-- `(x, p)` is the lowest wide position, as a formula. -/
-noncomputable def ptMinWideF (x p : α) : ptSOLang.Formula α := ptBotF x ⊓ ptMinPosnF p
+private noncomputable def ptMinWideF (x p : α) : ptSOLang.Formula α := ptBotF x ⊓ ptMinPosnF p
 
 /-- `(x, p)` is the highest wide position, as a formula. -/
-noncomputable def ptMaxWideF (x p : α) : ptSOLang.Formula α := ptTopF x ⊓ ptMaxPosnF p
+private noncomputable def ptMaxWideF (x p : α) : ptSOLang.Formula α := ptTopF x ⊓ ptMaxPosnF p
 
 /-- `(y, q)` is the wide position right above `(x, p)`, as a formula: a step
 inside a block, or from the top of one block to the bottom of the next. -/
-noncomputable def ptSuccWideF (x p y q : α) : ptSOLang.Formula α :=
+private noncomputable def ptSuccWideF (x p y q : α) : ptSOLang.Formula α :=
   (ptEqF x y ⊓ ptSuccPosnF p q) ⊔ (ptSuccAllF x y ⊓ (ptMaxPosnF p ⊓ ptMinPosnF q))
 
 end Builders
@@ -216,63 +219,63 @@ end Builders
 /-! ### The clauses -/
 
 /-- Kernel clause: the order is reflexive. -/
-noncomputable def ptReflClause : ptSOLang.Sentence :=
+private noncomputable def ptReflClause : ptSOLang.Sentence :=
   fo% ∀ x, ptLeF⟨x, x⟩
 
 /-- Kernel clause: the order is transitive. -/
-noncomputable def ptTransClause : ptSOLang.Sentence :=
+private noncomputable def ptTransClause : ptSOLang.Sentence :=
   fo% ∀ x y z, ptLeF⟨x, y⟩ ∧ ptLeF⟨y, z⟩ → ptLeF⟨x, z⟩
 
 /-- Kernel clause: the order is antisymmetric. -/
-noncomputable def ptAntisymmClause : ptSOLang.Sentence :=
+private noncomputable def ptAntisymmClause : ptSOLang.Sentence :=
   fo% ∀ x y, ptLeF⟨x, y⟩ ∧ ptLeF⟨y, x⟩ → ptEqF⟨x, y⟩
 
 /-- Kernel clause: the order is total. -/
-noncomputable def ptTotalClause : ptSOLang.Sentence :=
+private noncomputable def ptTotalClause : ptSOLang.Sentence :=
   fo% ∀ x y, ptLeF⟨x, y⟩ ∨ ptLeF⟨y, x⟩
 
 /-- Kernel clause: only items are chosen. -/
-noncomputable def ptSelClause : ptSOLang.Sentence :=
+private noncomputable def ptSelClause : ptSOLang.Sentence :=
   fo% ∀ x, ptSelF⟨x⟩ → ptItemF⟨x⟩
 
 /-- Kernel clause: at the first item the running total is that item's
 contribution. -/
-noncomputable def ptBaseClause (b : Bool) : ptSOLang.Sentence :=
+private noncomputable def ptBaseClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i x p, ptMinItemF⟨i⟩ ∧ ptPosnF⟨p⟩ → ((ptPSF b)⟨i, x, p⟩ ↔ (ptAddF b)⟨i, x, p⟩)
 
 /-- Kernel clause: each step adds a bit. -/
-noncomputable def ptSumClause (b : Bool) : ptSOLang.Sentence :=
+private noncomputable def ptSumClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptPosnF⟨p⟩ →
     ((ptPSF b)⟨j, x, p⟩ ↔
       ptXor3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: each step propagates its carry. -/
-noncomputable def ptCarryClause (b : Bool) : ptSOLang.Sentence :=
+private noncomputable def ptCarryClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p y q, ptSuccItemF⟨i, j⟩ ∧ ptSuccWideF⟨x, p, y, q⟩ →
     ((ptCyF b)⟨j, y, q⟩ ↔
       ptMaj3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄)
 
 /-- Kernel clause: nothing is carried into the lowest wide position. -/
-noncomputable def ptBottomClause (b : Bool) : ptSOLang.Sentence :=
+private noncomputable def ptBottomClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptMinWideF⟨x, p⟩ → ¬ (ptCyF b)⟨j, x, p⟩
 
 /-- Kernel clause: nothing is carried out of the highest wide position. -/
-noncomputable def ptTopClause (b : Bool) : ptSOLang.Sentence :=
+private noncomputable def ptTopClause (b : Bool) : ptSOLang.Sentence :=
   fo% ∀ i j x p, ptSuccItemF⟨i, j⟩ ∧ ptMaxWideF⟨x, p⟩ →
     ¬ ptMaj3F⦃(ptPSF b)⟨i, x, p⟩, (ptAddF b)⟨j, x, p⟩, (ptCyF b)⟨j, x, p⟩⦄
 
 /-- Kernel clause: at the last item the two walks agree – the two sides weigh
 the same. -/
-noncomputable def ptFinalClause : ptSOLang.Sentence :=
+private noncomputable def ptFinalClause : ptSOLang.Sentence :=
   fo% ∀ i x p, ptMaxItemF⟨i⟩ ∧ ptPosnF⟨p⟩ → ((ptPSF true)⟨i, x, p⟩ ↔ (ptPSF false)⟨i, x, p⟩)
 
 /-- The clauses of one walk. -/
-noncomputable def ptWalkClauses (b : Bool) : ptSOLang.Sentence :=
+private noncomputable def ptWalkClauses (b : Bool) : ptSOLang.Sentence :=
   ptBaseClause b ⊓ (ptSumClause b ⊓ (ptCarryClause b ⊓
     (ptBottomClause b ⊓ ptTopClause b)))
 
 /-- The first-order kernel of the `Σ₁` definition of Partition. -/
-noncomputable def partitionKernel : ptSOLang.Sentence :=
+private noncomputable def partitionKernel : ptSOLang.Sentence :=
   (ptReflClause ⊓ (ptTransClause ⊓ (ptAntisymmClause ⊓ ptTotalClause))) ⊓
     (ptSelClause ⊓ (ptWalkClauses true ⊓ (ptWalkClauses false ⊓ ptFinalClause)))
 
@@ -284,16 +287,16 @@ variable {A : Type} [Language.binWeights.Structure A]
 variable (ρ : partitionGuessBlock.Assignment A)
 
 /-- The chosen items, read off an assignment of the block. -/
-def PSel (i : A) : Prop := ρ .sel ![i]
+private def PSel (i : A) : Prop := ρ .sel ![i]
 
 /-- The running total of the side `b`, read off an assignment of the block. -/
-def PPS (b : Bool) (i : A) (u : A × A) : Prop := ρ (.ps b) ![i, u.1, u.2]
+private def PPS (b : Bool) (i : A) (u : A × A) : Prop := ρ (.ps b) ![i, u.1, u.2]
 
 /-- The carries of the side `b`, read off an assignment of the block. -/
-def PCy (b : Bool) (i : A) (u : A × A) : Prop := ρ (.cy b) ![i, u.1, u.2]
+private def PCy (b : Bool) (i : A) (u : A × A) : Prop := ρ (.cy b) ![i, u.1, u.2]
 
 /-- The items of the side `b`: the chosen ones, or the others. -/
-def PSide (b : Bool) (i : A) : Prop :=
+private def PSide (b : Bool) (i : A) : Prop :=
   match b with
   | true => PSel ρ i
   | false => BWItem i ∧ ¬PSel ρ i
@@ -302,10 +305,10 @@ def PSide (b : Bool) (i : A) : Prop :=
 block. The minimality of the block is written with the `Fin 1`-indexed
 quantifier the kernel's `∀` produces; `DescriptiveComplexity.pWt_iff` reads it
 back. -/
-def PWt (i : A) (u : A × A) : Prop :=
+private def PWt (i : A) (u : A × A) : Prop :=
   (∀ y : Fin 1 → A, BWLe u.1 (y 0)) ∧ BWBit i u.2
 
-theorem pWt_iff {i : A} {u : A × A} :
+private theorem pWt_iff {i : A} {u : A × A} :
     PWt (A := A) i u ↔ ((∀ y : A, BWLe u.1 y) ∧ BWBit i u.2) :=
   and_congr ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩ Iff.rfl
 
@@ -474,7 +477,7 @@ walks, one along the chosen items and one along the others, and check
 first-order that they end on the same number. Since NP is defined as
 `Σ₁`-definability, this is the membership half of the NP-completeness of
 Partition. -/
-theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
+private theorem partition_sigmaSODefinable : SigmaSODefinable 1 Partition := by
   refine ⟨[partitionGuessBlock], rfl, partitionKernel, ?_⟩
   intro A _ _ _
   constructor

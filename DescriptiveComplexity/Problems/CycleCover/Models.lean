@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.CycleCover.Base
+import all DescriptiveComplexity.Problems.CycleCover.Base
+import all DescriptiveComplexity.Problems.OneInSat.Counting
 
 /-!
 # The consistent choices are the exactly-one models
@@ -38,7 +40,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Fintype A]
 /-! ### The tracks of a consistent choice -/
 
 /-- **The track of a literal is chosen entirely or not at all.** -/
-theorem chain_all_or_none {U : Finset (Occ A)} (hU : Consistent U) (x : A) (s : Bool) :
+private theorem chain_all_or_none {U : Finset (Occ A)} (hU : Consistent U) (x : A) (s : Bool) :
     (∀ o : Occ A, o.x = x → o.s = s → o ∈ U) ∨ ∀ o : Occ A, o.x = x → o.s = s → o ∉ U := by
   classical
   by_cases hx : SatOccurs A x
@@ -76,14 +78,14 @@ theorem chain_all_or_none {U : Finset (Occ A)} (hU : Consistent U) (x : A) (s : 
   · exact Or.inr fun o hox _ _ => hx (hox ▸ o.satOccurs)
 
 /-- An occurrence is chosen iff the dummy occurrence of its literal is. -/
-theorem mem_iff_dummy_mem {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A) :
+private theorem mem_iff_dummy_mem {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A) :
     o ∈ U ↔ Occ.dummy o.x o.satOccurs o.s ∈ U := by
   rcases chain_all_or_none hU o.x o.s with h | h
   · exact ⟨fun _ => h _ rfl rfl, fun _ => h o rfl rfl⟩
   · exact ⟨fun ho => absurd ho (h o rfl rfl), fun ho => absurd ho (h _ rfl rfl)⟩
 
 /-- Exactly one of the two dummy occurrences of a variable is chosen. -/
-theorem dummy_true_mem_iff {U : Finset (Occ A)} (hU : Consistent U) (x : A)
+private theorem dummy_true_mem_iff {U : Finset (Occ A)} (hU : Consistent U) (x : A)
     (hx : SatOccurs A x) : Occ.dummy x hx true ∈ U ↔ Occ.dummy x hx false ∉ U := by
   obtain ⟨o, ⟨hoh, ho⟩, huniq⟩ := hU.2.2 (Sum.inr ⟨x, hx⟩)
   obtain ⟨hob, hox⟩ := (hubOf_eq_inr_iff o ⟨x, hx⟩).mp hoh
@@ -106,12 +108,12 @@ theorem dummy_true_mem_iff {U : Finset (Occ A)} (hU : Consistent U) (x : A)
 
 /-- **The assignment read off a choice**: a variable is true when the track
 loop of its positive dummy occurrence is chosen. -/
-def toModel (U : Finset (Occ A)) (x : A) : Prop :=
+private def toModel (U : Finset (Occ A)) (x : A) : Prop :=
   ∃ hx : SatOccurs A x, Occ.dummy x hx true ∈ U
 
 /-- A literal is true under the assignment read off a consistent choice iff
 its occurrences are chosen. -/
-theorem litTrue_toModel_iff {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A) :
+private theorem litTrue_toModel_iff {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A) :
     LitTrue (toModel U) o.x o.s ↔ o ∈ U := by
   rw [mem_iff_dummy_mem hU o]
   cases hs : o.s
@@ -122,7 +124,8 @@ theorem litTrue_toModel_iff {U : Finset (Occ A)} (hU : Consistent U) (o : Occ A)
     exact ⟨fun ⟨_, h⟩ => h, fun h => ⟨_, h⟩⟩
 
 /-- **The assignment read off a consistent choice is an exactly-one model.** -/
-theorem oneInModel_toModel {U : Finset (Occ A)} (hU : Consistent U) : OneInModel A (toModel U) := by
+private theorem oneInModel_toModel
+    {U : Finset (Occ A)} (hU : Consistent U) : OneInModel A (toModel U) := by
   refine ⟨fun c hc => ?_, fun x ⟨hx, _⟩ => hx⟩
   obtain ⟨o, ⟨hoh, ho⟩, huniq⟩ := hU.2.2 (Sum.inl ⟨c, hc⟩)
   have hoc : o.c = c := (hubOf_eq_inl_iff o ⟨c, hc⟩).mp hoh
@@ -146,7 +149,8 @@ theorem mem_ofModel {ν : A → Prop} {o : Occ A} : o ∈ ofModel ν ↔ LitTrue
 
 open Classical in
 /-- **The choice read off an exactly-one model is consistent.** -/
-theorem consistent_ofModel {ν : A → Prop} (hν : OneInModel A ν) : Consistent (ofModel ν) := by
+private theorem consistent_ofModel
+    {ν : A → Prop} (hν : OneInModel A ν) : Consistent (ofModel ν) := by
   refine ⟨fun o ho => ?_, fun o ho => ?_, fun h => ?_⟩
   · rw [mem_ofModel] at ho ⊢
     exact ho
@@ -178,7 +182,7 @@ theorem consistent_ofModel {ν : A → Prop} (hν : OneInModel A ν) : Consisten
         simp [Occ.dummy, Occ.s, hlit]
 
 /-- **The consistent choices are the exactly-one models.** -/
-noncomputable def consistentEquiv :
+private noncomputable def consistentEquiv :
     {U : Finset (Occ A) // Consistent U} ≃ {ν : A → Prop // OneInModel A ν} where
   toFun U := ⟨toModel U.1, oneInModel_toModel U.2⟩
   invFun ν := ⟨ofModel ν.1, consistent_ofModel ν.2⟩
@@ -189,7 +193,7 @@ noncomputable def consistentEquiv :
 
 open Classical in
 /-- The number of consistent choices is the number of exactly-one models. -/
-theorem card_consistent :
+private theorem card_consistent :
     ((univ : Finset (Finset (Occ A))).filter Consistent).card =
       Nat.card {ν : A → Prop // OneInModel A ν} := by
   rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card, Nat.card_congr consistentEquiv]

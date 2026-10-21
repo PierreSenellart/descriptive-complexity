@@ -9,6 +9,8 @@ import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.Problems.TwoSat.Implication
 public import DescriptiveComplexity.Problems.TwoSat.Membership
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.TwoSat.Defs
+import all DescriptiveComplexity.Problems.TwoSat.Membership
 
 /-!
 # 2SAT is in PTIME, by a Horn program for the implication graph
@@ -73,7 +75,7 @@ variable {A : Type}
 def RVal (ρ : reachBlock.Assignment A) (s t : Bool) (x y : A) : Prop :=
   ρ (s, t) ![x, y]
 
-theorem reachAtom_holds (ρ : reachBlock.Assignment A) (s t : Bool) (i j : Fin 4)
+private theorem reachAtom_holds (ρ : reachBlock.Assignment A) (s t : Bool) (i j : Fin 4)
     (v : Fin 4 → A) : (reachAtom s t i j).Holds ρ v ↔ RVal ρ s t (v i) (v j) := by
   refine iff_of_eq (congrArg (ρ (s, t)) (funext fun m => ?_))
   fin_cases m <;> rfl
@@ -103,7 +105,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {v : Fin 4 → A}
 
 /-- The covering-pair guard says exactly that the clause `v 0` is covered by
 the occurrences `(v 1, s)` and `(v 2, u)`. -/
-theorem realize_pairGuard4 {s u : Bool} :
+private theorem realize_pairGuard4 {s u : Bool} :
     (pairGuard4 s u).Realize v ↔ Covers (v 0) (v 1) s (v 2) u := by
   rw [pairGuard4, Formula.realize_relabel, TwoSatKrom.realize_pairGuard, Covers]
   constructor
@@ -176,25 +178,25 @@ noncomputable def twoSatHornProgram : HornProgram satOrd reachBlock 4 :=
     cycleClause true, cycleClause false,
     emptyGoal, wideGoal]
 
-theorem reflClause_mem (s : Bool) : reflClause s ∈ twoSatHornProgram := by
+private theorem reflClause_mem (s : Bool) : reflClause s ∈ twoSatHornProgram := by
   cases s <;> simp [twoSatHornProgram]
 
-theorem edgeClause₁_mem (s u : Bool) : edgeClause₁ s u ∈ twoSatHornProgram := by
+private theorem edgeClause₁_mem (s u : Bool) : edgeClause₁ s u ∈ twoSatHornProgram := by
   cases s <;> cases u <;> simp [twoSatHornProgram]
 
-theorem edgeClause₂_mem (s u : Bool) : edgeClause₂ s u ∈ twoSatHornProgram := by
+private theorem edgeClause₂_mem (s u : Bool) : edgeClause₂ s u ∈ twoSatHornProgram := by
   cases s <;> cases u <;> simp [twoSatHornProgram]
 
-theorem transClause_mem (s t r : Bool) : transClause s t r ∈ twoSatHornProgram := by
+private theorem transClause_mem (s t r : Bool) : transClause s t r ∈ twoSatHornProgram := by
   cases s <;> cases t <;> cases r <;> simp [twoSatHornProgram]
 
-theorem cycleClause_mem (s : Bool) : cycleClause s ∈ twoSatHornProgram := by
+private theorem cycleClause_mem (s : Bool) : cycleClause s ∈ twoSatHornProgram := by
   cases s <;> simp [twoSatHornProgram]
 
-theorem emptyGoal_mem : emptyGoal ∈ twoSatHornProgram := by
+private theorem emptyGoal_mem : emptyGoal ∈ twoSatHornProgram := by
   simp [twoSatHornProgram]
 
-theorem wideGoal_mem : wideGoal ∈ twoSatHornProgram := by
+private theorem wideGoal_mem : wideGoal ∈ twoSatHornProgram := by
   simp [twoSatHornProgram]
 
 /-! ### A yes-instance satisfies the program -/
@@ -214,14 +216,14 @@ theorem rVal_reachAssign (s t : Bool) (x y : A) :
 
 variable (hsat : Satisfiable A) (hw : WidthAtMostTwo A)
 
-theorem reflClause_holds (s : Bool) (v : Fin 4 → A) :
+private theorem reflClause_holds (s : Bool) (v : Fin 4 → A) :
     (reflClause s).Holds (reachAssign (A := A)) v := by
   intro _
   rw [HornClause.HeadHolds, reflClause]
   exact (reachAtom_holds _ _ _ _ _ v).mpr ((rVal_reachAssign _ _ _ _).mpr
     Relation.ReflTransGen.refl)
 
-theorem edgeClause₁_holds (s u : Bool) (v : Fin 4 → A) :
+private theorem edgeClause₁_holds (s u : Bool) (v : Fin 4 → A) :
     (edgeClause₁ s u).Holds (reachAssign (A := A)) v := by
   intro hbody
   rw [HornClause.HeadHolds, edgeClause₁]
@@ -229,7 +231,7 @@ theorem edgeClause₁_holds (s u : Bool) (v : Fin 4 → A) :
     (Relation.ReflTransGen.single ?_))
   exact ⟨v 0, v 1, s, v 2, u, realize_pairGuard4.mp hbody.1, Or.inl ⟨rfl, rfl⟩⟩
 
-theorem edgeClause₂_holds (s u : Bool) (v : Fin 4 → A) :
+private theorem edgeClause₂_holds (s u : Bool) (v : Fin 4 → A) :
     (edgeClause₂ s u).Holds (reachAssign (A := A)) v := by
   intro hbody
   rw [HornClause.HeadHolds, edgeClause₂]
@@ -237,7 +239,7 @@ theorem edgeClause₂_holds (s u : Bool) (v : Fin 4 → A) :
     (Relation.ReflTransGen.single ?_))
   exact ⟨v 0, v 1, s, v 2, u, realize_pairGuard4.mp hbody.1, Or.inr ⟨rfl, rfl⟩⟩
 
-theorem transClause_holds (s t r : Bool) (v : Fin 4 → A) :
+private theorem transClause_holds (s t r : Bool) (v : Fin 4 → A) :
     (transClause s t r).Holds (reachAssign (A := A)) v := by
   intro hbody
   rw [HornClause.HeadHolds, transClause]
@@ -279,7 +281,7 @@ theorem wideGoal_holds (v : Fin 4 → A) : wideGoal.Holds (reachAssign (A := A))
 include hsat hw in
 /-- **A yes-instance satisfies the program**: the reachability relation itself
 is a satisfying assignment. -/
-theorem holds_reachAssign : twoSatHornProgram.Holds (reachAssign (A := A)) := by
+private theorem holds_reachAssign : twoSatHornProgram.Holds (reachAssign (A := A)) := by
   intro v c hc
   simp only [twoSatHornProgram, List.mem_cons, List.not_mem_nil, or_false] at hc
   rcases hc with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl |
@@ -307,7 +309,7 @@ omit [Finite A] [Nonempty A] in
 include hρ in
 /-- **A satisfying assignment contains reachability**: it is closed under the
 reflexivity, edge and transitivity clauses. -/
-theorem rVal_of_reach {p q : A × Bool} (h : Reach p q) : RVal ρ p.2 q.2 p.1 q.1 := by
+private theorem rVal_of_reach {p q : A × Bool} (h : Reach p q) : RVal ρ p.2 q.2 p.1 q.1 := by
   induction h with
   | refl =>
     have hcl := hρ ![p.1, p.1, p.1, p.1] (reflClause p.2) (reflClause_mem p.2)
@@ -340,7 +342,7 @@ theorem rVal_of_reach {p q : A × Bool} (h : Reach p q) : RVal ρ p.2 q.2 p.1 q.
 
 include hρ in
 /-- **A satisfying assignment makes the instance a yes-instance.** -/
-theorem twoSatisfiable_of_holds : TwoSatisfiable A := by
+private theorem twoSatisfiable_of_holds : TwoSatisfiable A := by
   -- the width promise
   have hw : WidthAtMostTwo A := by
     by_contra hnw
@@ -377,7 +379,8 @@ end Completeness
 
 /-- **Correctness of the program**: it is satisfiable exactly on the
 yes-instances of 2SAT. -/
-theorem twoSatisfiable_iff_exists_holds {A : Type} [Language.sat.Structure A] [LinearOrder A]
+private theorem twoSatisfiable_iff_exists_holds
+    {A : Type} [Language.sat.Structure A] [LinearOrder A]
     [Finite A] [Nonempty A] :
     TwoSatisfiable A ↔ ∃ ρ : reachBlock.Assignment A, twoSatHornProgram.Holds ρ :=
   ⟨fun h => ⟨reachAssign, holds_reachAssign h.2 h.1⟩,

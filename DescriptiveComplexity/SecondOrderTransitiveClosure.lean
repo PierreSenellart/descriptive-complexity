@@ -228,7 +228,7 @@ section Transfer
 variable {L' : Language.{0, 0}} {spec₁ : SOTCSpec L} {spec₂ : SOTCSpec L'}
   {A B : Type} [L.Structure A] [LinearOrder A] [L'.Structure B] [LinearOrder B]
 
-theorem reach_map (e : spec₁.State A ≃ spec₂.State B)
+private theorem reach_map (e : spec₁.State A ≃ spec₂.State B)
     (hstep : ∀ ρ σ, spec₁.Step ρ σ ↔ spec₂.Step (e ρ) (e σ)) {ρ σ : spec₁.State A}
     (h : spec₁.Reach ρ σ) : spec₂.Reach (e ρ) (e σ) := by
   induction h with
@@ -266,25 +266,25 @@ variable [L.Structure A'] [LinearOrder A']
 
 /-- One step is preserved by an isomorphism of the ordered expansions, the
 states being transported. -/
-theorem step_equiv (e : A ≃[L.sum Language.order] A') (ρ σ : spec.State A) :
+private theorem step_equiv (e : A ≃[L.sum Language.order] A') (ρ σ : spec.State A) :
     spec.Step ρ σ ↔ spec.Step (spec.B.mapAssign e.toEquiv ρ) (spec.B.mapAssign e.toEquiv σ) :=
   realize_sentence_of_equiv (spec.B.extendEquiv₂ e ρ σ) spec.step
 
 /-- Starting states are preserved by an isomorphism of the ordered
 expansions. -/
-theorem isSrc_equiv (e : A ≃[L.sum Language.order] A') (ρ : spec.State A) :
+private theorem isSrc_equiv (e : A ≃[L.sum Language.order] A') (ρ : spec.State A) :
     spec.IsSrc ρ ↔ spec.IsSrc (spec.B.mapAssign e.toEquiv ρ) :=
   realize_sentence_of_equiv (spec.B.extendEquiv e ρ) spec.src
 
 /-- Accepting states are preserved by an isomorphism of the ordered
 expansions. -/
-theorem isTgt_equiv (e : A ≃[L.sum Language.order] A') (ρ : spec.State A) :
+private theorem isTgt_equiv (e : A ≃[L.sum Language.order] A') (ρ : spec.State A) :
     spec.IsTgt ρ ↔ spec.IsTgt (spec.B.mapAssign e.toEquiv ρ) :=
   realize_sentence_of_equiv (spec.B.extendEquiv e ρ) spec.tgt
 
 /-- **Acceptance is isomorphism-invariant** (for isomorphisms of the ordered
 expansions, the order being visible to the sentences). -/
-theorem accepts_equiv (e : A ≃[L.sum Language.order] A') :
+private theorem accepts_equiv (e : A ≃[L.sum Language.order] A') :
     spec.Accepts A ↔ spec.Accepts A' :=
   accepts_congr (spec.B.assignEquiv e.toEquiv) (spec.step_equiv e) (spec.isSrc_equiv e)
     (spec.isTgt_equiv e)

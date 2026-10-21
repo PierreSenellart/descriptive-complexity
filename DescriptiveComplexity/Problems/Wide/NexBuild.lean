@@ -7,6 +7,16 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.NexSpec
 import DescriptiveComplexity.Problems.Wide.DrawBuild
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.BlkFile
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.LowFile
+import all DescriptiveComplexity.Problems.Wide.NexOuter
+import all DescriptiveComplexity.Problems.Wide.NexSpec
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The clocked program lays its file out
@@ -86,7 +96,7 @@ noncomputable def regAt {I : Type} (F : LaidFile dt A R' P' I) (dflt : I)
   if h : ∃ v : I, r = F.cell v then h.choose else dflt
 
 /-- At a register's cell it is that register. -/
-theorem regAt_cell {I : Type} {F : LaidFile dt A R' P' I}
+private theorem regAt_cell {I : Type} {F : LaidFile dt A R' P' I}
     (hinj : Function.Injective F.cell) (dflt : I) (v : I) :
     regAt F dflt (F.cell v) = v := by
   classical
@@ -118,7 +128,7 @@ of the two rules the pointer's tuple selects – stay in the block, or roll over
 into the next – it writes the register's mark, advances the pointer to the next
 register and moves right. Which one fired is invisible from here, which is what
 lets the run treat the sweep as one step per register. -/
-theorem hasRight_buildAt (hcoord : Function.Injective coord)
+private theorem hasRight_buildAt (hcoord : Function.Injective coord)
     (v : Wide.BlkIx dt.KIx A dt.dd) (hv : v ≠ blkTop A dt.KIx dt.dd)
     (g : dt.SlotIx → A) :
     PR.HasRight (NexPh.buildP v.1) (dt.ctlOf coord f₀ v.2) g
@@ -154,7 +164,7 @@ theorem hasRight_buildAt (hcoord : Function.Injective coord)
 omit [LinearOrder R'] in
 /-- **The step at the last register**: the same write and the same advance, into
 the phase one cell past the file, where the machine turns round. -/
-theorem hasRight_buildAtTop (hcoord : Function.Injective coord)
+private theorem hasRight_buildAtTop (hcoord : Function.Injective coord)
     (g : dt.SlotIx → A) :
     PR.HasRight (NexPh.buildP (blkTop A dt.KIx dt.dd).1)
       (dt.ctlOf coord f₀ (blkTop A dt.KIx dt.dd).2) g
@@ -203,14 +213,14 @@ noncomputable def phAt {J : Type}
 
 /-- **The control at an address**: the pointer holding the tuple of the register
 it is. -/
-noncomputable def fcAt (tup : I → Fin dt.dd → A)
+private noncomputable def fcAt (tup : I → Fin dt.dd → A)
     (r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) : dt.CtlIx → A :=
   dt.ctlOf coord f₀ (tup (regAt F dflt r))
 
 variable {F dflt coord f₀}
 
 /-- At a register's cell the phase is that register's block. -/
-theorem phAt_cell (hinj : Function.Injective F.cell) (blk : I → Option dt.KIx)
+private theorem phAt_cell (hinj : Function.Injective F.cell) (blk : I → Option dt.KIx)
     (inb : Option dt.KIx → NexPh (Option dt.KIx) PE)
     (done : NexPh (Option dt.KIx) PE) (v : I) :
     phAt F blk inb done (F.cell v) = inb (blk v) := by
@@ -220,7 +230,7 @@ theorem phAt_cell (hinj : Function.Injective F.cell) (blk : I → Option dt.KIx)
   exact congrArg (fun w => inb (blk w)) (hinj hex.choose_spec).symm
 
 /-- Off the file the phase is the turn-around one. -/
-theorem phAt_not_cell {blk : I → Option dt.KIx}
+private theorem phAt_not_cell {blk : I → Option dt.KIx}
     {inb : Option dt.KIx → NexPh (Option dt.KIx) PE}
     {done : NexPh (Option dt.KIx) PE}
     {r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
@@ -228,12 +238,12 @@ theorem phAt_not_cell {blk : I → Option dt.KIx}
   dite_eq_right fun hc => hr hc.choose hc.choose_spec
 
 /-- At a register's cell the control holds that register's tuple. -/
-theorem fcAt_cell (hinj : Function.Injective F.cell) (tup : I → Fin dt.dd → A)
+private theorem fcAt_cell (hinj : Function.Injective F.cell) (tup : I → Fin dt.dd → A)
     (v : I) : dt.fcAt F dflt coord f₀ tup (F.cell v) = dt.ctlOf coord f₀ (tup v) := by
   rw [fcAt, regAt_cell hinj]
 
 /-- Off the file the control holds the default register's tuple. -/
-theorem fcAt_not_cell {tup : I → Fin dt.dd → A}
+private theorem fcAt_not_cell {tup : I → Fin dt.dd → A}
     {r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hr : ∀ v : I, r ≠ F.cell v) :
     dt.fcAt F dflt coord f₀ tup r = dt.ctlOf coord f₀ (tup dflt) := by
@@ -258,7 +268,7 @@ omit [Finite R'] [Finite (NexPh (Option dt.KIx) PE)] in
 file at the register's cell, presented along the walked track. The track carries
 no register digit – the file is being laid, nothing is marked yet – so what the
 presentation adds is the blank the mark already has there. -/
-theorem buildWr_eq_passTracks {coord : Fin dt.dd → dt.CtlIx}
+private theorem buildWr_eq_passTracks {coord : Fin dt.dd → dt.CtlIx}
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) ≤
@@ -320,7 +330,7 @@ omit [Finite R'] [Finite (NexPh (Option dt.KIx) PE)] in
 stretch**: the address is some register's cell, and the rule at that register
 writes its mark, advances the pointer and moves right – onto the next register's
 cell, or, at the last, onto the address past the file. -/
-theorem hasRight_buildSweep (hcoord : Function.Injective coord)
+private theorem hasRight_buildSweep (hcoord : Function.Injective coord)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) <
@@ -507,7 +517,7 @@ omit hrules [LinearOrder R'] [LinearOrder (NexPh (Option dt.KIx) PE)]
   [Finite R'] [Finite (NexPh (Option dt.KIx) PE)] in
 /-- **The guessing sweep's step at a register short of the last**, at one
 value. -/
-theorem hasRight_guessAt (hcoord : Function.Injective coord)
+private theorem hasRight_guessAt (hcoord : Function.Injective coord)
     (v : Wide.BlkIx dt.KIx A dt.dd) (hv : v ≠ blkTop A dt.KIx dt.dd)
     (x : dt.d.B.ι → Bool) (g : dt.SlotIx → A) :
     PR.HasRight (NexPh.guessP v.1) (dt.ctlOf coord f₀ v.2) g
@@ -545,7 +555,7 @@ omit hrules [LinearOrder R'] [LinearOrder (NexPh (Option dt.KIx) PE)]
   [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)]
   [Finite R'] [Finite (NexPh (Option dt.KIx) PE)] in
 /-- **The guessing sweep's step at the last register.** -/
-theorem hasRight_guessAtTop (hcoord : Function.Injective coord)
+private theorem hasRight_guessAtTop (hcoord : Function.Injective coord)
     (x : dt.d.B.ι → Bool) (g : dt.SlotIx → A) :
     PR.HasRight (NexPh.guessP (blkTop A dt.KIx dt.dd).1)
       (dt.ctlOf coord f₀ (blkTop A dt.KIx dt.dd).2) g
@@ -572,7 +582,7 @@ omit hrules [Finite R'] [Finite (NexPh (Option dt.KIx) PE)] in
 the address is some register's cell, and the rule at that register writes the
 value the certificate has there onto the stage tracks, advances the pointer and
 moves right. Which value it is, is the shape – the program's one guess. -/
-theorem hasRight_guessSweep (hcoord : Function.Injective coord)
+private theorem hasRight_guessSweep (hcoord : Function.Injective coord)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) <
@@ -759,7 +769,7 @@ theorem step_doneBack
 omit hrules in
 /-- **The walk home after a sweep**: from the last register down to the marker,
 one step per address, the tape riding along. -/
-theorem reachesIn_homeAfterBuild
+private theorem reachesIn_homeAfterBuild
     (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
@@ -992,7 +1002,7 @@ omit hrules in
 /-- **The approach walk**: the machine moves right in one phase, writing
 nothing, from wherever the opening step left it up to any address it likes. Its
 cost is the stretch it crosses. -/
-theorem reachesIn_approachWalk (hR : PR.table.Reads)
+private theorem reachesIn_approachWalk (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) ≤
@@ -1022,7 +1032,7 @@ omit hrules in
 /-- **The approach's exit**: the machine stops walking and moves right into the
 phase that lays the first block, so the file's first register is where it has
 arrived. -/
-theorem step_approachEnter (hR : PR.table.Reads)
+private theorem step_approachEnter (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) ≤
@@ -1054,7 +1064,7 @@ round and moves right into the guessing phase – the step between the file-layi
 phase and the guess. Where it lands is the marker's neighbor, which is where
 the guess begins: the certificate lives in the data region, *below* the file. It
 writes nothing. -/
-theorem step_homeBuildExit (hR : PR.table.Reads)
+private theorem step_homeBuildExit (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) ≤
@@ -1087,7 +1097,7 @@ theorem step_homeBuildExit (hR : PR.table.Reads)
 omit hrules [Nonempty A] in
 /-- **The dispatch into the evaluation**: at the marker after the guess's walk
 home, the machine enters the evaluation's first phase one cell to the right. -/
-theorem step_homeGuessExit (hR : PR.table.Reads)
+private theorem step_homeGuessExit (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {base : ℕ} (hpos : 0 < base)
     (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) ≤
@@ -1139,7 +1149,7 @@ include hrulesS
 omit hrules [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
 /-- **The opening step, at any file**: the machine plants the marker and the
 bottom mark at the cell it starts on and moves right into the approach. -/
-theorem step_startAny (hR : PR.table.Reads)
+private theorem step_startAny (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {v v' : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v')
@@ -1159,7 +1169,7 @@ theorem step_startAny (hR : PR.table.Reads)
 omit hrules [Nonempty A] in
 /-- **The approach walk, at any file**: the machine moves right in one phase,
 writing nothing, as far as it likes. -/
-theorem reachesIn_approachAny (hR : PR.table.Reads)
+private theorem reachesIn_approachAny (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {s₀ s₁ : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hle : WMSetLe WMLe s₀ s₁) :
@@ -1175,7 +1185,7 @@ theorem reachesIn_approachAny (hR : PR.table.Reads)
 omit hrules [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
 /-- **The approach's exit, at any file**: the machine stops walking and moves
 right into the sweep's first phase. -/
-theorem step_approachEnterAny (hR : PR.table.Reads)
+private theorem step_approachEnterAny (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {x y : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe x y) :
@@ -1190,7 +1200,7 @@ omit hrules [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt
 /-- **The dispatch out of the walk home, at any file**: at the marker the
 machine turns round into the guessing phase, its pointer reset by the sweep's
 own `st0`. -/
-theorem step_homeBuildExitAny (hR : PR.table.Reads)
+private theorem step_homeBuildExitAny (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {v s₀ : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v s₀)
@@ -1206,7 +1216,7 @@ theorem step_homeBuildExitAny (hR : PR.table.Reads)
 
 omit hrules [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
 /-- **The dispatch into the evaluation, at any file.** -/
-theorem step_homeGuessExitAny (hR : PR.table.Reads)
+private theorem step_homeGuessExitAny (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {v v' : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v')
@@ -1225,7 +1235,7 @@ spec writes and leaves the pointer where the spec's roll-over leaves it, which
 for `DescriptiveComplexity.Draw.Data.nullSpec` is nothing and the same
 pointer. This is the whole of the file-laying phase of a program that is *handed*
 its file. -/
-theorem step_sweepDone (hR : PR.table.Reads)
+private theorem step_sweepDone (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {v v' : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v')
@@ -1249,7 +1259,7 @@ omit hrules [Nonempty A] [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt
 /-- **The turn-around after a sweep, at any file**: in the done phase the
 machine steps back one cell and its walk home begins there. It writes
 nothing. -/
-theorem step_doneBackAny (hR : PR.table.Reads)
+private theorem step_doneBackAny (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {v v' : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v') :

@@ -67,10 +67,10 @@ theorem neg_neg (p : Lit V) : neg (neg p) = p := by
 theorem neg_fst (p : Lit V) : (neg p).1 = p.1 := rfl
 
 /-- The literal is true under the assignment `ν`. -/
-def LitTrue (ν : V → Prop) (p : Lit V) : Prop :=
+private def LitTrue (ν : V → Prop) (p : Lit V) : Prop :=
   if p.2 then ν p.1 else ¬ν p.1
 
-theorem litTrue_neg {ν : V → Prop} {p : Lit V} : LitTrue ν (neg p) ↔ ¬LitTrue ν p := by
+private theorem litTrue_neg {ν : V → Prop} {p : Lit V} : LitTrue ν (neg p) ↔ ¬LitTrue ν p := by
   obtain ⟨x, s⟩ := p
   cases s <;> simp [LitTrue, neg]
 
@@ -79,7 +79,7 @@ theorem litTrue_neg {ν : V → Prop} {p : Lit V} : LitTrue ν (neg p) ↔ ¬Lit
 variable (Cl : Lit V → Lit V → Prop)
 
 /-- The assignment satisfies the 2-CNF: every clause has a true literal. -/
-def Satisfies (ν : V → Prop) : Prop :=
+private def Satisfies (ν : V → Prop) : Prop :=
   ∀ p q : Lit V, Cl p q → LitTrue ν p ∨ LitTrue ν q
 
 /-- One step of the implication graph: the clause `¬p ∨ q`, in either order,
@@ -92,7 +92,7 @@ abbrev Reach : Lit V → Lit V → Prop :=
   Relation.ReflTransGen (Step Cl)
 
 /-- **Contraposition, one step**: the implication `p → q` is also `¬q → ¬p`. -/
-theorem step_neg {p q : Lit V} (h : Step Cl p q) : Step Cl (neg q) (neg p) := by
+private theorem step_neg {p q : Lit V} (h : Step Cl p q) : Step Cl (neg q) (neg p) := by
   rw [Step, neg_neg]
   exact h.symm
 
@@ -109,7 +109,7 @@ section Sound
 variable {Cl} {ν : V → Prop}
 
 /-- One implication step preserves truth. -/
-theorem litTrue_of_step (hν : Satisfies Cl ν) {p q : Lit V} (hstep : Step Cl p q)
+private theorem litTrue_of_step (hν : Satisfies Cl ν) {p q : Lit V} (hstep : Step Cl p q)
     (hp : LitTrue ν p) : LitTrue ν q := by
   rcases hstep with h | h
   · rcases hν _ _ h with h' | h'
@@ -120,7 +120,7 @@ theorem litTrue_of_step (hν : Satisfies Cl ν) {p q : Lit V} (hstep : Step Cl p
     · exact absurd hp (litTrue_neg.mp h')
 
 /-- **Implications are sound**: reachability preserves truth. -/
-theorem litTrue_of_reach (hν : Satisfies Cl ν) {p q : Lit V} (h : Reach Cl p q)
+private theorem litTrue_of_reach (hν : Satisfies Cl ν) {p q : Lit V} (h : Reach Cl p q)
     (hp : LitTrue ν p) : LitTrue ν q := by
   induction h with
   | refl => exact hp
@@ -130,7 +130,7 @@ end Sound
 
 /-- **A satisfiable 2-CNF has no bad cycle**: a literal reaching its own
 negation and back would be both true and false. -/
-theorem no_bad_cycle_of_satisfies {ν : V → Prop} (hν : Satisfies Cl ν) (p : Lit V) :
+private theorem no_bad_cycle_of_satisfies {ν : V → Prop} (hν : Satisfies Cl ν) (p : Lit V) :
     ¬(Reach Cl p (neg p) ∧ Reach Cl (neg p) p) := by
   rintro ⟨h1, h2⟩
   by_cases hp : LitTrue ν p
@@ -142,22 +142,22 @@ theorem no_bad_cycle_of_satisfies {ν : V → Prop} (hν : Satisfies Cl ν) (p :
 section Greedy
 
 /-- A set of literals closed under reachability. -/
-def Closed (T : Set (Lit V)) : Prop :=
+private def Closed (T : Set (Lit V)) : Prop :=
   ∀ p ∈ T, ∀ q, Reach Cl p q → q ∈ T
 
 /-- A set of literals containing no literal together with its negation. -/
-def Consistent (T : Set (Lit V)) : Prop :=
+private def Consistent (T : Set (Lit V)) : Prop :=
   ∀ p : Lit V, p ∈ T → neg p ∉ T
 
 /-- The variable `x` is decided by `T`: one of its two literals is in `T`. -/
-def Decides (T : Set (Lit V)) (x : V) : Prop :=
+private def Decides (T : Set (Lit V)) (x : V) : Prop :=
   ((x, true) : Lit V) ∈ T ∨ ((x, false) : Lit V) ∈ T
 
-theorem closed_empty : Closed Cl (∅ : Set (Lit V)) := by
+private theorem closed_empty : Closed Cl (∅ : Set (Lit V)) := by
   intro p hp
   exact hp.elim
 
-theorem consistent_empty : Consistent (∅ : Set (Lit V)) := by
+private theorem consistent_empty : Consistent (∅ : Set (Lit V)) := by
   intro p hp
   exact hp.elim
 
@@ -165,7 +165,7 @@ variable {Cl}
 
 /-- **The extension step**: a closed consistent set that does not decide `x`
 can be extended to one that does, provided `x` has no bad cycle. -/
-theorem exists_extend {T : Set (Lit V)} (hclosed : Closed Cl T) (hcons : Consistent T)
+private theorem exists_extend {T : Set (Lit V)} (hclosed : Closed Cl T) (hcons : Consistent T)
     {x : V} (hx : ¬Decides T x)
     (hcyc : ∀ s : Bool, ¬(Reach Cl ((x, s) : Lit V) (neg (x, s)) ∧
       Reach Cl (neg ((x, s) : Lit V)) (x, s))) :
@@ -211,7 +211,7 @@ theorem exists_extend {T : Set (Lit V)} (hclosed : Closed Cl T) (hcons : Consist
     | true => exact Or.inl (Or.inr Relation.ReflTransGen.refl)
 
 /-- Deciding a whole finite set of variables, one extension at a time. -/
-theorem exists_closed_consistent_deciding
+private theorem exists_closed_consistent_deciding
     (hcyc : ∀ (x : V) (s : Bool), ¬(Reach Cl ((x, s) : Lit V) (neg (x, s)) ∧
       Reach Cl (neg ((x, s) : Lit V)) (x, s)))
     (S : Finset V) :
@@ -240,7 +240,7 @@ variable [Finite V]
 
 /-- **The criterion**: a 2-CNF with no literal reaching its own negation and
 back is satisfiable. -/
-theorem exists_satisfies_of_no_bad_cycle
+private theorem exists_satisfies_of_no_bad_cycle
     (hcyc : ∀ (x : V) (s : Bool), ¬(Reach Cl ((x, s) : Lit V) (neg (x, s)) ∧
       Reach Cl (neg ((x, s) : Lit V)) (x, s))) :
     ∃ ν : V → Prop, Satisfies Cl ν := by
@@ -321,14 +321,14 @@ variable {Cl}
 
 /-- A walk of the cycle-witnessing graph projects to a walk of the implication
 graph. -/
-theorem reach_of_carryReach {a b : CarryNode V}
+private theorem reach_of_carryReach {a b : CarryNode V}
     (h : Relation.ReflTransGen (CarryStep Cl) a b) : Reach Cl a.2.1 b.2.1 := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
   | tail _ hstep ih => exact ih.tail hstep.2.1
 
 /-- The start component is constant along a walk. -/
-theorem start_of_carryReach {a b : CarryNode V}
+private theorem start_of_carryReach {a b : CarryNode V}
     (h : Relation.ReflTransGen (CarryStep Cl) a b) : b.1 = a.1 := by
   induction h with
   | refl => rfl
@@ -336,7 +336,7 @@ theorem start_of_carryReach {a b : CarryNode V}
 
 /-- A walk of the implication graph lifts to one of the cycle-witnessing graph
 at any fixed start and flag. -/
-theorem carryReach_of_reach (s : Lit V) (ph : Bool) {a b : Lit V} (h : Reach Cl a b) :
+private theorem carryReach_of_reach (s : Lit V) (ph : Bool) {a b : Lit V} (h : Reach Cl a b) :
     Relation.ReflTransGen (CarryStep Cl) (s, a, ph) (s, b, ph) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -344,7 +344,7 @@ theorem carryReach_of_reach (s : Lit V) (ph : Bool) {a b : Lit V} (h : Reach Cl 
 
 /-- What a walk that has raised its flag witnesses: the start's negation was
 passed on the way. -/
-theorem reach_neg_of_carryReach {s a : Lit V} {d : CarryNode V}
+private theorem reach_neg_of_carryReach {s a : Lit V} {d : CarryNode V}
     (h : Relation.ReflTransGen (CarryStep Cl) ((s, a, false) : CarryNode V) d)
     (hd : d.2.2 = true) : Reach Cl a (neg s) ∧ Reach Cl (neg s) d.2.1 := by
   induction h with

@@ -73,7 +73,7 @@ theorem pad_of_lt (j : Fin dd) (h : (j : ℕ) < c) : pad (dd := dd) zero w j = w
 theorem pad_of_ge (j : Fin dd) (h : c ≤ (j : ℕ)) : pad (dd := dd) zero w j = zero := by
   simp [pad, Nat.not_lt.mpr h]
 
-theorem isPad_pad : IsPad c zero (pad (dd := dd) zero w) := fun j h => pad_of_ge j h
+private theorem isPad_pad : IsPad c zero (pad (dd := dd) zero w) := fun j h => pad_of_ge j h
 
 /-- **A payload reads back.** -/
 @[simp]
@@ -84,7 +84,7 @@ theorem unpad_pad (hc : c ≤ dd) : unpad hc (pad (dd := dd) zero w) = w :=
 /-- **A canonically padded tuple is the padding of what it carries**, so the two
 descriptions of an element – “it is `pad` of something” and “it is padded” – are
 the same. -/
-theorem pad_unpad (hc : c ≤ dd) (hv : IsPad c zero v) : pad zero (unpad hc v) = v := by
+private theorem pad_unpad (hc : c ≤ dd) (hv : IsPad c zero v) : pad zero (unpad hc v) = v := by
   refine funext fun j => ?_
   by_cases h : (j : ℕ) < c
   · rw [pad_of_lt j h, unpad]
@@ -111,12 +111,12 @@ noncomputable def symElt (zero : A) (w : Fin c → A) : Tag R P K × (Fin dd →
   (Tag.sym, pad zero w)
 
 /-- **A transition**: the rule in the tag, the rule's data in the payload. -/
-noncomputable def trElt (zero : A) (r : R) (w : Fin c → A) :
+private noncomputable def trElt (zero : A) (r : R) (w : Fin c → A) :
     Tag R P K × (Fin dd → A) :=
   (Tag.ctrl r, pad zero w)
 
 /-- **A state is determined by its call site and its pointer.** -/
-theorem stateElt_inj (hc : c ≤ dd) {p p' : P} {w w' : Fin c → A}
+private theorem stateElt_inj (hc : c ≤ dd) {p p' : P} {w w' : Fin c → A}
     (h : stateElt (dd := dd) (R := R) (K := K) zero p w = stateElt zero p' w') :
     p = p' ∧ w = w' := by
   refine ⟨?_, pad_injective hc (congrArg Prod.snd h)⟩
@@ -124,7 +124,7 @@ theorem stateElt_inj (hc : c ≤ dd) {p p' : P} {w w' : Fin c → A}
   simpa using h1
 
 /-- **A symbol is determined by its tracks.** -/
-theorem symElt_inj (hc : c ≤ dd) {w w' : Fin c → A}
+private theorem symElt_inj (hc : c ≤ dd) {w w' : Fin c → A}
     (h : symElt (dd := dd) (R := R) (P := P) (K := K) zero w = symElt zero w') : w = w' :=
   pad_injective hc (congrArg Prod.snd h)
 

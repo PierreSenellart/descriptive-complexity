@@ -252,11 +252,11 @@ section Marks
 variable {k : ℕ} {A : Type} [(Language.turingAlt k).Structure A]
 
 /-- A marked state has a block index below `k`. -/
-theorem lt_of_atmBlk {j : ℕ} {a : A} (h : ATMBlk (k := k) j a) : j < k :=
+private theorem lt_of_atmBlk {j : ℕ} {a : A} (h : ATMBlk (k := k) j a) : j < k :=
   h.1
 
 /-- The mark of a block, with its index bound supplied. -/
-theorem atmBlk_iff {j : ℕ} (h : j < k) (a : A) :
+private theorem atmBlk_iff {j : ℕ} (h : j < k) (a : A) :
     ATMBlk (k := k) j a ↔ RelMap (atmBlk (⟨j, h⟩ : Fin k)) ![a] :=
   ⟨fun hb => hb.2, fun hb => ⟨h, hb⟩⟩
 
@@ -275,7 +275,7 @@ variable {A : Type} [(Language.turingAlt 1).Structure A]
 
 /-- **At one block nothing is universal**, when the prefix starts
 existentially: the only block is `0`, whose polarity is `true`. -/
-theorem not_isUniv_one (q : A) : ¬(atmData 1 A).IsUniv true q := by
+private theorem not_isUniv_one (q : A) : ¬(atmData 1 A).IsUniv true q := by
   rintro ⟨j, hj, hpol⟩
   obtain rfl : j = 0 := by have := lt_of_atmBlk (k := 1) hj; omega
   exact Bool.noConfusion hpol
@@ -283,7 +283,7 @@ theorem not_isUniv_one (q : A) : ¬(atmData 1 A).IsUniv true q := by
 /-- **At one block, well-formedness of the block structure is just that every
 state is marked.** Uniqueness and monotonicity are automatic: there is only one
 mark to carry. -/
-theorem blocksWellFormed_one_iff :
+private theorem blocksWellFormed_one_iff :
     (atmData 1 A).BlocksWellFormed 1 ↔ ∀ q : A, ATMBlk (k := 1) 0 q := by
   constructor
   · intro h q

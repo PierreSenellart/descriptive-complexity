@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.AltLadder
 public import DescriptiveComplexity.Problems.Machine.Membership
+import all DescriptiveComplexity.MachinesAlt
 
 /-!
 # The ladder, written with the relations a second-order block guesses
@@ -125,7 +126,7 @@ def graphOf (w : A → Config A) : tmGuessBlock.Assignment A := fun i =>
     · simp [runQ, runH, runT, graphOf]
 
 /-- Two values with the same graph are equal. -/
-theorem eq_of_iff_eq {α : Type} {x y : α} (h : ∀ a, a = x ↔ a = y) : x = y := (h x).mp rfl
+private theorem eq_of_iff_eq {α : Type} {x y : α} (h : ∀ a, a = x ↔ a = y) : x = y := (h x).mp rfl
 
 variable {ρ : tmGuessBlock.Assignment A} {w : A → Config A}
 
@@ -188,7 +189,7 @@ variable {A : Type} (M : ATMData A) (ρ ρ' : tmGuessBlock.Assignment A)
 def RunAcc (t : A) : Prop := ∀ q, runQ ρ t q → M.Acc q
 
 /-- The state at time `t` is in block `j`. -/
-def RunBlk (j : ℕ) (t : A) : Prop := ∀ q, runQ ρ t q → M.Blk j q
+private def RunBlk (j : ℕ) (t : A) : Prop := ∀ q, runQ ρ t q → M.Blk j q
 
 /-- The state at time `t` is in a block below `i`. -/
 def RunBlkLt (i : ℕ) (t : A) : Prop := ∀ q, runQ ρ t q → M.BlkLt i q
@@ -251,14 +252,14 @@ section Dict
 
 variable {M} {ρ ρ'} {w w' : A → Config A}
 
-theorem runAcc_iff (h : Graphs ρ w) (t : A) : M.RunAcc ρ t ↔ M.Acc (w t).state :=
+private theorem runAcc_iff (h : Graphs ρ w) (t : A) : M.RunAcc ρ t ↔ M.Acc (w t).state :=
   ⟨fun hacc => hacc _ ((h.1 t _).mpr rfl), fun hacc q hq => (h.1 t q).mp hq ▸ hacc⟩
 
-theorem runBlkLt_iff (h : Graphs ρ w) (i : ℕ) (t : A) :
+private theorem runBlkLt_iff (h : Graphs ρ w) (i : ℕ) (t : A) :
     M.RunBlkLt ρ i t ↔ M.BlkLt i (w t).state :=
   ⟨fun hb => hb _ ((h.1 t _).mpr rfl), fun hb q hq => (h.1 t q).mp hq ▸ hb⟩
 
-theorem runInit_iff (h : Graphs ρ w) (t : A) : M.RunInit ρ t ↔ M.IsInit (w t) := by
+private theorem runInit_iff (h : Graphs ρ w) (t : A) : M.RunInit ρ t ↔ M.IsInit (w t) := by
   refine ⟨fun hi => ⟨hi.1 _ ((h.1 t _).mpr rfl), hi.2.1 _ ((h.2.1 t _).mpr rfl),
     fun p => hi.2.2 p _ ((h.2.2 t p _).mpr rfl)⟩, fun hi => ⟨fun q hq => ?_, fun p hp => ?_,
       fun p a ha => ?_⟩⟩
@@ -266,7 +267,7 @@ theorem runInit_iff (h : Graphs ρ w) (t : A) : M.RunInit ρ t ↔ M.IsInit (w t
   · exact (h.2.1 t p).mp hp ▸ hi.2.1
   · exact (h.2.2 t p a).mp ha ▸ hi.2.2 p
 
-theorem runSame_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (t t' : A) :
+private theorem runSame_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (t t' : A) :
     RunSame ρ ρ' t t' ↔ w' t' = w t := by
   constructor
   · rintro ⟨hq, hp, ha⟩
@@ -281,7 +282,8 @@ theorem runSame_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (t t' : A) :
     · rw [hg'.2.1 t' p, hg.2.1 t p, heq]
     · rw [hg'.2.2 t' p a, hg.2.2 t p a, heq]
 
-theorem runAppTr_iff (h : Graphs ρ w) (t : A) : M.RunAppTr ρ t ↔ M.toTMData.AppTr (w t) := by
+private theorem runAppTr_iff
+    (h : Graphs ρ w) (t : A) : M.RunAppTr ρ t ↔ M.toTMData.AppTr (w t) := by
   refine exists_congr fun τ => and_congr_right fun _ => ?_
   refine and_congr ⟨fun hs => hs _ ((h.1 t _).mpr rfl), fun hs q hq => (h.1 t q).mp hq ▸ hs⟩
     (and_congr ⟨fun hr => hr _ _ ((h.2.1 t _).mpr rfl) ((h.2.2 t _ _).mpr rfl),
@@ -290,11 +292,11 @@ theorem runAppTr_iff (h : Graphs ρ w) (t : A) : M.RunAppTr ρ t ↔ M.toTMData.
   refine or_congr (and_congr Iff.rfl ?_) (and_congr Iff.rfl ?_) <;>
     exact ⟨fun hm => hm _ ((h.2.1 t _).mpr rfl), fun hm p hp => (h.2.1 t p).mp hp ▸ hm⟩
 
-theorem runStuck_iff (h : Graphs ρ w) (t : A) : ¬M.RunAppTr ρ t ↔ M.Stuck (w t) := by
+private theorem runStuck_iff (h : Graphs ρ w) (t : A) : ¬M.RunAppTr ρ t ↔ M.Stuck (w t) := by
   rw [runAppTr_iff h, ← TMData.exists_step_iff_appTr]
   exact stuck_iff_not_exists_step.symm
 
-theorem runStep_iff (h : Graphs ρ w) (t t' : A) :
+private theorem runStep_iff (h : Graphs ρ w) (t t' : A) :
     M.RunStep (ρ := ρ) t t' ↔ M.Step (w t) (w t') := by
   refine exists_congr fun τ => and_congr_right fun _ => ?_
   refine and_congr ⟨fun hs => hs _ ((h.1 t _).mpr rfl), fun hs q hq => (h.1 t q).mp hq ▸ hs⟩
@@ -315,7 +317,7 @@ theorem runStep_iff (h : Graphs ρ w) (t t' : A) :
       exact ⟨fun hm => hm _ _ ((h.2.1 t _).mpr rfl) ((h.2.1 t' _).mpr rfl),
         fun hm p p' hp hp' => (h.2.1 t p).mp hp ▸ (h.2.1 t' p').mp hp' ▸ hm⟩
 
-theorem runBlkMono_iff (h : Graphs ρ w) : M.RunBlkMono ρ ↔ M.BlkMono w := by
+private theorem runBlkMono_iff (h : Graphs ρ w) : M.RunBlkMono ρ ↔ M.BlkMono w := by
   constructor
   · intro hm p q hpq j j' hj hj'
     exact hm p q hpq _ _ ((h.1 p _).mpr rfl) ((h.1 q _).mpr rfl) j j' hj hj'
@@ -324,7 +326,7 @@ theorem runBlkMono_iff (h : Graphs ρ w) : M.RunBlkMono ρ ↔ M.BlkMono w := by
     rw [(h.1 q y).mp hy] at hj'
     exact hm p q hpq j j' hj hj'
 
-theorem runLegalBelow_iff (h : Graphs ρ w) (i : ℕ) :
+private theorem runLegalBelow_iff (h : Graphs ρ w) (i : ℕ) :
     M.RunLegalBelow ρ i ↔ M.LegalBelow i w := by
   refine and_congr (forall_congr' fun p => forall_congr' fun _ => runInit_iff h p)
     (and_congr (runBlkMono_iff h) ?_)
@@ -333,17 +335,17 @@ theorem runLegalBelow_iff (h : Graphs ρ w) (i : ℕ) :
   exact imp_congr Iff.rfl (or_congr (and_congr (runStep_iff h p q) (not_congr (runAcc_iff h p)))
     (and_congr (runSame_iff h h p q) (or_congr (runAcc_iff h p) (runStuck_iff h p))))
 
-theorem runAccAt_iff (h : Graphs ρ w) : M.RunAccAt ρ ↔ M.AccAt w :=
+private theorem runAccAt_iff (h : Graphs ρ w) : M.RunAccAt ρ ↔ M.AccAt w :=
   forall_congr' fun p => forall_congr' fun _ => runAcc_iff h p
 
-theorem runAgreeBelow_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (i : ℕ) :
+private theorem runAgreeBelow_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (i : ℕ) :
     M.RunAgreeBelow ρ ρ' i ↔ M.AgreeBelow i w' w := by
   refine and_congr (forall_congr' fun t => forall_congr' fun _ => ?_)
     (forall_congr' fun t => forall_congr' fun t' => forall_congr' fun _ => ?_) <;>
     rw [runBlkLt_iff hg] <;>
     exact imp_congr Iff.rfl (runSame_iff hg hg' _ _)
 
-theorem runRoundCond_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (i : ℕ) :
+private theorem runRoundCond_iff (hg : Graphs ρ w) (hg' : Graphs ρ' w') (i : ℕ) :
     M.RunRoundCond ρ ρ' i ↔ M.RoundCond i w w' :=
   and_congr (runLegalBelow_iff hg' (i + 1)) (runAgreeBelow_iff hg hg' i)
 
@@ -366,7 +368,7 @@ def RunAltLadder (start : Bool) : ℕ → Prop
         fun ρ => M.runLadder start 1 m ρ
 
 /-- **The ladder over walks is the ladder over guesses**, from round `i` on. -/
-theorem gameLadder_iff_runLadder (start : Bool) :
+private theorem gameLadder_iff_runLadder (start : Bool) :
     ∀ (m i : ℕ) (ρprev : tmGuessBlock.Assignment A) (prev : A → Config A),
       Graphs ρprev prev → (M.gameLadder start i m prev ↔ M.runLadder start i m ρprev) := by
   intro m

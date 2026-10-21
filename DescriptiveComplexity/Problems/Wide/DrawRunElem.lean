@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawElem
 import DescriptiveComplexity.Problems.Wide.DrawLoop
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The element loop's run
@@ -85,7 +90,7 @@ theorem trackTape_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A
   · rw [ite_eq_right hs]
 
 /-- A backed track's pass presentation is the background itself. -/
-theorem passTracks_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A}
+private theorem passTracks_of_back {t : W} {rest : (Univ A R P K dd → Prop) → W → A}
     {m : I → Prop}
     (hm : ∀ r, rest r t = bitVal PR.zero PR.one (bitAtOf RF.cell m r))
     (r : Univ A R P K dd → Prop) :
@@ -124,7 +129,7 @@ variable (hrules : ∀ (i : ElemSite nr) (ρ : ElemSh nr i),
 /-- The phase before the `k`-th read of a round – the fold checkpoint once
 the reads are exhausted. `DescriptiveComplexity.Draw.elemFirstRd` is this at
 `0`, `DescriptiveComplexity.Draw.elemNextRd j` at `j + 1`. -/
-def elemPhaseAt (emb : ElemPh nr → P) (k : ℕ) : P :=
+private def elemPhaseAt (emb : ElemPh nr → P) (k : ℕ) : P :=
   if h : k < nr then emb (.rdP ⟨k, h⟩ .start) else emb .e1
 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -195,7 +200,7 @@ variable (hwkt₀ : wk ≠ t₀) (hrgt₀ : rg ≠ t₀)
 omit hrules [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
 include hlin hix hbot hv in
 /-- The working cell is nobody's register. -/
-theorem not_reg_of_lt_bot : ∀ u : I, v ≠ RF.cell u := by
+private theorem not_reg_of_lt_bot : ∀ u : I, v ≠ RF.cell u := by
   intro u hvu
   rw [hvu] at hv
   exact ((RF.lt_iff hix u gbot).mp hv).2 (hbot u)
@@ -503,7 +508,7 @@ include hrules RF hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ 
 /-- **The element loop's run**, the budget forgotten: what a space-bounded
 caller reads. The width of a trip is then the largest of the finitely many the
 loop takes. -/
-theorem elem_run {f₀ : Q → A}
+private theorem elem_run {f₀ : Q → A}
     (hinit : initEl f₀ (rest v) = fsOf a₀ 0) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (emb .e0) f₀), Sum.inl v,

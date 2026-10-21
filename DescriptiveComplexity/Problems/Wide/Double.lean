@@ -101,7 +101,7 @@ theorem relMap_dbl_inl {n : ℕ} (r : L.Relations n) (xs : Fin n → (dblInterp 
   exact relMap_sumInl r _
 
 /-- **The mark** holds exactly on the copy that carries the instance. -/
-theorem relMap_dbl_old (xs : Fin 1 → (dblInterp L).Map A) :
+private theorem relMap_dbl_old (xs : Fin 1 → (dblInterp L).Map A) :
     RelMap (M := (dblInterp L).Map A) (oldNewSym L) xs ↔ (xs 0).1 = false := by
   rw [FOInterpretation.relMap_map]
   exact realize_sideF

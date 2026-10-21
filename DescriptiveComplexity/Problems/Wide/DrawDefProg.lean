@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawDefVar
 import DescriptiveComplexity.Problems.Wide.DrawVar
 import DescriptiveComplexity.Problems.Wide.DrawRound
+import all DescriptiveComplexity.Problems.Wide.DrawDefKit
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The last four layers, and the program's own kits
@@ -42,7 +44,7 @@ variable [Fintype dt.SlotIx]
 
 /-- **One round's rules are definable**: the branch checkpoint's dispatches
 read the two gate flags, which are control slots. -/
-theorem uRulesDefinable_roundRule {PG PX SG SX : Type} {ShG : SG → Type}
+private theorem uRulesDefinable_roundRule {PG PX SG SX : Type} {ShG : SG → Type}
     {ShX : SX → Type} {emb : RoundPh PG PX → P}
     {ruleG : ∀ (e : Env L) (s : SG), ShG s → Rule e.α Q dt.SlotIx P}
     {ruleX : ∀ (e : Env L) (s : SX), ShX s → Rule e.α Q dt.SlotIx P}
@@ -79,7 +81,7 @@ theorem uRulesDefinable_roundRule {PG PX SG SX : Type} {ShG : SG → Type}
 clear, the exhaustion test and the block-indexed increment, with the folds as
 the caller's control updates and the two stage writes as single-slot
 updates. -/
-theorem uRulesDefinable_varRule {PG PX SG SX : Type} {ShG : SG → Type}
+private theorem uRulesDefinable_varRule {PG PX SG SX : Type} {ShG : SG → Type}
     {ShX : SX → Type} {emb : VarPh dt.CarryB PG PX → P}
     {ruleG : ∀ (e : Env L) (s : SG), ShG s → Rule e.α Q dt.SlotIx P}
     {ruleX : ∀ (e : Env L) (s : SX), ShX s → Rule e.α Q dt.SlotIx P}
@@ -182,7 +184,7 @@ theorem uRulesDefinable_varRule {PG PX SG SX : Type} {ShG : SG → Type}
 /-- **The evaluation's spine is definable**: one checkpoint per variable
 position, the last one erasing the marker towards the sweep's advance or the
 post-sweep reset. -/
-theorem uRulesDefinable_evalRule {PM SM : Type} {nv : ℕ} {ShM : SM → Type}
+private theorem uRulesDefinable_evalRule {PM SM : Type} {nv : ℕ} {ShM : SM → Type}
     {ruleM : ∀ (e : Env L) (s : SM), ShM s →
       Rule e.α Q dt.SlotIx (OuterPh (EvalPh nv PM))}
     {subEntry : Fin nv → PM} (hM : URulesDefinable ruleM) :
@@ -222,7 +224,7 @@ theorem uRulesDefinable_evalRule {PM SM : Type} {nv : ℕ} {ShM : SM → Type}
 
 /-- **The convergence test's question is definable**: one equivalence per
 fixed-point variable. -/
-theorem uGDefinable_cmpG :
+private theorem uGDefinable_cmpG :
     UGDefinable (L := L) (Q := Q) fun e (_ : Q → e.α) g => dt.cmpG e.one g :=
   (uGDefinable_forall fun i : dt.d.B.ι =>
     (uGDefinable_trkOne (L := L) (Q := Q) (Slot.old i : dt.SlotIx)).iff
@@ -232,7 +234,7 @@ theorem uGDefinable_cmpG :
 /-- **The copy-back's rewrite is definable**: every stage track takes its
 next's digit, and every other slot rides along – a decision made slot by
 slot. -/
-theorem uTrDefinable_copyKit_wrG {ph : P} :
+private theorem uTrDefinable_copyKit_wrG {ph : P} :
     UTrDefinable (L := L) (Q := Q) fun e (_ : Q → e.α) g =>
       (dt.copyKit (A := e.α) (Q := Q) (P := P) ph).wrG g := by
   intro s
@@ -259,7 +261,7 @@ theorem uTrDefinable_copyKit_wrG {ph : P} :
 
 /-- **The outer program's rules are definable**: thirteen kits with their exit
 rules, the initial step, and the evaluation's rules as the parameter. -/
-theorem uRulesDefinable_outerRule {PE SE : Type} {ShE : SE → Type}
+private theorem uRulesDefinable_outerRule {PE SE : Type} {ShE : SE → Type}
     {ruleE : ∀ (e : Env L) (s : SE), ShE s → Rule e.α Q dt.SlotIx (OuterPh PE)}
     {evalEntry evalEntryOut : PE} (hE : URulesDefinable ruleE) :
     URulesDefinable (L := L) (Q := Q) fun e =>

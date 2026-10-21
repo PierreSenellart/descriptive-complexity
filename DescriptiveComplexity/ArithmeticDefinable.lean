@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Arithmetic
 public import DescriptiveComplexity.FirstOrderDefinable
 public import DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.FirstOrderDefinable
 
 /-!
 # AC⁰ definability: first-order logic with the numeric predicates
@@ -99,7 +101,7 @@ hypothesis a `DescriptiveComplexity.ComplexityClass` demands of its membership
 predicate.
 Registered in the Lax archive as
 [`Lax895169.ACZeroFinite.ac0Definable_congr_finite`](https://laxarchive.org/lax-895169/Lax895169.ACZeroFinite.html#s-Lax895169.ACZeroFinite.ac0Definable_congr_finite). -/
-theorem ac0Definable_congr {P Q : DecisionProblem L}
+private theorem ac0Definable_congr {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     AC0Definable P ↔ AC0Definable Q := by
   constructor <;> rintro ⟨φ, hφ⟩ <;> refine ⟨φ, ?_⟩ <;> intro A _ _ _ _

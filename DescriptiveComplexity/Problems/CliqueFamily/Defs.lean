@@ -174,7 +174,7 @@ private theorem symm_hK {KB : B → Prop} {KA : A → Prop} (u : B ≃ A)
   simp
 
 /-- `CliqueOn` transports along an equivalence, iff version. -/
-theorem CliqueOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+private theorem CliqueOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     CliqueOn AdjB KB ↔ CliqueOn AdjA KA :=
@@ -182,7 +182,7 @@ theorem CliqueOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → P
     CliqueOn.of_equiv u.symm (symm_hadj u hadj) (symm_hK u hK)⟩
 
 /-- `IndepOn` transports along an equivalence, iff version. -/
-theorem IndepOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+private theorem IndepOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     IndepOn AdjB KB ↔ IndepOn AdjA KA :=
@@ -190,7 +190,7 @@ theorem IndepOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Pr
     IndepOn.of_equiv u.symm (symm_hadj u hadj) (symm_hK u hK)⟩
 
 /-- `CoverOn` transports along an equivalence, iff version. -/
-theorem CoverOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+private theorem CoverOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     CoverOn AdjB KB ↔ CoverOn AdjA KA :=
@@ -199,7 +199,7 @@ theorem CoverOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Pr
 
 /-- `CliqueOn` only depends on the off-diagonal part of the adjacency
 predicate and on the extension of the mark predicate. -/
-theorem cliqueOn_congr {P Q : A → A → Prop} {K K' : A → Prop}
+private theorem cliqueOn_congr {P Q : A → A → Prop} {K K' : A → Prop}
     (hPQ : ∀ x y, x ≠ y → (P x y ↔ Q x y)) (hK : ∀ x, K x ↔ K' x) :
     CliqueOn P K ↔ CliqueOn Q K' := by
   have h : ∀ {P Q : A → A → Prop} {K K' : A → Prop},
@@ -212,7 +212,7 @@ theorem cliqueOn_congr {P Q : A → A → Prop} {K K' : A → Prop}
 
 /-- `IndepOn` only depends on the off-diagonal part of the adjacency
 predicate and on the extension of the mark predicate. -/
-theorem indepOn_congr {P Q : A → A → Prop} {K K' : A → Prop}
+private theorem indepOn_congr {P Q : A → A → Prop} {K K' : A → Prop}
     (hPQ : ∀ x y, x ≠ y → (P x y ↔ Q x y)) (hK : ∀ x, K x ↔ K' x) :
     IndepOn P K ↔ IndepOn Q K' :=
   cliqueOn_congr (fun x y hxy => not_congr (hPQ x y hxy)) hK

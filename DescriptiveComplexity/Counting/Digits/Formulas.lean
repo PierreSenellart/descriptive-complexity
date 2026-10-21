@@ -9,6 +9,8 @@ import DescriptiveComplexity.Counting.Digits.Tower
 public import DescriptiveComplexity.Counting.Digits.SetArith
 import DescriptiveComplexity.OrderWalk
 import Mathlib.Order.PiLex
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Arithmetic on numbers given by formulas
@@ -89,11 +91,11 @@ theorem dblSet_tupBits (n : ℕ) :
   · rintro ⟨q, hq, h⟩
     exact ⟨toLex q, hq, h⟩
 
-theorem tupBits_one (p : Fin ℓ → A) :
+private theorem tupBits_one (p : Fin ℓ → A) :
     tupBits 1 p ↔ ∀ c : Lex (Fin ℓ → A), toLex p ≤ c :=
   bitsOf_one (toLex p)
 
-theorem tupBits_congr {m n : ℕ}
+private theorem tupBits_congr {m n : ℕ}
     (h : m % 2 ^ Nat.card (Lex (Fin ℓ → A)) = n % 2 ^ Nat.card (Lex (Fin ℓ → A))) :
     (tupBits m : (Fin ℓ → A) → Prop) = tupBits n :=
   funext fun p => congrFun (bitsOf_congr h) (toLex p)
@@ -139,7 +141,7 @@ noncomputable def dblF (ν : N.Formula (γ ⊕ Fin ℓ)) : N.Formula (γ ⊕ Fin
   Formula.iExs (Fin ℓ) (ι.onFormula (succTupF Sum.inr (Sum.inl ∘ Sum.inr)) ⊓ atQ ν)
 
 /-- **The number one.** -/
-noncomputable def oneF : N.Formula (γ ⊕ Fin ℓ) :=
+private noncomputable def oneF : N.Formula (γ ⊕ Fin ℓ) :=
   ι.onFormula (minTupF Sum.inr)
 
 variable {A : Type} [K.Structure A] [LinearOrder A] [N.Structure A] [ι.IsExpansionOn A]
@@ -152,7 +154,7 @@ theorem realize_xorF (φ ψ : N.Formula γ) (v : γ → A) :
   rfl
 
 /-- An order formula, read in the vocabulary `N`. -/
-theorem realize_lift {δ : Type} (φ : (K.sum Language.order).Formula δ) (v : δ → A) :
+private theorem realize_lift {δ : Type} (φ : (K.sum Language.order).Formula δ) (v : δ → A) :
     (ι.onFormula φ).Realize v ↔ φ.Realize v :=
   LHom.realize_onFormula ι φ
 
@@ -172,7 +174,7 @@ theorem realize_atR (ν : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p q r : Fi
   funext x
   rcases x with x | x <;> rfl
 
-theorem realize_carryF (ν₁ ν₂ : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p : Fin ℓ → A) :
+private theorem realize_carryF (ν₁ ν₂ : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p : Fin ℓ → A) :
     (carryF ι ν₁ ν₂).Realize (Sum.elim g p) ↔
       ∃ q : Fin ℓ → A, toLex q < toLex p ∧ ν₁.Realize (Sum.elim g q) ∧
         ν₂.Realize (Sum.elim g q) ∧ ∀ r : Fin ℓ → A, toLex q < toLex r → toLex r < toLex p →
@@ -186,20 +188,20 @@ theorem realize_carryF (ν₁ ν₂ : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A)
     realize_lexSelLtF, realize_lexSelLtF, Formula.realize_sup, realize_atR, realize_atR]
   exact and_imp
 
-theorem realize_addF (ν₁ ν₂ : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p : Fin ℓ → A) :
+private theorem realize_addF (ν₁ ν₂ : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p : Fin ℓ → A) :
     (addF ι ν₁ ν₂).Realize (Sum.elim g p) ↔
       AddSet (fun p' => ν₁.Realize (Sum.elim g p')) (fun p' => ν₂.Realize (Sum.elim g p')) p := by
   rw [addF, realize_xorF, realize_xorF, realize_carryF]
   rfl
 
-theorem realize_dblF (ν : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p : Fin ℓ → A) :
+private theorem realize_dblF (ν : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A) (p : Fin ℓ → A) :
     (dblF ι ν).Realize (Sum.elim g p) ↔ DblSet (fun p' => ν.Realize (Sum.elim g p')) p := by
   rw [dblF, Formula.realize_iExs]
   refine exists_congr fun q => ?_
   rw [Formula.realize_inf, realize_lift, realize_succTupF, realize_atQ, tupSucc_iff_covBy]
   rfl
 
-theorem realize_oneF (g : γ → A) (p : Fin ℓ → A) :
+private theorem realize_oneF (g : γ → A) (p : Fin ℓ → A) :
     (oneF ι : N.Formula (γ ⊕ Fin ℓ)).Realize (Sum.elim g p) ↔
       ∀ c : Lex (Fin ℓ → A), toLex p ≤ c := by
   rw [oneF, realize_lift, realize_minTupF, tup_isBot_iff]
@@ -219,7 +221,7 @@ noncomputable def exMid (ξ : N.Formula ((γ ⊕ Fin m) ⊕ Fin ℓ)) : N.Formul
   Formula.iExs (Fin m)
     (Formula.relabel (Sum.elim (Sum.elim (Sum.inl ∘ Sum.inl) Sum.inr) (Sum.inl ∘ Sum.inr)) ξ)
 
-theorem realize_exMid {A : Type} [N.Structure A] (ξ : N.Formula ((γ ⊕ Fin m) ⊕ Fin ℓ))
+private theorem realize_exMid {A : Type} [N.Structure A] (ξ : N.Formula ((γ ⊕ Fin m) ⊕ Fin ℓ))
     (g : γ → A) (p : Fin ℓ → A) :
     (exMid ξ).Realize (Sum.elim g p) ↔
       ∃ u : Fin m → A, ξ.Realize (Sum.elim (Sum.elim g u) p) := by
@@ -234,7 +236,7 @@ theorem realize_exMid {A : Type} [N.Structure A] (ξ : N.Formula ((γ ⊕ Fin m)
 def weaken (ν : N.Formula (γ ⊕ Fin ℓ)) : N.Formula ((γ ⊕ Fin m) ⊕ Fin ℓ) :=
   Formula.relabel (Sum.map Sum.inl id) ν
 
-theorem realize_weaken {A : Type} [N.Structure A] (ν : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A)
+private theorem realize_weaken {A : Type} [N.Structure A] (ν : N.Formula (γ ⊕ Fin ℓ)) (g : γ → A)
     (u : Fin m → A) (p : Fin ℓ → A) :
     (weaken ν).Realize (Sum.elim (Sum.elim g u) p) ↔ ν.Realize (Sum.elim g p) := by
   rw [weaken, Formula.realize_relabel]

@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Walk
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.Tape
+import all DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # Testing the register file

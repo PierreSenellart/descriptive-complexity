@@ -8,6 +8,18 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawProg
 public import DescriptiveComplexity.Problems.Wide.DrawBack
 public import DescriptiveComplexity.Problems.Wide.DrawInit
+import all DescriptiveComplexity.Problems.Wide.DrawAdvKit
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawInit
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawSeekKit
+import all DescriptiveComplexity.Problems.Wide.DrawSites
+import all DescriptiveComplexity.Problems.Wide.DrawSweepKit
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # The runs: the program's rules are its kits' rules
@@ -59,7 +71,7 @@ Each lemma names a call site's rule-name injection: the site, and `Sum.inl`
 into its kit's shape. -/
 
 /-- The startup pattern write of TARGET. -/
-theorem prog_rules_tgtTop (ρ : TrackRule) :
+private theorem prog_rules_tgtTop (ρ : TrackRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.tgtTop, Sum.inl ρ⟩ =
       (dt.tgtTopKit (Q := Q) (P := dt.PF) one OuterPh.tgtTopP).rule zero one ρ :=
   rfl
@@ -71,67 +83,67 @@ theorem prog_rules_seek1 (ρ : SeekRule) :
   rfl
 
 /-- The startup reset of the marker to the bottom cell. -/
-theorem prog_rules_reset1 (ρ : ResetRule) :
+private theorem prog_rules_reset1 (ρ : ResetRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.reset1, Sum.inl ρ⟩ =
       (ResetKit.mk (A := A) (Q := Q) (P := dt.PF) .mir .bot .wk
         OuterPh.reset1P).rule one ρ :=
   rfl
 
 /-- The startup clear of the mirror. -/
-theorem prog_rules_clearMir1 (ρ : TrackRule) :
+private theorem prog_rules_clearMir1 (ρ : TrackRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.clearMir1, Sum.inl ρ⟩ =
       (dt.clearMirKit (A := A) (Q := Q) (P := dt.PF) OuterPh.clearMir1P).rule
         zero one ρ :=
   rfl
 
 /-- One round of the outer sweep. -/
-theorem prog_rules_sweepAdv (ρ : AdvRule) :
+private theorem prog_rules_sweepAdv (ρ : AdvRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.sweepAdv, Sum.inl ρ⟩ =
       (dt.advKit (A := A) (Q := Q) (P := dt.PF) OuterPh.advP).rule zero one ρ :=
   rfl
 
 /-- The post-sweep reset of the marker. -/
-theorem prog_rules_reset2 (ρ : ResetRule) :
+private theorem prog_rules_reset2 (ρ : ResetRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.reset2, Sum.inl ρ⟩ =
       (ResetKit.mk (A := A) (Q := Q) (P := dt.PF) .mir .bot .wk
         OuterPh.reset2P).rule one ρ :=
   rfl
 
 /-- The post-sweep clear of the mirror. -/
-theorem prog_rules_clearMir2 (ρ : TrackRule) :
+private theorem prog_rules_clearMir2 (ρ : TrackRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.clearMir2, Sum.inl ρ⟩ =
       (dt.clearMirKit (A := A) (Q := Q) (P := dt.PF) OuterPh.clearMir2P).rule
         zero one ρ :=
   rfl
 
 /-- The convergence sweep. -/
-theorem prog_rules_compare (ρ : SweepRule) :
+private theorem prog_rules_compare (ρ : SweepRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.compare, Sum.inl ρ⟩ =
       (dt.compareKit (Q := Q) (P := dt.PF) one OuterPh.cmpP).rule one ρ :=
   rfl
 
 /-- The walk home after a failed convergence sweep. -/
-theorem prog_rules_homeCmp (ρ : HomeKit.HomeRule) :
+private theorem prog_rules_homeCmp (ρ : HomeKit.HomeRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.homeCmp, Sum.inl ρ⟩ =
       (HomeKit.mk (A := A) (Q := Q) (P := dt.PF) .mir .wk
         OuterPh.homeCmpP).rule one ρ :=
   rfl
 
 /-- The copy-back sweep. -/
-theorem prog_rules_copy (ρ : WSweepRule) :
+private theorem prog_rules_copy (ρ : WSweepRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.copy, Sum.inl ρ⟩ =
       (dt.copyKit (A := A) (Q := Q) (P := dt.PF) OuterPh.copyP).rule one ρ :=
   rfl
 
 /-- The walk home after the copy-back. -/
-theorem prog_rules_homeCopy (ρ : HomeKit.HomeRule) :
+private theorem prog_rules_homeCopy (ρ : HomeKit.HomeRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.homeCopy, Sum.inl ρ⟩ =
       (HomeKit.mk (A := A) (Q := Q) (P := dt.PF) .mir .wk
         OuterPh.homeCopyP).rule one ρ :=
   rfl
 
 /-- The walk home before the output evaluation. -/
-theorem prog_rules_homeOut (ρ : HomeKit.HomeRule) :
+private theorem prog_rules_homeOut (ρ : HomeKit.HomeRule) :
     (dt.prog zero one hzo args hpl).rules ⟨.homeOut, Sum.inl ρ⟩ =
       (HomeKit.mk (A := A) (Q := Q) (P := dt.PF) .mir .wk
         OuterPh.homeOutP).rule one ρ :=
@@ -156,7 +168,7 @@ theorem prog_hasRight (i : dt.SF) (ρ : (dt.progAsm zero one hzo args).Sh i)
   ⟨⟨i, ρ⟩, hg, rfl, rfl, rfl, rfl, hmr⟩
 
 /-- **A leftward rule of the assembly is a `HasLeft` witness.** -/
-theorem prog_hasLeft (i : dt.SF) (ρ : (dt.progAsm zero one hzo args).Sh i)
+private theorem prog_hasLeft (i : dt.SF) (ρ : (dt.progAsm zero one hzo args).Sh i)
     {f : Q → A} {g : dt.SlotIx → A}
     (hg : ((dt.progAsm zero one hzo args).rule i ρ).guard f g)
     (hml : ¬((dt.progAsm zero one hzo args).rule i ρ).moveRight) :
@@ -426,19 +438,19 @@ omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
   [Finite dt.KIx] in
 /-- The four machine registers carry their track's digits at their own slot,
 which is the hypothesis both glue lemmas ask for. -/
-theorem back_mir (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
+private theorem back_mir (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
     ∀ r, dt.back wmSeg zero one dt.dd0Le st r .mir = bitVal zero one (regBit st.mir r) :=
   fun _ => rfl
 
 omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
   [Finite dt.KIx] in
-theorem back_tgt (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
+private theorem back_tgt (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
     ∀ r, dt.back wmSeg zero one dt.dd0Le st r .tgt = bitVal zero one (regBit st.tgt r) :=
   fun _ => rfl
 
 omit [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
   [Finite dt.KIx] in
-theorem back_val (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
+private theorem back_val (st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF) :
     ∀ r, dt.back wmSeg zero one dt.dd0Le st r .val = bitVal zero one (regBit st.val r) :=
   fun _ => rfl
 
@@ -557,7 +569,7 @@ theorem reaches_tgtTop (hR : (dt.prog zero one hzo args hpl).table.Reads)
 /-- **The run so far, chained**: from the initial configuration – the marks
 over the blank, the head on the empty address – to the return of the pattern
 write, with both markers planted and TARGET holding the logical top. -/
-theorem reaches_startup₁ (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem reaches_startup₁ (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd,
       WMLe x y ↔ tagTupleLe x y)
@@ -610,7 +622,7 @@ omit [LinearOrder A] [LinearOrder (dt.RIx zero one hzo args)] [LinearOrder dt.PF
   [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF] [Finite dt.KIx] in
 /-- The successor of the empty address is not empty: it holds the greatest
 element. -/
-theorem ne_empty_of_wmIncr
+private theorem ne_empty_of_wmIncr
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') : v' ≠ fun _ => False := by
   obtain ⟨u, -, -, ht⟩ := hi
@@ -621,7 +633,7 @@ theorem ne_empty_of_wmIncr
 
 /-- **The pattern write's exit**: off the marker, rightwards, into the seek's
 loop head. -/
-theorem step_tgtTop_exit (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem step_tgtTop_exit (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') {fc : Q → A}
@@ -658,7 +670,7 @@ theorem step_tgtTop_exit (hR : (dt.prog zero one hzo args hpl).table.Reads)
 
 /-- **The seek's loop head walks back to the marker**: the one step the
 rightward exit above owes. -/
-theorem step_seek1_home (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem step_seek1_home (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') {fc : Q → A}
@@ -776,7 +788,7 @@ theorem reaches_seek1 (hR : (dt.prog zero one hzo args hpl).table.Reads)
 /-- **Startup, up to the logical top**: from the initial configuration to the
 verdict of the seek – the marker and the mirror on the last logical address,
 where the end marker is about to be planted. -/
-theorem reaches_startup₂ (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem reaches_startup₂ (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd,
       WMLe x y ↔ tagTupleLe x y)
@@ -993,7 +1005,7 @@ trip does it, entered by the reset's exit. -/
 
 /-- **The reset's exit**: off the marker, rightwards, into the mirror
 clear. -/
-theorem step_reset1_exit (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem step_reset1_exit (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {v' : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') {fc : Q → A}
@@ -1357,7 +1369,7 @@ theorem reaches_home (ph : dt.PF)
     (m := st.mir) (v := v) (fun r => by rw [back_wk, hwk]; rfl) (fc := fc) hle
 
 /-- The walk home after a failed convergence sweep. -/
-theorem reaches_homeCmp (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem reaches_homeCmp (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {fc : Q → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {v s : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
@@ -1379,7 +1391,7 @@ theorem reaches_homeCmp (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (fun ρ => dt.prog_rules_homeCmp zero one hzo args hpl ρ) hR hlin hwk hle
 
 /-- The walk home after the copy-back. -/
-theorem reaches_homeCopy (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem reaches_homeCopy (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {fc : Q → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {v s : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}
@@ -1401,7 +1413,7 @@ theorem reaches_homeCopy (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (fun ρ => dt.prog_rules_homeCopy zero one hzo args hpl ρ) hR hlin hwk hle
 
 /-- The walk home before the output evaluation. -/
-theorem reaches_homeOut (hR : (dt.prog zero one hzo args hpl).table.Reads)
+private theorem reaches_homeOut (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {fc : Q → A} {st : TapeStD dt A (dt.RIx zero one hzo args) dt.PF}
     {v s : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd → Prop}

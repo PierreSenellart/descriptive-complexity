@@ -12,6 +12,8 @@ public import DescriptiveComplexity.Numbers.Digits
 public import DescriptiveComplexity.Padding
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Numbers.Digits
+import all DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
 # Knapsack is NP-hard
@@ -147,29 +149,29 @@ def Lex2 (w w' : Fin 2 → A) : Prop := w 0 < w' 0 ∨ (w 0 = w' 0 ∧ w 1 ≤ w
 
 omit [LinearOrder A] in
 /-- Two `2`-tuples with the same coordinates are equal. -/
-theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
+private theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
   funext j
   fin_cases j
   · exact h0
   · exact h1
 
-theorem lex2_refl (w : Fin 2 → A) : Lex2 w w := Or.inr ⟨rfl, le_rfl⟩
+private theorem lex2_refl (w : Fin 2 → A) : Lex2 w w := Or.inr ⟨rfl, le_rfl⟩
 
-theorem lex2_trans {u v w : Fin 2 → A} (h₁ : Lex2 u v) (h₂ : Lex2 v w) : Lex2 u w := by
+private theorem lex2_trans {u v w : Fin 2 → A} (h₁ : Lex2 u v) (h₂ : Lex2 v w) : Lex2 u w := by
   rcases h₁ with h | ⟨he, hle⟩ <;> rcases h₂ with h' | ⟨he', hle'⟩
   · exact Or.inl (h.trans h')
   · exact Or.inl (he' ▸ h)
   · exact Or.inl (he ▸ h')
   · exact Or.inr ⟨he.trans he', hle.trans hle'⟩
 
-theorem lex2_antisymm {u v : Fin 2 → A} (h₁ : Lex2 u v) (h₂ : Lex2 v u) : u = v := by
+private theorem lex2_antisymm {u v : Fin 2 → A} (h₁ : Lex2 u v) (h₂ : Lex2 v u) : u = v := by
   rcases h₁ with h | ⟨he, hle⟩ <;> rcases h₂ with h' | ⟨he', hle'⟩
   · exact absurd h' (asymm h)
   · exact absurd he' (ne_of_gt h)
   · exact absurd he (ne_of_gt h')
   · exact tuple₂_ext he (hle.antisymm hle')
 
-theorem lex2_total (u v : Fin 2 → A) : Lex2 u v ∨ Lex2 v u := by
+private theorem lex2_total (u v : Fin 2 → A) : Lex2 u v ∨ Lex2 v u := by
   rcases lt_trichotomy (u 0) (v 0) with h | h | h
   · exact Or.inl (Or.inl h)
   · rcases le_total (u 1) (v 1) with h' | h'
@@ -255,9 +257,9 @@ variable {A : Type}
 /-- The point of tag `t` over the pair `w`. -/
 def kPt (t : KTag) (w : Fin 2 → A) : kInterp.Map A := (t, w)
 
-theorem kPt_surj (q : kInterp.Map A) : ∃ t w, q = kPt t w := ⟨q.1, q.2, rfl⟩
+private theorem kPt_surj (q : kInterp.Map A) : ∃ t w, q = kPt t w := ⟨q.1, q.2, rfl⟩
 
-theorem kPt_eq_iff {t t' : KTag} {w w' : Fin 2 → A} :
+private theorem kPt_eq_iff {t t' : KTag} {w w' : Fin 2 → A} :
     kPt t w = kPt t' w' ↔ t = t' ∧ w = w' := by
   constructor
   · intro h
@@ -286,14 +288,14 @@ theorem kLow_fst (a₀ e : A) : (kLow a₀ e).2 0 = e := rfl
 @[simp]
 theorem kLow_snd (a₀ e : A) : (kLow a₀ e).2 1 = a₀ := rfl
 
-theorem kItem_injective (a₀ : A) : Function.Injective (kItem a₀) := fun _ _ h =>
+private theorem kItem_injective (a₀ : A) : Function.Injective (kItem a₀) := fun _ _ h =>
   congrArg (fun q : kInterp.Map A => q.2 0) h
 
-theorem kLow_injective (a₀ : A) : Function.Injective (kLow a₀) := fun _ _ h =>
+private theorem kLow_injective (a₀ : A) : Function.Injective (kLow a₀) := fun _ _ h =>
   congrArg (fun q : kInterp.Map A => q.2 0) h
 
 /-- Being the lowest position of a block, coordinate by coordinate. -/
-theorem eq_kLow_iff {a₀ e : A} {t : KTag} {w : Fin 2 → A} :
+private theorem eq_kLow_iff {a₀ e : A} {t : KTag} {w : Fin 2 → A} :
     kPt t w = kLow a₀ e ↔ t = KTag.pos ∧ w = ![e, a₀] := kPt_eq_iff
 
 end Points
@@ -371,7 +373,7 @@ theorem bwLe_itm_pos (w w' : Fin 2 → A) : BWLe (kPt .itm w) (kPt .pos w') := b
   simp [kInterp, leKF]
 
 /-- Comparison with the lowest position of a block. -/
-theorem bwLe_pos_kLow (w : Fin 2 → A) (a₀ e : A) :
+private theorem bwLe_pos_kLow (w : Fin 2 → A) (a₀ e : A) :
     BWLe (kPt .pos w) (kLow a₀ e) ↔ Lex2 w ![e, a₀] := bwLe_pos_pos w ![e, a₀]
 
 @[simp]
@@ -381,7 +383,7 @@ theorem bwLe_pos_itm (w w' : Fin 2 → A) : ¬BWLe (kPt .pos w) (kPt .itm w') :=
 
 /-- The interpreted order is a linear order: the two tags in order, each
 carrying the lexicographic order on pairs. -/
-theorem isLinOrd_bwLe : IsLinOrd (BWLe (A := kInterp.Map A)) := by
+private theorem isLinOrd_bwLe : IsLinOrd (BWLe (A := kInterp.Map A)) := by
   refine ⟨fun q => ?_, fun q₁ q₂ q₃ h₁ h₂ => ?_, fun q₁ q₂ h₁ h₂ => ?_, fun q₁ q₂ => ?_⟩
   · obtain ⟨t, w, rfl⟩ := kPt_surj q
     cases t
@@ -428,7 +430,7 @@ variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
 
 omit [Finite A] in
 /-- An item is the padded item of the set it carries. -/
-theorem eq_kItem {a₀ : A} (ha₀ : IsBot a₀) {i : kInterp.Map A} (h : BWItem i) :
+private theorem eq_kItem {a₀ : A} (ha₀ : IsBot a₀) {i : kInterp.Map A} (h : BWItem i) :
     i = kItem a₀ (i.2 0) ∧ SSFam (i.2 0) := by
   obtain ⟨t, w, rfl⟩ := kPt_surj i
   cases t
@@ -503,7 +505,8 @@ theorem one_lt_base [Nonempty A] : 1 < base A := by
 open Classical in
 /-- A binary number whose bits sit on the lowest positions of the blocks
 selected by `sub` is the base-`2 ^ |A|` number with digit `1` there. -/
-theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : kInterp.Map A → Prop} {sub : A → Prop}
+private theorem binNum_eq_digit
+    {a₀ : A} (ha₀ : IsBot a₀) {p : kInterp.Map A → Prop} {sub : A → Prop}
     (hsub : ∀ e, sub e → SSElem e)
     (hp : ∀ q : kInterp.Map A, (BWPosn q ∧ p q) ↔ ∃ e, sub e ∧ q = kLow a₀ e) :
     binNum (BWLe (A := kInterp.Map A)) BWPosn p =
@@ -519,7 +522,7 @@ theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : kInterp.Map A → P
 
 open Classical in
 /-- The target is the number with digit `1` in every block. -/
-theorem bwTarget_eq {a₀ : A} (ha₀ : IsBot a₀) :
+private theorem bwTarget_eq {a₀ : A} (ha₀ : IsBot a₀) :
     BWTarget (kInterp.Map A) =
       digitNum (· ≤ · : A → A → Prop) SSElem (base A) (fun e => if SSElem e then 1 else 0) := by
   refine binNum_eq_digit ha₀ (fun _ he => he) fun q => ?_
@@ -542,7 +545,7 @@ theorem bwTarget_eq {a₀ : A} (ha₀ : IsBot a₀) :
 open Classical in
 /-- The weight of an item is the number with digit `1` in the blocks of the
 elements of its set. -/
-theorem bwWeight_eq {a₀ : A} (ha₀ : IsBot a₀) {i : kInterp.Map A} (h : BWItem i) :
+private theorem bwWeight_eq {a₀ : A} (ha₀ : IsBot a₀) {i : kInterp.Map A} (h : BWItem i) :
     BWWeight i = digitNum (· ≤ · : A → A → Prop) SSElem (base A)
       (fun e => if SSElem e ∧ SSMem e (i.2 0) then 1 else 0) := by
   obtain ⟨hi, hfam⟩ := eq_kItem ha₀ h
@@ -581,7 +584,7 @@ variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
 open Classical in
 /-- **The sum of the selected weights**, read digit by digit: the digit of the
 block of `e` is the number of selected items whose set contains `e`. -/
-theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) {S : kInterp.Map A → Prop}
+private theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) {S : kInterp.Map A → Prop}
     (hS : ∀ i, S i → BWItem i) :
     (∑ᶠ i ∈ {i | S i}, BWWeight i) =
       digitNum (· ≤ · : A → A → Prop) SSElem (base A)
@@ -599,7 +602,7 @@ theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) {S : kInterp.Map A → Pr
 
 /-- Only items are selected, and there are at most `|A|` of them, so the
 digits of the sum stay below the base. -/
-theorem count_lt_base {S : kInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i)
+private theorem count_lt_base {S : kInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i)
     {a₀ : A} (ha₀ : IsBot a₀) (e : A) :
     ({i : kInterp.Map A | S i ∧ SSElem e ∧ SSMem e (i.2 0)} : Set _).ncard < base A := by
   have : Finite (kInterp.Map A) := kInterp.map_finite A
@@ -625,14 +628,14 @@ section Correctness
 variable {A : Type} [Language.setSystem.Structure A] [LinearOrder A] [Finite A]
 
 /-- The items of a subfamily: the padded items of its sets. -/
-def itemsOf (a₀ : A) (G : A → Prop) (i : kInterp.Map A) : Prop := ∃ s, G s ∧ i = kItem a₀ s
+private def itemsOf (a₀ : A) (G : A → Prop) (i : kInterp.Map A) : Prop := ∃ s, G s ∧ i = kItem a₀ s
 
 /-- The subfamily of a set of items: the sets whose padded item is chosen. -/
-def coverOfItems (a₀ : A) (S : kInterp.Map A → Prop) (s : A) : Prop := S (kItem a₀ s)
+private def coverOfItems (a₀ : A) (S : kInterp.Map A → Prop) (s : A) : Prop := S (kItem a₀ s)
 
 open Classical in
 /-- **The items of an exact cover sum to the target.** -/
-theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {G : A → Prop}
+private theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {G : A → Prop}
     (hG : ExactCoverBy (SSElem (A := A)) SSFam SSMem G) :
     (∀ i, itemsOf a₀ G i → BWItem i) ∧
       (∑ᶠ i ∈ {i | itemsOf a₀ G i}, BWWeight i) = BWTarget (kInterp.Map A) := by
@@ -661,7 +664,7 @@ theorem subsetSum_itemsOf [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀) {G : A �
 
 open Classical in
 /-- **A set of items summing to the target is an exact cover.** -/
-theorem exactCoverBy_coverOfItems [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀)
+private theorem exactCoverBy_coverOfItems [Nonempty A] {a₀ : A} (ha₀ : IsBot a₀)
     {S : kInterp.Map A → Prop} (hSi : ∀ i, S i → BWItem i)
     (hsum : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget (kInterp.Map A)) :
     ExactCoverBy (SSElem (A := A)) SSFam SSMem (coverOfItems a₀ S) := by
@@ -695,7 +698,7 @@ variable (A) in
 /-- **Correctness of the reduction**: the set system has an exact cover iff the
 interpreted binary-weighted instance has a set of items summing to the
 target. -/
-theorem hasExactCover_iff_hasSubsetSum [Nonempty A] :
+private theorem hasExactCover_iff_hasSubsetSum [Nonempty A] :
     HasExactCover A ↔ HasSubsetSum (kInterp.Map A) := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   have : Finite (kInterp.Map A) := kInterp.map_finite A
@@ -715,7 +718,8 @@ open KnapRed in
 one item per set, one digit block of `|A|` bits per ground element, weights
 carrying a `1` in the block of each of their elements and the target a `1` in
 every block. -/
-noncomputable def exactCover_ordered_fo_reduction_knapsack : ExactCover ≤ᶠᵒ[≤] Knapsack where
+private noncomputable def exactCover_ordered_fo_reduction_knapsack
+    : ExactCover ≤ᶠᵒ[≤] Knapsack where
   Tag := KTag
   dim := 2
   toInterpretation := kInterp

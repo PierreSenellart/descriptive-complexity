@@ -10,6 +10,9 @@ public import DescriptiveComplexity.MachinesAltSpace
 public import DescriptiveComplexity.Problems.Machine.Walk
 public import DescriptiveComplexity.Exponential.GameTape
 public import DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Exponential.GameTape
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The machine of a second-order game
@@ -82,7 +85,7 @@ namespace SymTag
 variable {B : SOBlock}
 
 /-- The symbol shapes as a sum, for the `Finite` instance. -/
-def equivSum : SymTag B ≃ Bool ⊕ (Bool × Bool × B.ι) where
+private def equivSum : SymTag B ≃ Bool ⊕ (Bool × Bool × B.ι) where
   toFun
     | .mark b => .inl b
     | .val b r i => .inr (b, r, i)
@@ -139,7 +142,7 @@ theorem joinTuple_of_lt (v : Fin V → A) (ā : Fin (blockArityBound B) → A)
 
 omit [LinearOrder A] in
 /-- **The address of a cell, read as a symbol's address.** -/
-theorem argsOf_pad (a₀ : A) (i : B.ι) (ā : Fin (B.arity i) → A) :
+private theorem argsOf_pad (a₀ : A) (i : B.ι) (ā : Fin (B.arity i) → A) :
     argsOf (B := B) i (pad a₀ ā) = ā := by
   funext l
   simp only [argsOf, pad]
@@ -169,7 +172,7 @@ omit [LinearOrder A] in
 omit [LinearOrder A] in
 /-- **A walk step agrees with its own state**: it carries the valuation the
 phase declares, whatever the address it is reading. -/
-theorem agree_walkTuple {m : ℕ} (hm : m ≤ V) (v : Fin (gameDim B V) → A)
+private theorem agree_walkTuple {m : ℕ} (hm : m ≤ V) (v : Fin (gameDim B V) → A)
     (ā : Fin (blockArityBound B) → A) : Agree m (walkTuple v ā) v := by
   intro j hj
   rw [walkTuple, joinTuple_of_lt _ _ (by omega)]
@@ -186,7 +189,7 @@ omit [LinearOrder A] in
 theorem agree_truncTuple (a₀ : A) (m : ℕ) {D : ℕ} (w : Fin D → A) :
     Agree m w (truncTuple a₀ m w) := fun _j hj => ite_eq_left hj
 
-theorem canon_truncTuple {a₀ : A} (h₀ : IsBot a₀) (m : ℕ) {D : ℕ} (w : Fin D → A) :
+private theorem canon_truncTuple {a₀ : A} (h₀ : IsBot a₀) (m : ℕ) {D : ℕ} (w : Fin D → A) :
     Canon m (truncTuple a₀ m w) := by
   intro j hj
   rw [truncTuple, ite_eq_right (by omega)]
@@ -214,7 +217,7 @@ theorem eq_truncTuple {a₀ : A} (h₀ : IsBot a₀) {m D : ℕ} {w x : Fin D �
 /-- **One step of a prefix writes exactly one coordinate**: the tuple the next
 phase keeps is the one it came from, updated at the coordinate just declared.
 This is the whole of the arithmetic the prefix costs. -/
-theorem truncTuple_succ {a₀ : A} (h₀ : IsBot a₀) {m D : ℕ} {vv w : Fin D → A} (hm : m < D)
+private theorem truncTuple_succ {a₀ : A} (h₀ : IsBot a₀) {m D : ℕ} {vv w : Fin D → A} (hm : m < D)
     (hc : Canon m vv) (ha : Agree m w vv) :
     truncTuple a₀ (m + 1) w = Function.update vv ⟨m, hm⟩ (w ⟨m, hm⟩) := by
   funext k
@@ -230,7 +233,7 @@ theorem truncTuple_succ {a₀ : A} (h₀ : IsBot a₀) {m D : ℕ} {vv w : Fin D
 omit [LinearOrder A] in
 /-- **Updating a coordinate commutes with taking a prefix**, when the
 coordinate is in the prefix. -/
-theorem pref_update {D m : ℕ} (h : m ≤ D) {vv : Fin D → A} {j : ℕ} (hjD : j < D)
+private theorem pref_update {D m : ℕ} (h : m ≤ D) {vv : Fin D → A} {j : ℕ} (hjD : j < D)
     (hjm : j < m) (a : A) :
     pref h (Function.update vv ⟨j, hjD⟩ a) = Function.update (pref h vv) ⟨j, hjm⟩ a := by
   funext l
@@ -280,10 +283,10 @@ namespace TrTag
 variable {B : SOBlock} {V M : ℕ}
 
 /-- A transition tag as a tuple, for the `Finite` instance. -/
-def toProd (t : TrTag B V M) : MachPh V M × MachPh V M × SymTag B × SymTag B × Bool :=
+private def toProd (t : TrTag B V M) : MachPh V M × MachPh V M × SymTag B × SymTag B × Bool :=
   (t.src, t.dst, t.rd, t.wr, t.right)
 
-theorem toProd_injective : Function.Injective (toProd (B := B) (V := V) (M := M)) := by
+private theorem toProd_injective : Function.Injective (toProd (B := B) (V := V) (M := M)) := by
   intro a b h
   simp only [toProd, Prod.mk.injEq] at h
   cases a; cases b
@@ -360,7 +363,7 @@ variable {vars pol a₀}
 
 /-- The tape order is linear on the whole universe, which is what
 `DescriptiveComplexity.TMData.WellFormed` asks of it. -/
-theorem isLinOrd_gameLe :
+private theorem isLinOrd_gameLe :
     letI := machTagOrder (B := B) (C := GameCtrlTag B V M)
     IsLinOrd (tagTupleLe (Tag := GameTag B V M) (d := gameDim B V) (A := A)) := by
   let := machTagOrder (B := B) (C := GameCtrlTag B V M)
@@ -400,7 +403,7 @@ theorem gameMachine_blocksSplit (hdim : blockArityBound B ≤ gameDim B V)
     · rfl
 
 /-- **A state is universal exactly when its phase is.** -/
-theorem gameMachine_isUniv (hdim : blockArityBound B ≤ gameDim B V)
+private theorem gameMachine_isUniv (hdim : blockArityBound B ≤ gameDim B V)
     (rule : TrTag B V M → (Fin (gameDim B V) → A) → Prop) (p : MachPh V M)
     (w : Fin (gameDim B V) → A) :
     (gameMachine vars pol a₀ hdim rule).IsUniv true (phasePt p w) ↔ MachPh.IsUniv pol p = true := by
@@ -416,7 +419,7 @@ theorem gameMachine_isUniv (hdim : blockArityBound B ≤ gameDim B V)
 /-- **What a position is**: a left sentinel, a cell, or the right sentinel.
 This is what a walk's step analysis begins with – the head is one of the three,
 and the symbol it reads follows. -/
-theorem posn_cases (h₀ : IsBot a₀) {p : GamePt B V M A}
+private theorem posn_cases (h₀ : IsBot a₀) {p : GamePt B V M A}
     (hp : machPosn p) (hd : machDom (ctrlArity vars) p) :
     (∃ b, p = leftPt a₀ b) ∨ (∃ (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A),
       p = cellPt a₀ r i ā) ∨ p = rightPt a₀ := by
@@ -497,7 +500,7 @@ variable {concOk : MachPh V M → (Fin (gameDim B V) → A) → Prop}
 
 /-- **A rule out of a walk phase is never a control step**: the control graph
 is empty there, so the nine families do not overlap at a walk. -/
-theorem not_ctrlStep_of_walk {t : TrTag B V M}
+private theorem not_ctrlStep_of_walk {t : TrTag B V M}
     (h : t.src.kind = .sweep ∨ t.src.kind = .rewind ∨ t.src.kind = .seek) :
     ¬ MachPh.CtrlStep vars natoms t.src t.dst := by
   rcases h with h | h | h <;> simp [MachPh.CtrlStep, h]
@@ -574,12 +577,12 @@ noncomputable def machine (a₀ : A) (hdim : blockArityBound B ≤ gameDim B V) 
     (gameRule prog.vars prog.natoms prog.concOk prog.isTarget)
 
 /-- **The machine is well formed.** -/
-theorem machine_wellFormed (a₀ : A) (hdim : blockArityBound B ≤ gameDim B V)
+private theorem machine_wellFormed (a₀ : A) (hdim : blockArityBound B ≤ gameDim B V)
     (h₀ : IsBot a₀) : (prog.machine a₀ hdim).toTMData.WellFormed :=
   gameMachine_wellFormed hdim _ h₀
 
 /-- **The two marks split its states.** -/
-theorem machine_blocksSplit (a₀ : A) (hdim : blockArityBound B ≤ gameDim B V) :
+private theorem machine_blocksSplit (a₀ : A) (hdim : blockArityBound B ≤ gameDim B V) :
     (prog.machine a₀ hdim).BlocksSplit :=
   gameMachine_blocksSplit hdim _
 
@@ -588,7 +591,7 @@ end GameProg
 /-- **Every specification has such a program.** The six questions are read in
 one language and normalized independently; the phases' index types are the
 maxima, and nothing is padded. -/
-theorem exists_gameProg {L : Language.{0, 0}} [L.IsRelational] (spec : SOGameSpec L) :
+private theorem exists_gameProg {L : Language.{0, 0}} [L.IsRelational] (spec : SOGameSpec L) :
     ∃ (V M : ℕ) (prog : GameProg (L.sum Language.order) spec.B V M),
       ∀ q, (prog.data q).Plays (spec.question q) := by
   classical
@@ -615,14 +618,14 @@ def trPt (t : TrTag B V M) (w : Fin (gameDim B V) → A) : GamePt B V M A :=
 /-- **Every transition is a tagged tuple**, and its rule holds of it. This is
 the one place the tag of a transition is destructured; everything downstream
 reads the five lemmas below. -/
-theorem exists_trPt_of_tr {τ : GamePt B V M A}
+private theorem exists_trPt_of_tr {τ : GamePt B V M A}
     (h : (gameMachine vars pol a₀ hdim rule).Tr τ) :
     ∃ (t : TrTag B V M) (w : Fin (gameDim B V) → A), τ = trPt t w ∧ rule t w := by
   obtain ⟨t, ht, hr⟩ := h
   exact ⟨t, τ.2, Prod.ext ht rfl, hr⟩
 
 omit [LinearOrder A] in
-private theorem tag_inj {t t' : TrTag B V M} {w : Fin (gameDim B V) → A}
+theorem tag_inj {t t' : TrTag B V M} {w : Fin (gameDim B V) → A}
     (h : (trPt t w : GamePt B V M A).1 = Sum.inr (Sum.inr t')) : t' = t :=
   (Sum.inr.inj (Sum.inr.inj h)).symm
 
@@ -662,7 +665,7 @@ private theorem tag_inj {t t' : TrTag B V M} {w : Fin (gameDim B V) → A}
 carries the value a prefix step writes and the address a walk step reads; the
 five clauses about it are exactly the five attributes of
 `DescriptiveComplexity.TMData.Step`. -/
-theorem game_step_iff (c c' : Config (GamePt B V M A)) :
+private theorem game_step_iff (c c' : Config (GamePt B V M A)) :
     (gameMachine vars pol a₀ hdim rule).toTMData.Step c c' ↔
       ∃ (t : TrTag B V M) (w : Fin (gameDim B V) → A), rule t w ∧
         (c.state.1 = Sum.inr (Sum.inl t.src) ∧ Canon (MachPh.arity vars t.src) c.state.2 ∧
@@ -708,7 +711,7 @@ open Classical in
 the state is whatever `Dst` allows, the head is the neighbor, and the tape is
 the old one with the written symbol at the head. Every case of every walk goes
 through this, so the frame condition is discharged once. -/
-theorem step_of_rule {t : TrTag B V M} {w : Fin (gameDim B V) → A} (hrule : rule t w)
+private theorem step_of_rule {t : TrTag B V M} {w : Fin (gameDim B V) → A} (hrule : rule t w)
     (c : Config (GamePt B V M A)) (q' h' : GamePt B V M A)
     (hsrc : c.state.1 = Sum.inr (Sum.inl t.src))
     (hcs : Canon (MachPh.arity vars t.src) c.state.2)
@@ -743,7 +746,7 @@ sentinel, act at a cell – guessing the bit in the swept region, copying it bac
 elsewhere – or reach the right mark and hand over to its rewind. The other six
 families die on the phase's kind, and the control's own family dies because
 `DescriptiveComplexity.MachPh.CtrlStep` is empty at a walk. -/
-theorem sweep_cases (hk : t.src.kind = .sweep)
+private theorem sweep_cases (hk : t.src.kind = .sweep)
     (h : gameRule vars natoms concOk isTarget t w) :
     (t.dst = t.src ∧ t.rd = .mark false ∧ t.wr = .mark false ∧ t.right = true) ∨
     (t.dst = t.src ∧ t.right = true ∧
@@ -765,7 +768,7 @@ theorem sweep_cases (hk : t.src.kind = .sweep)
 /-- **The two things a rewind may do**: cross a cell without changing it, or
 reach the left mark and hand over to its continuation. Both move left, so it
 really does walk back. -/
-theorem rewind_cases (hk : t.src.kind = .rewind)
+private theorem rewind_cases (hk : t.src.kind = .rewind)
     (h : gameRule vars natoms concOk isTarget t w) :
     (t.dst = t.src ∧ t.rd = t.wr ∧ t.right = false ∧
       ∃ (b rr : Bool) (i : B.ι), t.rd = .val b rr i) ∨
@@ -787,7 +790,7 @@ that is not its target, or stop at the one that is. Every one of them writes
 back what it read, so a seek never changes the tape; and the last is the only
 way out of the phase, so a seek that never meets its target simply runs off the
 tape and loses. -/
-theorem seek_cases (hk : t.src.kind = .seek)
+private theorem seek_cases (hk : t.src.kind = .seek)
     (h : gameRule vars natoms concOk isTarget t w) :
     (t.dst = t.src ∧ t.rd = .mark false ∧ t.wr = .mark false ∧ t.right = true) ∨
     (t.dst = t.src ∧ t.rd = t.wr ∧ t.right = true ∧
@@ -809,7 +812,7 @@ theorem seek_cases (hk : t.src.kind = .seek)
 The eight tape families all name a walk kind, so at any other phase they are
 empty and family (A) is what is left – with the guard of a concluding
 transition, which is the one thing the control graph does not carry. -/
-theorem ctrl_cases (hs : t.src.kind ≠ .sweep) (hr : t.src.kind ≠ .rewind)
+private theorem ctrl_cases (hs : t.src.kind ≠ .sweep) (hr : t.src.kind ≠ .rewind)
     (hk : t.src.kind ≠ .seek) (h : gameRule vars natoms concOk isTarget t w) :
     t.rd = .mark false ∧ t.wr = .mark false ∧ t.right = !t.src.par ∧
       MachPh.CtrlStep vars natoms t.src t.dst ∧ (t.src.kind = .conc → concOk t.src w) := by
@@ -825,7 +828,7 @@ theorem ctrl_cases (hs : t.src.kind ≠ .sweep) (hr : t.src.kind ≠ .rewind)
   · exact absurd h.1 hk
 
 /-- **A rewind never changes the tape.** -/
-theorem rewind_writes_back (hk : t.src.kind = .rewind)
+private theorem rewind_writes_back (hk : t.src.kind = .rewind)
     (h : gameRule vars natoms concOk isTarget t w) : t.rd = t.wr := by
   rcases rewind_cases hk h with ⟨_, hrd, _⟩ | ⟨_, hrd, hwr, _⟩
   · exact hrd
@@ -848,7 +851,7 @@ local notation "𝕄" => gameMachine vars pol a₀ hdim (gameRule vars natoms co
 
 open Classical in
 /-- **A sweep crosses a sentinel**, changing nothing. -/
-theorem sweep_step_left (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
+private theorem sweep_step_left (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt (MachPh.sweepPh r tgt cont par) fun _ => a₀)
     (hread : c.tape c.head = markPt a₀ false) {h' : GamePt B V M A}
     (hsucc : SuccPos (𝕄).Le (𝕄).Posn c.head h') :
@@ -867,7 +870,7 @@ theorem sweep_step_left (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
 open Classical in
 /-- **A sweep acts at a cell**: in the region it is writing it may put either
 bit there, and elsewhere it writes back what it read. -/
-theorem sweep_step_cell (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
+private theorem sweep_step_cell (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt (MachPh.sweepPh r tgt cont par) fun _ => a₀)
     {b rr b' : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
     (hread : c.tape c.head = valPt a₀ b rr i ā) (hb : rr = tgt ∨ b' = b)
@@ -896,7 +899,7 @@ open Classical in
 /-- **A sweep reaches the right mark and hands over to its rewind**, moving
 left in the same step – so the rewind starts strictly below the right
 sentinel. -/
-theorem sweep_step_right (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
+private theorem sweep_step_right (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt (MachPh.sweepPh r tgt cont par) fun _ => a₀)
     (hread : c.tape c.head = markPt a₀ true)
     {h' : GamePt B V M A} (hsucc : SuccPos (𝕄).Le (𝕄).Posn h' c.head) :
@@ -933,7 +936,7 @@ variable {U : Type} [Finite U] {M : TMData U}
 tape.** A sweep is stopped by nothing and so reaches the right sentinel; a seek
 is stopped by the cell it is looking for, and reaching the sentinel instead is
 how it learns there was none. -/
-theorem exists_reach_stop (hlin : IsLinOrd M.Le) {Inv Stop Guard : Config U → Prop}
+private theorem exists_reach_stop (hlin : IsLinOrd M.Le) {Inv Stop Guard : Config U → Prop}
     (hguard : ∀ c, Inv c → ¬ MaxPos M.Le M.Posn c.head → ¬ Stop c → Guard c)
     (hstep : ∀ c, Inv c → M.Posn c.head → ¬ MaxPos M.Le M.Posn c.head → ¬ Stop c →
       ∃ c', M.Step c c' ∧ SuccPos M.Le M.Posn c.head c'.head ∧ Inv c') :
@@ -965,7 +968,7 @@ theorem exists_reach_stop (hlin : IsLinOrd M.Le) {Inv Stop Guard : Config U → 
   exact fun c => key _ c le_rfl
 
 /-- **A rightward walk reaches the highest position**, when nothing stops it. -/
-theorem exists_reach_maxPos (hlin : IsLinOrd M.Le) {Inv Guard : Config U → Prop}
+private theorem exists_reach_maxPos (hlin : IsLinOrd M.Le) {Inv Guard : Config U → Prop}
     (hguard : ∀ c, Inv c → ¬ MaxPos M.Le M.Posn c.head → Guard c)
     (hstep : ∀ c, Inv c → M.Posn c.head → ¬ MaxPos M.Le M.Posn c.head →
       ∃ c', M.Step c c' ∧ SuccPos M.Le M.Posn c.head c'.head ∧ Inv c') :
@@ -979,7 +982,7 @@ theorem exists_reach_maxPos (hlin : IsLinOrd M.Le) {Inv Guard : Config U → Pro
   exact ⟨c', hreach, hstop.resolve_left id, hInv'⟩
 
 /-- **A leftward walk reaches the lowest position.** -/
-theorem exists_reach_minPos (hlin : IsLinOrd M.Le) {Inv Guard : Config U → Prop}
+private theorem exists_reach_minPos (hlin : IsLinOrd M.Le) {Inv Guard : Config U → Prop}
     (hguard : ∀ c, Inv c → ¬ MinPos M.Le M.Posn c.head → Guard c)
     (hstep : ∀ c, Inv c → M.Posn c.head → ¬ MinPos M.Le M.Posn c.head →
       ∃ c', M.Step c c' ∧ SuccPos M.Le M.Posn c'.head c.head ∧ Inv c') :
@@ -1024,7 +1027,7 @@ variable {U : Type} {Le : U → U → Prop} {Posn : U → Prop}
 /-- **A step of the walk moves exactly one position from ahead to behind**: the
 positions strictly below the successor are those strictly below the head,
 together with the head itself. -/
-theorem below_succPos (hlin : IsLinOrd Le) {h h' : U} (hs : SuccPos Le Posn h h')
+private theorem below_succPos (hlin : IsLinOrd Le) {h h' : U} (hs : SuccPos Le Posn h h')
     {p : U} (hp : Posn p) :
     (Le p h' ∧ p ≠ h') ↔ ((Le p h ∧ p ≠ h) ∨ p = h) := by
   obtain ⟨hph, hph', hhh', hne, hbetween⟩ := hs
@@ -1045,7 +1048,7 @@ theorem below_succPos (hlin : IsLinOrd Le) {h h' : U} (hs : SuccPos Le Posn h h'
 /-- **The element immediately above a given one is unique** – the mirror of
 `DescriptiveComplexity.succPos_left_unique`, and what pins the head a control
 step lands on. -/
-theorem succPos_right_unique (hlin : IsLinOrd Le) {p q q' : U}
+private theorem succPos_right_unique (hlin : IsLinOrd Le) {p q q' : U}
     (h : SuccPos Le Posn p q) (h' : SuccPos Le Posn p q') : q = q' := by
   rcases hlin.2.2.2 q q' with hle | hle
   · rcases h'.2.2.2.2 q h.2.1 h.2.2.1 hle with h1 | h1
@@ -1078,7 +1081,7 @@ why every such step flips it – and the tape is untouched. The destination keep
 the transition's tuple up to the arity it declares, so a prefix step *writes*
 exactly one coordinate and the choice of the transition is the choice of the
 value written. -/
-theorem ctrl_step (h₀ : IsBot a₀) {p p' : MachPh V M} {w vv : Fin (gameDim B V) → A}
+private theorem ctrl_step (h₀ : IsBot a₀) {p p' : MachPh V M} {w vv : Fin (gameDim B V) → A}
     (hcs : MachPh.CtrlStep vars natoms p p') (hconc : p.kind = .conc → concOk p w)
     (c : Config (GamePt B V M A)) (hstate : c.state = phasePt p vv)
     (hcv : Canon (MachPh.arity vars p) vv) (hag : Agree (MachPh.arity vars p) w vv)
@@ -1234,7 +1237,7 @@ local notation "𝕄" => gameMachine vars pol a₀ hdim (gameRule vars natoms co
 omit [Finite A] in
 open Classical in
 /-- **A rewind crosses a cell**, changing nothing. -/
-theorem rewind_step_cell (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
+private theorem rewind_step_cell (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt (MachPh.rewindPh r tgt cont par) fun _ => a₀)
     {b rr : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
     (hread : c.tape c.head = valPt a₀ b rr i ā)
@@ -1257,7 +1260,7 @@ omit [Finite A] in
 open Classical in
 /-- **A rewind reads the left mark and hands over**, moving left in the same
 step – which is why it has to be the second sentinel it reads it on. -/
-theorem rewind_step_left (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
+private theorem rewind_step_left (h₀ : IsBot a₀) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt (MachPh.rewindPh r tgt cont par) fun _ => a₀)
     (hread : c.tape c.head = markPt a₀ false)
     {h' : GamePt B V M A} (hsucc : SuccPos (𝕄).Le (𝕄).Posn h' c.head) :
@@ -1374,7 +1377,7 @@ def SeekHit (tape : GamePt B V M A → GamePt B V M A) (p : GamePt B V M A) : Pr
 
 omit [LinearOrder A] [Finite A] in
 /-- A sentinel is never the cell a seek is looking for. -/
-theorem not_seekHit_leftPt {tape : GamePt B V M A → GamePt B V M A} (b : Bool) :
+private theorem not_seekHit_leftPt {tape : GamePt B V M A → GamePt B V M A} (b : Bool) :
     ¬ SeekHit a₀ isTarget ph v tape (leftPt a₀ b) := by
   rintro ⟨-, rr, i, ā, hc, -, -⟩
   exact leftPt_ne_cellPt a₀ b rr i ā hc
@@ -1388,7 +1391,7 @@ theorem not_seekHit_rightPt {tape : GamePt B V M A → GamePt B V M A} :
 omit [Finite A] in
 open Classical in
 /-- **A seek crosses a sentinel**, changing nothing. -/
-theorem seek_step_left (hk : ph.kind = .seek)
+private theorem seek_step_left (hk : ph.kind = .seek)
     (harity : MachPh.arity vars ph ≤ V) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt ph v) (hcv : Canon (MachPh.arity vars ph) v)
     (hread : c.tape c.head = markPt a₀ false)
@@ -1407,7 +1410,7 @@ omit [Finite A] in
 open Classical in
 /-- **A seek crosses a cell that is not the one it is looking for**, changing
 nothing. -/
-theorem seek_step_miss (hk : ph.kind = .seek)
+private theorem seek_step_miss (hk : ph.kind = .seek)
     (harity : MachPh.arity vars ph ≤ V) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt ph v) (hcv : Canon (MachPh.arity vars ph) v)
     {b rr : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
@@ -1431,7 +1434,7 @@ theorem seek_step_miss (hk : ph.kind = .seek)
 omit [Finite A] in
 open Classical in
 /-- **A seek stops at the cell it is looking for, and accepts.** -/
-theorem seek_step_hit (h₀ : IsBot a₀) (hk : ph.kind = .seek)
+private theorem seek_step_hit (h₀ : IsBot a₀) (hk : ph.kind = .seek)
     (harity : MachPh.arity vars ph ≤ V) (c : Config (GamePt B V M A))
     (hstate : c.state = phasePt ph v) (hcv : Canon (MachPh.arity vars ph) v)
     {b rr : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}

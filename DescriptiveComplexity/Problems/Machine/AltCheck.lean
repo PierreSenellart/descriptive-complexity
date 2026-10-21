@@ -6,6 +6,14 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltSweep
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltProg
+import all DescriptiveComplexity.Problems.Machine.AltSweep
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # The intended run: the check phase
@@ -59,7 +67,7 @@ noncomputable def chkVal (νs : Fin k → A → Prop) (x : A) : Bool := valAfter
 
 /-- The tape of the check phase reads a real cell as the truth value of its
 variable. -/
-theorem tapeAfter_top_at_cell {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
+private theorem tapeAfter_top_at_cell {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
     tapeAfter νs k p = symV (chkVal νs (p.2 0)) (p.2 0) :=
   tapeAfter_at_cell hp hb
 
@@ -81,7 +89,7 @@ noncomputable def confChkR (cnf : Bool) (νs : Fin k → A → Prop) (c : A) (p 
 
 /-- **A rightward sweep starts with an empty flag**: nothing lies below the
 lowest cell. -/
-theorem chkFlagR_bot (cnf : Bool) (c : A) :
+private theorem chkFlagR_bot (cnf : Bool) (c : A) :
     chkFlagR cnf νs c (posCell (qbotA (A := A))) = false := by
   classical
   simp only [chkFlagR, decide_eq_false_iff_not]
@@ -91,7 +99,7 @@ theorem chkFlagR_bot (cnf : Bool) (c : A) :
 /-- **Stepping up adds exactly one literal to the flag.** Moving the head from
 `p` to the position above it brings `p`'s own cell into view and nothing else,
 because `DescriptiveComplexity.SuccPos` leaves no room between them. -/
-theorem chkFlagR_succ (cnf : Bool) (c : A) {p q : AltV k A}
+private theorem chkFlagR_succ (cnf : Bool) (c : A) {p q : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hp : p.1.1 = AltBase.pCell) :
     chkFlagR cnf νs c q = true ↔
       (chkFlagR cnf νs c p = true ∨ QGood k cnf c (p.2 0) (chkVal νs (p.2 0))) := by
@@ -122,7 +130,7 @@ theorem chkFlagR_succ (cnf : Bool) (c : A) {p q : AltV k A}
 
 /-- **One step of a rightward check sweep.** The machine reads the cell it is
 on, folds that literal into the flag, and moves one place right. -/
-theorem step_chkR {cnf : Bool} {c : A} (hc : QbfCl k c) {p q : AltV k A}
+private theorem step_chkR {cnf : Bool} {c : A} (hc : QbfCl k c) {p q : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hp : p.1.1 = AltBase.pCell) :
     (altMachine k A cnf).Step (confChkR cnf νs c p) (confChkR cnf νs c q) := by
   classical
@@ -146,7 +154,7 @@ theorem step_chkR {cnf : Bool} {c : A} (hc : QbfCl k c) {p q : AltV k A}
 
 /-- **A whole rightward check sweep**: from the lowest cell to the right
 marker, the flag accumulating the literals of `c` met along the way. -/
-theorem steps_chkR {cnf : Bool} {c : A} (hc : QbfCl k c) :
+private theorem steps_chkR {cnf : Bool} {c : A} (hc : QbfCl k c) :
     (altMachine k A cnf).StepsIn
       (bitRank tagTupleLe AltPosn (posEnd : AltV k A) -
         bitRank tagTupleLe AltPosn (posCell qbotA : AltV k A))
@@ -184,7 +192,7 @@ noncomputable def confChkL (cnf : Bool) (νs : Fin k → A → Prop) (c : A) (p 
 
 /-- **A leftward sweep starts with an empty flag**: nothing lies above the
 highest cell. -/
-theorem chkFlagL_top (cnf : Bool) (c : A) :
+private theorem chkFlagL_top (cnf : Bool) (c : A) :
     chkFlagL cnf νs c (posCell (qtopA (A := A))) = false := by
   classical
   simp only [chkFlagL, decide_eq_false_iff_not]
@@ -192,7 +200,7 @@ theorem chkFlagL_top (cnf : Bool) (c : A) :
   exact hne (congrArg _ (le_antisymm (le_qtopA y) (posCell_le_iff.mp hle))).symm
 
 /-- **Stepping down adds exactly one literal to the flag.** -/
-theorem chkFlagL_succ (cnf : Bool) (c : A) {p q : AltV k A}
+private theorem chkFlagL_succ (cnf : Bool) (c : A) {p q : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hq : q.1.1 = AltBase.pCell) :
     chkFlagL cnf νs c p = true ↔
       (chkFlagL cnf νs c q = true ∨ QGood k cnf c (q.2 0) (chkVal νs (q.2 0))) := by
@@ -223,7 +231,7 @@ theorem chkFlagL_succ (cnf : Bool) (c : A) {p q : AltV k A}
     · exact ⟨q.2 0, hqc ▸ hsucc.2.2.1, hqc ▸ hsucc.2.2.2.1, hlit⟩
 
 /-- **One step of a leftward check sweep.** -/
-theorem step_chkL {cnf : Bool} {c : A} (hc : QbfCl k c) {p q : AltV k A}
+private theorem step_chkL {cnf : Bool} {c : A} (hc : QbfCl k c) {p q : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hq : q.1.1 = AltBase.pCell) :
     (altMachine k A cnf).Step (confChkL cnf νs c q) (confChkL cnf νs c p) := by
   classical
@@ -247,7 +255,7 @@ theorem step_chkL {cnf : Bool} {c : A} (hc : QbfCl k c) {p q : AltV k A}
 
 /-- **A whole leftward check sweep**: from the highest cell down to the left
 marker. -/
-theorem steps_chkL {cnf : Bool} {c : A} (hc : QbfCl k c) :
+private theorem steps_chkL {cnf : Bool} {c : A} (hc : QbfCl k c) :
     (altMachine k A cnf).StepsIn
       (bitRank tagTupleLe AltPosn (posCell qtopA : AltV k A) -
         bitRank tagTupleLe AltPosn (posStart : AltV k A))
@@ -265,7 +273,7 @@ theorem steps_chkL {cnf : Bool} {c : A} (hc : QbfCl k c) :
 /-! ### The turns -/
 
 /-- **The turn at the right marker**, when another clause follows. -/
-theorem step_turnNextR {cnf : Bool} {c c' : A} (hnext : QbfNextCl k c c')
+private theorem step_turnNextR {cnf : Bool} {c c' : A} (hnext : QbfNextCl k c c')
     (hflag : chkFlagR cnf νs c posEnd = true) :
     (altMachine k A cnf).Step (confChkR cnf νs c posEnd) (confChkL cnf νs c' (posCell qtopA)) := by
   refine ⟨((AltBase.tTurnNext true, 0), ![c, c']), ⟨hnext, rfl⟩, ?_, rfl, ?_, rfl,
@@ -277,7 +285,8 @@ theorem step_turnNextR {cnf : Bool} {c c' : A} (hnext : QbfNextCl k c c')
     rfl
 
 /-- **The turn at the right marker**, when the clause settles the run. -/
-theorem step_turnAccR {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
+private theorem step_turnAccR
+    {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
     (hflag : chkFlagR cnf νs c posEnd = cnf) :
     (altMachine k A cnf).Step (confChkR cnf νs c posEnd)
       { state := stAcc, head := posCell qtopA, tape := tapeAfter νs k } := by
@@ -288,7 +297,7 @@ theorem step_turnAccR {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true �
   rw [hflag]
 
 /-- **The turn at the left marker**, when another clause follows. -/
-theorem step_turnNextL {cnf : Bool} {c c' : A} (hnext : QbfNextCl k c c')
+private theorem step_turnNextL {cnf : Bool} {c c' : A} (hnext : QbfNextCl k c c')
     (hflag : chkFlagL cnf νs c posStart = true) :
     (altMachine k A cnf).Step (confChkL cnf νs c posStart)
       (confChkR cnf νs c' (posCell qbotA)) := by
@@ -301,7 +310,8 @@ theorem step_turnNextL {cnf : Bool} {c c' : A} (hnext : QbfNextCl k c c')
     rfl
 
 /-- **The turn at the left marker**, when the clause settles the run. -/
-theorem step_turnAccL {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
+private theorem step_turnAccL
+    {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
     (hflag : chkFlagL cnf νs c posStart = cnf) :
     (altMachine k A cnf).Step (confChkL cnf νs c posStart)
       { state := stAcc, head := posCell qbotA, tape := tapeAfter νs k } := by
@@ -314,7 +324,7 @@ theorem step_turnAccL {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true �
 /-! ### One clause, checked end to end -/
 
 /-- **At the far marker the flag has seen every cell.** -/
-theorem chkFlagR_posEnd (cnf : Bool) (c : A) :
+private theorem chkFlagR_posEnd (cnf : Bool) (c : A) :
     chkFlagR cnf νs c (posEnd : AltV k A) = true ↔
       ∃ y : A, QGood k cnf c y (chkVal νs y) := by
   classical
@@ -328,7 +338,7 @@ theorem chkFlagR_posEnd (cnf : Bool) (c : A) :
     exact absurd (congrArg (fun p => p.1.1) hcon) (show ¬(AltBase.pCell = AltBase.pEnd) by decide)
 
 /-- **At the far marker the flag has seen every cell.** -/
-theorem chkFlagL_posStart (cnf : Bool) (c : A) :
+private theorem chkFlagL_posStart (cnf : Bool) (c : A) :
     chkFlagL cnf νs c (posStart : AltV k A) = true ↔
       ∃ y : A, QGood k cnf c y (chkVal νs y) := by
   classical
@@ -343,24 +353,24 @@ theorem chkFlagL_posStart (cnf : Bool) (c : A) :
 
 omit [(Language.qbf k).Structure A] in
 /-- The left marker has rank `0`. -/
-theorem bitRank_posStart : bitRank tagTupleLe AltPosn (posStart : AltV k A) = 0 :=
+private theorem bitRank_posStart : bitRank tagTupleLe AltPosn (posStart : AltV k A) = 0 :=
   bitRank_eq_zero_of_minPos isLinOrd_altTagTupleLe minPos_posStart
 
 omit [(Language.qbf k).Structure A] in
 /-- The right marker sits one step above the last cell. -/
-theorem bitRank_posEnd_eq :
+private theorem bitRank_posEnd_eq :
     bitRank tagTupleLe AltPosn (posEnd : AltV k A) =
       bitRank tagTupleLe AltPosn (posCell (qtopA (A := A)) : AltV k A) + 1 :=
   bitRank_succPos isLinOrd_altTagTupleLe succPos_posCell_posEnd
 
 omit [(Language.qbf k).Structure A] in
 /-- The first cell has rank `1`. -/
-theorem bitRank_posCell_qbotA :
+private theorem bitRank_posCell_qbotA :
     bitRank tagTupleLe AltPosn (posCell (qbotA (A := A)) : AltV k A) = 1 := by
   rw [bitRank_succPos isLinOrd_altTagTupleLe succPos_posStart_posCell, bitRank_posStart]
 
 /-- Checking `c` rightwards and moving on to the next clause. -/
-theorem steps_clauseR {cnf : Bool} {c c' : A} (hc : QbfCl k c) (hnext : QbfNextCl k c c')
+private theorem steps_clauseR {cnf : Bool} {c c' : A} (hc : QbfCl k c) (hnext : QbfNextCl k c c')
     (hgood : ∃ y : A, QGood k cnf c y (chkVal νs y)) :
     ∃ n ≤ bitRank tagTupleLe AltPosn (posEnd : AltV k A),
       (altMachine k A cnf).StepsIn n (confChkR cnf νs c (posCell qbotA))
@@ -372,7 +382,7 @@ theorem steps_clauseR {cnf : Bool} {c c' : A} (hc : QbfCl k c) (hnext : QbfNextC
   omega
 
 /-- Checking `c` leftwards and moving on to the next clause. -/
-theorem steps_clauseL {cnf : Bool} {c c' : A} (hc : QbfCl k c) (hnext : QbfNextCl k c c')
+private theorem steps_clauseL {cnf : Bool} {c c' : A} (hc : QbfCl k c) (hnext : QbfNextCl k c c')
     (hgood : ∃ y : A, QGood k cnf c y (chkVal νs y)) :
     ∃ n ≤ bitRank tagTupleLe AltPosn (posEnd : AltV k A),
       (altMachine k A cnf).StepsIn n (confChkL cnf νs c (posCell qtopA))
@@ -384,7 +394,8 @@ theorem steps_clauseL {cnf : Bool} {c c' : A} (hc : QbfCl k c) (hnext : QbfNextC
   omega
 
 /-- Checking `c` rightwards and accepting. -/
-theorem steps_clauseAccR {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
+private theorem steps_clauseAccR
+    {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
     (hflag : chkFlagR cnf νs c (posEnd : AltV k A) = cnf) :
     ∃ n ≤ bitRank tagTupleLe AltPosn (posEnd : AltV k A), ∃ cfin : Config (AltV k A),
       (altMachine k A cnf).StepsIn n (confChkR cnf νs c (posCell qbotA)) cfin ∧
@@ -395,7 +406,8 @@ theorem steps_clauseAccR {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = tru
   omega
 
 /-- Checking `c` leftwards and accepting. -/
-theorem steps_clauseAccL {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
+private theorem steps_clauseAccL
+    {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
     (hflag : chkFlagL cnf νs c (posStart : AltV k A) = cnf) :
     ∃ n ≤ bitRank tagTupleLe AltPosn (posEnd : AltV k A), ∃ cfin : Config (AltV k A),
       (altMachine k A cnf).StepsIn n (confChkL cnf νs c (posCell qtopA)) cfin ∧
@@ -409,7 +421,7 @@ theorem steps_clauseAccL {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = tru
 
 omit [Nonempty A] in
 /-- **Every clause but the last has a next one.** -/
-theorem exists_qNextCl {c : A} (hc : QbfCl k c) (hnmax : ¬QbfMaxCl k c) :
+private theorem exists_qNextCl {c : A} (hc : QbfCl k c) (hnmax : ¬QbfMaxCl k c) :
     ∃ c', QbfNextCl k c c' := by
   have hne : ∃ e : A, QbfCl k e ∧ c < e := by
     by_contra hcon
@@ -423,7 +435,7 @@ theorem exists_qNextCl {c : A} (hc : QbfCl k c) (hnmax : ¬QbfMaxCl k c) :
 omit [Nonempty A] in
 /-- Passing to the next clause removes exactly one clause from those still to
 be checked. -/
-theorem ncard_qclauses_next {c c' : A} (hnext : QbfNextCl k c c') :
+private theorem ncard_qclauses_next {c c' : A} (hnext : QbfNextCl k c c') :
     {e : A | QbfCl k e ∧ c ≤ e}.ncard = {e : A | QbfCl k e ∧ c' ≤ e}.ncard + 1 := by
   obtain ⟨hc, hc', hlt, hmin⟩ := hnext
   have hset : {e : A | QbfCl k e ∧ c ≤ e} = insert c {e : A | QbfCl k e ∧ c' ≤ e} := by
@@ -489,7 +501,7 @@ theorem accepts_from_chk_cnf {cnf : Bool} (hcnf : cnf = true)
 /-- **A disjunctive matrix: the machine walks the terms until one has no
 violated literal, and accepts there.** The flag is *clear* at such a term,
 which is exactly what the accepting turn fires at when `cnf` is `false`. -/
-theorem accepts_from_chk_dnf {cnf : Bool} (hcnf : cnf = false) {c₀ : A} (hc₀ : QbfCl k c₀)
+private theorem accepts_from_chk_dnf {cnf : Bool} (hcnf : cnf = false) {c₀ : A} (hc₀ : QbfCl k c₀)
     (hgood : ∀ y : A, ¬QGood k cnf c₀ y (chkVal νs y)) :
     ∀ c : A, QbfCl k c → c ≤ c₀ →
       (∃ (n : ℕ) (cfin : Config (AltV k A)),
@@ -558,7 +570,7 @@ omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 existential half is `DescriptiveComplexity.ATMData.altAcc_of_steps`; this is
 the version that also serves a universal block, and could be hoisted to
 `DescriptiveComplexity.MachinesAltPlay`. -/
-theorem altAcc_of_stepsIn_det {M : ATMData (AltV k A)} {start : Bool}
+private theorem altAcc_of_stepsIn_det {M : ATMData (AltV k A)} {start : Bool}
     {P : Config (AltV k A) → Prop}
     (hclosed : ∀ e e', P e → M.Step e e' → P e')
     (hdet : ∀ e e' e'', P e → M.Step e e' → M.Step e e'' → e' = e'') :
@@ -583,11 +595,11 @@ theorem altAcc_of_stepsIn_det {M : ATMData (AltV k A)} {start : Bool}
 
 /-- Being in the check phase: the state is a checking state or the accepting
 one. -/
-def InCheck (c : Config (AltV k A)) : Prop :=
+private def InCheck (c : Config (AltV k A)) : Prop :=
   (∃ (f d : Bool) (cl : A), c.state = stChk f d cl) ∨ c.state = stAcc
 
 /-- The check phase never returns to a sweep. -/
-theorem inCheck_closed {cnf : Bool} (c c' : Config (AltV k A)) (hP : InCheck c)
+private theorem inCheck_closed {cnf : Bool} (c c' : Config (AltV k A)) (hP : InCheck c)
     (hstep : (altMachine k A cnf).Step c c') : InCheck c' := by
   obtain ⟨τ, hτ, hsrc, -, hdst, -⟩ := hstep
   have hne : ∀ (i : Fin (k + 1)) (b : Bool), c.state ≠ stG i b := by
@@ -607,7 +619,7 @@ theorem inCheck_closed {cnf : Bool} (c c' : Config (AltV k A)) (hP : InCheck c)
 
 /-- The check phase is deterministic: none of its configurations is a guessing
 choice. -/
-theorem inCheck_det {cnf : Bool} (c c' c'' : Config (AltV k A)) (hP : InCheck c)
+private theorem inCheck_det {cnf : Bool} (c c' c'' : Config (AltV k A)) (hP : InCheck c)
     (h₁ : (altMachine k A cnf).Step c c') (h₂ : (altMachine k A cnf).Step c c'') : c' = c'' := by
   refine step_functional_off_guess ?_ h₁ h₂
   rintro ⟨i, x, hc, -⟩
@@ -616,7 +628,7 @@ theorem inCheck_det {cnf : Bool} (c c' c'' : Config (AltV k A)) (hP : InCheck c)
 
 /-- **The check phase accepts**, at either polarity of its block, as soon as a
 run through it reaches an accepting state. -/
-theorem altAcc_of_check {cnf : Bool} {start : Bool} {m n : ℕ} {c d : Config (AltV k A)}
+private theorem altAcc_of_check {cnf : Bool} {start : Bool} {m n : ℕ} {c d : Config (AltV k A)}
     (hmn : m ≤ n) (hP : InCheck c) (hrun : (altMachine k A cnf).StepsIn m c d)
     (hacc : AltAccSt d.state) : (altMachine k A cnf).AltAcc start n c :=
   altAcc_of_stepsIn_det (fun e e' => inCheck_closed e e') (fun e e' e'' => inCheck_det e e' e'')
@@ -631,14 +643,14 @@ left marker and the cells lie below the right marker. -/
 
 omit [(Language.qbf k).Structure A] in
 /-- Only the three bracketing base tags are at or below the right marker's. -/
-theorem base_le_pEnd {t : AltBase} (h : altBaseIdx t ≤ altBaseIdx AltBase.pEnd) :
+private theorem base_le_pEnd {t : AltBase} (h : altBaseIdx t ≤ altBaseIdx AltBase.pEnd) :
     t = AltBase.pStart ∨ t = AltBase.pCell ∨ t = AltBase.pEnd := by
   revert h; revert t; decide
 
 omit [(Language.qbf k).Structure A] in
 /-- **A sweep is short.** Proved by injecting the positions below the right
 marker into `Option A` rather than by counting. -/
-theorem bitRank_posEnd_le :
+private theorem bitRank_posEnd_le :
     bitRank tagTupleLe AltPosn (posEnd : AltV k A) ≤ Nat.card A + 1 := by
   classical
   have hcell : ∀ r : AltV k A, AltPosn r → tagTupleLe r posEnd → r ≠ posEnd →
@@ -666,7 +678,7 @@ theorem bitRank_posEnd_le :
 omit [(Language.qbf k).Structure A] in
 /-- **A sweep costs about twice the size of the instance**: down the tape and
 back. -/
-theorem sweepLen_le : sweepLen k A ≤ 2 * (Nat.card A + 1) := by
+private theorem sweepLen_le : sweepLen k A ≤ 2 * (Nat.card A + 1) := by
   have h1 := bitRank_posStart (k := k) (A := A)
   have h2 := bitRank_posEnd_eq (k := k) (A := A)
   have h3 := bitRank_posCell_qbotA (k := k) (A := A)

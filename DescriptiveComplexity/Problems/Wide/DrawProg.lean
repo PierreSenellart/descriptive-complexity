@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawVarRule
+import all DescriptiveComplexity.Problems.Wide.DrawEval
+import all DescriptiveComplexity.Problems.Wide.DrawRound
+import all DescriptiveComplexity.Problems.Wide.DrawVar
+import all DescriptiveComplexity.Problems.Wide.DrawVarRule
 
 /-!
 # The program, assembled
@@ -138,7 +142,7 @@ variable {dt}
 
 /-- **Every rule of one variable's machinery fires from a phase its site
 owns.** -/
-theorem varHosrcF (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
+private theorem varHosrcF (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
     {emb : dt.VarPhF v → P} (exitPh : P) :
     ∀ (i : dt.VarSiteF v) (ρ : dt.VarShF v i),
       ∃ p : dt.VarPhF v,
@@ -167,7 +171,7 @@ phase it can move to**: the gates, the round and the matrix all stay inside, and
 only the two verdict dispatches leave. This is the fact a
 determinism-after-the-guess argument asks of the evaluation
 (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
-theorem varRuleF_dstIn (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
+private theorem varRuleF_dstIn (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
     {emb : dt.VarPhF v → P} (exitPh : P) {S : P → Prop}
     (hemb : ∀ p : dt.VarPhF v, S (emb p)) (hexit : S exitPh)
     (i : dt.VarSiteF v) (ρ : dt.VarShF v i) :
@@ -209,7 +213,7 @@ theorem varRuleF_dstIn (v : dt.VarIx) (args : dt.VarArgs (A := A) (Q := Q) v)
     (hemb (.gatesP (.chk 0))) (hemb (.matrixP (.igP (.chk 0)))) i ρ
 
 /-- **One variable's machinery separates in-shape.** -/
-theorem varSepF (hzo : zero ≠ one) (v : dt.VarIx)
+private theorem varSepF (hzo : zero ≠ one) (v : dt.VarIx)
     (args : dt.VarArgs (A := A) (Q := Q) v)
     {emb : dt.VarPhF v → P} (hemb : Function.Injective emb) (exitPh : P) :
     ∀ (i : dt.VarSiteF v) (ρ ρ' : dt.VarShF v i) (f : Q → A)
@@ -270,7 +274,7 @@ variable {dt}
 
 /-- **Every rule of the evaluation's machineries fires from a phase its site
 owns.** -/
-theorem smHosrc (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
+private theorem smHosrc (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     ∀ (s : dt.SMF) (ρ : dt.SMSh s),
       ∃ p : dt.PMF, (dt.smRule zero one args s ρ).srcPh = .evalP (.sub p) ∧
         dt.smOwn p = s := by
@@ -290,7 +294,7 @@ theorem smHosrc (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     exact ⟨Sum.inr p, hp, congrArg (fun x => (Sum.inr x : dt.SMF)) ho⟩
 
 /-- **The evaluation's machineries separate in-shape.** -/
-theorem smSep (hzo : zero ≠ one)
+private theorem smSep (hzo : zero ≠ one)
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     ∀ (s : dt.SMF) (ρ ρ' : dt.SMSh s) (f : Q → A) (g : dt.SlotIx → A),
       (dt.smRule zero one args s ρ).guard f g →
@@ -395,7 +399,7 @@ noncomputable def prog (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd) :
 
 /-- **The program is deterministic**: separation by the assembly, site by
 site. -/
-theorem prog_sep (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd) :
+private theorem prog_sep (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd) :
     (dt.prog zero one hzo args hpl).table.Sep :=
   Assembly.sep _
 
@@ -404,12 +408,12 @@ variable {dt zero one hzo args}
 /-- The mirror track is clear at time zero – on the register file and off it
 alike – so it is the track the initial tape is presented along
 (`DescriptiveComplexity.Draw.Prog.trackTape_initBack`). -/
-theorem prog_mark_mir (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd)
+private theorem prog_mark_mir (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd)
     (x : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd) :
     (dt.prog zero one hzo args hpl).mark x Slot.mir =
       (dt.prog zero one hzo args hpl).zero := rfl
 
-theorem prog_blank_mir (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd) :
+private theorem prog_blank_mir (hpl : Fintype.card (Q ⊕ dt.SlotIx) ≤ dt.dd) :
     (dt.prog zero one hzo args hpl).blank Slot.mir =
       (dt.prog zero one hzo args hpl).zero := rfl
 

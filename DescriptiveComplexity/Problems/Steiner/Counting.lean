@@ -14,6 +14,10 @@ public import DescriptiveComplexity.Counting.Class
 public import Mathlib.Data.Set.Finite.Lemmas
 public import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Steiner.Defs
 
 /-!
 # #Steiner Tree: counting the Steiner sets of the threshold size
@@ -62,7 +66,7 @@ section Reach
 
 variable {A : Type}
 
-theorem reachIn_le {R : A → A → Prop} {n m : ℕ} (hnm : n ≤ m) {x y : A}
+private theorem reachIn_le {R : A → A → Prop} {n m : ℕ} (hnm : n ≤ m) {x y : A}
     (h : reachIn R n x y) : reachIn R m x y := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hnm
   induction k with
@@ -141,7 +145,7 @@ theorem clockOf_iff {Lk : A → A → Prop} {S : A → Prop} {x t : A} {k : ℕ}
     clockOf Lk S x t ↔ ∃ r, (S r ∧ ∀ y, S y → r ≤ y) ∧ reachIn Lk k r x := by
   rw [clockOf, hk]
 
-theorem isReachClock_clockOf (Lk : A → A → Prop) (S : A → Prop) :
+private theorem isReachClock_clockOf (Lk : A → A → Prop) (S : A → Prop) :
     IsReachClock Lk S (clockOf Lk S) := by
   refine ⟨fun x t ht => ?_, fun x t u htu => ?_⟩
   · rw [clockOf_iff (orank_eq_zero ht)]
@@ -262,7 +266,7 @@ noncomputable def SharpSteinerTree : CountingProblem Language.steinerGraph where
     (steinerOfSizeEquiv e.toEquiv (fun a a' => relMap_equiv₂ e stAdj a a')
       (fun a => relMap_equiv₁ e stTerminal a) fun a => relMap_equiv₁ e stMarked a)
 
-theorem sharpSteinerTree_apply (A : Type) [Language.steinerGraph.Structure A] :
+private theorem sharpSteinerTree_apply (A : Type) [Language.steinerGraph.Structure A] :
     SharpSteinerTree A = Nat.card {S : A → Prop // SteinerOfSize A S} :=
   rfl
 
@@ -270,7 +274,7 @@ theorem sharpSteinerTree_apply (A : Type) [Language.steinerGraph.Structure A] :
 number of non-terminals.
 Registered in the Lax archive as
 [`Lax280166.SteinerTreeComplete.sharpSteinerTree_support_iff`](https://laxarchive.org/lax-280166/Lax280166.SteinerTreeComplete.html#s-Lax280166.SteinerTreeComplete.sharpSteinerTree_support_iff). -/
-theorem sharpSteinerTree_support_iff (A : Type) [Language.steinerGraph.Structure A]
+private theorem sharpSteinerTree_support_iff (A : Type) [Language.steinerGraph.Structure A]
     [Finite A] : SharpSteinerTree.support A ↔ ∃ S : A → Prop, SteinerOfSize A S := by
   rw [CountingProblem.support_iff, sharpSteinerTree_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨S⟩, _⟩ => ⟨S.1, S.2⟩, fun ⟨S, hS⟩ => ⟨⟨⟨S, hS⟩⟩, inferInstance⟩⟩
@@ -278,7 +282,7 @@ theorem sharpSteinerTree_support_iff (A : Type) [Language.steinerGraph.Structure
 /-- The support of #Steiner Tree implies Steiner Tree.
 Registered in the Lax archive as
 [`Lax280166.SteinerTreeComplete.steinerTree_of_sharpSteinerTree_support`](https://laxarchive.org/lax-280166/Lax280166.SteinerTreeComplete.html#s-Lax280166.SteinerTreeComplete.steinerTree_of_sharpSteinerTree_support). -/
-theorem steinerTree_of_sharpSteinerTree_support (A : Type)
+private theorem steinerTree_of_sharpSteinerTree_support (A : Type)
     [Language.steinerGraph.Structure A] [Finite A] (h : SharpSteinerTree.support A) :
     SteinerTree A := by
   obtain ⟨S, hfin, hterm, hconn, hcard⟩ := (sharpSteinerTree_support_iff A).mp h
@@ -323,7 +327,7 @@ abbrev stoReachSym : stoLang.Relations 2 := Sum.inr scReachRel
 chosen set contains the terminals, the second set is its non-terminals, the
 binary relation is the reachability clock, and the clock reaches the whole set
 by the last tick. -/
-noncomputable def steinerCountKernel : stoLang.Sentence :=
+private noncomputable def steinerCountKernel : stoLang.Sentence :=
   fo% (∀ x, stoTermSym(x) → stoSelSym(x)) ∧
     (∀ x, stoNonSym(x) ↔ (stoSelSym(x) ∧ ¬ stoTermSym(x))) ∧
     (∀ x t, (∀ z, stoLeSym(t, z)) →
@@ -339,7 +343,7 @@ section Kernel
 variable {A : Type} [Language.steinerGraph.Structure A] [LinearOrder A]
 
 /-- Realization of the kernel of #Steiner Tree. -/
-theorem realize_steinerCountKernel (ρ : steinerCountBlock.Assignment A) :
+private theorem realize_steinerCountKernel (ρ : steinerCountBlock.Assignment A) :
     (@Sentence.Realize stoLang A
         (@sumStructure _ _ A _ (steinerCountBlock.structure ρ)) steinerCountKernel) ↔
       (∀ x : A, STTerminal x → ρ .sel fun _ => x) ∧
@@ -388,7 +392,7 @@ theorem realize_steinerCountKernel (ρ : steinerCountBlock.Assignment A) :
       fun h i hi => h (i 0) (i 1) (fun z => hi.1 fun _ => z) hi.2⟩
 
 /-- The certificate of a set: the set, its non-terminals, and its clock. -/
-def steinerCertOf (S : A → Prop) : steinerCountBlock.Assignment A :=
+private def steinerCertOf (S : A → Prop) : steinerCountBlock.Assignment A :=
   fun i => match i with
     | .sel => fun w : Fin 1 → A => S (w 0)
     | .non => fun w : Fin 1 → A => S (w 0) ∧ ¬STTerminal (w 0)
@@ -399,7 +403,7 @@ variable (A) [Finite A]
 
 /-- **The Steiner sets of the threshold size are the witnesses of the kernel of
 that size**, bijectively: the non-terminals and the clock are determined. -/
-noncomputable def steinerEquiv :
+private noncomputable def steinerEquiv :
     {ρ : steinerCountBlock.Assignment A //
         (@Sentence.Realize stoLang A
           (@sumStructure _ _ A _ (steinerCountBlock.structure ρ)) steinerCountKernel) ∧

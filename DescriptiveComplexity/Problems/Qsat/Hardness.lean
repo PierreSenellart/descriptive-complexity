@@ -7,6 +7,16 @@ module
 
 public import DescriptiveComplexity.Problems.Qsat.Induction
 import DescriptiveComplexity.Problems.SuccinctReach
+import all DescriptiveComplexity.Problems.Qsat.Induction
+import all DescriptiveComplexity.Problems.Qsat.Leaf
+import all DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Membership
+import all DescriptiveComplexity.Problems.Qsat.Peel
+import all DescriptiveComplexity.Problems.Qsat.Prefix
+import all DescriptiveComplexity.Problems.Qsat.Reach
+import all DescriptiveComplexity.Problems.Qsat.Tags
+import all DescriptiveComplexity.Problems.SuccinctReach
+import all DescriptiveComplexity.Savitch
 
 /-!
 # QSAT is PSPACE-hard
@@ -39,10 +49,10 @@ section Correct
 variable {A : Type} [Language.transSys.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- The assignment of the first block made of the two endpoints of the walk. -/
-def endVal (S T : A → Prop) : QM A → Prop := fun y =>
+private def endVal (S T : A → Prop) : QM A → Prop := fun y =>
   (∃ a : A, y = qVar .sS a (qBot A) ∧ S a) ∨ ∃ a : A, y = qVar .sT a (qBot A) ∧ T a
 
-theorem stS_over_endVal (τ : QM A → Prop) (S T : A → Prop) {a : A} (ha : IsSV a) :
+private theorem stS_over_endVal (τ : QM A → Prop) (S T : A → Prop) {a : A} (ha : IsSV a) :
     stS (qOver (QBlk (tEnds A)) τ (endVal S T)) a ↔ S a := by
   refine (readout_in (v := .sS) τ _ ⟨ha, isBot_qBot A⟩ (by simp [tEnds])).trans ?_
   constructor
@@ -51,7 +61,7 @@ theorem stS_over_endVal (τ : QM A → Prop) (S T : A → Prop) {a : A} (ha : Is
     · exact absurd (qVar_inj he).1 (by decide)
   · exact fun hs => Or.inl ⟨a, rfl, hs⟩
 
-theorem stT_over_endVal (τ : QM A → Prop) (S T : A → Prop) {a : A} (ha : IsSV a) :
+private theorem stT_over_endVal (τ : QM A → Prop) (S T : A → Prop) {a : A} (ha : IsSV a) :
     stT (qOver (QBlk (tEnds A)) τ (endVal S T)) a ↔ T a := by
   refine (readout_in (v := .sT) τ _ ⟨ha, isBot_qBot A⟩ (by simp [tEnds])).trans ?_
   constructor
@@ -62,7 +72,7 @@ theorem stT_over_endVal (τ : QM A → Prop) (S T : A → Prop) {a : A} (ha : Is
 
 /-- With no state variable, the auxiliary block is the first one: every other
 variable would need a state variable for one of its coordinates. -/
-theorem qPlayed_tAux_of_isEmpty (h : ∀ x : A, ¬IsSV x) :
+private theorem qPlayed_tAux_of_isEmpty (h : ∀ x : A, ¬IsSV x) :
     QPlayed (tAux A) = fun _ : QM A => False := by
   funext x
   refine propext ⟨?_, False.elim⟩
@@ -85,7 +95,7 @@ theorem qPlayed_tAux_of_isEmpty (h : ∀ x : A, ¬IsSV x) :
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- With no state variable, all states have the same class. -/
-theorem stCls_subsingleton (h : ∀ x : A, ¬IsSV x) (S S' : A → Prop) :
+private theorem stCls_subsingleton (h : ∀ x : A, ¬IsSV x) (S S' : A → Prop) :
     stCls S = stCls S' :=
   stCls_eq_iff.mpr fun x hx => absurd hx (h x)
 
@@ -135,7 +145,7 @@ theorem qsatHolds_iff : QsatHolds (QM A) ↔ SuccinctReachable A := by
 end Correct
 
 /-- **The Savitch reduction**, as an ordered first-order reduction. -/
-noncomputable def succinctReach_ordered_fo_reduction_qsat : SUCCINCTREACH ≤ᶠᵒ[≤] QSAT where
+private noncomputable def succinctReach_ordered_fo_reduction_qsat : SUCCINCTREACH ≤ᶠᵒ[≤] QSAT where
   Tag := QTag
   dim := 2
   toInterpretation := qsatInterp

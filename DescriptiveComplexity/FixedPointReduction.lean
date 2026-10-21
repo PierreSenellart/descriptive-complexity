@@ -270,7 +270,7 @@ namespace LFPReduction
 variable [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L} {Q : DecisionProblem L'}
 
 /-- The same interpretation reduces `Pᶜ` to `Qᶜ`. -/
-def compl (f : P ≤ˡᶠᵖ Q) : Pᶜ ≤ˡᶠᵖ Qᶜ :=
+private def compl (f : P ≤ˡᶠᵖ Q) : Pᶜ ≤ˡᶠᵖ Qᶜ :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim

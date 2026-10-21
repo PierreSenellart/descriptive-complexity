@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannelTape
 public import DescriptiveComplexity.Problems.Wide.DrawInit
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawInit
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.RegChannel
+import all DescriptiveComplexity.Problems.Wide.RegChannelTape
 
 /-!
 # A program's run at the register channel
@@ -45,7 +50,7 @@ omit [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **The elements the channel writes for are the ones the table marks**: the
 instance's input relation is the table's, and the table's holds at `x` exactly
 when `x` is marked. -/
-theorem wmHasInp_iff_marked (hR : T.Reads) (x : Univ A R P K dd) :
+private theorem wmHasInp_iff_marked (hR : T.Reads) (x : Univ A R P K dd) :
     WMHasInp x ↔ T.Marked x :=
   ⟨fun ⟨_a, ha⟩ => ((hR.inp _ _).mp ha).1,
     fun hm => ⟨symElt T.zero (T.markPl x), (hR.inp _ _).mpr ⟨hm, rfl⟩⟩⟩
@@ -53,7 +58,7 @@ theorem wmHasInp_iff_marked (hR : T.Reads) (x : Univ A R P K dd) :
 /-- **The emitted machine accepts on the clock at the register channel**: the
 reading of `DescriptiveComplexity.Draw.Table.accepts` whose marks sit on the file
 of the elements the table writes for. -/
-theorem acceptsReg (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
+private theorem acceptsReg (hR : T.Reads) {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, T.Marked x →
       f (wmRegSeg x) = symElt T.zero (T.markPl x))
     (hrest : ∀ s : Univ A R P K dd → Prop,
@@ -78,7 +83,7 @@ initial configuration – the start state, the empty address, and the tape the
 channel wrote – because a well-formed machine with one start state has one
 initial configuration (`TMData.isInit_unique`). This is where a backward reading
 of an accepting run gets the run it walks. -/
-theorem exists_reachesIn_of_acceptsReg (hR : T.Reads)
+private theorem exists_reachesIn_of_acceptsReg (hR : T.Reads)
     {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, T.Marked x →
       f (wmRegSeg x) = symElt T.zero (T.markPl x))
@@ -142,7 +147,7 @@ variable {PR}
 omit [DecidableEq W] in
 /-- On a register cell the background is that register's mark: two marked
 elements with the same cell are equal (`wmRegSeg_injOn`). -/
-theorem initBackReg_wmRegSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem initBackReg_wmRegSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     (hR : PR.table.Reads) {x : Univ A R P K dd} (hx : PR.marked x) :
     PR.initBackReg (wmRegSeg x) = PR.mark x := by
   classical
@@ -159,7 +164,7 @@ theorem initBackReg_wmRegSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [DecidableEq W] in
 /-- Off the file the background is the blank. -/
-theorem initBackReg_of_not_reg {r : Univ A R P K dd → Prop}
+private theorem initBackReg_of_not_reg {r : Univ A R P K dd → Prop}
     (hno : ∀ x : Univ A R P K dd, PR.marked x → r ≠ wmRegSeg x) :
     PR.initBackReg r = PR.blank := by
   classical
@@ -171,7 +176,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 /-- **The initial tape is the pass-layer presentation**, at the register
 channel: the walked track is empty, so nothing of the file is read but the cells
 themselves. -/
-theorem trackTape_initBackReg {t₀ : W}
+private theorem trackTape_initBackReg {t₀ : W}
     (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero) (hb : PR.blank t₀ = PR.zero) :
     PR.trackTapeAt wmRegSeg t₀ PR.initBackReg (fun _ => False) =
       fun r => PR.syElt (PR.initBackReg r) := by
@@ -190,7 +195,7 @@ theorem trackTape_initBackReg {t₀ : W}
   · rw [ite_eq_right hs]
 
 /-- **A program's run accepts on the clock, at the register channel.** -/
-theorem accepts_progReg (hR : PR.table.Reads)
+private theorem accepts_progReg (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t₀ : W} (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero)
     (hb : PR.blank t₀ = PR.zero) {n : ℕ} {cfg : Config (WPoint (Univ A R P K dd))}
@@ -214,7 +219,7 @@ configuration it starts in – the state it starts in, the empty address, and th
 tape the channel wrote. The clock is dropped: a backward reading refutes
 acceptance by determinism, and for that the length of the run does not
 matter. -/
-theorem exists_stepsIn_of_wideRegAccept (hR : PR.table.Reads)
+private theorem exists_stepsIn_of_wideRegAccept (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t₀ : W} (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero)
     (hb : PR.blank t₀ = PR.zero)
@@ -237,7 +242,7 @@ theorem exists_stepsIn_of_wideRegAccept (hR : PR.table.Reads)
 /-- **A program's run makes its instance a yes-instance of
 `DescriptiveComplexity.WideRegAccept`**: the reading a clocked reduction into
 the register channel produces. -/
-theorem wideRegAccept_prog (hR : PR.table.Reads)
+private theorem wideRegAccept_prog (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t₀ : W} (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero)
     (hb : PR.blank t₀ = PR.zero) {n : ℕ} {cfg : Config (WPoint (Univ A R P K dd))}

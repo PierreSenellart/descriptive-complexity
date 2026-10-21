@@ -8,6 +8,13 @@ module
 public import DescriptiveComplexity.Problems.Machine.AltSplice
 import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.MachinesAltPlay
+import all DescriptiveComplexity.Problems.Machine.AltGame
+import all DescriptiveComplexity.Problems.Machine.AltRank
+import all DescriptiveComplexity.Problems.Machine.AltSplice
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # One round of the game, and what it leaves behind
@@ -43,7 +50,7 @@ variable {A : Type} [Finite A] {M : ATMData A} {k : ℕ}
 omit [Finite A] in
 /-- **The blocks along a play never decrease**: a play takes genuine steps, and
 a step never lowers the block. -/
-theorem le_blk_of_blockPlay (hbwf : M.BlocksWellFormed k) {i : ℕ} {c : Config A} {ℓ : ℕ}
+private theorem le_blk_of_blockPlay (hbwf : M.BlocksWellFormed k) {i : ℕ} {c : Config A} {ℓ : ℕ}
     {f : ℕ → Config A} (hplay : M.BlockPlay i c ℓ f) (hc : M.Blk i c.state) :
     ∀ j, j ≤ ℓ → ∀ jj, M.Blk jj (f j).state → i ≤ jj := by
   intro j
@@ -62,14 +69,14 @@ theorem le_blk_of_blockPlay (hbwf : M.BlocksWellFormed k) {i : ℕ} {c : Config 
 
 omit [Finite A] in
 /-- Both readings of the end of a play depend only on its last configuration. -/
-theorem PlayEnds.congr {start : Bool} {i n ℓ : ℕ} {f g : ℕ → Config A} (h : f ℓ = g ℓ)
+private theorem PlayEnds.congr {start : Bool} {i n ℓ : ℕ} {f g : ℕ → Config A} (h : f ℓ = g ℓ)
     (hf : M.PlayEnds start i n ℓ f) : M.PlayEnds start i n ℓ g := by
   unfold PlayEnds at hf ⊢
   rwa [← h]
 
 omit [Finite A] in
 /-- The universal reading likewise. -/
-theorem UnivPlayOk.congr {start : Bool} {i n ℓ : ℕ} {f g : ℕ → Config A} (h : f ℓ = g ℓ)
+private theorem UnivPlayOk.congr {start : Bool} {i n ℓ : ℕ} {f g : ℕ → Config A} (h : f ℓ = g ℓ)
     (hf : M.UnivPlayOk start i n ℓ f) : M.UnivPlayOk start i n ℓ g := by
   unfold UnivPlayOk at hf ⊢
   rwa [← h]
@@ -79,7 +86,7 @@ theorem UnivPlayOk.congr {start : Bool} {i n ℓ : ℕ} {f g : ℕ → Config A}
 /-- **An absorbing configuration is never left.** Once a walk is accepting or
 stuck at a position whose block it still answers for, its legality forces it to
 stand still at every later position. -/
-theorem constant_of_absorbing (hlin : IsLinOrd M.Le) {i : ℕ} {w : A → Config A}
+private theorem constant_of_absorbing (hlin : IsLinOrd M.Le) {i : ℕ} {w : A → Config A}
     (hw : M.LegalBelow i w) {x : A} (hx : M.Posn x) (hb : M.BlkLt i (w x).state)
     (habs : M.Acc (w x).state ∨ M.Stuck (w x)) :
     ∀ y, M.Posn y → M.Le x y → w y = w x := by
@@ -101,7 +108,7 @@ include hbwf hlin hmax
 
 omit hbwf in
 /-- A position above `t` is the one the enumeration reaches at its rank. -/
-theorem posSeq_eq_of_le {t s : A} (ht : M.Posn t) (hs : M.Posn s) (hle : M.Le t s) :
+private theorem posSeq_eq_of_le {t s : A} (ht : M.Posn t) (hs : M.Posn s) (hle : M.Le t s) :
     s = M.posSeq t (bitRank M.Le M.Posn s - bitRank M.Le M.Posn t) := by
   have h1 : bitRank M.Le M.Posn t ≤ bitRank M.Le M.Posn s :=
     TMData.bitRank_le_of_le (M := M.toTMData) hlin ht hle
@@ -238,7 +245,7 @@ to be met by the walk `DescriptiveComplexity.ATMData.splice` builds out of any
 play that ends the way a round may end. -/
 
 /-- **One round of the game.** -/
-theorem altAcc_iff_guardQ (start : Bool) {i m : ℕ}
+private theorem altAcc_iff_guardQ (start : Bool) {i m : ℕ}
     (hIH : ∀ (v : A → Config A) (t' : A), M.LegalBelow (i + 1) v → M.Posn t' →
       M.Blk (i + 1) (v t').state →
       (∀ s, M.Posn s → M.Le s t' → s ≠ t' → M.BlkLt (i + 1) (v s).state) →
@@ -375,7 +382,7 @@ theorem altAcc_iff_guardQ (start : Bool) {i m : ℕ}
 because a state of block `k` does not exist, and the step is
 `DescriptiveComplexity.ATMData.altAcc_iff_guardQ` with the agreement condition
 of the round as its admissibility. -/
-theorem gameFrom_iff (start : Bool) :
+private theorem gameFrom_iff (start : Bool) :
     ∀ (m i : ℕ), i + m = k → 0 < i → ∀ (prev : A → Config A) (t : A),
       M.LegalBelow i prev → M.Posn t → M.Blk i (prev t).state →
       (∀ s, M.Posn s → M.Le s t → s ≠ t → M.BlkLt i (prev s).state) →

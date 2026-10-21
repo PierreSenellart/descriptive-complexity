@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The cells a wide machine can recognize
@@ -74,7 +75,7 @@ the input channel writes its symbol. -/
 def wmSeg (x : A) : A → Prop := fun y => WMLe y x
 
 /-- The cell of an element is the address the vocabulary calls its own. -/
-theorem wmDown_wmSeg (x : A) : WMDown WMLe (wmSeg x) x := fun _ => Iff.rfl
+private theorem wmDown_wmSeg (x : A) : WMDown WMLe (wmSeg x) x := fun _ => Iff.rfl
 
 /-- **An address is the cell of an element exactly when it is its segment**, so
 `DescriptiveComplexity.WMDown` never has to be unfolded again. -/
@@ -168,7 +169,7 @@ right and comes back by scanning left. -/
 
 omit [Finite A] in
 /-- **Every marked cell contains the least element.** -/
-theorem wmSeg_bot {bot : A} (hbot : ∀ v : A, WMLe bot v) (x : A) : wmSeg x bot := hbot x
+private theorem wmSeg_bot {bot : A} (hbot : ∀ v : A, WMLe bot v) (x : A) : wmSeg x bot := hbot x
 
 omit [Finite A] in
 /-- **The working area lies below the register file.** An address missing the
@@ -227,7 +228,7 @@ omit [Finite A] in
 `x` in the cell of `x`, the blank in every other cell. A reduction gives the
 symbol as a function `sym` of the element and marks nothing else; the tape it
 gets is then a *function*, which is what a run has to be given. -/
-theorem initTape_of_marks {b : A} (hb : WMBlank b) {sym : A → A}
+private theorem initTape_of_marks {b : A} (hb : WMBlank b) {sym : A → A}
     (hinp : ∀ x : A, WMInp x (sym x)) {tp : WPoint A → WPoint A}
     (hmark : ∀ x : A, tp (Sum.inl (wmSeg x)) = Sum.inr (sym x))
     (hrest : ∀ p : WPoint A, (∀ x : A, p ≠ Sum.inl (wmSeg x)) → tp p = Sum.inr b) :

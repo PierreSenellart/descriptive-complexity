@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Marks
 import DescriptiveComplexity.Problems.Wide.Blocks
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Wide.Blocks
 
 /-!
 # The universe the EXPSPACE reduction draws
@@ -118,7 +120,7 @@ variable [LinearOrder R] [LinearOrder P] [LinearOrder K]
 
 instance : LinearOrder (Tag R P K) := LinearOrder.lift' tagKey tagKey_injective
 
-theorem le_iff_tagKey (σ τ : Tag R P K) : σ ≤ τ ↔ tagKey σ ≤ tagKey τ := Iff.rfl
+private theorem le_iff_tagKey (σ τ : Tag R P K) : σ ≤ τ ↔ tagKey σ ≤ tagKey τ := Iff.rfl
 
 /-- The argument blocks come after the control, the alphabet and the phases,
 which is what makes the logical addresses an initial interval. -/
@@ -133,7 +135,7 @@ theorem lt_arg (τ : Tag R P K) (i : K) (h : ∀ j : K, τ ≠ Tag.arg j) :
 
 /-- **The argument tags are ordered like their blocks**: the tag order is the
 key's, and the key of an argument tag is its block. -/
-theorem lt_arg_arg (i j : K) :
+private theorem lt_arg_arg (i j : K) :
     (Tag.arg i : Tag R P K) < Tag.arg j ↔ i < j := by
   have hle : ∀ a b : K, ((Tag.arg a : Tag R P K) ≤ Tag.arg b) ↔ a ≤ b := by
     intro a b
@@ -186,7 +188,7 @@ theorem logicalTop_arg (i : K) (v : V) :
 /-- **Being logical is avoiding the non-argument blocks**, which is what the
 generic reading of the layout calls it
 (`DescriptiveComplexity.wmAvoids`). -/
-theorem logical_iff_wmAvoids {s : Tag R P K × V → Prop} :
+private theorem logical_iff_wmAvoids {s : Tag R P K × V → Prop} :
     (∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) → ∀ v : V, ¬s (τ, v)) ↔
       wmAvoids (fun τ : Tag R P K => ∀ i : K, τ ≠ Tag.arg i) s :=
   Iff.rfl
@@ -194,7 +196,7 @@ theorem logical_iff_wmAvoids {s : Tag R P K × V → Prop} :
 open Classical in
 /-- **The last logical address is the top of the region** the non-argument blocks
 cut out. -/
-theorem logicalTop_eq :
+private theorem logicalTop_eq :
     logicalTop (R := R) (P := P) (K := K) (V := V) =
       wmAvoidTop fun τ : Tag R P K => ∀ i : K, τ ≠ Tag.arg i :=
   funext fun _p => propext
@@ -203,7 +205,7 @@ theorem logicalTop_eq :
 /-- **A tag that is not an argument is below no argument tag**: the non-argument
 tags are an initial segment of the tag order, which is what makes the logical
 addresses an initial stretch of the tape rather than a scattered set. -/
-theorem nonArg_downward [LinearOrder R] [LinearOrder P] [LinearOrder K]
+private theorem nonArg_downward [LinearOrder R] [LinearOrder P] [LinearOrder K]
     (τ σ : Tag R P K) (hle : τ ≤ σ) (hσ : ∀ i : K, σ ≠ Tag.arg i) :
     ∀ i : K, τ ≠ Tag.arg i := by
   rintro i rfl

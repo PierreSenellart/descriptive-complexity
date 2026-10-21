@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Padding
 import Mathlib.Data.Finset.Max
+import all DescriptiveComplexity.Padding
 
 /-!
 # Data read only through its equality pattern is first-order definable
@@ -81,19 +82,19 @@ noncomputable def patOf (bot top : A) (w : Fin c → A) : EqPat c :=
     fun i j => decide (w i = w j))
 
 open Classical in
-theorem patOf_fst {bot top : A} {w : Fin c → A} (i : Fin c) :
+private theorem patOf_fst {bot top : A} {w : Fin c → A} (i : Fin c) :
     (patOf bot top w).1 i = true ↔ w i = bot := by
   rw [patOf]
   exact decide_eq_true_iff
 
 open Classical in
-theorem patOf_snd {bot top : A} {w : Fin c → A} (i : Fin c) :
+private theorem patOf_snd {bot top : A} {w : Fin c → A} (i : Fin c) :
     (patOf bot top w).2.1 i = true ↔ w i = top := by
   rw [patOf]
   exact decide_eq_true_iff
 
 open Classical in
-theorem patOf_same {bot top : A} {w : Fin c → A} (i j : Fin c) :
+private theorem patOf_same {bot top : A} {w : Fin c → A} (i j : Fin c) :
     (patOf bot top w).2.2 i j = true ↔ w i = w j := by
   rw [patOf]
   exact decide_eq_true_iff
@@ -116,7 +117,7 @@ noncomputable def topF (x : γ) : (L.sum Language.order).Formula γ :=
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_topF {x : γ} : (topF (L := L) x).Realize v ↔ IsTop (v x) := by
+private theorem realize_topF {x : γ} : (topF (L := L) x).Realize v ↔ IsTop (v x) := by
   rw [topF]
   simp only [Formula.realize_iAlls, Formula.realize_rel₂, Term.realize_var,
     Sum.elim_inl, Sum.elim_inr, relMap_leSymb]
@@ -137,7 +138,7 @@ section Succ
 variable {A : Type}
 
 /-- In a finite linear order, an element that is not a maximum is covered. -/
-theorem exists_covBy_of_not_isTop [LinearOrder A] [Finite A] {a : A}
+private theorem exists_covBy_of_not_isTop [LinearOrder A] [Finite A] {a : A}
     (h : ¬IsTop a) : ∃ b : A, a ⋖ b := by
   classical
   let := Fintype.ofFinite A
@@ -153,7 +154,7 @@ theorem exists_covBy_of_not_isTop [LinearOrder A] [Finite A] {a : A}
       (Finset.mem_filter.mpr ⟨Finset.mem_univ c, hac⟩)) (not_le.mpr hcb)
 
 /-- **Covers are unique in a linear order.** -/
-theorem covBy_unique [LinearOrder A] {a b b' : A} (h : a ⋖ b) (h' : a ⋖ b') :
+private theorem covBy_unique [LinearOrder A] {a b b' : A} (h : a ⋖ b) (h' : a ⋖ b') :
     b = b' := by
   rcases lt_trichotomy b b' with hlt | heq | hlt
   · exact absurd hlt (h'.2 h.1)
@@ -167,18 +168,18 @@ stands still, which is what `DescriptiveComplexity.Draw.tupNext` does. -/
 noncomputable def ordSucc [Preorder A] (a : A) : A :=
   if h : ∃ b : A, a ⋖ b then h.choose else a
 
-theorem covBy_ordSucc [Preorder A] {a : A} (h : ∃ b : A, a ⋖ b) : a ⋖ ordSucc a := by
+private theorem covBy_ordSucc [Preorder A] {a : A} (h : ∃ b : A, a ⋖ b) : a ⋖ ordSucc a := by
   classical
   rw [ordSucc, dite_eq_left h]
   exact h.choose_spec
 
-theorem ordSucc_of_not_covBy [Preorder A] {a : A} (h : ¬∃ b : A, a ⋖ b) :
+private theorem ordSucc_of_not_covBy [Preorder A] {a : A} (h : ¬∃ b : A, a ⋖ b) :
     ordSucc a = a := by
   classical
   rw [ordSucc, dite_eq_right h]
 
 /-- **The cover is the next element.** -/
-theorem eq_ordSucc_of_covBy [LinearOrder A] {a b : A} (h : a ⋖ b) :
+private theorem eq_ordSucc_of_covBy [LinearOrder A] {a b : A} (h : a ⋖ b) :
     b = ordSucc a :=
   covBy_unique h (covBy_ordSucc ⟨b, h⟩)
 
@@ -232,20 +233,20 @@ variable {A : Type} {c : ℕ}
 
 /-- **A tuple has a pattern**: the three families of decisions, read as
 conditions on the tuple. -/
-def HasPat (bot top : A) (p : EqPat c) (w : Fin c → A) : Prop :=
+private def HasPat (bot top : A) (p : EqPat c) (w : Fin c → A) : Prop :=
   (∀ i, w i = bot ↔ p.1 i = true) ∧ (∀ i, w i = top ↔ p.2.1 i = true) ∧
     ∀ i j, w i = w j ↔ p.2.2 i j = true
 
 open Classical in
 /-- Every tuple has the pattern it is read off. -/
-theorem hasPat_patOf (bot top : A) (w : Fin c → A) :
+private theorem hasPat_patOf (bot top : A) (w : Fin c → A) :
     HasPat bot top (patOf bot top w) w :=
   ⟨fun i => (patOf_fst i).symm, fun i => (patOf_snd i).symm,
     fun i j => (patOf_same i j).symm⟩
 
 open Classical in
 /-- And it has only that one. -/
-theorem eq_patOf_of_hasPat {bot top : A} {p : EqPat c} {w : Fin c → A}
+private theorem eq_patOf_of_hasPat {bot top : A} {p : EqPat c} {w : Fin c → A}
     (h : HasPat bot top p w) : p = patOf bot top w := by
   refine Prod.ext (funext fun i => ?_) (Prod.ext (funext fun i => ?_)
     (funext fun i => funext fun j => ?_))
@@ -267,7 +268,7 @@ variable {L : Language.{0, 0}} {γ : Type} {c : ℕ}
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 variable {bot top : A}
 
-theorem realize_litF {b : Bool} {φ : (L.sum Language.order).Formula γ} :
+private theorem realize_litF {b : Bool} {φ : (L.sum Language.order).Formula γ} :
     (litF b φ).Realize v ↔ (φ.Realize v ↔ b = true) := by
   cases b
   · simp only [litF, ite_eq_right Bool.false_ne_true, Formula.realize_not]
@@ -276,7 +277,7 @@ theorem realize_litF {b : Bool} {φ : (L.sum Language.order).Formula γ} :
   · rw [litF, ite_eq_left rfl]
     exact ⟨fun h => ⟨fun _ => rfl, fun _ => h⟩, fun h => h.mpr rfl⟩
 
-theorem realize_covByF {x y : γ} : (covByF (L := L) x y).Realize v ↔ v x ⋖ v y := by
+private theorem realize_covByF {x y : γ} : (covByF (L := L) x y).Realize v ↔ v x ⋖ v y := by
   rw [covByF]
   simp only [Formula.realize_inf, Formula.realize_not, Formula.realize_sup,
     Formula.realize_iAlls, Formula.realize_rel₂, Term.realize_var, Sum.elim_inl,
@@ -302,7 +303,7 @@ private theorem isTop_iff (ht : IsTop top) (a : A) : IsTop a ↔ a = top :=
   ⟨fun h => le_antisymm (ht a) (h top), fun h => h ▸ ht⟩
 
 /-- **A pattern's formula holds exactly of the tuples that have it.** -/
-theorem realize_patF (hb : IsBot bot) (ht : IsTop top) (p : EqPat c)
+private theorem realize_patF (hb : IsBot bot) (ht : IsTop top) (p : EqPat c)
     (x : Fin c → γ) :
     (patF (L := L) p x).Realize v ↔ HasPat bot top p fun i => v (x i) := by
   rw [patF, realize_listInf]
@@ -334,7 +335,7 @@ theorem realize_patF (hb : IsBot bot) (ht : IsTop top) (p : EqPat c)
 
 open Classical in
 /-- **A predicate on patterns is defined by its disjunction.** -/
-theorem realize_patSetF (hb : IsBot bot) (ht : IsTop top) (Q : EqPat c → Prop)
+private theorem realize_patSetF (hb : IsBot bot) (ht : IsTop top) (Q : EqPat c → Prop)
     (x : Fin c → γ) :
     (patSetF (L := L) Q x).Realize v ↔ Q (patOf bot top fun i => v (x i)) := by
   rw [patSetF, realize_listSup]
@@ -380,7 +381,7 @@ inductive SlotVal (c : ℕ) : Type
 variable [LinearOrder A]
 
 /-- What a source names, at a tuple. -/
-noncomputable def SlotVal.eval (bot top : A) (w : Fin c → A) : SlotVal c → A
+private noncomputable def SlotVal.eval (bot top : A) (w : Fin c → A) : SlotVal c → A
   | .copy k => w k
   | .bot => bot
   | .top => top
@@ -419,7 +420,7 @@ variable {L : Language.{0, 0}} {γ : Type} {c : ℕ}
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 variable {bot top : A}
 
-theorem realize_slotValF [Finite A] (hb : IsBot bot) (ht : IsTop top) (u : Fin c → γ)
+private theorem realize_slotValF [Finite A] (hb : IsBot bot) (ht : IsTop top) (u : Fin c → γ)
     (y : γ) (sv : SlotVal c) :
     (slotValF (L := L) u y sv).Realize v ↔
       v y = sv.eval bot top fun k => v (u k) := by

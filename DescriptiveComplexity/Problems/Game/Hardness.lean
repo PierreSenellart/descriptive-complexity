@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Problems.Game.Membership
 import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.Problems.HornSat.Unsat
 import DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.HornSat.Unsat
 
 /-!
 # HORN-SAT to GAME: unit propagation is a game
@@ -126,7 +127,7 @@ theorem realize_negInG (c x : γ) : (negInG c x).Realize v ↔ RelMap satNegIn !
   rw [negInG, Formula.realize_rel₂, relMap_sumInl]
   exact Iff.rfl
 
-theorem realize_nonHornG : (nonHornG (γ := γ)).Realize v ↔ ¬AtMostOnePositive A := by
+private theorem realize_nonHornG : (nonHornG (γ := γ)).Realize v ↔ ¬AtMostOnePositive A := by
   rw [nonHornG, AtMostOnePositive]
   simp only [Formula.realize_iExs, Formula.realize_inf, Formula.realize_not,
     realize_isClauseG, realize_posInG, Formula.realize_equal, Term.realize_var,
@@ -180,7 +181,7 @@ def clPt (c : A) : gameInterp.Map A := (GTag.cl, fun _ => c)
 
 omit [Language.sat.Structure A] [LinearOrder A] in
 /-- Every node is a variable node or a clause node. -/
-theorem pt_cases (p : gameInterp.Map A) : (∃ x, p = varPt x) ∨ ∃ c, p = clPt c := by
+private theorem pt_cases (p : gameInterp.Map A) : (∃ x, p = varPt x) ∨ ∃ c, p = clPt c := by
   obtain ⟨t, w⟩ := p
   have hw : w = fun _ => w 0 := funext fun j => congrArg w (Subsingleton.elim j 0)
   cases t with
@@ -279,7 +280,7 @@ theorem good_clPt (c : A) :
 omit [Nonempty A] in
 /-- **Soundness**: a winning node is forced, and a winning clause node has all
 its negative literals forced. -/
-theorem good_of_winsOn (hhorn : AtMostOnePositive A) {p : gameInterp.Map A}
+private theorem good_of_winsOn (hhorn : AtMostOnePositive A) {p : gameInterp.Map A}
     (h : WinsOn (gameInterp.Map A) p) : Good p := by
   induction h with
   | @won b hb =>
@@ -312,7 +313,7 @@ omit [Finite A] [Nonempty A] in
 /-- A clause node with all its negative literals winning is winning: the
 opponent's every challenge is answered, and a clause with nothing to challenge
 wins outright. -/
-theorem winsOn_clPt {c : A} (hc : RelMap satIsClause ![c])
+private theorem winsOn_clPt {c : A} (hc : RelMap satIsClause ![c])
     (hall : ∀ y : A, RelMap satNegIn ![c, y] → WinsOn (gameInterp.Map A) (varPt y)) :
     WinsOn (gameInterp.Map A) (clPt c) := by
   by_cases hsome : ∃ y : A, RelMap satNegIn ![c, y]
@@ -325,7 +326,7 @@ theorem winsOn_clPt {c : A} (hc : RelMap satIsClause ![c])
 
 omit [Finite A] [Nonempty A] in
 /-- **Completeness**: a forced variable wins. -/
-theorem winsOn_of_forcedIn : ∀ (n : ℕ) (x : A), ForcedIn n x →
+private theorem winsOn_of_forcedIn : ∀ (n : ℕ) (x : A), ForcedIn n x →
     WinsOn (gameInterp.Map A) (varPt x) := by
   intro n
   induction n with
@@ -345,7 +346,7 @@ theorem winsOn_of_forced {x : A} (h : Forced x) : WinsOn (gameInterp.Map A) (var
 omit [Nonempty A] in
 /-- On a Horn instance, the game is won exactly when some goal clause has all
 its negative literals forced. -/
-theorem gameWon_iff_goalClause (hhorn : AtMostOnePositive A) :
+private theorem gameWon_iff_goalClause (hhorn : AtMostOnePositive A) :
     GameWon (gameInterp.Map A) ↔
       ∃ c : A, RelMap satIsClause ![c] ∧ (∀ x : A, ¬RelMap satPosIn ![c, x]) ∧
         ∀ y : A, RelMap satNegIn ![c, y] → Forced y := by
@@ -362,7 +363,7 @@ theorem gameWon_iff_goalClause (hhorn : AtMostOnePositive A) :
 
 /-- **The reduction is correct**: the game is won exactly on the instances that
 are *not* yes-instances of HORN-SAT. -/
-theorem gameWon_iff_not_hornSatisfiable :
+private theorem gameWon_iff_not_hornSatisfiable :
     ¬HornSatisfiable A ↔ GameWon (gameInterp.Map A) := by
   classical
   by_cases hhorn : AtMostOnePositive A
@@ -386,7 +387,7 @@ end GameHard
 open GameHard in
 /-- **The complement of HORN-SAT reduces to GAME**: unit propagation, read as a
 game. -/
-noncomputable def hornSatCompl_ordered_fo_reduction_game : HORNSATᶜ ≤ᶠᵒ[≤] GAME where
+private noncomputable def hornSatCompl_ordered_fo_reduction_game : HORNSATᶜ ≤ᶠᵒ[≤] GAME where
   Tag := GTag
   dim := 1
   toInterpretation := gameInterp

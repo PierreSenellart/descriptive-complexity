@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Interpretation
+import all DescriptiveComplexity.Interpretation
 
 /-!
 # EPR: satisfiability of an `∃*∀*` sentence
@@ -224,33 +225,34 @@ section Transport
 variable {A B : Type} [Language.epr.Structure A] [Language.epr.Structure B]
 variable (e : A ≃[Language.epr] B)
 
-theorem eVarG_map (x : A) : EVarG x ↔ EVarG (e x) := relMap_equiv₁ e Language.eprEVarSym x
+private theorem eVarG_map (x : A) : EVarG x ↔ EVarG (e x) := relMap_equiv₁ e Language.eprEVarSym x
 
-theorem clauseG_map (c : A) : ClauseG c ↔ ClauseG (e c) := relMap_equiv₁ e Language.eprClSym c
+private theorem clauseG_map
+    (c : A) : ClauseG c ↔ ClauseG (e c) := relMap_equiv₁ e Language.eprClSym c
 
-theorem inClG_map (c l : A) : InClG c l ↔ InClG (e c) (e l) :=
+private theorem inClG_map (c l : A) : InClG c l ↔ InClG (e c) (e l) :=
   relMap_equiv₂ e Language.eprInClSym c l
 
-theorem posG_map (l s : A) : PosG l s ↔ PosG (e l) (e s) :=
+private theorem posG_map (l s : A) : PosG l s ↔ PosG (e l) (e s) :=
   relMap_equiv₂ e Language.eprPosSym l s
 
-theorem negG_map (l s : A) : NegG l s ↔ NegG (e l) (e s) :=
+private theorem negG_map (l s : A) : NegG l s ↔ NegG (e l) (e s) :=
   relMap_equiv₂ e Language.eprNegSym l s
 
-theorem sigG_map (s p : A) : SigG s p ↔ SigG (e s) (e p) :=
+private theorem sigG_map (s p : A) : SigG s p ↔ SigG (e s) (e p) :=
   relMap_equiv₂ e Language.eprSigSym s p
 
-theorem argG_map (l p x : A) : ArgG l p x ↔ ArgG (e l) (e p) (e x) :=
+private theorem argG_map (l p x : A) : ArgG l p x ↔ ArgG (e l) (e p) (e x) :=
   relMap_equiv₃ e Language.eprArgSym l p x
 
 variable {M : Type}
 
 /-- The interpretation the image carries: read the symbol back through the
 isomorphism. -/
-def mapI (I : A → (A → M) → Prop) : B → (B → M) → Prop :=
+private def mapI (I : A → (A → M) → Prop) : B → (B → M) → Prop :=
   fun s w => I (e.symm s) (fun x => w (e x))
 
-theorem local_mapI {I : A → (A → M) → Prop} (h : Local I) : Local (mapI e I) := by
+private theorem local_mapI {I : A → (A → M) → Prop} (h : Local I) : Local (mapI e I) := by
   intro s w w' hw
   refine h (e.symm s) _ _ fun p hp => ?_
   have hs : SigG s (e p) := by
@@ -258,7 +260,7 @@ theorem local_mapI {I : A → (A → M) → Prop} (h : Local I) : Local (mapI e 
     rwa [e.apply_symm_apply] at this
   exact hw (e p) hs
 
-theorem litTrue_map {I : A → (A → M) → Prop} {v : A → M} {l : A} (h : LitTrue I v l) :
+private theorem litTrue_map {I : A → (A → M) → Prop} {v : A → M} {l : A} (h : LitTrue I v l) :
     LitTrue (mapI e I) (fun y => v (e.symm y)) (e l) := by
   have hw : ∀ (w : A → M) (s : A), I s w ↔ mapI e I (e s) (fun y => w (e.symm y)) := by
     intro w s
@@ -279,19 +281,19 @@ theorem litTrue_map {I : A → (A → M) → Prop} {v : A → M} {l : A} (h : Li
   · exact Or.inr ⟨e s, (negG_map e l s).mp hs, fun y => w (e.symm y),
       harg w l hwa, fun hc => hI ((hw w s).mpr hc)⟩
 
-theorem posG_map' (l s : B) : PosG l s ↔ PosG (e.symm l) (e.symm s) := by
+private theorem posG_map' (l s : B) : PosG l s ↔ PosG (e.symm l) (e.symm s) := by
   have h := (posG_map e (e.symm l) (e.symm s)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem negG_map' (l s : B) : NegG l s ↔ NegG (e.symm l) (e.symm s) := by
+private theorem negG_map' (l s : B) : NegG l s ↔ NegG (e.symm l) (e.symm s) := by
   have h := (negG_map e (e.symm l) (e.symm s)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem sigG_map' (s p : B) : SigG s p ↔ SigG (e.symm s) (e.symm p) := by
+private theorem sigG_map' (s p : B) : SigG s p ↔ SigG (e.symm s) (e.symm p) := by
   have h := (sigG_map e (e.symm s) (e.symm p)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem argG_map' (l p x : B) : ArgG l p x ↔ ArgG (e.symm l) (e.symm p) (e.symm x) := by
+private theorem argG_map' (l p x : B) : ArgG l p x ↔ ArgG (e.symm l) (e.symm p) (e.symm x) := by
   have h := (argG_map e (e.symm l) (e.symm p) (e.symm x)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply, e.apply_symm_apply] at h
 

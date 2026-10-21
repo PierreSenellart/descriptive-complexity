@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Prefix
 
 /-!
 # The matrix of the constructed instance
@@ -48,7 +50,7 @@ def ClSat (σ : QM A → Prop) (c : QClTag) (p q : A) : Prop :=
 omit [Finite A] [Nonempty A] in
 /-- **The matrix of the constructed instance**: every guarded clause tag is
 satisfied. -/
-theorem qsatMatrix_iff (σ : QM A → Prop) :
+private theorem qsatMatrix_iff (σ : QM A → Prop) :
     QsatMatrix σ ↔ ∀ (c : QClTag) (p q : A), QClOn c p q → ClSat σ c p q := by
   constructor
   · intro hm c p q hcl
@@ -217,42 +219,42 @@ theorem clSat_cSrc (p q : A) :
   simp [ClSat, qLits, QVarOn, valS, exists_or]
 
 /-- A copy of a target clause reads its literals on the target valuation. -/
-theorem clSat_cTgt (p q : A) :
+private theorem clSat_cTgt (p q : A) :
     ClSat σ .cTgt p q ↔
       ∃ x : A, (RelMap tsPosIn ![p, x] ∧ valT σ x) ∨ (RelMap tsNegIn ![p, x] ∧ ¬valT σ x) := by
   simp [ClSat, qLits, QVarOn, valT, exists_or]
 
 /-- A copy of a transition clause reads its literals on the transition
 valuation, unless the base case is the equality branch. -/
-theorem clSat_cStep (p q : A) :
+private theorem clSat_cStep (p q : A) :
     ClSat σ .cStep p q ↔ bitE σ ∨
       ∃ x : A, (RelMap tsPosIn ![p, x] ∧ valP σ x) ∨ (RelMap tsNegIn ![p, x] ∧ ¬valP σ x) := by
   simp [ClSat, qLits, QVarOn, valP, bitE, exists_or]
 
 /-- The source valuation reads the source endpoint. -/
-theorem clSat_lS (s : Bool) {p q : A} (hg : QClOn (.lS s) p q) :
+private theorem clSat_lS (s : Bool) {p q : A} (hg : QClOn (.lS s) p q) :
     ClSat σ (.lS s) p q ↔ (valS σ p ↔ s = true) ∨ (stS σ p ↔ (!s) = true) := by
   simp [ClSat, qLits, QVarOn, valS, stS, hg.1]
 
 /-- The target valuation reads the target endpoint. -/
-theorem clSat_lT (s : Bool) {p q : A} (hg : QClOn (.lT s) p q) :
+private theorem clSat_lT (s : Bool) {p q : A} (hg : QClOn (.lT s) p q) :
     ClSat σ (.lT s) p q ↔ (valT σ p ↔ s = true) ∨ (stT σ p ↔ (!s) = true) := by
   simp [ClSat, qLits, QVarOn, valT, stT, hg.1]
 
 /-- The transition valuation reads the first component of the bottom pair. -/
-theorem clSat_lU (s : Bool) {p q : A} (hg : QClOn (.lU s) p q) :
+private theorem clSat_lU (s : Bool) {p q : A} (hg : QClOn (.lU s) p q) :
     ClSat σ (.lU s) p q ↔ bitE σ ∨ (valP σ p ↔ s = true) ∨
       ∃ m : A, IsMaxSV m ∧ (stU σ m p ↔ (!s) = true) := by
   simp [ClSat, qLits, QVarOn, bitE, valP, stU, hg.1]
 
 /-- The transition valuation writes the second component of the bottom pair. -/
-theorem clSat_lV (s : Bool) {p q : A} (hg : QClOn (.lV s) p q) :
+private theorem clSat_lV (s : Bool) {p q : A} (hg : QClOn (.lV s) p q) :
     ClSat σ (.lV s) p q ↔ bitE σ ∨ (valP σ q ↔ s = true) ∨
       ∃ m : A, IsMaxSV m ∧ (stV σ m p ↔ (!s) = true) := by
   simp [ClSat, qLits, QVarOn, bitE, valP, stV, hg.1]
 
 /-- The equality branch of the base case. -/
-theorem clSat_bE (s : Bool) {p q : A} (hg : QClOn (.bE s) p q) :
+private theorem clSat_bE (s : Bool) {p q : A} (hg : QClOn (.bE s) p q) :
     ClSat σ (.bE s) p q ↔ ¬bitE σ ∨ (∃ m : A, IsMaxSV m ∧ (stU σ m p ↔ s = true)) ∨
       ∃ m : A, IsMaxSV m ∧ (stV σ m p ↔ (!s) = true) := by
   simp [ClSat, qLits, QVarOn, bitE, stU, stV, hg.1]
@@ -270,7 +272,7 @@ def LevSat (b w s : Bool) (ℓ x : A) : Prop :=
        (∃ d : A, IsPredSV d ℓ ∧ (stV σ d x ↔ s = true)))
 
 /-- **A level clause** says exactly what `DescriptiveComplexity.LevSat` says. -/
-theorem clSat_lev (b w s : Bool) {ℓ x : A} (hg : QClOn (.lev b w s) ℓ x) :
+private theorem clSat_lev (b w s : Bool) {ℓ x : A} (hg : QClOn (.lev b w s) ℓ x) :
     ClSat σ (.lev b w s) ℓ x ↔ LevSat σ b w s ℓ x := by
   obtain ⟨hl, hx⟩ := hg
   cases b <;> cases w <;>

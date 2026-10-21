@@ -9,6 +9,18 @@ import DescriptiveComplexity.TransitiveClosureSentenceDecide
 public import DescriptiveComplexity.TransitiveClosureParamPull
 public import DescriptiveComplexity.TransitiveClosureReductionComposition
 public import DescriptiveComplexity.DetLogSpace
+import all DescriptiveComplexity.FixedPointReductionComposition
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.TransitiveClosureDecide
+import all DescriptiveComplexity.TransitiveClosureDecideReach
+import all DescriptiveComplexity.TransitiveClosureDecideReachDet
+import all DescriptiveComplexity.TransitiveClosureFlatten
+import all DescriptiveComplexity.TransitiveClosureParam
+import all DescriptiveComplexity.TransitiveClosureParamPull
+import all DescriptiveComplexity.TransitiveClosureReduction
+import all DescriptiveComplexity.TransitiveClosureReductionComposition
+import all DescriptiveComplexity.TransitiveClosureReductionDet
+import all DescriptiveComplexity.TransitiveClosureSentenceDecide
 
 /-!
 # NL is closed under FO(TC) reductions, and LOGSPACE under FO(DTC) reductions
@@ -61,7 +73,8 @@ variable {L'' : Language.{0, 0}} {M N : Type} {instM : L''.Structure M} {instN :
   (e : @Language.Equiv L'' M N instM instN)
 
 /-- A step of a parameterized walk transports along an isomorphism. -/
-theorem ParamTCSpec.stepAt_of_equiv (s : ParamTCSpec L'') (z : Fin s.par → M) (a b : s.Node M) :
+private theorem ParamTCSpec.stepAt_of_equiv
+    (s : ParamTCSpec L'') (z : Fin s.par → M) (a b : s.Node M) :
     @ParamTCSpec.StepAt L'' s N instN (e ∘ z) (a.1, e ∘ a.2) (b.1, e ∘ b.2) ↔
       @ParamTCSpec.StepAt L'' s M instM z a b := by
   change @Formula.Realize L'' N instN _ (s.step a.1 b.1) (Sum.elim (Sum.elim (e ∘ a.2) (e ∘ b.2))
@@ -124,7 +137,7 @@ variable {A : Type} [L₁.Structure A]
 abbrev pullPar (A : Type) : Fin (spec.pullSpec J).par → A :=
   fun i => (Fin.cast (Nat.zero_mul dim) i).elim0
 
-theorem realize_pullSrc (a : (spec.pullSpec J).Node A) :
+private theorem realize_pullSrc (a : (spec.pullSpec J).Node A) :
     (spec.pullSrc J a.1).Realize a.2 ↔
       ∃ ha : ParamTCSpec.InDom a,
         (@Formula.Realize _ (J.MapRel A) (RelFOInterpretation.mapRelStructure J A) _
@@ -150,7 +163,7 @@ theorem realize_pullSrc (a : (spec.pullSpec J).Node A) :
     exact ⟨(J.realize_pullRelF (spec.src a.1.1) a.1.2
       (a.2 ∘ fun p => ParamTCSpec.coordIx dim p.1 p.2) h2).mpr h1, h2⟩
 
-theorem realize_pullTgt (a : (spec.pullSpec J).Node A) :
+private theorem realize_pullTgt (a : (spec.pullSpec J).Node A) :
     (spec.pullTgt J a.1).Realize a.2 ↔
       ∃ ha : ParamTCSpec.InDom a,
         (@Formula.Realize _ (J.MapRel A) (RelFOInterpretation.mapRelStructure J A) _
@@ -177,7 +190,7 @@ theorem realize_pullTgt (a : (spec.pullSpec J).Node A) :
       (a.2 ∘ fun p => ParamTCSpec.coordIx dim p.1 p.2) h2).mpr h1, h2⟩
 
 /-- Decoding then encoding is the identity on in-domain nodes. -/
-theorem encode_decode (a : (spec.pullSpec J).Node A) (ha : ParamTCSpec.InDom a) :
+private theorem encode_decode (a : (spec.pullSpec J).Node A) (ha : ParamTCSpec.InDom a) :
     ParamTCSpec.encode Fin.elim0 (ParamTCSpec.decode a ha) = a := by
   refine Prod.ext (Prod.ext rfl rfl) (funext fun m => ?_)
   change a.2 (ParamTCSpec.coordIx dim (finProdFinEquiv.symm m).1 (finProdFinEquiv.symm m).2) =
@@ -194,7 +207,7 @@ def PulledAccepts : Prop :=
 
 /-- **The pulled sentence says what the original says on the interpreted
 structure**, read with the interpretation's own structure. -/
-theorem pulledAccepts_iff :
+private theorem pulledAccepts_iff :
     spec.PulledAccepts J A ↔
       ∃ u v : spec.Node (J.MapRel A),
         (@Formula.Realize _ (J.MapRel A) (RelFOInterpretation.mapRelStructure J A) _
@@ -413,7 +426,7 @@ theorem mem_NL_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ NL) : P ∈ NL :=
   (tcDefinable_iff_mem_NL P).mp (TCDefinable.of_tcReduction f ((tcDefinable_iff_mem_NL Q).mpr h))
 
 /-- **NL is closed under FO(DTC) reductions.** -/
-theorem mem_NL_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ NL) : P ∈ NL :=
+private theorem mem_NL_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ NL) : P ∈ NL :=
   mem_NL_of_tcReduction f.toTC h
 
 /-- **LOGSPACE is closed under FO(DTC) reductions.** -/
@@ -422,7 +435,7 @@ theorem mem_LOGSPACE_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ LOGSPACE)
 
 /-- An FO(TC) reduction complements: the same interpretation reduces the
 complements. -/
-noncomputable def TCReduction.compl (f : P ≤ᵗᶜ Q) : Pᶜ ≤ᵗᶜ Qᶜ :=
+private noncomputable def TCReduction.compl (f : P ≤ᵗᶜ Q) : Pᶜ ≤ᵗᶜ Qᶜ :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -431,7 +444,7 @@ noncomputable def TCReduction.compl (f : P ≤ᵗᶜ Q) : Pᶜ ≤ᵗᶜ Qᶜ :=
     correct := fun A _ _ _ _ => not_congr (f.correct A) }
 
 /-- An FO(DTC) reduction complements. -/
-noncomputable def DTCReduction.compl (f : P ≤ᵈᵗᶜ Q) : Pᶜ ≤ᵈᵗᶜ Qᶜ :=
+private noncomputable def DTCReduction.compl (f : P ≤ᵈᵗᶜ Q) : Pᶜ ≤ᵈᵗᶜ Qᶜ :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -441,13 +454,13 @@ noncomputable def DTCReduction.compl (f : P ≤ᵈᵗᶜ Q) : Pᶜ ≤ᵈᵗᶜ 
     correct := fun A _ _ _ _ => not_congr (f.correct A) }
 
 /-- **coNL is closed under FO(TC) reductions.** -/
-theorem mem_coNL_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ coNL) : P ∈ coNL :=
+private theorem mem_coNL_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ coNL) : P ∈ coNL :=
   (NL.mem_compl P).mpr (mem_NL_of_tcReduction f.compl ((NL.mem_compl Q).mp h))
 
 /-- **coLOGSPACE is closed under FO(DTC) reductions** (the complement class
 `LOGSPACE.compl` is `DescriptiveComplexity.coLOGSPACE`, which is defined with
 its complete problem in `DescriptiveComplexity.Problems.ReachabilityDet.Complement`). -/
-theorem mem_coLOGSPACE_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ LOGSPACE.compl) :
+private theorem mem_coLOGSPACE_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ LOGSPACE.compl) :
     P ∈ LOGSPACE.compl :=
   (LOGSPACE.mem_compl P).mpr (mem_LOGSPACE_of_dtcReduction f.compl ((LOGSPACE.mem_compl Q).mp h))
 

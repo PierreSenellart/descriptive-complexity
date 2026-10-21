@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Machine.Tape
 public import DescriptiveComplexity.Problems.Qsat.Defs
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Machine.Tape
 
 /-!
 # The tape of the QBF machine
@@ -159,7 +160,7 @@ def qTagIdx : QTag → ℕ
       69 + (if v then 1 else 0) + (if b then 2 else 0) + (if f then 4 else 0)
   | tProcAcc => 77
 
-theorem qTagIdx_injective : Function.Injective qTagIdx := by decide
+private theorem qTagIdx_injective : Function.Injective qTagIdx := by decide
 
 /-! ### The prefix order, as an order on the universe
 
@@ -179,7 +180,7 @@ def PLe (x y : A) : Prop :=
 
 variable (A) in
 /-- **The tape order is a linear order** on a well-formed instance. -/
-theorem isLinOrd_pLe (hwf : QsatWf A) : IsLinOrd (PLe (A := A)) := by
+private theorem isLinOrd_pLe (hwf : QsatWf A) : IsLinOrd (PLe (A := A)) := by
   refine ⟨fun x => ?_, fun x y z hxy hyz => ?_, fun x y hxy hyx => ?_, fun x y => ?_⟩
   · by_cases hx : IsQVar x
     · exact Or.inl ⟨hx, hx, Or.inl rfl⟩
@@ -323,7 +324,7 @@ omit [Language.qsat.Structure A] [Finite A] [Nonempty A] in
 theorem qBlank_unique {p q : QV A} (hp : QBlank p) (hq : QBlank q) : p = q :=
   Prod.ext (hp.1.trans hq.1.symm) (isMinTup_unique hp.2 hq.2)
 
-theorem exists_qPosn : ∃ p : QV A, QPosn p := by
+private theorem exists_qPosn : ∃ p : QV A, QPosn p := by
   obtain ⟨w, hw⟩ := exists_isMinTup (A := A)
   exact ⟨(QTag.pStart, w), hw⟩
 
@@ -337,7 +338,7 @@ def QInp (p a : QV A) : Prop :=
 
 omit [Language.qsat.Structure A] [Finite A] [Nonempty A] in
 /-- **The initial tape is functional**: a cell holds at most one symbol. -/
-theorem qInp_functional {p a b : QV A} (ha : QInp p a) (hb : QInp p b) : a = b := by
+private theorem qInp_functional {p a b : QV A} (ha : QInp p a) (hb : QInp p b) : a = b := by
   have htup : ∀ u v : Fin 2 → A, u 0 = p.2 0 → (∀ c : A, u 1 ≤ c) →
       v 0 = p.2 0 → (∀ c : A, v 1 ≤ c) → u = v := by
     intro u v hu0 hu1 hv0 hv1

@@ -8,6 +8,15 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawIxEval
 public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
 import DescriptiveComplexity.Problems.Wide.DrawIxBridge
+import all DescriptiveComplexity.Problems.Wide.DrawGateFacts
+import all DescriptiveComplexity.Problems.Wide.DrawInstIGate
+import all DescriptiveComplexity.Problems.Wide.DrawIxBridge
+import all DescriptiveComplexity.Problems.Wide.DrawIxSeq
+import all DescriptiveComplexity.Problems.Wide.DrawIxVar
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawSlots
+import all DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # A gated position's semantic pack, at an arbitrary file and phase
@@ -105,7 +114,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite (P)]
 /-- **A passing round's valuation depends on the registers alone**: both
 states' choices encode the same block value, and the encoding is
 injective. -/
-theorem ixPassW_congr {zero one : A} (hzo : zero ≠ one)
+private theorem ixPassW_congr {zero one : A} (hzo : zero ≠ one)
     (hpassEnc' : ∀ (vi : dt.VarIx)
       (stV : TapeSt dt A R P I)
       (ℓ : Fin (dt.nIn vi)),
@@ -148,7 +157,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite (P)]
 /-- **The pass's pack transports to the pass's pack**: what a spine
 position's `hsem` is discharged by, when its pack is the entry state's
 carried forward by `ixKindSemCast`. -/
-theorem ixKindSemCast_passSem {zero one : A} (hzo : zero ≠ one)
+private theorem ixKindSemCast_passSem {zero one : A} (hzo : zero ≠ one)
     (hpassEnc' : ∀ (vi : dt.VarIx)
       (stV : TapeSt dt A R P I)
       (ℓ : Fin (dt.nIn vi)),
@@ -198,7 +207,7 @@ positions are the entry state's, transported. This is what makes the
 per-position family *definable* – the recursion that builds the tape
 family needs a pack at each of its own states, and here it has one as soon
 as the mirror rides. -/
-noncomputable def ixSpineSem (zero one : A) (vi : dt.VarIx)
+private noncomputable def ixSpineSem (zero one : A) (vi : dt.VarIx)
     {st₀ st : TapeSt dt A R P I}
     (mV : ιV → I → Prop)
     (sem₀ : ∀ a : ιV,
@@ -222,7 +231,7 @@ own thread produces. Those differ from the position's entry state in the
 two scratch registers and the register they enumerate, and a pack reads
 the state through the mirror and VAL alone, so the entry state's pack
 transports to all of them. -/
-noncomputable def ixSpineSemT (zero one : A) (vi : dt.VarIx)
+private noncomputable def ixSpineSemT (zero one : A) (vi : dt.VarIx)
     {st₀ st : TapeSt dt A R P I}
     {v : Univ A R P dt.KIx dt.dd → Prop}
     (mV : ιV → I → Prop)
@@ -328,7 +337,7 @@ include hinj hhasP heltP hix hblkP hmono hup hpassEnc hgateEnc in
 the state the *semantics* names. `ixGatedSem` is this pack transported
 (`ixGatedSem_eq_semCastT`), which is what the VAL loop's bridge asks of a
 threaded family. -/
-noncomputable def ixGatedSem₀ (_hzo : PR.zero ≠ PR.one)
+private noncomputable def ixGatedSem₀ (_hzo : PR.zero ≠ PR.one)
     (_hlin : IsLinOrd
       (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {ιV : Type} (mV : ιV → I → Prop)
@@ -353,7 +362,7 @@ address's blocks, which the scratch registers do not touch, so the family
 the machinery is run with is `ixSemCastT` at
 `DescriptiveComplexity.Draw.Data.ixGatedSem₀` – the hypothesis the VAL
 loop's bridge (`ixVarFMT_eq_varFM`) is stated under. -/
-theorem ixGatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
+private theorem ixGatedSem_eq_semCastT (hzo : PR.zero ≠ PR.one)
     (hlin : IsLinOrd
       (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {ιV : Type} (mV : ιV → I → Prop)
@@ -412,7 +421,7 @@ encodings. This is `hgateEnc`, at any file whose registers stand for elements,
 whose tuples are their elements' (`hargP`). Nothing has to be said about which
 elements have registers: a failing element is one the address holds, hence a
 register's already. -/
-theorem ixGatedAt_iff_isEnc (RF : RegFile (Univ A R P dt.KIx dt.dd))
+private theorem ixGatedAt_iff_isEnc (RF : RegFile (Univ A R P dt.KIx dt.dd))
     (hargP : ∀ u : I, F.arg u = (elt u).2)
     (hzo : PR.zero ≠ PR.one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
@@ -482,7 +491,7 @@ which elements have registers, because the members of the block are the marked
 registers' own tuples. The verdict half is
 `DescriptiveComplexity.Draw.Data.igVerdict_iff_isEnc`, which asks only that
 the block's members be encoding-shaped, and that is what the shape test says. -/
-theorem ixIGPassP_iff_isEnc
+private theorem ixIGPassP_iff_isEnc
     (hargP : ∀ u : I, F.arg u = (elt u).2)
     (hzo : PR.zero ≠ PR.one)
     (vi : dt.VarIx) (stV : TapeSt dt A R P I) (ℓ : Fin (dt.nIn vi)) :

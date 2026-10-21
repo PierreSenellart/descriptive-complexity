@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.SetFamily
 public import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Problems.ThreeSat.ToSat
 import DescriptiveComplexity.Problems.SetFamily.Membership
+import all DescriptiveComplexity.Problems.NaeSat
+import all DescriptiveComplexity.Problems.SetFamily.Defs
+import all DescriptiveComplexity.Problems.SetFamily.Membership
 
 /-!
 # Set Splitting is NP-complete
@@ -106,7 +109,7 @@ variable {A : Type}
 /-- The point of tag `t` over the element `x`. -/
 def splPt (t : SplTag) (x : A) : splInterp.Map A := (t, fun _ => x)
 
-theorem splPt_eq_iff {t t' : SplTag} {x x' : A} :
+private theorem splPt_eq_iff {t t' : SplTag} {x x' : A} :
     splPt t x = splPt t' x' ↔ t = t' ∧ x = x' := by
   constructor
   · intro h
@@ -115,7 +118,7 @@ theorem splPt_eq_iff {t t' : SplTag} {x x' : A} :
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem splPt_surj (q : splInterp.Map A) : ∃ t x, q = splPt t x :=
+private theorem splPt_surj (q : splInterp.Map A) : ∃ t x, q = splPt t x :=
   ⟨q.1, q.2 0, Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg q.2 (Subsingleton.elim i 0)⟩⟩
 
 end Points
@@ -169,7 +172,8 @@ theorem ssMem_lit_clSet (s : Bool) (x c : A) :
   simp [splInterp, memF, ThreeSatToSat.realize_occF]
 
 /-- The ground elements are exactly the literals. -/
-theorem ssElem_cases {q : splInterp.Map A} (h : SSElem q) : ∃ s x, q = splPt (.lit s) x := by
+private theorem ssElem_cases
+    {q : splInterp.Map A} (h : SSElem q) : ∃ s x, q = splPt (.lit s) x := by
   obtain ⟨t, x, rfl⟩ := splPt_surj q
   cases t with
   | lit s => exact ⟨s, x, rfl⟩
@@ -177,7 +181,7 @@ theorem ssElem_cases {q : splInterp.Map A} (h : SSElem q) : ∃ s x, q = splPt (
   | clSet => exact absurd h (ssElem_clSet x)
 
 /-- The sets of the family are the pair sets and the clause sets. -/
-theorem ssFam_cases {q : splInterp.Map A} (h : SSFam q) :
+private theorem ssFam_cases {q : splInterp.Map A} (h : SSFam q) :
     (∃ x, q = splPt .pairSet x) ∨ ∃ c, IsCl c ∧ q = splPt .clSet c := by
   obtain ⟨t, x, rfl⟩ := splPt_surj q
   cases t with
@@ -195,7 +199,7 @@ variable (A : Type) [Language.sat.Structure A]
 
 /-- Correctness of the reduction: a CNF structure is not-all-equal satisfiable
 iff its literal set system can be split. -/
-theorem naeSatisfiable_iff_hasSetSplitting :
+private theorem naeSatisfiable_iff_hasSetSplitting :
     NAESatisfiable A ↔ HasSetSplitting (splInterp.Map A) := by
   constructor
   · -- the true literals of a not-all-equal assignment are a splitting color
@@ -263,7 +267,7 @@ open SetSplitRed in
 /-- **NAE-SAT FO-reduces to Set Splitting**: the ground elements are the
 literals, the family holds one pair set per variable and one set per clause.
 No order, no gadget and no counting. -/
-noncomputable def naeSat_fo_reduction_setSplitting : NAESAT ≤ᶠᵒ SetSplitting where
+private noncomputable def naeSat_fo_reduction_setSplitting : NAESAT ≤ᶠᵒ SetSplitting where
   Tag := SplTag
   dim := 1
   toInterpretation := splInterp

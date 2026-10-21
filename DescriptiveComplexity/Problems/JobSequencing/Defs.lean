@@ -9,6 +9,7 @@ import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Numbers.BinRel
 public import DescriptiveComplexity.Interpretation
 import Mathlib.Algebra.BigOperators.Finprod
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Job sequencing: definition

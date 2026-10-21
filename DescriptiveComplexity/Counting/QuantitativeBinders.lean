@@ -61,7 +61,7 @@ theorem eval_sumOver (f : ∀ {δ : Type}, (γ → δ) → δ → QTerm L δ) (v
     (f := fun w : Fin 1 → A =>
       (f (δ := γ ⊕ Fin 1) Sum.inl (Sum.inr 0)).eval (Sum.elim v w))).symm
 
-theorem eval_prodOver (f : ∀ {δ : Type}, (γ → δ) → δ → QTerm L δ) (v : γ → A) :
+private theorem eval_prodOver (f : ∀ {δ : Type}, (γ → δ) → δ → QTerm L δ) (v : γ → A) :
     (prodOver f).eval v =
       ∏ᶠ a : A, (f (δ := γ ⊕ Fin 1) Sum.inl (Sum.inr 0)).eval (Sum.elim v fun _ => a) :=
   (finprod_comp_equiv (Equiv.funUnique (Fin 1) A).symm
@@ -69,22 +69,22 @@ theorem eval_prodOver (f : ∀ {δ : Type}, (γ → δ) → δ → QTerm L δ) (
       (f (δ := γ ⊕ Fin 1) Sum.inl (Sum.inr 0)).eval (Sum.elim v w))).symm
 
 open Classical in
-theorem eval_cond (φ : L.Formula γ) (s t : QTerm L γ) (v : γ → A) :
+private theorem eval_cond (φ : L.Formula γ) (s t : QTerm L γ) (v : γ → A) :
     (cond φ s t).eval v = if φ.Realize v then s.eval v else t.eval v := by
   by_cases h : φ.Realize v <;> simp [cond, eval, h]
 
 open Classical in
-theorem eval_ind (φ : L.Formula γ) (v : γ → A) :
+private theorem eval_ind (φ : L.Formula γ) (v : γ → A) :
     (ind φ : QTerm L γ).eval v = if φ.Realize v then 1 else 0 :=
   rfl
 
-theorem eval_mul (s t : QTerm L γ) (v : γ → A) : (mul s t).eval v = s.eval v * t.eval v :=
+private theorem eval_mul (s t : QTerm L γ) (v : γ → A) : (mul s t).eval v = s.eval v * t.eval v :=
   rfl
 
-theorem eval_add (s t : QTerm L γ) (v : γ → A) : (add s t).eval v = s.eval v + t.eval v :=
+private theorem eval_add (s t : QTerm L γ) (v : γ → A) : (add s t).eval v = s.eval v + t.eval v :=
   rfl
 
-theorem eval_const (n : ℕ) (v : γ → A) : (const n : QTerm L γ).eval v = n :=
+private theorem eval_const (n : ℕ) (v : γ → A) : (const n : QTerm L γ).eval v = n :=
   rfl
 
 end QTerm

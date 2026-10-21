@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltRead
+import all DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltProg
+import all DescriptiveComplexity.Problems.Machine.AltRead
+import all DescriptiveComplexity.Problems.Machine.AltSweep
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # A round of the game, played by either player
@@ -48,7 +54,7 @@ variable {k : ℕ} {A : Type} [(Language.qbf k).Structure A] [LinearOrder A] [Fi
 /-! ### The block of a sweeping state -/
 
 /-- **A sweeping state is universal exactly when its block is.** -/
-theorem isUniv_stG {cnf start : Bool} {i : Fin k} {d : Bool} :
+private theorem isUniv_stG {cnf start : Bool} {i : Fin k} {d : Bool} :
     (altMachine k A cnf).IsUniv start (stG i.castSucc d : AltV k A) ↔
       blockPol start (i : ℕ) = false := by
   constructor
@@ -66,7 +72,7 @@ theorem isUniv_stG {cnf start : Bool} {i : Fin k} {d : Bool} :
 
 omit [(Language.qbf k).Structure A] in
 /-- A position at or below the last cell is the left marker or a cell. -/
-theorem posn_le_posCell_cases {p : AltV k A} (hp : AltPosn p)
+private theorem posn_le_posCell_cases {p : AltV k A} (hp : AltPosn p)
     (hle : tagTupleLe p (posCell (qtopA (A := A)) : AltV k A)) :
     p = posStart ∨ p = posCell (p.2 0) := by
   rcases base_le_pCell (altBaseIdx_le_of_tag_le (altTagTupleLe_tag_le hle)) with h | h
@@ -76,7 +82,7 @@ theorem posn_le_posCell_cases {p : AltV k A} (hp : AltPosn p)
 omit [(Language.qbf k).Structure A] in
 /-- A position between the first cell and the right marker is a cell or the
 right marker. -/
-theorem posn_between_cases {p : AltV k A} (hp : AltPosn p)
+private theorem posn_between_cases {p : AltV k A} (hp : AltPosn p)
     (hlo : tagTupleLe (posCell (qbotA (A := A)) : AltV k A) p)
     (hhi : tagTupleLe p (posEnd : AltV k A)) :
     p = posCell (p.2 0) ∨ p = posEnd := by
@@ -87,13 +93,13 @@ theorem posn_between_cases {p : AltV k A} (hp : AltPosn p)
 
 omit [(Language.qbf k).Structure A] in
 /-- A cell has a position above it: the right marker. -/
-theorem not_maxPos_of_ne_posEnd {p : AltV k A} (hhi : tagTupleLe p (posEnd : AltV k A))
+private theorem not_maxPos_of_ne_posEnd {p : AltV k A} (hhi : tagTupleLe p (posEnd : AltV k A))
     (hne : p ≠ posEnd) : ¬MaxPos tagTupleLe AltPosn p := fun hmax =>
   hne (isLinOrd_altTagTupleLe.2.2.1 p posEnd hhi (hmax.2 posEnd altPosn_posEnd))
 
 omit [(Language.qbf k).Structure A] in
 /-- A cell has a position below it: the left marker. -/
-theorem not_minPos_posCell (x : A) : ¬MinPos tagTupleLe AltPosn (posCell x : AltV k A) :=
+private theorem not_minPos_posCell (x : A) : ¬MinPos tagTupleLe AltPosn (posCell x : AltV k A) :=
   fun hmin => absurd (altBaseIdx_le_of_tag_le (altTagTupleLe_tag_le
     (hmin.2 posStart altPosn_posStart)))
     (show ¬(altBaseIdx AltBase.pCell ≤ altBaseIdx AltBase.pStart) by decide)
@@ -212,7 +218,7 @@ there is no single run to count.
 
 /-- **The leftward pass of a universal round accepts**, given that whatever it
 hands over accepts. -/
-theorem altAcc_of_inSweepL {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} {n' : ℕ}
+private theorem altAcc_of_inSweepL {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} {n' : ℕ}
     (huniv : blockPol start (i : ℕ) = false) (hover : (i : ℕ) + 1 = k → CanHandOver k A cnf)
     (hexit : ∀ (ν' : A → Prop) (c : Config (AltV k A)), (∀ x : A, ν' x → QbfBlk i x) →
       AfterSweep cnf i (Function.update νs i ν') c → (altMachine k A cnf).AltAcc start n' c) :
@@ -248,7 +254,7 @@ theorem altAcc_of_inSweepL {cnf start : Bool} {i : Fin k} {νs : Fin k → A →
 the head has left to climb; at the turn the leftward pass takes over, with what
 it has left to descend. The two together are the length of the sweep, so a
 universal round costs no more than the run it must survive. -/
-theorem altAcc_of_inSweepR {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} {n' : ℕ}
+private theorem altAcc_of_inSweepR {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} {n' : ℕ}
     (huniv : blockPol start (i : ℕ) = false) (hover : (i : ℕ) + 1 = k → CanHandOver k A cnf)
     (hexit : ∀ (ν' : A → Prop) (c : Config (AltV k A)), (∀ x : A, ν' x → QbfBlk i x) →
       AfterSweep cnf i (Function.update νs i ν') c → (altMachine k A cnf).AltAcc start n' c) :
@@ -309,12 +315,12 @@ its downward twin, and could be hoisted beside them.
 /-- **Acceptance descends across a step** when the step is not a choice: either
 the state is universal, and then every successor accepts, or it is the only
 step available, and then the successor the machine picks is that one. -/
-def StepForced (M : ATMData (AltV k A)) (start : Bool) (c c' : Config (AltV k A)) : Prop :=
+private def StepForced (M : ATMData (AltV k A)) (start : Bool) (c c' : Config (AltV k A)) : Prop :=
   ¬M.Acc c.state ∧ (M.IsUniv start c.state ∨ ∀ c'', M.Step c c'' → c'' = c')
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- **One step down.** -/
-theorem altAcc_down_step {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
+private theorem altAcc_down_step {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
     {c c' : Config (AltV k A)} (hf : StepForced M start c c')
     (hstep : M.Step c c') (hacc : M.AltAcc start n c) : 1 ≤ n ∧ M.AltAcc start (n - 1) c' := by
   obtain ⟨hnacc, hforced⟩ := hf
@@ -330,7 +336,7 @@ theorem altAcc_down_step {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Nonempty A] in
 /-- **Down a rising segment.** -/
-theorem altAcc_along_segment {M : ATMData (AltV k A)} {start : Bool} (hlin : IsLinOrd M.Le)
+private theorem altAcc_along_segment {M : ATMData (AltV k A)} {start : Bool} (hlin : IsLinOrd M.Le)
     {conf : AltV k A → Config (AltV k A)} {p₀ p₁ : AltV k A} (hp₀ : M.Posn p₀)
     (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ → M.Step (conf p) (conf q))
     (hf : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
@@ -372,7 +378,8 @@ theorem altAcc_along_segment {M : ATMData (AltV k A)} {start : Bool} (hlin : IsL
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Nonempty A] in
 /-- **Down a falling segment.** -/
-theorem altAcc_along_segment_down {M : ATMData (AltV k A)} {start : Bool} (hlin : IsLinOrd M.Le)
+private theorem altAcc_along_segment_down
+    {M : ATMData (AltV k A)} {start : Bool} (hlin : IsLinOrd M.Le)
     {conf : AltV k A → Config (AltV k A)} {p₀ p₁ : AltV k A} (hp₁ : M.Posn p₁)
     (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ → M.Step (conf q) (conf p))
     (hf : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
@@ -416,7 +423,7 @@ theorem altAcc_along_segment_down {M : ATMData (AltV k A)} {start : Bool} (hlin 
 /-! ### A universal round, followed for one assignment at a time -/
 
 /-- A sweeping state is not accepting. -/
-theorem not_acc_stG {cnf : Bool} {i : Fin (k + 1)} {d : Bool} :
+private theorem not_acc_stG {cnf : Bool} {i : Fin (k + 1)} {d : Bool} :
     ¬(altMachine k A cnf).Acc (stG i d : AltV k A) := fun h =>
   AltBase.noConfusion (show AltBase.qG d = AltBase.qAcc from h)
 
@@ -436,7 +443,7 @@ theorem sweepLen_eq_passLen : sweepLen k A = passLen k A + 1 := rfl
 passes are runs of universal configurations, so acceptance descends along them:
 whatever the round's assignment, the configuration it leaves at the left marker
 accepts too. -/
-theorem altAcc_passes_down {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop}
+private theorem altAcc_passes_down {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     (huniv : blockPol start (i : ℕ) = false) {n : ℕ}
     (hacc : (altMachine k A cnf).AltAcc start n (confSweep νs i.castSucc (posCell qbotA))) :
     passLen k A ≤ n ∧
@@ -495,14 +502,15 @@ plays the assignment it has chosen.
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- **One step up.** -/
-theorem altAcc_up_step {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
+private theorem altAcc_up_step {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
     {c c' : Config (AltV k A)} (hnu : ¬M.IsUniv start c.state) (hstep : M.Step c c')
     (hacc : M.AltAcc start n c') : M.AltAcc start (n + 1) c :=
   Or.inr (Or.inr ⟨hnu, c', hstep, hacc⟩)
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Nonempty A] in
 /-- **Up a rising segment.** -/
-theorem altAcc_along_segment_up {M : ATMData (AltV k A)} {start : Bool} (hlin : IsLinOrd M.Le)
+private theorem altAcc_along_segment_up
+    {M : ATMData (AltV k A)} {start : Bool} (hlin : IsLinOrd M.Le)
     {conf : AltV k A → Config (AltV k A)} {p₀ p₁ : AltV k A} (hp₀ : M.Posn p₀)
     (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ → M.Step (conf p) (conf q))
     (hnu : ∀ p, ¬M.IsUniv start (conf p).state) :
@@ -541,7 +549,7 @@ theorem altAcc_along_segment_up {M : ATMData (AltV k A)} {start : Bool} (hlin : 
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Nonempty A] in
 /-- **Up a falling segment.** -/
-theorem altAcc_along_segment_up_down {M : ATMData (AltV k A)} {start : Bool}
+private theorem altAcc_along_segment_up_down {M : ATMData (AltV k A)} {start : Bool}
     (hlin : IsLinOrd M.Le) {conf : AltV k A → Config (AltV k A)} {p₀ p₁ : AltV k A}
     (hp₁ : M.Posn p₁)
     (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ → M.Step (conf q) (conf p))
@@ -583,7 +591,7 @@ theorem altAcc_along_segment_up_down {M : ATMData (AltV k A)} {start : Bool}
 /-- **An existential round, played along the run of the assignment it picks.**
 The mirror of `DescriptiveComplexity.AltQbf.altAcc_passes_down`: acceptance at the
 left marker, where the round hands over, climbs back to its entry. -/
-theorem altAcc_passes_up {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop}
+private theorem altAcc_passes_up {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     (hex : blockPol start (i : ℕ) = true) {n : ℕ}
     (hacc : (altMachine k A cnf).AltAcc start n (confBack νs i.castSucc posStart)) :
     (altMachine k A cnf).AltAcc start (n + passLen k A)
@@ -624,11 +632,11 @@ theorem altAcc_passes_up {cnf start : Bool} {i : Fin k} {νs : Fin k → A → P
 /-! ### An existential round, and reading any round off an accepting run -/
 
 /-- Being somewhere in the sweep of round `i`, on either pass. -/
-def InSweep (i : Fin k) (νs : Fin k → A → Prop) (c : Config (AltV k A)) : Prop :=
+private def InSweep (i : Fin k) (νs : Fin k → A → Prop) (c : Config (AltV k A)) : Prop :=
   InSweepR i νs c ∨ InSweepL i νs c
 
 /-- **A sweep either continues or hands over**, whatever the machine does. -/
-theorem inSweep_step {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
+private theorem inSweep_step {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     {c c' : Config (AltV k A)} (hinv : InSweep i νs c)
     (hstep : (altMachine k A cnf).Step c c') :
     InSweep i νs c' ∨ ∃ ν' : A → Prop, (∀ x : A, ν' x → QbfBlk i x) ∧
@@ -642,7 +650,7 @@ theorem inSweep_step {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     · exact Or.inr h'
 
 /-- The state of a sweeping configuration. -/
-theorem state_of_inSweep {i : Fin k} {νs : Fin k → A → Prop} {c : Config (AltV k A)}
+private theorem state_of_inSweep {i : Fin k} {νs : Fin k → A → Prop} {c : Config (AltV k A)}
     (hinv : InSweep i νs c) :
     c.state = stG i.castSucc true ∨ c.state = stG i.castSucc false := by
   rcases hinv with ⟨-, -, h, -⟩ | ⟨-, -, h, -⟩
@@ -650,7 +658,7 @@ theorem state_of_inSweep {i : Fin k} {νs : Fin k → A → Prop} {c : Config (A
   · exact Or.inr h
 
 /-- A sweeping configuration is not accepting. -/
-theorem not_acc_of_inSweep {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
+private theorem not_acc_of_inSweep {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
     {c : Config (AltV k A)} (hinv : InSweep i νs c) : ¬(altMachine k A cnf).Acc c.state := by
   rcases state_of_inSweep hinv with h | h <;> rw [h] <;> exact not_acc_stG
 
@@ -658,7 +666,7 @@ theorem not_acc_of_inSweep {cnf : Bool} {i : Fin k} {νs : Fin k → A → Prop}
 owns the block, an accepting configuration has an accepting successor – the one
 it picks, or any of the ones it must survive – and following those successors
 reaches the handover, since a sweeping state never accepts. -/
-theorem exit_of_altAcc {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} :
+private theorem exit_of_altAcc {cnf start : Bool} {i : Fin k} {νs : Fin k → A → Prop} :
     ∀ (n : ℕ) (c : Config (AltV k A)), InSweep i νs c →
       (altMachine k A cnf).AltAcc start n c →
       ∃ (ν' : A → Prop) (d : Config (AltV k A)) (m : ℕ), m < n ∧ (∀ x : A, ν' x → QbfBlk i x) ∧

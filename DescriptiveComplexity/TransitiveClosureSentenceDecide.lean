@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.TransitiveClosureFlatten
+import all DescriptiveComplexity.TransitiveClosureDecide
+import all DescriptiveComplexity.TransitiveClosureFlatten
 
 /-!
 # A walk over an expansion, with endpoints, as one decider
@@ -69,7 +71,7 @@ theorem decides_listOr (l : List (Decider L β)) (v : β → A) {P : Decider L �
 
 omit [Finite A] [Nonempty A] in
 /-- The disjunction of a family of deciders indexed by a list. -/
-theorem decides_listOr_map {ι : Type} (l : List ι) (f : ι → Decider L β) (v : β → A)
+private theorem decides_listOr_map {ι : Type} (l : List ι) (f : ι → Decider L β) (v : β → A)
     {P : ι → Prop} (h : ∀ i ∈ l, (f i).Decides v (P i)) :
     (listOr (l.map f)).Decides v (∃ i ∈ l, P i) := by
   induction l with
@@ -94,7 +96,7 @@ theorem functional_listOr (l : List (Decider L β)) (h : ∀ D ∈ l, D.Function
 
 /-- A formula with free variables, decided; the sentence-level instance of
 `DescriptiveComplexity.Decider.exists_of_formula`. -/
-theorem exists_of_formula₀ [L.IsRelational] {B : SOBlock}
+private theorem exists_of_formula₀ [L.IsRelational] {B : SOBlock}
     (ρ : (A : Type) → [L.Structure A] → [LinearOrder A] → B.Assignment A)
     (Dq : ∀ q : B.ι, Decider L (Fin (B.arity q)))
     (hD : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A] (q : B.ι)
@@ -236,7 +238,7 @@ abbrev val4 (z : Fin S.par → A) (x y : Fin S.k → A)
 variable (A) in
 /-- What the reachability deciders of the flat walk decide, in the two
 readings. -/
-def DecidesReach : Prop :=
+private def DecidesReach : Prop :=
   ∀ (m n : S.Mode) (w : Fin (Nat.card (S.flat D det).Coord + Nat.card (S.flat D det).Coord +
       S.par) → A),
     (Dr m n).Decides w
@@ -250,7 +252,7 @@ omit [L.IsRelational] in
 /-- **The pair decider decides**: some source tuple and some target tuple,
 the outer walk reaching the target from the source – given that the flat walk
 simulates the outer one at the encodings. -/
-theorem decides_pairDecider {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a) (z : Fin S.par → A)
+private theorem decides_pairDecider {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a) (z : Fin S.par → A)
     (p : S.Mode × S.Mode)
     (hsrc : ∀ (m : S.Mode) (x : Fin S.k → A),
       (Dsrc m).Decides x (@Formula.Realize _ A instE _ (Ssrc m) x))
@@ -332,7 +334,7 @@ theorem decides_pairDecider {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a) (z : Fin S
 omit [L.IsRelational] in
 /-- **The sentence decider decides the sentence**: some source node reaches
 some target node in the outer walk. -/
-theorem decides_sentenceDecider {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a) (z : Fin S.par → A)
+private theorem decides_sentenceDecider {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a) (z : Fin S.par → A)
     (hsrc : ∀ (m : S.Mode) (x : Fin S.k → A),
       (Dsrc m).Decides x (@Formula.Realize _ A instE _ (Ssrc m) x))
     (htgt : ∀ (m : S.Mode) (x : Fin S.k → A),
@@ -356,7 +358,7 @@ theorem decides_sentenceDecider {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a) (z : F
 
 omit [L.IsRelational] [Finite A] [Nonempty A] instE in
 /-- **The sentence decider is functional** when its components are. -/
-theorem functional_sentenceDecider (hsrc : ∀ m, (Dsrc m).Functional A)
+private theorem functional_sentenceDecider (hsrc : ∀ m, (Dsrc m).Functional A)
     (htgt : ∀ m, (Dtgt m).Functional A) (hr : ∀ m n, (Dr m n).Functional A) :
     (S.sentenceDecider D det Dsrc Dtgt Dr).Functional A := by
   refine Decider.functional_listOr _ fun D' hD' => ?_

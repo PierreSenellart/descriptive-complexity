@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltKernel
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltLadder
+import all DescriptiveComplexity.SecondOrderReplicate
 
 /-!
 # Alternating acceptance is `Σₖ`-definable
@@ -48,7 +51,7 @@ variable {A : Type} [Finite A] {M : ATMData A} {k : ℕ}
 state.** The second conjunct is the one existence clause the ladder cannot
 carry itself (see `DescriptiveComplexity.Problems.Machine.AltLadder`); it is
 first-order, so the kernel states it outright. -/
-theorem altAccepts_iff_start_and_altLadder (hwf : M.toTMData.WellFormed)
+private theorem altAccepts_iff_start_and_altLadder (hwf : M.toTMData.WellFormed)
     (hbwf : M.BlocksWellFormed k) (hk : 0 < k) (start : Bool) :
     M.AltAccepts start ↔ (∃ q, M.Start q) ∧ M.AltLadder start k := by
   have hlin : IsLinOrd M.Le := hwf.1
@@ -107,7 +110,7 @@ private theorem atm_definable_aux (pol : Bool) (A : Type)
 /-- **Alternating acceptance with an existential first block is
 `Σₖ₊₁`-definable**: one block guesses the run of each round, and the
 first-order kernel checks the ladder. -/
-theorem atmAccept_sigmaSODefinable : SigmaSODefinable (k + 1) (ATMAccept (k + 1) true) :=
+private theorem atmAccept_sigmaSODefinable : SigmaSODefinable (k + 1) (ATMAccept (k + 1) true) :=
   ⟨repBlocks tmGuessBlock (k + 1), repBlocks_length tmGuessBlock (k + 1),
     (unmergeHom (repBlocks tmGuessBlock (k + 1)) (Language.turingAlt (k + 1))).onSentence
       (akKernel true (k + 1)),
@@ -115,18 +118,18 @@ theorem atmAccept_sigmaSODefinable : SigmaSODefinable (k + 1) (ATMAccept (k + 1)
 
 /-- **Alternating acceptance with a universal first block is
 `Πₖ₊₁`-definable**, by the same sentence at the other starting polarity. -/
-theorem atmAccept_piSODefinable : PiSODefinable (k + 1) (ATMAccept (k + 1) false) :=
+private theorem atmAccept_piSODefinable : PiSODefinable (k + 1) (ATMAccept (k + 1) false) :=
   ⟨repBlocks tmGuessBlock (k + 1), repBlocks_length tmGuessBlock (k + 1),
     (unmergeHom (repBlocks tmGuessBlock (k + 1)) (Language.turingAlt (k + 1))).onSentence
       (akKernel false (k + 1)),
     fun A instA _ _ => atm_definable_aux k false A instA⟩
 
 /-- **Alternating acceptance is in `Σₖ₊₁ᵖ`.** -/
-theorem atmAccept_mem_sigmaP : ATMAccept (k + 1) true ∈ SigmaP (k + 1) :=
+private theorem atmAccept_mem_sigmaP : ATMAccept (k + 1) true ∈ SigmaP (k + 1) :=
   atmAccept_sigmaSODefinable k
 
 /-- **Alternating acceptance at the other polarity is in `Πₖ₊₁ᵖ`.** -/
-theorem atmAccept_mem_piP : ATMAccept (k + 1) false ∈ PiP (k + 1) :=
+private theorem atmAccept_mem_piP : ATMAccept (k + 1) false ∈ PiP (k + 1) :=
   atmAccept_piSODefinable k
 
 end Definability

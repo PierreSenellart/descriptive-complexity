@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.PointAtoms
+import all DescriptiveComplexity.Exponential.PointAtoms
 
 /-!
 # Translating a quantifier-free matrix
@@ -54,7 +55,7 @@ def termVar {n : ℕ} : (X.E.sum Language.order).Term (Fin m ⊕ Fin n) → Fin 
   | .var x => x
   | .func f _ => isEmptyElim f
 
-theorem realize_termVar {A : Type} [(X.E.sum Language.order).Structure A] {n : ℕ}
+private theorem realize_termVar {A : Type} [(X.E.sum Language.order).Structure A] {n : ℕ}
     (v : (Fin m ⊕ Fin n) → A) :
     ∀ t : (X.E.sum Language.order).Term (Fin m ⊕ Fin n), t.realize v = v (termVar t)
   | .var _ => rfl
@@ -101,7 +102,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 omit [Finite A] [Nonempty A] in
 /-- At no bound variables, a valuation of the free variables reads a variable
 through its round. -/
-theorem elim_finZeroElim (pts : Fin m → X.Map A) (x : Fin m ⊕ Fin 0) :
+private theorem elim_finZeroElim (pts : Fin m → X.Map A) (x : Fin m ⊕ Fin 0) :
     letI := X.mapLinearOrder A
     Sum.elim pts (default : Fin 0 → X.Map A) x = pts (Sum.elim id finZeroElim x) := by
   match x with

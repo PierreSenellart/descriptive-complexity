@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRunVar
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The evaluation spine's run
@@ -137,7 +141,7 @@ include hrules hR hlin hix hbot hv hvi hwkOf hrgOf hVar in
 /-- **The spine's run, on a clock**: from the checkpoint before the first
 variable at the marker to the checkpoint after the last, one machinery run per
 position, each with its dispatch and its walk back. -/
-theorem eval_reachesIn :
+private theorem eval_reachesIn :
     (wideData (Univ A R (OuterPh (EvalPh nv PM)) dt.KIx dt.dd)).ReachesIn
       ((w + 2) * nv)
       ⟨Sum.inr (PR.stElt (.evalP (.chk 0)) (fs 0)), Sum.inl v,

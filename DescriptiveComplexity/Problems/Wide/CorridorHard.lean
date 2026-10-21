@@ -13,6 +13,15 @@ public import DescriptiveComplexity.Problems.Wide.TilingHard.Grid
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Run
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Yes
 public import DescriptiveComplexity.Problems.Wide.TilingHard.No
+import all DescriptiveComplexity.Problems.Wide.Corridor
+import all DescriptiveComplexity.Problems.Wide.Reduce
+import all DescriptiveComplexity.Problems.Wide.Tiling
+import all DescriptiveComplexity.Problems.Wide.TilingHard
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Emit
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Grid
+import all DescriptiveComplexity.Problems.Wide.TilingHard.No
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Run
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Yes
 
 /-!
 # Tiling a wide corridor is EXPSPACE-complete
@@ -51,7 +60,7 @@ omit [Finite A] in
 /-- **Every digit is described**, as soon as the instance has a blank: an
 element with an input symbol has a tile holding it, and one without has the
 blank. That is what makes the drawing's file the machine's whole ruler. -/
-theorem wtHasFirst_tileStrR (hblank : ∃ b : A, WMBlank b) (p : TilePt A) :
+private theorem wtHasFirst_tileStrR (hblank : ∃ b : A, WMBlank b) (p : TilePt A) :
     letI := tileStrR A
     (WTHasFirst p ↔ TPDig p) := by
   let := tileStrR A
@@ -67,7 +76,7 @@ omit [Finite A] in
 /-- **The cells of the drawing's file are the machine's own segments**: a
 coordinate is the cell of the digit of `x` exactly when the address it is is the
 initial segment `x` cuts. -/
-theorem wmFileSeg_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (x : A) :
+private theorem wmFileSeg_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (x : A) :
     letI := tileStrR A
     (WMFileSeg WTLe WTHasFirst (tpCol s) (tpDig x) ↔ WMDown WMLe s x) := by
   let := tileStrR A
@@ -92,7 +101,7 @@ omit [Finite A] in
 /-- **The bottom row of the drawing is the machine's ruler**: the cell of an
 element may carry a tile holding that element's input symbol, or the blank where
 it has none. -/
-theorem wtpFirst_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (t : TilePt A) :
+private theorem wtpFirst_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (t : TilePt A) :
     letI := tileStrR A
     ((wideTileData (TilePt A)).First (Sum.inl (tpCol s)) (Sum.inr t) ↔
       ∃ x, WMDown WMLe s x ∧ TPFirstR (tpDig x) t) := by
@@ -111,7 +120,7 @@ theorem wtpFirst_tpColR (hblank : ∃ b : A, WMBlank b) (s : A → Prop) (t : Ti
 omit [LinearOrder A] [Finite A] in
 /-- **An address is the segment of at most one element**: the two elements are
 each below the other. -/
-theorem wmDown_unique (hlin : IsLinOrd (WMLe (A := A))) {s : A → Prop} {x x' : A}
+private theorem wmDown_unique (hlin : IsLinOrd (WMLe (A := A))) {s : A → Prop} {x x' : A}
     (h : WMDown WMLe s x) (h' : WMDown WMLe s x') : x = x' :=
   hlin.2.2.1 _ _ ((h' x).mp ((h x).mpr (hlin.1 x))) ((h x').mp ((h' x').mpr (hlin.1 x')))
 
@@ -138,7 +147,7 @@ theorem tableCorridor_tpCol (k : ℕ) (s : A → Prop) :
 /-- **The bottom row the table draws is the machine's initial tape**, read at
 the ruler: the corner carries the machine's start, and every other column the
 input symbol of the element whose segment it is, or the blank. -/
-theorem first_tableCorridor (hwf : WideWF A)
+private theorem first_tableCorridor (hwf : WideWF A)
     (hstep : ∀ i, i < n → StepWith (wideData A) (g i) (g (i + 1)) (tr i))
     (hinit : (wideData A).IsInit (g 0)) {x : WPoint (TilePt A)}
     (hx : letI := tileStrR A; (wideTileData (TilePt A)).Posn x) :
@@ -238,7 +247,7 @@ theorem first_tableCorridor (hwf : WideWF A)
 square.** Each of the conditions is the square's, with the clock taken out: the
 rows are the configurations, one per time step, and there is no bound on how
 many of them the run takes. -/
-theorem isCorridor_tableCorridor (hwf : WideWF A)
+private theorem isCorridor_tableCorridor (hwf : WideWF A)
     (hinit : (wideData A).IsInit (g 0)) (hfreeze : ∀ i, n ≤ i → g i = g n)
     (hacc : (wideData A).Acc (g n).state)
     (hstep : ∀ i, i < n → StepWith (wideData A) (g i) (g (i + 1)) (tr i)) :
@@ -289,7 +298,7 @@ theorem isCorridor_tableCorridor (hwf : WideWF A)
 
 /-- **The emitted corridor can be tiled when the machine accepts in bounded
 space.** -/
-theorem corridorTileable_of_acceptsSpace (hwf : WideWF A) (h : (wideData A).AcceptsSpace) :
+private theorem corridorTileable_of_acceptsSpace (hwf : WideWF A) (h : (wideData A).AcceptsSpace) :
     letI := tileStrR A
     (wideTileData (TilePt A)).WellFormed ∧
       (wideTileData (TilePt A)).CorridorTileable := by
@@ -309,7 +318,7 @@ variable {A : Type} [LinearOrder A] [Finite A] [Language.wide.Structure A]
 /-- **A tiling of the emitted corridor is an accepting run of the machine.**
 The columns are the machine's addresses and the rows its configurations, exactly
 as for the square; what the corridor drops is the clock. -/
-theorem wideAcceptSpace_of_corridorTileable
+private theorem wideAcceptSpace_of_corridorTileable
     (hwf0 : letI := tileStrR A; (wideTileData (TilePt A)).WellFormed)
     (h : letI := tileStrR A; (wideTileData (TilePt A)).CorridorTileable) :
     WideWF A ∧ (wideData A).AcceptsSpace := by
@@ -403,7 +412,7 @@ open TilingHard
 
 /-- **The interpreted structure is a yes-instance exactly when the emitted one
 is.** -/
-theorem wideCorridor_map_iff (A : Type) [Language.wide.Structure A] [LinearOrder A]
+private theorem wideCorridor_map_iff (A : Type) [Language.wide.Structure A] [LinearOrder A]
     [Finite A] [Nonempty A] :
     letI := tileStrR A
     (WideCorridor (tileInterpR.Map A) ↔ WideCorridor (TilePt A)) :=
@@ -413,7 +422,7 @@ theorem wideCorridor_map_iff (A : Type) [Language.wide.Structure A] [LinearOrder
 /-- **A wide machine bounded in space is drawn as a tiling of the emitted
 corridor.** The drawing is the square's; what the corridor drops is the clock,
 which is the one thing a space-bounded machine does not have. -/
-noncomputable def wideAcceptSpace_ordered_fo_reduction_wideCorridor :
+private noncomputable def wideAcceptSpace_ordered_fo_reduction_wideCorridor :
     WideAcceptSpace ≤ᶠᵒ[≤] WideCorridor where
   Tag := TileTag
   dim := 3

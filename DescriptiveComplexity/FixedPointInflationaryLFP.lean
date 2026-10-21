@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.FixedPointInflationary
 public import DescriptiveComplexity.SecondOrderBlockHom
 public import DescriptiveComplexity.FixedPointHorn
+import all DescriptiveComplexity.FixedPointHorn
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Padding
 
 /-!
 # FO(≤, IFP) into FO(LFP): the capture of the inflationary limit
@@ -104,7 +108,7 @@ noncomputable def hX : ℕ :=
   letI := Fintype.ofFinite d.B.ι
   (Finset.univ.sup fun i => ctxB (stepB d i) : ℕ)
 
-theorem ctxB_le_hX (i : d.B.ι) : ctxB (stepB d i) ≤ hX d := by
+private theorem ctxB_le_hX (i : d.B.ι) : ctxB (stepB d i) ≤ hX d := by
   let := Fintype.ofFinite d.B.ι
   have h : ctxB (stepB d i) ≤ (Finset.univ.sup fun i => ctxB (stepB d i) : ℕ) :=
     Finset.le_sup (f := fun i => ctxB (stepB d i)) (Finset.mem_univ i)
@@ -246,7 +250,7 @@ noncomputable def acAt (j : Fin (hs d)) (x : SubIx d)
 noncomputable def iotaList : List d.B.ι :=
   (@Finset.univ d.B.ι (Fintype.ofFinite _)).toList
 
-theorem mem_iotaList (i : d.B.ι) : i ∈ iotaList d := by
+private theorem mem_iotaList (i : d.B.ι) : i ∈ iotaList d := by
   rw [iotaList, Finset.mem_toList]
   exact @Finset.mem_univ _ (Fintype.ofFinite _) i
 
@@ -256,7 +260,7 @@ noncomputable def stagePairs : List (Fin (hs d) × Fin (hs d)) :=
   ((List.finRange (hs d)).flatMap fun j => (List.finRange (hs d)).map fun j' => (j, j')).filter
     fun p => p.1 = p.2 ∨ (p.1 : ℕ) + 1 = (p.2 : ℕ)
 
-theorem mem_stagePairs {j j' : Fin (hs d)} :
+private theorem mem_stagePairs {j j' : Fin (hs d)} :
     (j, j') ∈ stagePairs d ↔ j = j' ∨ (j : ℕ) + 1 = (j' : ℕ) := by
   rw [stagePairs, List.mem_filter]
   constructor
@@ -450,7 +454,7 @@ theorem trArity_rIx (i : d.B.ι) : (trBlock d).arity (rIx d i) = d.B.arity i := 
 /-- **The translated FO(LFP) definition**: the rules above, with the original
 output sentence transported along the answer-variable injection
 (`DescriptiveComplexity.SOBlock.homLHom`). -/
-noncomputable def trDef : LFPDef L where
+private noncomputable def trDef : LFPDef L where
   B := trBlock d
   k := kk d
   rules := trRules d
@@ -533,12 +537,12 @@ noncomputable def canonAssign : (trBlock d).Assignment A := fun ix =>
 
 variable {d} {A}
 
-theorem rAt_holds {i : d.B.ι} {sel : Fin (d.B.arity i) → Fin (kk d)}
+private theorem rAt_holds {i : d.B.ι} {sel : Fin (d.B.arity i) → Fin (kk d)}
     {V : Fin (kk d) → A} :
     (rAt d i sel).Holds (canonAssign d A) V ↔ d.inflLimit A i fun q => V (sel q) :=
   Iff.rfl
 
-theorem sAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
+private theorem sAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
     {xs : Fin (d.B.arity i) → Fin (kk d)} {V : Fin (kk d) → A} :
     (sAt d j i ts xs).Holds (canonAssign d A) V ↔
       d.inflStage A (srank d A j fun q => V (ts q)) i fun q => V (xs q) := by
@@ -553,7 +557,7 @@ theorem sAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
     funext fun q => Fin.addCases_right q
   rw [ha, hb]
 
-theorem nAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
+private theorem nAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
     {xs : Fin (d.B.arity i) → Fin (kk d)} {V : Fin (kk d) → A} :
     (nAt d j i ts xs).Holds (canonAssign d A) V ↔
       ¬d.inflStage A (srank d A j fun q => V (ts q)) i fun q => V (xs q) := by
@@ -568,7 +572,7 @@ theorem nAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
     funext fun q => Fin.addCases_right q
   rw [ha, hb]
 
-theorem tAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)}
+private theorem tAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)}
     {es : Fin x.2.1.1 → Fin (kk d)} {V : Fin (kk d) → A} :
     (tfAt d j x true ts es).Holds (canonAssign d A) V ↔
       evalT d A (srank d A j fun q => V (ts q)) x.2.1.2 fun q => V (es q) := by
@@ -583,7 +587,7 @@ theorem tAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)
       fun q => V (es q) := funext fun q => congrArg V (Fin.addCases_right q)
   rw [ha, hb]
 
-theorem fAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)}
+private theorem fAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)}
     {es : Fin x.2.1.1 → Fin (kk d)} {V : Fin (kk d) → A} :
     (tfAt d j x false ts es).Holds (canonAssign d A) V ↔
       ¬evalT d A (srank d A j fun q => V (ts q)) x.2.1.2 fun q => V (es q) := by
@@ -598,7 +602,7 @@ theorem fAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)
       fun q => V (es q) := funext fun q => congrArg V (Fin.addCases_right q)
   rw [ha, hb]
 
-theorem acAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)}
+private theorem acAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d)}
     {es : Fin (x.2.1.1 + 1) → Fin (kk d)} {V : Fin (kk d) → A} :
     (acAt d j x ts es).Holds (canonAssign d A) V ↔
       canonAc d A (srank d A j fun q => V (ts q)) x fun q => V (es q) := by
@@ -618,7 +622,7 @@ theorem acAt_holds {j : Fin (hs d)} {x : SubIx d} {ts : Fin (hm d) → Fin (kk d
   rw [ha, hb]
 
 /-- The accumulator of `∀`, at an explicit `snoc` tuple. -/
-theorem canonAc_all_snoc {r : ℕ} {i : d.B.ι} {n : ℕ}
+private theorem canonAc_all_snoc {r : ℕ} {i : d.B.ι} {n : ℕ}
     {χ : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty (n + 1)}
     {hmem : (⟨n, χ.all⟩ : Σ n',
       ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty n') ∈
@@ -675,7 +679,7 @@ theorem stageG_covBy {j j' : Fin (hs d)} {V : Fin (kk d) → A}
 
 omit [Finite A] in
 /-- A cover of stages, as a realized stage guard. -/
-theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
+private theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
     (hjj : (j, j') ∈ stagePairs d)
     (hcov : toLex ((j, toLex fun q => V (vT1 d q)) :
         Fin (hs d) × Lex (Fin (hm d) → A)) ⋖
@@ -698,7 +702,7 @@ theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
 
 omit [L.Structure A] [Finite A] in
 /-- A cover of stages is a stage pair. -/
-theorem stagePairs_of_covBy {j j' : Fin (hs d)} {u u' : Lex (Fin (hm d) → A)}
+private theorem stagePairs_of_covBy {j j' : Fin (hs d)} {u u' : Lex (Fin (hm d) → A)}
     (hcov : toLex ((j, u) : Fin (hs d) × Lex (Fin (hm d) → A)) ⋖ toLex (j', u')) :
     (j, j') ∈ stagePairs d := by
   rcases prodLex_covBy_iff.mp hcov with ⟨rfl, -⟩ | ⟨hjcov, -, -⟩
@@ -706,7 +710,7 @@ theorem stagePairs_of_covBy {j j' : Fin (hs d)} {u u' : Lex (Fin (hm d) → A)}
   · exact (mem_stagePairs (d := d)).mpr (Or.inr (finCovBy_iff.mp hjcov))
 
 /-- A `stageG` step raises the stage rank by one. -/
-theorem srank_stageG {j j' : Fin (hs d)} {V : Fin (kk d) → A}
+private theorem srank_stageG {j j' : Fin (hs d)} {V : Fin (kk d) → A}
     (hjj : (j, j') ∈ stagePairs d) (h : (stageG d j j').Realize V) :
     srank d A j' (fun q => V (vT2 d q)) = srank d A j (fun q => V (vT1 d q)) + 1 :=
   orank_covBy (stageG_covBy hjj h)
@@ -776,33 +780,33 @@ noncomputable def evTermVal (r : ℕ) {n : ℕ} (v : Fin n → A)
 
 omit [Finite A] [Nonempty A]
 
-theorem evalT_imp {r n : ℕ}
+private theorem evalT_imp {r n : ℕ}
     {a b : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty n}
     {v : Fin n → A} :
     evalT d A r (a.imp b) v ↔ (evalT d A r a v → evalT d A r b v) :=
   Iff.rfl
 
-theorem evalT_all {r n : ℕ}
+private theorem evalT_all {r n : ℕ}
     {a : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty (n + 1)}
     {v : Fin n → A} :
     evalT d A r a.all v ↔ ∀ y : A, evalT d A r a (Fin.snoc v y) :=
   Iff.rfl
 
-theorem evalT_equal {r n : ℕ}
+private theorem evalT_equal {r n : ℕ}
     {t u : ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)}
     {v : Fin n → A} :
     evalT d A r (.equal t u) v ↔
       evTermVal (d := d) (A := A) r v t = evTermVal (d := d) (A := A) r v u :=
   Iff.rfl
 
-theorem evalT_rel_inl {r n l : ℕ} {rl : (L.sum Language.order).Relations l}
+private theorem evalT_rel_inl {r n l : ℕ} {rl : (L.sum Language.order).Relations l}
     {ts : Fin l → ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)}
     {v : Fin n → A} :
     evalT d A r (.rel (Sum.inl rl) ts) v ↔
       RelMap (M := A) rl fun q => evTermVal (d := d) (A := A) r v (ts q) :=
   Iff.rfl
 
-theorem evalT_rel_inr {r n l : ℕ} {rl : d.B.lang.Relations l}
+private theorem evalT_rel_inr {r n l : ℕ} {rl : d.B.lang.Relations l}
     {ts : Fin l → ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)}
     {v : Fin n → A} :
     evalT d A r (.rel (Sum.inr rl) ts) v ↔
@@ -810,7 +814,7 @@ theorem evalT_rel_inr {r n l : ℕ} {rl : d.B.lang.Relations l}
   Iff.rfl
 
 /-- Truth of a step formula at a stage is one application of the step. -/
-theorem evalT_stepB {r : ℕ} {i : d.B.ι} {v : Fin (d.B.arity i + 0) → A} :
+private theorem evalT_stepB {r : ℕ} {i : d.B.ι} {v : Fin (d.B.arity i + 0) → A} :
     evalT d A r (stepB d i) v ↔
       d.next (d.inflStage A r) i fun q => v (Fin.castAdd 0 q) := by
   let := stageStr d A r
@@ -820,7 +824,7 @@ theorem evalT_stepB {r : ℕ} {i : d.B.ι} {v : Fin (d.B.arity i + 0) → A} :
       (stageStr d A r) _ _ (d.step i) a b)
     (funext fun q => rfl) (Subsingleton.elim _ _))
 
-theorem realize_evTerm {r n : ℕ} (hn : n ≤ hX d) {V : Fin (kk d) → A}
+private theorem realize_evTerm {r n : ℕ} (hn : n ≤ hX d) {V : Fin (kk d) → A}
     (t : ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)) :
     (evTerm d hn t).realize V = evTermVal (d := d) (A := A) r (fun q => V (eSel d hn q)) t := by
   rw [evTerm, Term.realize_relabel]
@@ -836,7 +840,7 @@ theorem realize_evTerm {r n : ℕ} (hn : n ≤ hX d) {V : Fin (kk d) → A}
 
 omit [L.Structure A] [LinearOrder A] in
 /-- The evaluation tuple of a wider context, as a `snoc`. -/
-theorem eSel_snoc {n : ℕ} (hn1 : n + 1 ≤ hX d) {V : Fin (kk d) → A} :
+private theorem eSel_snoc {n : ℕ} (hn1 : n + 1 ≤ hX d) {V : Fin (kk d) → A} :
     (fun q => V (eSel d hn1 q)) =
       Fin.snoc (fun q => V (eSel d (le_trans (Nat.le_succ n) hn1) q))
         (V (eSel d hn1 (Fin.last n))) := by
@@ -851,7 +855,7 @@ variable [Finite A] [Nonempty A]
 
 /-! #### The stage rules are sound -/
 
-theorem sCarry_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
+private theorem sCarry_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
     (HornClause.mk (stageG d j j') [sAt d j i (vT1 d) (xa d i)]
       (some (sAt d j' i (vT2 d) (xa d i)))).Holds (canonAssign d A) V := by
   rintro ⟨hg, hb⟩
@@ -861,7 +865,7 @@ theorem sCarry_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d
   rw [hstep]
   exact d.inflStage_le_succ _ i _ hS
 
-theorem sDerive_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
+private theorem sDerive_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
     (HornClause.mk (stageG d j j')
       [tfAt d j (rootSub d i) true (vT1 d) (rootSel d i)]
       (some (sAt d j' i (vT2 d) (rootSel d i)))).Holds (canonAssign d A) V := by
@@ -883,7 +887,7 @@ theorem nBase_sound {i : d.B.ι} :
   intro hder
   exact hder
 
-theorem nStep_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
+private theorem nStep_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
     (HornClause.mk (stageG d j j')
       [nAt d j i (vT1 d) (rootSel d i),
         tfAt d j (rootSub d i) false (vT1 d) (rootSel d i)]
@@ -898,7 +902,7 @@ theorem nStep_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.
   · exact hN hprev
   · exact hF (evalT_stepB.mpr hnext)
 
-theorem rRules_sound {i : d.B.ι} :
+private theorem rRules_sound {i : d.B.ι} :
     (HornClause.mk (maxTupF (L := L) (vT1 d)) [sAt d (jTop d) i (vT1 d) (xa d i)]
       (some (rAt d i (xa d i)))).Holds (canonAssign d A) V := by
   rintro ⟨hg, hb⟩
@@ -1111,7 +1115,7 @@ section PackProj
 
 omit [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
-theorem packV_comp_vT1 : (fun q => packV t1 t2 x e sp (vT1 d q)) = t1 := by
+private theorem packV_comp_vT1 : (fun q => packV t1 t2 x e sp (vT1 d q)) = t1 := by
   funext q
   have hq := q.isLt
   have hv : ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) := rfl
@@ -1119,7 +1123,7 @@ theorem packV_comp_vT1 : (fun q => packV t1 t2 x e sp (vT1 d q)) = t1 := by
   rw [dite_eq_left (by rw [hv]; omega)]
   exact congrArg t1 (Fin.ext (show ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) from hv))
 
-theorem packV_comp_vT2 : (fun q => packV t1 t2 x e sp (vT2 d q)) = t2 := by
+private theorem packV_comp_vT2 : (fun q => packV t1 t2 x e sp (vT2 d q)) = t2 := by
   funext q
   have hq := q.isLt
   have hv : ((vT2 d q : Fin (kk d)) : ℕ) = hm d + (q : ℕ) := rfl
@@ -1128,7 +1132,7 @@ theorem packV_comp_vT2 : (fun q => packV t1 t2 x e sp (vT2 d q)) = t2 := by
   exact congrArg t2 (Fin.ext
     (show ((vT2 d q : Fin (kk d)) : ℕ) - hm d = (q : ℕ) from by rw [hv]; omega))
 
-theorem packV_comp_eSel {n : ℕ} (hn : n ≤ hX d) {v : Fin n → A}
+private theorem packV_comp_eSel {n : ℕ} (hn : n ≤ hX d) {v : Fin n → A}
     (hpad : ∀ q : Fin n, e ⟨q, lt_of_lt_of_le q.isLt hn⟩ = v q) :
     (fun q => packV t1 t2 x e sp (eSel d hn q)) = v := by
   funext q
@@ -1142,13 +1146,13 @@ theorem packV_comp_eSel {n : ℕ} (hn : n ≤ hX d) {v : Fin n → A}
   exact congrArg e (Fin.ext
     (show ((eSel d hn q : Fin (kk d)) : ℕ) - 3 * hm d = (q : ℕ) from by rw [hv]; omega))
 
-theorem packV_vS : packV t1 t2 x e sp (vS d) = sp := by
+private theorem packV_vS : packV t1 t2 x e sp (vS d) = sp := by
   have hv : ((vS d : Fin (kk d)) : ℕ) = 3 * hm d + hX d := rfl
   simp only [packV]
   rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
     dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega)]
 
-theorem packV_comp_xa {i : d.B.ι}
+private theorem packV_comp_xa {i : d.B.ι}
     {xt : Fin (d.B.arity i) → A}
     (hpad : ∀ q : Fin (d.B.arity i),
       x ⟨q, lt_of_lt_of_le q.isLt (arity_le_blockArityBound d.B i)⟩ = xt q) :
@@ -1186,30 +1190,30 @@ theorem packV_comp_xa_pad {i : d.B.ι} {xt : Fin (d.B.arity i) → A} :
 
 /-! #### Membership of the rules in the program -/
 
-theorem mem_trRules_sCarry {c} (h : c ∈ sCarry d) : c ∈ trRules d := by
+private theorem mem_trRules_sCarry {c} (h : c ∈ sCarry d) : c ∈ trRules d := by
   rw [trRules]
   exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_left _
     (List.mem_append_left _ (List.mem_append_left _ h))))
 
-theorem mem_trRules_sDerive {c} (h : c ∈ sDerive d) : c ∈ trRules d := by
+private theorem mem_trRules_sDerive {c} (h : c ∈ sDerive d) : c ∈ trRules d := by
   rw [trRules]
   exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_left _
     (List.mem_append_left _ (List.mem_append_right _ h))))
 
-theorem mem_trRules_nBase {c} (h : c ∈ nBase d) : c ∈ trRules d := by
+private theorem mem_trRules_nBase {c} (h : c ∈ nBase d) : c ∈ trRules d := by
   rw [trRules]
   exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_left _
     (List.mem_append_right _ h)))
 
-theorem mem_trRules_nStep {c} (h : c ∈ nStep d) : c ∈ trRules d := by
+private theorem mem_trRules_nStep {c} (h : c ∈ nStep d) : c ∈ trRules d := by
   rw [trRules]
   exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_right _ h))
 
-theorem mem_trRules_rRules {c} (h : c ∈ rRules d) : c ∈ trRules d := by
+private theorem mem_trRules_rRules {c} (h : c ∈ rRules d) : c ∈ trRules d := by
   rw [trRules]
   exact List.mem_append_left _ (List.mem_append_right _ h)
 
-theorem mem_trRules_evalClauses {j : Fin (hs d)} {x : SubIx d} {c}
+private theorem mem_trRules_evalClauses {j : Fin (hs d)} {x : SubIx d} {c}
     (h : c ∈ evalClauses d j x) : c ∈ trRules d := by
   rw [trRules]
   refine List.mem_append_right _ (List.mem_flatMap.mpr ⟨j, List.mem_finRange j, ?_⟩)
@@ -1952,7 +1956,7 @@ theorem homAssign_lfpAssign_trRules :
   · exact derives_r h
 
 /-- **The translated definition means the inflationary definition.** -/
-theorem trDef_holds_iff : (trDef d).Holds A ↔ d.IFPHolds A := by
+private theorem trDef_holds_iff : (trDef d).Holds A ↔ d.IFPHolds A := by
   rw [LFPDef.Holds, StepDef.IFPHolds]
   have htrans := SOBlock.realize_homSentence (B := d.B) (B' := trBlock d) (rIx d)
     (trArity_rIx d) (L := L.sum Language.order) (A := A)

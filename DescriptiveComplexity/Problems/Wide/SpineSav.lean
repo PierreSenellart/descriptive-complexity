@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
 
 /-!
 # The two scratch registers are parked at the marker
@@ -48,7 +49,7 @@ variable {v : Univ A R P dt.KIx dt.dd → Prop}
 
 variable (dt) in
 /-- **Both scratch registers are parked at the marker.** -/
-def Parked (st : TapeSt dt A R P I) (elt : I → Univ A R P dt.KIx dt.dd)
+private def Parked (st : TapeSt dt A R P I) (elt : I → Univ A R P dt.KIx dt.dd)
     (v : Univ A R P dt.KIx dt.dd → Prop) : Prop :=
   st.sav = ixMark elt v ∧ st.tgt = ixMark elt v
 
@@ -58,7 +59,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [Finite dt.KIx] in
 /-- **An atom leaves the scratch parked**: a stage atom parks both registers at
 the marker, and every other kind touches neither. -/
-theorem parked_ixKindEndSt {vi : dt.VarIx} {st : TapeSt dt A R P I}
+private theorem parked_ixKindEndSt {vi : dt.VarIx} {st : TapeSt dt A R P I}
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (hst : dt.Parked st elt v) :
     dt.Parked (dt.ixKindEndSt (elt := elt) vi v κ st) elt v := by
   cases κ with
@@ -70,7 +71,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [Finite R] [Finite P] [Finite I] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
 /-- **The matrix's chain leaves the scratch parked.** -/
-theorem parked_ixMatSt {vi : dt.VarIx} {st : TapeSt dt A R P I}
+private theorem parked_ixMatSt {vi : dt.VarIx} {st : TapeSt dt A R P I}
     (hst : dt.Parked st elt v) (n : ℕ) :
     dt.Parked (dt.ixMatSt (elt := elt) vi st v n) elt v := by
   induction n with
@@ -99,7 +100,7 @@ variable {hhas : F.toLayout.HasName zero}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite I] [Finite dt.KIx] in
 /-- **A round leaves the scratch parked**: it is the matrix's chain when the
 gates pass and the identity when they do not. -/
-theorem parked_ixRoundEndSt {vi : dt.VarIx} {stV : TapeSt dt A R P I}
+private theorem parked_ixRoundEndSt {vi : dt.VarIx} {stV : TapeSt dt A R P I}
     (hst : dt.Parked stV elt v) (f₀ : dt.CtlIx → A) :
     dt.Parked (dt.ixRoundEndSt (elt := elt) F zero one hhas vi stV v f₀) elt v := by
   rw [ixRoundEndSt]
@@ -132,7 +133,7 @@ variable (mV : ιV → I → Prop)
 omit [Finite R] [Finite P] [Finite I] [Finite dt.KIx] [Finite ιV] in
 /-- **The VAL loop's thread leaves the scratch parked**: the pair it carries is
 the round's, and a round parks both registers. -/
-theorem parked_ixVarSTT {vi : dt.VarIx} {st : TapeSt dt A R P I}
+private theorem parked_ixVarSTT {vi : dt.VarIx} {st : TapeSt dt A R P I}
     {semT : ∀ (p : IxScratch dt A R P I) (a : ιV),
       (∀ ℓ : Fin (dt.nIn vi),
         dt.ixIGPassP (elt := elt) F PR.zero PR.one vi (dt.ixVarRdSt st p (mV a)) ℓ) →
@@ -153,7 +154,7 @@ theorem parked_ixVarSTT {vi : dt.VarIx} {st : TapeSt dt A R P I}
 
 omit [Finite R] [Finite P] [Finite I] [Finite dt.KIx] [Finite ιV] in
 /-- **A VAL round's exit state leaves the scratch parked.** -/
-theorem parked_ixVarStE {vi : dt.VarIx} {st : TapeSt dt A R P I}
+private theorem parked_ixVarStE {vi : dt.VarIx} {st : TapeSt dt A R P I}
     {semT : ∀ (p : IxScratch dt A R P I) (a : ιV),
       (∀ ℓ : Fin (dt.nIn vi),
         dt.ixIGPassP (elt := elt) F PR.zero PR.one vi (dt.ixVarRdSt st p (mV a)) ℓ) →
@@ -173,7 +174,7 @@ theorem parked_ixVarStE {vi : dt.VarIx} {st : TapeSt dt A R P I}
 omit [Finite R] [Finite P] [Finite I] [Finite dt.KIx] [Finite ιV] in
 /-- **A leg leaves the scratch parked**: gated, it is the VAL loop's exit state
 with the stage bit written; ungated, it writes nothing but that bit. -/
-theorem parked_ixLegStB {j : Fin dt.nv} {st : TapeSt dt A R P I}
+private theorem parked_ixLegStB {j : Fin dt.nv} {st : TapeSt dt A R P I}
     {semT : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st →
       ∀ (p : IxScratch dt A R P I) (a : ιV),
       (∀ ℓ : Fin (dt.nIn (dt.varAt j)),
@@ -195,7 +196,7 @@ theorem parked_ixLegStB {j : Fin dt.nv} {st : TapeSt dt A R P I}
 omit [Finite R] [Finite P] [Finite I] [Finite dt.KIx] [Finite ιV] in
 /-- **The branched spine leaves the scratch parked**, position by position: the
 `hsavL` and `htgtL` an evaluation's exit asks for, at any file. -/
-theorem parked_ixSpineStOfB {st₀ : TapeSt dt A R P I} {f₀ : dt.CtlIx → A}
+private theorem parked_ixSpineStOfB {st₀ : TapeSt dt A R P I} {f₀ : dt.CtlIx → A}
     {semB : ∀ (w : Univ A R P dt.KIx dt.dd → Prop) (j : Fin dt.nv)
       (st : TapeSt dt A R P I),
       dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st →

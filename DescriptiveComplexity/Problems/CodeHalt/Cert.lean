@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.CodeHalt.Arith
 public import DescriptiveComplexity.Problems.CodeHalt.Numerals
 public import DescriptiveComplexity.Problems.CodeHalt.Defs
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.CodeHalt.Arith
+import all DescriptiveComplexity.Problems.CodeHalt.Numerals
 
 /-!
 # A halting computation, read off as a finite certificate
@@ -198,10 +201,10 @@ section Sound
 variable {A D : Type} [Language.code.Structure A] [Finite D] {c : Cert A D} (h : CertOK c)
 include h
 
-theorem lt_sound {x y : D} : c.Lt x y ↔ numOf c.Le x < numOf c.Le y :=
+private theorem lt_sound {x y : D} : c.Lt x y ↔ numOf c.Le x < numOf c.Le y :=
   ⟨fun hxy => numOf_lt h.le_lin hxy.1 hxy.2, fun hxy => le_of_numOf_lt h.le_lin hxy⟩
 
-theorem add_sound : ∀ (Y : ℕ) (x y z : D), numOf c.Le y = Y → c.Add x y z →
+private theorem add_sound : ∀ (Y : ℕ) (x y z : D), numOf c.Le y = Y → c.Add x y z →
     numOf c.Le x + numOf c.Le y = numOf c.Le z := by
   intro Y
   induction Y using Nat.strong_induction_on with
@@ -215,7 +218,7 @@ theorem add_sound : ∀ (Y : ℕ) (x y z : D), numOf c.Le y = Y → c.Add x y z 
       have h3 := ih (numOf c.Le y') (by omega) x y' z' rfl hadd'
       omega
 
-theorem nextPR_sound {a' b' a b : D} (hn : c.NextPR a' b' a b) :
+private theorem nextPR_sound {a' b' a b : D} (hn : c.NextPR a' b' a b) :
     NextP (numOf c.Le a') (numOf c.Le b') (numOf c.Le a) (numOf c.Le b) := by
   rcases hn with ⟨h1, h2, h3, h4⟩ | ⟨h1, h2, h3⟩ | ⟨h1, h2, h3, h4⟩ | ⟨h1, h2, h3⟩
   · exact Or.inl ⟨(lt_sound h).mp h1, (isS_iff h.le_lin).mp h2, (lt_sound h).mp h3, by rw [h4]⟩
@@ -225,7 +228,7 @@ theorem nextPR_sound {a' b' a b : D} (hn : c.NextPR a' b' a b) :
   · exact Or.inr (Or.inr (Or.inr ⟨by rw [h1], (isZ_iff h.le_lin).mp h2,
       (isS_iff h.le_lin).mp h3⟩))
 
-theorem pr_sound : ∀ (P : ℕ) (a b p : D), numOf c.Le p = P → c.Pr a b p →
+private theorem pr_sound : ∀ (P : ℕ) (a b p : D), numOf c.Le p = P → c.Pr a b p →
     Nat.pair (numOf c.Le a) (numOf c.Le b) = numOf c.Le p := by
   intro P
   induction P using Nat.strong_induction_on with
@@ -239,13 +242,13 @@ theorem pr_sound : ∀ (P : ℕ) (a b p : D), numOf c.Le p = P → c.Pr a b p �
       have h3 := pair_next (nextPR_sound h hnext)
       omega
 
-theorem quad_sound {p q : D} (hq : c.Quad p q) : numOf c.Le q = 4 * numOf c.Le p := by
+private theorem quad_sound {p q : D} (hq : c.Quad p q) : numOf c.Le q = 4 * numOf c.Le p := by
   obtain ⟨s, h1, h2⟩ := hq
   have e1 := add_sound h _ p p s rfl h1
   have e2 := add_sound h _ s s q rfl h2
   omega
 
-theorem plus4_sound {q e : D} (he : c.Plus4 q e) : numOf c.Le e = numOf c.Le q + 4 := by
+private theorem plus4_sound {q e : D} (he : c.Plus4 q e) : numOf c.Le e = numOf c.Le q + 4 := by
   obtain ⟨u₁, u₂, u₃, h1, h2, h3, h4⟩ := he
   have e1 := (isS_iff h.le_lin).mp h1
   have e2 := (isS_iff h.le_lin).mp h2
@@ -253,43 +256,43 @@ theorem plus4_sound {q e : D} (he : c.Plus4 q e) : numOf c.Le e = numOf c.Le q +
   have e4 := (isS_iff h.le_lin).mp h4
   omega
 
-theorem plus5_sound {q e : D} (he : c.Plus5 q e) : numOf c.Le e = numOf c.Le q + 5 := by
+private theorem plus5_sound {q e : D} (he : c.Plus5 q e) : numOf c.Le e = numOf c.Le q + 5 := by
   obtain ⟨u, h1, h2⟩ := he
   have e1 := plus4_sound h h1
   have e2 := (isS_iff h.le_lin).mp h2
   omega
 
-theorem plus6_sound {q e : D} (he : c.Plus6 q e) : numOf c.Le e = numOf c.Le q + 6 := by
+private theorem plus6_sound {q e : D} (he : c.Plus6 q e) : numOf c.Le e = numOf c.Le q + 6 := by
   obtain ⟨u, h1, h2⟩ := he
   have e1 := plus5_sound h h1
   have e2 := (isS_iff h.le_lin).mp h2
   omega
 
-theorem plus7_sound {q e : D} (he : c.Plus7 q e) : numOf c.Le e = numOf c.Le q + 7 := by
+private theorem plus7_sound {q e : D} (he : c.Plus7 q e) : numOf c.Le e = numOf c.Le q + 7 := by
   obtain ⟨u, h1, h2⟩ := he
   have e1 := plus6_sound h h1
   have e2 := (isS_iff h.le_lin).mp h2
   omega
 
-theorem isOne_sound {e : D} (he : c.IsOne e) : numOf c.Le e = 1 := by
+private theorem isOne_sound {e : D} (he : c.IsOne e) : numOf c.Le e = 1 := by
   obtain ⟨z, h1, h2⟩ := he
   have e1 := (isZ_iff h.le_lin).mp h1
   have e2 := (isS_iff h.le_lin).mp h2
   omega
 
-theorem isTwo_sound {e : D} (he : c.IsTwo e) : numOf c.Le e = 2 := by
+private theorem isTwo_sound {e : D} (he : c.IsTwo e) : numOf c.Le e = 2 := by
   obtain ⟨u, h1, h2⟩ := he
   have e1 := isOne_sound h h1
   have e2 := (isS_iff h.le_lin).mp h2
   omega
 
-theorem isThree_sound {e : D} (he : c.IsThree e) : numOf c.Le e = 3 := by
+private theorem isThree_sound {e : D} (he : c.IsThree e) : numOf c.Le e = 3 := by
   obtain ⟨u, h1, h2⟩ := he
   have e1 := isTwo_sound h h1
   have e2 := (isS_iff h.le_lin).mp h2
   omega
 
-theorem isPairE_sound {e e₁ e₂ : D} (he : c.IsPairE e e₁ e₂) :
+private theorem isPairE_sound {e e₁ e₂ : D} (he : c.IsPairE e e₁ e₂) :
     numOf c.Le e = 4 * Nat.pair (numOf c.Le e₁) (numOf c.Le e₂) + 4 := by
   obtain ⟨p, q, h1, h2, h3⟩ := he
   have e1 := pr_sound h _ e₁ e₂ p rfl h1
@@ -297,7 +300,7 @@ theorem isPairE_sound {e e₁ e₂ : D} (he : c.IsPairE e e₁ e₂) :
   have e3 := plus4_sound h h3
   omega
 
-theorem isPrecE_sound {e e₁ e₂ : D} (he : c.IsPrecE e e₁ e₂) :
+private theorem isPrecE_sound {e e₁ e₂ : D} (he : c.IsPrecE e e₁ e₂) :
     numOf c.Le e = 4 * Nat.pair (numOf c.Le e₁) (numOf c.Le e₂) + 5 := by
   obtain ⟨p, q, h1, h2, h3⟩ := he
   have e1 := pr_sound h _ e₁ e₂ p rfl h1
@@ -305,7 +308,7 @@ theorem isPrecE_sound {e e₁ e₂ : D} (he : c.IsPrecE e e₁ e₂) :
   have e3 := plus5_sound h h3
   omega
 
-theorem isCompE_sound {e e₁ e₂ : D} (he : c.IsCompE e e₁ e₂) :
+private theorem isCompE_sound {e e₁ e₂ : D} (he : c.IsCompE e e₁ e₂) :
     numOf c.Le e = 4 * Nat.pair (numOf c.Le e₁) (numOf c.Le e₂) + 6 := by
   obtain ⟨p, q, h1, h2, h3⟩ := he
   have e1 := pr_sound h _ e₁ e₂ p rfl h1
@@ -313,7 +316,7 @@ theorem isCompE_sound {e e₁ e₂ : D} (he : c.IsCompE e e₁ e₂) :
   have e3 := plus6_sound h h3
   omega
 
-theorem isRfindE_sound {e e₁ : D} (he : c.IsRfindE e e₁) :
+private theorem isRfindE_sound {e e₁ : D} (he : c.IsRfindE e e₁) :
     numOf c.Le e = 4 * numOf c.Le e₁ + 7 := by
   obtain ⟨q, h1, h2⟩ := he
   have e1 := quad_sound h h1
@@ -321,7 +324,7 @@ theorem isRfindE_sound {e e₁ : D} (he : c.IsRfindE e e₁) :
   omega
 
 /-- **The node really draws the code its number denotes.** -/
-theorem dec_sound : ∀ (E : ℕ) (n : A) (e : D), numOf c.Le e = E → c.Dec n e →
+private theorem dec_sound : ∀ (E : ℕ) (n : A) (e : D), numOf c.Le e = E → c.Dec n e →
     DecodesTo n (dec (numOf c.Le e)) := by
   intro E
   induction E using Nat.strong_induction_on with
@@ -357,7 +360,7 @@ theorem dec_sound : ∀ (E : ℕ) (n : A) (e : D), numOf c.Le e = E → c.Dec n 
 the pair (number of the code, argument), lexicographically: every rule but the
 recursive one of `prec` appeals to a strictly smaller code number, and that one
 appeals to the same code at a strictly smaller argument. -/
-theorem ev_sound : ∀ (E X : ℕ) (e x v : D), numOf c.Le e = E → numOf c.Le x = X →
+private theorem ev_sound : ∀ (E X : ℕ) (e x v : D), numOf c.Le e = E → numOf c.Le x = X →
     c.Ev e x v → numOf c.Le v ∈ eval (dec (numOf c.Le e)) (numOf c.Le x) := by
   intro E
   induction E using Nat.strong_induction_on with
@@ -435,7 +438,7 @@ theorem ev_sound : ∀ (E X : ℕ) (e x v : D), numOf c.Le e = E → numOf c.Le 
         rwa [← hqq] at hue
 
 /-- **A certificate exhibits a yes-instance.** -/
-theorem holds_of_certOK : CODEHALT A := by
+private theorem holds_of_certOK : CODEHALT A := by
   obtain ⟨n, e, z, v, hroot, hdec, hz, hev⟩ := h.root
   refine ⟨n, dec (numOf c.Le e), hroot, dec_sound h _ n e rfl hdec, ?_⟩
   have hm := ev_sound h _ _ e z v rfl rfl hev
@@ -506,70 +509,71 @@ variable {E k N : ℕ}
   · intro hij
     exact ⟨show i ≤ j by rw [Fin.le_def]; omega, fun hh => by rw [hh] at hij; omega⟩
 
-theorem finCert_quad {p q : Fin (N + 1)} (hq : (q : ℕ) = 4 * (p : ℕ)) :
+private theorem finCert_quad {p q : Fin (N + 1)} (hq : (q : ℕ) = 4 * (p : ℕ)) :
     (finCert A E k N).Quad p q := by
   have hb := q.isLt
   exact ⟨numVal (2 * (p : ℕ)) (by omega), by simp; omega, by simp; omega⟩
 
-theorem finCert_plus4 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 4) :
+private theorem finCert_plus4 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 4) :
     (finCert A E k N).Plus4 q e := by
   have hb := e.isLt
   exact ⟨numVal ((q : ℕ) + 1) (by omega), numVal ((q : ℕ) + 2) (by omega),
     numVal ((q : ℕ) + 3) (by omega), by simp, by simp, by simp, by simp; omega⟩
 
-theorem finCert_plus5 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 5) :
+private theorem finCert_plus5 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 5) :
     (finCert A E k N).Plus5 q e := by
   have hb := e.isLt
   exact ⟨numVal ((q : ℕ) + 4) (by omega), finCert_plus4 (by simp), by simp; omega⟩
 
-theorem finCert_plus6 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 6) :
+private theorem finCert_plus6 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 6) :
     (finCert A E k N).Plus6 q e := by
   have hb := e.isLt
   exact ⟨numVal ((q : ℕ) + 5) (by omega), finCert_plus5 (by simp), by simp; omega⟩
 
-theorem finCert_plus7 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 7) :
+private theorem finCert_plus7 {q e : Fin (N + 1)} (he : (e : ℕ) = (q : ℕ) + 7) :
     (finCert A E k N).Plus7 q e := by
   have hb := e.isLt
   exact ⟨numVal ((q : ℕ) + 6) (by omega), finCert_plus6 (by simp), by simp; omega⟩
 
-theorem finCert_isOne {e : Fin (N + 1)} (he : (e : ℕ) = 1) : (finCert A E k N).IsOne e :=
+private theorem finCert_isOne {e : Fin (N + 1)} (he : (e : ℕ) = 1) : (finCert A E k N).IsOne e :=
   ⟨numVal 0 (Nat.zero_le _), by simp, by simp [he]⟩
 
-theorem finCert_isTwo {e : Fin (N + 1)} (he : (e : ℕ) = 2) : (finCert A E k N).IsTwo e := by
+private theorem finCert_isTwo {e : Fin (N + 1)} (he : (e : ℕ) = 2) : (finCert A E k N).IsTwo e := by
   have hb := e.isLt
   exact ⟨numVal 1 (by omega), finCert_isOne rfl, by simp [he]⟩
 
-theorem finCert_isThree {e : Fin (N + 1)} (he : (e : ℕ) = 3) : (finCert A E k N).IsThree e := by
+private theorem finCert_isThree
+    {e : Fin (N + 1)} (he : (e : ℕ) = 3) : (finCert A E k N).IsThree e := by
   have hb := e.isLt
   exact ⟨numVal 2 (by omega), finCert_isTwo rfl, by simp [he]⟩
 
-theorem finCert_isPairE {e e₁ e₂ : Fin (N + 1)}
+private theorem finCert_isPairE {e e₁ e₂ : Fin (N + 1)}
     (he : (e : ℕ) = 4 * Nat.pair (e₁ : ℕ) (e₂ : ℕ) + 4) : (finCert A E k N).IsPairE e e₁ e₂ := by
   have hb := e.isLt
   exact ⟨numVal (Nat.pair (e₁ : ℕ) (e₂ : ℕ)) (by omega),
     numVal (4 * Nat.pair (e₁ : ℕ) (e₂ : ℕ)) (by omega), rfl, finCert_quad (by simp),
     finCert_plus4 (by simp; omega)⟩
 
-theorem finCert_isPrecE {e e₁ e₂ : Fin (N + 1)}
+private theorem finCert_isPrecE {e e₁ e₂ : Fin (N + 1)}
     (he : (e : ℕ) = 4 * Nat.pair (e₁ : ℕ) (e₂ : ℕ) + 5) : (finCert A E k N).IsPrecE e e₁ e₂ := by
   have hb := e.isLt
   exact ⟨numVal (Nat.pair (e₁ : ℕ) (e₂ : ℕ)) (by omega),
     numVal (4 * Nat.pair (e₁ : ℕ) (e₂ : ℕ)) (by omega), rfl, finCert_quad (by simp),
     finCert_plus5 (by simp; omega)⟩
 
-theorem finCert_isCompE {e e₁ e₂ : Fin (N + 1)}
+private theorem finCert_isCompE {e e₁ e₂ : Fin (N + 1)}
     (he : (e : ℕ) = 4 * Nat.pair (e₁ : ℕ) (e₂ : ℕ) + 6) : (finCert A E k N).IsCompE e e₁ e₂ := by
   have hb := e.isLt
   exact ⟨numVal (Nat.pair (e₁ : ℕ) (e₂ : ℕ)) (by omega),
     numVal (4 * Nat.pair (e₁ : ℕ) (e₂ : ℕ)) (by omega), rfl, finCert_quad (by simp),
     finCert_plus6 (by simp; omega)⟩
 
-theorem finCert_isRfindE {e e₁ : Fin (N + 1)} (he : (e : ℕ) = 4 * (e₁ : ℕ) + 7) :
+private theorem finCert_isRfindE {e e₁ : Fin (N + 1)} (he : (e : ℕ) = 4 * (e₁ : ℕ) + 7) :
     (finCert A E k N).IsRfindE e e₁ := by
   have hb := e.isLt
   exact ⟨numVal (4 * (e₁ : ℕ)) (by omega), finCert_quad (by simp), finCert_plus7 (by simp; omega)⟩
 
-theorem finCert_nextPR {a' b' a b : Fin (N + 1)}
+private theorem finCert_nextPR {a' b' a b : Fin (N + 1)}
     (h : NextP (a' : ℕ) (b' : ℕ) (a : ℕ) (b : ℕ)) : (finCert A E k N).NextPR a' b' a b := by
   rcases h with ⟨h1, h2, h3, h4⟩ | ⟨h1, h2, h3⟩ | ⟨h1, h2, h3, h4⟩ | ⟨h1, h2, h3⟩
   · exact Or.inl ⟨by simp [h1], by simp [h2], by simp [h3], Fin.ext h4⟩
@@ -578,7 +582,7 @@ theorem finCert_nextPR {a' b' a b : Fin (N + 1)}
   · exact Or.inr (Or.inr (Or.inr ⟨Fin.ext h1, by simp [h2], by simp [h3]⟩))
 
 /-- **A halting computation is a certificate.** -/
-theorem certOK_finCert (hEN : E ≤ N) (hkN : k ≤ N) (hbN : valBound E k ≤ N)
+private theorem certOK_finCert (hEN : E ≤ N) (hkN : k ≤ N) (hbN : valBound E k ≤ N)
     {n₀ : A} {c₀ : Nat.Partrec.Code} {v₀ : ℕ} (hroot : CRoot n₀) (hdec : DecodesTo n₀ c₀)
     (hE : encodeCode c₀ = E) (hv : v₀ ∈ evaln k c₀ 0) : CertOK (finCert A E k N) := by
   obtain _ | k := k

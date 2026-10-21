@@ -6,6 +6,19 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstGate
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawDefGate
+import all DescriptiveComplexity.Problems.Wide.DrawExp
+import all DescriptiveComplexity.Problems.Wide.DrawInstCmp
+import all DescriptiveComplexity.Problems.Wide.DrawInstExp
+import all DescriptiveComplexity.Problems.Wide.DrawInstGate
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
 
 /-!
 # The inner gates, instantiated
@@ -81,7 +94,7 @@ variable {dt zero one b st t flag hnt hc hn hrd}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A gate's witness chain is blind to the two scratch registers**: it
 reads the VAL register and its background at the working cell. -/
-theorem igateTagFam_congr_scratch {st' : TapeStD dt A R P}
+private theorem igateTagFam_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')
     (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = RF.cell u)
     (f₀ : dt.CtlIx → A) (i : Fin (Fintype.card dt.X.Tag + 1)) :
@@ -92,7 +105,7 @@ theorem igateTagFam_congr_scratch {st' : TapeStD dt A R P}
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A gate's domain loop is blind to them too.** -/
-theorem igateFam_congr_scratch {st' : TapeStD dt A R P}
+private theorem igateFam_congr_scratch {st' : TapeStD dt A R P}
     (h : dt.ScratchEq st st')
     (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, vAdr = RF.cell u)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
@@ -106,7 +119,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- A domain leaf-read store preserves the wide loop element. -/
-theorem readLvE_igate_setFlag (r : Fin (dt.domNr t)) (bb : Bool)
+private theorem readLvE_igate_setFlag (r : Fin (dt.domNr t)) (bb : Bool)
     (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.readLvE ((dt.igateArgs zero one b flag hc hn hrd).setFlagE t r bb q g) =
       dt.readLvE q := by
@@ -120,14 +133,14 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- The branch's domain loop starts at the least wide tuple. -/
-theorem readLvE_igate_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
+private theorem readLvE_igate_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.readLvE ((dt.igateArgs zero one b flag hc hn hrd).initEl t q g) = botTup := by
   change dt.readLvE (dt.gateInit zero one t q) = _
   rw [gateInit, initSac, readLvE_putSac, readLvE_initLvE]
 
 omit [Fintype dt.SlotIx] in
 /-- A domain round's fold-and-advance steps the wide tuple. -/
-theorem readLvE_igate_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
+private theorem readLvE_igate_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.readLvE ((dt.igateArgs zero one b flag hc hn hrd).advEl t q g) =
       tupNext (dt.readLvE q) := by
   change dt.readLvE (dt.gateAdv zero one t (hn t) (hrd t) q) = _
@@ -138,7 +151,7 @@ theorem readLvE_igate_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The loop element is the round's wide tuple**, at every stage of a
 gate's family. -/
-theorem readLvE_igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
+private theorem readLvE_igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) :
     dt.readLvE (dt.igateFam RF zero one b st t flag hc hn hrd vAdr f₀ a j) =
       ofLex a := by
@@ -193,7 +206,7 @@ theorem readLvE_igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness flags read back**: after the chain, the flag of tag `t'`
 holds the digit of `t'`'s witness cell in the gated block. -/
-theorem ctlBit_igateTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
+private theorem ctlBit_igateTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (t' : dt.X.Tag) :
     dt.ctlBit one
         (dt.igateTagFam RF zero one b st flag hc hn hrd vAdr f₀
@@ -225,7 +238,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness flags after the chain read the block value**: the flag of
 tag `t'` holds exactly when `t'`'s witness tuple belongs to the gated
 block. -/
-theorem ctlBit_igateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
+private theorem ctlBit_igateTagFam_wit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (t' : dt.X.Tag) :
     dt.ctlBit one
         (dt.igateTagFam RF zero one b st flag hc hn hrd vAdr f₀
@@ -246,7 +259,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 one-hot witness the flags decode its tag, and at any other the default
 branch fires – the totality of the branch checkpoint on *every* block
 value the VAL enumeration produces. -/
-theorem igTagsAre_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
+private theorem igTagsAre_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.DspTagsAre one hc
       (dt.dspTagOf zero one
         (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))
@@ -271,7 +284,7 @@ theorem igTagsAre_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The payload a domain leaf spells at a generated state** is the round's
 tuple's. -/
-theorem domPay_igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
+private theorem domPay_igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) (r : Fin (dt.domNr t)) :
     dt.domPay (zero := zero) (t := t) (r := r) (hn := hn t)
       (dt.igateFam RF zero one b st t flag hc hn hrd vAdr f₀ a j) =
@@ -281,7 +294,7 @@ theorem domPay_igateFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A domain leaf read's guard holds at its cell.** -/
-theorem domMatch_igateFam (hzo : zero ≠ one)
+private theorem domMatch_igateFam (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) (r : Fin (dt.domNr t)) :
@@ -294,7 +307,7 @@ theorem domMatch_igateFam (hzo : zero ≠ one)
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A domain leaf read's guard identifies its cell.** -/
-theorem domMatch_igateFam_uniq (hzo : zero ≠ one)
+private theorem domMatch_igateFam_uniq (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.domNr t + 1)) (r : Fin (dt.domNr t))
@@ -361,7 +374,7 @@ marker – the witness chain reading the block value, the dispatch onto the
 decoded tag's branch (or the default tag's, where the witness is not
 one-hot), and the branch's domain loop over the wide tuples – to the exit
 phase one cell to the marker's right. -/
-theorem igate_run :
+private theorem igate_run :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt RF.cell t₀ (dt.back RF.cell PR.zero PR.one dt.dd0Le st) m₀)
@@ -495,7 +508,7 @@ variable (hflag : flag = dt.existGateC ∨ flag = dt.allGateC)
 variable (dt b st t hnt) in
 /-- **A gate's leaf, over the wide valuation**: the tag's domain sentence at
 the *decoded* assignment of the raw block value – no encoding assumed. -/
-noncomputable def igateLeafP (zero one : A) (v : Fin dt.eDim → A) : Prop :=
+private noncomputable def igateLeafP (zero one : A) (v : Fin dt.eDim → A) : Prop :=
   dt.domLeaf t
     (decRho dt.ly zero one
       (wmBlk st.val (Tag.arg (toLex b) : Tag R P dt.KIx)))
@@ -503,7 +516,7 @@ noncomputable def igateLeafP (zero one : A) (v : Fin dt.eDim → A) : Prop :=
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The domain leaf-read flags read back** at a round's end. -/
-theorem ctlBit_rdf_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
+private theorem ctlBit_rdf_igateFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.domNr t)) :
     dt.ctlBit one
         (dt.igateFam RF zero one b st t flag hc hn hrd vAdr f₀ a
@@ -528,7 +541,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The leaf flag's value at a round's end is the gate's leaf**: the
 domain sentence's matrix at the decoded assignment, read at the round's
 tuple. -/
-theorem domLeafVal_igateFam (hzo : zero ≠ one)
+private theorem domLeafVal_igateFam (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A)) :
     dt.domLeafVal one t (hn t) (hrd t)
         (dt.igateFam RF zero one b st t flag hc hn hrd vAdr f₀ a
@@ -558,7 +571,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A gate's accumulators fold the strict prefix**: at every round's
 entry, the `sac` slots hold the contributions of the domain sentence's
 prefix at the round's tuple. -/
-theorem readSac_igateIter (hzo : zero ≠ one)
+private theorem readSac_igateIter (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A)) (j : ℕ)
     (hj : j < dt.eDim) :
     dt.readSac one (elemIter
@@ -697,7 +710,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- A witness flag rides along one branch round. -/
-theorem ctlBit_tgf_igate_adv (t₂ : dt.X.Tag) (q : dt.CtlIx → A)
+private theorem ctlBit_tgf_igate_adv (t₂ : dt.X.Tag) (q : dt.CtlIx → A)
     (g : dt.SlotIx → A) :
     dt.ctlBit one
         ((dt.igateArgs zero one b flag hc hn hrd).advEl t q g)
@@ -717,7 +730,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- A witness flag rides along a branch loop's start. -/
-theorem ctlBit_tgf_igate_init (t₂ : dt.X.Tag) (q : dt.CtlIx → A)
+private theorem ctlBit_tgf_igate_init (t₂ : dt.X.Tag) (q : dt.CtlIx → A)
     (g : dt.SlotIx → A) :
     dt.ctlBit one
         ((dt.igateArgs zero one b flag hc hn hrd).initEl t q g)
@@ -735,7 +748,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness flags survive a branch's domain loop**: neither the leaf
 reads nor the fold write them, so the conjoining exit still reads the
 chain's decoding. -/
-theorem ctlBit_tgf_igateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
+private theorem ctlBit_tgf_igateFam (t₂ : dt.X.Tag) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (j : Fin (dt.domNr t + 1)) :
     dt.ctlBit one
         (dt.igateFam RF zero one b st t flag hc hn hrd vAdr f₀ a j)
@@ -798,7 +811,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- The gates' flag rides along one branch round. -/
-theorem ctlBit_flag_igate_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
+private theorem ctlBit_flag_igate_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.ctlBit one
         ((dt.igateArgs zero one b flag hc hn hrd).advEl t q g) flag ↔
       dt.ctlBit one q flag := by
@@ -819,7 +832,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- The gates' flag rides along a branch loop's start. -/
-theorem ctlBit_flag_igate_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
+private theorem ctlBit_flag_igate_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.ctlBit one
         ((dt.igateArgs zero one b flag hc hn hrd).initEl t q g) flag ↔
       dt.ctlBit one q flag := by
@@ -836,7 +849,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Finite R] [Finite P] in
 /-- Either round flag rides along one branch round – the other polarity's
 included, whatever the pack's own flag. -/
-theorem ctlBit_roundFlag_igate_adv {q : dt.CtlIx}
+private theorem ctlBit_roundFlag_igate_adv {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (qc : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.ctlBit one
@@ -858,7 +871,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- Either round flag rides along a branch loop's start. -/
-theorem ctlBit_roundFlag_igate_init {q : dt.CtlIx}
+private theorem ctlBit_roundFlag_igate_init {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (qc : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.ctlBit one
@@ -876,7 +889,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **Either round flag survives one gate's machinery** – the other
 polarity's included: neither the witness chain nor the branch's domain
 loop writes any flag at all. -/
-theorem ctlBit_roundFlag_igateFam {q : dt.CtlIx}
+private theorem ctlBit_roundFlag_igateFam {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (j : Fin (dt.domNr t + 1)) :
     dt.ctlBit one
@@ -957,7 +970,7 @@ include hflag in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The gates' flag survives one gate's machinery**: neither the witness
 chain nor the branch's domain loop writes it. -/
-theorem ctlBit_flag_igateFam (f₀ : dt.CtlIx → A)
+private theorem ctlBit_flag_igateFam (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (j : Fin (dt.domNr t + 1)) :
     dt.ctlBit one
         (dt.igateFam RF zero one b st t flag hc hn hrd vAdr
@@ -1041,7 +1054,7 @@ the block value's witness is one-hot at the dispatched tag – so the default
 branch always clears – **and** the fold of this block's domain sentence over
 the whole wide enumeration holds, i.e., the tag's domain condition at the
 decoded assignment. -/
-theorem ctlBit_flag_igate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
+private theorem ctlBit_flag_igate_exit (hzo : zero ≠ one) (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
         ((dt.igateArgs zero one b flag hc hn hrd).exitSt t
           (dt.igateFam RF zero one b st t flag hc hn hrd vAdr
@@ -1132,7 +1145,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 exactly when it held before – every earlier block passed – and the block
 value's witness is one-hot at the dispatched tag and the decoded assignment
 satisfies that tag's domain sentence. -/
-theorem ctlBit_flag_igate_domHolds (hzo : zero ≠ one)
+private theorem ctlBit_flag_igate_domHolds (hzo : zero ≠ one)
     (f₀ : dt.CtlIx → A) :
     dt.ctlBit one
         ((dt.igateArgs zero one b flag hc hn hrd).exitSt t
@@ -1166,7 +1179,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 whose members are encoding-shaped – the file test's question – the
 dispatch's one-hotness together with the domain condition at the dispatched
 tag is exactly `DescriptiveComplexity.Draw.IsEnc`. -/
-theorem igVerdict_iff_isEnc (hzo : zero ≠ one)
+private theorem igVerdict_iff_isEnc (hzo : zero ≠ one)
     {S : (Fin dt.dd → A) → Prop}
     (hshape : ∀ w : Fin dt.dd → A, S w →
       ((∃ t' : dt.X.Tag, w = encTagTup dt.ly zero one t') ∨

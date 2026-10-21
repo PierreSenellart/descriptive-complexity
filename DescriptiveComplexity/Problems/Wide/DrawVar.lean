@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawEval
 public import DescriptiveComplexity.Problems.Wide.DrawIncrKit
+import all DescriptiveComplexity.Problems.Wide.DrawIncrKit
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
 
 /-!
 # One variable's machinery: gates, the VAL loop, the stage write
@@ -270,7 +272,7 @@ variable {ownG : PG → SG} {ownX : PX → SX}
 
 /-- **A property of a variable machinery's phases and its exit holds of every
 phase it can move to**, given it holds of the gates' and the matrix's. -/
-theorem varRule_dstIn {S : P → Prop} (hemb : ∀ p : VarPh dt.CarryB PG PX, S (emb p))
+private theorem varRule_dstIn {S : P → Prop} (hemb : ∀ p : VarPh dt.CarryB PG PX, S (emb p))
     (hexit : S exitPh)
     (hG : ∀ (s : SG) (ρ : ShG s), S (ruleG s ρ).dstPh)
     (hX : ∀ (s : SX) (ρ : ShX s), S (ruleX s ρ).dstPh)
@@ -327,7 +329,7 @@ theorem varRule_dstIn {S : P → Prop} (hemb : ∀ p : VarPh dt.CarryB PG PX, S 
 
 /-- **Every rule of one variable's machinery fires from a phase its site
 owns**; the two abstract machineries' obligations are parameters. -/
-theorem varHosrc
+private theorem varHosrc
     (hosrcG : ∀ (s : SG) (ρ : ShG s),
       ∃ p : PG, (ruleG s ρ).srcPh = emb (.gatesP p) ∧ ownG p = s)
     (hosrcX : ∀ (s : SX) (ρ : ShX s),

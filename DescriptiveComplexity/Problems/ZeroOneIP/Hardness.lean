@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
 public import DescriptiveComplexity.Problems.Knapsack.Defs
 public import DescriptiveComplexity.Padding
 import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # 0-1 integer programming is NP-hard
@@ -156,7 +157,7 @@ theorem ipPt_surj (q : ipInterp.Map A) : q = ipPt (q.2 0) := by
   funext j
   exact congrArg w (Subsingleton.elim j 0)
 
-theorem ipPt_injective : Function.Injective (ipPt (A := A)) := fun _ _ h =>
+private theorem ipPt_injective : Function.Injective (ipPt (A := A)) := fun _ _ h =>
   congrArg (fun q : ipInterp.Map A => q.2 0) h
 
 /-- The interpreted universe is a copy of the input, which is what makes the
@@ -212,7 +213,7 @@ theorem ipLe_iff (a b : A) : IPLe (ipPt a) (ipPt b) ↔ BWLe a b := by
 
 /-- The interpreted order is the input's own place-value order, read on the
 copy. -/
-theorem isLinOrd_ipLe (h : IsLinOrd (BWLe (A := A))) :
+private theorem isLinOrd_ipLe (h : IsLinOrd (BWLe (A := A))) :
     IsLinOrd (IPLe (A := ipInterp.Map A)) :=
   IsLinOrd.of_equiv ipEquiv (fun a a' => (ipLe_iff a a').symm) h
 
@@ -240,14 +241,14 @@ private theorem binNum_ipPt (b : A → Prop) (b' : ipInterp.Map A → Prop)
 
 /-- The entry of the single row in the column of an item is the weight of that
 item. -/
-theorem ipCoefVal_eq {r j : A} (hr : IsBot r) (hj : BWItem j) :
+private theorem ipCoefVal_eq {r j : A} (hr : IsBot r) (hj : BWItem j) :
     IPCoefVal (ipPt r) (ipPt j) = BWWeight j :=
   (binNum_ipPt (BWBit j) _ fun p hp => by
     rw [ipCoef_iff]
     exact ⟨fun h => ⟨hr, hj, hp, h⟩, fun h => h.2.2.2⟩).symm
 
 /-- The right-hand side of the single row is the target. -/
-theorem ipRhsVal_eq {r : A} (hr : IsBot r) : IPRhsVal (ipPt r) = BWTarget A :=
+private theorem ipRhsVal_eq {r : A} (hr : IsBot r) : IPRhsVal (ipPt r) = BWTarget A :=
   (binNum_ipPt BWTgt _ fun p hp => by
     rw [ipRhs_iff]
     exact ⟨fun h => ⟨hr, hp, h⟩, fun h => h.2.2⟩).symm
@@ -266,15 +267,15 @@ section Correctness
 variable {A : Type} [Language.binWeights.Structure A] [LinearOrder A] [Finite A]
 
 /-- The columns of a set of items. -/
-def colsOf (S : A → Prop) (q : ipInterp.Map A) : Prop := S (q.2 0)
+private def colsOf (S : A → Prop) (q : ipInterp.Map A) : Prop := S (q.2 0)
 
 /-- The items of a set of columns. -/
-def itemsOfCols (x : ipInterp.Map A → Prop) (a : A) : Prop := x (ipPt a)
+private def itemsOfCols (x : ipInterp.Map A → Prop) (a : A) : Prop := x (ipPt a)
 
 omit [Finite A] in
 /-- The order of the interpreted program is linear exactly when the input's
 is. -/
-theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map A))) :
+private theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map A))) :
     IsLinOrd (BWLe (A := A)) :=
   IsLinOrd.of_equiv ipEquiv.symm (fun q q' => by
     rw [ipPt_surj q, ipPt_surj q', ipLe_iff]
@@ -282,7 +283,7 @@ theorem isLinOrd_bwLe_of_ipLe (hlin : IsLinOrd (IPLe (A := ipInterp.Map A))) :
 
 omit [Finite A] in
 /-- **A set of items summing to the target solves the one-equation program.** -/
-theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem i)
+private theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem i)
     (hsum : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget A) :
     (∀ q, colsOf S q → IPCol q) ∧
       ∀ r : ipInterp.Map A, IPRow r → (∑ᶠ j ∈ {j | colsOf S j}, IPCoefVal r j) = IPRhsVal r := by
@@ -299,7 +300,7 @@ theorem zeroOneSol_colsOf {S : A → Prop} (hSi : ∀ i, S i → BWItem i)
 omit [Finite A] in
 /-- **A solution of the one-equation program is a set of items summing to the
 target.** -/
-theorem subsetSum_itemsOfCols {a₀ : A} (ha₀ : IsBot a₀) {x : ipInterp.Map A → Prop}
+private theorem subsetSum_itemsOfCols {a₀ : A} (ha₀ : IsBot a₀) {x : ipInterp.Map A → Prop}
     (hxc : ∀ j, x j → IPCol j)
     (heq : ∀ r : ipInterp.Map A, IPRow r → (∑ᶠ j ∈ {j | x j}, IPCoefVal r j) = IPRhsVal r) :
     (∀ a, itemsOfCols x a → BWItem a) ∧
@@ -319,7 +320,7 @@ variable (A) in
 /-- **Correctness of the reduction**: a binary-weighted instance has a set of
 items summing to the target iff the one-equation program interpreted in it has
 a `0-1` solution. -/
-theorem hasSubsetSum_iff_hasZeroOneSolution [Nonempty A] :
+private theorem hasSubsetSum_iff_hasZeroOneSolution [Nonempty A] :
     HasSubsetSum A ↔ HasZeroOneSolution (ipInterp.Map A) := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   have : Finite (ipInterp.Map A) := ipInterp.map_finite A
@@ -340,7 +341,7 @@ open IPRed in
 on the input: the items become the columns, the target the right-hand side,
 and the whole instance a single equation, carried by the minimum of the
 order. -/
-noncomputable def knapsack_ordered_fo_reduction_zeroOneIP : Knapsack ≤ᶠᵒ[≤] ZeroOneIP where
+private noncomputable def knapsack_ordered_fo_reduction_zeroOneIP : Knapsack ≤ᶠᵒ[≤] ZeroOneIP where
   Tag := Unit
   dim := 1
   toInterpretation := ipInterp

@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Counting.QSOWitness
 import DescriptiveComplexity.Syntax
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting.QSOWitness
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # First-order sums and products of witness counts
@@ -192,7 +194,7 @@ def castTerm {B' : SOBlock} {γ : Type} : (M.sum B.lang).Term γ → (M.sum B'.l
 
 /-- **Substituting `X'(w̄, ȳ)` for every atom `X(ȳ)`** of a relation variable
 of the block, `w̄` free variables. -/
-def extendRel (w : Fin n → α) :
+private def extendRel (w : Fin n → α) :
     ∀ {k : ℕ}, (M.sum B.lang).BoundedFormula α k → (M.sum (B.extend n).lang).BoundedFormula α k
   | _, .falsum => .falsum
   | _, .equal t₁ t₂ => .equal (castTerm t₁) (castTerm t₂)
@@ -205,7 +207,8 @@ def extendRel (w : Fin n → α) :
 
 variable {A : Type} [M.Structure A]
 
-theorem realize_castTerm {B' : SOBlock} {γ : Type} (ρ : B.Assignment A) (ρ' : B'.Assignment A)
+private theorem realize_castTerm
+    {B' : SOBlock} {γ : Type} (ρ : B.Assignment A) (ρ' : B'.Assignment A)
     (t : (M.sum B.lang).Term γ) (u : γ → A) :
     @Term.realize _ A (@sumStructure M _ A _ (B'.structure ρ')) _ u (castTerm t) =
       @Term.realize _ A (@sumStructure M _ A _ (B.structure ρ)) _ u t := by
@@ -218,10 +221,10 @@ theorem realize_castTerm {B' : SOBlock} {γ : Type} (ρ : B.Assignment A) (ρ' :
     · exact isEmptyElim f
 
 /-- The assignment of the block at a tuple. -/
-def atTuple (ρ : (B.extend n).Assignment A) (a : Fin n → A) : B.Assignment A :=
+private def atTuple (ρ : (B.extend n).Assignment A) (a : Fin n → A) : B.Assignment A :=
   fun i y => ρ i (Fin.append a y)
 
-theorem realize_extendRel (w : Fin n → α) (ρ : (B.extend n).Assignment A) {k : ℕ}
+private theorem realize_extendRel (w : Fin n → α) (ρ : (B.extend n).Assignment A) {k : ℕ}
     (φ : (M.sum B.lang).BoundedFormula α k) (u : α → A) (xs : Fin k → A) :
     @BoundedFormula.Realize _ A (@sumStructure M _ A _ ((B.extend n).structure ρ)) _ _
         (extendRel w φ) u xs ↔

@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.FixedPointStratify
 public import DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.FixedPointStratify
 
 /-!
 # An induction, then a partial iteration: one partial iteration
@@ -73,7 +75,7 @@ noncomputable def strat1AtomF (L : Language.{0, 0}) (B₁ B₂ : SOBlock) (i : B
     (L.sum (stratBlock B₁ B₂).lang).Formula (Fin (B₁.arity i)) :=
   Relations.formula (strat1Sym L B₁ B₂ i) fun j => Term.var j
 
-theorem realize_strat1AtomF (σ : (stratBlock B₁ B₂).Assignment A) (i : B₁.ι)
+private theorem realize_strat1AtomF (σ : (stratBlock B₁ B₂).Assignment A) (i : B₁.ι)
     (x : Fin (B₁.arity i) → A) :
     (@Formula.Realize _ A ((stratBlock B₁ B₂).structure₁ (L := L) σ) _
       (strat1AtomF L B₁ B₂ i) x) ↔ strat1Assign σ i x := by
@@ -115,7 +117,7 @@ variable {A : Type} [L.Structure A]
 
 /-- One step of the first stratum: its own inflationary step, the
 accumulation being written out. -/
-theorem next_stratifyPFP_inl (σ : (stratBlock d₁.B d₂.B).Assignment A) (i : d₁.B.ι)
+private theorem next_stratifyPFP_inl (σ : (stratBlock d₁.B d₂.B).Assignment A) (i : d₁.B.ι)
     (x : Fin (d₁.B.arity i) → A) :
     (d₁.stratifyPFP d₂).next σ (.inl (.inl i)) x ↔
       (strat1Assign σ i x ∨
@@ -132,7 +134,7 @@ theorem next_stratifyPFP_inl (σ : (stratBlock d₁.B d₂.B).Assignment A) (i :
 
 /-- One step of the gate: set once the first stratum's steps add nothing, and
 never unset. -/
-theorem next_stratifyPFP_gate (σ : (stratBlock d₁.B d₂.B).Assignment A) :
+private theorem next_stratifyPFP_gate (σ : (stratBlock d₁.B d₂.B).Assignment A) :
     (d₁.stratifyPFP d₂).next σ (.inl (.inr ())) Fin.elim0 ↔
       (StratGate σ ∨ ∀ (i : d₁.B.ι) (x : Fin (d₁.B.arity i) → A),
         @StepDef.next L d₁ A _ (strat1Assign σ) i x → strat1Assign σ i x) := by
@@ -150,7 +152,7 @@ theorem next_stratifyPFP_gate (σ : (stratBlock d₁.B d₂.B).Assignment A) :
 
 /-- One step of the second stratum: empty until the gate fires, one partial
 step over the frozen first stratum afterwards. -/
-theorem next_stratifyPFP_inr (σ : (stratBlock d₁.B d₂.B).Assignment A) (j : d₂.B.ι)
+private theorem next_stratifyPFP_inr (σ : (stratBlock d₁.B d₂.B).Assignment A) (j : d₂.B.ι)
     (x : Fin (d₂.B.arity j) → A) :
     (d₁.stratifyPFP d₂).next σ (.inr j) x ↔
       (StratGate σ ∧
@@ -171,20 +173,20 @@ theorem next_stratifyPFP_inr (σ : (stratBlock d₁.B d₂.B).Assignment A) (j :
 /-! ### The three parts of one step -/
 
 /-- The first stratum of one step is its own inflationary step. -/
-theorem strat1Assign_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignment A) :
+private theorem strat1Assign_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignment A) :
     strat1Assign ((d₁.stratifyPFP d₂).next σ) = d₁.inflStep (strat1Assign σ) := by
   funext i x
   exact propext (d₁.next_stratifyPFP_inl d₂ σ i x)
 
 /-- The gate of one step. -/
-theorem stratGate_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignment A) :
+private theorem stratGate_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignment A) :
     StratGate ((d₁.stratifyPFP d₂).next σ) ↔
       (StratGate σ ∨ IsFixedPt d₁.inflStep (strat1Assign σ)) :=
   (d₁.next_stratifyPFP_gate d₂ σ).trans
     (or_congr Iff.rfl (d₁.isFixedPt_inflStep_iff (strat1Assign σ)).symm)
 
 /-- The second stratum of one step. -/
-theorem strat2Assign_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignment A) :
+private theorem strat2Assign_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignment A) :
     strat2Assign ((d₁.stratifyPFP d₂).next σ) =
       fun j x => StratGate σ ∧
         @StepDef.next (L.sum d₁.B.lang) d₂ A (d₁.B.structure₁ (L := L) (strat1Assign σ))
@@ -196,7 +198,7 @@ theorem strat2Assign_next_stratifyPFP (σ : (stratBlock d₁.B d₂.B).Assignmen
 
 /-- The first stratum of the composite stages is its own inflationary
 stages. -/
-theorem strat1Assign_partStage_stratifyPFP (n : ℕ) :
+private theorem strat1Assign_partStage_stratifyPFP (n : ℕ) :
     strat1Assign ((d₁.stratifyPFP d₂).partStage A n) = d₁.inflStage A n := by
   induction n with
   | zero => rfl
@@ -205,7 +207,7 @@ theorem strat1Assign_partStage_stratifyPFP (n : ℕ) :
 
 /-- The gate of the composite stages: it turns on when the first stratum stops
 moving, and never off. -/
-theorem stratGate_partStage_succ (n : ℕ) :
+private theorem stratGate_partStage_succ (n : ℕ) :
     StratGate ((d₁.stratifyPFP d₂).partStage A (n + 1)) ↔
       (StratGate ((d₁.stratifyPFP d₂).partStage A n) ∨
         IsFixedPt d₁.inflStep (d₁.inflStage A n)) := by
@@ -214,12 +216,12 @@ theorem stratGate_partStage_succ (n : ℕ) :
   rw [strat1Assign_partStage_stratifyPFP]
 
 /-- The gate is off at the start. -/
-theorem not_stratGate_partStage_zero :
+private theorem not_stratGate_partStage_zero :
     ¬StratGate ((d₁.stratifyPFP d₂).partStage A 0) :=
   fun h => h
 
 /-- The gate stays on. -/
-theorem stratGate_partStage_mono {m n : ℕ} (hmn : m ≤ n)
+private theorem stratGate_partStage_mono {m n : ℕ} (hmn : m ≤ n)
     (h : StratGate ((d₁.stratifyPFP d₂).partStage A m)) :
     StratGate ((d₁.stratifyPFP d₂).partStage A n) := by
   induction n with
@@ -230,7 +232,7 @@ theorem stratGate_partStage_mono {m n : ℕ} (hmn : m ≤ n)
     · rwa [heq] at h
 
 /-- While the gate is off, the second stratum stays empty. -/
-theorem strat2Assign_partStage_succ_of_not_gate {n : ℕ}
+private theorem strat2Assign_partStage_succ_of_not_gate {n : ℕ}
     (h : ¬StratGate ((d₁.stratifyPFP d₂).partStage A n)) :
     strat2Assign ((d₁.stratifyPFP d₂).partStage A (n + 1)) = d₂.B.botAssign A := by
   rw [StepDef.partStage_succ, strat2Assign_next_stratifyPFP]
@@ -260,7 +262,7 @@ theorem strat2Assign_partStage_add {G : ℕ} {ρ₁ : d₁.B.Assignment A}
 /-! ### The value of the composite -/
 
 /-- An inflationary limit is reached at any stage that stops moving. -/
-theorem inflLimit_eq_inflStage_of_isFixedPt {k : ℕ}
+private theorem inflLimit_eq_inflStage_of_isFixedPt {k : ℕ}
     (h : IsFixedPt d₁.inflStep (d₁.inflStage A k)) : d₁.inflLimit A = d₁.inflStage A k := by
   funext i x
   refine propext ⟨?_, fun hx => ⟨k, hx⟩⟩
@@ -271,7 +273,7 @@ theorem inflLimit_eq_inflStage_of_isFixedPt {k : ℕ}
     rwa [hst] at hn
 
 /-- An assignment of the combined block is its three parts. -/
-theorem stratBlock_ext {B₁ B₂ : SOBlock} {σ τ : (stratBlock B₁ B₂).Assignment A}
+private theorem stratBlock_ext {B₁ B₂ : SOBlock} {σ τ : (stratBlock B₁ B₂).Assignment A}
     (h1 : strat1Assign σ = strat1Assign τ) (hg : StratGate σ ↔ StratGate τ)
     (h2 : strat2Assign σ = strat2Assign τ) : σ = τ := by
   funext i x

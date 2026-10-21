@@ -12,6 +12,11 @@ public import DescriptiveComplexity.Problems.CliqueFamily.CountingAll
 public import DescriptiveComplexity.Syntax
 public import Mathlib.Tactic.FinCases
 public import DescriptiveComplexity.Numbers.DigitExtract
+import all DescriptiveComplexity.Counting.Post
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Counting.Restrict
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+import all DescriptiveComplexity.Problems.Sat.Counting
 
 /-!
 # #2SAT, #HORN-SAT, #Monotone-2SAT, and all the vertex covers of a graph
@@ -78,11 +83,11 @@ noncomputable def monotoneS : Language.sat.Sentence :=
 
 variable {A : Type} [Language.sat.Structure A]
 
-theorem realize_occS {s : Bool} {c x : α} {v : α → A} :
+private theorem realize_occS {s : Bool} {c x : α} {v : α → A} :
     (occS s c x).Realize v ↔ OccIn (v c) (v x) s := by
   cases s <;> simp [occS, OccIn, IsCl, PosIn, NegIn, Formula.realize_rel₁, Formula.realize_rel₂]
 
-theorem realize_widthTwoS : A ⊨ widthTwoS ↔ WidthAtMostTwo A := by
+private theorem realize_widthTwoS : A ⊨ widthTwoS ↔ WidthAtMostTwo A := by
   simp only [widthTwoS, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iInf,
     Formula.realize_imp, Formula.realize_iSup, realize_occS, Formula.realize_equal,
     Term.realize_var, Sum.elim_inr]
@@ -94,7 +99,7 @@ theorem realize_widthTwoS : A ⊨ widthTwoS ↔ WidthAtMostTwo A := by
     obtain ⟨i, j, hij, hx, hs⟩ := h (w 0) (fun i => w i.succ) s hocc
     exact ⟨⟨⟨i, j⟩, hij, hs⟩, hx⟩
 
-theorem realize_hornS : A ⊨ hornS ↔ AtMostOnePositive A := by
+private theorem realize_hornS : A ⊨ hornS ↔ AtMostOnePositive A := by
   simp only [hornS, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal, Term.realize_var,
     Sum.elim_inr, AtMostOnePositive]
@@ -108,7 +113,7 @@ theorem realize_hornS : A ⊨ hornS ↔ AtMostOnePositive A := by
 def NoNegative (A : Type) [Language.sat.Structure A] : Prop :=
   ∀ c x : A, RelMap satIsClause ![c] → ¬RelMap satNegIn ![c, x]
 
-theorem realize_monotoneS : A ⊨ monotoneS ↔ NoNegative A := by
+private theorem realize_monotoneS : A ⊨ monotoneS ↔ NoNegative A := by
   simp only [monotoneS, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_not, Formula.realize_rel₁, Formula.realize_rel₂, Term.realize_var,
     Sum.elim_inr, NoNegative]
@@ -137,13 +142,13 @@ literals per clause, all positive, `0` on the other formulas. -/
 noncomputable def SharpMonotoneTwoSAT : CountingProblem Language.sat :=
   SharpSAT.restrict (widthTwoS ⊓ monotoneS)
 
-theorem sharpTwoSat_mem_sharpP : SharpTwoSAT ∈ SharpP :=
+private theorem sharpTwoSat_mem_sharpP : SharpTwoSAT ∈ SharpP :=
   SharpPDefinable.restrict sharpSat_mem_sharpP widthTwoS
 
-theorem sharpHornSat_mem_sharpP : SharpHornSAT ∈ SharpP :=
+private theorem sharpHornSat_mem_sharpP : SharpHornSAT ∈ SharpP :=
   SharpPDefinable.restrict sharpSat_mem_sharpP hornS
 
-theorem sharpMonotoneTwoSat_mem_sharpP : SharpMonotoneTwoSAT ∈ SharpP :=
+private theorem sharpMonotoneTwoSat_mem_sharpP : SharpMonotoneTwoSAT ∈ SharpP :=
   SharpPDefinable.restrict sharpSat_mem_sharpP _
 
 /-! ### Graphs: independent sets and vertex covers -/
@@ -162,14 +167,14 @@ def NonIso (x : A) : Prop :=
 
 /-- The condition an edge sets on a set of vertices, by sign: one end in the
 set when positive, one end out of it when negative. -/
-def EdgeCond (s : Bool) (S : A → Prop) : Prop :=
+private def EdgeCond (s : Bool) (S : A → Prop) : Prop :=
   ∀ x y, GEdge x y → if s then S x ∨ S y else ¬S x ∨ ¬S y
 
 /-- A **vertex cover**: every edge has an end in it. -/
 def GVertexCover (A : Type) [Language.graph.Structure A] (C : A → Prop) : Prop :=
   ∀ x y : A, x ≠ y → RelMap Language.adj ![x, y] → C x ∨ C y
 
-theorem indepSet_iff_edgeCond (S : A → Prop) :
+private theorem indepSet_iff_edgeCond (S : A → Prop) :
     IndepSet (fun x y : A => RelMap Language.adj ![x, y]) S ↔ EdgeCond false S := by
   constructor
   · intro h x y hxy
@@ -183,7 +188,7 @@ theorem indepSet_iff_edgeCond (S : A → Prop) :
     · exact h' hx
     · exact h' hy
 
-theorem vertexCover_iff_edgeCond (C : A → Prop) : GVertexCover A C ↔ EdgeCond true C := by
+private theorem vertexCover_iff_edgeCond (C : A → Prop) : GVertexCover A C ↔ EdgeCond true C := by
   simp only [GVertexCover, EdgeCond, GEdge, ↓reduceIte]
   exact ⟨fun h x y hxy => h x y hxy.1 hxy.2, fun h x y hne hadj => h x y ⟨hne, hadj⟩⟩
 
@@ -211,7 +216,7 @@ theorem sharpAllVertexCovers_eq (A : Type) [Language.graph.Structure A] :
     SharpAllVertexCovers A = SharpAllIndependentSets A :=
   card_vertexCover_eq A
 
-theorem sharpAllVertexCovers_mem_sharpP : SharpAllVertexCovers ∈ SharpP :=
+private theorem sharpAllVertexCovers_mem_sharpP : SharpAllVertexCovers ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (sharpAllVertexCovers_eq A).symm)
     sharpAllIndependentSets_mem_sharpP
 
@@ -226,7 +231,7 @@ theorem sharpAllVertexCovers_sharpP_oneCallComplete :
 
 open Classical in
 /-- Each isolated vertex doubles the number of sets meeting the condition. -/
-theorem card_edgeCond_split [Finite A] (s : Bool) :
+private theorem card_edgeCond_split [Finite A] (s : Bool) :
     Nat.card {S : A → Prop // EdgeCond s S} =
       Nat.card {S : A → Prop // (∀ x, S x → NonIso x) ∧ EdgeCond s S} *
         2 ^ Nat.card {x : A // ¬NonIso x} := by
@@ -268,7 +273,7 @@ theorem card_edgeCond_split [Finite A] (s : Bool) :
 
 /-- Among the sets of non-isolated vertices, the vertex covers are the
 complements of the independent sets. -/
-theorem card_edgeCond_true_eq :
+private theorem card_edgeCond_true_eq :
     Nat.card {S : A → Prop // (∀ x, S x → NonIso x) ∧ EdgeCond true S} =
       Nat.card {S : A → Prop // (∀ x, S x → NonIso x) ∧ EdgeCond false S} := by
   have hN : ∀ x y : A, GEdge x y → NonIso x ∧ NonIso y := fun x y h =>
@@ -320,26 +325,27 @@ section Edge
 
 variable {A : Type} [Language.graph.Structure A] [LinearOrder A] {s : Bool}
 
-theorem realize_edgeDomF (w : Fin 2 → A) : edgeDomF.Realize w ↔ GEdge (w 0) (w 1) := by
+private theorem realize_edgeDomF (w : Fin 2 → A) : edgeDomF.Realize w ↔ GEdge (w 0) (w 1) := by
   simp [edgeDomF, GEdge, Formula.realize_rel₂]
 
-theorem edge_dom_true (w : Fin 2 → A) :
+private theorem edge_dom_true (w : Fin 2 → A) :
     ((edgeInterp s).domFormula true).Realize w ↔ GEdge (w 0) (w 1) :=
   realize_edgeDomF w
 
-theorem edge_dom_false (w : Fin 2 → A) :
+private theorem edge_dom_false (w : Fin 2 → A) :
     ((edgeInterp s).domFormula false).Realize w ↔ w 0 = w 1 := by
   simp [edgeInterp]
 
 /-- The variable of a vertex. -/
-def varPt (s : Bool) (x : A) : (edgeInterp s).MapRel A :=
+private def varPt (s : Bool) (x : A) : (edgeInterp s).MapRel A :=
   ⟨(false, ![x, x]), (edge_dom_false _).mpr rfl⟩
 
 /-- The clause of an edge. -/
-def clPt (s : Bool) (x y : A) (h : GEdge x y) : (edgeInterp s).MapRel A :=
+private def clPt (s : Bool) (x y : A) (h : GEdge x y) : (edgeInterp s).MapRel A :=
   ⟨(true, ![x, y]), (edge_dom_true _).mpr h⟩
 
-theorem eq_varPt (p : (edgeInterp s).MapRel A) (h : p.1.1 = false) : p = varPt s (p.1.2 0) := by
+private theorem eq_varPt
+    (p : (edgeInterp s).MapRel A) (h : p.1.1 = false) : p = varPt s (p.1.2 0) := by
   obtain ⟨⟨t, w⟩, hw⟩ := p
   change t = false at h
   subst h
@@ -349,12 +355,13 @@ theorem eq_varPt (p : (edgeInterp s).MapRel A) (h : p.1.1 = false) : p = varPt s
   · rfl
   · exact h1.symm
 
-theorem edge_isCl (p : (edgeInterp s).MapRel A) : RelMap satIsClause ![p] ↔ p.1.1 = true := by
+private theorem edge_isCl
+    (p : (edgeInterp s).MapRel A) : RelMap satIsClause ![p] ↔ p.1.1 = true := by
   rw [RelFOInterpretation.relMap_mapRel]
   obtain ⟨⟨t, w⟩, hw⟩ := p
   cases t <;> simp [edgeInterp]
 
-theorem edge_posIn (p q : (edgeInterp s).MapRel A) :
+private theorem edge_posIn (p q : (edgeInterp s).MapRel A) :
     RelMap satPosIn ![p, q] ↔ s = true ∧ p.1.1 = true ∧ q.1.1 = false ∧
       (q.1.2 0 = p.1.2 0 ∨ q.1.2 0 = p.1.2 1) := by
   rw [RelFOInterpretation.relMap_mapRel]
@@ -362,7 +369,7 @@ theorem edge_posIn (p q : (edgeInterp s).MapRel A) :
   obtain ⟨⟨t', w'⟩, hw'⟩ := q
   cases s <;> cases t <;> cases t' <;> simp [edgeInterp, endF]
 
-theorem edge_negIn (p q : (edgeInterp s).MapRel A) :
+private theorem edge_negIn (p q : (edgeInterp s).MapRel A) :
     RelMap satNegIn ![p, q] ↔ s = false ∧ p.1.1 = true ∧ q.1.1 = false ∧
       (q.1.2 0 = p.1.2 0 ∨ q.1.2 0 = p.1.2 1) := by
   rw [RelFOInterpretation.relMap_mapRel]
@@ -370,7 +377,7 @@ theorem edge_negIn (p q : (edgeInterp s).MapRel A) :
   obtain ⟨⟨t', w'⟩, hw'⟩ := q
   cases s <;> cases t <;> cases t' <;> simp [edgeInterp, endF]
 
-theorem edge_satOccurs (p : (edgeInterp s).MapRel A) :
+private theorem edge_satOccurs (p : (edgeInterp s).MapRel A) :
     SatOccurs ((edgeInterp s).MapRel A) p ↔ p.1.1 = false ∧ NonIso (p.1.2 0) := by
   constructor
   · rintro ⟨c, hc, h⟩
@@ -396,7 +403,7 @@ theorem edge_satOccurs (p : (edgeInterp s).MapRel A) :
 
 /-- **The models of the formula of the edges are the sets of non-isolated
 vertices meeting the condition of the sign.** -/
-noncomputable def edgeModelEquiv :
+private noncomputable def edgeModelEquiv :
     {ν : (edgeInterp s).MapRel A → Prop // SatModel _ ν} ≃
       {S : A → Prop // (∀ x, S x → NonIso x) ∧ EdgeCond s S} where
   toFun ν := ⟨fun x => ν.1 (varPt s x), fun x hx => ((edge_satOccurs _).mp (ν.2.2 _ hx)).2,
@@ -476,7 +483,7 @@ theorem eval_isoCount [LinearOrder A] : isoCount.eval A = Nat.card {x : A // ¬N
 
 /-- The count of the graph is the model count of the formula of its edges,
 doubled for each isolated vertex. -/
-theorem sharpAllIndependentSets_eq_edge [Finite A] :
+private theorem sharpAllIndependentSets_eq_edge [Finite A] :
     SharpAllIndependentSets A = SharpSAT ((edgeInterp s).MapRel A) *
       2 ^ Nat.card {x : A // ¬NonIso x} := by
   rw [sharpAllIndependentSets_apply, sharpSat_apply, Nat.card_congr edgeModelEquiv,
@@ -487,7 +494,7 @@ theorem sharpAllIndependentSets_eq_edge [Finite A] :
 
 /-- **Counting all the independent sets reduces to #SAT with one call**, the
 formula being one clause of sign `s` per edge. -/
-noncomputable def sharpAllIndependentSets_oneCall_sharpSat (s : Bool) :
+private noncomputable def sharpAllIndependentSets_oneCall_sharpSat (s : Bool) :
     SharpAllIndependentSets ≤ᶜ[≤] SharpSAT where
   Tag := Bool
   dim := 2
@@ -503,7 +510,7 @@ noncomputable def sharpAllIndependentSets_oneCall_sharpSat (s : Bool) :
 
 /-- Every occurrence of the formula of the edges has the sign `s`, and is an
 end of its clause. -/
-theorem edge_occIn {c p : (edgeInterp s).MapRel A} {t : Bool} (h : OccIn c p t) :
+private theorem edge_occIn {c p : (edgeInterp s).MapRel A} {t : Bool} (h : OccIn c p t) :
     t = s ∧ p = varPt s (p.1.2 0) ∧ (p.1.2 0 = c.1.2 0 ∨ p.1.2 0 = c.1.2 1) := by
   obtain ⟨-, h⟩ := h
   cases t
@@ -512,7 +519,7 @@ theorem edge_occIn {c p : (edgeInterp s).MapRel A} {t : Bool} (h : OccIn c p t) 
   · obtain ⟨hs, -, hf, h0⟩ := (edge_posIn c p).mp h
     exact ⟨hs.symm, eq_varPt p hf, h0⟩
 
-theorem edge_widthAtMostTwo : WidthAtMostTwo ((edgeInterp s).MapRel A) := by
+private theorem edge_widthAtMostTwo : WidthAtMostTwo ((edgeInterp s).MapRel A) := by
   intro c x t hocc
   have h := fun i => edge_occIn (hocc i)
   have hx : ∀ i, x i = varPt s ((x i).1.2 0) := fun i => (h i).2.1
@@ -526,10 +533,10 @@ theorem edge_widthAtMostTwo : WidthAtMostTwo ((edgeInterp s).MapRel A) := by
     | exact ⟨0, 2, by decide, hv 0 2 (h0.trans h2.symm), hst 0 2⟩
     | exact ⟨1, 2, by decide, hv 1 2 (h1.trans h2.symm), hst 1 2⟩
 
-theorem edge_atMostOnePositive : AtMostOnePositive ((edgeInterp false).MapRel A) :=
+private theorem edge_atMostOnePositive : AtMostOnePositive ((edgeInterp false).MapRel A) :=
   fun _ _ _ _ h => absurd ((edge_posIn _ _).mp h).1 Bool.false_ne_true
 
-theorem edge_noNegative : NoNegative ((edgeInterp true).MapRel A) :=
+private theorem edge_noNegative : NoNegative ((edgeInterp true).MapRel A) :=
   fun _ _ _ h => Bool.noConfusion ((edge_negIn _ _).mp h).1
 
 end Edge

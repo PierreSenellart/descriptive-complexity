@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.CircuitNumber.Membership
 public import DescriptiveComplexity.Problems.CircuitNumber.Hardness
 import DescriptiveComplexity.Problems.CircuitNumber.Junk
 import DescriptiveComplexity.Counting.Digits.NormalForm
+import all DescriptiveComplexity.Problems.CircuitNumber.Junk
 
 /-!
 # The number written by a circuit is complete for FP

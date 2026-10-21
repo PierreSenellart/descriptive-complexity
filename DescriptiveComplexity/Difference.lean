@@ -103,13 +103,13 @@ variable {A B : Type} [L.Structure A] [L.Structure B]
 /-- The linear order transported along an isomorphism: `b ≤ b'` when the
 preimages compare. -/
 @[instance_reducible]
-noncomputable def transportOrder (e : A ≃[L] B) (lo : LinearOrder A) : LinearOrder B :=
+private noncomputable def transportOrder (e : A ≃[L] B) (lo : LinearOrder A) : LinearOrder B :=
   letI := lo
   LinearOrder.lift' e.symm e.symm.injective
 
 /-- An isomorphism of `L`-structures is one of the ordered expansions, once
 the order of the target is the transported one. -/
-def orderedEquivOfTransport (e : A ≃[L] B) (lo : LinearOrder A) :
+private def orderedEquivOfTransport (e : A ≃[L] B) (lo : LinearOrder A) :
     letI := lo
     letI := transportOrder e lo
     A ≃[L.sum Language.order] B :=
@@ -162,7 +162,7 @@ def DecisionProblem.comapExOrd [L.IsRelational] : DecisionProblem L where
 /-- The pullback of `Q` along an *ordered* interpretation, with the order
 quantified universally: every linear order on the instance sends it to a
 yes-instance of `Q`. -/
-def DecisionProblem.comapAllOrd [L.IsRelational] : DecisionProblem L where
+private def DecisionProblem.comapAllOrd [L.IsRelational] : DecisionProblem L where
   Holds A _ := ∀ lo : LinearOrder A,
     letI := lo
     Q (I.Map A)
@@ -321,7 +321,7 @@ theorem DPDefinable.sigmaSODefinable_two (h : DPDefinable P) : SigmaSODefinable 
 /-- **DP ⊆ Π₂ᵖ**, the same merge with the blocks in the other order:
 `∀Y ∃X. (φ ∧ ψ)`. Recovering the `Σ` half from it uses that a block always has
 *some* assignment – the constantly true one will do. -/
-theorem DPDefinable.piSODefinable_two (h : DPDefinable P) : PiSODefinable 2 P := by
+private theorem DPDefinable.piSODefinable_two (h : DPDefinable P) : PiSODefinable 2 P := by
   obtain ⟨S, T, hS, hT, hST⟩ := h
   obtain ⟨Bs₁, hk1, φ, hφ⟩ := hS
   obtain ⟨Bs₂, hk2, ψ, hψ⟩ := hT
@@ -363,7 +363,7 @@ noncomputable def DP : ComplexityClass :=
     (fun h => dpDefinable_congr h)
 
 /-- Membership in DP is exactly DP definability, by definition. -/
-theorem mem_DP_iff (P : DecisionProblem L) : P ∈ DP ↔ DPDefinable P :=
+private theorem mem_DP_iff (P : DecisionProblem L) : P ∈ DP ↔ DPDefinable P :=
   Iff.rfl
 
 /-! ### NP and coNP inside DP
@@ -383,14 +383,14 @@ def trivBlock : SOBlock where
   arity := fun _ => 1
 
 /-- The trivial problem is `Σ₁`-definable: guess nothing, check nothing. -/
-theorem sigmaSODefinable_triv : SigmaSODefinable 1 (DecisionProblem.triv L) := by
+private theorem sigmaSODefinable_triv : SigmaSODefinable 1 (DecisionProblem.triv L) := by
   refine ⟨[trivBlock], rfl, ⊤, ?_⟩
   intro A _ _ _
   refine ⟨fun _ => ⟨fun _ _ => True, ?_⟩, fun _ => trivial⟩
   exact fun h => h
 
 /-- The trivial problem is `Π₁`-definable. -/
-theorem piSODefinable_triv : PiSODefinable 1 (DecisionProblem.triv L) := by
+private theorem piSODefinable_triv : PiSODefinable 1 (DecisionProblem.triv L) := by
   refine ⟨[trivBlock], rfl, ⊤, ?_⟩
   intro A _ _ _
   refine ⟨fun _ _ => ?_, fun _ => trivial⟩
@@ -428,7 +428,7 @@ theorem DP_subset_piP_two : DP ⊆ PiP 2 :=
 
 /-- DP-hardness is the usual notion: every DP-definable problem reduces to
 `P`. -/
-theorem hard_DP_iff (P : DecisionProblem L) :
+private theorem hard_DP_iff (P : DecisionProblem L) :
     DP.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         DPDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=

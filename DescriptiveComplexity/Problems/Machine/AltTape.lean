@@ -157,7 +157,7 @@ def altBaseIdx : AltBase → ℕ
   | .tTurnNext d => 41 + (if d then 1 else 0)
   | .tTurnAcc d => 43 + (if d then 1 else 0)
 
-theorem altBaseIdx_injective : Function.Injective altBaseIdx := by decide
+private theorem altBaseIdx_injective : Function.Injective altBaseIdx := by decide
 
 /-- The tags of the tape: a base tag together with a sweep index. The index is
 the sweep a guessing state or transition belongs to, and the second coordinate
@@ -200,7 +200,8 @@ def AltPosn (p : AltTag k × (Fin 2 → A)) : Prop :=
 pinned to, so that exactly one tuple carries such a tag. -/
 def IsMinTup2 (w : Fin 2 → A) : Prop := (∀ a : A, w 0 ≤ a) ∧ ∀ a : A, w 1 ≤ a
 
-theorem isMinTup2_unique {w w' : Fin 2 → A} (h : IsMinTup2 w) (h' : IsMinTup2 w') : w = w' := by
+private theorem isMinTup2_unique
+    {w w' : Fin 2 → A} (h : IsMinTup2 w) (h' : IsMinTup2 w') : w = w' := by
   funext i
   fin_cases i
   · exact le_antisymm (h.1 _) (h'.1 _)
@@ -208,7 +209,7 @@ theorem isMinTup2_unique {w w' : Fin 2 → A} (h : IsMinTup2 w) (h' : IsMinTup2 
 
 variable [Finite A] [Nonempty A]
 
-theorem exists_isMinTup2 : ∃ w : Fin 2 → A, IsMinTup2 w := by
+private theorem exists_isMinTup2 : ∃ w : Fin 2 → A, IsMinTup2 w := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   exact ⟨fun _ => m, hm, hm⟩
 
@@ -216,7 +217,7 @@ theorem exists_isMinTup2 : ∃ w : Fin 2 → A, IsMinTup2 w := by
 def AltBlank (p : AltTag k × (Fin 2 → A)) : Prop :=
   p.1 = (AltBase.sBlank, 0) ∧ IsMinTup2 p.2
 
-theorem exists_altBlank : ∃ p : AltTag k × (Fin 2 → A), AltBlank p := by
+private theorem exists_altBlank : ∃ p : AltTag k × (Fin 2 → A), AltBlank p := by
   obtain ⟨w, hw⟩ := exists_isMinTup2 (A := A)
   exact ⟨((AltBase.sBlank, 0), w), rfl, hw⟩
 
@@ -236,7 +237,8 @@ def AltInp (p a : AltTag k × (Fin 2 → A)) : Prop :=
 
 omit [Finite A] [Nonempty A] in
 /-- **The initial tape is functional**: a cell holds at most one symbol. -/
-theorem altInp_functional {p a b : AltTag k × (Fin 2 → A)} (ha : AltInp p a) (hb : AltInp p b) :
+private theorem altInp_functional
+    {p a b : AltTag k × (Fin 2 → A)} (ha : AltInp p a) (hb : AltInp p b) :
     a = b := by
   have htup : ∀ u v : Fin 2 → A, u 0 = p.2 0 → (∀ c : A, u 1 ≤ c) →
       v 0 = p.2 0 → (∀ c : A, v 1 ≤ c) → u = v := by
@@ -253,12 +255,12 @@ theorem altInp_functional {p a b : AltTag k × (Fin 2 → A)} (ha : AltInp p a) 
         | (rw [hp] at hq; exact absurd hq (by simp))
 
 /-- There is a position: the start marker. -/
-theorem exists_altPosn : ∃ p : AltTag k × (Fin 2 → A), AltPosn p := by
+private theorem exists_altPosn : ∃ p : AltTag k × (Fin 2 → A), AltPosn p := by
   obtain ⟨w, hw⟩ := exists_isMinTup2 (A := A)
   exact ⟨((AltBase.pStart, 0), w), rfl, fun a => ⟨hw.1 a, hw.2 a⟩⟩
 
 omit [Finite A] [Nonempty A] in
-private theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOrd o.le :=
+theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOrd o.le :=
   ⟨fun a => @le_refl X o.toPreorder a, fun a b c => @le_trans X o.toPreorder a b c,
     fun a b => @le_antisymm X o.toPartialOrder a b, fun a b => @le_total X o a b⟩
 
@@ -291,7 +293,7 @@ theorem alt_budget {k n m : ℕ} (hn : 1 ≤ n) (hm : m ≤ n) :
 
 /-- **The tape really has that many positions**: the filler tuples alone inject
 into the positions. -/
-theorem alt_card_le_card_posn (k : ℕ) (A : Type) [LinearOrder A] [Finite A] :
+private theorem alt_card_le_card_posn (k : ℕ) (A : Type) [LinearOrder A] [Finite A] :
     8 * (k + 1) * Nat.card A * Nat.card A ≤
       Nat.card {p : AltTag k × (Fin 2 → A) // AltPosn p} := by
   have hinj : Function.Injective

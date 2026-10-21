@@ -54,7 +54,7 @@ def MaxCutOn (Adjp : A → A → Prop) (Kp : A → A → Prop) : Prop :=
 
 /-- The max-cut property, with the threshold certified by an injection of the
 marked pairs into the cut – the shape the second-order definition guesses. -/
-theorem maxCutOn_iff_certificate [Finite A] (Adjp : A → A → Prop) (Kp : A → A → Prop) :
+private theorem maxCutOn_iff_certificate [Finite A] (Adjp : A → A → Prop) (Kp : A → A → Prop) :
     MaxCutOn Adjp Kp ↔ ∃ S : A → Prop,
       Nonempty ({p : A × A // Kp p.1 p.2} ↪ {p : A × A // CutRel Adjp S p.1 p.2}) :=
   exists_congr fun S => (nonempty_embedding_iff_ncard_le₂ Kp (CutRel Adjp S)).symm
@@ -81,7 +81,7 @@ private theorem maxCut_symm (u : B ≃ A) {RB : B → B → Prop} {RA : A → A 
   simp
 
 /-- `MaxCutOn` transports along an equivalence, iff version. -/
-theorem MaxCutOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop} {AdjA KA : A → A → Prop}
+private theorem MaxCutOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop} {AdjA KA : A → A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b'))
     (hK : ∀ b b', KB b b' ↔ KA (u b) (u b')) :
     MaxCutOn AdjB KB ↔ MaxCutOn AdjA KA :=

@@ -85,7 +85,7 @@ def pebbleRefine (E₀ E : PebbleRel A k) : PebbleRel A k :=
 
 /-- The back-and-forth condition is monotone in the relation it is relative
 to. -/
-theorem pebbleBackForth_mono {E E' : PebbleRel A k} (h : E.Le E') :
+private theorem pebbleBackForth_mono {E E' : PebbleRel A k} (h : E.Le E') :
     (PebbleBackForth E).Le (PebbleBackForth E') := by
   intro a b hab i
   refine ⟨fun c => ?_, fun d => ?_⟩
@@ -95,7 +95,7 @@ theorem pebbleBackForth_mono {E E' : PebbleRel A k} (h : E.Le E') :
     exact ⟨c, h _ _ hc⟩
 
 /-- One round of refinement is monotone in the refined relation. -/
-theorem pebbleRefine_mono (E₀ : PebbleRel A k) {E E' : PebbleRel A k} (h : E.Le E') :
+private theorem pebbleRefine_mono (E₀ : PebbleRel A k) {E E' : PebbleRel A k} (h : E.Le E') :
     (pebbleRefine E₀ E).Le (pebbleRefine E₀ E') :=
   fun a b hab => ⟨hab.1, pebbleBackForth_mono h a b hab.2⟩
 
@@ -117,14 +117,14 @@ def EquivK (E₀ : PebbleRel A k) : PebbleRel A k :=
 variable {E₀ : PebbleRel A k}
 
 /-- The refinement chain descends. -/
-theorem pebbleStage_succ_le (E₀ : PebbleRel A k) (n : ℕ) :
+private theorem pebbleStage_succ_le (E₀ : PebbleRel A k) (n : ℕ) :
     (pebbleStage E₀ (n + 1)).Le (pebbleStage E₀ n) := by
   induction n with
   | zero => exact fun a b _ => trivial
   | succ n ih => exact pebbleRefine_mono E₀ ih
 
 /-- The refinement chain descends, monotonically. -/
-theorem pebbleStage_le_of_le (E₀ : PebbleRel A k) {m n : ℕ} (hmn : m ≤ n) :
+private theorem pebbleStage_le_of_le (E₀ : PebbleRel A k) {m n : ℕ} (hmn : m ≤ n) :
     (pebbleStage E₀ n).Le (pebbleStage E₀ m) := by
   induction n with
   | zero => rw [Nat.le_zero.mp hmn]; exact fun _ _ h => h
@@ -174,7 +174,7 @@ theorem exists_pebbleStage_succ_eq (E₀ : PebbleRel A k) :
     fun h => (Set.ext_iff.mp heq (a, b)).mpr h⟩
 
 omit [Finite A] in
-private theorem pebbleStage_eq_of_succ_eq {N : ℕ}
+theorem pebbleStage_eq_of_succ_eq {N : ℕ}
     (hN : pebbleStage E₀ (N + 1) = pebbleStage E₀ N) {n : ℕ} (hn : N ≤ n) :
     pebbleStage E₀ n = pebbleStage E₀ N := by
   induction n with
@@ -189,7 +189,7 @@ private theorem pebbleStage_eq_of_succ_eq {N : ℕ}
 
 /-- **On a finite type the limit is a fixed point of the refinement** – the
 greatest one, by `DescriptiveComplexity.le_equivK`. -/
-theorem pebbleRefine_equivK (E₀ : PebbleRel A k) :
+private theorem pebbleRefine_equivK (E₀ : PebbleRel A k) :
     pebbleRefine E₀ (EquivK E₀) = EquivK E₀ := by
   obtain ⟨N, hle, hN⟩ := exists_pebbleStage_succ_eq E₀
   have hlim : EquivK E₀ = pebbleStage E₀ N := by
@@ -216,7 +216,7 @@ theorem EquivK.update {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k) (c :
   (((equivK_iff E₀ a b).mp h).2 i).1 c
 
 /-- The game move, from the right. -/
-theorem EquivK.update_right {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k) (d : A) :
+private theorem EquivK.update_right {a b : Fin k → A} (h : EquivK E₀ a b) (i : Fin k) (d : A) :
     ∃ c : A, EquivK E₀ (Function.update a i c) (Function.update b i d) :=
   (((equivK_iff E₀ a b).mp h).2 i).2 d
 
@@ -283,12 +283,12 @@ end Finite
 section Equivalence
 
 /-- The back-and-forth condition preserves reflexivity. -/
-theorem pebbleBackForth_refl {E : PebbleRel A k} (h : ∀ a, E a a) (a : Fin k → A) :
+private theorem pebbleBackForth_refl {E : PebbleRel A k} (h : ∀ a, E a a) (a : Fin k → A) :
     PebbleBackForth E a a :=
   fun _ => ⟨fun c => ⟨c, h _⟩, fun d => ⟨d, h _⟩⟩
 
 /-- The back-and-forth condition preserves symmetry. -/
-theorem pebbleBackForth_symm {E : PebbleRel A k} (h : ∀ a b, E a b → E b a)
+private theorem pebbleBackForth_symm {E : PebbleRel A k} (h : ∀ a b, E a b → E b a)
     {a b : Fin k → A} (hab : PebbleBackForth E a b) : PebbleBackForth E b a := by
   intro i
   refine ⟨fun c => ?_, fun d => ?_⟩
@@ -298,7 +298,7 @@ theorem pebbleBackForth_symm {E : PebbleRel A k} (h : ∀ a b, E a b → E b a)
     exact ⟨c, h _ _ hc⟩
 
 /-- The back-and-forth condition preserves transitivity. -/
-theorem pebbleBackForth_trans {E : PebbleRel A k} (h : ∀ a b c, E a b → E b c → E a c)
+private theorem pebbleBackForth_trans {E : PebbleRel A k} (h : ∀ a b c, E a b → E b c → E a c)
     {a b c : Fin k → A} (hab : PebbleBackForth E a b) (hbc : PebbleBackForth E b c) :
     PebbleBackForth E a c := by
   intro i
@@ -312,7 +312,7 @@ theorem pebbleBackForth_trans {E : PebbleRel A k} (h : ∀ a b c, E a b → E b 
 
 /-- Every stage of the refinement chain of an equivalence is an
 equivalence. -/
-theorem pebbleStage_equivalence (hE₀ : Equivalence E₀) (n : ℕ) :
+private theorem pebbleStage_equivalence (hE₀ : Equivalence E₀) (n : ℕ) :
     Equivalence (pebbleStage E₀ n) := by
   induction n with
   | zero => exact ⟨fun _ => trivial, fun _ => trivial, fun _ _ => trivial⟩
@@ -334,7 +334,7 @@ end Equivalence
 /-! ### Monotonicity and the expansion lemma -/
 
 /-- The stages are monotone in the initial relation. -/
-theorem pebbleStage_mono {E₀ E₀' : PebbleRel A k} (h : E₀'.Le E₀) (n : ℕ) :
+private theorem pebbleStage_mono {E₀ E₀' : PebbleRel A k} (h : E₀'.Le E₀) (n : ℕ) :
     (pebbleStage E₀' n).Le (pebbleStage E₀ n) := by
   induction n with
   | zero => exact fun _ _ h => h
@@ -342,7 +342,7 @@ theorem pebbleStage_mono {E₀ E₀' : PebbleRel A k} (h : E₀'.Le E₀) (n : �
     exact fun a b hab => ⟨h a b hab.1, pebbleBackForth_mono ih a b hab.2⟩
 
 /-- `≡ᵏ` is monotone in the initial relation. -/
-theorem equivK_mono {E₀ E₀' : PebbleRel A k} (h : E₀'.Le E₀) :
+private theorem equivK_mono {E₀ E₀' : PebbleRel A k} (h : E₀'.Le E₀) :
     (EquivK E₀').Le (EquivK E₀) :=
   fun a b hab n => pebbleStage_mono h n a b (hab n)
 

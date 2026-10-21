@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.AltQuant
+import all DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Relativizing an alternating prefix along an encoding
@@ -58,7 +59,7 @@ variable {e G pol}
 omit [Nonempty α] in
 /-- Updating an encoded valuation at an encoded value is encoding the updated
 valuation. -/
-theorem update_encode (v : Fin n → α) (k : Fin n) (a : α) :
+private theorem update_encode (v : Fin n → α) (k : Fin n) (a : α) :
     Function.update (fun i => e (v i)) k (e a) = fun i => e (Function.update v k a i) := by
   refine funext fun i => ?_
   by_cases hik : i = k

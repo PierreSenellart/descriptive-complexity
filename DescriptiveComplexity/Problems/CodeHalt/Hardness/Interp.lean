@@ -227,7 +227,7 @@ minima. Elements failing it carry no mark and no child, so they draw nothing. -/
 def OkOn (t : ProgTag V cP) (u : Fin (dimOf V) → A) : Prop := Canon (ProgTag.used t) u
 
 /-- **The first-child relation of the drawing**, one case per pair of tags. -/
-def Arg1On : ProgTag V cP → ProgTag V cP → (Fin (dimOf V) → A) → (Fin (dimOf V) → A) → Prop
+private def Arg1On : ProgTag V cP → ProgTag V cP → (Fin (dimOf V) → A) → (Fin (dimOf V) → A) → Prop
   | .root, .cp p, _, _ => p = codeRootPos cP
   | .cp p, .cp q, _, _ => sub1 cP p = some q
   | .pairN, .numN, _, u' => IsBot (u' (fz V))
@@ -240,7 +240,7 @@ def Arg1On : ProgTag V cP → ProgTag V cP → (Fin (dimOf V) → A) → (Fin (d
 
 /-- **The second-child relation of the drawing**, one case per pair of
 tags. -/
-def Arg2On : ProgTag V cP → ProgTag V cP → (Fin (dimOf V) → A) → (Fin (dimOf V) → A) → Prop
+private def Arg2On : ProgTag V cP → ProgTag V cP → (Fin (dimOf V) → A) → (Fin (dimOf V) → A) → Prop
   | .root, .pairN, _, _ => True
   | .cp p, .cp q, _, _ => sub2 cP p = some q
   | .pairN, .symN i, _, _ => (i : ℕ) = 0
@@ -281,7 +281,7 @@ private theorem realize_guardF_selB (t : ProgTag V cP) (u : Fin (dimOf V) → A)
   rw [guardF, realize_canonF, OkOn]
   exact iff_of_eq (congrArg (Canon (ProgTag.used t)) (funext hv))
 
-theorem realize_arg1Body (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A)
+private theorem realize_arg1Body (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A)
     (v : Fin 2 × Fin (dimOf V) → A) (hA : ∀ j, v (selA V j) = u j)
     (hB : ∀ j, v (selB V j) = u' j) :
     (arg1Body V cP t t').Realize v ↔ Arg1On t t' u u' := by
@@ -292,7 +292,7 @@ theorem realize_arg1Body (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A)
     simp only [arg1Body, Arg1On] <;> (try split_ifs with h) <;>
     simp_all [Formula.realize_not]
 
-theorem realize_arg2Body (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A)
+private theorem realize_arg2Body (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A)
     (v : Fin 2 × Fin (dimOf V) → A) (hA : ∀ j, v (selA V j) = u j)
     (hB : ∀ j, v (selB V j) = u' j) :
     (arg2Body V cP t t').Realize v ↔ Arg2On t t' u u' := by
@@ -303,7 +303,7 @@ theorem realize_arg2Body (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A)
     simp only [arg2Body, Arg2On] <;> (try split_ifs with h) <;>
     simp_all [Formula.realize_inf]
 
-theorem cRoot_pt (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
+private theorem cRoot_pt (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
     CRoot (progPt t u) ↔ OkOn t u ∧ t = ProgTag.root := by
   rw [CRoot, FOInterpretation.relMap_map]
   change (rootMarkF V cP t).Realize _ ↔ _
@@ -313,7 +313,7 @@ theorem cRoot_pt (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
     exact (realize_guardF_sel₀ _ u _ fun _ => rfl).trans (by simp)
   all_goals exact iff_of_false (by simp [rootMarkF]) (by simp)
 
-theorem mark_pt (s : CodeTag) (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
+private theorem mark_pt (s : CodeTag) (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
     Mark s (progPt t u) ↔ OkOn t u ∧ ProgTag.mark t = s := by
   have hkey : ∀ (φ : Language.code.Relations 1) (hφ : ∀ (τ : Fin 1 → ProgTag V cP),
       (codeProgInterp V cP).relFormula φ τ = markF V cP s (τ 0)),
@@ -337,7 +337,7 @@ theorem mark_pt (s : CodeTag) (t : ProgTag V cP) (u : Fin (dimOf V) → A) :
   · exact hkey cPrec fun _ => rfl
   · exact hkey cRfind fun _ => rfl
 
-theorem cArg1_pt (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A) :
+private theorem cArg1_pt (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A) :
     CArg1 (progPt t u) (progPt t' u') ↔ OkOn t u ∧ OkOn t' u' ∧ Arg1On t t' u u' := by
   rw [CArg1, FOInterpretation.relMap_map]
   change (arg1F V cP t t').Realize _ ↔ _
@@ -345,7 +345,7 @@ theorem cArg1_pt (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A) :
     realize_guardF_selA t u _ fun _ => rfl, realize_guardF_selB t' u' _ fun _ => rfl,
     realize_arg1Body t t' u u' _ (fun _ => rfl) fun _ => rfl, and_assoc]
 
-theorem cArg2_pt (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A) :
+private theorem cArg2_pt (t t' : ProgTag V cP) (u u' : Fin (dimOf V) → A) :
     CArg2 (progPt t u) (progPt t' u') ↔ OkOn t u ∧ OkOn t' u' ∧ Arg2On t t' u u' := by
   rw [CArg2, FOInterpretation.relMap_map]
   change (arg2F V cP t t').Realize _ ↔ _

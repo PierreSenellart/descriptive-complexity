@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Parts
+import all DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Prefix
+import all DescriptiveComplexity.Problems.Qsat.Tags
 
 /-!
 # Peeling the blocks of the prefix
@@ -91,7 +94,7 @@ theorem triple_eq_lev {ℓ'' ℓ : A} {s k : ℕ} :
 /-! ### The five transitions -/
 
 /-- Before the endpoints nothing has been quantified. -/
-theorem qPlayed_tEnds : QPlayed (tEnds A) = fun _ : QM A => False := by
+private theorem qPlayed_tEnds : QPlayed (tEnds A) = fun _ : QM A => False := by
   funext x
   refine propext ⟨?_, False.elim⟩
   rintro ⟨v, p, q, -, hv, hlt⟩
@@ -214,7 +217,7 @@ theorem step_last {ℓ : A} (hmax : IsMaxSV ℓ) :
     · exact triple_ne_grp (by omega) h1
 
 /-- Once the auxiliary variables are quantified, everything is. -/
-theorem all_played :
+private theorem all_played :
     ∀ x : QM A, IsQVar x → qUnion (QPlayed (tAux A)) (QBlk (tAux A)) x := by
   intro x hx
   rcases qm_cases x with ⟨v, p, q, rfl⟩ | ⟨c, p, q, rfl⟩
@@ -241,7 +244,7 @@ theorem blk_all {T : ℕ × A × ℕ}
   rintro x ⟨v, p, q, rfl, hv, he⟩
   exact (isQAll_qVar v p q).mpr ⟨h v p q hv he, hv⟩
 
-theorem blk_ex_tEnds : ∀ x : QM A, QBlk (tEnds A) x → ¬IsQAll x := by
+private theorem blk_ex_tEnds : ∀ x : QM A, QBlk (tEnds A) x → ¬IsQAll x := by
   refine blk_ex fun v p q hv he => ?_
   cases v <;> simp_all [tEnds, Prod.mk.injEq]
 
@@ -255,7 +258,7 @@ theorem blk_ex_tUV (ℓ : A) : ∀ x : QM A, QBlk (tUV ℓ) x → ¬IsQAll x := 
   refine blk_ex fun v p q hv he => ?_
   cases v <;> simp_all [tUV, Prod.mk.injEq]
 
-theorem blk_ex_tAux : ∀ x : QM A, QBlk (tAux A) x → ¬IsQAll x := by
+private theorem blk_ex_tAux : ∀ x : QM A, QBlk (tAux A) x → ¬IsQAll x := by
   refine blk_ex fun v p q hv he => ?_
   cases v <;> simp_all [tAux, Prod.mk.injEq]
 

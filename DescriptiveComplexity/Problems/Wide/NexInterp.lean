@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.NexDef
 public import DescriptiveComplexity.Problems.Wide.DrawInterp
+import all DescriptiveComplexity.Problems.Wide.DrawInterp
+import all DescriptiveComplexity.Problems.Wide.NexDef
+import all DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
 # The clocked machine, written down
@@ -61,7 +64,7 @@ rules are the same function of the rule name, the start phase, the accepting
 predicate and the blank tape are the same, and the initial pointer – the file's
 first register – is clear at every coordinate, because the least index of the
 layout carries the least tuple. -/
-theorem nexProg_eq_progFrom (e : Env L)
+private theorem nexProg_eq_progFrom (e : Env L)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     (coord : Fin dt.dd → dt.CtlIx)
     (β : SweepSpec e.α dt.CtlIx dt.SlotIx (Option dt.KIx))
@@ -110,7 +113,7 @@ noncomputable def nexInterp (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.
 /-- **The interpreted structure reads the clocked program's table**: the whole
 point of the definability layer, at the program the reduction emits. This is
 what the run layer's lemmas are stated under. -/
-theorem reads_nexProg (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
+private theorem reads_nexProg (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     (hcoord : Function.Injective coord)
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v)
     (bot : Option dt.KIx) (e : Env L)

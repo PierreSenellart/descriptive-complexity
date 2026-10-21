@@ -162,7 +162,7 @@ variable {A B : Type} [Language.circuit.Structure A] [Language.circuit.Structure
 
 /-- Derivable values transport along an isomorphism: one induction on the
 derivation, each rule rebuilt at the image. -/
-theorem gateVal_map (e : A ≃[Language.circuit] B) {b : Bool} {g : A}
+private theorem gateVal_map (e : A ≃[Language.circuit] B) {b : Bool} {g : A}
     (h : GateVal b g) : GateVal b (e g) := by
   induction h with
   | constTrue hg => exact .constTrue ((relMap_equiv₁ e circIsTrue _).mp hg)

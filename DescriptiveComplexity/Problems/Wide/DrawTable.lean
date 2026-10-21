@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawGeom
 public import DescriptiveComplexity.Problems.Wide.Key
 public import DescriptiveComplexity.Problems.Wide.Tape
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # The transition table, and the two promises it has to keep
@@ -198,52 +200,52 @@ name. Each is the definitional unfolding of the predicate above with
 `DescriptiveComplexity.Draw.unpad_pad` applied to the payload, and together they
 are the only thing a program ever needs about the table. -/
 
-theorem isTr_trElt {r : R} {w : Fin c → A} (hg : T.guard r w) :
+private theorem isTr_trElt {r : R} {w : Fin c → A} (hg : T.guard r w) :
     T.IsTr (trElt (dd := dd) (K := K) (P := P) T.zero r w) := by
   refine ⟨isPad_pad, ?_⟩
   change T.guard r (unpad T.payload_le (pad T.zero w))
   rw [unpad_pad T.payload_le]
   exact hg
 
-theorem isAcc_stateElt {p : P} {w : Fin c → A} (ha : T.accept p w) :
+private theorem isAcc_stateElt {p : P} {w : Fin c → A} (ha : T.accept p w) :
     T.IsAcc (stateElt (dd := dd) (K := K) (R := R) T.zero p w) := by
   refine ⟨isPad_pad, ?_⟩
   change T.accept p (unpad T.payload_le (pad T.zero w))
   rw [unpad_pad T.payload_le]
   exact ha
 
-theorem src_trElt (r : R) (w : Fin c → A) :
+private theorem src_trElt (r : R) (w : Fin c → A) :
     T.Src (trElt (dd := dd) (K := K) (P := P) T.zero r w)
       (stateElt T.zero (T.srcPh r) (T.srcPl r w)) := by
   change stateElt T.zero (T.srcPh r) (T.srcPl r w) =
     stateElt T.zero (T.srcPh r) (T.srcPl r (unpad T.payload_le (pad T.zero w)))
   rw [unpad_pad T.payload_le]
 
-theorem read_trElt (r : R) (w : Fin c → A) :
+private theorem read_trElt (r : R) (w : Fin c → A) :
     T.Read (trElt (dd := dd) (K := K) (P := P) T.zero r w)
       (symElt T.zero (T.readPl r w)) := by
   change symElt T.zero (T.readPl r w) =
     symElt T.zero (T.readPl r (unpad T.payload_le (pad T.zero w)))
   rw [unpad_pad T.payload_le]
 
-theorem dst_trElt (r : R) (w : Fin c → A) :
+private theorem dst_trElt (r : R) (w : Fin c → A) :
     T.Dst (trElt (dd := dd) (K := K) (P := P) T.zero r w)
       (stateElt T.zero (T.dstPh r) (T.dstPl r w)) := by
   change stateElt T.zero (T.dstPh r) (T.dstPl r w) =
     stateElt T.zero (T.dstPh r) (T.dstPl r (unpad T.payload_le (pad T.zero w)))
   rw [unpad_pad T.payload_le]
 
-theorem write_trElt (r : R) (w : Fin c → A) :
+private theorem write_trElt (r : R) (w : Fin c → A) :
     T.Write (trElt (dd := dd) (K := K) (P := P) T.zero r w)
       (symElt T.zero (T.writePl r w)) := by
   change symElt T.zero (T.writePl r w) =
     symElt T.zero (T.writePl r (unpad T.payload_le (pad T.zero w)))
   rw [unpad_pad T.payload_le]
 
-theorem isRight_trElt {r : R} (w : Fin c → A) (hd : T.moveRight r) :
+private theorem isRight_trElt {r : R} (w : Fin c → A) (hd : T.moveRight r) :
     T.IsRight (trElt (dd := dd) (K := K) (P := P) T.zero r w) := hd
 
-theorem not_isRight_trElt {r : R} (w : Fin c → A) (hd : ¬T.moveRight r) :
+private theorem not_isRight_trElt {r : R} (w : Fin c → A) (hd : ¬T.moveRight r) :
     ¬T.IsRight (trElt (dd := dd) (K := K) (P := P) T.zero r w) := hd
 
 /-! ### An instance that reads the table -/
@@ -365,7 +367,7 @@ omit [Finite A] [Finite R] [Finite P] [Finite K] in
 phase satisfies `Ph`, the state and the symbol read name the transition. This is
 the hypothesis of `DescriptiveComplexity.TMData.step_functional_at`, and with it
 a guessing program is functional off its guess. -/
-theorem tr_unique_of_sepOn (hR : T.Reads) {Ph : P → Prop} (hsep : T.SepOn Ph)
+private theorem tr_unique_of_sepOn (hR : T.Reads) {Ph : P → Prop} (hsep : T.SepOn Ph)
     {q a : Univ A R P K dd}
     (hq : ∀ (p : P) (f : Fin c → A), q = stateElt T.zero p f → Ph p) :
     ∀ τ σ : Univ A R P K dd, WMTr τ → WMTr σ → WMSrc τ q → WMSrc σ q →
@@ -390,7 +392,7 @@ theorem tr_unique_of_sepOn (hR : T.Reads) {Ph : P → Prop} (hsep : T.SepOn Ph)
 
 omit [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **A transition has one destination**: it is an equation in the rule. -/
-theorem dst_functional (hR : T.Reads) :
+private theorem dst_functional (hR : T.Reads) :
     ∀ τ q q' : Univ A R P K dd, WMDst τ q → WMDst τ q' → q = q' := by
   rintro ⟨t, v⟩ q q' hq hq'
   rw [hR.dst] at hq hq'
@@ -399,7 +401,7 @@ theorem dst_functional (hR : T.Reads) :
 
 omit [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **A transition writes one symbol**: it is an equation in the rule. -/
-theorem write_functional (hR : T.Reads) :
+private theorem write_functional (hR : T.Reads) :
     ∀ τ a a' : Univ A R P K dd, WMWrite τ a → WMWrite τ a' → a = a' := by
   rintro ⟨t, v⟩ a a' ha ha'
   rw [hR.write] at ha ha'
@@ -451,7 +453,7 @@ omit [LinearOrder R] [LinearOrder P] [LinearOrder K] [LinearOrder A]
   [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- The order on addresses depends on the order of the elements only through its
 extension. -/
-theorem wmSetLe_congr_rel {α : Type} {Le Le' : α → α → Prop} (h : ∀ x y, Le x y ↔ Le' x y)
+private theorem wmSetLe_congr_rel {α : Type} {Le Le' : α → α → Prop} (h : ∀ x y, Le x y ↔ Le' x y)
     (s u : α → Prop) : WMSetLe Le s u ↔ WMSetLe Le' s u := by
   refine or_congr Iff.rfl (exists_congr fun x => and_congr_left fun _ => ?_)
   exact forall_congr' fun y => imp_congr (and_congr (h y x) (not_congr (h x y))) Iff.rfl
@@ -513,7 +515,7 @@ theorem acceptsSpace (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
 are addresses – `2 ^ n` of them, `n` the size of the drawn universe – and ends in
 a state the table accepts. This is the reading a *time*-bounded reduction needs,
 where `DescriptiveComplexity.Draw.Table.acceptsSpace` is the space-bounded one. -/
-theorem accepts (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
+private theorem accepts (hR : T.Reads) (hmk : ∀ x : Univ A R P K dd, T.Marked x)
     {f : (Univ A R P K dd → Prop) → Univ A R P K dd}
     (hmark : ∀ x : Univ A R P K dd, f (wmSeg x) = symElt T.zero (T.markPl x))
     (hrest : ∀ s : Univ A R P K dd → Prop, (∀ x : Univ A R P K dd, s ≠ wmSeg x) →

@@ -7,6 +7,10 @@ module
 
 import DescriptiveComplexity.Problems.Wide.NexOuter
 public import DescriptiveComplexity.Problems.Wide.NexSpec
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawRules
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # What a rule may not write
@@ -43,7 +47,7 @@ open Classical in
 `StepsIn` form is an iterated existential, which is what a *forward* proof wants;
 a backward reading has to speak of the configuration at each time, and that is
 this. -/
-theorem exists_seq_of_stepsIn : ∀ {n : ℕ} {c d : Config V}, M.StepsIn n c d →
+private theorem exists_seq_of_stepsIn : ∀ {n : ℕ} {c d : Config V}, M.StepsIn n c d →
     ∃ g : ℕ → Config V, g 0 = c ∧ (∀ i, n ≤ i → g i = d) ∧
       ∀ i, i < n → M.Step (g i) (g (i + 1)) := by
   intro n
@@ -77,7 +81,7 @@ theorem exists_seq_of_stepsIn : ∀ {n : ℕ} {c d : Config V}, M.StepsIn n c d 
 steps compose. This is how a backward reading passes the *rest* of the run – from
 the entry it found to the accepting configuration – to
 `DescriptiveComplexity.TMData.not_acc_of_reaches_dead_of_uniqueFrom`. -/
-theorem reflTransGen_of_seq (g : ℕ → Config V) {n : ℕ}
+private theorem reflTransGen_of_seq (g : ℕ → Config V) {n : ℕ}
     (hstep : ∀ i, i < n → M.Step (g i) (g (i + 1))) :
     ∀ {m : ℕ}, m ≤ n → Relation.ReflTransGen M.Step (g m) (g n) := by
   induction n with
@@ -145,14 +149,14 @@ variable {L : Language.{0, 0}} {dt : Data L} {A Q P : Type}
 variable (dt) in
 /-- **A rule keeps the file**: whatever it writes, the slots the channel wrote
 come out unchanged. -/
-def Rule.KeepsFile (ρ : Rule A Q dt.SlotIx P) : Prop :=
+private def Rule.KeepsFile (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A) (s : dt.SlotIx), s.IsFile → ρ.wr f g s = g s
 
 variable (dt) in
 /-- **A rule writes bits**: every slot it leaves is either untouched or one of
 the two designated elements. This is what keeps a tape readable as an
 `DescriptiveComplexity.Draw.Data.ixBack`, whose tracks are `bitVal`s. -/
-def Rule.WritesBits (zero one : A) (ρ : Rule A Q dt.SlotIx P) : Prop :=
+private def Rule.WritesBits (zero one : A) (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A) (s : dt.SlotIx),
     ρ.wr f g s = g s ∨ ρ.wr f g s = zero ∨ ρ.wr f g s = one
 
@@ -161,7 +165,7 @@ variable (dt) in
 saved mirror and the valuation are read off the *file's* registers, so a tape
 that carries them at an address which is nobody's register is not an
 `ixBack` of anything. The opening never writes them. -/
-def Rule.KeepsCellTracks (ρ : Rule A Q dt.SlotIx P) : Prop :=
+private def Rule.KeepsCellTracks (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A) (s : dt.SlotIx),
     (s = Slot.mir ∨ s = Slot.tgt ∨ s = Slot.sav ∨ s = Slot.val) → ρ.wr f g s = g s
 
@@ -169,20 +173,20 @@ variable (dt) in
 /-- **A rule leaves one slot alone.** The semantic half of a backward reading is
 built from these: which slot each rule may touch, and hence what a track still
 holds after a stretch of the run. -/
-def Rule.KeepsSlot (t : dt.SlotIx) (ρ : Rule A Q dt.SlotIx P) : Prop :=
+private def Rule.KeepsSlot (t : dt.SlotIx) (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A), ρ.wr f g t = g t
 
 variable (dt) in
 /-- **A rule sets a slot**: whatever it reads, it leaves that slot holding the
 designated one. The start step does this to the marker and the bottom mark. -/
-def Rule.SetsSlot (one : A) (t : dt.SlotIx) (ρ : Rule A Q dt.SlotIx P) : Prop :=
+private def Rule.SetsSlot (one : A) (t : dt.SlotIx) (ρ : Rule A Q dt.SlotIx P) : Prop :=
   ∀ (f : Q → A) (g : dt.SlotIx → A), ρ.wr f g t = one
 
 open Classical in
 /-- **After a rule that sets a slot, that track marks the cell it was written
 at** – provided it was clear before, which at the channel's tape it is
 (`initBackReg_track_zero`). -/
-theorem track_after_set {zero one : A} {t : dt.SlotIx}
+private theorem track_after_set {zero one : A} {t : dt.SlotIx}
     {ρ : Rule A Q dt.SlotIx P} (hset : Rule.SetsSlot dt one t ρ)
     {U : Type} {rest : U → dt.SlotIx → A} (hzero : ∀ r, rest r t = zero)
     (f : Q → A) (v : U) (s : U) :
@@ -204,7 +208,7 @@ variable [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx]
 omit [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] in
 /-- **The guess keeps the file**: it writes the stage tracks and copies every
 other slot, the file's included. -/
-theorem guessWr_keepsFile (zero one : A) (x : dt.d.B.ι → Bool)
+private theorem guessWr_keepsFile (zero one : A) (x : dt.d.B.ι → Bool)
     (g : dt.SlotIx → A) (s : dt.SlotIx) (hs : s.IsFile) :
     dt.guessWr zero one x g s = g s := by
   match s with
@@ -234,7 +238,7 @@ handed program's rules either write nothing, or write the marker and the bottom
 mark (the start step), or write the guess's stage tracks – and none of those is a
 slot the channel wrote. The evaluation's own sites are the parameter `ruleE`, and
 a backward *opening* reading never reaches them. -/
-theorem nexRule_keepsFile_of_ne_eval {SE PE : Type} {ShE : SE → Type}
+private theorem nexRule_keepsFile_of_ne_eval {SE PE : Type} {ShE : SE → Type}
     (one : A) (zero : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (hγ : ∀ (b : Option dt.KIx) (x : dt.d.B.ι → Bool),
@@ -285,7 +289,7 @@ theorem nexRule_keepsFile_of_ne_eval {SE PE : Type} {ShE : SE → Type}
 
 omit [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] in
 /-- The guess's write is a bit at the stage tracks and a copy everywhere else. -/
-theorem guessWr_bits (one zero : A)
+private theorem guessWr_bits (one zero : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (hγ : ∀ (b : Option dt.KIx) (x : dt.d.B.ι → Bool),
       γ.wr b x = fun (_ : dt.CtlIx → A) g => dt.guessWr zero one x g)
@@ -317,7 +321,7 @@ theorem guessWr_bits (one zero : A)
 
 omit [Fintype Q] [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] in
 /-- The guess leaves the addressed tracks alone. -/
-theorem guessWr_cellTracks (one zero : A)
+private theorem guessWr_cellTracks (one zero : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (hγ : ∀ (b : Option dt.KIx) (x : dt.d.B.ι → Bool),
       γ.wr b x = fun (_ : dt.CtlIx → A) g => dt.guessWr zero one x g)
@@ -334,7 +338,7 @@ set_option linter.unusedDecidableInType false in
 set_option linter.unusedFintypeInType false in
 /-- **The outer layer writes bits**: the start step writes `one`, the guess
 writes a stage bit, and every other site of the opening writes nothing. -/
-theorem nexRule_writesBits_of_ne_eval {SE PE : Type} {ShE : SE → Type}
+private theorem nexRule_writesBits_of_ne_eval {SE PE : Type} {ShE : SE → Type}
     (one : A) (zero : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (hγ : ∀ (b : Option dt.KIx) (x : dt.d.B.ι → Bool),
@@ -386,7 +390,7 @@ set_option linter.unusedFintypeInType false in
 /-- **The outer layer leaves the addressed tracks alone**: the opening writes the
 marker, the bottom mark and the stage tracks, never the mirror, the target, the
 saved mirror or the valuation. -/
-theorem nexRule_keepsCellTracks_of_ne_eval {SE PE : Type} {ShE : SE → Type}
+private theorem nexRule_keepsCellTracks_of_ne_eval {SE PE : Type} {ShE : SE → Type}
     (one : A) (zero : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (hγ : ∀ (b : Option dt.KIx) (x : dt.d.B.ι → Bool),
@@ -433,7 +437,7 @@ set_option linter.unusedFintypeInType false in
 /-- **Only the start step writes the marker and the bottom mark**: every other
 site of the opening leaves both alone, so after the first step the working track
 marks the address the head started on and nothing else. -/
-theorem nexRule_keepsSlot_wk_bot {SE PE : Type} {ShE : SE → Type}
+private theorem nexRule_keepsSlot_wk_bot {SE PE : Type} {ShE : SE → Type}
     (one : A) (zero : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (hγ : ∀ (b : Option dt.KIx) (x : dt.d.B.ι → Bool),
@@ -484,7 +488,7 @@ set_option linter.unusedDecidableInType false in
 set_option linter.unusedFintypeInType false in
 /-- **Only the guess writes the stage tracks**: every other site of the opening
 leaves them alone, so what the evaluation reads there is what the guess wrote. -/
-theorem nexRule_keepsSlot_old {SE PE : Type} {ShE : SE → Type}
+private theorem nexRule_keepsSlot_old {SE PE : Type} {ShE : SE → Type}
     (one : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (ruleE : ∀ e : SE, ShE e → Rule A dt.CtlIx dt.SlotIx (NexPh (Option dt.KIx) PE))
@@ -521,7 +525,7 @@ set_option linter.unusedSectionVars false in
 set_option linter.unusedDecidableInType false in
 set_option linter.unusedFintypeInType false in
 /-- **The start step sets the marker and the bottom mark.** -/
-theorem nexRule_setsSlot_start {SE PE : Type} {ShE : SE → Type}
+private theorem nexRule_setsSlot_start {SE PE : Type} {ShE : SE → Type}
     (one : A)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (ruleE : ∀ e : SE, ShE e → Rule A dt.CtlIx dt.SlotIx (NexPh (Option dt.KIx) PE))
@@ -554,7 +558,7 @@ open Classical in
 has them, the four addressed tracks clear, every other track a bit – and the tape
 state is read off the tape, bit by bit. This is what turns a *recognized* tape
 into the object every run lemma is stated against. -/
-theorem exists_ixBack_of_shape (lay : Layout dt A R' P' I) {zero one : A}
+private theorem exists_ixBack_of_shape (lay : Layout dt A R' P' I) {zero one : A}
     (hzo : zero ≠ one)
     (rest : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A)
     (st₀ : TapeSt dt A R' P' I)
@@ -627,7 +631,7 @@ open Classical in
 keeps the shape.** This is the step of the opening's reading: the cell under the
 head is the only one that changes, and the three facts say the change stays
 inside the shape. -/
-theorem tapeShape_update {lay : Layout dt A R' P' I} {zero one : A}
+private theorem tapeShape_update {lay : Layout dt A R' P' I} {zero one : A}
     {st₀ : TapeSt dt A R' P' I}
     {rest : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     (hshape : TapeShape (dt := dt) lay zero one st₀ rest)
@@ -664,7 +668,7 @@ theorem tapeShape_update {lay : Layout dt A R' P' I} {zero one : A}
 
 omit [Fintype dt.SlotIx] in
 /-- **The marker track, read back.** -/
-theorem ixBack_wk_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠ one)
+private theorem ixBack_wk_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠ one)
     (st : TapeSt dt A R' P' I) {P : (Univ A R' P' dt.KIx dt.dd → Prop) → Prop}
     (hread : ∀ r, dt.ixBack lay zero one dt.dd0Le st r Slot.wk = bitVal zero one (P r)) :
     st.wk = P := by
@@ -683,7 +687,7 @@ theorem ixBack_wk_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠
 
 omit [Fintype dt.SlotIx] in
 /-- **The bottom mark, read back.** -/
-theorem ixBack_bot_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠ one)
+private theorem ixBack_bot_inv (lay : Layout dt A R' P' I) {zero one : A} (hzo : zero ≠ one)
     (st : TapeSt dt A R' P' I) {P : (Univ A R' P' dt.KIx dt.dd → Prop) → Prop}
     (hread : ∀ r, dt.ixBack lay zero one dt.dd0Le st r Slot.bot = bitVal zero one (P r)) :
     st.bot = P := by
@@ -705,7 +709,7 @@ writes its tapes as `passTracksAt`, which overwrites the walked track with the
 mark the head carries; where the head carries no mark and the track is clear,
 the two agree. This is the bridge from the shape a *reading* recovers to the
 tape the run lemmas are stated over. -/
-theorem passTracksAt_of_mir_zero {J : Type}
+private theorem passTracksAt_of_mir_zero {J : Type}
     (cell : J → (Univ A R' P' dt.KIx dt.dd → Prop))
     {PR : Prog A R' P' dt.CtlIx dt.SlotIx dt.KIx dt.dd} [DecidableEq dt.SlotIx]
     (rest : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A)
@@ -740,7 +744,7 @@ payload and the cell's own tracks. Read backwards – from an arbitrary step to 
 tape it produces – this is what a recognizing argument walks along, and it is the
 converse of the run layer's `Prog.step_*` lemmas, which write the cell they
 already know. -/
-theorem step_tape_of_shape_tr (hR : PR.table.Reads)
+private theorem step_tape_of_shape_tr (hR : PR.table.Reads)
     {x y : Config (WPoint (Univ A R P K dd))}
     {rest : (Univ A R P K dd → Prop) → W → A}
     {v : Univ A R P K dd → Prop}
@@ -825,7 +829,7 @@ variable {PR : Prog A R' P' dt.CtlIx dt.SlotIx dt.KIx dt.dd}
 variable (PR) in
 /-- **A configuration the reading recognizes**: its tape carries a slot vector
 at every cell, of the shape `TapeShape` describes. -/
-def ShapedAt (lay : Layout dt A R' P' I) (st₀ : TapeSt dt A R' P' I)
+private def ShapedAt (lay : Layout dt A R' P' I) (st₀ : TapeSt dt A R' P' I)
     (c : Config (WPoint (Univ A R' P' dt.KIx dt.dd))) : Prop :=
   ∃ rest, c.tape = wideTape (fun r => PR.syElt (rest r)) (PR.syElt PR.blank) ∧
     TapeShape (dt := dt) lay PR.zero PR.one st₀ rest
@@ -836,7 +840,7 @@ open Classical in
 caller vouches for.** A step's transition carries its rule, and the state it
 fires from carries that rule's source phase, so vouching for the phases a run
 passes through is vouching for the rules it fires. -/
-theorem shapedAt_step_of_phase (hR : PR.table.Reads) {lay : Layout dt A R' P' I}
+private theorem shapedAt_step_of_phase (hR : PR.table.Reads) {lay : Layout dt A R' P' I}
     {st₀ : TapeSt dt A R' P' I} {Ph : P' → Prop}
     {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     {v : Univ A R' P' dt.KIx dt.dd → Prop} (hhead : x.head = Sum.inl v)
@@ -877,7 +881,7 @@ passes through** – all of them but the last, since it is the *fired* rules tha
 matter. This is the form an opening's reading uses: the phases before the
 evaluation's entry are the outer layer's, and those are the rules
 `nexRule_keepsFile_of_ne_eval` and its two siblings are about. -/
-theorem shapedAt_of_reaches_of_phase (hR : PR.table.Reads)
+private theorem shapedAt_of_reaches_of_phase (hR : PR.table.Reads)
     {lay : Layout dt A R' P' I} {st₀ : TapeSt dt A R' P' I} {Ph : P' → Prop}
     {c₀ : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     (hfacts : ∀ r : R', Ph (PR.table.srcPh r) → Rule.KeepsFile dt (PR.rules r) ∧
@@ -908,7 +912,7 @@ recognized, as long as the phases up to that time are ones the caller vouches
 for. This is `shapedAt_of_reaches_of_phase` in the form a backward reading
 actually has its run in – time by time, so that «the phases *before* the entry»
 is a statement about indices. -/
-theorem shapedAt_of_seq (hR : PR.table.Reads)
+private theorem shapedAt_of_seq (hR : PR.table.Reads)
     {lay : Layout dt A R' P' I} {st₀ : TapeSt dt A R' P' I} {Ph : P' → Prop}
     (hfacts : ∀ r : R', Ph (PR.table.srcPh r) → Rule.KeepsFile dt (PR.rules r) ∧
       Rule.KeepsCellTracks dt (PR.rules r) ∧
@@ -934,7 +938,7 @@ open Classical in
 /-- **A step that fires a rule keeping a slot leaves that track alone**, at every
 address: at the head because the rule keeps it, elsewhere because a step writes
 nowhere else. -/
-theorem step_track_const (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx}
+private theorem step_track_const (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx}
     {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     {rest : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     {v : Univ A R' P' dt.KIx dt.dd → Prop} (hhead : x.head = Sum.inl v)
@@ -976,7 +980,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] [LinearOrder A]
 the positions of a wide machine are its addresses. The head of the *initial*
 configuration is one by construction, so along a run every head is – which is
 what a reading needs before it can speak of the cell under the head. -/
-theorem head_isAddr_of_step
+private theorem head_isAddr_of_step
     {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     (hstep : (wideData (Univ A R' P' dt.KIx dt.dd)).Step x y) :
     ∃ v, y.head = Sum.inl v := by
@@ -992,7 +996,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 guard held, and the two phases it went between. `step_state_dst` is its
 destination half; a reading that has to know *which* rule fired – because the
 guard of every other one is false – needs the guard too. -/
-theorem step_rule (hR : PR.table.Reads)
+private theorem step_rule (hR : PR.table.Reads)
     {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     (hstep : (wideData (Univ A R' P' dt.KIx dt.dd)).Step x y) :
     ∃ (r : R') (f : dt.CtlIx → A) (g : dt.SlotIx → A),
@@ -1031,7 +1035,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] [LinearOrder A]
 and the packing is injective, so two recognized tapes that are equal carry equal
 tracks. That is what lets a reading combine facts proved of *different*
 recognitions of the same run – the shape's, and the marker's. -/
-theorem rest_eq_of_tape
+private theorem rest_eq_of_tape
     {rest rest' : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     (h : wideTape (fun r => PR.syElt (rest r)) (PR.syElt PR.blank) =
       wideTape (fun r => PR.syElt (rest' r)) (PR.syElt PR.blank)) :
@@ -1049,7 +1053,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **The state a step lands in is a rule's destination**: which is how a
 reading learns that a phase *no rule enters* – the start phase – occurs at time
 zero and never again. -/
-theorem step_state_dst (hR : PR.table.Reads)
+private theorem step_state_dst (hR : PR.table.Reads)
     {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     (hstep : (wideData (Univ A R' P' dt.KIx dt.dd)).Step x y) :
     ∃ (r : R') (f : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → A),
@@ -1077,7 +1081,7 @@ it was written at** – provided the track was clear before, which at the
 channel's tape it is (`initBackReg_track_zero`). This is the one write of the
 opening a backward reading has to *read*, rather than merely skip: the start
 step's marker, which every later rule keeps (`nexRule_keepsSlot_wk_bot`). -/
-theorem step_track_set (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx}
+private theorem step_track_set (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx}
     {x y : Config (WPoint (Univ A R' P' dt.KIx dt.dd))}
     {rest : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     {v : Univ A R' P' dt.KIx dt.dd → Prop} (hhead : x.head = Sum.inl v)
@@ -1115,7 +1119,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 induction as the shape's, carried on one slot. Together with
 `nexRule_keepsSlot_wk_bot` and `nexRule_keepsSlot_old` this is how a backward
 reading learns *what* the tracks hold, not merely that they hold bits. -/
-theorem track_const_of_seq (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx}
+private theorem track_const_of_seq (hR : PR.table.Reads) {Ph : P' → Prop} {t : dt.SlotIx}
     (hkeep : ∀ r : R', Ph (PR.table.srcPh r) → Rule.KeepsSlot dt t (PR.rules r))
     (g : ℕ → Config (WPoint (Univ A R' P' dt.KIx dt.dd)))
     (hhead : ∀ i, ∃ v, (g i).head = Sum.inl v)
@@ -1144,7 +1148,7 @@ began on and every later step keeps it, so at any time after the first the track
 marks that cell and nothing else. With `ixBack_wk_inv` this is «the working
 track marks the address the machine started at», the first of the hypotheses the
 evaluation's entry state is asked for. -/
-theorem track_set_of_seq (hR : PR.table.Reads) {Ph Ph₀ : P' → Prop}
+private theorem track_set_of_seq (hR : PR.table.Reads) {Ph Ph₀ : P' → Prop}
     {t : dt.SlotIx}
     (hset : ∀ r : R', Ph₀ (PR.table.srcPh r) →
       Rule.SetsSlot dt PR.one t (PR.rules r))

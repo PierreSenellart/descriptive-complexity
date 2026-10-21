@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTower
+import all DescriptiveComplexity.Problems.Wide.DrawElem
+import all DescriptiveComplexity.Problems.Wide.DrawStageAtom
+import all DescriptiveComplexity.Problems.Wide.DrawTagged
 
 /-!
 # The rules of an atom's machinery, dispatched by its kind
@@ -170,7 +173,7 @@ variable {dt}
 can move to**: whichever kind it is, its machinery stays inside its own phases
 and only its verdict leaves. This is what a determinism-after-the-guess argument
 asks of an atom (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
-theorem kindDstIn {S : P → Prop} {n : ℕ}
+private theorem kindDstIn {S : P → Prop} {n : ℕ}
     (κ : MatAtom dt.X dt.d.B n) (args : dt.KindArgs (A := A) (Q := Q) κ)
     {emb : dt.KindPh κ → P} (exitPh : P)
     (hemb : ∀ p : dt.KindPh κ, S (emb p)) (hexit : S exitPh) :
@@ -197,7 +200,7 @@ theorem kindDstIn {S : P → Prop} {n : ℕ}
 
 /-- **Every rule of an atom kind's machinery fires from a phase its site
 owns.** -/
-theorem kindHosrc {n : ℕ}
+private theorem kindHosrc {n : ℕ}
     (κ : MatAtom dt.X dt.d.B n) (args : dt.KindArgs (A := A) (Q := Q) κ)
     {emb : dt.KindPh κ → P} (exitPh : P) :
     ∀ (s : dt.KindSite κ) (ρ : dt.KindSh κ s),

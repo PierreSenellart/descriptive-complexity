@@ -8,6 +8,14 @@ module
 public import DescriptiveComplexity.Problems.HornSat.Number
 import DescriptiveComplexity.Problems.HornSat.Hardness
 public import DescriptiveComplexity.Problems.CircuitNumber.Hardness
+import all DescriptiveComplexity.ClauseDischarge
+import all DescriptiveComplexity.Counting.DigitDefinable
+import all DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.CircuitNumber.Draw
+import all DescriptiveComplexity.Problems.CircuitNumber.Hardness
+import all DescriptiveComplexity.Problems.HornSat.Hardness
+import all DescriptiveComplexity.Problems.HornSat.Number
 
 /-!
 # Every digit-definable function reduces to the number written by unit propagation
@@ -66,7 +74,7 @@ variable {prog : HornProgram (L.sum Language.order) B k}
 
 omit [Finite A] [Nonempty A] in
 /-- **Every forced variable is a derived atom**, canonically padded. -/
-theorem derives_of_forcedIn {a₀ : A} (h₀ : IsBot a₀) :
+private theorem derives_of_forcedIn {a₀ : A} (h₀ : IsBot a₀) :
     ∀ (n : ℕ) (i : B.ι) (w : Fin (clauseDim B k) → A),
       ForcedIn (A := (hornInterp prog).Map A) n (varTag i, w) →
         Canon (B.arity i) w ∧ Derives prog ⟨i, pref (arity_le_clauseDim (k := k) i) w⟩ := by
@@ -93,7 +101,7 @@ theorem derives_of_forcedIn {a₀ : A} (h₀ : IsBot a₀) :
 
 omit [Nonempty A] in
 /-- **Every derived atom is a forced variable.** -/
-theorem forced_of_derives {a₀ : A} (h₀ : IsBot a₀) :
+private theorem forced_of_derives {a₀ : A} (h₀ : IsBot a₀) :
     ∀ q : Σ i : B.ι, Fin (B.arity i) → A, Derives prog q →
       Forced (A := (hornInterp prog).Map A) (varTag q.1, pad a₀ q.2) := by
   intro q h
@@ -136,7 +144,7 @@ theorem forced_var_iff {a₀ : A} (h₀ : IsBot a₀) (i : B.ι) (w : Fin (claus
     rwa [pad_pref_of_canon h₀ (arity_le_clauseDim i) hc] at this
 
 /-- **A Horn formula drawn from rules with heads is satisfiable.** -/
-theorem hornSatisfiable_of_headed (hhead : ∀ c ∈ prog, c.head.isSome) :
+private theorem hornSatisfiable_of_headed (hhead : ∀ c ∈ prog, c.head.isSome) :
     HornSatisfiable ((hornInterp prog).Map A) := by
   obtain ⟨a₀, h₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   refine ⟨horn_atMostOnePositive prog, fun _ => True, ?_⟩
@@ -187,22 +195,22 @@ def satEquiv (prog : HornProgram (L.sum Language.order) B k) (bit : Fin c → B.
   ⟨Equiv.refl _, fun {_} f _ => isEmptyElim f, fun {_} _ _ => Iff.rfl⟩
 
 open Classical in
-theorem out_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem out_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (hornNumInterp prog bit).Map A) hnOut ![(varTag i, w)] ↔
       (∃ τ, bit τ = i) ∧ Canon (B.arity i) w := by
   rw [FOInterpretation.relMap_map]
   exact (realize_ite_bot _ _ _).trans (and_congr Iff.rfl realize_canonF)
 
-theorem not_out_cl (ci : Fin prog.length) (w : Fin (clauseDim B k) → A) :
+private theorem not_out_cl (ci : Fin prog.length) (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (hornNumInterp prog bit).Map A) hnOut ![(clTag ci, w)] :=
   fun h => h.elim
 
-theorem not_out_junk (w : Fin (clauseDim B k) → A) :
+private theorem not_out_junk (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (hornNumInterp prog bit).Map A) hnOut ![((Sum.inr () : HornTag prog), w)] :=
   fun h => h.elim
 
 open Classical in
-theorem below_bit_bit (hinj : Function.Injective bit) (τ τ' : Fin c)
+private theorem below_bit_bit (hinj : Function.Injective bit) (τ τ' : Fin c)
     (w w' : Fin (clauseDim B k) → A) :
     RelMap (M := (hornNumInterp prog bit).Map A) hnBelow
         ![(varTag (bit τ), w), (varTag (bit τ'), w')] ↔
@@ -241,7 +249,7 @@ theorem varPt_injective (a₀ : A) : Function.Injective (varPt prog bit hℓ a�
   have : y = y' := funext fun n => congrFun h3 (Fin.cast (hℓ τ).symm n)
   rw [this]
 
-theorem out_iff_varPt (h₀ : IsBot a₀) (p : (hornNumInterp prog bit).Map A) :
+private theorem out_iff_varPt (h₀ : IsBot a₀) (p : (hornNumInterp prog bit).Map A) :
     RelMap (M := (hornNumInterp prog bit).Map A) hnOut ![p] ↔
       ∃ q, p = varPt prog bit hℓ a₀ q := by
   obtain ⟨t, w⟩ := p
@@ -282,7 +290,7 @@ variable [Finite A] [Nonempty A]
 
 omit [Nonempty A] in
 /-- **An output variable is forced exactly when its atom is derived.** -/
-theorem forced_varPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
+private theorem forced_varPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
     Forced (varPt prog bit hℓ a₀ q) ↔
       lfpAssign prog (bit (ofLex q).1)
         fun n => ofLex (ofLex q).2 (Fin.cast (hℓ (ofLex q).1) n) := by
@@ -298,7 +306,8 @@ theorem forced_varPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
 omit [Finite A] [Nonempty A] in
 include hinj hℓ in
 /-- The output variables of the Horn formula are linearly ordered. -/
-theorem varOrder_hornNumInterp (h₀ : IsBot a₀) : VarOrder ((hornNumInterp prog bit).Map A) :=
+private theorem varOrder_hornNumInterp
+    (h₀ : IsBot a₀) : VarOrder ((hornNumInterp prog bit).Map A) :=
   enum_linear (fun x => RelMap (M := (hornNumInterp prog bit).Map A) hnOut ![x])
     (fun y x => RelMap (M := (hornNumInterp prog bit).Map A) hnBelow ![y, x])
     (varPt prog bit hℓ a₀) (out_iff_varPt hℓ h₀) (below_varPt hinj hℓ)
@@ -352,7 +361,7 @@ noncomputable def DigitLFPDef.orderedParsimoniousHorn (d : DigitLFPDef L)
 
 /-- **Every digit-definable problem parsimoniously reduces to the number
 written by unit propagation.** -/
-theorem DigitDefinable.nonempty_orderedParsimoniousHorn (h : DigitDefinable C) :
+private theorem DigitDefinable.nonempty_orderedParsimoniousHorn (h : DigitDefinable C) :
     Nonempty (C ≤ᵖ[≤] HornNumber) := by
   obtain ⟨d, hd⟩ := h
   exact ⟨d.orderedParsimoniousHorn hd⟩

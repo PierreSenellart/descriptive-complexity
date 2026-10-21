@@ -7,6 +7,15 @@ module
 
 import DescriptiveComplexity.Problems.Wide.TrackWrites
 public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.PadRules
+import all DescriptiveComplexity.Problems.Wide.RegChannelEntry
+import all DescriptiveComplexity.Problems.Wide.RegChannelPad
+import all DescriptiveComplexity.Problems.Wide.TrackWrites
 
 /-!
 # Where a backward reading of an accepting run starts
@@ -39,7 +48,7 @@ open Classical in
 nothing before it. This is `Nat.find` in the form a run's reading wants: the
 index, that it is no later than the one it was given, and that every earlier
 index misses. -/
-theorem exists_first_of {P : ℕ → Prop} {n : ℕ} (hn : P n) :
+private theorem exists_first_of {P : ℕ → Prop} {n : ℕ} (hn : P n) :
     ∃ m, m ≤ n ∧ P m ∧ ∀ i, i < m → ¬P i :=
   ⟨Nat.find ⟨n, hn⟩, Nat.find_le hn, Nat.find_spec ⟨n, hn⟩,
     fun _ hi => Nat.find_min ⟨n, hn⟩ hi⟩
@@ -76,7 +85,7 @@ file, keeps the addressed tracks and writes bits.** The evaluation's rules fire
 from an evaluation phase (`nexEvalHosrcF`), and those are post-guess – so a rule
 whose source phase is not is one of the outer layer's, where the three facts are
 `nexRule_keepsFile_of_ne_eval` and its siblings. -/
-theorem nexProgHanded_facts_of_not_postGuess
+private theorem nexProgHanded_facts_of_not_postGuess
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
     {bot : Option dt.KIx}
     (hcov : dt.NexCovered PR (dt.regionSpec PR.zero PR.one) args bot)
@@ -107,7 +116,7 @@ omit [Finite A] [Finite dt.KIx] [Nonempty A]
 phase state: the accepting predicate names `NexPh.acceptP`, and an accepting
 state is canonically padded, so it *is* `stateElt` of its own pointer. This is
 what gives the search for the entry something to find. -/
-theorem postGuess_of_acc
+private theorem postGuess_of_acc
     (haccPh : ∀ (p : NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
       (f : dt.CtlIx → A), PR.accept p f → p = NexPh.acceptP)
     (hR : PR.table.Reads)
@@ -143,7 +152,7 @@ omit [Finite A] [Finite dt.KIx] [Nonempty A]
 /-- **No rule enters the start phase.** The machine is in it at time zero and
 never again – which is what tells a reading that every step after the first
 fires a rule that *keeps* the marker rather than writing it. -/
-theorem nexProgHanded_dstPh_ne_start
+private theorem nexProgHanded_dstPh_ne_start
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
     {bot : Option dt.KIx}
     (hcov : NexCovered PR (dt.regionSpec PR.zero PR.one) args bot)
@@ -185,7 +194,7 @@ omit [Finite A] [Finite dt.KIx] [Nonempty A]
   [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))] [LinearOrder R'] in
 /-- **The start step writes the marker and the bottom mark**, and it is the only
 rule that fires from the start phase. -/
-theorem nexProgHanded_setsSlot_wk
+private theorem nexProgHanded_setsSlot_wk
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
     {bot : Option dt.KIx}
     (hcov : NexCovered PR (dt.regionSpec PR.zero PR.one) args bot)
@@ -230,7 +239,7 @@ omit [Finite A] [Finite dt.KIx] [Nonempty A]
 mark**: the evaluation's fire from a post-guess phase and the start step from the
 start phase, so a rule whose source phase is neither leaves them where they
 are. -/
-theorem nexProgHanded_keepsSlot_wk
+private theorem nexProgHanded_keepsSlot_wk
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
     {bot : Option dt.KIx}
     (hcov : NexCovered PR (dt.regionSpec PR.zero PR.one) args bot)
@@ -267,7 +276,7 @@ the program's choice, so `GuessSpec.Done` is `False` and the exit that would lan
 in `NexPh.guessDoneP` can never fire – so a rule that leaves the pre-guess phases
 leaves them for `NexPh.homeGuessP`. That is the phase a backward reading finds at
 its entry, and it is the one `reachesIn_homeGuessTail` runs from. -/
-theorem nexProgHanded_dstPh_homeGuess
+private theorem nexProgHanded_dstPh_homeGuess
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
     {bot : Option dt.KIx}
     (hcov : NexCovered PR (dt.regionSpec PR.zero PR.one) args bot)
@@ -332,7 +341,7 @@ one the machine never leaves, which is what
 
 This is where a backward reading starts: the guess is on the tape, the run from
 here on is the evaluation's, and it is deterministic. -/
-theorem exists_postGuess_shaped
+private theorem exists_postGuess_shaped
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
     {bot : Option dt.KIx}
     (hcov : NexCovered PR (dt.regionSpec PR.zero PR.one) args bot)
@@ -415,7 +424,7 @@ and the dispatch (`reachesIn_homeGuessTail`) with the program's rules discharged
 whatever the guess left – the lemma reads none of it but the marker – so this is
 the step a *backward* reading takes from the configuration
 `exists_postGuess_shaped` hands it. -/
-theorem nexProgHanded_reachesIn_homeGuessTail
+private theorem nexProgHanded_reachesIn_homeGuessTail
     {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)
@@ -648,7 +657,7 @@ run (`not_acc_of_verdict_false_of`) – so nothing below the entry accepts.
 This is the backward direction's last step: the reading supplies the entry, the
 evaluation supplies the verdict, and the false verdict of a no-instance closes
 it. -/
-theorem not_acc_of_entry_verdict
+private theorem not_acc_of_entry_verdict
     {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)

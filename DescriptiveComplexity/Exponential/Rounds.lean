@@ -101,7 +101,7 @@ theorem homAssign_roundIx (X : ExpExpansion L)
 /-- **The renaming is correct**: a sentence over `n` copies of the expansion's
 block, read inside the prefix, says of the selected rounds what it said of the
 copies. -/
-theorem realize_roundLHom (X : ExpExpansion L) (ρs : Fin m → X.pointBlock.Assignment A)
+private theorem realize_roundLHom (X : ExpExpansion L) (ρs : Fin m → X.pointBlock.Assignment A)
     (φ : ((L.sum Language.order).sum (X.B.replicate n).lang).Sentence) :
     (@Sentence.Realize _ A
         ((repMerged X.pointBlock m).structure₁ (L := L.sum Language.order)
@@ -150,7 +150,7 @@ theorem homAssign_roundOneIx (X : ExpExpansion L)
   exact propext (relMap_repSym X.pointBlock x rfl m ρs i y)
 
 /-- **Reading one round is reading its own assignment.** -/
-theorem realize_roundOneLHom (X : ExpExpansion L) (ρs : Fin m → X.pointBlock.Assignment A)
+private theorem realize_roundOneLHom (X : ExpExpansion L) (ρs : Fin m → X.pointBlock.Assignment A)
     (φ : ((L.sum Language.order).sum X.pointBlock.lang).Sentence) :
     (@Sentence.Realize _ A
         ((repMerged X.pointBlock m).structure₁ (L := L.sum Language.order)

@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.Qbf.Defs
 import DescriptiveComplexity.Problems.Qbf.Membership
 import DescriptiveComplexity.Problems.Qbf.Transfer
 import DescriptiveComplexity.Problems.Qbf.Hardness
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Problems.Qbf.Hardness
 
 /-!
 # QBF: quantified Boolean formulas with bounded alternation
@@ -70,22 +72,22 @@ namespace DescriptiveComplexity
 /-- **QBF with `k + 1` blocks is in `Σₖ₊₁ᵖ`**: the `k + 1` truth assignments
 are guessed as monadic second-order relations, and the matrix is evaluated by
 a first-order kernel. -/
-theorem qbf_mem_sigmaP (k : ℕ) : QBF (k + 1) ∈ SigmaP (k + 1) :=
+private theorem qbf_mem_sigmaP (k : ℕ) : QBF (k + 1) ∈ SigmaP (k + 1) :=
   qbfProblem_sigmaSODefinable (k + 1) _
 
 /-- **QBF with a universal outermost block and `k + 1` blocks is in
 `Πₖ₊₁ᵖ`.** -/
-theorem qbfPi_mem_piP (k : ℕ) : QBFPi (k + 1) ∈ PiP (k + 1) :=
+private theorem qbfPi_mem_piP (k : ℕ) : QBFPi (k + 1) ∈ PiP (k + 1) :=
   qbfProblem_piSODefinable (k + 1) _
 
 /-- Both matrix shapes stay inside the level: the shape only matters for
 hardness. -/
-theorem qbfProblem_mem_sigmaP (k : ℕ) (cnf : Bool) :
+private theorem qbfProblem_mem_sigmaP (k : ℕ) (cnf : Bool) :
     QbfProblem (k + 1) true cnf ∈ SigmaP (k + 1) :=
   qbfProblem_sigmaSODefinable (k + 1) cnf
 
 /-- Dually for a universal outermost block. -/
-theorem qbfProblem_mem_piP (k : ℕ) (cnf : Bool) :
+private theorem qbfProblem_mem_piP (k : ℕ) (cnf : Bool) :
     QbfProblem (k + 1) false cnf ∈ PiP (k + 1) :=
   qbfProblem_piSODefinable (k + 1) cnf
 
@@ -101,7 +103,7 @@ theorem QBF_complete (k : ℕ) : (SigmaP (k + 1)).Complete (QBF (k + 1)) :=
       (qbf_hard_of_sigmaSODefinable k Q hQ).map OrderedFOReduction.toRel⟩
 
 /-- QBF is `Σₖ₊₁ᵖ`-hard. -/
-theorem qbf_hard (k : ℕ) : (SigmaP (k + 1)).Hard (QBF (k + 1)) :=
+private theorem qbf_hard (k : ℕ) : (SigmaP (k + 1)).Hard (QBF (k + 1)) :=
   (QBF_complete k).hard
 
 /-- **The dual family is `Πₖ₊₁ᵖ`-complete**: `QBFPi (k + 1)`, with a universal
@@ -117,7 +119,7 @@ theorem QBFPi_complete (k : ℕ) : (PiP (k + 1)).Complete (QBFPi (k + 1)) :=
       (qbfPi_hard_of_piSODefinable k Q hQ).map OrderedFOReduction.toRel⟩
 
 /-- `QBFPi` is `Πₖ₊₁ᵖ`-hard. -/
-theorem qbfPi_hard (k : ℕ) : (PiP (k + 1)).Hard (QBFPi (k + 1)) :=
+private theorem qbfPi_hard (k : ℕ) : (PiP (k + 1)).Hard (QBFPi (k + 1)) :=
   (QBFPi_complete k).hard
 
 /-- QBF with one universal block is coNP-complete. -/

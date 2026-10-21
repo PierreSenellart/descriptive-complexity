@@ -7,6 +7,8 @@ module
 
 import DescriptiveComplexity.Exponential.GameAsk
 public import DescriptiveComplexity.Exponential.GameBack
+import all DescriptiveComplexity.Exponential.GameCtrl
+import all DescriptiveComplexity.Exponential.GameTape
 
 /-!
 # A question, read back
@@ -53,7 +55,7 @@ variable {prog}
 omit [K.Structure A] [LinearOrder A] [Finite A] in
 /-- **The seek's test never fires on a mark**: it asks for the symbol of a cell,
 which a sentinel's mark is not. -/
-theorem not_isTarget_mark (p : MachPh V M) (b : Bool) (w : Fin (gameDim B V) → A) :
+private theorem not_isTarget_mark (p : MachPh V M) (b : Bool) (w : Fin (gameDim B V) → A) :
     ¬ prog.isTarget p (SymTag.mark b) w := by
   rintro ⟨h, hs, -⟩
   exact absurd hs (by simp)
@@ -61,7 +63,7 @@ theorem not_isTarget_mark (p : MachPh V M) (b : Bool) (w : Fin (gameDim B V) →
 omit [LinearOrder A] [Finite A] in
 /-- **The guard of a concluding transition reads only the valuation the phase
 declares.** -/
-theorem concOk_congr {p : MachPh V M} {w vv : Fin (gameDim B V) → A}
+private theorem concOk_congr {p : MachPh V M} {w vv : Fin (gameDim B V) → A}
     (hp : p.kind = .conc) (hag : Agree (MachPh.arity prog.vars p) w vv)
     (h : prog.concOk p w) : prog.concOk p vv := by
   have hac : MachPh.arity prog.vars p = prog.vars p.q :=
@@ -76,7 +78,7 @@ omit [K.Structure A] [Finite A] in
 /-- **An arrival is a correct claim.** The cell the seek stopped at holds the
 atom the challenge named, its bit is the one that was claimed, and the tape
 gives that bit by the assignment of the region the atom's copy points to. -/
-theorem holds_of_seekArrives (q : GameQuestion) (r par : Bool)
+private theorem holds_of_seekArrives (q : GameQuestion) (r par : Bool)
     {b : Fin M → Bool} {vv : Fin (gameDim B V) → A} {k : Fin (M + 1)}
     (hk : (k : ℕ) < (prog.data q).natoms) {pos : GamePt B V M A}
     (harr : SeekArrives a₀ prog.isTarget prog.vars (MachPh.seekPh q r b k par) vv
@@ -116,7 +118,7 @@ omit [Finite A] in
 /-- **The matrix holds, read back from a winning claim phase**: the vector the
 existential player claimed is correct at every atom the universal player could
 have challenged, and the residue it leaves holds. -/
-theorem matrixHolds_of_altWin (h₀ : IsBot a₀) {q : GameQuestion} {r par : Bool}
+private theorem matrixHolds_of_altWin (h₀ : IsBot a₀) {q : GameQuestion} {r par : Bool}
     {vv : Fin (gameDim B V) → A} {c : Config (GamePt B V M A)}
     (h : CtrlCfg a₀ hdim prog.vars ρ σ (MachPh.claimPh q r par) vv c)
     (hw : (𝕄).AltWin true c) :

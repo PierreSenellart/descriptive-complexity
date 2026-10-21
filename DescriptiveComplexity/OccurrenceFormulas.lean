@@ -140,7 +140,7 @@ section Realize
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
 omit [Language.sat.Structure A] in
-private theorem occLt_iff_le {x y : A} {s t : Bool} (h : s < t) : occLt x s y t ↔ x ≤ y := by
+theorem occLt_iff_le {x y : A} {s t : Bool} (h : s < t) : occLt x s y t ↔ x ≤ y := by
   constructor
   · rintro (h' | ⟨rfl, -⟩)
     exacts [h'.le, le_rfl]
@@ -149,7 +149,7 @@ private theorem occLt_iff_le {x y : A} {s t : Bool} (h : s < t) : occLt x s y t 
     exacts [Or.inl h'', Or.inr ⟨rfl, h⟩]
 
 omit [Language.sat.Structure A] in
-private theorem occLt_iff_lt {x y : A} {s t : Bool} (h : ¬s < t) : occLt x s y t ↔ x < y := by
+theorem occLt_iff_lt {x y : A} {s t : Bool} (h : ¬s < t) : occLt x s y t ↔ x < y := by
   constructor
   · rintro (h' | ⟨-, h''⟩)
     exacts [h', absurd h'' h]

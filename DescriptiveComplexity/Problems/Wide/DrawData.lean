@@ -112,7 +112,7 @@ transparency. -/
   | none => dt.pkOut.mat
   | some i => (dt.pk i).mat
 
-theorem matOf_isQF : ∀ v : dt.VarIx, (dt.matOf v).IsQF
+private theorem matOf_isQF : ∀ v : dt.VarIx, (dt.matOf v).IsQF
   | none => dt.pkOut.isQF
   | some i => (dt.pk i).isQF
 
@@ -162,7 +162,7 @@ noncomputable def kindOf (v : dt.VarIx) (a : Fin (dt.natOf v)) :
     (isSome_matAtom?_of_mem_qfAtoms (dt.matOf v) _ ((dt.atomsOf v).get_mem a))
 
 /-- The classifier agrees with the kind. -/
-theorem matAtom?_get (v : dt.VarIx) (a : Fin (dt.natOf v)) :
+private theorem matAtom?_get (v : dt.VarIx) (a : Fin (dt.natOf v)) :
     matAtom? ((dt.atomsOf v).get a) = some (dt.kindOf v a) :=
   (Option.some_get _).symm
 

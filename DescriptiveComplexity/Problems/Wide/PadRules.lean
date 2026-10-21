@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInterp
 public import DescriptiveComplexity.Problems.Wide.TrackWrites
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
+import all DescriptiveComplexity.Problems.Wide.TrackWrites
 
 /-!
 # Rules that never fire, and the tags they buy
@@ -103,7 +105,7 @@ omit [Fintype dt.SlotIx] in
 /-- **A junk rule writes nothing**, so it keeps the file, keeps the addressed
 tracks, keeps every slot and writes bits – the four facts a backward reading
 asks of a rule it meets by name. -/
-theorem falseRule_facts {A Q : Type} (zero one : A) (p : P) :
+private theorem falseRule_facts {A Q : Type} (zero one : A) (p : P) :
     Rule.KeepsFile dt (falseRule (A := A) (Q := Q) (W := dt.SlotIx) p) ∧
       Rule.KeepsCellTracks dt (falseRule (A := A) (Q := Q) (W := dt.SlotIx) p) ∧
       Rule.WritesBits dt zero one (falseRule (A := A) (Q := Q) (W := dt.SlotIx) p) :=
@@ -111,7 +113,7 @@ theorem falseRule_facts {A Q : Type} (zero one : A) (p : P) :
 
 omit [Fintype dt.SlotIx] in
 /-- **And it leaves every slot as it found it.** -/
-theorem falseRule_keepsSlot {A Q : Type} (t : dt.SlotIx) (p : P) :
+private theorem falseRule_keepsSlot {A Q : Type} (t : dt.SlotIx) (p : P) :
     Rule.KeepsSlot dt t (falseRule (A := A) (Q := Q) (W := dt.SlotIx) p) :=
   fun _ _ => rfl
 
@@ -135,7 +137,7 @@ theorem padRulesAt_inl {A : Type}
 omit [Fintype dt.SlotIx] in
 /-- **A junk rule never fires**, which is all any run, separation or determinism
 argument needs to know about it. -/
-theorem not_guard_padRulesAt {A : Type}
+private theorem not_guard_padRulesAt {A : Type}
     (rl : ∀ i : S, Sh i → Rule A dt.CtlIx dt.SlotIx P) {p₀ : P} {n : ℕ}
     (k : Fin n) (ρ : padSh Sh n (Sum.inr k)) (f : dt.CtlIx → A)
     (g : dt.SlotIx → A) :
@@ -144,7 +146,7 @@ theorem not_guard_padRulesAt {A : Type}
 omit [Fintype dt.SlotIx] in
 /-- **Padding keeps in-shape separation**: two rules that fire on the same data
 in the same phase are the same, the junk ones firing on none. -/
-theorem sep_padRulesAt {A : Type}
+private theorem sep_padRulesAt {A : Type}
     {rl : ∀ i : S, Sh i → Rule A dt.CtlIx dt.SlotIx P} {p₀ : P} {n : ℕ}
     {Ph : P → Prop}
     (hsep : ∀ (i i' : S) (ρ : Sh i) (ρ' : Sh i') (f : dt.CtlIx → A)
@@ -172,7 +174,7 @@ theorem sep_padRulesAt {A : Type}
 omit [Fintype dt.SlotIx] in
 /-- **The family and the pointwise padding agree**, which is what lets a program
 written down at one universe be read as the definability layer's. -/
-theorem padRules_eq_padRulesAt
+private theorem padRules_eq_padRulesAt
     (rules : ∀ (e : Env L) (i : S), Sh i → Rule e.α dt.CtlIx dt.SlotIx P)
     (p₀ : P) (n : ℕ) (e : Env L) :
     padRules (dt := dt) rules p₀ n e =
@@ -181,7 +183,7 @@ theorem padRules_eq_padRulesAt
   cases i <;> rfl
 
 /-- **What the padding buys**: one rule name per junk site. -/
-theorem card_rTagOf_pad [Finite S] [∀ i, Finite (Sh i)] (n : ℕ) :
+private theorem card_rTagOf_pad [Finite S] [∀ i, Finite (Sh i)] (n : ℕ) :
     Nat.card (Data.RTagOf (S ⊕ Fin n) (padSh Sh n)) =
       Nat.card (Data.RTagOf S Sh) + n := by
   classical

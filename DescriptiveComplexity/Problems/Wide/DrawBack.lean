@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSites
+import all DescriptiveComplexity.Problems.Wide.DrawSlots
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # The background: the machine's mutable state, presented as a tape
@@ -161,14 +164,14 @@ noncomputable def reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
   (hhas b c).choose
 
 /-- The named register is in the named block. -/
-theorem blk_reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
+private theorem blk_reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     {lay : Layout dt A R' P' I} {zero : A} (hhas : lay.HasName zero)
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     lay.blk (lay.reg hhas b c) = some b :=
   (hhas b c).choose_spec.1
 
 /-- The named register carries the named tuple, canonically padded. -/
-theorem arg_reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
+private theorem arg_reg {L : Language.{0, 0}} {dt : Data L} {A R' P' I : Type}
     {lay : Layout dt A R' P' I} {zero : A} (hhas : lay.HasName zero)
     (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     lay.arg (lay.reg hhas b c) = padTup zero c :=
@@ -236,7 +239,7 @@ its own tuple. -/
 /-- **The elementwise file's layout order is linear**, given that the universe's
 is and that the two agree – which is the `hord` every diagonal statement of the
 layer already carries. -/
-theorem isLinOrd_laidFile_le {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
+private theorem isLinOrd_laidFile_le {L : Language.{0, 0}} {dt : Data L} {A R' P' : Type}
     [LinearOrder A] [LinearOrder R'] [LinearOrder P']
     [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
     {F : RegFile (Univ A R' P' dt.KIx dt.dd)}
@@ -305,7 +308,7 @@ own tuple. This is what a space-bounded program's register file is, read as a
 `DescriptiveComplexity.Draw.LaidFile`, so that the runs stated at an arbitrary
 file apply to it – its layout is `DescriptiveComplexity.Draw.Data.diagLayout`
 exactly, so its background is `DescriptiveComplexity.Draw.Data.back`. -/
-noncomputable def diagLaid (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
+private noncomputable def diagLaid (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y) :
     LaidFile dt A R' P' (Univ A R' P' dt.KIx dt.dd) where
   cell := RF.cell
@@ -317,7 +320,7 @@ noncomputable def diagLaid (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
   cell_nonempty := RF.cell_nonempty
 
 /-- **The elementwise layout order is linear**, being the address order. -/
-theorem isLinOrd_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
+private theorem isLinOrd_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd))) :
     IsLinOrd (dt.diagLaid RF hord).le := by
@@ -331,7 +334,7 @@ theorem isLinOrd_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
 
 /-- **The elementwise file names each element by itself**, which is the identity
 embedding of `DescriptiveComplexity.ixAddr`. -/
-theorem wmLt_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
+private theorem wmLt_diagLaid_le (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     (u u' : Univ A R' P' dt.KIx dt.dd) :
     WMLt (dt.diagLaid RF hord).le u u' ↔ WMLt WMLe (id u) (id u') :=
@@ -361,7 +364,7 @@ variable {zero one : A} {hdd : dt.dd0 ≤ dt.dd} {stI : TapeSt dt A R' P' I}
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The marker slot, at an arbitrary layout. -/
-theorem ixBack_wk :
+private theorem ixBack_wk :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.ixBack lay zero one hdd stI r .wk = bitVal zero one (stI.wk r) :=
   fun _ => rfl
@@ -370,7 +373,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **Off the file, a state with no track set presents the blank**, at an
 arbitrary layout. -/
-theorem ixBack_of_not_reg {r : Univ A R' P' dt.KIx dt.dd → Prop}
+private theorem ixBack_of_not_reg {r : Univ A R' P' dt.KIx dt.dd → Prop}
     (hr : ∀ u : I, r ≠ lay.cell u)
     (hwk : ¬stI.wk r) (hbot : ¬stI.bot r) (hltp : ¬stI.ltp r)
     (hold : ∀ i : dt.d.B.ι, ¬stI.old i r) (hnew : ∀ i : dt.d.B.ι, ¬stI.new i r) :
@@ -398,7 +401,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **The background reads the stage tracks at one cell**, at an arbitrary
 layout. -/
-theorem ixBack_old_congr (σ : dt.d.B.ι → (Univ A R' P' dt.KIx dt.dd → Prop) → Prop)
+private theorem ixBack_old_congr (σ : dt.d.B.ι → (Univ A R' P' dt.KIx dt.dd → Prop) → Prop)
     {r : Univ A R' P' dt.KIx dt.dd → Prop} (hr : ∀ i : dt.d.B.ι, (σ i r ↔ stI.old i r)) :
     dt.ixBack lay zero one hdd { stI with old := σ } r =
       dt.ixBack lay zero one hdd stI r := by
@@ -411,7 +414,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **Off the file the background is blind to every register**, at an arbitrary
 layout. -/
-theorem ixBack_congr_off_reg {stI stI' : TapeSt dt A R' P' I}
+private theorem ixBack_congr_off_reg {stI stI' : TapeSt dt A R' P' I}
     (hwk : stI.wk = stI'.wk) (hbot : stI.bot = stI'.bot) (hltp : stI.ltp = stI'.ltp)
     (hold : stI.old = stI'.old) (hnew : stI.new = stI'.new)
     {r : Univ A R' P' dt.KIx dt.dd → Prop} (hr : ¬∃ u : I, r = lay.cell u) :
@@ -434,7 +437,7 @@ theorem ixBack_congr_off_reg {stI stI' : TapeSt dt A R' P' I}
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The block one-hot, at a register cell of an arbitrary layout. -/
-theorem ixBack_blk_cell (hinj : Function.Injective lay.cell)
+private theorem ixBack_blk_cell (hinj : Function.Injective lay.cell)
     (u : I) (b : Option (Fin dt.ko ⊕ Fin dt.ki)) :
     dt.ixBack lay zero one hdd stI (lay.cell u) (.blk b) =
       bitVal zero one (lay.blk u = b) := by
@@ -446,7 +449,7 @@ theorem ixBack_blk_cell (hinj : Function.Injective lay.cell)
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The padding mark, at a register cell of an arbitrary layout. -/
-theorem ixBack_pdd_cell (hinj : Function.Injective lay.cell) (u : I) :
+private theorem ixBack_pdd_cell (hinj : Function.Injective lay.cell) (u : I) :
     dt.ixBack lay zero one hdd stI (lay.cell u) .pdd =
       bitVal zero one (∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → lay.arg u j = zero) := by
   refine bitVal_congr ⟨?_, fun h => ⟨u, rfl, h⟩⟩
@@ -457,7 +460,7 @@ theorem ixBack_pdd_cell (hinj : Function.Injective lay.cell) (u : I) :
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- A name slot, at a register cell of an arbitrary layout. -/
-theorem ixBack_name_cell (hinj : Function.Injective lay.cell) (u : I) (j : Fin dt.dd0) :
+private theorem ixBack_name_cell (hinj : Function.Injective lay.cell) (u : I) (j : Fin dt.dd0) :
     dt.ixBack lay zero one hdd stI (lay.cell u) (.name j) = lay.arg u (Fin.castLE hdd j) := by
   classical
   change (if h : ∃ v : I, lay.cell u = lay.cell v then
@@ -476,7 +479,7 @@ variable {zero one : A} {hdd : dt.dd0 ≤ dt.dd} {st : TapeStD dt A R' P'}
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The register mark: set exactly at the register cells – the equation
 every discharge's `hrg` is. -/
-theorem back_reg :
+private theorem back_reg :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r .reg =
         bitVal zero one (∃ u : Univ A R' P' dt.KIx dt.dd, r = cell u) :=
@@ -484,21 +487,21 @@ theorem back_reg :
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The marker slot, read back. -/
-theorem back_wk :
+private theorem back_wk :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r .wk = bitVal zero one (st.wk r) :=
   fun _ => rfl
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The bottom mark, read back. -/
-theorem back_bot :
+private theorem back_bot :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r .bot = bitVal zero one (st.bot r) :=
   fun _ => rfl
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The end mark, read back. -/
-theorem back_ltp :
+private theorem back_ltp :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r .ltp = bitVal zero one (st.ltp r) :=
   fun _ => rfl
@@ -508,7 +511,7 @@ omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **A name slot, read back**: the coordinate the register's own index carries,
 and the designated `zero` where there is no register. Stated because the
 definition matches on the slot, so `rw` cannot reach the branch on its own. -/
-theorem back_name (j : Fin dt.dd0) :
+private theorem back_name (j : Fin dt.dd0) :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r (.name j) =
         if h : ∃ u : Univ A R' P' dt.KIx dt.dd, r = cell u then h.choose.2 (Fin.castLE hdd j)
@@ -517,14 +520,14 @@ theorem back_name (j : Fin dt.dd0) :
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- A stage track, read back. -/
-theorem back_old (i : dt.d.B.ι) :
+private theorem back_old (i : dt.d.B.ι) :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r (.old i) = bitVal zero one (st.old i r) :=
   fun _ => rfl
 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- The next-stage track, read back. -/
-theorem back_new (i : dt.d.B.ι) :
+private theorem back_new (i : dt.d.B.ι) :
     ∀ r : Univ A R' P' dt.KIx dt.dd → Prop,
       dt.back cell zero one hdd st r (.new i) = bitVal zero one (st.new i r) :=
   fun _ => rfl
@@ -581,7 +584,7 @@ def ScratchEq {I : Type} (st st' : TapeSt dt A R' P' I) : Prop :=
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- Rewriting the two scratch registers is a `ScratchEq`. -/
-theorem scratchEq_scratch (st : TapeStD dt A R' P')
+private theorem scratchEq_scratch (st : TapeStD dt A R' P')
     (X Y : Univ A R' P' dt.KIx dt.dd → Prop) :
     dt.ScratchEq { st with sav := X, tgt := Y } st :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
@@ -599,7 +602,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 variable {dt} in
 /-- `ScratchEq` is transitive. -/
-theorem ScratchEq.trans {I : Type} {st st' st'' : TapeSt dt A R' P' I}
+private theorem ScratchEq.trans {I : Type} {st st' st'' : TapeSt dt A R' P' I}
     (h : dt.ScratchEq st st') (h' : dt.ScratchEq st' st'') :
     dt.ScratchEq st st'' :=
   ⟨h.1.trans h'.1, h.2.1.trans h'.2.1, h.2.2.1.trans h'.2.2.1,
@@ -612,7 +615,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable {dt} in
 /-- `ScratchEq` survives writing the same scratch registers on both
 sides. -/
-theorem ScratchEq.scratch {st st' : TapeStD dt A R' P'}
+private theorem ScratchEq.scratch {st st' : TapeStD dt A R' P'}
     (h : dt.ScratchEq st st') (X Y : Univ A R' P' dt.KIx dt.dd → Prop) :
     dt.ScratchEq { st with sav := X, tgt := Y }
       { st' with sav := X, tgt := Y } :=
@@ -658,7 +661,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 variable {dt} in
 /-- `ScratchEq` survives writing the same save and target on both sides, at an
 arbitrary file. -/
-theorem ScratchEq.ixScratch {I : Type} {st st' : TapeSt dt A R' P' I}
+private theorem ScratchEq.ixScratch {I : Type} {st st' : TapeSt dt A R' P' I}
     (h : dt.ScratchEq st st') (X Y : I → Prop) :
     dt.ScratchEq { st with sav := X, tgt := Y } { st' with sav := X, tgt := Y } := h
 
@@ -704,7 +707,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 /-- **The name guard, at a register cell of an arbitrary layout**: the register
 is in the named block, canonically padded, and carries the coordinates the
 control computes. -/
-theorem ixNameGF_cell (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
+private theorem ixNameGF_cell (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (cf : (Q → A) → Fin dt.dd0 → A)
     (fc : Q → A) (u : I) :
     dt.nameGF one b cf fc (dt.ixBack lay zero one hdd stI (lay.cell u)) ↔
@@ -720,7 +723,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **The name guard identifies one register**, at a layout whose marks tell
 them apart. -/
-theorem ixNameGF_unique (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
+private theorem ixNameGF_unique (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
     (hsep : lay.NameSep zero hdd)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {cf : (Q → A) → Fin dt.dd0 → A}
     {fc : Q → A} {u u' : I}
@@ -735,7 +738,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **Off the file the name guard fails**, at an arbitrary layout: the block
 one-hot is clear there, so no scan stops in the working area. -/
-theorem ixNot_nameGF_of_not_reg (hzo : zero ≠ one)
+private theorem ixNot_nameGF_of_not_reg (hzo : zero ≠ one)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {cf : (Q → A) → Fin dt.dd0 → A}
     {fc : Q → A} {r : Univ A R' P' dt.KIx dt.dd → Prop}
     (hr : ∀ u : I, r ≠ lay.cell u) :
@@ -747,14 +750,14 @@ theorem ixNot_nameGF_of_not_reg (hzo : zero ≠ one)
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- A named tuple is canonically padded. -/
-theorem padTup_pad (zero : A) (c : Fin dt.dd0 → A) {j : Fin dt.dd}
+private theorem padTup_pad (zero : A) (c : Fin dt.dd0 → A) {j : Fin dt.dd}
     (hj : dt.dd0 ≤ (j : ℕ)) : padTup zero c j = zero :=
   dite_eq_right (by omega)
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- A named tuple carries the control's coordinates. -/
-theorem padTup_coord (zero : A) (c : Fin dt.dd0 → A) (hdd : dt.dd0 ≤ dt.dd)
+private theorem padTup_coord (zero : A) (c : Fin dt.dd0 → A) (hdd : dt.dd0 ≤ dt.dd)
     (j : Fin dt.dd0) : padTup zero c (Fin.castLE hdd j) = c j := by
   have h : ((Fin.castLE hdd j : Fin dt.dd) : ℕ) < dt.dd0 := j.isLt
   change (if h : ((Fin.castLE hdd j : Fin dt.dd) : ℕ) < dt.dd0 then
@@ -789,7 +792,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- **The name guard holds at the named register.** -/
-theorem nameGF_named (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
+private theorem nameGF_named (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {cf : (Q → A) → Fin dt.dd0 → A}
     {fc : Q → A} {u : I} (hb : lay.blk u = some b)
     (ha : lay.arg u = padTup zero (cf fc)) :
@@ -827,7 +830,7 @@ that has a register for every name and tells them apart, the guard holds at
 exactly the register whose coordinates the control computes. The trips of the
 evaluation layer ask *which* cell they stopped at, and this is the answer,
 whatever function of the control the coordinates are. -/
-theorem ixNameGF_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
+private theorem ixNameGF_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
     (hsep : lay.NameSep zero hdd) (hhas : lay.HasName zero)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (cf : (Q → A) → Fin dt.dd0 → A)
     (fc : Q → A) (u : I) :
@@ -846,7 +849,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 /-- **The name guard at a register says which register it is**, the coordinates
 read straight off the control: `DescriptiveComplexity.Draw.Data.ixNameGF_iff`
 at the coordinate slots the copy loops use. -/
-theorem ixNameG_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
+private theorem ixNameG_iff (hzo : zero ≠ one) (hinj : Function.Injective lay.cell)
     (hsep : lay.NameSep zero hdd) (hhas : lay.HasName zero)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (coord : Fin dt.dd0 → Q) (fc : Q → A)
     (u : I) :
@@ -860,7 +863,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 /-- **Off the file the coordinate-loop trips' guard fails**, at an arbitrary
 layout: the shape the evaluation layer's «the scan stopped nowhere else»
 arguments are written against. -/
-theorem ixNot_nameG_of_not_reg (hzo : zero ≠ one)
+private theorem ixNot_nameG_of_not_reg (hzo : zero ≠ one)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {coord : Fin dt.dd0 → Q}
     {fc : Q → A} {r : Univ A R' P' dt.KIx dt.dd → Prop}
     (hr : ∀ u : I, r ≠ lay.cell u) :
@@ -888,7 +891,7 @@ register file. -/
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- The block one-hot, at a register cell. -/
-theorem back_blk_cell (hinj : Function.Injective cell)
+private theorem back_blk_cell (hinj : Function.Injective cell)
     (u : Univ A R' P' dt.KIx dt.dd) (b : Option (Fin dt.ko ⊕ Fin dt.ki)) :
     dt.back cell zero one hdd st (cell u) (.blk b) =
       bitVal zero one (tagBlk u.1 = b) :=
@@ -897,7 +900,7 @@ theorem back_blk_cell (hinj : Function.Injective cell)
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- The padding mark, at a register cell. -/
-theorem back_pdd_cell (hinj : Function.Injective cell) (u : Univ A R' P' dt.KIx dt.dd) :
+private theorem back_pdd_cell (hinj : Function.Injective cell) (u : Univ A R' P' dt.KIx dt.dd) :
     dt.back cell zero one hdd st (cell u) .pdd =
       bitVal zero one (∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → u.2 j = zero) :=
   dt.ixBack_pdd_cell hinj u
@@ -905,7 +908,7 @@ theorem back_pdd_cell (hinj : Function.Injective cell) (u : Univ A R' P' dt.KIx 
 omit [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 /-- A name slot, at a register cell: the element's own coordinate. -/
-theorem back_name_cell (hinj : Function.Injective cell)
+private theorem back_name_cell (hinj : Function.Injective cell)
     (u : Univ A R' P' dt.KIx dt.dd) (j : Fin dt.dd0) :
     dt.back cell zero one hdd st (cell u) (.name j) = u.2 (Fin.castLE hdd j) :=
   dt.ixBack_name_cell hinj u j
@@ -915,7 +918,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 /-- **The name guard, at a register cell**: the cell's element is in the
 named block, canonically padded, and carries the coordinates the control
 computes. -/
-theorem nameGF_cell (hzo : zero ≠ one)
+private theorem nameGF_cell (hzo : zero ≠ one)
     (hinj : Function.Injective cell)
     {Q : Type} (b : Fin dt.ko ⊕ Fin dt.ki) (cf : (Q → A) → Fin dt.dd0 → A)
     (fc : Q → A) (u : Univ A R' P' dt.KIx dt.dd) :
@@ -929,7 +932,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **The elementwise layout's marks tell its registers apart**: a register *is*
 its tag and its tuple, so the block and the named coordinates spell it. -/
-theorem nameSep_diagLayout :
+private theorem nameSep_diagLayout :
     (dt.diagLayout cell).NameSep zero hdd :=
   fun _ _ _ hb hb' hp hp' hn =>
     eq_of_slotMark_name (hdd := hdd) (hb.trans hb'.symm) hb hn hp hp'
@@ -940,7 +943,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 /-- **A named tuple is the padded one**: `DescriptiveComplexity.Draw.padTup` and
 `DescriptiveComplexity.Draw.pad` are the same function, written once for the name
 a control holds and once for the geometry. -/
-theorem padTup_eq_pad (zero : A) (c : Fin dt.dd0 → A) :
+private theorem padTup_eq_pad (zero : A) (c : Fin dt.dd0 → A) :
     padTup (dt := dt) zero c = pad (dd := dt.dd) zero c :=
   rfl
 
@@ -958,7 +961,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 /-- **At the elementwise layout the named register is the obvious one**: the
 element whose tag is the block and whose tuple is the padded name. Chosen by
 `DescriptiveComplexity.Draw.Layout.reg`, pinned by `NameSep`. -/
-theorem reg_diagLayout (hdd : dt.dd0 ≤ dt.dd) (b : Fin dt.ko ⊕ Fin dt.ki)
+private theorem reg_diagLayout (hdd : dt.dd0 ≤ dt.dd) (b : Fin dt.ko ⊕ Fin dt.ki)
     (c : Fin dt.dd0 → A) :
     (dt.diagLayout cell).reg (dt.hasName_diagLayout (zero := zero)) b c =
       (Tag.arg (toLex b), padTup zero c) :=
@@ -974,7 +977,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
 /-- **The name guard identifies one cell**: two register cells it holds at
 are the same. This is what a navigation-by-name scan needs of its stopping
 condition (`DescriptiveComplexity.Draw.Prog.reaches_toCell`). -/
-theorem nameGF_unique (hzo : zero ≠ one)
+private theorem nameGF_unique (hzo : zero ≠ one)
     (hinj : Function.Injective cell)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {cf : (Q → A) → Fin dt.dd0 → A}
     {fc : Q → A} {u u' : Univ A R' P' dt.KIx dt.dd}
@@ -987,7 +990,7 @@ omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- **Off the register file the name guard fails**: the block one-hot is
 clear there, so no scan stops in the working area. -/
-theorem not_nameGF_of_not_reg (hzo : zero ≠ one)
+private theorem not_nameGF_of_not_reg (hzo : zero ≠ one)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {cf : (Q → A) → Fin dt.dd0 → A}
     {fc : Q → A} {r : Univ A R' P' dt.KIx dt.dd → Prop}
     (hr : ∀ u : Univ A R' P' dt.KIx dt.dd, r ≠ cell u) :
@@ -1022,7 +1025,7 @@ theorem nameG_unique (hzo : zero ≠ one)
 omit [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx]
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 /-- Off the register file the coordinate-loop trips' guard fails. -/
-theorem not_nameG_of_not_reg (hzo : zero ≠ one)
+private theorem not_nameG_of_not_reg (hzo : zero ≠ one)
     {Q : Type} {b : Fin dt.ko ⊕ Fin dt.ki} {coord : Fin dt.dd0 → Q}
     {fc : Q → A} {r : Univ A R' P' dt.KIx dt.dd → Prop}
     (hr : ∀ u : Univ A R' P' dt.KIx dt.dd, r ≠ cell u) :
@@ -1074,7 +1077,7 @@ theorem ixBack_regFirst {I : Type} {lay : Layout dt A R' P' I}
 /-- **The file-top mark is the greatest element's cell**: given that the
 universe order is linear, the `regLast` slot is set exactly at the cell of
 the top element – the equation every discharge's `hrl` is. -/
-theorem back_regLast
+private theorem back_regLast
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     {gtop : Univ A R' P' dt.KIx dt.dd} (htop : ∀ y, WMLe y gtop)
     (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y) :

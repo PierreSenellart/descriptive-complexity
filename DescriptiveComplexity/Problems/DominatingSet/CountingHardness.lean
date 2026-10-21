@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.DominatingSet.Counting
 public import DescriptiveComplexity.Problems.ExactCover
 public import DescriptiveComplexity.Problems.Sat.CountingHardness
 import DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.ExactCover
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
 
 /-!
 # #Dominating Set is parsimoniously `#P`-complete
@@ -90,27 +93,27 @@ def NoCl : Prop := ¬∃ c : A, IsCl c
 /-- The vertices the literal vertex `(lit s, x)` is adjacent to: the other
 literal vertex of `x`, its private vertices, the clauses the literal occurs in,
 and all the junk. -/
-def Target (s : Bool) (x : A) : SDTag → A → Prop
+private def Target (s : Bool) (x : A) : SDTag → A → Prop
   | .lit s', y => (s' ≠ s ∧ y = x) ∨ ¬SatOccurs A y
   | .priv _, y => y = x ∨ ¬SatOccurs A y
   | .cl, y => OccIn y x s ∨ ¬IsCl y
 
 /-- The first vertex is a literal vertex of a variable, adjacent to the
 second. -/
-def LitDom : SDTag → A → SDTag → A → Prop
+private def LitDom : SDTag → A → SDTag → A → Prop
   | .lit s, x, t, y => SatOccurs A x ∧ Target s x t y
   | _, _, _, _ => False
 
 /-- The adjacency condition of the interpreted graph. -/
-def AdjCore (t₁ : SDTag) (x : A) (t₂ : SDTag) (y : A) : Prop :=
+private def AdjCore (t₁ : SDTag) (x : A) (t₂ : SDTag) (y : A) : Prop :=
   ¬NoCl A ∧ (LitDom t₁ x t₂ y ∨ LitDom t₂ y t₁ x)
 
 /-- The marking condition of the interpreted graph: one vertex per variable –
 or everything, when there is no clause. -/
-def MarkedCore (t : SDTag) (x : A) : Prop :=
+private def MarkedCore (t : SDTag) (x : A) : Prop :=
   NoCl A ∨ (t = .lit true ∧ SatOccurs A x)
 
-theorem litDom_iff {t t' : SDTag} {x y : A} :
+private theorem litDom_iff {t t' : SDTag} {x y : A} :
     LitDom t x t' y ↔ ∃ s, t = .lit s ∧ SatOccurs A x ∧ Target s x t' y := by
   cases t with
   | lit s =>
@@ -121,7 +124,7 @@ theorem litDom_iff {t t' : SDTag} {x y : A} :
 open Classical in
 omit [Language.sat.Structure A] in
 /-- The sign of the true literal of a variable. -/
-theorem litTrue_iff_decide {ν : A → Prop} {x : A} {s : Bool} :
+private theorem litTrue_iff_decide {ν : A → Prop} {x : A} {s : Bool} :
     LitTrue ν x s ↔ s = decide (ν x) := by
   by_cases h : ν x <;> cases s <;> simp [LitTrue, h]
 
@@ -175,7 +178,8 @@ variable {A : Type}
 /-- The vertex of tag `t` over the element `x`. -/
 def sdPt (t : SDTag) (x : A) : sdInterp.Map A := (t, fun _ => x)
 
-theorem sdPt_eq_iff {t t' : SDTag} {x x' : A} : sdPt t x = sdPt t' x' ↔ t = t' ∧ x = x' := by
+private theorem sdPt_eq_iff
+    {t t' : SDTag} {x x' : A} : sdPt t x = sdPt t' x' ↔ t = t' ∧ x = x' := by
   constructor
   · intro h
     exact ⟨by simpa [sdPt] using congrArg (fun p : sdInterp.Map A => p.1) h,
@@ -183,7 +187,7 @@ theorem sdPt_eq_iff {t t' : SDTag} {x x' : A} : sdPt t x = sdPt t' x' ↔ t = t'
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem sdPt_surj (q : sdInterp.Map A) : ∃ t x, q = sdPt t x :=
+private theorem sdPt_surj (q : sdInterp.Map A) : ∃ t x, q = sdPt t x :=
   ⟨q.1, q.2 0, Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg q.2 (Subsingleton.elim i 0)⟩⟩
 
 end Points
@@ -198,12 +202,12 @@ section Realize
 
 variable {α : Type} {v : α → A}
 
-theorem realize_noClF : (noClF (α := α)).Realize v ↔ NoCl A := by
+private theorem realize_noClF : (noClF (α := α)).Realize v ↔ NoCl A := by
   simp only [noClF, Formula.realize_not, Formula.realize_iExs, ThreeSatToSat.realize_clF,
     Sum.elim_inr, NoCl]
   exact not_congr ⟨fun ⟨i, h⟩ => ⟨i (), h⟩, fun ⟨c, h⟩ => ⟨fun _ => c, h⟩⟩
 
-theorem realize_targetF {s : Bool} {x y : α} {t : SDTag} :
+private theorem realize_targetF {s : Bool} {x y : α} {t : SDTag} :
     (targetF s x t y).Realize v ↔ Target s (v x) t (v y) := by
   cases t with
   | lit s' =>
@@ -212,27 +216,27 @@ theorem realize_targetF {s : Bool} {x y : α} {t : SDTag} :
   | priv b => simp [targetF, Target, realize_occursF, ThreeSatToSat.realize_eqF]
   | cl => simp [targetF, Target, ThreeSatToSat.realize_clF]
 
-theorem realize_litDomF {t₁ t₂ : SDTag} {x y : α} :
+private theorem realize_litDomF {t₁ t₂ : SDTag} {x y : α} :
     (litDomF t₁ x t₂ y).Realize v ↔ LitDom t₁ (v x) t₂ (v y) := by
   cases t₁ <;> simp [litDomF, LitDom, realize_targetF, realize_occursF]
 
 end Realize
 
-theorem realize_adjF {t₁ t₂ : SDTag} {v : Fin 2 × Fin 1 → A} :
+private theorem realize_adjF {t₁ t₂ : SDTag} {v : Fin 2 × Fin 1 → A} :
     (adjF t₁ t₂).Realize v ↔ AdjCore t₁ (v (0, 0)) t₂ (v (1, 0)) := by
   simp [adjF, AdjCore, realize_noClF, realize_litDomF]
 
-theorem realize_markedF {t : SDTag} {v : Fin 1 × Fin 1 → A} :
+private theorem realize_markedF {t : SDTag} {v : Fin 1 × Fin 1 → A} :
     (markedF t).Realize v ↔ MarkedCore t (v (0, 0)) := by
   by_cases h : t = .lit true <;>
     simp [markedF, MarkedCore, h, realize_noClF, realize_occursF]
 
-theorem mgAdj_pt {t₁ t₂ : SDTag} {x y : A} :
+private theorem mgAdj_pt {t₁ t₂ : SDTag} {x y : A} :
     MGAdj (sdPt t₁ x) (sdPt t₂ y) ↔ AdjCore t₁ x t₂ y := by
   rw [MGAdj, sdPt, sdPt, FOInterpretation.relMap_map]
   exact realize_adjF
 
-theorem mgMarked_pt {t : SDTag} {x : A} : MGMarked (sdPt t x) ↔ MarkedCore t x := by
+private theorem mgMarked_pt {t : SDTag} {x : A} : MGMarked (sdPt t x) ↔ MarkedCore t x := by
   rw [MGMarked, sdPt, FOInterpretation.relMap_map]
   exact realize_markedF
 
@@ -246,30 +250,30 @@ variable {A : Type} [Language.sat.Structure A]
 
 /-- The dominating set of an assignment: the vertices of its true literals – or
 everything, when there is no clause. -/
-def domOf (ν : A → Prop) (p : sdInterp.Map A) : Prop :=
+private def domOf (ν : A → Prop) (p : sdInterp.Map A) : Prop :=
   NoCl A ∨ ∃ s x, p = sdPt (.lit s) x ∧ SatOccurs A x ∧ LitTrue ν x s
 
 /-- The assignment of a dominating set: the variables whose positive literal
 vertex it holds. -/
-def modelOf (D : sdInterp.Map A → Prop) (x : A) : Prop :=
+private def modelOf (D : sdInterp.Map A → Prop) (x : A) : Prop :=
   D (sdPt (.lit true) x) ∧ SatOccurs A x
 
 /-- The marked vertices, one per variable. -/
-def markEnum (x : {x : A // SatOccurs A x}) : sdInterp.Map A := sdPt (.lit true) x.1
+private def markEnum (x : {x : A // SatOccurs A x}) : sdInterp.Map A := sdPt (.lit true) x.1
 
 open Classical in
 /-- The vertices of the dominating set of an assignment, one per variable. -/
-noncomputable def chosenEnum (ν : A → Prop) (x : {x : A // SatOccurs A x}) :
+private noncomputable def chosenEnum (ν : A → Prop) (x : {x : A // SatOccurs A x}) :
     sdInterp.Map A :=
   sdPt (.lit (decide (ν x.1))) x.1
 
-theorem markEnum_injective : Function.Injective (markEnum (A := A)) :=
+private theorem markEnum_injective : Function.Injective (markEnum (A := A)) :=
   fun _ _ h => Subtype.ext (sdPt_eq_iff.mp h).2
 
-theorem chosenEnum_injective (ν : A → Prop) : Function.Injective (chosenEnum ν) :=
+private theorem chosenEnum_injective (ν : A → Prop) : Function.Injective (chosenEnum ν) :=
   fun _ _ h => Subtype.ext (sdPt_eq_iff.mp h).2
 
-theorem range_markEnum (hne : ¬NoCl A) :
+private theorem range_markEnum (hne : ¬NoCl A) :
     Set.range (markEnum (A := A)) = {p | MGMarked p} := by
   ext p
   simp only [Set.mem_range, Set.mem_ofPred_eq]
@@ -283,7 +287,7 @@ theorem range_markEnum (hne : ¬NoCl A) :
     · subst ht
       exact ⟨⟨x, hx⟩, rfl⟩
 
-theorem range_chosenEnum (hne : ¬NoCl A) (ν : A → Prop) :
+private theorem range_chosenEnum (hne : ¬NoCl A) (ν : A → Prop) :
     Set.range (chosenEnum ν) = {p | domOf ν p} := by
   ext p
   simp only [Set.mem_range, Set.mem_ofPred_eq]
@@ -296,12 +300,12 @@ theorem range_chosenEnum (hne : ¬NoCl A) (ν : A → Prop) :
       rw [litTrue_iff_decide.mp hT]
       rfl
 
-theorem ncard_marked (hne : ¬NoCl A) :
+private theorem ncard_marked (hne : ¬NoCl A) :
     {p : sdInterp.Map A | MGMarked p}.ncard = Nat.card {x : A // SatOccurs A x} := by
   rw [← range_markEnum hne]
   exact Set.ncard_range_of_injective markEnum_injective
 
-theorem ncard_domOf (hne : ¬NoCl A) (ν : A → Prop) :
+private theorem ncard_domOf (hne : ¬NoCl A) (ν : A → Prop) :
     {p | domOf ν p}.ncard = Nat.card {x : A // SatOccurs A x} := by
   rw [← range_chosenEnum hne ν]
   exact Set.ncard_range_of_injective (chosenEnum_injective ν)
@@ -309,7 +313,7 @@ theorem ncard_domOf (hne : ¬NoCl A) (ν : A → Prop) :
 /-! ### Correctness -/
 
 /-- The dominating set of a model is one, of the threshold size. -/
-theorem domSetOfSize_domOf [Finite A] {ν : A → Prop} (hν : SatModel A ν) :
+private theorem domSetOfSize_domOf [Finite A] {ν : A → Prop} (hν : SatModel A ν) :
     DomSetOfSize (sdInterp.Map A) (domOf ν) := by
   by_cases hne : NoCl A
   · refine ⟨sdInterp.map_finite A, fun v => Or.inl (Or.inl hne), ?_⟩
@@ -415,7 +419,7 @@ theorem dom_structure [Finite A] (hne : ¬NoCl A) {D : sdInterp.Map A → Prop}
   exact ⟨s, (huniq _ _ x h hs).1, hocc⟩
 
 /-- The assignment of a dominating set of the threshold size is a model. -/
-theorem satModel_modelOf [Finite A] {D : sdInterp.Map A → Prop}
+private theorem satModel_modelOf [Finite A] {D : sdInterp.Map A → Prop}
     (hD : DomSetOfSize (sdInterp.Map A) D) : SatModel A (modelOf D) := by
   refine ⟨fun c hc => ?_, fun x hx => hx.2⟩
   have hne : ¬NoCl A := fun h => h ⟨c, hc⟩
@@ -436,7 +440,7 @@ theorem satModel_modelOf [Finite A] {D : sdInterp.Map A → Prop}
 
 /-- A dominating set of the threshold size is the dominating set of its
 assignment. -/
-theorem domOf_modelOf [Finite A] {D : sdInterp.Map A → Prop}
+private theorem domOf_modelOf [Finite A] {D : sdInterp.Map A → Prop}
     (hD : DomSetOfSize (sdInterp.Map A) D) : domOf (modelOf D) = D := by
   funext p
   apply propext
@@ -467,7 +471,7 @@ theorem domOf_modelOf [Finite A] {D : sdInterp.Map A → Prop}
       · exact ⟨h, hx⟩
 
 /-- A model is the assignment of its dominating set. -/
-theorem modelOf_domOf {ν : A → Prop} (hν : SatModel A ν) : modelOf (domOf ν) = ν := by
+private theorem modelOf_domOf {ν : A → Prop} (hν : SatModel A ν) : modelOf (domOf ν) = ν := by
   funext x
   apply propext
   constructor
@@ -488,7 +492,7 @@ variable (A) [Finite A]
 
 /-- **The dominating sets of the threshold size of the interpreted graph are
 the models of the CNF formula**, bijectively. -/
-def solEquiv :
+private def solEquiv :
     {ν : A → Prop // SatModel A ν} ≃
       {D : sdInterp.Map A → Prop // DomSetOfSize (sdInterp.Map A) D} where
   toFun ν := ⟨domOf ν.1, domSetOfSize_domOf ν.2⟩
@@ -502,7 +506,7 @@ end SatToDom
 
 open SatToDom in
 /-- **#SAT reduces parsimoniously to #Dominating Set**, without an order. -/
-noncomputable def sharpSat_parsimonious_sharpDominatingSet :
+private noncomputable def sharpSat_parsimonious_sharpDominatingSet :
     SharpSAT ≤ᵖ SharpDominatingSet where
   Tag := SDTag
   dim := 1

@@ -12,6 +12,9 @@ import DescriptiveComplexity.Problems.Hamilton.Reductions
 import DescriptiveComplexity.Problems.Hamilton.Hardness
 public import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.CliqueFamily
+import all DescriptiveComplexity.Problems.Hamilton.Hardness
+import all DescriptiveComplexity.Problems.Hamilton.Reductions
 
 /-!
 # Hamilton circuits are NP-complete

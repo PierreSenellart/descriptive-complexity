@@ -84,7 +84,7 @@ def mergeStep (L : Language.{0, 0}) (B M : SOBlock) :
 /-- The re-association is an expansion: it does not change how any symbol is
 interpreted, when the two block assignments on one side are assembled into a
 single merged assignment on the other. -/
-theorem mergeStep_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Structure A)
+private theorem mergeStep_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Structure A)
     (B M : SOBlock) (ρ : B.Assignment A) (μ : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (mergeStep L B M) A
       (@sumStructure (L.sum B.lang) M.lang A
@@ -141,7 +141,7 @@ def altAssign (A : Type) : ∀ (Bs : List SOBlock),
 
 /-- Alternating quantification over a merged assignment only depends on the
 quantified predicate up to pointwise equivalence. -/
-theorem altAssign_congr {A : Type} :
+private theorem altAssign_congr {A : Type} :
     ∀ (Bs : List SOBlock) (P Q : (mergeBlocks Bs).Assignment A → Prop),
       (∀ μ, P μ ↔ Q μ) → ∀ pol : Bool, altAssign A Bs P pol ↔ altAssign A Bs Q pol := by
   intro Bs
@@ -228,7 +228,8 @@ def innerPol : ℕ → Bool → Bool
 
 /-- The innermost polarity in closed form: it flips with the parity of the
 number of blocks below it. -/
-theorem innerPol_eq : ∀ (n : ℕ) (pol : Bool), innerPol n pol = xor (decide (n % 2 = 1)) pol := by
+private theorem innerPol_eq
+    : ∀ (n : ℕ) (pol : Bool), innerPol n pol = xor (decide (n % 2 = 1)) pol := by
   intro n
   induction n with
   | zero => intro pol; cases pol <;> rfl
@@ -279,7 +280,7 @@ def splitIdx (Gt : SOBlock) : ∀ (B : SOBlock) (Bs : List SOBlock),
 
 /-- Arities of the enlarged prefix are bounded by the bounds of its two
 parts. -/
-theorem arity_consLast_le (Gt : SOBlock) {D : ℕ} (hGt : ∀ j : Gt.ι, Gt.arity j ≤ D) :
+private theorem arity_consLast_le (Gt : SOBlock) {D : ℕ} (hGt : ∀ j : Gt.ι, Gt.arity j ≤ D) :
     ∀ (B : SOBlock) (Bs : List SOBlock),
       (∀ i : (mergeBlocks (B :: Bs)).ι, (mergeBlocks (B :: Bs)).arity i ≤ D) →
       ∀ i : (mergeBlocks (consLast Gt B Bs)).ι,
@@ -320,14 +321,14 @@ def gatePart (Gt : SOBlock) {A : Type} : ∀ (B : SOBlock) (Bs : List SOBlock),
   | _, B' :: Bs, μ => gatePart Gt B' Bs fun i => μ (Sum.inr i)
 
 /-- Reassembling a singleton merged assignment. -/
-theorem consAssign_nil {A : Type} {B : SOBlock} (μ : (mergeBlocks [B]).Assignment A) :
+private theorem consAssign_nil {A : Type} {B : SOBlock} (μ : (mergeBlocks [B]).Assignment A) :
     consAssign (fun i => μ (Sum.inl i)) (nilAssign A) = μ := by
   funext i
   rcases i with i | i
   · rfl
   · exact Empty.elim (i : Empty)
 
-theorem atomPart_combineLast (Gt : SOBlock) {A : Type} :
+private theorem atomPart_combineLast (Gt : SOBlock) {A : Type} :
     ∀ (B : SOBlock) (Bs : List SOBlock) (μ : (mergeBlocks (B :: Bs)).Assignment A)
       (g : Gt.Assignment A), atomPart Gt B Bs (combineLast Gt B Bs μ g) = μ := by
   intro B Bs
@@ -340,7 +341,7 @@ theorem atomPart_combineLast (Gt : SOBlock) {A : Type} :
     rw [ih B' (fun i => μ (Sum.inr i)) g]
     exact consAssign_split μ
 
-theorem gatePart_combineLast (Gt : SOBlock) {A : Type} :
+private theorem gatePart_combineLast (Gt : SOBlock) {A : Type} :
     ∀ (B : SOBlock) (Bs : List SOBlock) (μ : (mergeBlocks (B :: Bs)).Assignment A)
       (g : Gt.Assignment A), gatePart Gt B Bs (combineLast Gt B Bs μ g) = g := by
   intro B Bs
@@ -372,7 +373,7 @@ private theorem quantB_cons {A : Type} {B C : SOBlock} (pol : Bool)
 /-- **Enlarging the innermost block**: quantifying a prefix whose innermost
 block has been enlarged by `Gt` is quantifying the original prefix, with an
 extra quantifier over `Gt` – of the innermost polarity – inside. -/
-theorem altAssign_consLast (Gt : SOBlock) {A : Type} :
+private theorem altAssign_consLast (Gt : SOBlock) {A : Type} :
     ∀ (B : SOBlock) (Bs : List SOBlock)
       (G : (mergeBlocks (consLast Gt B Bs)).Assignment A → Prop) (pol : Bool),
       altAssign A (consLast Gt B Bs) G pol ↔
@@ -423,7 +424,7 @@ def unmergeStep (L : Language.{0, 0}) (B M : SOBlock) :
     | Sum.inr ⟨Sum.inl i, h⟩ => Sum.inl (Sum.inr ⟨i, h⟩)
     | Sum.inr ⟨Sum.inr i, h⟩ => Sum.inr ⟨i, h⟩
 
-theorem unmergeStep_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Structure A)
+private theorem unmergeStep_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Structure A)
     (B M : SOBlock) (ρ : B.Assignment A) (μ : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (unmergeStep L B M) A
       (@sumStructure L (SOBlock.cons B M).lang A instL
@@ -457,7 +458,7 @@ def unmergeNil (L : Language.{0, 0}) : L.sum SOBlock.trivial.lang →ᴸ L where
     | Sum.inl r => r
     | Sum.inr r => Empty.elim (r.1 : Empty)
 
-theorem unmergeNil_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Structure A)
+private theorem unmergeNil_isExpansionOn (L : Language.{0, 0}) {A : Type} (instL : L.Structure A)
     (μ : SOBlock.trivial.Assignment A) :
     @LHom.IsExpansionOn _ _ (unmergeNil L) A
       (@sumStructure L SOBlock.trivial.lang A instL (SOBlock.trivial.structure μ)) instL := by

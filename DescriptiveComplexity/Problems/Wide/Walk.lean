@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # Walking the register file
@@ -100,7 +105,7 @@ def bitAtOf {I : Type} (cell : I → (A → Prop)) (m : I → Prop) (r : A → P
 
 omit [Language.wide.Structure A] [Finite A] in
 /-- At a cell that is nobody's register a track shows nothing. -/
-theorem bitAtOf_of_not_reg {I : Type} {cell : I → (A → Prop)} {m : I → Prop} {r : A → Prop}
+private theorem bitAtOf_of_not_reg {I : Type} {cell : I → (A → Prop)} {m : I → Prop} {r : A → Prop}
     (hno : ∀ u : I, r ≠ cell u) : ¬bitAtOf cell m r :=
   fun hc => hc.elim fun u hu => hno u hu.1
 
@@ -112,7 +117,7 @@ through this.
 
 A caller finishes with `congrArg`: its tape is some `g r (bitAtOf cell m r)`, and
 this says the second argument does not move. -/
-theorem bitAtOf_congr {I : Type} {cell : I → (A → Prop)} {m m' : I → Prop} {u : I}
+private theorem bitAtOf_congr {I : Type} {cell : I → (A → Prop)} {m m' : I → Prop} {u : I}
     (hag : ∀ v : I, v ≠ u → (m v ↔ m' v)) {r : A → Prop} (hr : r ≠ cell u) :
     bitAtOf cell m r = bitAtOf cell m' r := by
   refine propext ⟨fun ⟨v, hv, hm⟩ => ⟨v, hv, ?_⟩, fun ⟨v, hv, hm⟩ => ⟨v, hv, ?_⟩⟩
@@ -307,7 +312,8 @@ offers the scanning transition at the cells that are nobody's register and at th
 registers of the *other* elements – which in a file marked by the input channel
 all hold the one generic mark, so that is a single transition – and withholds it
 at the symbol the register of `u` carries, which is what stops the scan. -/
-theorem reachesIn_toReg (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : I}
+theorem reachesIn_toReg
+    (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : I}
     {s : A → Prop} (hle : WMSetLe WMLe s (F.cell u))
     (hother : ∀ x : I, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell x)) ∧
       WMDst τ q ∧ WMWrite τ (f (F.cell x)) ∧ WMRight τ)
@@ -343,7 +349,8 @@ theorem reaches_toReg (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop
 omit [Finite I] in
 /-- **Walking back down to a named register**, the same reading downwards: from
 any cell at or above the register of `u`, the machine scans left to it. -/
-theorem reachesIn_toRegBack (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : I}
+theorem reachesIn_toRegBack
+    (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : I}
     {s : A → Prop} (hle : WMSetLe WMLe (F.cell u) s)
     (hother : ∀ x : I, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell x)) ∧
       WMDst τ q ∧ WMWrite τ (f (F.cell x)) ∧ ¬WMRight τ)
@@ -365,7 +372,8 @@ theorem reachesIn_toRegBack (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A �
 
 omit [Finite I] in
 /-- **Walking back down to a named register**, the budget forgotten. -/
-theorem reaches_toRegBack (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : I}
+private theorem reaches_toRegBack
+    (ha : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : I}
     {s : A → Prop} (hle : WMSetLe WMLe (F.cell u) s)
     (hother : ∀ x : I, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell x)) ∧
       WMDst τ q ∧ WMWrite τ (f (F.cell x)) ∧ ¬WMRight τ)
@@ -437,7 +445,7 @@ theorem reachesIn_regStepBack (ha : IsLinOrd (WMLe (A := A))) (h : IsLinOrd ile)
 
 omit [Finite I] in
 /-- **One move of a register walk, downwards**, the budget forgotten. -/
-theorem reaches_regStepBack (ha : IsLinOrd (WMLe (A := A))) (h : IsLinOrd ile)
+private theorem reaches_regStepBack (ha : IsLinOrd (WMLe (A := A))) (h : IsLinOrd ile)
     {u u' : I} (hs : IxSucc ile u u')
     {q q' b : A} {f f' : (A → Prop) → A}
     (hwrite : ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell u')) ∧ WMDst τ q' ∧
@@ -493,7 +501,7 @@ theorem reachesIn_regWalkBack (h : IsLinOrd ile) {b : A} {st : I → A}
 
 omit [Finite A] in
 /-- **A register walk, downwards**, the budget forgotten. -/
-theorem reaches_regWalkBack (h : IsLinOrd ile) {b : A} {st : I → A}
+private theorem reaches_regWalkBack (h : IsLinOrd ile) {b : A} {st : I → A}
     {tp : I → (A → Prop) → A} {u₁ : I}
     (hmove : ∀ u u' : I, IxSucc ile u u' → ile u' u₁ →
       Relation.ReflTransGen (wideData A).Step
@@ -550,7 +558,7 @@ theorem bitAt_cell (h : IsLinOrd ile) (m : I → Prop) (u : I) :
 omit [Finite A] in
 omit [Finite I] in
 /-- At a cell that is nobody's register a track shows nothing. -/
-theorem bitAt_of_not_reg
+private theorem bitAt_of_not_reg
     {m : I → Prop} {r : A → Prop} (hno : ∀ u : I, r ≠ F.cell u) : ¬F.bitAt m r :=
   bitAtOf_of_not_reg hno
 
@@ -598,7 +606,7 @@ theorem reachesIn_regStep (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc
   F.toIx.reachesIn_regStep h h hs hwrite hagree hscan
 
 /-- **One move of a register walk**, the budget forgotten. -/
-theorem reaches_regStep (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
+private theorem reaches_regStep (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
     {q q' b : A} {f f' : (A → Prop) → A}
     (hwrite : ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell u)) ∧ WMDst τ q' ∧
       WMWrite τ (f' (F.cell u)) ∧ WMRight τ)
@@ -634,7 +642,7 @@ theorem reachesIn_regWalk (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
 
 /-- **A register walk**, the budget forgotten: each move is a run of any length
 whatever. -/
-theorem reaches_regWalk (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
+private theorem reaches_regWalk (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
     {tp : A → (A → Prop) → A} {u₀ : A}
     (hmove : ∀ u u' : A, WMSucc A u u' → WMLe u₀ u →
       Relation.ReflTransGen (wideData A).Step
@@ -674,7 +682,7 @@ theorem reachesIn_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Pro
   F.toIx.reachesIn_toReg h hle hother hskip
 
 /-- **Walking up to a distinguished register**, the budget forgotten. -/
-theorem reaches_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
+private theorem reaches_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
     {s : A → Prop} (hle : WMSetLe WMLe s (F.cell u))
     (hother : ∀ x : A, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell x)) ∧
       WMDst τ q ∧ WMWrite τ (f (F.cell x)) ∧ WMRight τ)
@@ -700,7 +708,8 @@ theorem reachesIn_toRegBack (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A →
   F.toIx.reachesIn_toRegBack h hle hother hskip
 
 /-- **Walking back down to a named register**, the budget forgotten. -/
-theorem reaches_toRegBack (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
+private theorem reaches_toRegBack
+    (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
     {s : A → Prop} (hle : WMSetLe WMLe (F.cell u) s)
     (hother : ∀ x : A, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell x)) ∧
       WMDst τ q ∧ WMWrite τ (f (F.cell x)) ∧ ¬WMRight τ)
@@ -736,7 +745,7 @@ theorem reachesIn_regStepBack (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WM
   F.toIx.reachesIn_regStepBack h h hs hwrite hagree hscan
 
 /-- **One move of a register walk, downwards**, the budget forgotten. -/
-theorem reaches_regStepBack (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
+private theorem reaches_regStepBack (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
     {q q' b : A} {f f' : (A → Prop) → A}
     (hwrite : ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (F.cell u')) ∧ WMDst τ q' ∧
       WMWrite τ (f' (F.cell u')) ∧ ¬WMRight τ)
@@ -766,7 +775,7 @@ theorem reachesIn_regWalkBack (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A →
   F.toIx.reachesIn_regWalkBack h hmove
 
 /-- **A register walk, downwards**, the budget forgotten. -/
-theorem reaches_regWalkBack (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
+private theorem reaches_regWalkBack (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
     {tp : A → (A → Prop) → A} {u₁ : A}
     (hmove : ∀ u u' : A, WMSucc A u u' → WMLe u' u₁ →
       Relation.ReflTransGen (wideData A).Step
@@ -801,7 +810,7 @@ theorem bitAt_cell (h : IsLinOrd (WMLe (A := A))) (m : A → Prop) (u : A) :
 
 omit [Finite A] in
 /-- At a cell that is nobody's register a track shows nothing. -/
-theorem bitAt_of_not_reg {m r : A → Prop} (hno : ∀ u : A, r ≠ F.cell u) : ¬F.bitAt m r :=
+private theorem bitAt_of_not_reg {m r : A → Prop} (hno : ∀ u : A, r ≠ F.cell u) : ¬F.bitAt m r :=
   F.toIx.bitAt_of_not_reg hno
 
 omit [Finite A] in
@@ -864,7 +873,8 @@ theorem reaches_toReg (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop)
 
 /-- **Walking back down to a named register** of the file the input channel
 marks. -/
-theorem reaches_toRegBack (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
+private theorem reaches_toRegBack
+    (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A} {u : A}
     {s : A → Prop} (hle : WMSetLe WMLe (wmSeg u) s)
     (hother : ∀ x : A, x ≠ u → ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (wmSeg x)) ∧
       WMDst τ q ∧ WMWrite τ (f (wmSeg x)) ∧ ¬WMRight τ)
@@ -877,7 +887,7 @@ theorem reaches_toRegBack (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → P
 
 /-- **One move of a register walk, downwards**, over the file the input channel
 marks. -/
-theorem reaches_regStepBack (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
+private theorem reaches_regStepBack (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u')
     {q q' b : A} {f f' : (A → Prop) → A}
     (hwrite : ∃ τ : A, WMTr τ ∧ WMSrc τ q ∧ WMRead τ (f (wmSeg u')) ∧ WMDst τ q' ∧
       WMWrite τ (f' (wmSeg u')) ∧ ¬WMRight τ)
@@ -890,7 +900,7 @@ theorem reaches_regStepBack (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSu
   (wmSegFile h).reaches_regStepBack h hs hwrite hagree hscan
 
 /-- **A register walk, downwards**, over the file the input channel marks. -/
-theorem reaches_regWalkBack (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
+private theorem reaches_regWalkBack (h : IsLinOrd (WMLe (A := A))) {b : A} {st : A → A}
     {tp : A → (A → Prop) → A} {u₁ : A}
     (hmove : ∀ u u' : A, WMSucc A u u' → WMLe u' u₁ →
       Relation.ReflTransGen (wideData A).Step
@@ -960,12 +970,14 @@ theorem accStateAfter_succ (h : IsLinOrd ile) {u u' : I} (hs : IxSucc ile u u') 
 omit [Finite A] [Language.wide.Structure A] in
 /-- **At the last register nothing has been seen yet**, so the pass starts in the
 first state. -/
-theorem accState_top {top : I} (htop : ∀ v : I, ile v top) : accState ile P qy qn top = qy :=
+private theorem accState_top
+    {top : I} (htop : ∀ v : I, ile v top) : accState ile P qy qn top = qy :=
   ite_eq_left fun v hlt => absurd (htop v) hlt.2
 
 omit [Finite A] [Language.wide.Structure A] in
 /-- A pass is in one of its two states, whatever it has seen. -/
-theorem accState_cases (w : I) : accState ile P qy qn w = qy ∨ accState ile P qy qn w = qn := by
+private theorem accState_cases
+    (w : I) : accState ile P qy qn w = qy ∨ accState ile P qy qn w = qn := by
   unfold accState
   split
   · exact Or.inl rfl

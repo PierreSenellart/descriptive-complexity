@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefStage
 public import DescriptiveComplexity.Problems.Wide.DrawKindRule
+import all DescriptiveComplexity.Problems.Wide.DrawDefTower
 
 /-!
 # What a parameter pack owes, and one atom kind's machinery
@@ -63,7 +64,7 @@ structure UElemArgsDef {nr : ℕ} (args : ∀ e : Env L, ElemArgs e.α Q W nr) :
   /-- And the exhaustion test. -/
   IsMaxEl : UGDefinable fun e f (_ : W → e.α) => (args e).IsMaxEl f
 
-theorem uRulesDefinable_elemArgs {nr : ℕ} {wk rg : W} {emb : ElemPh nr → P}
+private theorem uRulesDefinable_elemArgs {nr : ℕ} {wk rg : W} {emb : ElemPh nr → P}
     {exitPh : P} {args : ∀ e : Env L, ElemArgs e.α Q W nr}
     (h : UElemArgsDef args) :
     URulesDefinable fun e =>
@@ -113,7 +114,7 @@ structure UTagArgsDef {m : ℕ} {T : Type} {nrOf : T → ℕ}
   IsMaxEl : ∀ τ : T,
     UGDefinable fun e f (_ : W → e.α) => (args e).IsMaxEl τ f
 
-theorem uRulesDefinable_tagArgs {m : ℕ} {T : Type} {nrOf : T → ℕ} {wk rg : W}
+private theorem uRulesDefinable_tagArgs {m : ℕ} {T : Type} {nrOf : T → ℕ} {wk rg : W}
     {emb : TagPh m T nrOf → P} {exitPh : P}
     {args : ∀ e : Env L, TagArgs e.α Q W m T nrOf} (h : UTagArgsDef args) :
     URulesDefinable fun e =>
@@ -173,7 +174,7 @@ structure UStageArgsDef {k : ℕ}
   /-- and the verdict's filing. -/
   setAv : ∀ b : Bool, UStDefinable fun e => (args e).setAv b
 
-theorem uRulesDefinable_stageArgs {k : ℕ} {emb : StagePh k → P} {exitPh : P}
+private theorem uRulesDefinable_stageArgs {k : ℕ} {emb : StagePh k → P} {exitPh : P}
     {args : ∀ e : Env L,
       StageArgs e.α Q dt.SlotIx (Fin dt.ko ⊕ Fin dt.ki) dt.dd0 k}
     (h : UStageArgsDef args) :
@@ -216,7 +217,7 @@ noncomputable def UKindArgsDef {n : ℕ} :
 /-- **An atom kind's machinery is definable**, given its pack: the stage
 atom's by its own statement, an expansion atom's by the tag-branched one, an
 equality's and an order atom's by the element loop's. -/
-theorem uRulesDefinable_kindRule {n : ℕ} (κ : MatAtom dt.X dt.d.B n)
+private theorem uRulesDefinable_kindRule {n : ℕ} (κ : MatAtom dt.X dt.d.B n)
     {args : ∀ e : Env L, dt.KindArgs (A := e.α) (Q := Q) κ}
     {emb : dt.KindPh κ → P} {exitPh : P} (h : UKindArgsDef κ args) :
     URulesDefinable (L := L) (Q := Q) fun e =>

@@ -200,13 +200,13 @@ variable {L L' : Language.{0, 0}} [L'.IsRelational] {Tag : Type} {dim : ℕ}
 
 /-- **The guarded interpretation**: the whole set of tagged tuples as universe,
 every relation holding only of tuples in the domain. -/
-noncomputable def RelFOInterpretation.guard (J : RelFOInterpretation L L' Tag dim) :
+private noncomputable def RelFOInterpretation.guard (J : RelFOInterpretation L L' Tag dim) :
     FOInterpretation L L' Tag dim where
   relFormula {n} R := fun t =>
     J.relFormula R t ⊓
       Formula.iInf fun i : Fin n => Formula.relabel (fun j => (i, j)) (J.domFormula (t i))
 
-theorem RelFOInterpretation.relMap_guard (J : RelFOInterpretation L L' Tag dim) {A : Type}
+private theorem RelFOInterpretation.relMap_guard (J : RelFOInterpretation L L' Tag dim) {A : Type}
     [L.Structure A] {n : ℕ} (R : L'.Relations n) (ys : Fin n → J.guard.Map A) :
     RelMap R ys ↔ (J.relFormula R fun i => (ys i).1).Realize (fun p => (ys p.1).2 p.2) ∧
       ∀ i, (J.domFormula (ys i).1).Realize (ys i).2 := by
@@ -225,7 +225,7 @@ variable {L : Language.{0, 0}} [L.IsRelational] {C : CountingProblem L}
 
 /-- **A relativized reduction to the number written by a circuit is a
 reduction**: the tuples outside the domain are isolated elements. -/
-noncomputable def RelOrderedParsimoniousReduction.unrelCircuitNumber
+private noncomputable def RelOrderedParsimoniousReduction.unrelCircuitNumber
     (f : C ≤ʳᵖ[≤] CircuitNumber) : C ≤ᵖ[≤] CircuitNumber where
   Tag := f.Tag
   tagFinite := f.tagFinite

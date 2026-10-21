@@ -68,13 +68,13 @@ def listSup : List (L'.Formula γ) → L'.Formula γ
   | [] => ⊥
   | φ :: l => φ ⊔ listSup l
 
-theorem realize_listInf (l : List (L'.Formula γ)) :
+private theorem realize_listInf (l : List (L'.Formula γ)) :
     (listInf l).Realize v ↔ ∀ φ ∈ l, φ.Realize v := by
   induction l with
   | nil => simp [listInf, Formula.realize_top]
   | cons φ l ih => simp [listInf, Formula.realize_inf, ih]
 
-theorem realize_listSup (l : List (L'.Formula γ)) :
+private theorem realize_listSup (l : List (L'.Formula γ)) :
     (listSup l).Realize v ↔ ∃ φ ∈ l, φ.Realize v := by
   induction l with
   | nil => simp [listSup, Formula.realize_bot]
@@ -105,7 +105,7 @@ def pad (a₀ : A) {m : ℕ} (w : Fin m → A) : Fin D → A :=
 def pref {m : ℕ} (h : m ≤ D) (u : Fin D → A) : Fin m → A :=
   fun j => u (Fin.castLE h j)
 
-theorem pref_pad (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) :
+private theorem pref_pad (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) :
     pref h (pad a₀ w) = w := by
   funext j
   rw [pref, pad, dite_eq_left (show ((Fin.castLE h j : Fin D) : ℕ) < m from j.isLt)]
@@ -117,7 +117,7 @@ theorem canon_pad [LE A] {a₀ : A} (h₀ : IsBot a₀) (m : ℕ) (w : Fin m →
   rw [pad, dite_eq_right (not_lt.mpr hj)]
   exact h₀
 
-theorem agree_pad_pad (a₀ : A) {m : ℕ} (w : Fin m → A) (a : A) :
+private theorem agree_pad_pad (a₀ : A) {m : ℕ} (w : Fin m → A) (a : A) :
     Agree m (pad (D := D) a₀ (Fin.snoc w a)) (pad a₀ w) := by
   intro j hj
   rw [pad, pad, dite_eq_left hj, dite_eq_left (hj.trans (Nat.lt_succ_self m))]
@@ -146,7 +146,7 @@ theorem eq_pad_of_canon_agree [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m
     exact (ha j hj).trans (congrArg u (Fin.ext rfl)).symm
   · exact ((h₀ (x j)).antisymm (hcx j (not_lt.mp hj) a₀)).symm
 
-theorem pref_pad_snoc (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) (a : A) :
+private theorem pref_pad_snoc (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) (a : A) :
     pref h (pad a₀ (Fin.snoc w a)) = w := by
   funext j
   rw [pref, pad, dite_eq_left (show ((Fin.castLE h j : Fin D) : ℕ) < m + 1 from
@@ -154,7 +154,7 @@ theorem pref_pad_snoc (a₀ : A) {m : ℕ} (h : m ≤ D) (w : Fin m → A) (a : 
   rw [show (⟨((Fin.castLE h j : Fin D) : ℕ), _⟩ : Fin (m + 1)) = Fin.castSucc j from
     Fin.ext rfl, Fin.snoc_castSucc]
 
-theorem agree_pad_snoc_pref (a₀ a : A) {m : ℕ} (h : m ≤ D) (u : Fin D → A) :
+private theorem agree_pad_snoc_pref (a₀ a : A) {m : ℕ} (h : m ≤ D) (u : Fin D → A) :
     Agree m u (pad a₀ (Fin.snoc (pref h u) a)) := by
   intro j hj
   rw [pad, dite_eq_left (hj.trans (Nat.lt_succ_self m))]
@@ -177,14 +177,14 @@ def PadTup [LE A] {m : ℕ} (f : Fin m → Fin D) (u x : Fin D → A) : Prop :=
 
 /-- The canonical padding of the tuple read through `f` does satisfy
 `DescriptiveComplexity.PadTup`. -/
-theorem padTup_pad [LE A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ} (f : Fin m → Fin D)
+private theorem padTup_pad [LE A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ} (f : Fin m → Fin D)
     (u : Fin D → A) : PadTup f u (pad (D := D) a₀ fun j => u (f j)) := by
   refine ⟨canon_pad h₀ m _, fun j hj => ?_⟩
   rw [pad, dite_eq_left hj]
 
 /-- Conversely, a tuple satisfying `DescriptiveComplexity.PadTup` *is* that canonical
 padding: the element encoding an atom is unique. -/
-theorem eq_pad_of_padTup [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ}
+private theorem eq_pad_of_padTup [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ}
     {f : Fin m → Fin D} {u x : Fin D → A} (h : PadTup f u x) :
     x = pad a₀ fun j => u (f j) := by
   funext j
@@ -195,7 +195,7 @@ theorem eq_pad_of_padTup [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : �
 
 /-- A tuple canonical at `m + 1` agreeing below `m` with `u` is the padding
 of the prefix of `u` extended by its own coordinate `m`. -/
-theorem eq_pad_snoc_of_canon_agree [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ}
+private theorem eq_pad_snoc_of_canon_agree [PartialOrder A] {a₀ : A} (h₀ : IsBot a₀) {m : ℕ}
     (h : m < D) {u x : Fin D → A} (hcx : Canon (m + 1) x) (ha : Agree m u x) :
     x = pad a₀ (Fin.snoc (pref h.le u) (x ⟨m, h⟩)) := by
   funext j

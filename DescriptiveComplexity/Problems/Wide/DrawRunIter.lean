@@ -9,6 +9,10 @@ import DescriptiveComplexity.Problems.Wide.DrawRunElem
 public import DescriptiveComplexity.Problems.Wide.DrawRunTagged
 public import DescriptiveComplexity.Problems.Wide.DrawRunTuple
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawRunTagged
+import all DescriptiveComplexity.Problems.Wide.DrawRunTuple
 
 /-!
 # Generated control families: the runs, iterated
@@ -62,13 +66,13 @@ noncomputable def iterOrd (init : Q') (step : ι → Q' → Q') (a : ι) : Q' :=
 
 omit [Finite ι] in
 /-- At the bottom the iteration is the base. -/
-theorem iterOrd_bot {init : Q'} {step : ι → Q' → Q'} {a₀ : ι}
+private theorem iterOrd_bot {init : Q'} {step : ι → Q' → Q'} {a₀ : ι}
     (hbot : ∀ b, a₀ ≤ b) : iterOrd init step a₀ = init := by
   rw [iterOrd, orank_eq_zero hbot]
   rfl
 
 /-- Across a cover the iteration steps once, at the covered element. -/
-theorem iterOrd_covers {init : Q'} {step : ι → Q' → Q'} {a a' : ι}
+private theorem iterOrd_covers {init : Q'} {step : ι → Q' → Q'} {a a' : ι}
     (hlt : a < a') (hnb : ∀ b, ¬(a < b ∧ b < a')) :
     iterOrd init step a' = step a (iterOrd init step a) := by
   classical
@@ -85,7 +89,7 @@ omit [Finite ι] in
 base satisfies and every step preserves holds at every element. This is what
 a threaded tape family's field lemmas are proved by – the fields a round
 leaves alone are preserved by each step, hence along the whole loop. -/
-theorem iterOrd_invariant {init : Q'} {step : ι → Q' → Q'} {Inv : Q' → Prop}
+private theorem iterOrd_invariant {init : Q'} {step : ι → Q' → Q'} {Inv : Q' → Prop}
     (hinit : Inv init) (hstep : ∀ a q, Inv q → Inv (step a q)) (a : ι) :
     Inv (iterOrd init step a) := by
   classical
@@ -125,7 +129,7 @@ theorem chainSt_zero {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' → Q
     {base : Q'} : chainSt bit upd base 0 = base := rfl
 
 /-- A positive read's link. -/
-theorem chainSt_succ_pos {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' → Q'}
+private theorem chainSt_succ_pos {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' → Q'}
     {base : Q'} {j : ℕ} (h : j < nr) (hb : bit ⟨j, h⟩) :
     chainSt bit upd base (j + 1) =
       upd ⟨j, h⟩ true (chainSt bit upd base j) := by
@@ -134,7 +138,7 @@ theorem chainSt_succ_pos {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' �
   rw [dite_eq_left h, ite_eq_left hb]
 
 /-- A negative read's link. -/
-theorem chainSt_succ_neg {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' → Q'}
+private theorem chainSt_succ_neg {bit : Fin nr → Prop} {upd : Fin nr → Bool → Q' → Q'}
     {base : Q'} {j : ℕ} (h : j < nr) (hb : ¬bit ⟨j, h⟩) :
     chainSt bit upd base (j + 1) =
       upd ⟨j, h⟩ false (chainSt bit upd base j) := by
@@ -203,7 +207,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [Finite P] [Finite K] [Finite ι] in
 /-- Two backgrounds agreeing at the working cell give one round-entry
 family. -/
-theorem elemIter_congr_rest (h : rest v = rest' v)
+private theorem elemIter_congr_rest (h : rest v = rest' v)
     (xOf : ι → Fin nr → I) (f₀ : Q → A) (a : ι) :
     elemIter setFlag initEl advEl rest v m xOf f₀ a =
       elemIter setFlag initEl advEl rest' v m xOf f₀ a := by
@@ -259,7 +263,7 @@ include RF hrules hR hlin hix hbot hv hvi hwkS hrg hm hnewk hnerg hm₀ hwkt₀ 
 /-- **The element loop's run at the generated family, on a clock**: only the
 name guards at the generated states, the exhaustion conditions and the geometry
 are owed; the family equations hold by construction. -/
-theorem elem_reachesIn_iter (c : ℕ)
+private theorem elem_reachesIn_iter (c : ℕ)
     (hcost : ∀ (a : ι) (j : Fin nr),
       2 * (wideRank (RF.cell (xOf a j)) - wideRank v) + 2 ≤ c) :
     (wideData (Univ A R P K dd)).ReachesIn ((2 + (c + 2) * nr) * (Nat.card ι + 1) + 1)
@@ -353,7 +357,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
   [Finite P] [Finite K] in
 /-- **The witness chain reads its background at the working cell alone.** -/
-theorem tagFam_congr_rest {rest' : (Univ A R P K dd → Prop) → W → A}
+private theorem tagFam_congr_rest {rest' : (Univ A R P K dd → Prop) → W → A}
     (h : rest v = rest' v) (xT : Fin m → I) (f₀ : Q → A)
     (i : Fin (m + 1)) :
     tagFam setTagFlag rest v mT xT f₀ i =
@@ -415,7 +419,7 @@ include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt�
 clock**: the witness chain and the branch's element loop are both generated, so
 only the name guards, the branch decode and the exhaustion conditions are owed,
 and the cost is the chain's reads plus the branch's whole loop. -/
-theorem tag_reachesIn_iter (c : ℕ)
+private theorem tag_reachesIn_iter (c : ℕ)
     (hcostT : ∀ i : Fin m, 2 * (wideRank (RF.cell (xT i)) - wideRank v) + 2 ≤ c)
     (hcostE : ∀ (a : ι) (j : Fin (nrOf τ)),
       2 * (wideRank (RF.cell (xE a j)) - wideRank v) + 2 ≤ c) :
@@ -463,7 +467,7 @@ include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt�
   hnameT huniqT hτ hmE hnewkE hnergE hbotI htopI hnameE huniqE hmaxT hmaxF in
 /-- **The tag-branched machinery's run at the generated families**, the budget
 forgotten. -/
-theorem tag_run_iter :
+private theorem tag_run_iter :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩
@@ -560,7 +564,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [Finite P] [Finite K] [Finite ι] in
 /-- **The copy loop reads its background at the working cell alone** – at
 every destination content, the cell being the same one. -/
-theorem tupleIter0_congr_restF (h : ∀ m', restF m' v = restF' m' v)
+private theorem tupleIter0_congr_restF (h : ∀ m', restF m' v = restF' m' v)
     (xS xD : ι → I) (mD₀ : I → Prop)
     (f₀ : Q → A) (a : ι) :
     tupleIter0 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a =
@@ -572,7 +576,7 @@ omit [Fintype Q] [Fintype W] [DecidableEq W] [LinearOrder A] [LinearOrder R]
   [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R]
   [Finite P] [Finite K] [Finite ι] in
 /-- The same, after the round's store. -/
-theorem tupleIter1_congr_restF (h : ∀ m', restF m' v = restF' m' v)
+private theorem tupleIter1_congr_restF (h : ∀ m', restF m' v = restF' m' v)
     (xS xD : ι → I) (mD₀ : I → Prop)
     (f₀ : Q → A) (a : ι) :
     tupleIter1 setBit initLv advLv mSrc v restF xS xD mD₀ f₀ a =
@@ -634,7 +638,7 @@ include RF hrules hR hlin hix hbot hv hvi hbotI htopI hwkS hrg hsrc hdst hoff
 /-- **The tuple loop's run at the generated families, on a clock**: only the
 name guards, the copied-bit read-back and the exhaustion conditions are owed,
 and the cost is a round's width once per tuple of the enumeration. -/
-theorem tuple_reachesIn_iter (w : ℕ)
+private theorem tuple_reachesIn_iter (w : ℕ)
     (hcost : ∀ a : ι, 2 * (wideRank (RF.cell (xS a)) - wideRank v) + 2 ≤ w ∧
       2 * (wideRank (RF.cell (xD a)) - wideRank v) + 2 ≤ w) :
     (wideData (Univ A R P K dd)).ReachesIn ((2 * w + 8) * (Nat.card ι + 1) + 1)
@@ -724,7 +728,7 @@ either one the loop wrote – a destination cell of some round – or one it
 started with. A property of cells closed under both is therefore closed
 under the whole loop; that is how the target of a random access is known to
 be an address of argument cells alone. -/
-theorem tupleIterD_of_mem {mSrc : I → Prop}
+private theorem tupleIterD_of_mem {mSrc : I → Prop}
     {xS xD : ι → I} {mD₀ : I → Prop}
     (Q : I → Prop) (hxD : ∀ a : ι, Q (xD a))
     (h₀ : ∀ y, mD₀ y → Q y) (b : ι) {y : I}
@@ -745,7 +749,7 @@ theorem tupleIterD_of_mem {mSrc : I → Prop}
 earlier round wrote it – that round's source bit – or it held one from the
 start and no round has touched it. The destination cells being distinct is
 what makes the disjunction honest: a cell is written at most once. -/
-theorem tupleIterD_iff {mSrc : I → Prop}
+private theorem tupleIterD_iff {mSrc : I → Prop}
     {xS xD : ι → I}
     (hinj : ∀ u u' : ι, xD u = xD u' → u = u')
     {mD₀ : I → Prop} (b : ι) (y : I) :

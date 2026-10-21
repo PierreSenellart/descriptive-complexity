@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawYes
 public import DescriptiveComplexity.Problems.Wide.DrawHalt
 public import DescriptiveComplexity.Problems.Machine.DetRun
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Problems.Wide.DrawHalt
+import all DescriptiveComplexity.Problems.Wide.DrawProg
+import all DescriptiveComplexity.Problems.Wide.DrawRunSpine
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.DrawYes
 
 /-!
 # A partial fixed point that fails makes the machine reject
@@ -63,7 +69,7 @@ omit [Finite dt.KIx]
 /-- **The machine's accepting predicate is the program's**, read back: the
 converse of `DescriptiveComplexity.Draw.Prog.accept_table`, the pointer being
 recovered from the state's payload by the same equation. -/
-theorem accept_of_isAcc
+private theorem accept_of_isAcc
     {p : dt.PF} {f : dt.CtlIx → A}
     (h : (dt.progOf zero one hzo hpl).table.IsAcc
       ((dt.progOf zero one hzo hpl).stElt p f)) :

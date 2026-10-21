@@ -11,6 +11,10 @@ public import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.Hierarchy
 public import Mathlib.Algebra.Group.Action.Defs
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.FixedPoint
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Padding
 
 /-!
 # FO(LFP) = SO-Horn: the translation into the fragment
@@ -89,7 +93,7 @@ def stripTerm : (L₀.sum R).Term α → L₀.Term α
   | .func (Sum.inl f) ts => .func f fun i => stripTerm (ts i)
   | .func (Sum.inr f) _ => isEmptyElim f
 
-theorem realize_stripTerm {A : Type} [L₀.Structure A] [R.Structure A] (v : α → A)
+private theorem realize_stripTerm {A : Type} [L₀.Structure A] [R.Structure A] (v : α → A)
     (t : (L₀.sum R).Term α) :
     (stripTerm t).realize v = Term.realize (L := L₀.sum R) v t := by
   induction t with
@@ -181,14 +185,14 @@ def ctxB : ∀ {n : ℕ}, Lg.BoundedFormula Empty n → ℕ
   | _, .all a => ctxB a
   | n, _ => n
 
-theorem le_ctxB : ∀ {n : ℕ} (φ : Lg.BoundedFormula Empty n), n ≤ ctxB φ
+private theorem le_ctxB : ∀ {n : ℕ} (φ : Lg.BoundedFormula Empty n), n ≤ ctxB φ
   | _, .falsum => le_rfl
   | _, .equal _ _ => le_rfl
   | _, .rel _ _ => le_rfl
   | _, .imp a _ => le_trans (le_ctxB a) (le_max_left _ _)
   | _, .all a => le_trans (Nat.le_succ _) (le_ctxB a)
 
-theorem fst_le_ctxB {n : ℕ} {φ : Lg.BoundedFormula Empty n}
+private theorem fst_le_ctxB {n : ℕ} {φ : Lg.BoundedFormula Empty n}
     {x : Σ n', Lg.BoundedFormula Empty n'} (hx : x ∈ subs φ) : x.1 ≤ ctxB φ := by
   induction φ with
   | falsum =>
@@ -232,7 +236,7 @@ noncomputable def headed :
     List (HornClause (L.sum Language.order) d.B d.k × SOAtom d.B d.k) :=
   d.rules.filterMap fun c => c.head.map fun a => (c, a)
 
-theorem mem_headed {ca : HornClause (L.sum Language.order) d.B d.k × SOAtom d.B d.k} :
+private theorem mem_headed {ca : HornClause (L.sum Language.order) d.B d.k × SOAtom d.B d.k} :
     ca ∈ headed d ↔ ca.1 ∈ d.rules ∧ ca.1.head = some ca.2 := by
   rw [headed, List.mem_filterMap]
   constructor
@@ -434,7 +438,7 @@ noncomputable def acAt (x : SubIx d) (es : Fin (x.1.1 + 1) → Fin (kk d)) :
 noncomputable def iotaList : List d.B.ι :=
   (@Finset.univ d.B.ι (Fintype.ofFinite _)).toList
 
-theorem mem_iotaList (i : d.B.ι) : i ∈ iotaList d := by
+private theorem mem_iotaList (i : d.B.ι) : i ∈ iotaList d := by
   rw [iotaList, Finset.mem_toList]
   exact @Finset.mem_univ _ (Fintype.ofFinite _) i
 
@@ -462,7 +466,7 @@ noncomputable def stagePairs : List (Fin (hs d) × Fin (hs d)) :=
   ((List.finRange (hs d)).flatMap fun j => (List.finRange (hs d)).map fun j' => (j, j')).filter
     fun p => p.1 = p.2 ∨ (p.1 : ℕ) + 1 = (p.2 : ℕ)
 
-theorem mem_stagePairs {j j' : Fin (hs d)} :
+private theorem mem_stagePairs {j j' : Fin (hs d)} :
     (j, j') ∈ stagePairs d ↔ j = j' ∨ (j : ℕ) + 1 = (j' : ℕ) := by
   rw [stagePairs, List.mem_filter]
   constructor
@@ -632,7 +636,7 @@ intended value; the correctness proof shows that the least model of the
 translated program is exactly this assignment. -/
 
 /-- Composition distributes over `Fin.addCases`. -/
-theorem comp_addCases {m n : ℕ} {α β : Type*} (g : α → β) (f₁ : Fin m → α)
+private theorem comp_addCases {m n : ℕ} {α β : Type*} (g : α → β) (f₁ : Fin m → α)
     (f₂ : Fin n → α) : (fun q => g (Fin.addCases f₁ f₂ q)) =
       Fin.addCases (fun q => g (f₁ q)) (fun q => g (f₂ q)) := by
   funext q
@@ -710,12 +714,12 @@ noncomputable def canonAssign : (trBlock d).Assignment A := fun ix =>
 
 variable {d} {A}
 
-theorem rAt_holds {i : d.B.ι} {sel : Fin (d.B.arity i) → Fin (kk d)}
+private theorem rAt_holds {i : d.B.ι} {sel : Fin (d.B.arity i) → Fin (kk d)}
     {V : Fin (kk d) → A} :
     (rAt d i sel).Holds (canonAssign d A) V ↔ Derives d.rules ⟨i, fun q => V (sel q)⟩ :=
   Iff.rfl
 
-theorem canonN_addCases {j : Fin (hs d)} {i : d.B.ι} {t : Fin (hm d) → A}
+private theorem canonN_addCases {j : Fin (hs d)} {i : d.B.ι} {t : Fin (hm d) → A}
     {x : Fin (d.B.arity i) → A} :
     canonN d A j i (Fin.addCases t x) ↔ ¬derivesIn d.rules (srank d A j t) ⟨i, x⟩ := by
   have ha : (fun q => Fin.addCases (m := hm d) t x (Fin.castAdd (d.B.arity i) q)) = t :=
@@ -724,7 +728,7 @@ theorem canonN_addCases {j : Fin (hs d)} {i : d.B.ι} {t : Fin (hm d) → A}
     funext fun q => Fin.addCases_right q
   rw [canonN, ha, hb]
 
-theorem nAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
+private theorem nAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
     {xs : Fin (d.B.arity i) → Fin (kk d)} {V : Fin (kk d) → A} :
     (nAt d j i ts xs).Holds (canonAssign d A) V ↔
       ¬derivesIn d.rules (srank d A j fun q => V (ts q)) ⟨i, fun q => V (xs q)⟩ := by
@@ -732,7 +736,7 @@ theorem nAt_holds {j : Fin (hs d)} {i : d.B.ι} {ts : Fin (hm d) → Fin (kk d)}
       canonN d A j i fun q => V (Fin.addCases ts xs q) := Iff.rfl
   rw [h0, comp_addCases V ts xs, canonN_addCases]
 
-theorem nfAt_holds {j : Fin (hs d)} {ca : HIx d} {ts : Fin (hm d) → Fin (kk d)}
+private theorem nfAt_holds {j : Fin (hs d)} {ca : HIx d} {ts : Fin (hm d) → Fin (kk d)}
     {xs : Fin (d.B.arity ca.1.2.idx) → Fin (kk d)} {ws : Fin d.k → Fin (kk d)}
     {V : Fin (kk d) → A} :
     (nfAt d j ca ts xs ws).Holds (canonAssign d A) V ↔
@@ -757,21 +761,21 @@ theorem nfAt_holds {j : Fin (hs d)} {ca : HIx d} {ts : Fin (hm d) → Fin (kk d)
         (Fin.natAdd (hm d + d.B.arity ca.1.2.idx) q))) ↔ _
   rw [h1, h2, h3]
 
-theorem tAt_holds {x : SubIx d} {es : Fin x.1.1 → Fin (kk d)} {V : Fin (kk d) → A} :
+private theorem tAt_holds {x : SubIx d} {es : Fin x.1.1 → Fin (kk d)} {V : Fin (kk d) → A} :
     (tfAt d x true es).Holds (canonAssign d A) V ↔ evalT d A x.1.2 (fun q => V (es q)) :=
   Iff.rfl
 
-theorem fAt_holds {x : SubIx d} {es : Fin x.1.1 → Fin (kk d)} {V : Fin (kk d) → A} :
+private theorem fAt_holds {x : SubIx d} {es : Fin x.1.1 → Fin (kk d)} {V : Fin (kk d) → A} :
     (tfAt d x false es).Holds (canonAssign d A) V ↔
       ¬evalT d A x.1.2 (fun q => V (es q)) :=
   Iff.rfl
 
-theorem acAt_holds {x : SubIx d} {es : Fin (x.1.1 + 1) → Fin (kk d)} {V : Fin (kk d) → A} :
+private theorem acAt_holds {x : SubIx d} {es : Fin (x.1.1 + 1) → Fin (kk d)} {V : Fin (kk d) → A} :
     (acAt d x es).Holds (canonAssign d A) V ↔ canonAc d A x (fun q => V (es q)) :=
   Iff.rfl
 
 /-- The accumulator of `∀`, at an explicit `snoc` tuple. -/
-theorem canonAc_all_snoc {n : ℕ}
+private theorem canonAc_all_snoc {n : ℕ}
     {χ : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty (n + 1)}
     {hmem : (⟨n, χ.all⟩ : Σ n', ((L.sum Language.order).sum d.B.lang).BoundedFormula
       Empty n') ∈ subs d.out} {v : Fin n → A} {y : A} :
@@ -790,7 +794,7 @@ end Canonical
 
 /-! ### Counting: the last stage is beyond every derivation -/
 
-theorem card_le_srank_top {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
+private theorem card_le_srank_top {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
     [Nonempty A] {t : Fin (hm d) → A} (ht : ∀ (p : Fin (hm d)) (a : A), a ≤ t p) :
     Nat.card (BAtom d.B A) ≤ srank d A (jTop d) t := by
   have htop : ∀ u : Fin (hs d) ×ₗ Lex (Fin (hm d) → A),
@@ -895,7 +899,7 @@ theorem stageG_covBy {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d)
     · exact tup_isBot_iff.mpr ((realize_minTupF (L := L) _).mp h.2)
 
 open Classical in
-theorem nStep_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
+private theorem nStep_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.B.ι} :
     (HornClause.mk (stageG d j j' ⊓ maxTupF (vW1 d))
       (nAt d j i (vT1 d) (xa d i) ::
         (((headed d).attach.filter fun ca => ca.1.2.idx = i).map fun ca =>
@@ -927,7 +931,7 @@ theorem nStep_sound {j j' : Fin (hs d)} (hjj : (j, j') ∈ stagePairs d) {i : d.
 
 omit [Finite A] [Nonempty A] in
 /-- Extending a non-firing certificate at the bottom valuation. -/
-theorem NFsem_base {r : ℕ} {c₀ : HornClause (L.sum Language.order) d.B d.k}
+private theorem NFsem_base {r : ℕ} {c₀ : HornClause (L.sum Language.order) d.B d.k}
     {a₀ : SOAtom d.B d.k} {x : Fin (d.B.arity a₀.idx) → A} {w : Fin d.k → A}
     (hbot : ∀ (p : Fin d.k) (a : A), w p ≤ a)
     (hfail : ¬(c₀.guard.Realize w ∧
@@ -941,7 +945,7 @@ theorem NFsem_base {r : ℕ} {c₀ : HornClause (L.sum Language.order) d.B d.k}
 
 omit [Finite A] [Nonempty A] in
 /-- Extending a non-firing certificate along the successor valuation. -/
-theorem NFsem_step {r : ℕ} {c₀ : HornClause (L.sum Language.order) d.B d.k}
+private theorem NFsem_step {r : ℕ} {c₀ : HornClause (L.sum Language.order) d.B d.k}
     {a₀ : SOAtom d.B d.k} {x : Fin (d.B.arity a₀.idx) → A} {w w' : Fin d.k → A}
     (hsucc : TupSucc w w') (hprev : NFsem d A r c₀ a₀ x w)
     (hfail : ¬(c₀.guard.Realize w' ∧
@@ -1011,36 +1015,36 @@ noncomputable def evTermVal {n : ℕ} (v : Fin n → A)
 
 omit [Finite A] [Nonempty A]
 
-theorem evalT_imp {n : ℕ}
+private theorem evalT_imp {n : ℕ}
     {a b : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty n} {v : Fin n → A} :
     evalT d A (a.imp b) v ↔ (evalT d A a v → evalT d A b v) :=
   Iff.rfl
 
-theorem evalT_all {n : ℕ}
+private theorem evalT_all {n : ℕ}
     {a : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty (n + 1)}
     {v : Fin n → A} :
     evalT d A a.all v ↔ ∀ y : A, evalT d A a (Fin.snoc v y) :=
   Iff.rfl
 
-theorem evalT_equal {n : ℕ}
+private theorem evalT_equal {n : ℕ}
     {t u : ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)} {v : Fin n → A} :
     evalT d A (.equal t u) v ↔ evTermVal v t = evTermVal v u :=
   Iff.rfl
 
-theorem evalT_rel_inl {n l : ℕ} {r : (L.sum Language.order).Relations l}
+private theorem evalT_rel_inl {n l : ℕ} {r : (L.sum Language.order).Relations l}
     {ts : Fin l → ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)}
     {v : Fin n → A} :
     evalT d A (.rel (Sum.inl r) ts) v ↔ RelMap (M := A) r fun q => evTermVal v (ts q) :=
   Iff.rfl
 
-theorem evalT_rel_inr {n l : ℕ} {r : d.B.lang.Relations l}
+private theorem evalT_rel_inr {n l : ℕ} {r : d.B.lang.Relations l}
     {ts : Fin l → ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)}
     {v : Fin n → A} :
     evalT d A (.rel (Sum.inr r) ts) v ↔
       Derives d.rules ⟨r.1, fun q => evTermVal v (ts (Fin.cast r.2 q))⟩ :=
   Iff.rfl
 
-theorem realize_evTerm {n : ℕ} (hn : n ≤ hX d) {V : Fin (kk d) → A}
+private theorem realize_evTerm {n : ℕ} (hn : n ≤ hX d) {V : Fin (kk d) → A}
     (t : ((L.sum Language.order).sum d.B.lang).Term (Empty ⊕ Fin n)) :
     (evTerm d hn t).realize V = evTermVal (fun q => V (eSel d hn q)) t := by
   rw [evTerm, Term.realize_relabel]
@@ -1056,7 +1060,7 @@ theorem realize_evTerm {n : ℕ} (hn : n ≤ hX d) {V : Fin (kk d) → A}
 
 omit [L.Structure A] [LinearOrder A] in
 /-- The evaluation tuple of a wider context, as a `snoc`. -/
-theorem eSel_snoc {n : ℕ} (hn1 : n + 1 ≤ hX d) {V : Fin (kk d) → A} :
+private theorem eSel_snoc {n : ℕ} (hn1 : n + 1 ≤ hX d) {V : Fin (kk d) → A} :
     (fun q => V (eSel d hn1 q)) =
       Fin.snoc (fun q => V (eSel d (le_trans (Nat.le_succ n) hn1) q))
         (V (eSel d hn1 (Fin.last n))) := by
@@ -1068,7 +1072,7 @@ theorem eSel_snoc {n : ℕ} (hn1 : n + 1 ≤ hX d) {V : Fin (kk d) → A} :
     rfl
 
 /-- Composition distributes over `Fin.snoc`. -/
-theorem comp_snoc_lambda {n : ℕ} {α β : Type*} (g : α → β) (f : Fin n → α) (c : α) :
+private theorem comp_snoc_lambda {n : ℕ} {α β : Type*} (g : α → β) (f : Fin n → α) (c : α) :
     (fun q => g (Fin.snoc (α := fun _ => α) f c q)) =
       Fin.snoc (fun q => g (f q)) (g c) := by
   funext q
@@ -1078,7 +1082,7 @@ theorem comp_snoc_lambda {n : ℕ} {α β : Type*} (g : α → β) (f : Fin n �
 
 variable [Finite A] [Nonempty A]
 
-theorem evalClauses_sound {x : SubIx d}
+private theorem evalClauses_sound {x : SubIx d}
     {c : HornClause (L.sum Language.order) (trBlock d) (kk d)}
     (hc : c ∈ evalClauses d x) : c.Holds (canonAssign d A) V := by
   obtain ⟨⟨n, ψ⟩, hmem⟩ := x
@@ -1252,7 +1256,7 @@ variable {d}
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- Assembling a valuation of the shared variables from its blocks. -/
-noncomputable def packV (t1 t2 x : Fin (hm d) → A) (w1 w2 : Fin d.k → A)
+private noncomputable def packV (t1 t2 x : Fin (hm d) → A) (w1 w2 : Fin d.k → A)
     (e : Fin (hX d) → A) (sp : A) : Fin (kk d) → A := fun q =>
   if h1 : (q : ℕ) < hm d then t1 ⟨q, h1⟩
   else if h2 : (q : ℕ) < 2 * hm d then t2 ⟨(q : ℕ) - hm d, by omega⟩
@@ -1265,14 +1269,14 @@ noncomputable def packV (t1 t2 x : Fin (hm d) → A) (w1 w2 : Fin d.k → A)
   else sp
 
 /-- Extending a tuple to a wider block, junk-padded. -/
-noncomputable def padF {m M : ℕ} (f : Fin m → A) : Fin M → A :=
+private noncomputable def padF {m M : ℕ} (f : Fin m → A) : Fin M → A :=
   fun p => if h : (p : ℕ) < m then f ⟨p, h⟩ else Classical.arbitrary A
 
 variable {t1 t2 x : Fin (hm d) → A} {w1 w2 : Fin d.k → A} {e : Fin (hX d) → A} {sp : A}
 
 omit [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
-theorem packV_comp_vT1 : (fun q => packV t1 t2 x w1 w2 e sp (vT1 d q)) = t1 := by
+private theorem packV_comp_vT1 : (fun q => packV t1 t2 x w1 w2 e sp (vT1 d q)) = t1 := by
   funext q
   have hq := q.isLt
   have hv : ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) := rfl
@@ -1280,7 +1284,7 @@ theorem packV_comp_vT1 : (fun q => packV t1 t2 x w1 w2 e sp (vT1 d q)) = t1 := b
   rw [dite_eq_left (by rw [hv]; omega)]
   exact congrArg t1 (Fin.ext (show ((vT1 d q : Fin (kk d)) : ℕ) = (q : ℕ) from hv))
 
-theorem packV_comp_vT2 : (fun q => packV t1 t2 x w1 w2 e sp (vT2 d q)) = t2 := by
+private theorem packV_comp_vT2 : (fun q => packV t1 t2 x w1 w2 e sp (vT2 d q)) = t2 := by
   funext q
   have hq := q.isLt
   have hv : ((vT2 d q : Fin (kk d)) : ℕ) = hm d + (q : ℕ) := rfl
@@ -1289,7 +1293,7 @@ theorem packV_comp_vT2 : (fun q => packV t1 t2 x w1 w2 e sp (vT2 d q)) = t2 := b
   exact congrArg t2 (Fin.ext
     (show ((vT2 d q : Fin (kk d)) : ℕ) - hm d = (q : ℕ) from by rw [hv]; omega))
 
-theorem packV_comp_vW1 : (fun q => packV t1 t2 x w1 w2 e sp (vW1 d q)) = w1 := by
+private theorem packV_comp_vW1 : (fun q => packV t1 t2 x w1 w2 e sp (vW1 d q)) = w1 := by
   funext q
   have hq := q.isLt
   have hv : ((vW1 d q : Fin (kk d)) : ℕ) = 3 * hm d + (q : ℕ) := rfl
@@ -1299,7 +1303,7 @@ theorem packV_comp_vW1 : (fun q => packV t1 t2 x w1 w2 e sp (vW1 d q)) = w1 := b
   exact congrArg w1 (Fin.ext
     (show ((vW1 d q : Fin (kk d)) : ℕ) - 3 * hm d = (q : ℕ) from by rw [hv]; omega))
 
-theorem packV_comp_vW2 : (fun q => packV t1 t2 x w1 w2 e sp (vW2 d q)) = w2 := by
+private theorem packV_comp_vW2 : (fun q => packV t1 t2 x w1 w2 e sp (vW2 d q)) = w2 := by
   funext q
   have hq := q.isLt
   have hv : ((vW2 d q : Fin (kk d)) : ℕ) = 3 * hm d + d.k + (q : ℕ) := rfl
@@ -1311,7 +1315,7 @@ theorem packV_comp_vW2 : (fun q => packV t1 t2 x w1 w2 e sp (vW2 d q)) = w2 := b
     (show ((vW2 d q : Fin (kk d)) : ℕ) - (3 * hm d + d.k) = (q : ℕ) from by
       rw [hv]; omega))
 
-theorem packV_comp_eSel {n : ℕ} [Nonempty A] (hn : n ≤ hX d) {v : Fin n → A} :
+private theorem packV_comp_eSel {n : ℕ} [Nonempty A] (hn : n ≤ hX d) {v : Fin n → A} :
     (fun q => packV t1 t2 x w1 w2 (padF v) sp (eSel d hn q)) = v := by
   funext q
   have hq := q.isLt
@@ -1327,14 +1331,14 @@ theorem packV_comp_eSel {n : ℕ} [Nonempty A] (hn : n ≤ hX d) {v : Fin n → 
     (show ((eSel d hn q : Fin (kk d)) : ℕ) - (3 * hm d + 2 * d.k) = (q : ℕ) from by
       rw [hv]; omega))
 
-theorem packV_vS : packV t1 t2 x w1 w2 e sp (vS d) = sp := by
+private theorem packV_vS : packV t1 t2 x w1 w2 e sp (vS d) = sp := by
   have hv : ((vS d : Fin (kk d)) : ℕ) = 3 * hm d + 2 * d.k + hX d := rfl
   simp only [packV]
   rw [dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
     dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega),
     dite_eq_right (by rw [hv]; omega), dite_eq_right (by rw [hv]; omega)]
 
-theorem packV_comp_xa {i : d.B.ι} [Nonempty A] {xt : Fin (d.B.arity i) → A} :
+private theorem packV_comp_xa {i : d.B.ι} [Nonempty A] {xt : Fin (d.B.arity i) → A} :
     (fun q => packV t1 t2 (padF xt) w1 w2 e sp (xa d i q)) = xt := by
   funext q
   have hq := q.isLt
@@ -1350,7 +1354,7 @@ theorem packV_comp_xa {i : d.B.ι} [Nonempty A] {xt : Fin (d.B.arity i) → A} :
     (show ((xa d i q : Fin (kk d)) : ℕ) - 2 * hm d = (q : ℕ) from by rw [hv]; omega))
 
 /-- Rewriting the tuple of a derived atom. -/
-theorem derives_congr_tuple {Lg : Language.{0, 0}} {B : SOBlock} {k : ℕ}
+private theorem derives_congr_tuple {Lg : Language.{0, 0}} {B : SOBlock} {k : ℕ}
     {rules : List (HornClause Lg B k)} {ix : B.ι} {w w' : Fin (B.arity ix) → A}
     [Lg.Structure A] (h : w = w') (hd : Derives rules ⟨ix, w⟩) :
     Derives rules ⟨ix, w'⟩ :=
@@ -1358,39 +1362,39 @@ theorem derives_congr_tuple {Lg : Language.{0, 0}} {B : SOBlock} {k : ℕ}
 
 /-! #### Membership of the rules in the program -/
 
-theorem mem_trProg_trRules {c : HornClause (L.sum Language.order) (trBlock d) (kk d)}
+private theorem mem_trProg_trRules {c : HornClause (L.sum Language.order) (trBlock d) (kk d)}
     (h : c ∈ trRules d) : c ∈ trProg d := by
   rw [trProg]
   exact List.mem_append_left _ h
 
-theorem mem_trProg_lifted {c} (h : c ∈ liftedRules d) : c ∈ trProg d :=
+private theorem mem_trProg_lifted {c} (h : c ∈ liftedRules d) : c ∈ trProg d :=
   mem_trProg_trRules (by
     rw [trRules]
     exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_left _
       (List.mem_append_left _ h))))
 
-theorem mem_trProg_nBase {c} (h : c ∈ nBase d) : c ∈ trProg d :=
+private theorem mem_trProg_nBase {c} (h : c ∈ nBase d) : c ∈ trProg d :=
   mem_trProg_trRules (by
     rw [trRules]
     exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_left _
       (List.mem_append_right _ h))))
 
-theorem mem_trProg_nStep {c} (h : c ∈ nStep d) : c ∈ trProg d :=
+private theorem mem_trProg_nStep {c} (h : c ∈ nStep d) : c ∈ trProg d :=
   mem_trProg_trRules (by
     rw [trRules]
     exact List.mem_append_left _ (List.mem_append_left _ (List.mem_append_right _ h)))
 
-theorem mem_trProg_nfRules {c} (h : c ∈ nfRules d) : c ∈ trProg d :=
+private theorem mem_trProg_nfRules {c} (h : c ∈ nfRules d) : c ∈ trProg d :=
   mem_trProg_trRules (by
     rw [trRules]
     exact List.mem_append_left _ (List.mem_append_right _ h))
 
-theorem mem_trProg_evalRules {c} (h : c ∈ evalRules d) : c ∈ trProg d :=
+private theorem mem_trProg_evalRules {c} (h : c ∈ evalRules d) : c ∈ trProg d :=
   mem_trProg_trRules (by
     rw [trRules]
     exact List.mem_append_right _ h)
 
-theorem mem_evalRules {x : SubIx d} {c} (h : c ∈ evalClauses d x) : c ∈ evalRules d := by
+private theorem mem_evalRules {x : SubIx d} {c} (h : c ∈ evalClauses d x) : c ∈ evalRules d := by
   rw [evalRules]
   exact List.mem_flatMap.mpr ⟨⟨x.1, x.2⟩, List.mem_attach _ _, h⟩
 
@@ -1401,7 +1405,7 @@ variable [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 omit [Finite A] in
 /-- The fixed point of the rules is derivable on the `R`-part: leastness,
 against the lifted rules. -/
-theorem derives_r {i : d.B.ι} {x : Fin (d.B.arity i) → A}
+private theorem derives_r {i : d.B.ι} {x : Fin (d.B.arity i) → A}
     (h : Derives d.rules ⟨i, x⟩) : Derives (trProg d) ⟨rIx d i, x⟩ := by
   refine lfpAssign_least_of_closed
     (ρ := fun i x => Derives (trProg d) ⟨rIx d i, x⟩) ?_ h
@@ -1436,7 +1440,7 @@ theorem derives_r {i : d.B.ι} {x : Fin (d.B.arity i) → A}
 omit [Finite A] [Nonempty A] in
 /-- A stage that derives nothing new certifies non-firing at every
 valuation. -/
-theorem NFsem_of_not_derivesIn {r : ℕ} {c : HornClause (L.sum Language.order) d.B d.k}
+private theorem NFsem_of_not_derivesIn {r : ℕ} {c : HornClause (L.sum Language.order) d.B d.k}
     {a : SOAtom d.B d.k} (hc : c ∈ d.rules) (ha : c.head = some a)
     {xt : Fin (d.B.arity a.idx) → A} (hnd : ¬derivesIn d.rules (r + 1) ⟨a.idx, xt⟩)
     (w : Fin d.k → A) : NFsem d A r c a xt w := by
@@ -1445,7 +1449,7 @@ theorem NFsem_of_not_derivesIn {r : ℕ} {c : HornClause (L.sum Language.order) 
 
 omit [Finite A] in
 /-- The stage-successor guard is realizable along a cover. -/
-theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
+private theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
     (hjj : (j, j') ∈ stagePairs d)
     (hcov : toLex ((j, toLex fun q => V (vT1 d q)) : Fin (hs d) × Lex (Fin (hm d) → A)) ⋖
       toLex (j', toLex fun q => V (vT2 d q))) :
@@ -1467,7 +1471,7 @@ theorem stageG_realize {j j' : Fin (hs d)} {V : Fin (kk d) → A}
 
 omit [L.Structure A] [Finite A] in
 /-- A cover of stages is a stage pair. -/
-theorem stagePairs_of_covBy {j j' : Fin (hs d)} {u u' : Lex (Fin (hm d) → A)}
+private theorem stagePairs_of_covBy {j j' : Fin (hs d)} {u u' : Lex (Fin (hm d) → A)}
     (hcov : toLex ((j, u) : Fin (hs d) × Lex (Fin (hm d) → A)) ⋖ toLex (j', u')) :
     (j, j') ∈ stagePairs d := by
   rcases prodLex_covBy_iff.mp hcov with ⟨rfl, -⟩ | ⟨hjcov, -, -⟩
@@ -1476,7 +1480,7 @@ theorem stagePairs_of_covBy {j j' : Fin (hs d)} {u u' : Lex (Fin (hm d) → A)}
 
 omit [Finite A] in
 /-- At the bottom stage, everything is underived, by the base rules. -/
-theorem derives_nBase {i : d.B.ι} {t : Fin (hm d) → A}
+private theorem derives_nBase {i : d.B.ι} {t : Fin (hm d) → A}
     (ht : ∀ (p : Fin (hm d)) (a : A), t p ≤ a) (xt : Fin (d.B.arity i) → A) :
     Derives (trProg d) ⟨nIx d (j0 d) i, Fin.addCases t xt⟩ := by
   have hmem : (HornClause.mk (minTupF (L := L) (vT1 d)) []
@@ -1496,14 +1500,14 @@ theorem derives_nBase {i : d.B.ι} {t : Fin (hm d) → A}
   rw [comp_addCases, hV, packV_comp_vT1, packV_comp_xa]
 
 /-- Membership of a non-firing clause in the program. -/
-theorem mem_trProg_nfClauses {j : Fin (hs d)} {ca : HIx d} {c}
+private theorem mem_trProg_nfClauses {j : Fin (hs d)} {ca : HIx d} {c}
     (h : c ∈ nfClauses d j ca) : c ∈ trProg d :=
   mem_trProg_nfRules (List.mem_flatMap.mpr ⟨j, List.mem_finRange j,
     List.mem_flatMap.mpr ⟨ca, List.mem_attach _ _, h⟩⟩)
 
 omit [Finite A] [Nonempty A] in
 /-- Firing one non-firing clause, given its guard and bodies. -/
-theorem fireNF {j : Fin (hs d)} {ca : HIx d} {t : Fin (hm d) → A}
+private theorem fireNF {j : Fin (hs d)} {ca : HIx d} {t : Fin (hm d) → A}
     {xt : Fin (d.B.arity ca.1.2.idx) → A} {w : Fin d.k → A} {V : Fin (kk d) → A}
     {c : HornClause (L.sum Language.order) (trBlock d) (kk d)}
     (hcmem : c ∈ nfClauses d j ca)
@@ -1521,7 +1525,7 @@ theorem fireNF {j : Fin (hs d)} {ca : HIx d} {t : Fin (hm d) → A}
   rw [comp_addCases, comp_addCases, ht1, hxa, hw2]
 
 /-- The non-firing certificates are derivable, walking the valuations. -/
-theorem derives_nf {j : Fin (hs d)} {t : Fin (hm d) → A}
+private theorem derives_nf {j : Fin (hs d)} {t : Fin (hm d) → A}
     (hN : ∀ (i : d.B.ι) (xt : Fin (d.B.arity i) → A),
       ¬derivesIn d.rules (srank d A j t) ⟨i, xt⟩ →
       Derives (trProg d) ⟨nIx d j i, Fin.addCases t xt⟩)
@@ -1768,14 +1772,14 @@ theorem derives_n (S : Fin (hs d) ×ₗ Lex (Fin (hm d) → A)) :
 
 /-! #### The subformula relations -/
 
-theorem mem_trProg_evalClauses {x : SubIx d} {c} (h : c ∈ evalClauses d x) :
+private theorem mem_trProg_evalClauses {x : SubIx d} {c} (h : c ∈ evalClauses d x) :
     c ∈ trProg d :=
   mem_trProg_evalRules (mem_evalRules h)
 
 /-- Truth and falsity of every subformula of the output are derivable, by
 structural induction; universally quantified subformulas accumulate their
 instances along the order. -/
-theorem derives_eval : ∀ {n : ℕ}
+private theorem derives_eval : ∀ {n : ℕ}
     (ψ : ((L.sum Language.order).sum d.B.lang).BoundedFormula Empty n)
     (hmem : (⟨n, ψ⟩ : Σ n', ((L.sum Language.order).sum d.B.lang).BoundedFormula
       Empty n') ∈ subs d.out) (v : Fin n → A),
@@ -2244,7 +2248,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 omit [Finite A] [Nonempty A] in
 /-- The truth of the output sentence, as the canonical value of its root. -/
-theorem evalT_out_iff {v : Fin 0 → A} : evalT d A d.out v ↔ d.Holds A :=
+private theorem evalT_out_iff {v : Fin 0 → A} : evalT d A d.out v ↔ d.Holds A :=
   iff_of_eq (congrArg
     (@BoundedFormula.Realize ((L.sum Language.order).sum d.B.lang) A (lfpStr d A)
       Empty 0 d.out default)
@@ -2350,7 +2354,7 @@ theorem SigmaSOHornDefinable.compl [L.IsRelational] {P : DecisionProblem L}
 /-! ### Level 0 of the hierarchy: `Π₀ᵖ = Σ₀ᵖ` -/
 
 /-- Complementation is a bijection of the SO-Horn definable problems. -/
-theorem sigmaSOHornDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
+private theorem sigmaSOHornDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
     SigmaSOHornDefinable Pᶜ ↔ SigmaSOHornDefinable P := by
   constructor
   · intro h

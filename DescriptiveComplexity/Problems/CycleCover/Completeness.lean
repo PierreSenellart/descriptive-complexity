@@ -9,6 +9,14 @@ public import DescriptiveComplexity.Problems.CycleCover.Drawing
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 public import DescriptiveComplexity.Counting.Reduction
 public import DescriptiveComplexity.Numbers.DigitExtract
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Permanent.Basic
+import all DescriptiveComplexity.Permanent.Minor
+import all DescriptiveComplexity.Problems.CycleCover.Base
+import all DescriptiveComplexity.Problems.CycleCover.Drawing
+import all DescriptiveComplexity.Problems.CycleCover.Formulas
+import all DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 
 /-!
 # #Cycle Cover is one-call `#P`-complete
@@ -50,20 +58,21 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Fintype A]
 
 /-- The permanent of the attached matrix is `4 ^ t` times the number of
 exactly-one models. -/
-theorem bperm_attachedM :
+private theorem bperm_attachedM :
     bperm (attachedM (A := A)) = 4 ^ Nat.card (Occ A) * (SharpOneInSAT A : ℤ) := by
   rw [attachedM, Site.bperm_flatAttach, Nat.card_eq_fintype_card]
   exact bperm_attachAll_sites_eq
 
 omit [LinearOrder A] [Fintype A] in
 /-- The number of variables is at most the number of occurrences. -/
-theorem card_satOccurs_le [Finite A] : Nat.card {x : A // SatOccurs A x} ≤ Nat.card (Occ A) :=
+private theorem card_satOccurs_le
+    [Finite A] : Nat.card {x : A // SatOccurs A x} ≤ Nat.card (Occ A) :=
   Nat.card_le_card_of_injective (fun x => Occ.dummy x.1 x.2 true) fun _ _ h =>
     Subtype.ext (congrArg Occ.x h)
 
 omit [LinearOrder A] [Fintype A] in
 /-- The number of exactly-one models is at most `2 ^ t`. -/
-theorem sharpOneInSat_le [Finite A] : SharpOneInSAT A ≤ 2 ^ Nat.card (Occ A) := by
+private theorem sharpOneInSat_le [Finite A] : SharpOneInSAT A ≤ 2 ^ Nat.card (Occ A) := by
   rw [sharpOneInSat_apply]
   refine le_trans (Nat.card_le_card_of_injective
     (fun ν : {ν : A → Prop // OneInModel A ν} => (⟨ν.1, ν.2.2⟩ :
@@ -77,7 +86,7 @@ variable [Nonempty A]
 
 /-- **The number of cycle covers of the drawing** is the permanent of the
 ladder expansion of the attached matrix. -/
-theorem sharpCycleCover_drawInterp :
+private theorem sharpCycleCover_drawInterp :
     SharpCycleCover (drawInterp.MapRel A) =
       bperm (ladder 3 (widths (Λ := Level A) (attachedM (A := A)))) := by
   classical
@@ -103,7 +112,8 @@ end SatCover
 exactly-one models is the permanent of the drawn digraph, modulo `2 ^ L + 1`
 for `L` the number of levels, divided by `4 ^ t` for `t` the number of
 occurrences. -/
-noncomputable def sharpOneInSat_oneCall_sharpCycleCover : SharpOneInSAT ≤ᶜ[≤] SharpCycleCover where
+private noncomputable def sharpOneInSat_oneCall_sharpCycleCover
+    : SharpOneInSAT ≤ᶜ[≤] SharpCycleCover where
   Tag := SatCover.FullTag
   dim := 6
   toRelInterpretation := SatCover.drawInterp

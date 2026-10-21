@@ -9,6 +9,10 @@ public import DescriptiveComplexity.FixedPointInflationaryLFP
 import DescriptiveComplexity.FixedPointOrderTransfer
 import DescriptiveComplexity.SecondOrderMerge
 import DescriptiveComplexity.Problems.HornSat
+import all DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointOrderTransfer
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Eliminating an induction from a second-order definition
@@ -64,7 +68,7 @@ variable (L : Language.{0, 0}) (B C : SOBlock)
 
 /-- Swapping two block expansions: the same symbols, read in the other
 association. -/
-def swapExpand : (L.sum B.lang).sum C.lang →ᴸ (L.sum C.lang).sum B.lang where
+private def swapExpand : (L.sum B.lang).sum C.lang →ᴸ (L.sum C.lang).sum B.lang where
   onFunction := fun {_} f =>
     match f with
     | .inl (.inl g) => .inl (.inl g)
@@ -80,7 +84,7 @@ variable {L B C} {A : Type}
 
 /-- The swap is an expansion: expanding by `B` then by `C` interprets every
 symbol as expanding by `C` then by `B` does. -/
-theorem swapExpand_isExpansionOn (instL : L.Structure A) (ρ : B.Assignment A)
+private theorem swapExpand_isExpansionOn (instL : L.Structure A) (ρ : B.Assignment A)
     (μ : C.Assignment A) :
     @LHom.IsExpansionOn _ _ (swapExpand L B C) A
       (@SOBlock.structure₁ (L.sum B.lang) C A (B.structure₁ (L := L) ρ) μ)
@@ -99,7 +103,7 @@ theorem swapExpand_isExpansionOn (instL : L.Structure A) (ρ : B.Assignment A)
     · rfl
 
 /-- Realization across the swap. -/
-theorem realize_swapExpand (instL : L.Structure A) (ρ : B.Assignment A)
+private theorem realize_swapExpand (instL : L.Structure A) (ρ : B.Assignment A)
     (μ : C.Assignment A) (φ : ((L.sum B.lang).sum C.lang).Sentence) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum C.lang) B A (C.structure₁ (L := L) μ) ρ)
@@ -134,7 +138,7 @@ variable {A : Type} (instL : L.Structure A) (instL' : L'.Structure A)
 variable (hexp : @LHom.IsExpansionOn _ _ φ A instL instL')
 
 include hexp in
-private theorem realize_liftLang {α : Type} (ρ : d.B.Assignment A)
+theorem realize_liftLang {α : Type} (ρ : d.B.Assignment A)
     (ψ : (L.sum d.B.lang).Formula α) (v : α → A) :
     (@Formula.Realize _ A (@SOBlock.structure₁ L' d.B A instL' ρ) _
       ((φ.sumMap (LHom.id d.B.lang)).onFormula ψ) v) ↔
@@ -147,13 +151,13 @@ private theorem realize_liftLang {α : Type} (ρ : d.B.Assignment A)
   exact LHom.realize_onFormula (φ := φ.sumMap (LHom.id d.B.lang)) ψ
 
 include hexp in
-private theorem next_liftLang (ρ : d.B.Assignment A) :
+theorem next_liftLang (ρ : d.B.Assignment A) :
     @StepDef.next L' (d.liftLang φ) A instL' ρ = @StepDef.next L d A instL ρ := by
   funext i x
   exact propext (d.realize_liftLang φ instL instL' hexp ρ (d.step i) x)
 
 include hexp in
-private theorem inflStage_liftLang (n : ℕ) :
+theorem inflStage_liftLang (n : ℕ) :
     @StepDef.inflStage L' (d.liftLang φ) A instL' n = @StepDef.inflStage L d A instL n := by
   induction n with
   | zero => rfl

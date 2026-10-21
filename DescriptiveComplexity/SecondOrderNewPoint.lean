@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrderNewRead
 public import DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.SecondOrderNewRead
 
 /-!
 # Which invented values are points, and what the expanded relations say of them
@@ -118,7 +119,7 @@ include hinj h in
 /-- **`DescriptiveComplexity.isPointF` says that the value is a point**: it
 carries one tag and no other, and its assignment satisfies that tag's domain
 sentence. -/
-theorem realize_isPointF (v : α) (w : α → M) :
+private theorem realize_isPointF (v : α) (w : α → M) :
     (isPointF P v).Realize w ↔
       ∃ t : X.Tag, tags (w v) t ∧ (∀ t' : X.Tag, tags (w v) t' → t' = t) ∧
         DomHolds (X := X) (t, means (w v)) := by
@@ -144,7 +145,7 @@ include hinj h in
 /-- **`DescriptiveComplexity.pointRelF` says that the relation holds**, provided
 the values carry the tags: some tuple of tags is the one the values carry, and
 the defining sentence at that tuple holds of the assignments they mean. -/
-theorem realize_pointRelF {k : ℕ} (r : X.E.Relations k) (vs : Fin k → α) (w : α → M) :
+private theorem realize_pointRelF {k : ℕ} (r : X.E.Relations k) (vs : Fin k → α) (w : α → M) :
     (pointRelF P r vs).Realize w ↔
       ∃ τ : Fin k → X.Tag, (∀ j, tags (w (vs j)) (τ j)) ∧
         @Sentence.Realize _ A

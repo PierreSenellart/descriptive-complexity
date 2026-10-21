@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RelExpansion
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.Problems.Wide.Double
 
 /-!
 # The relativized expansion over the doubled universe is the expansion
@@ -49,7 +51,7 @@ theorem extAssign_replicateAssign {n : ℕ} (ρs : Fin n → X.B.Assignment A) :
 
 /-- The fallback tag contributes no point over a doubled universe: there is
 always a marked element. -/
-theorem not_domHolds_none (ρ : X.B.Assignment ((dblInterp L).Map A)) :
+private theorem not_domHolds_none (ρ : X.B.Assignment ((dblInterp L).Map A)) :
     ¬ExpExpansion.DomHolds (X := relExp X)
       ((none, ρ) : (relExp X).Point ((dblInterp L).Map A)) := by
   intro h
@@ -62,7 +64,7 @@ theorem not_domHolds_none (ρ : X.B.Assignment ((dblInterp L).Map A)) :
 omit [Nonempty A] in
 /-- **A point's assignment is supported**: that is what the domain sentence's
 second conjunct says. -/
-theorem supported_of_domHolds {t : X.Tag} {ρ : X.B.Assignment ((dblInterp L).Map A)}
+private theorem supported_of_domHolds {t : X.Tag} {ρ : X.B.Assignment ((dblInterp L).Map A)}
     (h : ExpExpansion.DomHolds (X := relExp X)
       ((some t, ρ) : (relExp X).Point ((dblInterp L).Map A))) : Supported ρ := by
   let := (relExp X).B.structure₁ (L := (newLang L).sum Language.order) ρ

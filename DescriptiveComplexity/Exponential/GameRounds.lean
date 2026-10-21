@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Exponential.GameMove
 import DescriptiveComplexity.Exponential.Translate
+import all DescriptiveComplexity.Exponential.GameMove
+import all DescriptiveComplexity.Exponential.TagBits
 
 /-!
 # Moving whole rounds

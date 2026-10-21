@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Exponential.AltQuant
 public import DescriptiveComplexity.Exponential.BlockClaim
 public import DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.Game
 
 /-!
 # The six questions a machine playing a second-order game must answer
@@ -70,7 +71,7 @@ variable {K : Language.{0, 0}} {B : SOBlock} {A : Type} [K.Structure A]
 
 /-- A sentence over one copy of the block, read in the two-copy language, says
 the same thing of the first copy. -/
-theorem realize_sumInl_two (ρ σ : B.Assignment A) (ψ : (K.sum B.lang).Sentence) :
+private theorem realize_sumInl_two (ρ σ : B.Assignment A) (ψ : (K.sum B.lang).Sentence) :
     @Sentence.Realize _ A (B.structure₂ (L := K) ρ σ)
         ((LHom.sumInl : (K.sum B.lang) →ᴸ ((K.sum B.lang).sum B.lang)).onSentence ψ) ↔
       @Sentence.Realize _ A (B.structure₁ (L := K) ρ) ψ :=
@@ -126,7 +127,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- **What a question asks**, semantically: a condition on the current
 position and the candidate. -/
-def QuestionHolds (q : GameQuestion) (ρ σ : spec.State A) : Prop :=
+private def QuestionHolds (q : GameQuestion) (ρ σ : spec.State A) : Prop :=
   match q with
   | .won => spec.IsWon ρ
   | .univ => spec.IsUniv ρ
@@ -136,7 +137,7 @@ def QuestionHolds (q : GameQuestion) (ρ σ : spec.State A) : Prop :=
   | .start => spec.IsStart ρ
 
 /-- **The sentence of a question says what the question asks.** -/
-theorem realize_question (q : GameQuestion) (ρ σ : spec.State A) :
+private theorem realize_question (q : GameQuestion) (ρ σ : spec.State A) :
     @Sentence.Realize _ A (spec.B.structure₂ (L := L.sum Language.order) ρ σ) (spec.question q) ↔
       spec.QuestionHolds q ρ σ := by
   cases q with

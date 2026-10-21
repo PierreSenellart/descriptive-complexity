@@ -7,6 +7,15 @@ module
 
 public import DescriptiveComplexity.LogTime.BitSum.Level2
 import DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitSum.Level2
+import all DescriptiveComplexity.LogTime.BitSum.Ones
+import all DescriptiveComplexity.LogTime.BitSum.Sizes
+import all DescriptiveComplexity.LogTime.BitSum.Sum
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Level 1: counting all the ones of an element
@@ -62,7 +71,7 @@ def PopAll (x y : A) : Prop :=
 `b`, the tail counts the rest, and there is no rest above the top position. As at
 level 2, no size condition is needed – the block length is guessed, and soundness
 holds for whichever one is. -/
-theorem popAll_sound {x y : A} (h : PopAll x y) :
+private theorem popAll_sound {x y : A} (h : PopAll x y) :
     orank y = onesBelow (orank x) (posCount A) := by
   obtain ⟨l, B, S, b, b', e, d, w, s, n, hl0, hllow, hB, hS, hbB, hsum, hlow', hwin,
     ⟨t, ht, hte⟩, hde, hxw, hn, hy⟩ := h
@@ -103,7 +112,7 @@ theorem popAll_sound {x y : A} (h : PopAll x y) :
 `DescriptiveComplexity.LogTime.BitSum.Sizes`, the boundaries at that gap, the
 running sums, the last boundary that still has room for its field, and the tail
 of `x` above it counted as one more chunk by level 2. -/
-theorem exists_popAll [Nonempty A] {x : A} (hP : 2 ^ 20 ≤ posCount A) :
+private theorem exists_popAll [Nonempty A] {x : A} (hP : 2 ^ 20 ≤ posCount A) :
     ∃ y : A, PopAll x y := by
   classical
   have hcard := posCount_lt_card (A := A)
@@ -198,7 +207,7 @@ variable {L : Language.{0, 0}} {α : Type}
 
 /-- **The Bit Sum Lemma is a formula**: level 2 enters it twice – once as the
 chunk counter of the running sum, once to count the tail. -/
-theorem bitDef_popAll (x y : α) :
+private theorem bitDef_popAll (x y : α) :
     BitDef (L := L) fun _ _ _ _ _ v => PopAll (v x) (v y) := by
   have htop : BitDef (L := L) (α := α ⊕ Fin 10)
       (fun A _ _ _ _ u => ∃ t : A, IsTopIx t ∧ t < u (Sum.inr 4)) :=

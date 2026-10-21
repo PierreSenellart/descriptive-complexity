@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Exponential.Order
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Exponential.Order
+import all DescriptiveComplexity.Padding
 
 /-!
 # The defining sentence of the order on an expanded universe
@@ -58,7 +60,7 @@ noncomputable def ivars : List B.ι :=
   (Finset.univ : Finset B.ι).toList
 
 open Classical in
-theorem mem_ivars (i : B.ι) : i ∈ B.ivars := by
+private theorem mem_ivars (i : B.ι) : i ∈ B.ivars := by
   let : Fintype B.ι := Fintype.ofFinite B.ι
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
@@ -75,7 +77,7 @@ noncomputable def atomF (c : Fin 2) (i : B.ι) {γ : Type} (sel : Fin (blockArit
 
 /-- **The atom says what it should**: the copy's assignment, at the padded atom
 the selected variables name. -/
-theorem realize_atomF {A : Type} [L.Structure A] [LinearOrder A]
+private theorem realize_atomF {A : Type} [L.Structure A] [LinearOrder A]
     (ρs : Fin 2 → B.Assignment A) (c : Fin 2) (i : B.ι) {γ : Type}
     (sel : Fin (blockArityBound B) → γ) (v : γ → A) :
     @Formula.Realize _ A
@@ -94,7 +96,7 @@ noncomputable def ivarsBelow (i : B.ι) : List B.ι :=
   letI : LinearOrder B.ι := finiteLinearOrder B.ι
   B.ivars.filter fun j => decide (j < i)
 
-theorem mem_ivarsBelow (i j : B.ι) :
+private theorem mem_ivarsBelow (i j : B.ι) :
     letI : LinearOrder B.ι := finiteLinearOrder B.ι
     (j ∈ B.ivarsBelow i ↔ j < i) := by
   let : LinearOrder B.ι := finiteLinearOrder B.ι
@@ -130,7 +132,7 @@ strictly below the witnessed atom”, by
 `DescriptiveComplexity.SOBlock.atomIx_lt_iff`: an atom is below `(i, x)` either
 at a strictly earlier relation variable, or at `i` on a lexicographically
 earlier tuple. -/
-theorem agree_below_iff (ρs : Fin 2 → B.Assignment A) (i : B.ι)
+private theorem agree_below_iff (ρs : Fin 2 → B.Assignment A) (i : B.ι)
     (x : Fin (blockArityBound B) → A) :
     ((∀ j ∈ B.ivarsBelow i, ∀ y, (B.atomSet (ρs 0) (j, y) ↔ B.atomSet (ρs 1) (j, y))) ∧
         ∀ y, toLex y < toLex x → (B.atomSet (ρs 0) (i, y) ↔ B.atomSet (ρs 1) (i, y))) ↔
@@ -203,7 +205,7 @@ noncomputable def eqAssignF : ((L.sum Language.order).sum (B.replicate 2).lang).
   listInf (B.ivars.map fun i =>
     Formula.iAlls (Fin (blockArityBound B)) (B.atomF L 0 i Sum.inr ⇔ B.atomF L 1 i Sum.inr))
 
-theorem realize_eqAssignF (ρs : Fin 2 → B.Assignment A) :
+private theorem realize_eqAssignF (ρs : Fin 2 → B.Assignment A) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.eqAssignF L) ↔ B.atomSet (ρs 0) = B.atomSet (ρs 1)) := by
@@ -229,7 +231,7 @@ equal. -/
 noncomputable def ordLeF : ((L.sum Language.order).sum (B.replicate 2).lang).Sentence :=
   B.ordLtF L ⊔ B.eqAssignF L
 
-theorem realize_ordLeF [Finite A] (ρs : Fin 2 → B.Assignment A) :
+private theorem realize_ordLeF [Finite A] (ρs : Fin 2 → B.Assignment A) :
     letI := B.atomIxLinearOrder A
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))

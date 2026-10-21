@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Wide.Tiling
 import DescriptiveComplexity.Problems.Tiling.Membership
 public import DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.AddrExp
+import all DescriptiveComplexity.Problems.Tiling.Defs
 
 /-!
 # The wide tiling as an exponential expansion
@@ -120,7 +122,7 @@ noncomputable def wtileEquiv : WPoint A ≃ wtileExp.Map A := AddrExp.addrEquiv
 theorem wtileEquiv_apply (p : WPoint A) : wtileEquiv p = wtileEmbed p := rfl
 
 /-- Reading a unary symbol of the expanded vocabulary at one point. -/
-theorem realize_one (rt : Language.tiling.Relations 1) (φ : WTag → wtile1.Sentence)
+private theorem realize_one (rt : Language.tiling.Relations 1) (φ : WTag → wtile1.Sentence)
     (h : ∀ τ : Fin 1 → wtileExp.Tag, wtileExp.relSentence rt τ = onS1 (φ (τ 0)))
     (x : wtileExp.Map A) :
     letI := wtileStructure A
@@ -130,7 +132,7 @@ theorem realize_one (rt : Language.tiling.Relations 1) (φ : WTag → wtile1.Sen
   AddrExp.realize_one rt φ h x
 
 /-- Reading a binary symbol of the expanded vocabulary at two points. -/
-theorem realize_two (rt : Language.tiling.Relations 2) (φ : WTag → WTag → wtile2.Sentence)
+private theorem realize_two (rt : Language.tiling.Relations 2) (φ : WTag → WTag → wtile2.Sentence)
     (h : ∀ τ : Fin 2 → wtileExp.Tag, wtileExp.relSentence rt τ = onS2 (φ (τ 0) (τ 1)))
     (x y : wtileExp.Map A) :
     letI := wtileStructure A
@@ -148,7 +150,7 @@ section Symbols
 variable {A : Type} [Language.wtile.Structure A] [LinearOrder A]
 
 /-- **The positions of the expanded tiling are the addresses.** -/
-theorem relMap_posn (p : WPoint A) :
+private theorem relMap_posn (p : WPoint A) :
     letI := wtileStructure A
     (RelMap tlPosn ![wtileEmbed p] ↔ (wideTileData A).Posn p) := by
   let := wtileStructure A
@@ -159,7 +161,7 @@ theorem relMap_posn (p : WPoint A) :
 
 /-- **A mark of the expanded tiling is the corresponding mark of the
 instance**, carried by the tiles alone. -/
-theorem relMap_mark (rt : Language.tiling.Relations 1) (r : Language.wtile.Relations 1)
+private theorem relMap_mark (rt : Language.tiling.Relations 1) (r : Language.wtile.Relations 1)
     (h : ∀ τ : Fin 1 → wtileExp.Tag, wtileExp.relSentence rt τ = onS1 (markT r (τ 0)))
     (p : WPoint A) :
     letI := wtileStructure A
@@ -174,7 +176,7 @@ theorem relMap_mark (rt : Language.tiling.Relations 1) (r : Language.wtile.Relat
 
 /-- **A compatibility of the expanded tiling is the corresponding relation of
 the instance**, holding of tiles alone. -/
-theorem relMap_attr (rt : Language.tiling.Relations 2) (r : Language.wtile.Relations 2)
+private theorem relMap_attr (rt : Language.tiling.Relations 2) (r : Language.wtile.Relations 2)
     (h : ∀ τ : Fin 2 → wtileExp.Tag, wtileExp.relSentence rt τ = onS2 (binT r (τ 0) (τ 1)))
     (p q : WPoint A) :
     letI := wtileStructure A
@@ -191,7 +193,7 @@ theorem relMap_attr (rt : Language.tiling.Relations 2) (r : Language.wtile.Relat
 
 /-- **The order of the expanded tiling**: addresses in the binary-number order
 the instance's own order induces, then the tiles in that order. -/
-theorem relMap_le (p q : WPoint A) :
+private theorem relMap_le (p q : WPoint A) :
     letI := wtileStructure A
     (RelMap tlLe ![wtileEmbed p, wtileEmbed q] ↔ (wideTileData A).Le p q) := by
   let := wtileStructure A
@@ -206,7 +208,7 @@ theorem relMap_le (p q : WPoint A) :
 
 /-- **The bottom row of the expanded tiling**: the address cutting the initial
 segment of an element may carry that element's tiles. -/
-theorem relMap_first (p q : WPoint A) :
+private theorem relMap_first (p q : WPoint A) :
     letI := wtileStructure A
     (RelMap tlFirst ![wtileEmbed p, wtileEmbed q] ↔ (wideTileData A).First p q) := by
   let := wtileStructure A
@@ -229,7 +231,7 @@ variable {A : Type} [Language.wtile.Structure A] [LinearOrder A]
 
 /-- **The expanded tile system is the wide one**, field by field, along the
 bijection between the universes. -/
-theorem wtileAgree :
+private theorem wtileAgree :
     letI := wtileStructure A
     (∀ p : WPoint A, (wideTileData A).Posn p ↔ (tileData (wtileExp.Map A)).Posn (wtileEquiv p)) ∧
       (∀ p q : WPoint A, (wideTileData A).Le p q ↔
@@ -265,7 +267,7 @@ theorem wtileAgree :
     fun p => (relMap_mark tlEdgeR wtEdgeR (fun _ => rfl) p).symm⟩
 
 /-- **A wide tiling is an ordinary tiling of the expansion.** -/
-theorem wideTiling_iff_expansion (A : Type) [Language.wtile.Structure A] [LinearOrder A] :
+private theorem wideTiling_iff_expansion (A : Type) [Language.wtile.Structure A] [LinearOrder A] :
     letI := wtileStructure A
     (WideTiling A ↔ TILING (wtileExp.Map A)) := by
   let := wtileStructure A

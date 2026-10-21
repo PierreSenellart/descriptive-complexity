@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawChain
+import all DescriptiveComplexity.Problems.Wide.DrawChain
+import all DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # The tuple loop: copying a block bit by bit
@@ -151,7 +153,7 @@ noncomputable def tupleRule :
 variable {emb}
 
 /-- **Every rule of a tuple loop fires from a phase its site owns.** -/
-theorem tupleHosrc :
+private theorem tupleHosrc :
     ∀ (i : ChainSite 3 TupleSS) (ρ : ChainSh 3 TupleSS TupleSh i),
       ∃ p : ChainPh 3 TuplePS,
         (tupleRule zero one wk rg emb tSrc tDst MatchS MatchD bitFlag setBit
@@ -167,7 +169,7 @@ theorem tupleHosrc :
 /-- **A property of a tuple loop's phases and its exit holds of every phase it
 can move to**: the two trips stay inside their own, the checkpoints stay where
 they are, and only the last dispatch leaves. -/
-theorem tupleRule_dstIn {S : P → Prop} (hemb : ∀ p : ChainPh 3 TuplePS, S (emb p))
+private theorem tupleRule_dstIn {S : P → Prop} (hemb : ∀ p : ChainPh 3 TuplePS, S (emb p))
     (hexit : S exitPh) (i : ChainSite 3 TupleSS)
     (ρ : ChainSh 3 TupleSS TupleSh i) :
     S (tupleRule zero one wk rg emb tSrc tDst MatchS MatchD bitFlag setBit
@@ -196,7 +198,7 @@ variable (hemb : Function.Injective emb)
 
 include hemb in
 /-- **A tuple loop separates in-shape.** -/
-theorem tupleSep :
+private theorem tupleSep :
     ∀ (i : ChainSite 3 TupleSS) (ρ ρ' : ChainSh 3 TupleSS TupleSh i)
       (f : Q → A) (g : W → A),
       (tupleRule zero one wk rg emb tSrc tDst MatchS MatchD bitFlag setBit

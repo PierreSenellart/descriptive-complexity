@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.CircuitNumber.Defs
 public import DescriptiveComplexity.Problems.Cvp.Membership
 public import DescriptiveComplexity.Counting.FP
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Problems.Cvp.Membership
 
 /-!
 # The number written by a circuit is in FP
@@ -52,7 +53,7 @@ variable {A : Type} [L.Structure A] [L'.Structure A]
 
 /-- Rules read in a larger vocabulary derive the same tuples, over an
 expansion of the structure. -/
-theorem derives_onLang (Φ : L →ᴸ L') [Φ.IsExpansionOn A] (rules : List (HornClause L B k))
+private theorem derives_onLang (Φ : L →ᴸ L') [Φ.IsExpansionOn A] (rules : List (HornClause L B k))
     (q : Σ i : B.ι, Fin (B.arity i) → A) :
     Derives (rules.map (HornClause.onLang Φ)) q ↔ Derives rules q := by
   constructor
@@ -68,7 +69,8 @@ theorem derives_onLang (Φ : L →ᴸ L') [Φ.IsExpansionOn A] (rules : List (Ho
         ((LHom.realize_onFormula Φ _).mpr hg) ih
 
 /-- The least fixed point of rules read in a larger vocabulary. -/
-theorem lfpAssign_onLang (Φ : L →ᴸ L') [Φ.IsExpansionOn A] (rules : List (HornClause L B k)) :
+private theorem lfpAssign_onLang
+    (Φ : L →ᴸ L') [Φ.IsExpansionOn A] (rules : List (HornClause L B k)) :
     lfpAssign (A := A) (rules.map (HornClause.onLang Φ)) = lfpAssign rules :=
   funext fun i => funext fun x => propext (derives_onLang Φ rules ⟨i, x⟩)
 
@@ -76,7 +78,7 @@ end OnLang
 
 /-- **A product of factors `1` and `2`** is two to the number of factors `2`:
 the place value of a digit, as a product over the universe. -/
-theorem finprod_boole_add_one {A : Type} [Finite A] (P : A → Prop) [DecidablePred P] :
+private theorem finprod_boole_add_one {A : Type} [Finite A] (P : A → Prop) [DecidablePred P] :
     ∏ᶠ h : A, ((if P h then 1 else 0) + 1) = 2 ^ Nat.card {h : A // P h} := by
   let := Fintype.ofFinite A
   have h2 : ∀ h : A, ((if P h then 1 else 0) + 1 : ℕ) = if P h then 2 else 1 := fun h => by
@@ -161,7 +163,7 @@ section Value
 
 variable {A : Type} [Language.numCircuit.Structure A] [LinearOrder A]
 
-theorem realize_bitF (w : Fin 1 → A) :
+private theorem realize_bitF (w : Fin 1 → A) :
     (@Formula.Realize outLang A
         (@sumStructure _ _ A _ (Cvp.valBlock.structure (lfpAssign (A := A) numRules))) _ bitF
         (Sum.elim default w)) ↔ OutBit (w 0) := by
@@ -169,7 +171,7 @@ theorem realize_bitF (w : Fin 1 → A) :
   rw [bitF, Formula.realize_inf, Formula.realize_rel₁, Formula.realize_rel₁]
   exact and_congr Iff.rfl (lfpAssign_numRules_iff (b := true) (x := ![w 0]))
 
-theorem realize_lowF (w u : Fin 1 → A) :
+private theorem realize_lowF (w u : Fin 1 → A) :
     (@Formula.Realize outLang A
         (@sumStructure _ _ A _ (Cvp.valBlock.structure (lfpAssign (A := A) numRules))) _ lowF
         (Sum.elim (Sum.elim default w) u)) ↔ LowerOut (w 0) (u 0) := by
@@ -178,7 +180,7 @@ theorem realize_lowF (w u : Fin 1 → A) :
     Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal]
   exact and_assoc
 
-theorem realize_outOrdS :
+private theorem realize_outOrdS :
     (@Sentence.Realize outLang A
         (@sumStructure _ _ A _ (Cvp.valBlock.structure (lfpAssign (A := A) numRules))) outOrdS) ↔
       OutOrder A := by
@@ -195,7 +197,7 @@ theorem realize_outOrdS :
 
 open Classical in
 /-- **The definition computes the number written by the circuit.** -/
-theorem numDef_value [Finite A] : numDef.value A = circuitNumber A := by
+private theorem numDef_value [Finite A] : numDef.value A = circuitNumber A := by
   have hord := realize_outOrdS (A := A)
   let := Cvp.valBlock.structure (lfpAssign (A := A) numRules)
   have hprod : ∀ w : Fin 1 → A,

@@ -79,7 +79,7 @@ noncomputable def argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fi
       have ha : (p.1 : ℕ) * d ≤ 1 * d := Nat.mul_le_mul_right d (Nat.lt_succ_iff.mp p.1.isLt)
       omega⟩ : Empty ⊕ Fin (2 * d))) φ).toPrenex
 
-theorem argsFreed_isPrenex {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 2 × Fin d)) :
+private theorem argsFreed_isPrenex {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 2 × Fin d)) :
     (argsFreed X φ).IsPrenex :=
   BoundedFormula.toPrenex_isPrenex _
 
@@ -88,7 +88,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 /-- **Freeing the arguments changes nothing**: read at any tuple of points, the
 freed formula says what the original said of the points its coordinates
 name. -/
-theorem realize_argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 2 × Fin d))
+private theorem realize_argsFreed {d : ℕ} (φ : (X.E.sum Language.order).Formula (Fin 2 × Fin d))
     (xs : Fin (2 * d) → X.Map A) :
     letI := X.mapLinearOrder A
     ((argsFreed X φ).Realize (M := X.Map A) default xs ↔

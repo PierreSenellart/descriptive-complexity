@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Machines
 
 /-!
 # Turing machines on an unbounded tape
@@ -128,7 +129,7 @@ theorem StepsInU.trans_step : ∀ {n : ℕ} {c d e : ConfigU A},
     exact ⟨m, hstep, ih hrest hde⟩
 
 /-- Runs compose; the step counts add. -/
-theorem StepsInU.trans : ∀ {n m : ℕ} {c d e : ConfigU A},
+private theorem StepsInU.trans : ∀ {n m : ℕ} {c d e : ConfigU A},
     M.StepsInU n c d → M.StepsInU m d e → M.StepsInU (n + m) c e := by
   intro n
   induction n with
@@ -155,7 +156,7 @@ section Band
 variable {M}
 
 /-- One step moves the head by at most one page, in either direction. -/
-theorem page_dist_stepU {c c' : ConfigU A} (h : M.StepU c c') :
+private theorem page_dist_stepU {c c' : ConfigU A} (h : M.StepU c c') :
     (c'.head.1 - c.head.1).natAbs ≤ 1 := by
   obtain ⟨_, _, _, _, _, _, _, hmove⟩ := h
   have hcell : ∀ x y : ℤ × A, M.SuccCell x y → y.1 = x.1 ∨ y.1 = x.1 + 1 := by
@@ -214,7 +215,7 @@ theorem _root_.DescriptiveComplexity.ConfigU.map_surjective (u : B ≃ A) :
   · funext x
     simp [ConfigU.map]
 
-theorem _root_.DescriptiveComplexity.ConfigU.map_injective (u : B ≃ A) :
+private theorem _root_.DescriptiveComplexity.ConfigU.map_injective (u : B ≃ A) :
     Function.Injective (ConfigU.map u) := by
   rintro ⟨s, hd, t⟩ ⟨s', hd', t'⟩ hc
   simp only [ConfigU.map, ConfigU.mk.injEq, Prod.mk.injEq] at hc
@@ -229,20 +230,20 @@ theorem _root_.DescriptiveComplexity.ConfigU.map_injective (u : B ≃ A) :
 /-- Highest positions correspond, the companion of
 `DescriptiveComplexity.TMData.Agree.minPos`: the bounded model never mentions a
 highest position, but the page-crossing move does. -/
-theorem Agree.maxPos (h : Agree u N M) {b : B} :
+private theorem Agree.maxPos (h : Agree u N M) {b : B} :
     MaxPos N.Le N.Posn b ↔ MaxPos M.Le M.Posn (u b) := by
   refine and_congr (h.posn b) ⟨fun hm a ha => ?_, fun hm a ha => ?_⟩
   · have := hm (u.symm a) ((h.posn _).mpr (by rwa [Equiv.apply_symm_apply]))
     rwa [(h.le _ _), Equiv.apply_symm_apply] at this
   · exact (h.le _ _).mpr (hm (u a) ((h.posn a).mp ha))
 
-theorem Agree.succCell (h : Agree u N M) {c c' : ℤ × B} :
+private theorem Agree.succCell (h : Agree u N M) {c c' : ℤ × B} :
     N.SuccCell c c' ↔ M.SuccCell (c.1, u c.2) (c'.1, u c'.2) := by
   refine or_congr (and_congr Iff.rfl h.succPos) (and_congr Iff.rfl (and_congr ?_ ?_))
   · exact h.maxPos
   · exact h.minPos
 
-theorem Agree.isInitU (h : Agree u N M) {c : ConfigU B} :
+private theorem Agree.isInitU (h : Agree u N M) {c : ConfigU B} :
     N.IsInitU c ↔ M.IsInitU (c.map u) := by
   refine and_congr (h.start _) (and_congr Iff.rfl (and_congr h.minPos ?_))
   constructor
@@ -257,7 +258,7 @@ theorem Agree.isInitU (h : Agree u N M) {c : ConfigU B} :
     refine ⟨fun hz => (h.initTape (u := u)).mpr (by simpa using this.1 hz),
       fun hz => (h.blank _).mpr (by simpa using this.2 hz)⟩
 
-theorem Agree.stepU (h : Agree u N M) {c c' : ConfigU B} :
+private theorem Agree.stepU (h : Agree u N M) {c c' : ConfigU B} :
     N.StepU c c' ↔ M.StepU (c.map u) (c'.map u) := by
   constructor
   · rintro ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩
@@ -294,7 +295,7 @@ theorem Agree.stepU (h : Agree u N M) {c c' : ConfigU B} :
         rw [← Equiv.apply_symm_apply u τ]
         exact (h.right _).mp hcon
 
-theorem Agree.stepsInU (h : Agree u N M) :
+private theorem Agree.stepsInU (h : Agree u N M) :
     ∀ (n : ℕ) (c c' : ConfigU B), N.StepsInU n c c' ↔ M.StepsInU n (c.map u) (c'.map u) := by
   intro n
   induction n with

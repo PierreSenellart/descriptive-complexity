@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.MachinesUnbounded
 public import DescriptiveComplexity.OrderWalk
 public import Mathlib.Data.Set.Finite.Lemmas
+import all DescriptiveComplexity.MachinesUnbounded
 
 /-!
 # An accepting run, read off as a finite certificate
@@ -66,7 +67,7 @@ section Sequence
 variable {A : Type} {M : TMData A}
 
 /-- **A run is a sequence of configurations.** -/
-theorem exists_runU : ∀ (n : ℕ) (c d : ConfigU A), M.StepsInU n c d →
+private theorem exists_runU : ∀ (n : ℕ) (c d : ConfigU A), M.StepsInU n c d →
     ∃ f : ℕ → ConfigU A, f 0 = c ∧ f n = d ∧ ∀ i, i < n → M.StepU (f i) (f (i + 1)) := by
   intro n
   induction n with
@@ -85,7 +86,7 @@ theorem exists_runU : ∀ (n : ℕ) (c d : ConfigU A), M.StepsInU n c d →
     | succ j => exact hgs j (Nat.lt_of_succ_lt_succ hi)
 
 /-- The prefix of a sequence of steps is a run. -/
-theorem stepsInU_of_steps {n : ℕ} {f : ℕ → ConfigU A}
+private theorem stepsInU_of_steps {n : ℕ} {f : ℕ → ConfigU A}
     (hs : ∀ i, i < n → M.StepU (f i) (f (i + 1))) :
     ∀ i, i ≤ n → M.StepsInU i (f 0) (f i) := by
   intro i
@@ -154,7 +155,7 @@ section OfRun
 variable {A : Type} {M : TMData A}
 
 /-- The integer a page index of the band stands for. -/
-def pgOf (n : ℕ) (z : Fin (2 * n + 1)) : ℤ := (z : ℤ) - n
+private def pgOf (n : ℕ) (z : Fin (2 * n + 1)) : ℤ := (z : ℤ) - n
 
 private theorem pgOf_injective (n : ℕ) : Function.Injective (pgOf n) := by
   intro z z' h
@@ -162,7 +163,7 @@ private theorem pgOf_injective (n : ℕ) : Function.Injective (pgOf n) := by
   exact Fin.ext (by exact_mod_cast hz)
 
 /-- The page index of a cell of the band. -/
-def ixOf (n : ℕ) (x : ℤ) : Fin (2 * n + 1) :=
+private def ixOf (n : ℕ) (x : ℤ) : Fin (2 * n + 1) :=
   if h : (x + n).toNat < 2 * n + 1 then ⟨(x + n).toNat, h⟩ else ⟨0, Nat.succ_pos _⟩
 
 private theorem pgOf_ixOf {n : ℕ} {x : ℤ} (h1 : -(n : ℤ) ≤ x) (h2 : x ≤ n) :
@@ -174,7 +175,7 @@ private theorem pgOf_ixOf {n : ℕ} {x : ℤ} (h1 : -(n : ℤ) ≤ x) (h2 : x �
 /-- The certificate a sequence of configurations carries. Named, rather than
 written as a structure literal inside the proof, so that its four projections
 have stated equations and `rw` applies under them. -/
-def runOfSeq (n : ℕ) (f : ℕ → ConfigU A) :
+private def runOfSeq (n : ℕ) (f : ℕ → ConfigU A) :
     RunCert A (Fin (n + 1)) (Fin (2 * n + 1)) where
   st i := (f i).state
   hdP i := ixOf n (f i).head.1
@@ -196,7 +197,7 @@ def runOfSeq (n : ℕ) (f : ℕ → ConfigU A) :
 
 /-- **A run yields a certificate**: the time points are the steps of the run and
 the pages the band the head stays inside. -/
-theorem runCert_of_acceptsU (h : M.AcceptsU) :
+private theorem runCert_of_acceptsU (h : M.AcceptsU) :
     ∃ (n : ℕ) (zero : Fin (2 * n + 1)) (r : RunCert A (Fin (n + 1)) (Fin (2 * n + 1))),
       RunOK M zero r := by
   obtain ⟨c₀, c, n, hinit, hrun, hacc⟩ := h
@@ -303,7 +304,7 @@ private theorem orank_injective [LinearOrder P] [Finite P] :
 
 /-- The integer a page stands for: its rank, shifted so that the input page is
 cell `0`. -/
-noncomputable def pgEmb [LinearOrder P] (zero : P) (z : P) : ℤ :=
+private noncomputable def pgEmb [LinearOrder P] (zero : P) (z : P) : ℤ :=
   (orank z : ℤ) - (orank zero : ℤ)
 
 private theorem pgEmb_injective [LinearOrder P] [Finite P] (zero : P) :
@@ -326,12 +327,12 @@ private theorem pgEmb_covBy [LinearOrder P] [Finite P] {zero a b : P} (h : a ⋖
 open Classical in
 /-- The tape a certificate induces: the certificate's symbol where the cell is
 the image of a page, and the blank everywhere else. -/
-noncomputable def tapeOf (r : RunCert A T P) (pg : P → ℤ) (b₀ : A) (t : T)
+private noncomputable def tapeOf (r : RunCert A T P) (pg : P → ℤ) (b₀ : A) (t : T)
     (x : ℤ × A) : A :=
   if hx : ∃ z, pg z = x.1 then r.sym t hx.choose x.2 else b₀
 
 /-- The configuration a certificate induces at a time point. -/
-noncomputable def confOf [LinearOrder P] (r : RunCert A T P) (pg : P → ℤ) (b₀ : A)
+private noncomputable def confOf [LinearOrder P] (r : RunCert A T P) (pg : P → ℤ) (b₀ : A)
     (t : T) : ConfigU A :=
   ⟨r.st t, (pg (r.hdP t), r.hdC t), tapeOf r pg b₀ t⟩
 

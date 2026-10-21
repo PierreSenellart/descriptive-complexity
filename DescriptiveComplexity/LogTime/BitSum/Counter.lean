@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The counter field: telling a block which block it is
@@ -59,7 +63,7 @@ def packVal (g : ℕ) (f : ℕ → ℕ) : ℕ → ℕ
 
 /-- **A packing fits below the block it stops at**, provided every value fits in
 a field. -/
-theorem packVal_lt {g : ℕ} {f : ℕ → ℕ} : ∀ {m : ℕ}, (∀ j, j < m → f j < 2 ^ g) →
+private theorem packVal_lt {g : ℕ} {f : ℕ → ℕ} : ∀ {m : ℕ}, (∀ j, j < m → f j < 2 ^ g) →
     packVal g f m < 2 ^ (m * g) := by
   intro m
   induction m with
@@ -79,7 +83,7 @@ theorem packVal_lt {g : ℕ} {f : ℕ → ℕ} : ∀ {m : ℕ}, (∀ j, j < m �
     omega
 
 /-- **What a field of a packing holds**: the `j`-th field is `f j`. -/
-theorem packVal_window {g : ℕ} {f : ℕ → ℕ} : ∀ {m j : ℕ}, (∀ j, j < m → f j < 2 ^ g) →
+private theorem packVal_window {g : ℕ} {f : ℕ → ℕ} : ∀ {m j : ℕ}, (∀ j, j < m → f j < 2 ^ g) →
     j < m → packVal g f m / 2 ^ (j * g) % 2 ^ g = f j := by
   intro m
   induction m with
@@ -109,16 +113,16 @@ theorem packVal_window {g : ℕ} {f : ℕ → ℕ} : ∀ {m j : ℕ}, (∀ j, j 
         Nat.div_eq_of_lt hlow, Nat.zero_add, Nat.mod_eq_of_lt (hm j (by omega))]
 
 /-- **The packed counters**: the number whose `j`-th field holds `j`. -/
-def counterVal (g m : ℕ) : ℕ := packVal g id m
+private def counterVal (g m : ℕ) : ℕ := packVal g id m
 
 /-- **The counters fit below the block they stop at**, provided each index fits
 in a field – which is what `m ≤ 2 ^ g` says. -/
-theorem counterVal_lt {g m : ℕ} (h : m ≤ 2 ^ g) : counterVal g m < 2 ^ (m * g) :=
+private theorem counterVal_lt {g m : ℕ} (h : m ≤ 2 ^ g) : counterVal g m < 2 ^ (m * g) :=
   packVal_lt fun j hj => by simpa using by omega
 
 /-- **What a counter field holds**: the `j`-th field of the packed counters is
 `j`. -/
-theorem counterVal_window {g m j : ℕ} (h : m ≤ 2 ^ g) (hj : j < m) :
+private theorem counterVal_window {g m j : ℕ} (h : m ≤ 2 ^ g) (hj : j < m) :
     counterVal g m / 2 ^ (j * g) % 2 ^ g = j :=
   packVal_window (fun i hi => by simpa using by omega) hj
 
@@ -244,7 +248,7 @@ variable {L : Language.{0, 0}} {α : Type}
 
 /-- **The counter is first-order in the bit logic**: two conditions, each a
 block of quantified indices over windows. -/
-theorem bitDef_isCounter (g B C : α) :
+private theorem bitDef_isCounter (g B C : α) :
     BitDef (L := L) fun _ _ _ _ _ v => IsCounter (v g) (v B) (v C) := by
   have hbase : BitDef (L := L) (α := α) (fun _ _ _ _ _ v => ∀ z b' c : _,
       orank z = 0 → orank z + orank (v g) = orank b' → WindowAt z b' (v C) c →

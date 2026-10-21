@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Blocks
 import DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # The sweep of a wide machine
@@ -100,7 +103,7 @@ theorem isInit_wide (h : IsLinOrd (WMLe (A := A))) (hno : ∀ x y : A, ¬WMInp x
 
 /-- Both ends of a step of a wide machine are addresses, and the step is the
 binary increment. -/
-theorem step_ends_wide (h : IsLinOrd (WMLe (A := A))) {p q : WPoint A}
+private theorem step_ends_wide (h : IsLinOrd (WMLe (A := A))) {p q : WPoint A}
     (hs : SuccPos wpLe wpPosn p q) :
     ∃ s t : A → Prop, p = Sum.inl s ∧ q = Sum.inl t ∧ WMIncr WMLe s t := by
   obtain ⟨s, rfl⟩ := (wpPosn_iff p).mp hs.1

@@ -37,7 +37,7 @@ def IndepSet {T : Type} (Adj : T → T → Prop) (S : T → Prop) : Prop :=
   ∀ x y, S x → S y → x ≠ y → ¬Adj x y
 
 /-- Independence transports along an equivalence respecting adjacency. -/
-theorem indepSet_equiv_iff {T T' : Type} {Adj : T → T → Prop} {Adj' : T' → T' → Prop}
+private theorem indepSet_equiv_iff {T T' : Type} {Adj : T → T → Prop} {Adj' : T' → T' → Prop}
     (E : T ≃ T') (hadj : ∀ x y, Adj x y ↔ Adj' (E x) (E y)) (S : T → Prop) :
     IndepSet Adj S ↔ IndepSet Adj' fun y => S (E.symm y) := by
   constructor
@@ -80,7 +80,7 @@ theorem indepSet_pend_iff (Adj : V → V → Prop) (T : V ⊕ V × V → Prop) :
     · exact hadj
 
 /-- The elements outside a set and those inside it share out the universe. -/
-theorem card_not_add_card [Finite V] (S : V → Prop) :
+private theorem card_not_add_card [Finite V] (S : V → Prop) :
     Nat.card {v // ¬S v} + Nat.card {v // S v} = Nat.card V := by
   classical
   rw [← Nat.card_sum, Nat.card_congr ((Equiv.sumComm _ _).trans (Equiv.sumCompl S))]

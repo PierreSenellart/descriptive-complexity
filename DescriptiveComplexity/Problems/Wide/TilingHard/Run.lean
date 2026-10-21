@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.Wide.TilingHard.Grid
 public import DescriptiveComplexity.Problems.Wide.TrackWrites
 import DescriptiveComplexity.Problems.Wide.Roam
 import DescriptiveComplexity.Problems.Wide.LowFile
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.TrackWrites
 
 /-!
 # A run, read as a table of tiles
@@ -61,20 +64,20 @@ noncomputable def wpElt (p : WPoint A) : A :=
 theorem wpElt_inr (x : A) : wpElt (Sum.inr x : WPoint A) = x := rfl
 
 /-- A point carrying a mark of the instance is a control element. -/
-theorem eq_inr_of_wpMark {R : A → Prop} {p : WPoint A} (h : wpMark R p) :
+private theorem eq_inr_of_wpMark {R : A → Prop} {p : WPoint A} (h : wpMark R p) :
     p = Sum.inr (wpElt p) := by
   rcases p with s | x
   · exact h.elim
   · rfl
 
 /-- And the mark holds of the element it is. -/
-theorem wpMark_elt {R : A → Prop} {p : WPoint A} (h : wpMark R p) : R (wpElt p) := by
+private theorem wpMark_elt {R : A → Prop} {p : WPoint A} (h : wpMark R p) : R (wpElt p) := by
   rcases p with s | x
   · exact h.elim
   · exact h
 
 /-- And the attribute holds of the elements they are. -/
-theorem wpAttr_elt {R : A → A → Prop} {p q : WPoint A} (h : wpAttr R p q) :
+private theorem wpAttr_elt {R : A → A → Prop} {p q : WPoint A} (h : wpAttr R p q) :
     R (wpElt p) (wpElt q) := by
   rcases p with s | x <;> rcases q with t | y
   · exact h.elim
@@ -92,20 +95,20 @@ variable {V : Type} {M : TMData V}
 
 /-- **One step, with the transition it fires named**: `TMData.Step` with its
 existential opened, so that a drawing may put *the* transition in a tile. -/
-def StepWith (M : TMData V) (c c' : Config V) (τ : V) : Prop :=
+private def StepWith (M : TMData V) (c c' : Config V) (τ : V) : Prop :=
   M.Tr τ ∧ M.Src τ c.state ∧ M.Read τ (c.tape c.head) ∧ M.Dst τ c'.state ∧
     M.Write τ (c'.tape c.head) ∧ (∀ p, p ≠ c.head → c'.tape p = c.tape p) ∧
     ((M.Right τ ∧ SuccPos M.Le M.Posn c.head c'.head) ∨
       (¬M.Right τ ∧ SuccPos M.Le M.Posn c'.head c.head))
 
-theorem step_iff_stepWith {c c' : Config V} :
+private theorem step_iff_stepWith {c c' : Config V} :
     M.Step c c' ↔ ∃ τ, StepWith M c c' τ := Iff.rfl
 
 open Classical in
 /-- **An accepting run, as a sequence with its transitions**: the configurations
 at every time, the transition fired at every step before the last, and the run
 standing still afterwards. -/
-theorem exists_runData [Nonempty V] (h : M.Accepts) :
+private theorem exists_runData [Nonempty V] (h : M.Accepts) :
     ∃ (g : ℕ → Config V) (tr : ℕ → V) (n : ℕ),
       M.IsInit (g 0) ∧ n < Nat.card {p : V // M.Posn p} ∧ (∀ i, n ≤ i → g i = g n) ∧
       M.Acc (g n).state ∧ ∀ i, i < n → StepWith M (g i) (g (i + 1)) (tr i) := by
@@ -128,7 +131,7 @@ open Classical in
 the same reading as `DescriptiveComplexity.TilingHard.exists_runData` for a
 machine with no clock – the run is still finite, only its length is not
 bounded by the instance. -/
-theorem exists_runDataSpace [Nonempty V] (h : M.AcceptsSpace) :
+private theorem exists_runDataSpace [Nonempty V] (h : M.AcceptsSpace) :
     ∃ (g : ℕ → Config V) (tr : ℕ → V) (n : ℕ),
       M.IsInit (g 0) ∧ (∀ i, n ≤ i → g i = g n) ∧ M.Acc (g n).state ∧
       ∀ i, i < n → StepWith M (g i) (g (i + 1)) (tr i) := by
@@ -149,7 +152,7 @@ theorem exists_runDataSpace [Nonempty V] (h : M.AcceptsSpace) :
 
 /-- **The head stands on a position at every time**: it starts on the least one
 and a step moves it to a neighbor. -/
-theorem head_posn {g : ℕ → Config V} {tr : ℕ → V} {n : ℕ}
+private theorem head_posn {g : ℕ → Config V} {tr : ℕ → V} {n : ℕ}
     (hinit : M.IsInit (g 0)) (hfreeze : ∀ i, n ≤ i → g i = g n)
     (hstep : ∀ i, i < n → StepWith M (g i) (g (i + 1)) (tr i)) (k : ℕ) :
     M.Posn (g k).head := by
@@ -180,7 +183,7 @@ variable {A : Type} [Finite A] [Language.wide.Structure A]
 injective into as many numbers as there are addresses, so it is onto them. That
 is what gives the drawing a row for every step of the clock, the clock counting
 the addresses. -/
-theorem exists_wideRank_eq (h : IsLinOrd (WMLe (A := A))) {k : ℕ}
+private theorem exists_wideRank_eq (h : IsLinOrd (WMLe (A := A))) {k : ℕ}
     (hk : k < Nat.card {p : WPoint A // (wideData A).Posn p}) :
     ∃ s : A → Prop, wideRank s = k := by
   classical
@@ -251,7 +254,7 @@ theorem tileAt_sym (hh : (g k).head ≠ cell) (hnext : ¬(k < n ∧ (g (k + 1)).
   simp only [ite_eq_right hh, ite_eq_right hnext]
 
 open Classical in
-theorem tileAt_arr (hh : (g k).head ≠ cell) (hk : k < n) (hnext : (g (k + 1)).head = cell) :
+private theorem tileAt_arr (hh : (g k).head ≠ cell) (hk : k < n) (hnext : (g (k + 1)).head = cell) :
     tileAt g tr n k cell =
       (if WMRight (wpElt (tr k)) then TileTag.arrL else TileTag.arrR,
         ![wpElt ((g k).tape cell), wpElt (g (k + 1)).state,
@@ -264,7 +267,7 @@ theorem tileAt_arr (hh : (g k).head ≠ cell) (hk : k < n) (hnext : (g (k + 1)).
   · simp only [ite_eq_right hr]
 
 /-- The symbol a tile of the table holds is what the tape holds there. -/
-theorem tpSym_tileAt : tpSym (tileAt g tr n k cell) = wpElt ((g k).tape cell) := by
+private theorem tpSym_tileAt : tpSym (tileAt g tr n k cell) = wpElt ((g k).tape cell) := by
   by_cases hh : (g k).head = cell
   · by_cases hk : k < n
     · rw [tileAt_head hh hk]

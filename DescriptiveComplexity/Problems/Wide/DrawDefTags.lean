@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefAcc
 public import DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawDefCtl
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # What a gate's branch dispatches on
@@ -41,7 +43,7 @@ open Language Structure
 variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 
 /-- **A gate's decoding is definable**: one-hotness of the witness flags. -/
-theorem uGDefinable_gateTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+private theorem uGDefinable_gateTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (t : dt.X.Tag) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.GateTagsAre e.one hc t f :=
@@ -59,7 +61,7 @@ theorem uConst_defTag (e₀ : Env L) :
 
 /-- **The total dispatch is definable**: its genuine branch is the decoding,
 and its default branch names a tag no instance can move. -/
-theorem uGDefinable_dspTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+private theorem uGDefinable_dspTagsAre (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (e₀ : Env L) (t : dt.X.Tag) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.DspTagsAre e.one hc t f := by

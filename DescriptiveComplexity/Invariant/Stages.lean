@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Invariant.EquivK
 public import DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Invariant.EquivK
 
 /-!
 # `≡ᵏ`-invariance of the fixed-point stages
@@ -69,7 +71,7 @@ section Structure
 variable [L.Structure A]
 
 /-- The empty assignment is invariant. -/
-theorem botAssign_invariant (B : SOBlock) :
+private theorem botAssign_invariant (B : SOBlock) :
     AssignInvariant S A k (B.botAssign A) :=
   fun _ _ _ _ _ => Iff.rfl
 

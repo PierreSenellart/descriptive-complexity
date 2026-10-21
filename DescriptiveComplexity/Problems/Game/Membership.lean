@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Game.Defs
 public import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.OrderWalk
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.FixedPoint
 
 /-!
 # GAME is in PTIME
@@ -70,10 +71,10 @@ abbrev gameBlock : SOBlock where
   arity := fun i => match i with | .win => 1 | .allge => 2
 
 /-- The atom `win x`. -/
-def winAt (x : Fin 3) : SOAtom gameBlock 3 := ⟨GIx.win, fun _ => x⟩
+private def winAt (x : Fin 3) : SOAtom gameBlock 3 := ⟨GIx.win, fun _ => x⟩
 
 /-- The atom `allge x y`. -/
-def allgeAt (x y : Fin 3) : SOAtom gameBlock 3 := ⟨GIx.allge, ![x, y]⟩
+private def allgeAt (x y : Fin 3) : SOAtom gameBlock 3 := ⟨GIx.allge, ![x, y]⟩
 
 /-! ### The guards -/
 
@@ -121,56 +122,56 @@ end Guards
 /-! ### The rules -/
 
 /-- A node that wins outright is winning. -/
-noncomputable def rWon : HornClause agOrd gameBlock 3 :=
+private noncomputable def rWon : HornClause agOrd gameBlock 3 :=
   ⟨wonG 0, [], some (winAt 0)⟩
 
 /-- An existential node with a winning successor is winning. -/
-noncomputable def rEx : HornClause agOrd gameBlock 3 :=
+private noncomputable def rEx : HornClause agOrd gameBlock 3 :=
   ⟨∼(univG 0) ⊓ moveG 0 1, [winAt 1], some (winAt 0)⟩
 
 /-- A universal node with a successor, all of whose successors are winning, is
 winning: the scan has reached the least element. -/
-noncomputable def rAll : HornClause agOrd gameBlock 3 :=
+private noncomputable def rAll : HornClause agOrd gameBlock 3 :=
   ⟨univG 0 ⊓ moveG 0 1 ⊓ minF 2, [allgeAt 0 2], some (winAt 0)⟩
 
 /-- The scan starts at the greatest element, which is not a successor. -/
-noncomputable def rTopNo : HornClause agOrd gameBlock 3 :=
+private noncomputable def rTopNo : HornClause agOrd gameBlock 3 :=
   ⟨maxF 1 ⊓ ∼(moveG 0 1), [], some (allgeAt 0 1)⟩
 
 /-- The scan starts at the greatest element, which is a winning successor. -/
-noncomputable def rTopYes : HornClause agOrd gameBlock 3 :=
+private noncomputable def rTopYes : HornClause agOrd gameBlock 3 :=
   ⟨maxF 1 ⊓ moveG 0 1, [winAt 1], some (allgeAt 0 1)⟩
 
 /-- The scan steps down past an element that is not a successor. -/
-noncomputable def rStepNo : HornClause agOrd gameBlock 3 :=
+private noncomputable def rStepNo : HornClause agOrd gameBlock 3 :=
   ⟨succF 1 2 ⊓ ∼(moveG 0 1), [allgeAt 0 2], some (allgeAt 0 1)⟩
 
 /-- The scan steps down past a winning successor. -/
-noncomputable def rStepYes : HornClause agOrd gameBlock 3 :=
+private noncomputable def rStepYes : HornClause agOrd gameBlock 3 :=
   ⟨succF 1 2 ⊓ moveG 0 1, [winAt 1, allgeAt 0 2], some (allgeAt 0 1)⟩
 
 /-- The rules of the definition. -/
-noncomputable def gameRules : List (HornClause agOrd gameBlock 3) :=
+private noncomputable def gameRules : List (HornClause agOrd gameBlock 3) :=
   [rWon, rEx, rAll, rTopNo, rTopYes, rStepNo, rStepYes]
 
-theorem rWon_mem : rWon ∈ gameRules := by simp [gameRules]
+private theorem rWon_mem : rWon ∈ gameRules := by simp [gameRules]
 
-theorem rEx_mem : rEx ∈ gameRules := by simp [gameRules]
+private theorem rEx_mem : rEx ∈ gameRules := by simp [gameRules]
 
-theorem rAll_mem : rAll ∈ gameRules := by simp [gameRules]
+private theorem rAll_mem : rAll ∈ gameRules := by simp [gameRules]
 
-theorem rTopNo_mem : rTopNo ∈ gameRules := by simp [gameRules]
+private theorem rTopNo_mem : rTopNo ∈ gameRules := by simp [gameRules]
 
-theorem rTopYes_mem : rTopYes ∈ gameRules := by simp [gameRules]
+private theorem rTopYes_mem : rTopYes ∈ gameRules := by simp [gameRules]
 
-theorem rStepNo_mem : rStepNo ∈ gameRules := by simp [gameRules]
+private theorem rStepNo_mem : rStepNo ∈ gameRules := by simp [gameRules]
 
-theorem rStepYes_mem : rStepYes ∈ gameRules := by simp [gameRules]
+private theorem rStepYes_mem : rStepYes ∈ gameRules := by simp [gameRules]
 
 /-! ### The output -/
 
 /-- **The output**: some marked start is winning. -/
-noncomputable def gameOut : ((agOrd).sum gameBlock.lang).Sentence :=
+private noncomputable def gameOut : ((agOrd).sum gameBlock.lang).Sentence :=
   Formula.iExs (Fin 3) (atomF (winAt 0) ⊓ guardOutF (startG 0))
 
 /-! ### The intended fixed point -/
@@ -181,7 +182,7 @@ variable {A : Type} [Language.andOrGraph.Structure A] [LinearOrder A] [Finite A]
 
 variable (A) in
 /-- The assignment the rules are meant to compute. -/
-def gameAssign : gameBlock.Assignment A := fun i =>
+private def gameAssign : gameBlock.Assignment A := fun i =>
   match i with
   | .win => fun t => WinsOn A (t 0)
   | .allge => fun t => ∀ c : A, t 1 ≤ c → AGMove (t 0) c → WinsOn A c
@@ -189,7 +190,7 @@ def gameAssign : gameBlock.Assignment A := fun i =>
 omit [Finite A] [Nonempty A] in
 /-- The intended assignment is closed under the rules, so the least fixed point
 is contained in it. -/
-theorem gameAssign_closed :
+private theorem gameAssign_closed :
     ∀ c ∈ gameRules, ∀ a : SOAtom gameBlock 3, c.head = some a →
       ∀ v : Fin 3 → A, c.guard.Realize v →
         (∀ b ∈ c.body, b.Holds (gameAssign A) v) → a.Holds (gameAssign A) v := by
@@ -262,7 +263,7 @@ theorem gameAssign_closed :
 
 omit [Finite A] [Nonempty A] in
 /-- **Soundness**: everything the rules derive about `win` is winning. -/
-theorem winsOn_of_derives {t : Fin (gameBlock.arity GIx.win) → A}
+private theorem winsOn_of_derives {t : Fin (gameBlock.arity GIx.win) → A}
     (h : Derives (A := A) gameRules ⟨GIx.win, t⟩) : WinsOn A (t 0) :=
   lfpAssign_least_of_closed gameAssign_closed h
 
@@ -270,14 +271,14 @@ theorem winsOn_of_derives {t : Fin (gameBlock.arity GIx.win) → A}
 
 omit [Language.andOrGraph.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- The arguments of `allge x y` read out of the three variables. -/
-theorem allgeArgs₁ (x y w : A) :
+private theorem allgeArgs₁ (x y w : A) :
     (fun j => (![x, y, w] : Fin 3 → A) ((allgeAt 0 1).args j)) = ![x, y] := by
   funext j
   fin_cases j <;> rfl
 
 omit [Language.andOrGraph.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- The arguments of `allge x z` read out of the three variables. -/
-theorem allgeArgs₂ (x y w : A) :
+private theorem allgeArgs₂ (x y w : A) :
     (fun j => (![x, y, w] : Fin 3 → A) ((allgeAt 0 2).args j)) = ![x, w] := by
   funext j
   fin_cases j <;> rfl
@@ -285,7 +286,7 @@ theorem allgeArgs₂ (x y w : A) :
 omit [Nonempty A] in
 /-- The scan is derivable at every element, by a downward induction along the
 order: this is the universal body the third rule needs. -/
-theorem derives_allge {x : A} (hw : ∀ b : A, AGMove x b → Derives (A := A) gameRules
+private theorem derives_allge {x : A} (hw : ∀ b : A, AGMove x b → Derives (A := A) gameRules
       ⟨GIx.win, fun _ => b⟩) (y : A) :
     Derives (A := A) gameRules ⟨GIx.allge, ![x, y]⟩ := by
   classical
@@ -343,7 +344,7 @@ theorem derives_allge {x : A} (hw : ∀ b : A, AGMove x b → Derives (A := A) g
         exact ih
 
 /-- **Completeness**: every winning node is derived. -/
-theorem derives_of_winsOn {x : A} (h : WinsOn A x) :
+private theorem derives_of_winsOn {x : A} (h : WinsOn A x) :
     Derives (A := A) gameRules ⟨GIx.win, fun _ => x⟩ := by
   classical
   induction h with
@@ -387,7 +388,7 @@ theorem derives_of_winsOn {x : A} (h : WinsOn A x) :
 end Correct
 
 /-- **Reading the output**: some marked start is in the fixed point. -/
-theorem realize_gameOut {A : Type} [Language.andOrGraph.Structure A] [LinearOrder A]
+private theorem realize_gameOut {A : Type} [Language.andOrGraph.Structure A] [LinearOrder A]
     (ρ : gameBlock.Assignment A) :
     (@Sentence.Realize (agOrd.sum gameBlock.lang) A
         (@sumStructure _ _ A _ (gameBlock.structure ρ)) gameOut) ↔

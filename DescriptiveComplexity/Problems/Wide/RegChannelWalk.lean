@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannelEnum
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The opening's walk at the register channel
@@ -57,7 +58,7 @@ facts the opening asks of them.
 The one thing the instance has to bring is an element **above** the one the
 channel marks below the argument tags – any argument element will do – which is
 what makes the file's first register more than one step above the marker. -/
-theorem exists_openingWalkReg {botE : Univ A R' P' dt.KIx dt.dd}
+private theorem exists_openingWalkReg {botE : Univ A R' P' dt.KIx dt.dd}
     (hbotm : WMHasInp botE)
     (hleast : ∀ y : Univ A R' P' dt.KIx dt.dd, WMHasInp y → WMLe botE y)
     (habove : ∃ z : Univ A R' P' dt.KIx dt.dd, WMLt WMLe botE z) :

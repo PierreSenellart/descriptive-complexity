@@ -19,6 +19,7 @@ public import DescriptiveComplexity.Problems.ThreeColorability
 meta import DescriptiveComplexity.Problems.ThreeColorability
 public import Mathlib.Data.Finset.Sort
 meta import Mathlib.Data.Finset.Sort
+import all DescriptiveComplexity.Decoding
 
 /-!
 # Worked example: Boolean conjunctive queries – evaluation and containment
@@ -386,7 +387,7 @@ theorem CQHom.of_equiv (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A 
 
 /-- The homomorphism condition transports along an equivalence, iff
 version. -/
-theorem CQHom.equiv_iff (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A → Prop}
+private theorem CQHom.equiv_iff (u : A ≃ B) {VarA : A → Prop} {AtomA FactA : A → A → Prop}
     {VarB : B → Prop} {AtomB FactB : B → B → Prop}
     (hVar : ∀ a, VarA a ↔ VarB (u a))
     (hAtom : ∀ a a', AtomA a a' ↔ AtomB (u a) (u a'))
@@ -482,7 +483,7 @@ def queryDbStructure (q : List ((V ⊕ C) × (V ⊕ C))) (D : List (C × C)) :
 /-- The concrete assignment read off a structural valuation: the constant
 the valuation sends a variable to (or a default for the junk case of a
 variable mapped to a variable, possible only for variables in no atom). -/
-noncomputable def concreteVal [Nonempty C] (h : V ⊕ C → V ⊕ C) (x : V) : C :=
+private noncomputable def concreteVal [Nonempty C] (h : V ⊕ C → V ⊕ C) (x : V) : C :=
   match h (Sum.inl x) with
   | Sum.inr c => c
   | Sum.inl _ => Classical.arbitrary C
@@ -592,7 +593,7 @@ theorem cqEncoding_faithful : cqEncoding.Faithful ConcreteCQHolds CQEval := by
 /-- The worked two-fact instance of step 6, packaged: one variable,
 two constants, the query `∃ x, E(x, c₀) ∧ E(c₀, x)`, the database
 `{E(c₁, c₀), E(c₀, c₁)}`. -/
-def cqExample : CQInstance :=
+private def cqExample : CQInstance :=
   ⟨1, 1, {(Sum.inl 0, Sum.inr 0), (Sum.inr 0, Sum.inl 0)}, {(1, 0), (0, 1)}⟩
 
 /-- The packaged instance is a concrete yes-instance, witnessed by
@@ -665,7 +666,7 @@ The one condition the decoder needs. -/
 noncomputable def cqWFSentence : Language.queryDb.Sentence :=
   fo% ∃ x, ¬ qdbIsVar(x)
 
-theorem realize_cqWFSentence {A : Type} [Language.queryDb.Structure A] :
+private theorem realize_cqWFSentence {A : Type} [Language.queryDb.Structure A] :
     A ⊨ cqWFSentence ↔ ∃ x : A, ¬QVar x := by
   simp only [cqWFSentence, Sentence.Realize, Formula.realize_iExs, Formula.realize_not,
     Formula.realize_rel₁, Term.realize_var, Sum.elim_inr, QVar]
@@ -774,7 +775,7 @@ def cqCode {m : ℕ} (h : (cqConsts S).card = m + 1) :
         fun hv => ((mem_cqConsts S _).mp (Finset.coe_mem _)) ((mem_cqVars S _).mp hv)
       rw [dite_eq_right hb, Subtype.coe_eta, OrderIso.symm_apply_apply, fin_cast_cast']
 
-theorem cqCode_isLeft {m : ℕ} (h : (cqConsts S).card = m + 1) (x : Fin S.card) :
+private theorem cqCode_isLeft {m : ℕ} (h : (cqConsts S).card = m + 1) (x : Fin S.card) :
     QVar x ↔ ((cqCode S h) x).isLeft = true := by
   by_cases hx : x ∈ cqVars S
   · simp only [cqCode, Equiv.coe_fn_mk]
@@ -898,24 +899,24 @@ def cqImgFormula {α : Type} (x y : α) : cqSOLang.Formula α :=
 /-- First kernel conjunct: for all `x y u v`, if `E(x, y)` is an atom and
 `u`, `v` are possible images of `x`, `y`, then `E(u, v)` is a fact between
 two database elements. -/
-noncomputable def cqKernelAtoms : cqSOLang.Sentence :=
+private noncomputable def cqKernelAtoms : cqSOLang.Sentence :=
   fo% ∀ x y u v,
     cqAtomSym(x, y) ∧ (cqImgFormula⟨x, u⟩ ∧ cqImgFormula⟨y, v⟩) →
       (cqFactSym(u, v) ∧ ¬ cqIsVarSym(u)) ∧ ¬ cqIsVarSym(v)
 
 /-- Second kernel conjunct: every query variable has at least one
 `H`-image. -/
-noncomputable def cqKernelTotal : cqSOLang.Sentence :=
+private noncomputable def cqKernelTotal : cqSOLang.Sentence :=
   fo% ∀ x, cqIsVarSym(x) → ∃ u, cqHomSym(x, u)
 
 /-- The first-order kernel of the `Σ₁` definition of BCQ evaluation. -/
-noncomputable def cqKernel : cqSOLang.Sentence := cqKernelAtoms ⊓ cqKernelTotal
+private noncomputable def cqKernel : cqSOLang.Sentence := cqKernelAtoms ⊓ cqKernelTotal
 
 variable {A : Type} [Language.queryDb.Structure A]
 
 /-- Lean-level counterpart of `cqImgFormula` under an assignment `ρ` of the
 relation variable. -/
-def PossibleImage (ρ : cqHomBlock.Assignment A) (x u : A) : Prop :=
+private def PossibleImage (ρ : cqHomBlock.Assignment A) (x u : A) : Prop :=
   (QVar x ∧ ρ .hom ![x, u]) ∨ (¬QVar x ∧ x = u)
 
 /-- Realization of the kernel under an assignment of the guessed-valuation
@@ -966,7 +967,7 @@ private theorem realize_cqKernel (ρ : cqHomBlock.Assignment A) :
 /-- **BCQ evaluation is `Σ₁`-definable**: existentially quantify the graph of
 a valuation and check it first-order. Since NP is defined as
 `Σ₁`-definability, this is membership in NP. -/
-theorem cqEval_sigmaSODefinable : SigmaSODefinable 1 CQEval := by
+private theorem cqEval_sigmaSODefinable : SigmaSODefinable 1 CQEval := by
   refine ⟨[cqHomBlock], rfl, cqKernel, ?_⟩
   intro A _ _ _
   constructor
@@ -1103,13 +1104,13 @@ end Characterizations
 
 /-- The color carried by a database-side tag (junk value `0` on the
 query-side tag). -/
-def tagColor : ColEvalTag → Fin 3
+private def tagColor : ColEvalTag → Fin 3
   | .qvtx => 0
   | .color c => c
 
 /-- Correctness of the reduction: a graph is 3-colorable iff the canonical
 query holds in the interpreted database. -/
-theorem threeColorable_iff_map_queryHolds (V : Type) [Language.graph.Structure V] :
+private theorem threeColorable_iff_map_queryHolds (V : Type) [Language.graph.Structure V] :
     ThreeColorable V ↔ QueryHolds (threeColToCQEval.Map V) := by
   constructor
   · -- a proper coloring induces a valuation: send each vertex variable to a
@@ -1153,7 +1154,7 @@ theorem threeColorable_iff_map_queryHolds (V : Type) [Language.graph.Structure V
 
 /-- **3-colorability FO-reduces to BCQ evaluation** – the `fo_reduction`
 theorem for the hardness half. -/
-def threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval where
+private def threeCol_fo_reduction_cqEval : ThreeCol ≤ᶠᵒ CQEval where
   Tag := ColEvalTag
   dim := 1
   toInterpretation := threeColToCQEval
@@ -1203,7 +1204,7 @@ theorem cqEval_NP_complete : NP.Complete CQEval :=
 
 /-- The image of the hardness reduction is well-formed: interpreted instances
 always carry a constant (any database-side copy). -/
-theorem threeColToCQEval_wf (V : Type) [Language.graph.Structure V] [Nonempty V] :
+private theorem threeColToCQEval_wf (V : Type) [Language.graph.Structure V] [Nonempty V] :
     DecisionProblem.ofSentence cqWFSentence (threeColToCQEval.Map V) := by
   obtain ⟨v⟩ := ‹Nonempty V›
   refine realize_cqWFSentence.mpr ⟨(ColEvalTag.color 0, fun _ => v), ?_⟩
@@ -1507,7 +1508,7 @@ evaluation instance is a yes-instance. Both sides are homomorphism
 conditions (containment via the Chandra–Merlin theorem), and the proof
 translates homomorphisms back and forth across the routing of the
 interpretation. -/
-theorem queryContained_iff_map_queryHolds (A : Type) [Language.queryPair.Structure A] :
+private theorem queryContained_iff_map_queryHolds (A : Type) [Language.queryPair.Structure A] :
     QueryContained A ↔ QueryHolds (containmentToEval.Map A) := by
   rw [queryContained_iff_hom]
   constructor
@@ -1567,7 +1568,7 @@ theorem queryContained_iff_map_queryHolds (A : Type) [Language.queryPair.Structu
 /-- **BCQ containment FO-reduces to BCQ evaluation** – the Chandra–Merlin
 theorem, in reduction form: evaluate the right query in the canonical
 database of the left one. -/
-def cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval where
+private def cqContainment_fo_reduction_cqEval : CQContainment ≤ᶠᵒ CQEval where
   Tag := PairTag
   dim := 1
   toInterpretation := containmentToEval
@@ -1663,7 +1664,7 @@ private theorem etc_hfact : ∀ b b' : evalToContainment.Map A,
 
 /-- Correctness of `evalToContainment`: the query holds in the database iff
 the interpreted containment instance is a yes-instance. -/
-theorem queryHolds_iff_map_queryContained :
+private theorem queryHolds_iff_map_queryContained :
     QueryHolds A ↔ QueryContained (evalToContainment.Map A) := by
   rw [queryContained_iff_hom]
   exact (CQHom.equiv_iff (evalToContainment.mapEquivSelf A) (etc_hvar A) (etc_hatom A)
@@ -1673,7 +1674,7 @@ end Correctness
 
 /-- **BCQ evaluation FO-reduces to BCQ containment**: a database is a
 variable-free conjunctive query. -/
-def cqEval_fo_reduction_cqContainment : CQEval ≤ᶠᵒ CQContainment where
+private def cqEval_fo_reduction_cqContainment : CQEval ≤ᶠᵒ CQContainment where
   Tag := Unit
   dim := 1
   toInterpretation := evalToContainment

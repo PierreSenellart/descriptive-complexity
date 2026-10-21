@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Problems.Wide.Step
 public import DescriptiveComplexity.Problems.Machine.Program
 public import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Sweep
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # Roaming: what a wide machine may do between its phases
@@ -93,14 +99,16 @@ theorem wideRank_bot (h : IsLinOrd (WMLe (A := A))) : wideRank (fun _ : A => Fal
 
 /-- Rank increases by one along an increment, which is what makes a difference of
 ranks a step count. -/
-theorem wideRank_incr (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop} (hi : WMIncr WMLe s t) :
+private theorem wideRank_incr
+    (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop} (hi : WMIncr WMLe s t) :
     wideRank t = wideRank s + 1 :=
   bitRank_succPos (isLinOrd_wpLe h) ((succPos_wpLe_iff h s t).mpr hi)
 
 /-- Rank is monotone along the address order: a budget stated at one address
 covers every address below it, which is how a phase whose stopping cell is
 unknown is charged against a known ceiling. -/
-theorem wideRank_mono (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop} (hle : WMSetLe WMLe s t) :
+private theorem wideRank_mono
+    (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop} (hle : WMSetLe WMLe s t) :
     wideRank s ≤ wideRank t :=
   TMData.bitRank_le_of_le (M := wideData A) (isLinOrd_wpLe h) trivial hle
 
@@ -112,7 +120,7 @@ theorem wideRank_lt_card (s : A → Prop) :
   bitRank_lt_card (p := (Sum.inl s : WPoint A)) trivial
 
 /-- **The addresses are the subsets of the instance.** -/
-def wideAddrEquiv : {p : WPoint A // (wideData A).Posn p} ≃ (A → Prop) where
+private def wideAddrEquiv : {p : WPoint A // (wideData A).Posn p} ≃ (A → Prop) where
   toFun p :=
     match p with
     | ⟨Sum.inl s, _⟩ => s
@@ -148,7 +156,7 @@ size. -/
 
 omit [Language.wide.Structure A] in
 /-- **The addresses supported on a set of positions are its subsets.** -/
-theorem card_addr_supported (Q : A → Prop) :
+private theorem card_addr_supported (Q : A → Prop) :
     Nat.card {s : A → Prop // ∀ x, s x → Q x} = 2 ^ Nat.card {x : A // Q x} := by
   classical
   have := Fintype.ofFinite A
@@ -174,7 +182,7 @@ theorem card_addr_supported (Q : A → Prop) :
 address at or below `s` is empty off `Q`, then fewer than `2 ^ #Q` addresses lie
 below `s`, since they are distinct subsets of `Q` and `s` is one more. This is
 the bound a clocked phase is charged against. -/
-theorem wideRank_lt_two_pow_supported (h : IsLinOrd (WMLe (A := A))) {Q s : A → Prop}
+private theorem wideRank_lt_two_pow_supported (h : IsLinOrd (WMLe (A := A))) {Q s : A → Prop}
     (hclosed : ∀ t : A → Prop, WMSetLe WMLe t s → ∀ x, t x → Q x) :
     wideRank s < 2 ^ Nat.card {x : A // Q x} := by
   classical
@@ -204,7 +212,7 @@ omit [Language.wide.Structure A] [Finite A] in
 set of blocks are one per surviving block and per tuple, so their number is
 `k · m` – which is the shape the clock compares against
 (`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'`). -/
-theorem card_avoid_positions {T V : Type} [Finite T] [Finite V] (H : T → Prop) :
+private theorem card_avoid_positions {T V : Type} [Finite T] [Finite V] (H : T → Prop) :
     Nat.card {p : T × V // ¬H p.1} = Nat.card {τ : T // ¬H τ} * Nat.card V := by
   classical
   have e : {p : T × V // ¬H p.1} ≃ {τ : T // ¬H τ} × V :=
@@ -220,7 +228,7 @@ below `2 ^` the number of positions outside `H`. That is the region a clocked
 program works in – `DescriptiveComplexity.wmAvoids_of_wmSetLe` is why it is an
 initial stretch – and this is what every phase run inside it is charged
 against. -/
-theorem wideRank_lt_two_pow_avoids {T V : Type} [Finite T] [Finite V]
+private theorem wideRank_lt_two_pow_avoids {T V : Type} [Finite T] [Finite V]
     [Language.wide.Structure (T × V)] {LeT : T → T → Prop} {LeV : V → V → Prop}
     (hT : IsLinOrd LeT) (hV : IsLinOrd LeV)
     (hord : ∀ x y : T × V, WMLe x y ↔ lexRel LeT LeV x y)
@@ -460,7 +468,7 @@ variable {P : (A → Prop) → Prop} {qy qn : A}
 
 /-- **Leaving one address is arriving at the next**, which is what makes the two
 definitions one accumulator. -/
-theorem sweepStateAfter_succ (h : IsLinOrd (WMLe (A := A))) {w w' : A → Prop}
+private theorem sweepStateAfter_succ (h : IsLinOrd (WMLe (A := A))) {w w' : A → Prop}
     (hi : WMIncr WMLe w w') : sweepStateAfter P qy qn w = sweepState P qy qn w' := by
   have hiff : (∀ r : A → Prop, WMSetLe WMLe r w → P r) ↔
       ∀ r : A → Prop, WMSetLt WMLe r w' → P r :=
@@ -487,7 +495,7 @@ theorem sweepStateAfter_pos {w : A → Prop} (hall : ∀ r : A → Prop, WMSetLe
 
 omit [Finite A] in
 /-- **A sweep that saw a failure ends in the second state.** -/
-theorem sweepStateAfter_neg {w r : A → Prop} (hle : WMSetLe WMLe r w) (hP : ¬P r) :
+private theorem sweepStateAfter_neg {w r : A → Prop} (hle : WMSetLe WMLe r w) (hP : ¬P r) :
     sweepStateAfter P qy qn w = qn :=
   ite_eq_right fun hall => hP (hall r hle)
 
@@ -495,7 +503,7 @@ theorem sweepStateAfter_neg {w r : A → Prop} (hle : WMSetLe WMLe r w) (hP : ¬
 
 /-- An address whose increment is at or below a bound is strictly below it: the
 side condition a rightward scan step needs. -/
-theorem wmSetLt_of_wmIncr_le (h : IsLinOrd (WMLe (A := A))) {r r' t : A → Prop}
+private theorem wmSetLt_of_wmIncr_le (h : IsLinOrd (WMLe (A := A))) {r r' t : A → Prop}
     (hi : WMIncr WMLe r r') (hub : WMSetLe WMLe r' t) : WMSetLt WMLe r t := by
   have hlin := isLinOrd_wmSetLe h
   refine (wmSetLt_iff r t).mpr ⟨hlin.2.1 r r' t (wmSetLe_of_wmIncr hi) hub, fun hc => ?_⟩
@@ -503,7 +511,7 @@ theorem wmSetLt_of_wmIncr_le (h : IsLinOrd (WMLe (A := A))) {r r' t : A → Prop
 
 /-- An address at or below one whose increment is taken is strictly below that
 increment: the side condition a leftward scan step needs. -/
-theorem wmSetLt_of_le_wmIncr (h : IsLinOrd (WMLe (A := A))) {t r r' : A → Prop}
+private theorem wmSetLt_of_le_wmIncr (h : IsLinOrd (WMLe (A := A))) {t r r' : A → Prop}
     (hlb : WMSetLe WMLe t r) (hi : WMIncr WMLe r r') : WMSetLt WMLe t r' := by
   have hlin := isLinOrd_wmSetLe h
   refine (wmSetLt_iff t r').mpr ⟨hlin.2.1 t r r' hlb (wmSetLe_of_wmIncr hi), fun hc => ?_⟩
@@ -583,7 +591,7 @@ addresses those marks sit at. The budget is stated at the cell reached, and a
 caller that knows a ceiling for its marks charges the scan against that ceiling
 by `DescriptiveComplexity.wideRank_mono` and
 `DescriptiveComplexity.TMData.ReachesIn.mono`. -/
-theorem reachesIn_scanRight_least (h : IsLinOrd (WMLe (A := A))) {q : A}
+private theorem reachesIn_scanRight_least (h : IsLinOrd (WMLe (A := A))) {q : A}
     {tp : WPoint A → WPoint A} {Stop : (A → Prop) → Prop} {s : A → Prop}
     (hex : ∃ t, Stop t ∧ WMSetLe WMLe s t)
     (hstep : ∀ r : A → Prop, WMSetLe WMLe s r →
@@ -621,7 +629,7 @@ theorem reaches_scanRight_least (h : IsLinOrd (WMLe (A := A))) {q : A}
 
 /-- **A leftward scan arrives at the first cell that stops it**, the same reading
 downwards: the *greatest* stopping cell at or below `s`. -/
-theorem reachesIn_scanLeft_greatest (h : IsLinOrd (WMLe (A := A))) {q : A}
+private theorem reachesIn_scanLeft_greatest (h : IsLinOrd (WMLe (A := A))) {q : A}
     {tp : WPoint A → WPoint A} {Stop : (A → Prop) → Prop} {s : A → Prop}
     (hex : ∃ t, Stop t ∧ WMSetLe WMLe t s)
     (hstep : ∀ r : A → Prop, WMSetLe WMLe r s →

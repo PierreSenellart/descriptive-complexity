@@ -262,7 +262,7 @@ theorem piSODefinable_iff_compl [L.IsRelational] (k : ℕ) (P : DecisionProblem 
     exact (not_not.symm.trans (not_congr (hφ A))).trans hd.symm
 
 /-- A problem is `Σₖ`-definable iff its complement is `Πₖ`-definable. -/
-theorem sigmaSODefinable_iff_compl [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
+private theorem sigmaSODefinable_iff_compl [L.IsRelational] (k : ℕ) (P : DecisionProblem L) :
     SigmaSODefinable k P ↔ PiSODefinable k Pᶜ := by
   rw [piSODefinable_iff_compl, DecisionProblem.compl_compl]
 

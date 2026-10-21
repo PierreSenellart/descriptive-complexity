@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTable
 public import DescriptiveComplexity.Problems.Machine.DetRun
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # A guessing program, deterministic after its guess
@@ -107,7 +111,7 @@ rule's phase, so a phase outside every rule's source has no successor. This is
 what makes a *verdict* final: the accepting phase of a clocked program has no
 rules, so an accepting configuration is a dead end and the run that reached it
 is the whole run. -/
-theorem stuck_of_srcPh (hR : T.Reads) {Ph : P → Prop}
+private theorem stuck_of_srcPh (hR : T.Reads) {Ph : P → Prop}
     (hno : ∀ r : R, ¬Ph (T.srcPh r))
     {x : Config (WPoint (Univ A R P K dd))} {p : P} {f : Fin c → A}
     (hx : x.state = Sum.inr (stateElt T.zero p f)) (hp : Ph p) :

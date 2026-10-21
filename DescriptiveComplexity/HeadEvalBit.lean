@@ -9,6 +9,12 @@ public import DescriptiveComplexity.HeadBit
 public import DescriptiveComplexity.HeadEvalArith
 public import DescriptiveComplexity.LogTime.Simulate
 public import DescriptiveComplexity.HeadCaptureDet
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.HeadArith
+import all DescriptiveComplexity.HeadBit
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The bit-level logic is inside LOGSPACE
@@ -120,7 +126,7 @@ variable {y cnt cand w tmk a b mk : Fin K} {S d : ℕ}
 
 /-- The layout gives the bit fragment the head discipline it asks for, at any
 level the evaluator can reach. -/
-theorem bitHeads (hs : BitScratch y cnt cand w tmk a b mk S) {ih xh : Fin K}
+private theorem bitHeads (hs : BitScratch y cnt cand w tmk a b mk S) {ih xh : Fin K}
     (hih : (ih : ℕ) < d) (hxh : (xh : ℕ) < d) (hd : d ≤ S) :
     BitHeads ih xh y cnt cand w tmk a b mk d S (S + 5) where
   hih := hih
@@ -137,7 +143,7 @@ theorem bitHeads (hs : BitScratch y cnt cand w tmk a b mk S) {ih xh : Fin K}
   hmk := hs.hmk
 
 /-- The layout gives an addition the head discipline it asks for. -/
-theorem plusHeads (hs : BitScratch y cnt cand w tmk a b mk S) {i j k : Fin K}
+private theorem plusHeads (hs : BitScratch y cnt cand w tmk a b mk S) {i j k : Fin K}
     (hi : (i : ℕ) < d) (hj : (j : ℕ) < d) (hk : (k : ℕ) < d) (hd : d ≤ S) :
     PlusHeads i j k a b mk d where
   hi := hi
@@ -207,7 +213,7 @@ variable {y cnt cand w tmk a b mk : Fin K} {S : ℕ}
 
 omit [LinearOrder A] [Finite A] in
 /-- A property read off a fixed tuple of heads only sees those heads. -/
-theorem headLocal_of_heads {γ : Type} {d : ℕ} (hv : γ → Fin K) (hlow : ∀ v, (hv v : ℕ) < d)
+private theorem headLocal_of_heads {γ : Type} {d : ℕ} (hv : γ → Fin K) (hlow : ∀ v, (hv v : ℕ) < d)
     (R : (γ → A) → Prop) : HeadLocal d (fun x => R fun v => x (hv v)) := by
   intro x x' hxx
   change R (fun v => x (hv v)) ↔ R (fun v => x' (hv v))
@@ -215,7 +221,7 @@ theorem headLocal_of_heads {γ : Type} {d : ℕ} (hv : γ → Fin K) (hlow : ∀
 
 /-- **An atom is decided**: as a guard where it is the order or an input
 relation, by a fragment where it is the addition or the bit. -/
-theorem decides_bitAtomP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S + 8 ≤ K)
+private theorem decides_bitAtomP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S + 8 ≤ K)
     {γ : Type} {d : ℕ} (hv : γ → Fin K) (hlow : ∀ v, (hv v : ℕ) < d) (hd : d ≤ S)
     (at' : BitAtom L γ) :
     (bitAtomP y cnt cand w tmk a b mk hv at').Decides A d
@@ -238,7 +244,7 @@ theorem decides_bitAtomP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S + 
       ((BoundedFormula.IsAtomic.rel _ _).isQF)).congr fun x => Iff.rfl
 
 /-- **A kernel is decided**, by recursion on its Boolean structure. -/
-theorem decides_bitKernelP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S + 8 ≤ K)
+private theorem decides_bitKernelP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S + 8 ≤ K)
     {γ : Type} {d : ℕ} (hv : γ → Fin K) (hlow : ∀ v, (hv v : ℕ) < d) (hd : d ≤ S) :
     ∀ k : BitKernel L γ, (bitKernelP y cnt cand w tmk a b mk hv k).Decides A d
       (fun x => k.Holds fun v => x (hv v)) := by
@@ -272,7 +278,7 @@ theorem decides_bitKernelP (hs : BitScratch y cnt cand w tmk a b mk S) (hSK : S 
 
 /-- **A quantified register is decided**: universally by the sweep, existentially
 by its double negation. -/
-theorem decides_quantP {pol : Bool} {h hm : Fin K} {lvl : ℕ} (hh : (h : ℕ) = lvl)
+private theorem decides_quantP {pol : Bool} {h hm : Fin K} {lvl : ℕ} (hh : (h : ℕ) = lvl)
     (hhm : (hm : ℕ) = lvl + 1) {F : HeadProgram L K} {P : (Fin K → A) → Prop}
     (hF : F.Decides A (lvl + 2) P) (hP : HeadLocal (lvl + 1) P) :
     (quantP pol h hm F).Decides A lvl
@@ -299,7 +305,7 @@ theorem decides_quantP {pol : Bool} {h hm : Fin K} {lvl : ℕ} (hh : (h : ℕ) =
 
 omit [LinearOrder A] [Finite A] in
 /-- Reading a valuation off the registers, one variable per even head. -/
-theorem snoc_update {n : ℕ} {sh : ℕ → Fin K} (hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i)
+private theorem snoc_update {n : ℕ} {sh : ℕ → Fin K} (hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i)
     (hK : 2 * n + 1 < K) (x : Fin K → A) (v : A) :
     (fun j : Fin (n + 1) => (Function.update x (sh (2 * n)) v) (sh (2 * (j : ℕ)))) =
       Fin.snoc (fun j : Fin n => x (sh (2 * (j : ℕ)))) v := by
@@ -325,7 +331,7 @@ theorem snoc_update {n : ℕ} {sh : ℕ → Fin K} (hsh : ∀ i : ℕ, i < K →
 /-- **The prefix is decided**: nested sweeps, one per variable, innermost first –
 and what they decide depends on no head at all, the prefix binding every
 variable. -/
-theorem decides_prefixP {sh : ℕ → Fin K} (hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i) :
+private theorem decides_prefixP {sh : ℕ → Fin K} (hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i) :
     ∀ (n : ℕ) (pol : Fin n → Bool) (F : HeadProgram L K) (R : (Fin n → A) → Prop),
       2 * n ≤ K → F.Decides A (2 * n) (fun x => R fun j : Fin n => x (sh (2 * (j : ℕ)))) →
         (prefixP sh n pol F).Decides A 0 (fun _ => prefixHolds n pol R) := by

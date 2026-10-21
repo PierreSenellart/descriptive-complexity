@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawProg
 import DescriptiveComplexity.Problems.Machine.DetRun
+import all DescriptiveComplexity.Problems.Wide.DrawTable
 
 /-!
 # The accepting phase is a dead end
@@ -86,7 +87,7 @@ theorem srcPh_ne_acceptP (r : dt.RIx zero one hzo args) :
 transition whose source state is the machine's, and a transition's source state
 carries the source phase of its rule in its *tag* – so the case analysis is on
 the tag, not on the rules. -/
-theorem stuck_of_srcPh_ne
+private theorem stuck_of_srcPh_ne
     (hR : (dt.prog zero one hzo args hpl).table.Reads) {p : dt.PF}
     (hp : ∀ r : dt.RIx zero one hzo args,
       ((dt.prog zero one hzo args hpl).rules r).srcPh ≠ p)

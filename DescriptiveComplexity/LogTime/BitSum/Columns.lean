@@ -8,6 +8,10 @@ module
 import Mathlib.Algebra.BigOperators.Ring.Finset
 public import DescriptiveComplexity.LogTime.BitSum.Sum
 import Mathlib.Algebra.Group.Action.Defs
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitSum.Counter
+import all DescriptiveComplexity.LogTime.BitSum.Ones
+import all DescriptiveComplexity.LogTime.Bits
 
 /-!
 # The columns of a product, and the carry chain that adds one block of them
@@ -61,7 +65,7 @@ open Finset
 /-! ### Reading a bit as a number -/
 
 /-- **A bit, as the number it contributes**: the digit of `x` at `i`. -/
-theorem toNat_testBit (x i : ℕ) : (x.testBit i).toNat = x / 2 ^ i % 2 := by
+private theorem toNat_testBit (x i : ℕ) : (x.testBit i).toNat = x / 2 ^ i % 2 := by
   have hlt : x / 2 ^ i % 2 < 2 := Nat.mod_lt _ (by norm_num)
   rw [Nat.testBit_eq_decide_div_mod_eq]
   by_cases h1 : x / 2 ^ i % 2 = 1
@@ -71,7 +75,7 @@ theorem toNat_testBit (x i : ℕ) : (x.testBit i).toNat = x / 2 ^ i % 2 := by
 
 /-- **One more bit of a remainder**: the next binary digit, in the form the
 carry chain steps through. -/
-theorem mod_two_pow_succ (x k : ℕ) :
+private theorem mod_two_pow_succ (x k : ℕ) :
     x % 2 ^ (k + 1) = x % 2 ^ k + (x.testBit k).toNat * 2 ^ k := by
   have h := Nat.mod_pow_succ (x := x) (b := 2) (k := k)
   have hc : 2 ^ k * (x / 2 ^ k % 2) = (x / 2 ^ k % 2) * 2 ^ k := Nat.mul_comm _ _
@@ -79,7 +83,7 @@ theorem mod_two_pow_succ (x k : ℕ) :
   omega
 
 /-- **A number is the sum of its bits**, below any width that bounds it. -/
-theorem mod_two_pow_eq_sum (x : ℕ) : ∀ m : ℕ,
+private theorem mod_two_pow_eq_sum (x : ℕ) : ∀ m : ℕ,
     x % 2 ^ m = ∑ i ∈ range m, (x.testBit i).toNat * 2 ^ i := by
   intro m
   induction m with
@@ -87,14 +91,14 @@ theorem mod_two_pow_eq_sum (x : ℕ) : ∀ m : ℕ,
   | succ m ih => rw [mod_two_pow_succ, sum_range_succ, ih]
 
 /-- The same, for a number known to fit. -/
-theorem eq_sum_testBit {x m : ℕ} (hx : x < 2 ^ m) :
+private theorem eq_sum_testBit {x m : ℕ} (hx : x < 2 ^ m) :
     x = ∑ i ∈ range m, (x.testBit i).toNat * 2 ^ i :=
   (Nat.mod_eq_of_lt hx).symm.trans (mod_two_pow_eq_sum x m)
 
 /-- **A number with no high bits is small**: the converse of
 `Nat.testBit_lt_two_pow`, which the guessed elements' vanishing conditions are
 read through. -/
-theorem lt_two_pow_of_high_bits {v k : ℕ} (h : ∀ i, k ≤ i → v.testBit i = false) :
+private theorem lt_two_pow_of_high_bits {v k : ℕ} (h : ∀ i, k ≤ i → v.testBit i = false) :
     v < 2 ^ k := by
   have hmod : v % 2 ^ k = v := Nat.eq_of_testBit_eq fun i => by
     rw [Nat.testBit_mod_two_pow]
@@ -105,7 +109,7 @@ theorem lt_two_pow_of_high_bits {v k : ℕ} (h : ∀ i, k ≤ i → v.testBit i 
   exact Nat.mod_lt _ (Nat.two_pow_pos _)
 
 /-- **A number with no low bits is a shifted quotient.** -/
-theorem eq_two_pow_mul_div {x b : ℕ} (hlow : ∀ i, i < b → x.testBit i = false) :
+private theorem eq_two_pow_mul_div {x b : ℕ} (hlow : ∀ i, i < b → x.testBit i = false) :
     x = 2 ^ b * (x / 2 ^ b) := by
   have hmod : x % 2 ^ b = 0 := by
     rw [mod_two_pow_eq_sum]
@@ -117,7 +121,7 @@ theorem eq_two_pow_mul_div {x b : ℕ} (hlow : ∀ i, i < b → x.testBit i = fa
 
 /-- **A number whose bits are another's, shifted, is that number shifted**: the
 identity that reads a certificate's tail element as `2 ^ b` times its value. -/
-theorem eq_two_pow_mul_of_testBit {x t b : ℕ} (hlow : ∀ i, i < b → x.testBit i = false)
+private theorem eq_two_pow_mul_of_testBit {x t b : ℕ} (hlow : ∀ i, i < b → x.testBit i = false)
     (hbits : ∀ k, x.testBit (b + k) = t.testBit k) : x = 2 ^ b * t := by
   rw [eq_two_pow_mul_div hlow]
   congr 1
@@ -136,7 +140,7 @@ def intervalSum (h : ℕ → ℕ) (a m : ℕ) : ℕ := ∑ t ∈ range m, h (a +
   simp [intervalSum]
 
 /-- One more column on top. -/
-theorem intervalSum_succ (h : ℕ → ℕ) (a m : ℕ) :
+private theorem intervalSum_succ (h : ℕ → ℕ) (a m : ℕ) :
     intervalSum h a (m + 1) = intervalSum h a m + h (a + m) * 2 ^ m :=
   sum_range_succ _ _
 
@@ -155,7 +159,7 @@ theorem intervalSum_append (h : ℕ → ℕ) (a m m' : ℕ) :
     ring
 
 /-- **The sum of a range fits** just above the widest column. -/
-theorem intervalSum_lt {h : ℕ → ℕ} {a m H : ℕ} (hH : 0 < H)
+private theorem intervalSum_lt {h : ℕ → ℕ} {a m H : ℕ} (hH : 0 < H)
     (hb : ∀ t, t < m → h (a + t) < H) : intervalSum h a m < H * 2 ^ m := by
   induction m with
   | zero => simpa using hH
@@ -182,7 +186,7 @@ unwritten position. The certificate stores these, one field per column. -/
 def carryChain (h : ℕ → ℕ) (a t : ℕ) : ℕ := intervalSum h a (t + 1) / 2 ^ (t + 1)
 
 /-- **The remainders stay small**: below any bound on the columns. -/
-theorem carryChain_lt {h : ℕ → ℕ} {a t H : ℕ} (hH : 0 < H)
+private theorem carryChain_lt {h : ℕ → ℕ} {a t H : ℕ} (hH : 0 < H)
     (hb : ∀ u, u < t + 1 → h (a + u) < H) : carryChain h a t < H :=
   (Nat.div_lt_iff_lt_mul (Nat.two_pow_pos _)).mpr (intervalSum_lt hH hb)
 
@@ -306,7 +310,7 @@ noncomputable def colWordN (x y j : ℕ) : ℕ :=
   y &&& bitsVal (fun i => decide (i ≤ j) && x.testBit (j - i)) (j + 1)
 
 /-- What the bits of a column word are. -/
-theorem testBit_colWordN (x y j i : ℕ) :
+private theorem testBit_colWordN (x y j i : ℕ) :
     (colWordN x y j).testBit i = (y.testBit i && (decide (i ≤ j) && x.testBit (j - i))) := by
   rw [colWordN, Nat.testBit_land]
   rcases Nat.lt_or_ge i (j + 1) with hi | hi
@@ -319,14 +323,14 @@ theorem testBit_colWordN (x y j i : ℕ) :
     simp
 
 /-- A column word is a sub-mask of `y`. -/
-theorem colWordN_le (x y j : ℕ) : colWordN x y j ≤ y := Nat.and_le_left
+private theorem colWordN_le (x y j : ℕ) : colWordN x y j ≤ y := Nat.and_le_left
 
 /-- **The count of one column**: the number of ones of its word among the
 first `P` positions. -/
 noncomputable def colCountN (x y P j : ℕ) : ℕ := onesBelow (colWordN x y j) P
 
 /-- A column has no more ones than there are positions. -/
-theorem colCountN_le (x y P j : ℕ) : colCountN x y P j ≤ P := onesBelow_le _ _
+private theorem colCountN_le (x y P j : ℕ) : colCountN x y P j ≤ P := onesBelow_le _ _
 
 /-- **The product is the weighted sum of its column counts** – the schoolbook
 multiplication, columns grouped by weight, under the one condition that no pair

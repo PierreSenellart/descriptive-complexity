@@ -8,6 +8,11 @@ module
 public import DescriptiveComplexity.LogTime.Arith
 public import DescriptiveComplexity.LogTime.BitLogic
 import DescriptiveComplexity.LogTime.Simulate
+import all DescriptiveComplexity.LogTime.Arith
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Machine
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The lower fence: a bit-level prenex logic, compiled into machines
@@ -103,14 +108,14 @@ namespace BitAtom
 variable {L : Language.{0, 0}} {m : ℕ}
 
 /-- The base test an atom compiles to. -/
-def compile : BitAtom L (Fin m) → BaseTest L m
+private def compile : BitAtom L (Fin m) → BaseTest L m
   | .le x y => .sweep (leSweep.relabel ![x, y])
   | .plus x y z => .sweep (plusSweep.relabel ![x, y, z])
   | .bit i x => .bit i x
   | .rel R arg => .query R arg
 
 /-- **The compilation of an atom is correct.** -/
-theorem holds_compile {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
+private theorem holds_compile {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
     (a : BitAtom L (Fin m)) (v : Fin m → A) : a.compile.Holds v ↔ a.Holds v := by
   cases a with
   | le x y =>
@@ -136,7 +141,7 @@ variable {L : Language.{0, 0}} {m : ℕ}
 
 /-- The base test a kernel compiles to: the Boolean structure is carried over
 unchanged. -/
-def compile : BitKernel L (Fin m) → BaseTest L m
+private def compile : BitKernel L (Fin m) → BaseTest L m
   | .atom a => a.compile
   | .tt => .sweep (trueSweep.relabel Fin.elim0)
   | .not k => .not k.compile
@@ -144,7 +149,7 @@ def compile : BitKernel L (Fin m) → BaseTest L m
   | .or k k' => .or k.compile k'.compile
 
 /-- **The compilation of a kernel is correct.** -/
-theorem holds_compile {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
+private theorem holds_compile {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
     (k : BitKernel L (Fin m)) (v : Fin m → A) : k.compile.Holds v ↔ k.Holds v := by
   induction k with
   | atom a => exact a.holds_compile v
@@ -162,14 +167,14 @@ namespace BitSentence
 variable {L : Language.{0, 0}}
 
 /-- The machine a sentence compiles to: the prefix *is* the register list. -/
-def compile (φ : BitSentence L) : LTMachine L where
+private def compile (φ : BitSentence L) : LTMachine L where
   regs := φ.vars
   pol := φ.pol
   base := φ.kernel.compile
 
 /-- **The compilation of a sentence is correct**: the machine accepts exactly
 the instances the sentence holds of. -/
-theorem accepts_compile (φ : BitSentence L) (A : Type) [L.Structure A] [LinearOrder A]
+private theorem accepts_compile (φ : BitSentence L) (A : Type) [L.Structure A] [LinearOrder A]
     [Finite A] : φ.compile.Accepts A ↔ φ.Holds A :=
   prefixHolds_congr φ.vars φ.pol fun v => φ.kernel.holds_compile v
 
@@ -188,7 +193,7 @@ section Carry
 variable {A : Type} [LinearOrder A] [Finite A]
 
 /-- The order of the elements is the order of their ranks. -/
-theorem lt_iff_orank_lt {i i' : A} : i < i' ↔ orank i < orank i' := by
+private theorem lt_iff_orank_lt {i i' : A} : i < i' ↔ orank i < orank i' := by
   refine ⟨orank_lt_orank, fun h => lt_of_not_ge fun hc => ?_⟩
   exact absurd (orank_le_iff.mpr hc) (by omega)
 
@@ -199,7 +204,7 @@ def CarryAt (x y i : A) : Prop :=
     ∀ k : A, j < k → k < i → (BitIx k x ∨ BitIx k y)
 
 /-- The carry into a position is the arithmetic carry at its index. -/
-theorem carryAt_iff (x y i : A) :
+private theorem carryAt_iff (x y i : A) :
     CarryAt x y i ↔ 2 ^ orank i ≤ orank x % 2 ^ orank i + orank y % 2 ^ orank i := by
   rw [carry_iff_lookahead]
   constructor
@@ -292,7 +297,7 @@ variable {L : Language.{0, 0}} {α : Type}
 
 /-- The carry into a bound index, bit-definably: three variables, `j` guessed
 and `k` universal, and nothing but the order to bound them. -/
-theorem bitDef_carryAt (x y : α) :
+private theorem bitDef_carryAt (x y : α) :
     BitDef (L := L) (α := α ⊕ Fin 1) fun _ _ _ _ _ u =>
       CarryAt (u (Sum.inl x)) (u (Sum.inl y)) (u (Sum.inr 0)) := by
   have hr : BitDef (L := L) (α := ((α ⊕ Fin 1) ⊕ Fin 1) ⊕ Fin 1)

@@ -146,7 +146,7 @@ variable {subEntry : Fin nv → PM} {ownM : PM → SM}
 
 /-- **Every spine rule fires from a phase its site owns**; the
 sub-machineries' obligation is the parameter. -/
-theorem evalHosrc
+private theorem evalHosrc
     (hosrcM : ∀ (s : SM) (ρ : ShM s),
       ∃ p : PM, (ruleM s ρ).srcPh = .evalP (.sub p) ∧ ownM p = s) :
     ∀ (e : EvalSite nv SM) (ρ : EvalSh nv SM ShM e),
@@ -171,7 +171,7 @@ theorem evalHosrc
 /-- **The spine separates in-shape**: per checkpoint, the walk's guard is
 disjoint from the dispatches' and the two dispatches split on the `ltp`
 mark; the sub-machineries' separation is the parameter. -/
-theorem evalSep
+private theorem evalSep
     (hsepM : ∀ (s : SM) (ρ ρ' : ShM s) (f : Q → A) (g : dt.SlotIx → A),
       (ruleM s ρ).guard f g → (ruleM s ρ').guard f g →
       (ruleM s ρ).srcPh = (ruleM s ρ').srcPh → ρ = ρ') :

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.OrderWalk
 public import Mathlib.Algebra.BigOperators.Finprod
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Binary numbers as sets of positions, and sweeps along an order
@@ -49,9 +50,10 @@ def Carry (M N i : ℕ) : Prop :=
   ∃ k, k < i ∧ M.testBit k = true ∧ N.testBit k = true ∧
     ∀ l, k < l → l < i → M.testBit l = true ∨ N.testBit l = true
 
-theorem carry_zero (M N : ℕ) : ¬Carry M N 0 := fun ⟨_, hk, _⟩ => absurd hk (Nat.not_lt_zero _)
+private theorem carry_zero
+    (M N : ℕ) : ¬Carry M N 0 := fun ⟨_, hk, _⟩ => absurd hk (Nat.not_lt_zero _)
 
-theorem carry_succ (M N i : ℕ) :
+private theorem carry_succ (M N i : ℕ) :
     Carry M N (i + 1) ↔ (M.testBit i = true ∧ N.testBit i = true) ∨
       ((M.testBit i = true ∨ N.testBit i = true) ∧ Carry M N i) := by
   constructor
@@ -68,7 +70,7 @@ theorem carry_succ (M N i : ℕ) :
       · exact hi
 
 /-- The carry, arithmetically: the low parts of the two numbers overflow. -/
-theorem carry_iff (M N i : ℕ) : Carry M N i ↔ 2 ^ i ≤ M % 2 ^ i + N % 2 ^ i := by
+private theorem carry_iff (M N i : ℕ) : Carry M N i ↔ 2 ^ i ≤ M % 2 ^ i + N % 2 ^ i := by
   induction i with
   | zero =>
     refine iff_of_false (carry_zero M N) ?_
@@ -113,11 +115,11 @@ the rank of its digit. -/
 def bitsOf (N : ℕ) (p : P) : Prop :=
   N.testBit (orank p) = true
 
-theorem bitsOf_zero (p : P) : ¬bitsOf 0 p := by
+private theorem bitsOf_zero (p : P) : ¬bitsOf 0 p := by
   simp [bitsOf]
 
 /-- The choice between a number and zero. -/
-theorem bitsOf_ite (c : Prop) [Decidable c] (N : ℕ) (p : P) :
+private theorem bitsOf_ite (c : Prop) [Decidable c] (N : ℕ) (p : P) :
     bitsOf (if c then N else 0) p ↔ c ∧ bitsOf N p := by
   split_ifs with h
   · exact (and_iff_right h).symm
@@ -125,16 +127,16 @@ theorem bitsOf_ite (c : Prop) [Decidable c] (N : ℕ) (p : P) :
 
 variable [Finite P]
 
-theorem orank_lt_iff {x y : P} : orank x < orank y ↔ x < y := by
+private theorem orank_lt_iff {x y : P} : orank x < orank y ↔ x < y := by
   rw [← not_le, ← not_le, orank_le_iff]
 
 /-- An element that is not least has an immediate predecessor. -/
-theorem exists_covBy_of_not_min {z : P} (hz : ¬∀ a : P, z ≤ a) : ∃ w : P, w ⋖ z := by
+private theorem exists_covBy_of_not_min {z : P} (hz : ¬∀ a : P, z ≤ a) : ∃ w : P, w ⋖ z := by
   obtain ⟨w, hw, hnb⟩ := exists_succ_of_not_min hz
   exact ⟨w, hw, fun a h1 h2 => hnb a ⟨h1, h2⟩⟩
 
 /-- The number one: its only digit is at the least position. -/
-theorem bitsOf_one (p : P) : bitsOf 1 p ↔ ∀ a : P, p ≤ a := by
+private theorem bitsOf_one (p : P) : bitsOf 1 p ↔ ∀ a : P, p ≤ a := by
   rw [bitsOf, Nat.testBit_one_eq_true_iff_self_eq_zero]
   constructor
   · intro h a
@@ -143,7 +145,7 @@ theorem bitsOf_one (p : P) : bitsOf 1 p ↔ ∀ a : P, p ≤ a := by
   · exact orank_eq_zero
 
 /-- **Addition**, by carry lookahead over the positions. -/
-theorem bitsOf_add (M N : ℕ) (p : P) :
+private theorem bitsOf_add (M N : ℕ) (p : P) :
     bitsOf (M + N) p ↔ Xor (Xor (bitsOf M p) (bitsOf N p))
       (∃ q, q < p ∧ bitsOf M q ∧ bitsOf N q ∧ ∀ r, q < r → r < p → bitsOf M r ∨ bitsOf N r) := by
   rw [bitsOf, testBit_add_iff]
@@ -159,7 +161,7 @@ theorem bitsOf_add (M N : ℕ) (p : P) :
     exact hall r (orank_lt_iff.mp hl) (orank_lt_iff.mp hlp)
 
 /-- **Doubling**: a shift by one position. -/
-theorem bitsOf_two_mul (N : ℕ) (p : P) : bitsOf (2 * N) p ↔ ∃ q, q ⋖ p ∧ bitsOf N q := by
+private theorem bitsOf_two_mul (N : ℕ) (p : P) : bitsOf (2 * N) p ↔ ∃ q, q ⋖ p ∧ bitsOf N q := by
   constructor
   · intro h
     by_cases hp : ∀ a : P, p ≤ a
@@ -201,7 +203,7 @@ open Classical in
 noncomputable def prodBefore (f : I → ℕ) (u : I) : ℕ :=
   ∏ᶠ u' : I, if u' < u then f u' else 1
 
-theorem sumUpTo_bot (f : I → ℕ) {u : I} (hu : ∀ c, u ≤ c) : sumUpTo f u = f u := by
+private theorem sumUpTo_bot (f : I → ℕ) {u : I} (hu : ∀ c, u ≤ c) : sumUpTo f u = f u := by
   classical
   let := Fintype.ofFinite I
   rw [sumUpTo, finsum_eq_sum_of_fintype, ← Finset.sum_filter]
@@ -211,7 +213,7 @@ theorem sumUpTo_bot (f : I → ℕ) {u : I} (hu : ∀ c, u ≤ c) : sumUpTo f u 
     exact ⟨fun h => le_antisymm h (hu u'), fun h => h ▸ le_rfl⟩
   rw [this, Finset.sum_singleton]
 
-theorem sumUpTo_covBy (f : I → ℕ) {u₀ u : I} (h : u₀ ⋖ u) :
+private theorem sumUpTo_covBy (f : I → ℕ) {u₀ u : I} (h : u₀ ⋖ u) :
     sumUpTo f u = sumUpTo f u₀ + f u := by
   classical
   let := Fintype.ofFinite I
@@ -245,7 +247,7 @@ theorem prodBefore_bot (f : I → ℕ) {u : I} (hu : ∀ c, u ≤ c) : prodBefor
   rw [prodBefore]
   exact (finprod_congr fun u' => ite_eq_right (not_lt.mpr (hu u'))).trans finprod_one
 
-theorem prodBefore_covBy (f : I → ℕ) {u₀ u : I} (h : u₀ ⋖ u) :
+private theorem prodBefore_covBy (f : I → ℕ) {u₀ u : I} (h : u₀ ⋖ u) :
     prodBefore f u = prodBefore f u₀ * f u₀ := by
   classical
   let := Fintype.ofFinite I
@@ -266,7 +268,7 @@ theorem prodBefore_covBy (f : I → ℕ) {u₀ u : I} (h : u₀ ⋖ u) :
   rw [this, Finset.prod_insert, mul_comm]
   simp only [Finset.mem_filter, Finset.mem_univ, true_and, lt_self_iff_false, not_false_eq_true]
 
-theorem prodBefore_top_mul (f : I → ℕ) {u : I} (hu : ∀ c, c ≤ u) :
+private theorem prodBefore_top_mul (f : I → ℕ) {u : I} (hu : ∀ c, c ≤ u) :
     prodBefore f u * f u = ∏ᶠ u' : I, f u' := by
   classical
   let := Fintype.ofFinite I
@@ -286,7 +288,7 @@ end Prefix
 
 /-- A number below `2 ^ c` is the sum of the place values of its first `c`
 digits. -/
-theorem sum_range_testBit (N c : ℕ) :
+private theorem sum_range_testBit (N c : ℕ) :
     ∑ i ∈ Finset.range c, (if N.testBit i = true then 2 ^ i else 0) = N % 2 ^ c := by
   induction c with
   | zero => simp [Nat.mod_one]
@@ -301,7 +303,7 @@ variable {P : Type} [LinearOrder P] [Finite P]
 open Classical in
 /-- **A number with fewer digits than there are positions is the sum of the
 place values of the positions of its digits `1`.** -/
-theorem finsum_bitsOf {N : ℕ} (hN : N < 2 ^ Nat.card P) :
+private theorem finsum_bitsOf {N : ℕ} (hN : N < 2 ^ Nat.card P) :
     ∑ᶠ p : P, (if bitsOf N p then 2 ^ orank p else 0) = N := by
   let := Fintype.ofFinite P
   have hbij : Function.Bijective (fun p : P => (⟨orank p, orank_lt_card p⟩ : Fin (Nat.card P))) :=
@@ -320,7 +322,7 @@ end ReadBack
 
 /-- **The rank in a lexicographic product**: the rank of the head, times the
 size of the tail order, plus the rank of the tail. -/
-theorem orank_prodLex {J B : Type} [LinearOrder J] [LinearOrder B] [Finite J] [Finite B]
+private theorem orank_prodLex {J B : Type} [LinearOrder J] [LinearOrder B] [Finite J] [Finite B]
     (a : J) (b : B) :
     orank (toLex (a, b)) = orank a * Nat.card B + orank b := by
   have hset : (ofLex '' {q : J ×ₗ B | q < toLex (a, b)}) =

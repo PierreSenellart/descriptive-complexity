@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Permanent.Minor
 public import Mathlib.Data.Fintype.Sum
 public import Mathlib.Tactic.Ring
 public import Mathlib.Algebra.BigOperators.Ring.Finset
+import all DescriptiveComplexity.Permanent.Basic
+import all DescriptiveComplexity.Permanent.Minor
 
 /-!
 # Attaching a gadget to a matrix
@@ -73,7 +75,8 @@ theorem mem_withGadget (A : Finset V) (w : V ⊕ X) :
 
 /-- The rows left when the gadget rows and those in `A` are deleted are the
 base rows outside `A`. -/
-def notWithGadgetEquiv (A : Finset V) : {w // w ∉ withGadget (X := X) A} ≃ {a // a ∉ A} where
+private def notWithGadgetEquiv
+    (A : Finset V) : {w // w ∉ withGadget (X := X) A} ≃ {a // a ∉ A} where
   toFun w :=
     match w with
     | ⟨Sum.inl a, h⟩ => ⟨a, fun ha => h ((mem_withGadget A _).mpr (Or.inl ⟨a, ha, rfl⟩))⟩
@@ -91,7 +94,7 @@ def notWithGadgetEquiv (A : Finset V) : {w // w ∉ withGadget (X := X) A} ≃ {
 
 /-- Deleting all the gadget rows and columns leaves a minor of the base
 matrix. -/
-theorem pdel_attach_withGadget (A B : Finset V) :
+private theorem pdel_attach_withGadget (A B : Finset V) :
     pdel (attach M₀ D ins outs) (withGadget A) (withGadget B) = pdel M₀ A B := by
   unfold pdel
   refine (bperm_reindex (notWithGadgetEquiv A) (notWithGadgetEquiv B) _).symm.trans ?_
@@ -116,7 +119,7 @@ theorem card_gadgetRows (O : Finset X) :
 
 omit [Fintype V] in
 /-- The gadget rows outside `O`, as elements of `X`. -/
-def gadgetRowsEquiv (O : Finset X) : gadgetRows (V := V) O ≃ {x // x ∉ O} where
+private def gadgetRowsEquiv (O : Finset X) : gadgetRows (V := V) O ≃ {x // x ∉ O} where
   toFun w :=
     match w with
     | ⟨Sum.inl _, h⟩ => absurd ((mem_gadgetRows O _).mp h) (by simp)
@@ -133,7 +136,7 @@ def gadgetRowsEquiv (O : Finset X) : gadgetRows (V := V) O ≃ {x // x ∉ O} wh
 
 omit [Fintype V] in
 /-- A block of the gadget, read as a minor of `D`. -/
-theorem bperm_gadgetRows (O Y : Finset X) (S : Finset (V ⊕ X))
+private theorem bperm_gadgetRows (O Y : Finset X) (S : Finset (V ⊕ X))
     (hS : ∀ w, w ∈ S ↔ ∃ y, w = Sum.inr y ∧ y ∉ Y) :
     bperm (fun (x : gadgetRows (V := V) O) (y : S) => attach M₀ D ins outs x y) = pdel D O Y := by
   have hSe : S = gadgetRows Y := Finset.ext fun w => (hS w).trans (mem_gadgetRows Y w).symm
@@ -143,7 +146,7 @@ theorem bperm_gadgetRows (O Y : Finset X) (S : Finset (V ⊕ X))
   rfl
 
 /-- A sum over the rows of the attached matrix outside the base rows `A`. -/
-theorem sum_compl_map_inl (A : Finset V) (f : V ⊕ X → R) :
+private theorem sum_compl_map_inl (A : Finset V) (f : V ⊕ X → R) :
     ∑ w ∈ (A.map Function.Embedding.inl)ᶜ, f w = ∑ a ∈ Aᶜ, f (Sum.inl a) + ∑ x, f (Sum.inr x) := by
   rw [← Finset.sum_disjSum]
   refine Finset.sum_congr (Finset.ext fun w => ?_) fun _ _ => rfl
@@ -162,7 +165,7 @@ theorem gadgetRows_subset (O : Finset X) : gadgetRows (V := V) O ⊆ gadgetRows 
 
 /-- Deleting all the gadget rows and columns, in whichever presentation,
 leaves a minor of the base matrix. -/
-theorem pdel_attach_of_mem (A B : Finset V) (A' B' : Finset (V ⊕ X))
+private theorem pdel_attach_of_mem (A B : Finset V) (A' B' : Finset (V ⊕ X))
     (hA : ∀ w, w ∈ A' ↔ (∃ a ∈ A, w = Sum.inl a) ∨ ∃ x, w = Sum.inr x)
     (hB : ∀ w, w ∈ B' ↔ (∃ b ∈ B, w = Sum.inl b) ∨ ∃ x, w = Sum.inr x) :
     pdel (attach M₀ D ins outs) A' B' = pdel M₀ A B := by
@@ -208,14 +211,14 @@ theorem attachXor_inl_inr (a : V) (x : X) :
 
 omit [Fintype V] [Fintype X] in
 /-- An out-edge to a deleted column vanishes. -/
-theorem attachXor_inr_inl_eq_zero {B : Finset V} (hv : v ∈ B) (hv' : v' ∈ B) (x : X) {b : V}
+private theorem attachXor_inr_inl_eq_zero {B : Finset V} (hv : v ∈ B) (hv' : v' ∈ B) (x : X) {b : V}
     (hb : b ∉ B) : attachXor M₀ D u u' v v' xin xin' o o' (Sum.inr x) (Sum.inl b) = 0 := by
   rw [attachXor_inr_inl, ite_eq_right fun (h : x = o ∧ b = v) => hb (h.2 ▸ hv),
     ite_eq_right fun (h : x = o' ∧ b = v') => hb (h.2 ▸ hv'), add_zero]
 
 omit [Fintype V] [Fintype X] in
 /-- An in-edge to a column that is no in-port vanishes. -/
-theorem attachXor_inl_inr_eq_zero (a : V) {x : X} (hx : x ≠ xin) (hx' : x ≠ xin') :
+private theorem attachXor_inl_inr_eq_zero (a : V) {x : X} (hx : x ≠ xin) (hx' : x ≠ xin') :
     attachXor M₀ D u u' v v' xin xin' o o' (Sum.inl a) (Sum.inr x) = 0 := by
   rw [attachXor_inl_inr, ite_eq_right fun (h : a = u ∧ x = xin) => hx h.2,
     ite_eq_right fun (h : a = u' ∧ x = xin') => hx' h.2, add_zero]
@@ -252,7 +255,7 @@ theorem attachXor_u'_xin' :
 omit [Fintype V] in
 /-- The deleted rows after a base row `a` reaches a gadget column: all the
 gadget rows, and the base rows in `insert a A`. -/
-theorem mem_insert_inl_union_gadgetRows (A : Finset V) (a : V) (o₀ : X) (w : V ⊕ X) :
+private theorem mem_insert_inl_union_gadgetRows (A : Finset V) (a : V) (o₀ : X) (w : V ⊕ X) :
     w ∈ insert (Sum.inl a) (insert (Sum.inr o₀) (A.map Function.Embedding.inl) ∪
         gadgetRows (V := V) {o₀}) ↔
       (∃ a' ∈ insert a A, w = Sum.inl a') ∨ ∃ x, w = Sum.inr x := by
@@ -269,7 +272,7 @@ theorem mem_insert_inl_union_gadgetRows (A : Finset V) (a : V) (o₀ : X) (w : V
 omit [Fintype V] in
 /-- The deleted columns after the in-port `x` has been reached: all the gadget
 columns, and the base columns in `B`. -/
-theorem mem_insert_inr_union_gadgetRows (B : Finset V) (x : X) (w : V ⊕ X) :
+private theorem mem_insert_inr_union_gadgetRows (B : Finset V) (x : X) (w : V ⊕ X) :
     w ∈ insert (Sum.inr x) (B.map Function.Embedding.inl ∪ gadgetRows (V := V) {x}) ↔
       (∃ b ∈ B, w = Sum.inl b) ∨ ∃ y, w = Sum.inr y := by
   cases w with
@@ -285,7 +288,7 @@ theorem mem_insert_inr_union_gadgetRows (B : Finset V) (x : X) (w : V ⊕ X) :
 omit [Fintype V] in
 /-- The support condition of the gadget rows, once the out-columns are
 deleted. -/
-theorem attachXor_support {B : Finset V} (hv : v ∈ B) (hv' : v' ∈ B) (O : Finset X) :
+private theorem attachXor_support {B : Finset V} (hv : v ∈ B) (hv' : v' ∈ B) (O : Finset X) :
     ∀ w ∈ gadgetRows (V := V) O, ∀ b, b ∉ B.map Function.Embedding.inl → b ∉ gadgetRows ∅ →
       attachXor M₀ D u u' v v' xin xin' o o' w b = 0 := by
   intro w hw b hb hb'
@@ -298,7 +301,7 @@ theorem attachXor_support {B : Finset V} (hv : v ∈ B) (hv' : v' ∈ B) (O : Fi
 
 /-- **No gadget row deleted**: with the out-columns deleted, the gadget is a
 block of its own. -/
-theorem pdel_attachXor_block (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) :
+private theorem pdel_attachXor_block (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) :
     pdel (attachXor M₀ D u u' v v' xin xin' o o') (A.map Function.Embedding.inl)
       (B.map Function.Embedding.inl) = pdel D ∅ ∅ * pdel M₀ A B := by
   rw [pdel_block _ _ _ (gadgetRows ∅) (gadgetRows ∅)
@@ -337,7 +340,7 @@ theorem card_gadgetRows_empty : (gadgetRows (V := V) (∅ : Finset X)).card = Fi
 
 omit [Fintype V] [DecidableEq V] in
 /-- A set of gadget rows missing the row `inr x` lies outside `x`. -/
-theorem subset_gadgetRows_singleton {S : Finset (V ⊕ X)} (hS : S ⊆ gadgetRows ∅) {x : X}
+private theorem subset_gadgetRows_singleton {S : Finset (V ⊕ X)} (hS : S ⊆ gadgetRows ∅) {x : X}
     (hx : Sum.inr x ∉ S) : S ⊆ gadgetRows {x} := by
   intro w hw
   obtain ⟨y, rfl, -⟩ := (mem_gadgetRows ∅ w).mp (hS hw)
@@ -346,7 +349,7 @@ theorem subset_gadgetRows_singleton {S : Finset (V ⊕ X)} (hS : S ⊆ gadgetRow
 omit [Fintype V] [DecidableEq V] in
 /-- Among the sets of gadget rows of size one less than all, one not missing
 two given rows is determined by the one row it misses. -/
-theorem exists_notMem_of_ne {S : Finset (V ⊕ X)} (hS : S ⊆ gadgetRows ∅)
+private theorem exists_notMem_of_ne {S : Finset (V ⊕ X)} (hS : S ⊆ gadgetRows ∅)
     (hcard : S.card = Fintype.card X - 1) {x x' : X} (h : S ≠ gadgetRows {x})
     (h' : S ≠ gadgetRows {x'}) : ∃ z, Sum.inr z ∉ S ∧ z ≠ x ∧ z ≠ x' := by
   have : Nonempty X := ⟨x⟩
@@ -366,7 +369,7 @@ theorem exists_notMem_of_ne {S : Finset (V ⊕ X)} (hS : S ⊆ gadgetRows ∅)
 omit [Fintype V] [DecidableEq V] in
 /-- Among the sets of gadget rows of size two less than all, one that is not
 the set outside `{x, x'}` misses some other row. -/
-theorem exists_notMem_of_ne_pair {S : Finset (V ⊕ X)} (_hS : S ⊆ gadgetRows ∅)
+private theorem exists_notMem_of_ne_pair {S : Finset (V ⊕ X)} (_hS : S ⊆ gadgetRows ∅)
     (hcard : S.card = Fintype.card X - 2) {x x' : X} (hxx' : x ≠ x')
     (h : S ≠ gadgetRows {x, x'}) : ∃ z, Sum.inr z ∉ S ∧ z ≠ x ∧ z ≠ x' := by
   by_contra hcon
@@ -382,7 +385,8 @@ theorem exists_notMem_of_ne_pair {S : Finset (V ⊕ X)} (_hS : S ⊆ gadgetRows 
 omit [Fintype V] [Fintype X] [DecidableEq V] [DecidableEq X] in
 /-- The rows outside a set of deleted rows that contains every gadget row are
 base rows. -/
-theorem eq_inl_of_notMem {C : Finset (V ⊕ X)} (hC : ∀ x, Sum.inr x ∈ C) {w : V ⊕ X} (hw : w ∉ C) :
+private theorem eq_inl_of_notMem
+    {C : Finset (V ⊕ X)} (hC : ∀ x, Sum.inr x ∈ C) {w : V ⊕ X} (hw : w ∉ C) :
     ∃ a, w = Sum.inl a := by
   cases w with
   | inl a => exact ⟨a, rfl⟩
@@ -392,7 +396,7 @@ include hxx' in
 /-- **One gadget row deleted**, the out-columns deleted: the row's out-port
 has left, and some in-port is entered from outside – from `u` through `xin`
 or from `u'` through `xin'`. -/
-theorem pdel_attachXor_one (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) (o₀ : X) :
+private theorem pdel_attachXor_one (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) (o₀ : X) :
     pdel (attachXor M₀ D u u' v v' xin xin' o o')
       (insert (Sum.inr o₀) (A.map Function.Embedding.inl))
       (B.map Function.Embedding.inl) =
@@ -526,7 +530,7 @@ theorem mem_insert_inr_inr_union_gadgetRows (B : Finset V) (x x' : X) (w : V ⊕
 include hxx' in
 /-- **Both gadget rows `o`, `o'` deleted**, the out-columns deleted: both
 in-ports are entered from outside. -/
-theorem pdel_attachXor_two (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) (hoo' : o ≠ o')
+private theorem pdel_attachXor_two (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) (hoo' : o ≠ o')
     (huu' : u ≠ u') :
     pdel (attachXor M₀ D u u' v v' xin xin' o o')
       (insert (Sum.inr o) (insert (Sum.inr o') (A.map Function.Embedding.inl)))
@@ -627,7 +631,7 @@ theorem pdel_attachXor_two (A B : Finset V) (hv : v ∈ B) (hv' : v' ∈ B) (hoo
 
 /-- A sum over the rows outside a deleted set made of base rows and gadget
 rows. -/
-theorem sum_compl_of_mem (C : Finset (V ⊕ X)) (A : Finset V) (O : Finset X)
+private theorem sum_compl_of_mem (C : Finset (V ⊕ X)) (A : Finset V) (O : Finset X)
     (hC : ∀ w, w ∈ C ↔ (∃ a ∈ A, w = Sum.inl a) ∨ ∃ x ∈ O, w = Sum.inr x) (f : V ⊕ X → R) :
     ∑ w ∈ Cᶜ, f w = ∑ a ∈ Aᶜ, f (Sum.inl a) + ∑ x ∈ Oᶜ, f (Sum.inr x) := by
   rw [← Finset.sum_disjSum]
@@ -637,7 +641,7 @@ theorem sum_compl_of_mem (C : Finset (V ⊕ X)) (A : Finset V) (O : Finset X)
 
 /-- The sum over the rows outside `A` of a term vanishing at `u` is the sum
 over the rows outside `insert u A`. -/
-theorem sum_ite_insert (A : Finset V) {u : V} (hu : u ∉ A) (g : V → R) :
+private theorem sum_ite_insert (A : Finset V) {u : V} (hu : u ∉ A) (g : V → R) :
     ∑ a ∈ Aᶜ, (if u ∈ insert a A then 0 else g a) = ∑ a ∈ (insert u A)ᶜ, g a := by
   rw [Finset.compl_insert, ← Finset.sum_erase_add _ _ (mem_compl.mpr hu),
     ite_eq_left (mem_insert_self u A), add_zero]
@@ -655,7 +659,7 @@ theorem insert_inl_map (a : V) (A : Finset V) :
 
 /-- The expansion of a base minor along a column, with the row entering
 excluded by the condition of the pattern. -/
-theorem sum_expand_ite (A B' : Finset V) {u b : V} (hb : b ∉ B') (P : R) :
+private theorem sum_expand_ite (A B' : Finset V) {u b : V} (hb : b ∉ B') (P : R) :
     ∑ a ∈ Aᶜ, M₀ a b * (P * (if u ∈ insert a A then 0
       else pdel M₀ (insert u (insert a A)) (insert b B'))) =
       P * (if u ∈ A then 0 else pdel M₀ (insert u A) B') := by

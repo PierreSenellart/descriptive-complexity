@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.OneInSat.Slots
 import DescriptiveComplexity.Problems.ThreeSat.Defs
 public import DescriptiveComplexity.Problems.OneInSat.Defs
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.OneInSat.Slots
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # 3SAT ordered-FO-reduces to 1-in-SAT
@@ -157,7 +161,7 @@ variable {A : Type}
 /-- The point of tag `t` over the element `x`. -/
 def pt (t : OITag) (x : A) : oiInterp.Map A := (t, fun _ => x)
 
-theorem pt_eq_iff {t t' : OITag} {x x' : A} : pt t x = pt t' x' ↔ t = t' ∧ x = x' := by
+private theorem pt_eq_iff {t t' : OITag} {x x' : A} : pt t x = pt t' x' ↔ t = t' ∧ x = x' := by
   constructor
   · intro h
     exact ⟨by simpa [pt] using congrArg (fun p : oiInterp.Map A => p.1) h,
@@ -165,10 +169,10 @@ theorem pt_eq_iff {t t' : OITag} {x x' : A} : pt t x = pt t' x' ↔ t = t' ∧ x
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem pt_eta {t : OITag} {w : Fin 1 → A} : ((t, w) : oiInterp.Map A) = pt t (w 0) :=
+private theorem pt_eta {t : OITag} {w : Fin 1 → A} : ((t, w) : oiInterp.Map A) = pt t (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
-theorem pt_surj (q : oiInterp.Map A) : ∃ t x, q = pt t x :=
+private theorem pt_surj (q : oiInterp.Map A) : ∃ t x, q = pt t x :=
   ⟨q.1, q.2 0, pt_eta⟩
 
 end Points
@@ -198,14 +202,14 @@ private theorem realize_linkLitF {t₁ t₂ : OITag} {s : Bool} {v : Fin 2 × Fi
     exact ⟨i, by rw [ite_eq_left h]; exact realize_nthF.mpr hn⟩
 
 /-- The clauses of the gadget. -/
-theorem isCl_pt (t : OITag) (x : A) :
+private theorem isCl_pt (t : OITag) (x : A) :
     IsCl (pt t x) ↔ (clauseTag t = true ∧ IsCl x) ∨ ThreeSatToSat.Wide A := by
   rw [IsCl, pt, FOInterpretation.relMap_map]
   cases h : clauseTag t <;>
     simp [oiInterp, isClauseF, h, IsCl]
 
 /-- The positive literals of the gadget. -/
-theorem posIn_pt (t₁ t₂ : OITag) (x y : A) :
+private theorem posIn_pt (t₁ t₂ : OITag) (x y : A) :
     PosIn (pt t₁ x) (pt t₂ y) ↔ ¬ThreeSatToSat.Wide A ∧
       ((posPair t₁ t₂ = true ∧ x = y) ∨
         ∃ i, (t₁ = .link i ∧ t₂ = .var) ∧ NthOcc i x y true) := by
@@ -216,7 +220,7 @@ theorem posIn_pt (t₁ t₂ : OITag) (x y : A) :
   exact ⟨fun h => ⟨h.2, h.1⟩, fun h => ⟨h.2, h.1⟩⟩
 
 /-- The negative literals of the gadget. -/
-theorem negIn_pt (t₁ t₂ : OITag) (x y : A) :
+private theorem negIn_pt (t₁ t₂ : OITag) (x y : A) :
     NegIn (pt t₁ x) (pt t₂ y) ↔ ¬ThreeSatToSat.Wide A ∧
       ((negPair t₁ t₂ = true ∧ x = y) ∨
         ∃ i, (t₁ = .link i ∧ t₂ = .var) ∧ NthOcc i x y false) := by
@@ -237,7 +241,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 /-- Every literal of a gadget clause is either prescribed by the pair of tags,
 on the same element, or is the copy of the `i`-th literal of the clause of a
 link clause. -/
-theorem occIn_pt_cases {tc : OITag} {c : A} {q : oiInterp.Map A} {u : Bool}
+private theorem occIn_pt_cases {tc : OITag} {c : A} {q : oiInterp.Map A} {u : Bool}
     (h : OccIn (pt tc c) q u) :
     (∃ t, (if u then posPair tc t else negPair tc t) = true ∧ q = pt t c) ∨
       ∃ i y, tc = .link i ∧ NthOcc i c y u ∧ q = pt .var y := by
@@ -255,24 +259,24 @@ theorem occIn_pt_cases {tc : OITag} {c : A} {q : oiInterp.Map A} {u : Bool}
     · exact Or.inr ⟨i, y, hi, hn, rfl⟩
 
 /-- The link and gadget clauses of a clause of the input are clauses. -/
-theorem isCl_gadget {t : OITag} {c : A} (ht : clauseTag t = true)
+private theorem isCl_gadget {t : OITag} {c : A} (ht : clauseTag t = true)
     (hc : IsCl c) : IsCl (pt t c) :=
   (isCl_pt t c).mpr (Or.inl ⟨ht, hc⟩)
 
 /-- A same-element positive literal of a gadget clause. -/
-theorem occIn_same_pos {t₁ t₂ : OITag} {c : A} (hw : ¬ThreeSatToSat.Wide A)
+private theorem occIn_same_pos {t₁ t₂ : OITag} {c : A} (hw : ¬ThreeSatToSat.Wide A)
     (ht : clauseTag t₁ = true) (hc : IsCl c) (hp : posPair t₁ t₂ = true) :
     OccIn (pt t₁ c) (pt t₂ c) true :=
   ⟨isCl_gadget ht hc, (posIn_pt _ _ _ _).mpr ⟨hw, Or.inl ⟨hp, rfl⟩⟩⟩
 
 /-- A same-element negative literal of a gadget clause. -/
-theorem occIn_same_neg {t₁ t₂ : OITag} {c : A} (hw : ¬ThreeSatToSat.Wide A)
+private theorem occIn_same_neg {t₁ t₂ : OITag} {c : A} (hw : ¬ThreeSatToSat.Wide A)
     (ht : clauseTag t₁ = true) (hc : IsCl c) (hp : negPair t₁ t₂ = true) :
     OccIn (pt t₁ c) (pt t₂ c) false :=
   ⟨isCl_gadget ht hc, (negIn_pt _ _ _ _).mpr ⟨hw, Or.inl ⟨hp, rfl⟩⟩⟩
 
 /-- The literal of a link clause coming from the occurrence it links. -/
-theorem occIn_link_lit {i : Ix3} {c x : A} {s : Bool} (hw : ¬ThreeSatToSat.Wide A)
+private theorem occIn_link_lit {i : Ix3} {c x : A} {s : Bool} (hw : ¬ThreeSatToSat.Wide A)
     (hc : IsCl c) (hn : NthOcc i c x s) : OccIn (pt (.link i) c) (pt .var x) s := by
   refine ⟨isCl_gadget rfl hc, ?_⟩
   cases s with
@@ -320,7 +324,7 @@ def oiAssign (ν : A → Prop) (p : oiInterp.Map A) : Prop :=
     oiAssign ν (pt (.fresh .g) c) ↔
       (SlotVal ν .one c ∨ SlotVal ν .two c) ∧ SlotVal ν .three c := Iff.rfl
 
-theorem litTrue_var (ν : A → Prop) (x : A) (s : Bool) :
+private theorem litTrue_var (ν : A → Prop) (x : A) (s : Bool) :
     LitTrue (oiAssign ν) (pt .var x) s ↔ LitTrue ν x s := by
   cases s <;> simp [LitTrue]
 
@@ -330,44 +334,45 @@ end Assignment
 
 section TagFacts
 
-theorem posPair_link (i : Ix3) (t : OITag) : posPair (.link i) t = false := by
+private theorem posPair_link (i : Ix3) (t : OITag) : posPair (.link i) t = false := by
   revert i t
   decide
 
-theorem negPair_link_iff (i : Ix3) (t : OITag) : negPair (.link i) t = true ↔ t = .slot i := by
+private theorem negPair_link_iff
+    (i : Ix3) (t : OITag) : negPair (.link i) t = true ↔ t = .slot i := by
   revert i t
   decide
 
-theorem posPair_piece_one (t : OITag) :
+private theorem posPair_piece_one (t : OITag) :
     posPair (.piece .one) t = true ↔ t = .fresh .d ∨ t = .fresh .e := by
   revert t
   decide
 
-theorem negPair_piece_one (t : OITag) :
+private theorem negPair_piece_one (t : OITag) :
     negPair (.piece .one) t = true ↔ t = .slot .one := by
   revert t
   decide
 
-theorem posPair_piece_two (t : OITag) :
+private theorem posPair_piece_two (t : OITag) :
     posPair (.piece .two) t = true ↔ t = .slot .two ∨ t = .fresh .e ∨ t = .fresh .f := by
   revert t
   decide
 
-theorem negPair_piece_two (t : OITag) : negPair (.piece .two) t = false := by
+private theorem negPair_piece_two (t : OITag) : negPair (.piece .two) t = false := by
   revert t
   decide
 
-theorem posPair_piece_three (t : OITag) :
+private theorem posPair_piece_three (t : OITag) :
     posPair (.piece .three) t = true ↔ t = .fresh .f ∨ t = .fresh .g := by
   revert t
   decide
 
-theorem negPair_piece_three (t : OITag) :
+private theorem negPair_piece_three (t : OITag) :
     negPair (.piece .three) t = true ↔ t = .slot .three := by
   revert t
   decide
 
-theorem clauseTag_cases {t : OITag} (h : clauseTag t = true) :
+private theorem clauseTag_cases {t : OITag} (h : clauseTag t = true) :
     (∃ i, t = .link i) ∨ ∃ i, t = .piece i := by
   revert t
   decide
@@ -396,7 +401,7 @@ private theorem oneIn_of_three {M : Type} [Language.sat.Structure M] {μ : M →
 
 omit [Finite A] in
 /-- The literals of the `i`-th link clause of `c`. -/
-theorem enum_link {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
+private theorem enum_link {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
     (h : OccIn (pt (.link i) c) y u) :
     (y = pt (.slot i) c ∧ u = false) ∨ ∃ x s, NthOcc i c x s ∧ y = pt .var x ∧ u = s := by
   rcases occIn_pt_cases h with ⟨t, ht, rfl⟩ | ⟨j, x, hj, hn, rfl⟩
@@ -410,7 +415,7 @@ theorem enum_link {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
 
 omit [Finite A] in
 /-- The literals of the `i`-th gadget clause of `c`. -/
-theorem enum_piece {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
+private theorem enum_piece {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
     (h : OccIn (pt (.piece i) c) y u) :
     ∃ t, (if u then posPair (.piece i) t else negPair (.piece i) t) = true ∧ y = pt t c := by
   rcases occIn_pt_cases h with ⟨t, ht, rfl⟩ | ⟨j, x, hj, -, -⟩
@@ -418,7 +423,7 @@ theorem enum_piece {i : Ix3} {c : A} {y : oiInterp.Map A} {u : Bool}
   · exact absurd hj (by simp)
 
 /-- **The gadget of a satisfiable input is exactly-one satisfiable.** -/
-theorem oneInProper_oiAssign (hw : ¬ThreeSatToSat.Wide A) (hwidth : WidthAtMostThree A)
+private theorem oneInProper_oiAssign (hw : ¬ThreeSatToSat.Wide A) (hwidth : WidthAtMostThree A)
     {ν : A → Prop} (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s) :
     OneInProper (oiAssign ν) := by
   intro P hP
@@ -578,7 +583,7 @@ theorem litTrue_var_gen {μ : oiInterp.Map A → Prop} (x : A) (s : Bool) :
 omit [Finite A] in
 /-- **A gadget that is exactly-one satisfiable comes from a satisfiable
 input.** -/
-theorem satisfiable_of_oneInProper (hw : ¬ThreeSatToSat.Wide A)
+private theorem satisfiable_of_oneInProper (hw : ¬ThreeSatToSat.Wide A)
     {μ : oiInterp.Map A → Prop} (hμ : OneInProper μ) (c : A) (hc : IsCl c) :
     ∃ x s, OccIn c x s ∧ LitTrue (fun z => μ (pt .var z)) x s := by
   -- the slots carry the values of the literals they link
@@ -661,7 +666,7 @@ theorem satisfiable_of_oneInProper (hw : ¬ThreeSatToSat.Wide A)
 
 /-- Correctness of the reduction: a CNF structure is a yes-instance of 3SAT
 iff its gadget is exactly-one satisfiable. -/
-theorem threeSatisfiable_iff_oneInSatisfiable_map :
+private theorem threeSatisfiable_iff_oneInSatisfiable_map :
     ThreeSatisfiable A ↔ OneInSatisfiable (oiInterp.Map A) := by
   by_cases hw : ThreeSatToSat.Wide A
   · -- on a wide input every element is a clause, and none has a literal
@@ -691,7 +696,7 @@ theorem threeSatisfiable_iff_oneInSatisfiable_map :
 end Correctness
 
 /-- **3SAT ordered-FO-reduces to 1-in-SAT**: the three-slot gadget. -/
-noncomputable def threeSat_ordered_fo_reduction_oneInSat : ThreeSAT ≤ᶠᵒ[≤] OneInSAT where
+private noncomputable def threeSat_ordered_fo_reduction_oneInSat : ThreeSAT ≤ᶠᵒ[≤] OneInSAT where
   Tag := OITag
   dim := 1
   toInterpretation := oiInterp

@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Counting.Digits.SetArith
 public import DescriptiveComplexity.FixedPointStratify
+import all DescriptiveComplexity.FixedPointStep
 
 /-!
 # Towers of inductions: first-order strata and sweep strata
@@ -51,14 +52,14 @@ section Tuples
 variable {A : Type} {a q ℓ : ℕ}
 
 /-- Parameters, then an index. -/
-def j2 (w : Fin a → A) (i : Fin q → A) : Fin (a + q) → A :=
+private def j2 (w : Fin a → A) (i : Fin q → A) : Fin (a + q) → A :=
   Fin.append w i
 
 /-- Parameters, then an index, then a position. -/
 def j3 (w : Fin a → A) (i : Fin q → A) (p : Fin ℓ → A) : Fin (a + q + ℓ) → A :=
   Fin.append (Fin.append w i) p
 
-theorem exists_j2 (x : Fin (a + q) → A) : ∃ w i, x = j2 (a := a) (q := q) w i :=
+private theorem exists_j2 (x : Fin (a + q) → A) : ∃ w i, x = j2 (a := a) (q := q) w i :=
   ⟨fun k => x (Fin.castAdd q k), fun k => x (Fin.natAdd a k),
     (Fin.append_castAdd_natAdd (f := x)).symm⟩
 
@@ -72,16 +73,16 @@ arguments of a relation. -/
 def g3 : (Fin a ⊕ Fin q) ⊕ Fin ℓ → Fin (a + q + ℓ) :=
   Sum.elim (Fin.castAdd ℓ ∘ g2) (Fin.natAdd (a + q))
 
-theorem j2_comp_g2 (w : Fin a → A) (i : Fin q → A) : j2 w i ∘ g2 = Sum.elim w i := by
+private theorem j2_comp_g2 (w : Fin a → A) (i : Fin q → A) : j2 w i ∘ g2 = Sum.elim w i := by
   funext x
   rcases x with k | k <;> simp [j2, g2]
 
-theorem j3_comp_g3 (w : Fin a → A) (i : Fin q → A) (p : Fin ℓ → A) :
+private theorem j3_comp_g3 (w : Fin a → A) (i : Fin q → A) (p : Fin ℓ → A) :
     j3 w i p ∘ g3 = Sum.elim (Sum.elim w i) p := by
   funext x
   rcases x with (k | k) | k <;> simp [j3, g3, g2]
 
-theorem comp_append {γ : Type} (v : γ → A) (s : Fin a → γ) (t : Fin q → γ) :
+private theorem comp_append {γ : Type} (v : γ → A) (s : Fin a → γ) (t : Fin q → γ) :
     (fun k => v (Fin.append s t k)) = Fin.append (v ∘ s) (v ∘ t) := by
   funext k
   refine Fin.addCases (fun k => ?_) (fun k => ?_) k <;> simp
@@ -161,7 +162,7 @@ def rowAt (ws : Fin a → γ) (is : Fin q → γ) (ps : Fin ℓ → γ) :
 
 variable {A : Type} [M.Structure A]
 
-theorem realize_doneAt (ρ : (sweepBlock a q ℓ).Assignment A) (ws : Fin a → γ)
+private theorem realize_doneAt (ρ : (sweepBlock a q ℓ).Assignment A) (ws : Fin a → γ)
     (is : Fin q → γ) (v : γ → A) :
     (@Formula.Realize _ A ((sweepBlock a q ℓ).structure₁ (L := M) ρ) _ (doneAt ℓ ws is) v) ↔
       ρ false (j2 (v ∘ ws) (v ∘ is)) := by
@@ -169,7 +170,7 @@ theorem realize_doneAt (ρ : (sweepBlock a q ℓ).Assignment A) (ws : Fin a → 
   rw [doneAt, Formula.realize_rel]
   exact iff_of_eq (congrArg (ρ false) (comp_append v ws is))
 
-theorem realize_rowAt (ρ : (sweepBlock a q ℓ).Assignment A) (ws : Fin a → γ)
+private theorem realize_rowAt (ρ : (sweepBlock a q ℓ).Assignment A) (ws : Fin a → γ)
     (is : Fin q → γ) (ps : Fin ℓ → γ) (v : γ → A) :
     (@Formula.Realize _ A ((sweepBlock a q ℓ).structure₁ (L := M) ρ) _ (rowAt ws is ps) v) ↔
       ρ true (j3 (v ∘ ws) (v ∘ is) (v ∘ ps)) := by
@@ -190,7 +191,7 @@ noncomputable def readyF (bot : M.Formula (Fin q)) (cov : M.Formula (Fin q ⊕ F
           (M.sum (sweepBlock a q ℓ).lang).Formula ((Fin a ⊕ Fin q) ⊕ Fin q)) ⊓
         doneAt ℓ (Sum.inl ∘ Sum.inl) Sum.inr)
 
-theorem realize_readyF (ρ : (sweepBlock a q ℓ).Assignment A) (bot : M.Formula (Fin q))
+private theorem realize_readyF (ρ : (sweepBlock a q ℓ).Assignment A) (bot : M.Formula (Fin q))
     (cov : M.Formula (Fin q ⊕ Fin q)) (w : Fin a → A) (i : Fin q → A) :
     (@Formula.Realize _ A ((sweepBlock a q ℓ).structure₁ (L := M) ρ) _ (readyF ℓ bot cov)
         (Sum.elim w i)) ↔
@@ -332,7 +333,7 @@ def refl (e : StepDef (K.sum Language.order)) : e.Ext e where
   limit := fun _ _ _ _ => rfl
 
 /-- Extensions compose. -/
-def trans (x : e.Ext e') (y : e'.Ext e'') : e.Ext e'' where
+private def trans (x : e.Ext e') (y : e'.Ext e'') : e.Ext e'' where
   emb := y.emb ∘ x.emb
   arity_emb := fun i => (y.arity_emb (x.emb i)).trans (x.arity_emb i)
   limit := fun A _ _ _ => by
@@ -370,7 +371,7 @@ theorem StepDef.Computes.ext {e e' : StepDef (K.sum Language.order)} {r : ℕ}
 /-- **The relations of a new stratum**, in the stratified induction: their
 limits are those of the stratum, over the structure expanded by the limit of
 the induction below. -/
-theorem StepDef.inflLimit_stratify_inr (e : StepDef (K.sum Language.order))
+private theorem StepDef.inflLimit_stratify_inr (e : StepDef (K.sum Language.order))
     (d : StepDef ((K.sum Language.order).sum e.B.lang)) (A : Type) [K.Structure A]
     [LinearOrder A] [Finite A] (i : d.B.ι) (x : Fin (d.B.arity i) → A) :
     (e.stratify d).inflLimit A (.inr i) x ↔

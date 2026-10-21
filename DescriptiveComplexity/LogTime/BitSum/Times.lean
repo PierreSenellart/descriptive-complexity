@@ -9,6 +9,16 @@ public import DescriptiveComplexity.LogTime.BitSum.Columns
 public import DescriptiveComplexity.LogTime.BitSum.Level1
 import DescriptiveComplexity.LogTime.Small
 import DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitSum.Columns
+import all DescriptiveComplexity.LogTime.BitSum.Counter
+import all DescriptiveComplexity.LogTime.BitSum.Level1
+import all DescriptiveComplexity.LogTime.BitSum.Sizes
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.LogTime.Small
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # `TIMES` from `BSUM`: multiplication of ranks, in the bit logic
@@ -59,7 +69,7 @@ namespace BitSum
 /-- **The carry chains fit on the tape**: a chain has at most `4 · lvl1Block`
 fields (a block, or the tail, which is at most two blocks and change) of
 `lvl1Block` bits each, and that is far below the top position. -/
-theorem chain_room {P : ℕ} (hP : 2 ^ 20 ≤ P) :
+private theorem chain_room {P : ℕ} (hP : 2 ^ 20 ≤ P) :
     lvl1Block P * (4 * lvl1Block P + 2) + 2 < P := by
   set s := Nat.size P with hsdef
   have hs : 21 ≤ s := Nat.lt_size.mpr hP
@@ -78,7 +88,7 @@ theorem chain_room {P : ℕ} (hP : 2 ^ 20 ≤ P) :
 
 /-- **Two positions' worth of sums fit in the universe**: what lets the local
 additions of a carry chain always name their result. -/
-theorem two_posCount_lt_card {A : Type} [LinearOrder A] [Finite A] [Nonempty A]
+private theorem two_posCount_lt_card {A : Type} [LinearOrder A] [Finite A] [Nonempty A]
     (hP : 2 ^ 20 ≤ posCount A) : 2 * posCount A < Nat.card A := by
   set P := posCount A with hPdef
   set s := Nat.size P with hsdef
@@ -97,7 +107,7 @@ theorem two_posCount_lt_card {A : Type} [LinearOrder A] [Finite A] [Nonempty A]
   omega
 
 /-- **The universe is not bigger than its positions can address.** -/
-theorem card_le_two_pow_posCount {A : Type} [LinearOrder A] [Finite A] :
+private theorem card_le_two_pow_posCount {A : Type} [LinearOrder A] [Finite A] :
     Nat.card A ≤ 2 ^ posCount A := by
   by_contra hc
   have h1 : 2 ^ posCount A < Nat.card A := by omega
@@ -117,7 +127,7 @@ def ColWord (x y j w : A) : Prop :=
 
 /-- **What the column word is worth**: exactly
 `DescriptiveComplexity.BitSum.colWordN` of the ranks. -/
-theorem colWord_iff {x y j w : A} :
+private theorem colWord_iff {x y j w : A} :
     ColWord x y j w ↔ orank w = colWordN (orank x) (orank y) (orank j) := by
   have : Nonempty A := ⟨w⟩
   have hylt : ∀ k, Nat.card A ≤ k → (orank y).testBit k = false := fun k hk =>
@@ -162,7 +172,7 @@ theorem colWord_iff {x y j w : A} :
       exact ⟨hy, by omega, by rw [show orank j - orank i = orank d by omega]; exact hx⟩
 
 /-- **The column word exists**: it is a sub-mask of `y`, hence a rank. -/
-theorem exists_colWord [Nonempty A] (x y j : A) : ∃ w : A, ColWord x y j w := by
+private theorem exists_colWord [Nonempty A] (x y j : A) : ∃ w : A, ColWord x y j w := by
   obtain ⟨w, hw⟩ := exists_orank_eq (A := A)
     (lt_of_le_of_lt (colWordN_le (orank x) (orank y) (orank j)) (orank_lt_card y))
   exact ⟨w, colWord_iff.mpr hw⟩
@@ -173,7 +183,7 @@ def ColCount (x y j n : A) : Prop := ∃ w : A, ColWord x y j w ∧ PopAll w n
 
 /-- **What the column count is worth** – with no condition at all, the Bit Sum
 Lemma's soundness being unconditional. -/
-theorem colCount_sound {x y j n : A} (h : ColCount x y j n) :
+private theorem colCount_sound {x y j n : A} (h : ColCount x y j n) :
     orank n = colCountN (orank x) (orank y) (posCount A) (orank j) := by
   obtain ⟨w, hw, hp⟩ := h
   rw [popAll_sound hp, colWord_iff.mp hw]
@@ -181,7 +191,7 @@ theorem colCount_sound {x y j n : A} (h : ColCount x y j n) :
 
 /-- **Every column can be counted**, above the threshold of the Bit Sum
 Lemma. -/
-theorem exists_colCount [Nonempty A] {x y j : A} (hP : 2 ^ 20 ≤ posCount A) :
+private theorem exists_colCount [Nonempty A] {x y j : A} (hP : 2 ^ 20 ≤ posCount A) :
     ∃ n : A, ColCount x y j n := by
   obtain ⟨w, hw⟩ := exists_colWord x y j
   obtain ⟨n, hn⟩ := exists_popAll (x := w) hP
@@ -205,7 +215,7 @@ def StepEq (n r r' t V : A) : Prop :=
 
 omit [Finite A] in
 /-- **What a step says**, read on the ranks. -/
-theorem stepEq_sound {n r r' t V : A} (h : StepEq n r r' t V) :
+private theorem stepEq_sound {n r r' t V : A} (h : StepEq n r r' t V) :
     orank r + orank n = 2 * orank r' + ((orank V).testBit (orank t)).toNat := by
   obtain ⟨s, d, hs, hd, hcase⟩ := h
   rcases hcase with ⟨hbit, hds⟩ | ⟨hbit, rfl⟩
@@ -220,7 +230,7 @@ theorem stepEq_sound {n r r' t V : A} (h : StepEq n r r' t V) :
 
 /-- **A true step is a certificate step**, as soon as the two intermediate
 sums are small enough to be ranks. -/
-theorem stepEq_intro {n r r' t V : A} (hs : orank r + orank n < Nat.card A)
+private theorem stepEq_intro {n r r' t V : A} (hs : orank r + orank n < Nat.card A)
     (hd : orank r' + orank r' < Nat.card A)
     (h : orank r + orank n = 2 * orank r' + ((orank V).testBit (orank t)).toNat) :
     StepEq n r r' t V := by
@@ -401,7 +411,7 @@ hold a column count in one field and short enough for the chain to fit on the
 tape, the remainders of `DescriptiveComplexity.BitSum.carryChain` are packed
 into one element and every condition holds by the corresponding chain
 equation. -/
-theorem rangeSum_of_eq [Nonempty A] {x y a e V : A} {Gv m : ℕ}
+private theorem rangeSum_of_eq [Nonempty A] {x y a e V : A} {Gv m : ℕ}
     (hP : 2 ^ 20 ≤ posCount A) (hGpos : 0 < Gv) (hPG : posCount A < 2 ^ Gv)
     (hm : 0 < m) (hae : orank a + m = orank e) (hroom : Gv * m + 1 < posCount A)
     (hV : orank V
@@ -594,7 +604,7 @@ def TimesCert (x y z : A) : Prop :=
 
 /-- **The certificate is sound**: above the threshold, whatever was guessed,
 the three parts assemble to the product of the ranks. -/
-theorem timesCert_sound [Nonempty A] {x y z : A} (hP : 2 ^ 20 ≤ posCount A)
+private theorem timesCert_sound [Nonempty A] {x y z : A} (hP : 2 ^ 20 ≤ posCount A)
     (h : TimesCert x y z) : orank x * orank y = orank z := by
   obtain ⟨g, g₂, B₂, bl, blg, bE, bO, T, T', u, e', hg0, hg₂, hB₂, hover, hblB, heven,
     hEhigh, hodd, hOlow, hblg, hOhigh, ⟨tp, htp, htpe⟩, htail, hT'low, hT'link, hu, huz⟩ := h
@@ -1089,7 +1099,7 @@ variable {L : Language.{0, 0}} {α : Type}
 
 /-- **The successor of a rank is first-order in the bit logic**: one guessed
 element of rank one. -/
-theorem bitDef_succ (x y : α) :
+private theorem bitDef_succ (x y : α) :
     BitDef (L := L) fun _ _ _ _ _ v => orank (v x) + 1 = orank (v y) := by
   refine (((bitDef_isOne (L := L) (α := α ⊕ Fin 1) (Sum.inr 0)).and
     (bitDef_plus (Sum.inl x) (Sum.inr 0) (Sum.inl y))).ex).congr fun A _ _ _ _ v => ?_
@@ -1104,7 +1114,7 @@ theorem bitDef_succ (x y : α) :
 
 /-- **The column word is a formula**: one universal index, one addition, three
 bit reads. -/
-theorem bitDef_colWord (x y j w : α) :
+private theorem bitDef_colWord (x y j w : α) :
     BitDef (L := L) fun _ _ _ _ _ v => ColWord (v x) (v y) (v j) (v w) := by
   refine (((bitDef_bit (L := L) (α := α ⊕ Fin 1) (Sum.inr 0) (Sum.inl w)).iff
     ((bitDef_bit (Sum.inr 0) (Sum.inl y)).and
@@ -1117,7 +1127,7 @@ theorem bitDef_colWord (x y j w : α) :
 
 /-- **The column count is a formula**: the column word, handed to the Bit Sum
 Lemma. -/
-theorem bitDef_colCount (x y j n : α) :
+private theorem bitDef_colCount (x y j n : α) :
     BitDef (L := L) fun _ _ _ _ _ v => ColCount (v x) (v y) (v j) (v n) := by
   refine (((bitDef_colWord (Sum.inl x) (Sum.inl y) (Sum.inl j) (Sum.inr 0)).and
     (bitDef_popAll (Sum.inr 0) (Sum.inl n))).ex).congr fun A _ _ _ _ v => ?_
@@ -1126,7 +1136,7 @@ theorem bitDef_colCount (x y j n : α) :
 
 /-- **A chain step is a formula**: two additions, a successor, a bit read and
 an equality, under two guessed intermediate sums. -/
-theorem bitDef_stepEq (n r r' t V : α) :
+private theorem bitDef_stepEq (n r r' t V : α) :
     BitDef (L := L) fun _ _ _ _ _ v => StepEq (v n) (v r) (v r') (v t) (v V) := by
   have hbody : BitDef (L := L) (α := α ⊕ Fin 2) (fun A _ _ _ _ u =>
       orank (u (Sum.inl r)) + orank (u (Sum.inl n)) = orank (u (Sum.inr 0)) ∧
@@ -1151,7 +1161,7 @@ theorem bitDef_stepEq (n r r' t V : α) :
 packed chain, and the three conditions – each a block of quantified indices
 over windows, the counts entering through
 `DescriptiveComplexity.BitSum.bitDef_colCount`. -/
-theorem bitDef_rangeSum (x y a e V : α) :
+private theorem bitDef_rangeSum (x y a e V : α) :
     BitDef (L := L) fun _ _ _ _ _ v => RangeSum (v x) (v y) (v a) (v e) (v V) := by
   have hbase : BitDef (L := L) (α := α ⊕ Fin 4) (fun A _ _ _ _ u =>
       ∀ p p' r : A, orank p = 0 → orank p + orank (u (Sum.inr 0)) = orank p' →
@@ -1297,7 +1307,7 @@ theorem bitDef_rangeSum (x y a e V : α) :
 
 /-- **The whole certificate is a formula**: eleven guessed elements and the
 conditions, every one of them built from the pieces above. -/
-theorem bitDef_timesCert (x y z : α) :
+private theorem bitDef_timesCert (x y z : α) :
     BitDef (L := L) fun _ _ _ _ _ v => TimesCert (v x) (v y) (v z) := by
   have hover : BitDef (L := L) (α := α ⊕ Fin 11) (fun A _ _ _ _ u =>
       ∀ i d : A, BitIx i (u (Sum.inl y)) → BitIx d (u (Sum.inl x)) →

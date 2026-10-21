@@ -169,7 +169,7 @@ def occPt (s : Bool) (c x : A) : mcInterp.Map A := (MCTag.occ s, ![c, x])
 /-- The penalty vertex of the clause `c`. -/
 def penPt (c : A) : mcInterp.Map A := (MCTag.pen, fun _ => c)
 
-theorem litPt_eq_iff {s t : Bool} {x y : A} : litPt s x = litPt t y ↔ s = t ∧ x = y := by
+private theorem litPt_eq_iff {s t : Bool} {x y : A} : litPt s x = litPt t y ↔ s = t ∧ x = y := by
   constructor
   · intro h
     exact ⟨by simpa [litPt] using congrArg (fun p : mcInterp.Map A => p.1) h,
@@ -177,7 +177,7 @@ theorem litPt_eq_iff {s t : Bool} {x y : A} : litPt s x = litPt t y ↔ s = t �
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem occPt_eq_iff {s t : Bool} {c d x y : A} :
+private theorem occPt_eq_iff {s t : Bool} {c d x y : A} :
     occPt s c x = occPt t d y ↔ s = t ∧ c = d ∧ x = y := by
   constructor
   · intro h
@@ -187,13 +187,13 @@ theorem occPt_eq_iff {s t : Bool} {c d x y : A} :
   · rintro ⟨rfl, rfl, rfl⟩
     rfl
 
-theorem litPt_ne_occPt {s t : Bool} {c x y : A} : litPt s x ≠ occPt t c y := fun h => by
+private theorem litPt_ne_occPt {s t : Bool} {c x y : A} : litPt s x ≠ occPt t c y := fun h => by
   simpa [litPt, occPt] using congrArg (fun p : mcInterp.Map A => p.1) h
 
-theorem litPt_ne_penPt {s : Bool} {c x : A} : litPt s x ≠ penPt c := fun h => by
+private theorem litPt_ne_penPt {s : Bool} {c x : A} : litPt s x ≠ penPt c := fun h => by
   simpa [litPt, penPt] using congrArg (fun p : mcInterp.Map A => p.1) h
 
-theorem occPt_ne_penPt {s : Bool} {c d x : A} : occPt s c x ≠ penPt d := fun h => by
+private theorem occPt_ne_penPt {s : Bool} {c d x : A} : occPt s c x ≠ penPt d := fun h => by
   simpa [occPt, penPt] using congrArg (fun p : mcInterp.Map A => p.1) h
 
 @[simp]
@@ -220,15 +220,15 @@ theorem occPt_eq_penPt_iff {s : Bool} {c d x : A} : (occPt s c x = penPt d) ↔ 
 theorem penPt_eq_occPt_iff {s : Bool} {c d x : A} : (penPt d = occPt s c x) ↔ False :=
   iff_of_false occPt_ne_penPt.symm (fun h => h.elim)
 
-theorem litPt_eta {s : Bool} {w : Fin 2 → A} (h : w 0 = w 1) :
+private theorem litPt_eta {s : Bool} {w : Fin 2 → A} (h : w 0 = w 1) :
     ((MCTag.lit s, w) : mcInterp.Map A) = litPt s (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [litPt, h]⟩
 
-theorem occPt_eta {s : Bool} {w : Fin 2 → A} :
+private theorem occPt_eta {s : Bool} {w : Fin 2 → A} :
     ((MCTag.occ s, w) : mcInterp.Map A) = occPt s (w 0) (w 1) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [occPt]⟩
 
-theorem penPt_eta {w : Fin 2 → A} (h : w 0 = w 1) :
+private theorem penPt_eta {w : Fin 2 → A} (h : w 0 = w 1) :
     ((MCTag.pen, w) : mcInterp.Map A) = penPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> simp [penPt, h]⟩
 
@@ -241,7 +241,7 @@ section Shapes
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- The shape of an edge, read on tags and coordinates. -/
-def AdjShape : MCTag → MCTag → (Fin 2 → A) → (Fin 2 → A) → Prop
+private def AdjShape : MCTag → MCTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | .lit s, .lit t, w₁, w₂ => s ≠ t ∧ w₁ 0 = w₁ 1 ∧ w₂ 0 = w₂ 1 ∧ w₁ 0 = w₂ 0
   | .occ s, .lit t, w₁, w₂ => s = t ∧ OccIn (w₁ 0) (w₁ 1) s ∧ w₂ 0 = w₂ 1 ∧ w₁ 1 = w₂ 0
   | .lit t, .occ s, w₁, w₂ => s = t ∧ OccIn (w₂ 0) (w₂ 1) s ∧ w₁ 0 = w₁ 1 ∧ w₂ 1 = w₁ 0
@@ -250,7 +250,7 @@ def AdjShape : MCTag → MCTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | _, _, _, _ => False
 
 /-- The shape of a threshold mark, read on tags and coordinates. -/
-def MarkShape : MCTag → MCTag → (Fin 2 → A) → (Fin 2 → A) → Prop
+private def MarkShape : MCTag → MCTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | .lit s, .lit t, w₁, w₂ =>
       s = true ∧ t = false ∧ w₁ 0 = w₁ 1 ∧ w₂ 0 = w₂ 1 ∧ w₁ 0 = w₂ 0
   | .occ s, .lit t, w₁, w₂ => s = t ∧ OccIn (w₁ 0) (w₁ 1) s ∧ w₂ 0 = w₂ 1 ∧ w₁ 1 = w₂ 0
@@ -262,7 +262,7 @@ def MarkShape : MCTag → MCTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | _, _, _, _ => False
 
 /-- **The edges of the gadget graph**, on tagged tuples. -/
-theorem adj_iff_aux (t₁ t₂ : MCTag) (w₁ w₂ : Fin 2 → A) :
+private theorem adj_iff_aux (t₁ t₂ : MCTag) (w₁ w₂ : Fin 2 → A) :
     RelMap (M := mcInterp.Map A) magAdj ![(t₁, w₁), (t₂, w₂)] ↔
       ¬ThreeSatToSat.Wide A ∧ AdjShape t₁ t₂ w₁ w₂ := by
   rw [FOInterpretation.relMap_map]
@@ -297,7 +297,7 @@ theorem adj_iff_aux (t₁ t₂ : MCTag) (w₁ w₂ : Fin 2 → A) :
   | pen => cases t₂ <;> simp [mcInterp, adjF, AdjShape]
 
 /-- **The threshold marks of the gadget graph**, on tagged tuples. -/
-theorem marked_iff_aux (t₁ t₂ : MCTag) (w₁ w₂ : Fin 2 → A) :
+private theorem marked_iff_aux (t₁ t₂ : MCTag) (w₁ w₂ : Fin 2 → A) :
     RelMap (M := mcInterp.Map A) magMarked ![(t₁, w₁), (t₂, w₂)] ↔ MarkShape t₁ t₂ w₁ w₂ := by
   rw [FOInterpretation.relMap_map]
   cases t₁ with
@@ -332,7 +332,7 @@ section Characterizations
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- Every edge of the gadget graph belongs to one of the three families. -/
-theorem adj_cases {p q : mcInterp.Map A} (h : MAGAdj p q) :
+private theorem adj_cases {p q : mcInterp.Map A} (h : MAGAdj p q) :
     ¬ThreeSatToSat.Wide A ∧
       ((∃ s x, p = litPt s x ∧ q = litPt (!s) x) ∨
         (∃ s c x, OccIn c x s ∧ p = occPt s c x ∧ q = litPt s x) ∨
@@ -373,7 +373,7 @@ theorem adj_cases {p q : mcInterp.Map A} (h : MAGAdj p q) :
   | pen => cases t₂ <;> exact hs.elim
 
 /-- Every threshold mark belongs to one of the four families. -/
-theorem marked_cases {p q : mcInterp.Map A} (h : MAGMarked p q) :
+private theorem marked_cases {p q : mcInterp.Map A} (h : MAGMarked p q) :
     (∃ x, p = litPt true x ∧ q = litPt false x) ∨
       (∃ s c x, OccIn c x s ∧ p = occPt s c x ∧ q = litPt s x) ∨
       (∃ s t c x y, OccIn c x s ∧ MaxOcc c y t ∧ ¬(x = y ∧ s = t) ∧
@@ -414,43 +414,43 @@ theorem marked_cases {p q : mcInterp.Map A} (h : MAGMarked p q) :
       rw [penPt_eta h2, ← h3]
 
 /-- The variable edge of an element. -/
-theorem adj_lit_lit (hw : ¬ThreeSatToSat.Wide A) {s t : Bool} (hst : s ≠ t) (x : A) :
+private theorem adj_lit_lit (hw : ¬ThreeSatToSat.Wide A) {s t : Bool} (hst : s ≠ t) (x : A) :
     MAGAdj (litPt s x) (litPt t x) :=
   (adj_iff_aux _ _ _ _).mpr ⟨hw, hst, rfl, rfl, rfl⟩
 
 /-- The edge joining an occurrence vertex to its literal vertex. -/
-theorem adj_occ_lit (hw : ¬ThreeSatToSat.Wide A) {s : Bool} {c x : A} (h : OccIn c x s) :
+private theorem adj_occ_lit (hw : ¬ThreeSatToSat.Wide A) {s : Bool} {c x : A} (h : OccIn c x s) :
     MAGAdj (occPt s c x) (litPt s x) :=
   (adj_iff_aux _ _ _ _).mpr ⟨hw, rfl, h, rfl, rfl⟩
 
 /-- The edge joining a literal vertex to an occurrence vertex. -/
-theorem adj_lit_occ (hw : ¬ThreeSatToSat.Wide A) {s : Bool} {c x : A} (h : OccIn c x s) :
+private theorem adj_lit_occ (hw : ¬ThreeSatToSat.Wide A) {s : Bool} {c x : A} (h : OccIn c x s) :
     MAGAdj (litPt s x) (occPt s c x) :=
   (adj_iff_aux _ _ _ _).mpr ⟨hw, rfl, h, rfl, rfl⟩
 
 /-- The edges of the gadget of a clause. -/
-theorem adj_occ_occ (hw : ¬ThreeSatToSat.Wide A) {s t : Bool} {c x y : A}
+private theorem adj_occ_occ (hw : ¬ThreeSatToSat.Wide A) {s t : Bool} {c x y : A}
     (hx : OccIn c x s) (hy : OccIn c y t) (hne : ¬(x = y ∧ s = t)) :
     MAGAdj (occPt s c x) (occPt t c y) :=
   (adj_iff_aux _ _ _ _).mpr ⟨hw, hx, hy, rfl, hne⟩
 
 /-- The threshold mark of an element. -/
-theorem marked_lit (x : A) : MAGMarked (litPt true x) (litPt false x) :=
+private theorem marked_lit (x : A) : MAGMarked (litPt true x) (litPt false x) :=
   (marked_iff_aux _ _ _ _).mpr ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 /-- The threshold mark of an occurrence. -/
-theorem marked_occ_lit {s : Bool} {c x : A} (h : OccIn c x s) :
+private theorem marked_occ_lit {s : Bool} {c x : A} (h : OccIn c x s) :
     MAGMarked (occPt s c x) (litPt s x) :=
   (marked_iff_aux _ _ _ _).mpr ⟨rfl, h, rfl, rfl⟩
 
 /-- The threshold mark of a non-maximal occurrence, charged against the
 maximal occurrence of its clause. -/
-theorem marked_tri {s t : Bool} {c x y : A} (hx : OccIn c x s) (hy : MaxOcc c y t)
+private theorem marked_tri {s t : Bool} {c x y : A} (hx : OccIn c x s) (hy : MaxOcc c y t)
     (hne : ¬(x = y ∧ s = t)) : MAGMarked (occPt s c x) (occPt t c y) :=
   (marked_iff_aux _ _ _ _).mpr ⟨hx, hy, rfl, hne⟩
 
 /-- The penalty mark of a clause with at most one occurrence. -/
-theorem marked_pen {c : A} (hcl : IsCl c) (hch : ∀ x s, ¬Chained c x s) :
+private theorem marked_pen {c : A} (hcl : IsCl c) (hch : ∀ x s, ¬Chained c x s) :
     MAGMarked (penPt c) (penPt c) :=
   (marked_iff_aux _ _ _ _).mpr ⟨rfl, rfl, rfl, hcl, hch⟩
 

@@ -75,7 +75,7 @@ def orderAddLHom (L : Language.{0, 0}) (B : SOBlock) :
 /-- **The ordered structure is an expansion along the morphism**, whatever the
 order: the order symbol is the only new one and no formula in the image mentions
 it. -/
-theorem orderAddLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type)
+private theorem orderAddLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type)
     (instA : L.Structure A) (lo : LinearOrder A) (ρ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (orderAddLHom L B) A
       (@sumStructure L B.lang A instA (B.structure ρ))
@@ -95,7 +95,8 @@ theorem orderAddLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type
         | Sum.inr s => rfl }
 
 /-- **Adding the order symbol changes no meaning.** -/
-theorem realize_orderAdd (B : SOBlock) (A : Type) [instA : L.Structure A] [lo : LinearOrder A]
+private theorem realize_orderAdd
+    (B : SOBlock) (A : Type) [instA : L.Structure A] [lo : LinearOrder A]
     (ρ : B.Assignment A) (φ : (L.sum B.lang).Sentence) :
     @Sentence.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure (L.sum Language.order) B.lang A (sumOrderStructure L A) (B.structure ρ))
@@ -109,7 +110,7 @@ theorem realize_orderAdd (B : SOBlock) (A : Type) [instA : L.Structure A] [lo : 
 one block is the certificate the machine guesses; the kernel is what it checks;
 and the statement holds at every linear order, so a consumer may impose its
 own. -/
-theorem exists_orderedKernel [L.IsRelational] {P : DecisionProblem L}
+private theorem exists_orderedKernel [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable 1 P) :
     ∃ (B : SOBlock) (φ : ((L.sum Language.order).sum B.lang).Sentence),
       ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

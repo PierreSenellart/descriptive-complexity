@@ -47,7 +47,7 @@ variable {P : DecisionProblem L} {Q : DecisionProblem L'}
 /-- **Order-free first-order definability travels backward along FO
 reductions**: the defining sentence of the target, pulled back through the
 interpretation, defines the source. -/
-theorem FODefinableFree.of_foReduction (h : FODefinableFree Q) (f : P ≤ᶠᵒ Q) :
+private theorem FODefinableFree.of_foReduction (h : FODefinableFree Q) (f : P ≤ᶠᵒ Q) :
     FODefinableFree P := by
   let := f.tagFinite
   let := f.tagNonempty
@@ -63,7 +63,7 @@ FO reductions**. The interpretation is extended with the lexicographic order on
 its tagged tuples, so the pulled sentence can still read an order; the
 extension is definable from the order of the input, which is what keeps the
 result inside FO(≤). -/
-theorem FODefinable.of_orderedReduction (h : FODefinable Q) (f : P ≤ᶠᵒ[≤] Q) :
+private theorem FODefinable.of_orderedReduction (h : FODefinable Q) (f : P ≤ᶠᵒ[≤] Q) :
     FODefinable P := by
   let := f.tagFinite
   let := f.tagNonempty
@@ -79,7 +79,7 @@ theorem FODefinable.of_orderedReduction (h : FODefinable Q) (f : P ≤ᶠᵒ[≤
 
 /-- Order-invariant definability travels backward along plain FO reductions
 too, a plain reduction being an ordered one. -/
-theorem FODefinable.of_foReduction (h : FODefinable Q) (f : P ≤ᶠᵒ Q) : FODefinable P :=
+private theorem FODefinable.of_foReduction (h : FODefinable Q) (f : P ≤ᶠᵒ Q) : FODefinable P :=
   h.of_orderedReduction f.toOrdered
 
 /-! ### Non-reducibility -/

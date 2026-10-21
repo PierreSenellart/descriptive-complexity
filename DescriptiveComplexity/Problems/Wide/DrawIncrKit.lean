@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawTrip
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The increment kit: a round trip around the block-indexed mirror increment
@@ -172,13 +178,13 @@ def rule : IncrRule B → Rule A Q W P
 
 /-- **The trip stays inside its own phases**: every rule lands in one the kit
 was given. -/
-theorem dstPh_emb (ρ : IncrRule B) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
+private theorem dstPh_emb (ρ : IncrRule B) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **In-shape separation.** The two indexed families separate through their
 index: the `set` rules by the one-hot clause of their guards, the `stay` rules
 by their source phases. -/
-theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
+private theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : IncrRule B) (f : Q → A) (g : W → A),
       (κ.rule zero one ρ).guard f g → (κ.rule zero one ρ').guard f g →
       (κ.rule zero one ρ).srcPh = (κ.rule zero one ρ').srcPh → ρ = ρ' := by
@@ -197,7 +203,7 @@ theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
     | (have hbb := hemb hph; cases hbb; try rfl)
 
 /-- **Exit disjointness** at the kit's landing phases. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : IncrRule B) (f : Q → A) (g : W → A) (b : B),
       (κ.rule zero one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
@@ -266,7 +272,7 @@ private theorem has_of_rule {ρ : IncrRule B} {f : Q → A} {g : W → A}
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
 include F hlin hix hnewk hbot hwkLt hwkS in
-private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
     PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
@@ -287,7 +293,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
 omit [Finite I] in
 include F hnerg hrg in
-private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hno : ∀ x : I, r ≠ F.cell x) :
     PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
@@ -298,7 +304,7 @@ include hrules F hR hlin hix hnerg hnerl hnewk hbs htop hbot hwkLt hrg hrl hwkS 
 /-- **The kit increments its track**, and lands at the marker in the phase of
 the block that carried: from the scan phase anywhere, up to the file top, the
 binary increment down the file, and back. -/
-theorem reachesIn (hi : WMIncr ile m m') :
+private theorem reachesIn (hi : WMIncr ile m m') :
     ∃ u₀ : I, (¬m u₀ ∧ ∀ v, WMLt ile u₀ v → m v) ∧
       (wideData (Univ A R P K dd)).ReachesIn
       (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
@@ -344,7 +350,7 @@ theorem reachesIn (hi : WMIncr ile m m') :
 
 include hrules F hR hlin hix hnerg hnerl hnewk hbs htop hbot hwkLt hrg hrl hwkS hblk hsle in
 /-- **The kit increments its track**, the budget forgotten. -/
-theorem reaches (hi : WMIncr ile m m') :
+private theorem reaches (hi : WMIncr ile m m') :
     ∃ u₀ : I, (¬m u₀ ∧ ∀ v, WMLt ile u₀ v → m v) ∧
       Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
         ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,

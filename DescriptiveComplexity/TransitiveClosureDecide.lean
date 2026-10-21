@@ -92,7 +92,7 @@ section Paths
 variable {N : Type} {R : N → N → Prop}
 
 /-- An invariant preserved by every step holds along a path. -/
-theorem reach_invariant {P : N → Prop} (hP : ∀ a b, P a → R a b → P b) {a b : N}
+private theorem reach_invariant {P : N → Prop} (hP : ∀ a b, P a → R a b → P b) {a b : N}
     (h : Relation.ReflTransGen R a b) (ha : P a) : P b := by
   induction h with
   | refl => exact ha
@@ -178,7 +178,7 @@ theorem Decides.congr {v : β → A} {P Q : Prop} (h : D.Decides v P) (hPQ : P �
     D.Decides v Q :=
   fun t => ⟨((h t).1).trans hPQ, ((h t).2).trans (not_congr hPQ)⟩
 
-theorem Decides.congr_val {v w : β → A} {P : Prop} (h : D.Decides v P) (hvw : v = w) :
+private theorem Decides.congr_val {v w : β → A} {P : Prop} (h : D.Decides v P) (hvw : v = w) :
     D.Decides w P :=
   hvw ▸ h
 
@@ -186,16 +186,16 @@ theorem Functional.step_unique (h : D.Functional A) {v : β → A} {a b c : D.No
     (hb : D.StepAt v a b) (hc : D.StepAt v a c) : b = c :=
   Sum.inl_injective (h v a (Sum.inl b) (Sum.inl c) hb hc)
 
-theorem Functional.not_exit_of_step (h : D.Functional A) {v : β → A} {a b : D.Node A}
+private theorem Functional.not_exit_of_step (h : D.Functional A) {v : β → A} {a b : D.Node A}
     (hb : D.StepAt v a b) {o : Bool} (ho : D.ExitAt v a o) : False :=
   Sum.inl_ne_inr (h v a (Sum.inl b) (Sum.inr o) hb ho)
 
-theorem Functional.exit_unique (h : D.Functional A) {v : β → A} {a : D.Node A} {o o' : Bool}
+private theorem Functional.exit_unique (h : D.Functional A) {v : β → A} {a : D.Node A} {o o' : Bool}
     (ho : D.ExitAt v a o) (ho' : D.ExitAt v a o') : o = o' :=
   Sum.inr_injective (h v a (Sum.inr o) (Sum.inr o') ho ho')
 
 /-- Functionality, from its three components. -/
-theorem functional_of (hstep : ∀ (v : β → A) (a b c : D.Node A),
+private theorem functional_of (hstep : ∀ (v : β → A) (a b c : D.Node A),
       D.StepAt v a b → D.StepAt v a c → b = c)
     (hexit : ∀ (v : β → A) (a b : D.Node A) (o : Bool), D.StepAt v a b → ¬D.ExitAt v a o)
     (hboth : ∀ (v : β → A) (a : D.Node A), D.ExitAt v a true → ¬D.ExitAt v a false) :
@@ -231,7 +231,7 @@ noncomputable def relabelPar (D : Decider L β) (f : β → γ) : Decider L γ w
 
 variable (D : Decider L β) (f : β → γ) {A : Type} [L.Structure A] [LinearOrder A] (v : γ → A)
 
-theorem stepAt_relabelPar (a b : D.Node A) :
+private theorem stepAt_relabelPar (a b : D.Node A) :
     (D.relabelPar f).StepAt v a b ↔ D.StepAt (v ∘ f) a b := by
   change ((D.step a.1 b.1).relabel (Sum.map id f)).Realize (Sum.elim (Sum.elim a.2 b.2) v) ↔
     (D.step a.1 b.1).Realize (Sum.elim (Sum.elim a.2 b.2) (v ∘ f))
@@ -239,7 +239,7 @@ theorem stepAt_relabelPar (a b : D.Node A) :
   refine iff_of_eq (congrArg (D.step a.1 b.1).Realize (funext fun i => ?_))
   rcases i with (i | i) | i <;> rfl
 
-theorem exitAt_relabelPar (a : D.Node A) (o : Bool) :
+private theorem exitAt_relabelPar (a : D.Node A) (o : Bool) :
     (D.relabelPar f).ExitAt v a o ↔ D.ExitAt (v ∘ f) a o := by
   change ((D.exit a.1 o).relabel (Sum.map id f)).Realize (Sum.elim a.2 v) ↔
     (D.exit a.1 o).Realize (Sum.elim a.2 (v ∘ f))
@@ -247,7 +247,7 @@ theorem exitAt_relabelPar (a : D.Node A) (o : Bool) :
   refine iff_of_eq (congrArg (D.exit a.1 o).Realize (funext fun i => ?_))
   rcases i with i | i <;> rfl
 
-theorem reachAt_relabelPar (a b : D.Node A) :
+private theorem reachAt_relabelPar (a b : D.Node A) :
     (D.relabelPar f).ReachAt v a b ↔ D.ReachAt (v ∘ f) a b := by
   constructor
   · intro h
@@ -259,15 +259,16 @@ theorem reachAt_relabelPar (a b : D.Node A) :
     | refl => exact Relation.ReflTransGen.refl
     | @tail c d _ hcd ih => exact ih.tail ((D.stepAt_relabelPar f v c d).mpr hcd)
 
-theorem out_relabelPar (t : D.Coord → A) (o : Bool) :
+private theorem out_relabelPar (t : D.Coord → A) (o : Bool) :
     (D.relabelPar f).Out v t o ↔ D.Out (v ∘ f) t o :=
   exists_congr fun a => and_congr (D.reachAt_relabelPar f v _ a) (D.exitAt_relabelPar f v a o)
 
-theorem decides_relabelPar {P : Prop} (h : D.Decides (v ∘ f) P) : (D.relabelPar f).Decides v P :=
+private theorem decides_relabelPar
+    {P : Prop} (h : D.Decides (v ∘ f) P) : (D.relabelPar f).Decides v P :=
   fun t => ⟨(D.out_relabelPar f v t true).trans (h t).1,
     (D.out_relabelPar f v t false).trans (h t).2⟩
 
-theorem functional_relabelPar (h : D.Functional A) : (D.relabelPar f).Functional A := by
+private theorem functional_relabelPar (h : D.Functional A) : (D.relabelPar f).Functional A := by
   intro v a m m' hm hm'
   refine h (v ∘ f) a m m' ?_ ?_
   · rcases m with b | o
@@ -298,7 +299,7 @@ noncomputable def atom (ψ : (L.sum Language.order).Formula β) : Decider L β w
 variable (ψ : (L.sum Language.order).Formula β) {A : Type} [L.Structure A] [LinearOrder A]
   (v : β → A)
 
-theorem exitAt_atom (a : (atom ψ).Node A) (o : Bool) :
+private theorem exitAt_atom (a : (atom ψ).Node A) (o : Bool) :
     (atom ψ).ExitAt v a o ↔ (if o then ψ.Realize v else ¬ψ.Realize v) := by
   cases o
   · change Formula.Realize (∼(ψ.relabel Sum.inr)) (Sum.elim a.2 v) ↔ ¬ψ.Realize v
@@ -308,15 +309,15 @@ theorem exitAt_atom (a : (atom ψ).Node A) (o : Bool) :
     rw [Formula.realize_relabel]
     exact iff_of_eq (congrArg ψ.Realize (funext fun i => rfl))
 
-theorem not_stepAt_atom (a b : (atom ψ).Node A) : ¬(atom ψ).StepAt v a b :=
+private theorem not_stepAt_atom (a b : (atom ψ).Node A) : ¬(atom ψ).StepAt v a b :=
   fun h => h
 
-theorem reachAt_atom {a b : (atom ψ).Node A} (h : (atom ψ).ReachAt v a b) : b = a := by
+private theorem reachAt_atom {a b : (atom ψ).Node A} (h : (atom ψ).ReachAt v a b) : b = a := by
   induction h with
   | refl => rfl
   | tail _ hcd _ => exact absurd hcd (not_stepAt_atom ψ v _ _)
 
-theorem decides_atom : (atom ψ).Decides v (ψ.Realize v) := by
+private theorem decides_atom : (atom ψ).Decides v (ψ.Realize v) := by
   intro t
   have hout : ∀ o, (atom ψ).Out v t o ↔ (if o then ψ.Realize v else ¬ψ.Realize v) := by
     intro o
@@ -328,7 +329,7 @@ theorem decides_atom : (atom ψ).Decides v (ψ.Realize v) := by
       exact ⟨_, Relation.ReflTransGen.refl, (exitAt_atom ψ v _ o).mpr h⟩
   exact ⟨hout true, hout false⟩
 
-theorem functional_atom : (atom ψ).Functional A := by
+private theorem functional_atom : (atom ψ).Functional A := by
   refine functional_of (fun v a b c hb _ => absurd hb (not_stepAt_atom ψ v a b))
     (fun v a b o hb _ => absurd hb (not_stepAt_atom ψ v a b)) fun v a h h' => ?_
   rw [exitAt_atom] at h h'
@@ -353,21 +354,22 @@ noncomputable def neg (D : Decider L β) : Decider L β where
 
 variable (D : Decider L β) {A : Type} [L.Structure A] [LinearOrder A] (v : β → A)
 
-theorem stepAt_neg (a b : D.Node A) : D.neg.StepAt v a b ↔ D.StepAt v a b := Iff.rfl
+private theorem stepAt_neg (a b : D.Node A) : D.neg.StepAt v a b ↔ D.StepAt v a b := Iff.rfl
 
-theorem exitAt_neg (a : D.Node A) (o : Bool) : D.neg.ExitAt v a o ↔ D.ExitAt v a (!o) := Iff.rfl
+private theorem exitAt_neg
+    (a : D.Node A) (o : Bool) : D.neg.ExitAt v a o ↔ D.ExitAt v a (!o) := Iff.rfl
 
-theorem reachAt_neg (a b : D.Node A) : D.neg.ReachAt v a b ↔ D.ReachAt v a b := Iff.rfl
+private theorem reachAt_neg (a b : D.Node A) : D.neg.ReachAt v a b ↔ D.ReachAt v a b := Iff.rfl
 
-theorem out_neg (t : D.Coord → A) (o : Bool) : D.neg.Out v t o ↔ D.Out v t (!o) := Iff.rfl
+private theorem out_neg (t : D.Coord → A) (o : Bool) : D.neg.Out v t o ↔ D.Out v t (!o) := Iff.rfl
 
-theorem decides_neg {P : Prop} (h : D.Decides v P) : D.neg.Decides v (¬P) := by
+private theorem decides_neg {P : Prop} (h : D.Decides v P) : D.neg.Decides v (¬P) := by
   intro t
   refine ⟨(D.out_neg v t true).trans (h t).2, (D.out_neg v t false).trans ?_⟩
   rw [not_not]
   exact (h t).1
 
-theorem functional_neg (h : D.Functional A) : D.neg.Functional A := by
+private theorem functional_neg (h : D.Functional A) : D.neg.Functional A := by
   refine functional_of (fun v a b c hb hc => h.step_unique hb hc)
     (fun v a b o hb ho => h.not_exit_of_step ((D.stepAt_neg v a b).mp hb)
       ((D.exitAt_neg v a o).mp ho)) fun v a h₁ h₂ => ?_
@@ -437,7 +439,7 @@ noncomputable def seq (D₁ D₂ : Decider L β) : Decider L β where
 
 variable (D₁ D₂ : Decider L β) {A : Type} [L.Structure A] [LinearOrder A] (v : β → A)
 
-theorem stepAt_seq_inl_inl (m m' : D₁.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
+private theorem stepAt_seq_inl_inl (m m' : D₁.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
     (seq D₁ D₂).StepAt v (Sum.inl m, t) (Sum.inl m', t') ↔
       D₁.StepAt v (m, t ∘ Sum.inl) (m', t' ∘ Sum.inl) ∧ t' ∘ Sum.inr = t ∘ Sum.inr := by
   change ((D₁.step m m').relabel seqVarL ⊓ _).Realize _ ↔ _
@@ -445,7 +447,7 @@ theorem stepAt_seq_inl_inl (m m' : D₁.Mode) (t t' : D₁.Coord ⊕ D₂.Coord 
   refine and_congr (iff_of_eq (congrArg (D₁.step m m').Realize (funext fun i => ?_))) Iff.rfl
   rcases i with (i | i) | i <;> rfl
 
-theorem stepAt_seq_inl_inr (m : D₁.Mode) (m' : D₂.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
+private theorem stepAt_seq_inl_inr (m : D₁.Mode) (m' : D₂.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
     (seq D₁ D₂).StepAt v (Sum.inl m, t) (Sum.inr m', t') ↔
       m' = D₂.start ∧ D₁.ExitAt v (m, t ∘ Sum.inl) true ∧ t' = t := by
   classical
@@ -464,11 +466,12 @@ theorem stepAt_seq_inl_inr (m : D₁.Mode) (m' : D₂.Mode) (t t' : D₁.Coord �
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem not_stepAt_seq_inr_inl (m : D₂.Mode) (m' : D₁.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
+private theorem not_stepAt_seq_inr_inl
+    (m : D₂.Mode) (m' : D₁.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
     ¬(seq D₁ D₂).StepAt v (Sum.inr m, t) (Sum.inl m', t') :=
   fun h => h
 
-theorem stepAt_seq_inr_inr (m m' : D₂.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
+private theorem stepAt_seq_inr_inr (m m' : D₂.Mode) (t t' : D₁.Coord ⊕ D₂.Coord → A) :
     (seq D₁ D₂).StepAt v (Sum.inr m, t) (Sum.inr m', t') ↔
       D₂.StepAt v (m, t ∘ Sum.inr) (m', t' ∘ Sum.inr) ∧ t' ∘ Sum.inl = t ∘ Sum.inl := by
   change ((D₂.step m m').relabel seqVarR ⊓ _).Realize _ ↔ _
@@ -476,7 +479,7 @@ theorem stepAt_seq_inr_inr (m m' : D₂.Mode) (t t' : D₁.Coord ⊕ D₂.Coord 
   refine and_congr (iff_of_eq (congrArg (D₂.step m m').Realize (funext fun i => ?_))) Iff.rfl
   rcases i with (i | i) | i <;> rfl
 
-theorem exitAt_seq_inl (m : D₁.Mode) (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
+private theorem exitAt_seq_inl (m : D₁.Mode) (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
     (seq D₁ D₂).ExitAt v (Sum.inl m, t) o ↔ o = false ∧ D₁.ExitAt v (m, t ∘ Sum.inl) false := by
   cases o
   · change ((D₁.exit m false).relabel seqExitL).Realize _ ↔ _
@@ -487,7 +490,7 @@ theorem exitAt_seq_inl (m : D₁.Mode) (t : D₁.Coord ⊕ D₂.Coord → A) (o 
   · change (⊥ : (L.sum Language.order).Formula _).Realize _ ↔ _
     simp
 
-theorem exitAt_seq_inr (m : D₂.Mode) (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
+private theorem exitAt_seq_inr (m : D₂.Mode) (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
     (seq D₁ D₂).ExitAt v (Sum.inr m, t) o ↔ D₂.ExitAt v (m, t ∘ Sum.inr) o := by
   change ((D₂.exit m o).relabel seqExitR).Realize _ ↔ _
   rw [Formula.realize_relabel]
@@ -496,7 +499,8 @@ theorem exitAt_seq_inr (m : D₂.Mode) (t : D₁.Coord ⊕ D₂.Coord → A) (o 
 
 /-- A path of the first component lifts to the composite, the second
 component's coordinates fixed. -/
-theorem reachAt_seq_of_reachAt₁ {a b : D₁.Node A} (h : D₁.ReachAt v a b) (y : D₂.Coord → A) :
+private theorem reachAt_seq_of_reachAt₁
+    {a b : D₁.Node A} (h : D₁.ReachAt v a b) (y : D₂.Coord → A) :
     (seq D₁ D₂).ReachAt v (Sum.inl a.1, Sum.elim a.2 y) (Sum.inl b.1, Sum.elim b.2 y) := by
   refine Relation.ReflTransGen.lift (fun c : D₁.Node A => (Sum.inl c.1, Sum.elim c.2 y))
     (fun c d hcd => ?_) _ _ h
@@ -504,7 +508,8 @@ theorem reachAt_seq_of_reachAt₁ {a b : D₁.Node A} (h : D₁.ReachAt v a b) (
 
 /-- A path of the second component lifts to the composite, the first
 component's coordinates fixed. -/
-theorem reachAt_seq_of_reachAt₂ {a b : D₂.Node A} (h : D₂.ReachAt v a b) (x : D₁.Coord → A) :
+private theorem reachAt_seq_of_reachAt₂
+    {a b : D₂.Node A} (h : D₂.ReachAt v a b) (x : D₁.Coord → A) :
     (seq D₁ D₂).ReachAt v (Sum.inr a.1, Sum.elim x a.2) (Sum.inr b.1, Sum.elim x b.2) := by
   refine Relation.ReflTransGen.lift (fun c : D₂.Node A => (Sum.inr c.1, Sum.elim x c.2))
     (fun c d hcd => ?_) _ _ h
@@ -513,13 +518,13 @@ theorem reachAt_seq_of_reachAt₂ {a b : D₂.Node A} (h : D₂.ReachAt v a b) (
 /-- What the composite may have reached from its start at `t`: a node of the
 first component reached by it, the second's coordinates untouched, or a node of
 the second component reached after the first exited `yes`. -/
-def SeqInv (t : D₁.Coord ⊕ D₂.Coord → A) (c : (seq D₁ D₂).Node A) : Prop :=
+private def SeqInv (t : D₁.Coord ⊕ D₂.Coord → A) (c : (seq D₁ D₂).Node A) : Prop :=
   (∃ (m : D₁.Mode) (t' : D₁.Coord ⊕ D₂.Coord → A), c = (Sum.inl m, t') ∧
       D₁.ReachAt v (D₁.start, t ∘ Sum.inl) (m, t' ∘ Sum.inl) ∧ t' ∘ Sum.inr = t ∘ Sum.inr) ∨
     (∃ (m : D₂.Mode) (t' : D₁.Coord ⊕ D₂.Coord → A), c = (Sum.inr m, t') ∧
       D₁.Out v (t ∘ Sum.inl) true ∧ D₂.ReachAt v (D₂.start, t ∘ Sum.inr) (m, t' ∘ Sum.inr))
 
-theorem seqInv_of_reachAt (t : D₁.Coord ⊕ D₂.Coord → A) {c : (seq D₁ D₂).Node A}
+private theorem seqInv_of_reachAt (t : D₁.Coord ⊕ D₂.Coord → A) {c : (seq D₁ D₂).Node A}
     (h : (seq D₁ D₂).ReachAt v (Sum.inl D₁.start, t) c) : SeqInv D₁ D₂ v t c := by
   refine reach_invariant (P := SeqInv D₁ D₂ v t) (fun a b ha hab => ?_) h
     (Or.inl ⟨D₁.start, t, rfl, Relation.ReflTransGen.refl, rfl⟩)
@@ -536,7 +541,7 @@ theorem seqInv_of_reachAt (t : D₁.Coord ⊕ D₂.Coord → A) {c : (seq D₁ D
     · obtain ⟨hs, -⟩ := (stepAt_seq_inr_inr D₁ D₂ v m mb t' tb).mp hab
       exact Or.inr ⟨mb, tb, rfl, ho, hr.tail hs⟩
 
-theorem out_seq (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
+private theorem out_seq (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
     (seq D₁ D₂).Out v t o ↔
       (o = false ∧ D₁.Out v (t ∘ Sum.inl) false) ∨
         (D₁.Out v (t ∘ Sum.inl) true ∧ D₂.Out v (t ∘ Sum.inr) o) := by
@@ -560,7 +565,7 @@ theorem out_seq (t : D₁.Coord ⊕ D₂.Coord → A) (o : Bool) :
         (stepAt_seq_inl_inr D₁ D₂ v a.1 D₂.start _ _).mpr ⟨rfl, by simpa using he, rfl⟩
       exact (h1.tail h2).trans (reachAt_seq_of_reachAt₂ D₁ D₂ v hb a.2)
 
-theorem decides_seq {P Q : Prop} (h₁ : D₁.Decides v P) (h₂ : D₂.Decides v Q) :
+private theorem decides_seq {P Q : Prop} (h₁ : D₁.Decides v P) (h₂ : D₂.Decides v Q) :
     (seq D₁ D₂).Decides v (P ∧ Q) := by
   intro t
   rw [out_seq, out_seq, (h₁ _).1, (h₁ _).2, (h₂ _).1, (h₂ _).2]
@@ -575,7 +580,7 @@ theorem decides_seq {P Q : Prop} (h₁ : D₁.Decides v P) (h₂ : D₂.Decides 
       · exact Or.inr ⟨hp, fun hq => h ⟨hp, hq⟩⟩
       · exact Or.inl ⟨rfl, hp⟩
 
-theorem functional_seq (h₁ : D₁.Functional A) (h₂ : D₂.Functional A) :
+private theorem functional_seq (h₁ : D₁.Functional A) (h₂ : D₂.Functional A) :
     (seq D₁ D₂).Functional A := by
   refine functional_of ?_ ?_ ?_
   · rintro v ⟨m, t⟩ ⟨mb, tb⟩ ⟨mc, tc⟩ hb hc
@@ -697,7 +702,7 @@ variable (D : Decider L (β ⊕ Unit)) {A : Type} [L.Structure A] [LinearOrder A
 current element. -/
 abbrev vy (y : A) : β ⊕ Unit → A := Sum.elim v fun _ => y
 
-theorem stepAt_all_none_some (n : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
+private theorem stepAt_all_none_some (n : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
     D.all.StepAt v (none, t) (some n, t') ↔
       n = D.start ∧ t' ∘ Sum.inl = t ∘ Sum.inl ∧ ∀ a : A, t' (Sum.inr ()) ≤ a := by
   classical
@@ -713,15 +718,15 @@ theorem stepAt_all_none_some (n : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem not_stepAt_all_none_none (t t' : D.Coord ⊕ Unit → A) :
+private theorem not_stepAt_all_none_none (t t' : D.Coord ⊕ Unit → A) :
     ¬D.all.StepAt v (none, t) (none, t') :=
   fun h => h
 
-theorem not_stepAt_all_some_none (m : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
+private theorem not_stepAt_all_some_none (m : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
     ¬D.all.StepAt v (some m, t) (none, t') :=
   fun h => h
 
-theorem stepAt_all_some_some (m n : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
+private theorem stepAt_all_some_some (m n : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
     D.all.StepAt v (some m, t) (some n, t') ↔
       (D.StepAt (vy v (t (Sum.inr ()))) (m, t ∘ Sum.inl) (n, t' ∘ Sum.inl) ∧
           t' (Sum.inr ()) = t (Sum.inr ())) ∨
@@ -752,11 +757,11 @@ theorem stepAt_all_some_some (m n : D.Mode) (t t' : D.Coord ⊕ Unit → A) :
     · simp only [Formula.realize_bot, false_iff, not_and]
       exact fun h' => absurd h' h
 
-theorem not_exitAt_all_none (t : D.Coord ⊕ Unit → A) (o : Bool) :
+private theorem not_exitAt_all_none (t : D.Coord ⊕ Unit → A) (o : Bool) :
     ¬D.all.ExitAt v (none, t) o :=
   fun h => h
 
-theorem exitAt_all_some (m : D.Mode) (t : D.Coord ⊕ Unit → A) (o : Bool) :
+private theorem exitAt_all_some (m : D.Mode) (t : D.Coord ⊕ Unit → A) (o : Bool) :
     D.all.ExitAt v (some m, t) o ↔
       D.ExitAt (vy v (t (Sum.inr ()))) (m, t ∘ Sum.inl) o ∧
         (o = true → ∀ a : A, a ≤ t (Sum.inr ())) := by
@@ -776,7 +781,7 @@ theorem exitAt_all_some (m : D.Mode) (t : D.Coord ⊕ Unit → A) (o : Bool) :
     exact and_congr Iff.rfl ⟨fun h _ => h, fun h => h rfl⟩
 
 /-- A path of the component lifts to the iteration, the element fixed. -/
-theorem reachAt_all_of_reachAt {y : A} {a b : D.Node A} (h : D.ReachAt (vy v y) a b) :
+private theorem reachAt_all_of_reachAt {y : A} {a b : D.Node A} (h : D.ReachAt (vy v y) a b) :
     D.all.ReachAt v (some a.1, Sum.elim a.2 fun _ => y) (some b.1, Sum.elim b.2 fun _ => y) := by
   refine Relation.ReflTransGen.lift
     (fun c : D.Node A => (some c.1, Sum.elim c.2 fun _ => y)) (fun c d hcd => ?_) _ _ h
@@ -786,7 +791,7 @@ variable [Finite A]
 
 /-- **Upwards from any element**: if the component says `yes` at every element
 from `y` on, the iteration exits `yes` from the component's start at `y`. -/
-theorem all_reach_yes {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (y : A)
+private theorem all_reach_yes {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (y : A)
     (hy : ∀ y', y ≤ y' → P y') (u : D.Coord → A) :
     ∃ c, D.all.ReachAt v (some D.start, Sum.elim u fun _ => y) c ∧ D.all.ExitAt v c true := by
   induction y using order_induction_down generalizing u with
@@ -804,7 +809,7 @@ theorem all_reach_yes {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (y 
 
 /-- **Upwards to a failure**: if the component says `yes` below `y` but not
 everywhere, the iteration exits `no` from the component's start at `y`. -/
-theorem all_reach_no {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (hnot : ¬∀ y, P y)
+private theorem all_reach_no {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (hnot : ¬∀ y, P y)
     (y : A) (hy : ∀ y', y' < y → P y') (u : D.Coord → A) :
     ∃ c, D.all.ReachAt v (some D.start, Sum.elim u fun _ => y) c ∧ D.all.ExitAt v c false := by
   induction y using order_induction_down generalizing u with
@@ -866,7 +871,8 @@ theorem allInv_of_reachAt {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y))
 
 variable [Nonempty A]
 
-theorem out_all {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (t : D.Coord ⊕ Unit → A) :
+private theorem out_all
+    {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (t : D.Coord ⊕ Unit → A) :
     (D.all.Out v t true ↔ ∀ y, P y) ∧ (D.all.Out v t false ↔ ¬∀ y, P y) := by
   obtain ⟨y₀, hy₀⟩ : ∃ y₀ : A, ∀ a, y₀ ≤ a := by
     obtain ⟨y₀, -, hy₀⟩ := (Finite.to_wellFoundedLT (α := A)).has_min Set.univ
@@ -899,7 +905,7 @@ theorem out_all {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) (t : D.Co
       exact ⟨c, Relation.ReflTransGen.head hinit hc, he⟩
 
 /-- **The iteration decides the universal quantification.** -/
-theorem decides_all {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) :
+private theorem decides_all {P : A → Prop} (h : ∀ y, D.Decides (vy v y) (P y)) :
     D.all.Decides v (∀ y, P y) :=
   fun t => out_all D v h t
 
@@ -989,7 +995,7 @@ noncomputable def imp {β : Type} (D₁ D₂ : Decider L β) : Decider L β :=
 
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
-theorem decides_allTup {β : Type} (K : ℕ) (D : Decider L (β ⊕ Fin K)) (v : β → A)
+private theorem decides_allTup {β : Type} (K : ℕ) (D : Decider L (β ⊕ Fin K)) (v : β → A)
     {P : (Fin K → A) → Prop} (h : ∀ xs, D.Decides (Sum.elim v xs) (P xs)) :
     (allTup K D).Decides v (∀ xs, P xs) := by
   induction K generalizing β with
@@ -1019,7 +1025,7 @@ theorem functional_allTup {β : Type} (K : ℕ) (D : Decider L (β ⊕ Fin K)) (
   | zero => exact functional_relabelPar D _ h
   | succ K ih => exact ih _ (functional_all _ (functional_relabelPar D _ h))
 
-theorem decides_exTup {β : Type} (K : ℕ) (D : Decider L (β ⊕ Fin K)) (v : β → A)
+private theorem decides_exTup {β : Type} (K : ℕ) (D : Decider L (β ⊕ Fin K)) (v : β → A)
     {P : (Fin K → A) → Prop} (h : ∀ xs, D.Decides (Sum.elim v xs) (P xs)) :
     (exTup K D).Decides v (∃ xs, P xs) := by
   refine (decides_neg _ v (decides_allTup K D.neg v fun xs => decides_neg D _ (h xs))).congr ?_
@@ -1092,7 +1098,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 /-- The valuation of the (absent) parameters. -/
 abbrev noPar (A : Type) : Empty → A := fun z => z.elim
 
-theorem step_toSpec_inl_inl (m n : D.Mode) (x x' : Fin (Nat.card D.Coord) → A) :
+private theorem step_toSpec_inl_inl (m n : D.Mode) (x x' : Fin (Nat.card D.Coord) → A) :
     D.toSpec.Step (Sum.inl m, x) (Sum.inl n, x') ↔
       D.StepAt (noPar A) (m, x ∘ D.coordEquiv) (n, x' ∘ D.coordEquiv) := by
   change Formula.Realize (M := A) ((D.step m n).relabel D.specVar) (Sum.elim x x') ↔ _
@@ -1103,7 +1109,7 @@ theorem step_toSpec_inl_inl (m n : D.Mode) (x x' : Fin (Nat.card D.Coord) → A)
   · rfl
   · exact i.elim
 
-theorem step_toSpec_inl_inr (m : D.Mode) (o : Bool) (x x' : Fin (Nat.card D.Coord) → A) :
+private theorem step_toSpec_inl_inr (m : D.Mode) (o : Bool) (x x' : Fin (Nat.card D.Coord) → A) :
     D.toSpec.Step (Sum.inl m, x) (Sum.inr o, x') ↔
       D.ExitAt (noPar A) (m, x ∘ D.coordEquiv) o ∧ x' = x := by
   change Formula.Realize (M := A) ((D.exit m o).relabel D.specExitVar ⊓
@@ -1116,21 +1122,22 @@ theorem step_toSpec_inl_inr (m : D.Mode) (o : Bool) (x x' : Fin (Nat.card D.Coor
   · rfl
   · exact i.elim
 
-theorem not_step_toSpec_inr (o : Bool) (n : D.Mode ⊕ Bool) (x x' : Fin (Nat.card D.Coord) → A) :
+private theorem not_step_toSpec_inr
+    (o : Bool) (n : D.Mode ⊕ Bool) (x x' : Fin (Nat.card D.Coord) → A) :
     ¬D.toSpec.Step (Sum.inr o, x) (n, x') :=
   fun h => h
 
-theorem isSrc_toSpec_inl (m : D.Mode) (x : Fin (Nat.card D.Coord) → A) :
+private theorem isSrc_toSpec_inl (m : D.Mode) (x : Fin (Nat.card D.Coord) → A) :
     D.toSpec.IsSrc (Sum.inl m, x) ↔ m = D.start := by
   classical
   change (if m = D.start then (⊤ : (L.sum Language.order).Formula _) else ⊥).Realize x ↔ _
   split_ifs with h <;> simp [h]
 
-theorem not_isSrc_toSpec_inr (o : Bool) (x : Fin (Nat.card D.Coord) → A) :
+private theorem not_isSrc_toSpec_inr (o : Bool) (x : Fin (Nat.card D.Coord) → A) :
     ¬D.toSpec.IsSrc (Sum.inr o, x) :=
   fun h => h
 
-theorem isTgt_toSpec (m : D.Mode ⊕ Bool) (x : Fin (Nat.card D.Coord) → A) :
+private theorem isTgt_toSpec (m : D.Mode ⊕ Bool) (x : Fin (Nat.card D.Coord) → A) :
     D.toSpec.IsTgt (m, x) ↔ m = Sum.inr true := by
   rcases m with m | (_ | _)
   · exact ⟨fun h => h.elim, fun h => absurd h Sum.inl_ne_inr⟩
@@ -1141,7 +1148,7 @@ theorem isTgt_toSpec (m : D.Mode ⊕ Bool) (x : Fin (Nat.card D.Coord) → A) :
 
 /-- What the specification reaches from its source: a node of the decider it
 reaches, or an exit it reaches. -/
-theorem toSpec_invariant (x : Fin (Nat.card D.Coord) → A) {c : D.toSpec.Node A}
+private theorem toSpec_invariant (x : Fin (Nat.card D.Coord) → A) {c : D.toSpec.Node A}
     (h : D.toSpec.Reach (Sum.inl D.start, x) c) :
     (∃ (m : D.Mode) (x' : Fin (Nat.card D.Coord) → A), c = (Sum.inl m, x') ∧
         D.ReachAt (noPar A) (D.start, x ∘ D.coordEquiv) (m, x' ∘ D.coordEquiv)) ∨
@@ -1162,7 +1169,7 @@ theorem toSpec_invariant (x : Fin (Nat.card D.Coord) → A) {c : D.toSpec.Node A
   · exact absurd hab (D.not_step_toSpec_inr o mb x' xb)
 
 /-- A path of the decider is a path of the specification. -/
-theorem reach_toSpec_of_reachAt {a b : D.Node A} (h : D.ReachAt (noPar A) a b) :
+private theorem reach_toSpec_of_reachAt {a b : D.Node A} (h : D.ReachAt (noPar A) a b) :
     D.toSpec.Reach (Sum.inl a.1, a.2 ∘ D.coordEquiv.symm)
       (Sum.inl b.1, b.2 ∘ D.coordEquiv.symm) := by
   refine Relation.ReflTransGen.lift
@@ -1172,7 +1179,7 @@ theorem reach_toSpec_of_reachAt {a b : D.Node A} (h : D.ReachAt (noPar A) a b) :
 
 /-- **The specification accepts exactly when the decider says `yes`** from some
 tuple. -/
-theorem accepts_toSpec [Nonempty A] {P : Prop} (h : D.Decides (noPar A) P) :
+private theorem accepts_toSpec [Nonempty A] {P : Prop} (h : D.Decides (noPar A) P) :
     D.toSpec.Accepts A ↔ P := by
   constructor
   · rintro ⟨⟨mu, xu⟩, w, hu, hw, huw⟩
@@ -1193,7 +1200,7 @@ theorem accepts_toSpec [Nonempty A] {P : Prop} (h : D.Decides (noPar A) P) :
     simpa [Function.comp_def] using he
 
 /-- **A functional decider gives a functional specification.** -/
-theorem functional_toSpec (h : D.Functional A) : D.toSpec.Functional A := by
+private theorem functional_toSpec (h : D.Functional A) : D.toSpec.Functional A := by
   rintro ⟨m, x⟩ ⟨mb, xb⟩ ⟨mc, xc⟩ hb hc
   rcases m with m | o
   · rcases mb with mb | ob <;> rcases mc with mc | oc

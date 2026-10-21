@@ -206,12 +206,12 @@ def encode (c : s.Node (I.MapRel A)) : (s.comapRel I τp).Node A :=
 
 variable {τp}
 
-theorem coord_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) (i : Fin s.k)
+private theorem coord_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) (i : Fin s.k)
     (j : Fin dim) : (encode τp c).2 (coordIx dim i j) = (c.2 i).1.2 j := by
   simp only [encode, coordIx, Equiv.symm_apply_apply]
 
 /-- The encoding of a node of the target is in domain. -/
-theorem inDom_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) :
+private theorem inDom_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) :
     InDom (encode τp c) := by
   intro i
   have hco : (fun j => (encode τp c).2 (coordIx dim i j)) = (c.2 i).1.2 :=
@@ -220,7 +220,7 @@ theorem inDom_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) :
   exact (c.2 i).2
 
 /-- Encoding and decoding are inverse on nodes of the target. -/
-theorem decode_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) :
+private theorem decode_encode (τp : Fin s.par → Tag) (c : s.Node (I.MapRel A)) :
     decode (encode τp c) (inDom_encode τp c) = c := by
   refine Prod.ext_iff.mpr ⟨rfl, funext fun i => Subtype.ext (Prod.ext_iff.mpr ⟨rfl, ?_⟩)⟩
   exact funext fun j => coord_encode τp c i j
@@ -236,7 +236,7 @@ variable {s : ParamTCSpec L₂} {I : RelFOInterpretation L₁ L₂ Tag dim} {A :
 
 /-- **A step of the pulled walk is a step of the original one**, both endpoints
 and the parameters being in the domain. -/
-theorem stepAt_comapRel_iff {z : Fin (s.par * dim) → A} (a b : (s.comapRel I τp).Node A) :
+private theorem stepAt_comapRel_iff {z : Fin (s.par * dim) → A} (a b : (s.comapRel I τp).Node A) :
     (s.comapRel I τp).StepAt z a b ↔
       ∃ (ha : InDom a) (hb : InDom b) (hz : ParInDom I τp z),
         s.StepAt (decodePar hz) (decode a ha) (decode b hb) := by
@@ -285,7 +285,8 @@ theorem stepAt_comapRel_iff {z : Fin (s.par * dim) → A} (a b : (s.comapRel I �
 /-- **The pulled walk reaches what the original one reaches**, from an
 in-domain node. The target's membership in the domain is part of the
 conclusion: a walk cannot leave the domain, its steps being guarded. -/
-theorem reachAt_comapRel_forward {z : Fin (s.par * dim) → A} {a b : (s.comapRel I τp).Node A}
+private theorem reachAt_comapRel_forward
+    {z : Fin (s.par * dim) → A} {a b : (s.comapRel I τp).Node A}
     (h : (s.comapRel I τp).ReachAt z a b) (ha : InDom a) (hz : ParInDom I τp z) :
     ∃ hb : InDom b, s.ReachAt (decodePar hz) (decode a ha) (decode b hb) := by
   induction h with
@@ -299,7 +300,7 @@ theorem reachAt_comapRel_forward {z : Fin (s.par * dim) → A} {a b : (s.comapRe
 
 /-- **And conversely**: what the original walk reaches, the pulled one
 reaches. -/
-theorem reachAt_comapRel_backward {z : Fin (s.par * dim) → A} (hz : ParInDom I τp z)
+private theorem reachAt_comapRel_backward {z : Fin (s.par * dim) → A} (hz : ParInDom I τp z)
     {c d : s.Node (I.MapRel A)} (h : s.ReachAt (decodePar hz) c d) :
     (s.comapRel I τp).ReachAt z (encode τp c) (encode τp d) := by
   induction h with

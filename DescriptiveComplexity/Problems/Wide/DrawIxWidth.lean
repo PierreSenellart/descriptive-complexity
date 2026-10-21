@@ -53,7 +53,7 @@ variable {a b q i : ℕ}
 
 /-- **A sum costs one exponent**, both summands being below a power of a `q`
 that is at least two. -/
-theorem add_le_pow {j k : ℕ} (hq : 2 ≤ q) (ha : a ≤ q ^ i) (hb : b ≤ q ^ j)
+private theorem add_le_pow {j k : ℕ} (hq : 2 ≤ q) (ha : a ≤ q ^ i) (hb : b ≤ q ^ j)
     (hi : i < k) (hj : j < k) : a + b ≤ q ^ k := by
   have hqi : q ^ i ≤ q ^ (k - 1) := Nat.pow_le_pow_right (by omega) (by omega)
   have hqj : q ^ j ≤ q ^ (k - 1) := Nat.pow_le_pow_right (by omega) (by omega)
@@ -65,21 +65,21 @@ theorem add_le_pow {j k : ℕ} (hq : 2 ≤ q) (ha : a ≤ q ^ i) (hb : b ≤ q ^
   omega
 
 /-- **A product adds the exponents.** -/
-theorem mul_le_pow {j k : ℕ} (hq : 1 ≤ q) (ha : a ≤ q ^ i) (hb : b ≤ q ^ j)
+private theorem mul_le_pow {j k : ℕ} (hq : 1 ≤ q) (ha : a ≤ q ^ i) (hb : b ≤ q ^ j)
     (hk : i + j ≤ k) : a * b ≤ q ^ k :=
   le_trans (le_trans (Nat.mul_le_mul ha hb) (le_of_eq (pow_add q i j).symm))
     (Nat.pow_le_pow_right hq hk)
 
 /-- **A bound is a first power.** -/
-theorem le_pow_one (ha : a ≤ q) : a ≤ q ^ 1 := by simpa using ha
+private theorem le_pow_one (ha : a ≤ q) : a ≤ q ^ 1 := by simpa using ha
 
 /-- **Raising the exponent of a bound.** -/
-theorem le_pow_of_le (k : ℕ) (hq : 1 ≤ q) (ha : a ≤ q ^ i) (hk : i ≤ k) : a ≤ q ^ k :=
+private theorem le_pow_of_le (k : ℕ) (hq : 1 ≤ q) (ha : a ≤ q ^ i) (hk : i ≤ k) : a ≤ q ^ k :=
   le_trans ha (Nat.pow_le_pow_right hq hk)
 
 /-- **A constant of the program is below every positive power**, the bound being
 at least sixteen and every constant written in these costs at most that. -/
-theorem cst_le_pow (k : ℕ) (hq : 16 ≤ q) (ha : a ≤ 16) (hk : 1 ≤ k) : a ≤ q ^ k :=
+private theorem cst_le_pow (k : ℕ) (hq : 16 ≤ q) (ha : a ≤ 16) (hk : 1 ≤ k) : a ≤ q ^ k :=
   le_pow_of_le k (by omega) (le_pow_one (le_trans ha hq)) hk
 
 /-! The three shapes a layer of the tower is assembled in, stated over fresh
@@ -87,7 +87,7 @@ naturals: the arithmetic is proved away from the machine's terms, as everything
 else in this budget pass is. -/
 
 /-- **The shape of a round of the VAL loop**: two loops and five dispatches. -/
-theorem round_shape (hq16 : 16 ≤ q) {g m : ℕ} (hg : g ≤ q ^ 13) (hm : m ≤ q ^ 13) :
+private theorem round_shape (hq16 : 16 ≤ q) {g m : ℕ} (hg : g ≤ q ^ 13) (hm : m ≤ q ^ 13) :
     1 + g + 1 + 1 + 1 + m + 1 ≤ q ^ 19 := by
   have hq1 : 1 ≤ q := by omega
   have hq2 : 2 ≤ q := by omega
@@ -109,7 +109,7 @@ theorem round_shape (hq16 : 16 ≤ q) {g m : ℕ} (hg : g ≤ q ^ 13) (hm : m �
     (by norm_num) (by norm_num)
 
 /-- **The shape of a gates' leg**: one loop between two dispatches. -/
-theorem gates_shape (hq16 : 16 ≤ q) {g : ℕ} (hg : g ≤ q ^ 13) :
+private theorem gates_shape (hq16 : 16 ≤ q) {g : ℕ} (hg : g ≤ q ^ 13) :
     1 + g + 1 ≤ q ^ 15 := by
   have hq2 : 2 ≤ q := by omega
   have a1 : 1 + g ≤ q ^ 14 :=
@@ -120,7 +120,7 @@ theorem gates_shape (hq16 : 16 ≤ q) {g : ℕ} (hg : g ≤ q ^ 13) :
 
 /-- **The shape of a variable's machinery as one width**: what it pays once, and
 what it pays per round of the VAL loop. -/
-theorem varCD_shape (hq16 : 16 ≤ q) {vg rc p : ℕ} (hvg : vg ≤ q ^ 15)
+private theorem varCD_shape (hq16 : 16 ≤ q) {vg rc p : ℕ} (hvg : vg ≤ q ^ 15)
     (hrc : rc ≤ q ^ 19) (hp : p ≤ q) :
     vg + rc + 3 * p + 6 + (2 * p + rc + 3) ≤ q ^ 23 := by
   have hq1 : 1 ≤ q := by omega
@@ -198,7 +198,7 @@ variable {dt} {w wP wR wK q : ℕ}
 /-- **The read of an expansion is polynomial**: the walk down the tags, then the
 loop over the leaf's tuples. It is the body of an `exp` atom and of a gate
 block alike. -/
-theorem ixExpBody_le (h : dt.IxWidthBd A w wP wR wK q) :
+private theorem ixExpBody_le (h : dt.IxWidthBd A w wP wR wK q) :
     (w + 2) * dt.ntgDim + 2 +
       ((2 + (w + 2) * dt.nfDim) * (Nat.card (Lex (Fin dt.eDim → A)) + 1) + 1) ≤ q ^ 7 := by
   have hq1 : 1 ≤ q := by have := h.cst; omega
@@ -225,7 +225,7 @@ theorem ixExpBody_le (h : dt.IxWidthBd A w wP wR wK q) :
 
 /-- **An atom's cost is polynomial**, whatever its kind: a comparison, an
 expansion's read, or a stage atom's random access. -/
-theorem ixKindCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx)
+private theorem ixKindCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx)
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) :
     dt.ixKindCost A vi w wP wR wK κ ≤ q ^ 10 := by
   have hq1 : 1 ≤ q := by have := h.cst; omega
@@ -297,13 +297,13 @@ theorem ixKindCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx)
       (by norm_num) (by norm_num)
 
 /-- **A matrix's cost is polynomial**: it is the largest of its atoms'. -/
-theorem ixMatCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
+private theorem ixMatCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
     dt.ixMatCost A vi w wP wR wK ≤ q ^ 10 :=
   Finset.sup_le fun a _ => ixKindCost_le h vi (dt.kindOf vi a)
 
 /-- **A gate block's cost is polynomial**: a sweep of the file and an
 expansion's read. -/
-theorem ixGateCost_le (h : dt.IxWidthBd A w wP wR wK q) :
+private theorem ixGateCost_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixGateCost A w wP ≤ q ^ 10 := by
   have hq2 : 2 ≤ q := by have := h.cst; omega
   have h1 : 1 + ((w + 2) * dt.ntgDim + 2 +
@@ -319,7 +319,7 @@ theorem ixGateCost_le (h : dt.IxWidthBd A w wP wR wK q) :
 
 /-- **A loop over a gate block is polynomial**: what a variable's gates leg and
 a round of the VAL loop both pay, at their own number of gates. -/
-theorem ixGateLoop_le (h : dt.IxWidthBd A w wP wR wK q) (n : ℕ) (hn : n ≤ q) :
+private theorem ixGateLoop_le (h : dt.IxWidthBd A w wP wR wK q) (n : ℕ) (hn : n ≤ q) :
     (dt.ixGateCost A w wP + 2) * n + 1 ≤ q ^ 13 := by
   have hq1 : 1 ≤ q := by have := h.cst; omega
   have hq2 : 2 ≤ q := by have := h.cst; omega
@@ -333,7 +333,7 @@ theorem ixGateLoop_le (h : dt.IxWidthBd A w wP wR wK q) (n : ℕ) (hn : n ≤ q)
 
 /-- **A round of the VAL loop is polynomial**: the inner gates and the matrix,
 each looped over once. -/
-theorem ixRoundCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
+private theorem ixRoundCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
     dt.ixRoundCost A vi w wP wR wK ≤ q ^ 19 := by
   have hq1 : 1 ≤ q := by have := h.cst; omega
   have hq2 : 2 ≤ q := by have := h.cst; omega
@@ -351,7 +351,7 @@ theorem ixRoundCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
   exact round_shape h.cst hg hm
 
 /-- **The gates' leg of a variable is polynomial.** -/
-theorem ixVarGatesCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
+private theorem ixVarGatesCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
     dt.ixVarGatesCost A vi w wP ≤ q ^ 15 := by
   have hq2 : 2 ≤ q := by have := h.cst; omega
   have hg : (dt.ixGateCost A w wP + 2) * dt.arOf vi + 1 ≤ q ^ 13 :=
@@ -360,7 +360,7 @@ theorem ixVarGatesCost_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
   exact gates_shape h.cst hg
 
 /-- **A variable's machinery, as one width, is polynomial.** -/
-theorem ixVarCD_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
+private theorem ixVarCD_le (h : dt.IxWidthBd A w wP wR wK q) (vi : dt.VarIx) :
     dt.ixVarCD A vi w wP wR wK ≤ q ^ 23 := by
   simp only [ixVarCD]
   exact varCD_shape h.cst (ixVarGatesCost_le h vi) (ixRoundCost_le h vi) h.wPLe
@@ -373,7 +373,7 @@ arities.
 This is the first of the two factors the clocked evaluation is charged
 (`DescriptiveComplexity.Draw.Data.ixSpineCost_le_mul`); the second is the
 number of VAL rounds. -/
-theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
+private theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixLegWidth A w wP wR wK * dt.nv ≤ q ^ 25 := by
   classical
   have hq1 : 1 ≤ q := by have := h.cst; omega
@@ -390,7 +390,7 @@ theorem ixLegWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
 the output machinery's and the four joining steps, all below `q ^ 26`. What an
 instantiation owes of the clock's first factor is therefore
 `q ^ 26 ≤ 2 ^ (k · m)`, and of the second the number of VAL rounds. -/
-theorem ixEvalWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
+private theorem ixEvalWidth_le (h : dt.IxWidthBd A w wP wR wK q) :
     dt.ixEvalWidth A w wP wR wK ≤ q ^ 26 := by
   have hq2 : 2 ≤ q := by have := h.cst; omega
   have hspine : dt.ixLegWidth A w wP wR wK * dt.nv ≤ q ^ 25 := ixLegWidth_le h

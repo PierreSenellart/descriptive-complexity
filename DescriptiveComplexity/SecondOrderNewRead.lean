@@ -221,7 +221,7 @@ def readEquiv₁ (h : ReadOn S e means) (v : M) :
 guarded image of a domain sentence holds of an invented value exactly when the
 sentence holds in the instance, the block interpreted by the assignment that
 value means. -/
-theorem realize_readHom₁ (h : ReadOn S e means) {R : Lt.Relations 1}
+private theorem realize_readHom₁ (h : ReadOn S e means) {R : Lt.Relations 1}
     (hinj : Function.Injective e) (hR : ∀ x : M, RelMap R ![x] ↔ ∃ a : A, e a = x) (v : M)
     (φ : ((L.sum Language.order).sum B.lang).Sentence) :
     ((readHom₁ S).relOnSentenceF R φ).Realize (fun _ => v) ↔

@@ -21,6 +21,13 @@ public import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.Problems.HornSat.Hardness
 public import DescriptiveComplexity.Problems.Qsat.Hardness
+import all DescriptiveComplexity.Composition
+import all DescriptiveComplexity.Problems.Machine.HornInterp
+import all DescriptiveComplexity.Problems.Machine.Interp
+import all DescriptiveComplexity.Problems.Machine.Membership
+import all DescriptiveComplexity.Problems.Machine.Space
+import all DescriptiveComplexity.Problems.Qsat.Hardness
+import all DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # Machine acceptance is NP-complete, and its deterministic restriction PTIME-complete

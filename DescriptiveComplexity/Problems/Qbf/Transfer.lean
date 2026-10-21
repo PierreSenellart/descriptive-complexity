@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Qbf.Defs
 public import DescriptiveComplexity.SecondOrderMerge
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Transferring an alternating prefix from valuations to block assignments
@@ -55,7 +56,7 @@ def readAll : ∀ (Bs : List SOBlock), BlockRead A A' Bs →
       consAssign (fun i a => rd (Sum.inl i) (νs 0) a)
         (readAll Bs (fun i => rd (Sum.inr i)) fun j => νs j.succ)
 
-theorem readAll_cons (B : SOBlock) (Bs : List SOBlock) (rd : BlockRead A A' (B :: Bs))
+private theorem readAll_cons (B : SOBlock) (Bs : List SOBlock) (rd : BlockRead A A' (B :: Bs))
     (ν : A' → Prop) (νs : Fin Bs.length → A' → Prop) :
     readAll (B :: Bs) rd (Fin.cons ν νs) =
       consAssign (fun i a => rd (Sum.inl i) ν a)
@@ -99,7 +100,7 @@ def markC (Gt : SOBlock) : ∀ (B : SOBlock) (Bs : List SOBlock),
 the truth assignment of the block `markC` assigns it is the same as assembling
 the original assignment and the auxiliary one with
 `DescriptiveComplexity.combineLast`. -/
-theorem readAll_consLast (Gt : SOBlock) {D : ℕ}
+private theorem readAll_consLast (Gt : SOBlock) {D : ℕ}
     (pdf : ∀ {m : ℕ}, (Fin m → A) → (Fin D → A)) :
     ∀ (B : SOBlock) (Bs : List SOBlock)
       (el : ((mergeBlocks (B :: Bs)).ι ⊕ Gt.ι) → (Fin D → A) → A')
@@ -129,7 +130,7 @@ theorem readAll_consLast (Gt : SOBlock) {D : ℕ}
 /-- A reading built from an injective tagging is surjective at every block: a
 truth assignment realizing a prescribed relation is obtained by reading the
 tag back off each propositional variable. -/
-theorem readSurj_consLast (Gt : SOBlock) {D : ℕ}
+private theorem readSurj_consLast (Gt : SOBlock) {D : ℕ}
     (pdf : ∀ {m : ℕ}, (Fin m → A) → (Fin D → A)) :
     ∀ (B : SOBlock) (Bs : List SOBlock)
       (el : ((mergeBlocks (B :: Bs)).ι ⊕ Gt.ι) → (Fin D → A) → A'),

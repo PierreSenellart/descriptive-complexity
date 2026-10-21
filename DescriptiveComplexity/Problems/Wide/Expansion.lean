@@ -11,6 +11,7 @@ import DescriptiveComplexity.Exponential.Copies
 import DescriptiveComplexity.Exponential.Expansion
 import DescriptiveComplexity.Exponential.AddrExp
 import Batteries.Tactic.OpenPrivate
+import all DescriptiveComplexity.Exponential.AddrExp
 
 /-!
 # The wide machine as an exponential expansion
@@ -108,12 +109,12 @@ theorem realize_ltG {v : γ → A} (x y : γ) :
     (ltG x y).Realize v ↔ (WMLe (v x) (v y) ∧ ¬WMLe (v y) (v x)) :=
   AddrExp.realize_ltG wmLe x y
 
-theorem realize_addrLeS (ρ σ : addrBlock.Assignment A) :
+private theorem realize_addrLeS (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize wide2 A (addrBlock.structure₂ (L := wOrd) ρ σ) addrLeS ↔
       WMSetLe WMLe (wbits ρ) (wbits σ)) :=
   AddrExp.realize_addrLeS wmLe ρ σ
 
-theorem realize_inpS (ρ σ : addrBlock.Assignment A) :
+private theorem realize_inpS (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize wide2 A (addrBlock.structure₂ (L := wOrd) ρ σ) inpS ↔
       ∃ x y, WMDown WMLe (wbits ρ) x ∧ wbits σ y ∧ WMInp x y) :=
   AddrExp.realize_inpS wmLe wmInp ρ σ

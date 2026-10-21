@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Invariant.OrderDef
 public import DescriptiveComplexity.Invariant.Simulation
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Invariant.OrderDef
+import all DescriptiveComplexity.Invariant.Structure
 
 /-!
 # Pulling an ordered induction on the invariant structure back to the base
@@ -67,7 +70,7 @@ def backBlock (B' : SOBlock) (k : ℕ) : SOBlock where
 def backFlatten {A : Type} {m : ℕ} (t : Fin m → Fin k → A) : Fin (m * k) → A :=
   fun p => t (finProdFinEquiv.symm p).1 (finProdFinEquiv.symm p).2
 
-theorem backFlatten_apply {A : Type} {m : ℕ} (t : Fin m → Fin k → A)
+private theorem backFlatten_apply {A : Type} {m : ℕ} (t : Fin m → Fin k → A)
     (a : Fin m) (q : Fin k) :
     backFlatten t (finProdFinEquiv (a, q)) = t a q := by
   rw [backFlatten, Equiv.symm_apply_apply]
@@ -78,7 +81,7 @@ def backAssign {S : Set (Σ n, L.Relations n)} {A : Type} [L.Structure A]
     (backBlock B' k).Assignment A :=
   fun i flat => X' i fun a => InvMap.mk S fun q => flat (finProdFinEquiv (a, q))
 
-theorem backAssign_backFlatten {S : Set (Σ n, L.Relations n)} {A : Type}
+private theorem backAssign_backFlatten {S : Set (Σ n, L.Relations n)} {A : Type}
     [L.Structure A] {B' : SOBlock} (X' : B'.Assignment (InvMap S k A))
     (i : B'.ι) (t : Fin (B'.arity i) → Fin k → A) :
     backAssign X' i (backFlatten t) ↔ X' i fun a => InvMap.mk S (t a) := by
@@ -191,7 +194,7 @@ variable {σ : (ordBlock k).Assignment A}
 variable {Y : (backBlock B' k).Assignment A}
 
 omit [Finite A] in
-private theorem realize_bPrecF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
+theorem realize_bPrecF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
     (@Formula.Realize _ A (@SOBlock.structure₁ (L.sum (ordBlock k).lang)
       (backBlock B' k) A ((ordBlock k).structure₁ (L := L) σ) Y) _
       (bPrecF L k f g) W) ↔
@@ -203,7 +206,7 @@ private theorem realize_bPrecF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
   exact Iff.rfl
 
 omit [Finite A] in
-private theorem realize_bEquivF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
+theorem realize_bEquivF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
     (@Formula.Realize _ A (@SOBlock.structure₁ (L.sum (ordBlock k).lang)
       (backBlock B' k) A ((ordBlock k).structure₁ (L := L) σ) Y) _
       (bEquivF L k f g) W) ↔
@@ -215,7 +218,7 @@ private theorem realize_bEquivF {γ : Type} (f g : Fin k → γ) (W : γ → A) 
   exact Iff.rfl
 
 omit [Finite A] in
-private theorem realize_bLeF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
+theorem realize_bLeF {γ : Type} (f g : Fin k → γ) (W : γ → A) :
     (@Formula.Realize _ A (@SOBlock.structure₁ (L.sum (ordBlock k).lang)
       (backBlock B' k) A ((ordBlock k).structure₁ (L := L) σ) Y) _
       (bLeF L k f g) W) ↔
@@ -669,7 +672,7 @@ variable {σ : (ordBlock k).Assignment A}
 
 /-- The stages of the pulled-back induction are the pullbacks of the
 original stages. -/
-theorem inflStage_backStepDef (lo : LinearOrder (InvMap S k A))
+private theorem inflStage_backStepDef (lo : LinearOrder (InvMap S k A))
     (h1 : IncompRel (toPebble σ) = EquivK (atomicAgreeOn S A k))
     (h2 : ∀ u v : Fin k → A,
       (toPebble σ u v ∨ EquivK (atomicAgreeOn S A k) u v) ↔

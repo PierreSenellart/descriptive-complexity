@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRoundSem
+import all DescriptiveComplexity.Problems.Wide.DrawLeaf
+import all DescriptiveComplexity.Problems.Wide.DrawRoundSem
 
 /-!
 # One variable's verdict *is* one step of the iteration
@@ -75,7 +77,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite P] [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] in
 /-- The address's blocks depend on the mirror alone. -/
-theorem mirBlk_of_mir {st st' : TapeStD dt A R P} (h : st.mir = st'.mir) :
+private theorem mirBlk_of_mir {st st' : TapeStD dt A R P} (h : st.mir = st'.mir) :
     dt.mirBlk st = dt.mirBlk st' :=
   funext fun k => congrArg
     (fun s => wmBlk s
@@ -98,7 +100,7 @@ and its pack by `DescriptiveComplexity.Draw.Data.passW`, the stage reads
 by `DescriptiveComplexity.Draw.Data.old_trackOf_stageTgtD`, and the two
 leaf readings by `DescriptiveComplexity.Draw.Data.leafP_pass_iff` /
 `DescriptiveComplexity.Draw.Data.leafP_fail_iff`. -/
-theorem accVerdict_leafP
+private theorem accVerdict_leafP
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
@@ -257,7 +259,7 @@ at the stage the tracks hold: the prefix of
 variable is nullary, so the working address's outer blocks encode the empty
 tuple and there is nothing to ask of them – which is why this is the one
 verdict a reduction can take at the *empty* address. -/
-theorem accVerdict_out
+private theorem accVerdict_out
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)

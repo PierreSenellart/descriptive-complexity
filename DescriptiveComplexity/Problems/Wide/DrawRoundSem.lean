@@ -8,6 +8,13 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawInstVar
 public import DescriptiveComplexity.Problems.Wide.DrawGateFacts
 public import DescriptiveComplexity.Problems.Wide.DrawLeaf
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawData
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawInstRound
+import all DescriptiveComplexity.Problems.Wide.DrawInstStage
+import all DescriptiveComplexity.Problems.Wide.DrawLeaf
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
 
 /-!
 # The round flags, read semantically, and the pack built from the pass
@@ -76,7 +83,7 @@ omit [Finite R] [Finite P] in
 /-- **Without quantified levels the two flags are constant along the VAL
 loop**: the entry seeded them `True`, the inner-gates thread is empty, and
 no fold update writes a flag. -/
-theorem ctlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
+private theorem ctlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
     (hn0 : dt.nIn vi = 0) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (v : Univ A R P dt.KIx dt.dd → Prop) (fG : dt.CtlIx → A) (a : ιV) :
@@ -169,7 +176,7 @@ omit [Finite R] [Finite P] in
 /-- **A round flag at the round's exit reads as the per-polarity pass**:
 every quantified level of the flag's polarity holds an encoding-shaped,
 one-hot, domain-satisfying block value. The capstone's `hEx`/`hAll`. -/
-theorem ctlBit_roundFX_pass_iff (hzo : PR.zero ≠ PR.one) {q : dt.CtlIx}
+private theorem ctlBit_roundFX_pass_iff (hzo : PR.zero ≠ PR.one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (v : Univ A R P dt.KIx dt.dd → Prop) (fG : dt.CtlIx → A) (a : ιV) :
     dt.ctlBit PR.one
@@ -212,7 +219,7 @@ variable {vi} in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational] in
 /-- **The two polarity readings deliver the full pass**: every level's
 flag is one of the two. The capstone's `hPass`. -/
-theorem roundPass_of_polarities {zero one : A} {stV : TapeStD dt A R P}
+private theorem roundPass_of_polarities {zero one : A} {stV : TapeStD dt A R P}
     (hEx : ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.existGateC →
       dt.igPassP RF zero one vi stV ℓ)
     (hAl : ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.allGateC →
@@ -332,7 +339,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 /-- **The composed TARGET's argument blocks are the sources'**: after all
 copy loops, block `ℓ` of TARGET is the position's source block – the copy
 is faithful on the padded cells, and an encoding holds no others. -/
-theorem wmBlk_stageTgtD_eq_encMap
+private theorem wmBlk_stageTgtD_eq_encMap
     (vi : dt.VarIx) (iv : dt.d.B.ι)
     (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
     (stV : TapeStD dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -437,7 +444,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- A level's polarity flag is the ∃-flag exactly by its polarity. -/
-theorem igFlag_eq_existGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
+private theorem igFlag_eq_existGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
     dt.igFlag vi ℓ = dt.existGateC ↔
       dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = true := by
   rw [igFlag]
@@ -455,7 +462,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational]
   [L.Structure A] in
 /-- A level's polarity flag is the ∀-flag exactly by its polarity. -/
-theorem igFlag_eq_allGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
+private theorem igFlag_eq_allGateC_iff (vi : dt.VarIx) (ℓ : Fin (dt.nIn vi)) :
     dt.igFlag vi ℓ = dt.allGateC ↔
       dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = false := by
   rw [igFlag]
@@ -471,7 +478,7 @@ variable {zero one} in
 omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **A per-polarity pass is the split's gate clause**, reindexed from the
 quantified levels to the pack's indices. -/
-theorem roundPass_iff_split_gen (hzo : zero ≠ one)
+private theorem roundPass_iff_split_gen (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (vi : dt.VarIx) (stV : TapeStD dt A R P) {q : dt.CtlIx} {bpol : Bool}
     (hqiff : ∀ ℓ : Fin (dt.nIn vi),
@@ -538,7 +545,7 @@ variable {zero one} in
 omit [Fintype dt.SlotIx] [L.IsRelational] [LinearOrder (dt.X.Map A)] [Finite R] [Finite P] in
 /-- **The valuation the leaf decodes is the pass's**: every level's block
 of the leaf's reading encodes `passW`'s point. -/
-theorem levelVal_encMap (hzo : zero ≠ one)
+private theorem levelVal_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (hp : ∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ)
@@ -585,7 +592,7 @@ omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The leaf at a passing round is the matrix's value at the pass's
 points** – the capstone's `hPsPass`, with `Ps` the gated matrix
 `DescriptiveComplexity.Draw.Data.leafP`. -/
-theorem leafP_pass_iff (hzo : zero ≠ one)
+private theorem leafP_pass_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (σ : dt.d.B.Assignment (dt.X.Map A))
@@ -654,7 +661,7 @@ omit [Fintype dt.SlotIx] [L.IsRelational] [Finite R] [Finite P] in
 /-- **The leaf at a failing round is the ∃-clause alone** – the capstone's
 `hPsFail`: the ∀-clause's implication is vacuous when the two readings do
 not both hold. -/
-theorem leafP_fail_iff (hzo : zero ≠ one)
+private theorem leafP_fail_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (σ : dt.d.B.Assignment (dt.X.Map A))

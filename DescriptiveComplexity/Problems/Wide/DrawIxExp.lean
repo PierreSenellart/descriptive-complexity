@@ -7,6 +7,18 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstExp
 import DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawExp
+import all DescriptiveComplexity.Problems.Wide.DrawInstCmp
+import all DescriptiveComplexity.Problems.Wide.DrawInstExp
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The expansion atoms at an arbitrary file
@@ -86,14 +98,14 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **The witness register holds the witness cell**: its address is the cell an
 elementwise atom reads. -/
-theorem elt_ixExpTagCell (i : Fin (k * Fintype.card dt.X.Tag)) :
+private theorem elt_ixExpTagCell (i : Fin (k * Fintype.card dt.X.Tag)) :
     elt (dt.ixExpTagCell F hhas one vi ts i) = dt.expTagCell zero one vi ts i :=
   dt.elt_reg_encCoord hhas helt _ _ _ _
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.Structure A] in
 /-- **The leaf register holds the leaf cell.** -/
-theorem elt_ixExpECell (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.relNr e τ)) :
+private theorem elt_ixExpECell (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.relNr e τ)) :
     elt (dt.ixExpECell F hhas one vi ts e τ (hnτ := hnτ) a r) =
       dt.expECell zero one vi ts e τ hnτ a r :=
   dt.elt_reg_encCoord hhas helt _ _ _ _
@@ -144,7 +156,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The loop element is the round's wide tuple**, at every stage of the
 family: the same reading as at the elementwise file, the reads now going to the
 registers the layout names. -/
-theorem readLvE_ixExpFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
+private theorem readLvE_ixExpFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) :
     dt.readLvE (dt.ixExpFam F hhas one vi ts e av st τ hk hn hrd vAdr f₀ a j) =
       ofLex a := by
@@ -202,7 +214,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An expansion atom's element loop is blind to the two scratch
 registers**, at an arbitrary file: it reads the levels' register sets – the
 mirror and VAL – and its background at the working cell alone. -/
-theorem ixExpFam_congr_scratch {st' : TapeSt dt A R P I}
+private theorem ixExpFam_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st') (hreg : ¬∃ u : I, vAdr = F.cell u)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) :
@@ -216,7 +228,7 @@ theorem ixExpFam_congr_scratch {st' : TapeSt dt A R P I}
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness chain is blind to the two scratch registers too.** -/
-theorem ixExpTagFam_congr_scratch {st' : TapeSt dt A R P I}
+private theorem ixExpTagFam_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st') (hreg : ¬∃ u : I, vAdr = F.cell u)
     (f₀ : dt.CtlIx → A) (i : Fin (k * Fintype.card dt.X.Tag + 1)) :
     dt.ixExpTagFam F hhas one vi ts e av st hk hn hrd vAdr f₀ i =
@@ -247,7 +259,7 @@ variable {dt F hhas one vi ts e av st hk hn hrd vAdr}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The witness flags read back**: after the chain, the flag of position `ℓ`
 and tag `t` holds the digit of the register the witness cell of `(ℓ, t)` is. -/
-theorem ctlBit_ixExpTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
+private theorem ctlBit_ixExpTagFam_last (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (ℓ : Fin k) (t : dt.X.Tag) :
     dt.ctlBit one
       (dt.ixExpTagFam F hhas one vi ts e av st hk hn hrd vAdr f₀
@@ -278,7 +290,7 @@ omit [Fintype dt.SlotIx] in
 addresses the levels' registers stand for hold the encodings of the points, the
 flags are one-hot at the points' tag tuple, which is the branch dispatch's
 guard. -/
-theorem tagsAre_ixExpTagFam (hzo : zero ≠ one)
+private theorem tagsAre_ixExpTagFam (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hinj : Function.Injective elt)
     (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
@@ -327,7 +339,7 @@ variable {dt F hhas one vi ts e av st τ hk hn hrd vAdr}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The payload a leaf read spells at a generated state** is the round's
 tuple's, so the guard's computed coordinates name the round's register. -/
-theorem expPay_ixExpFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
+private theorem expPay_ixExpFam (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) (r : Fin (dt.relNr e τ)) :
     dt.expPay (zero := zero) (e := e) (τ := τ) (r := r) (hn := hn τ)
       (dt.ixExpFam F hhas one vi ts e av st τ hk hn hrd vAdr f₀ a j) =
@@ -339,7 +351,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A leaf read's guard holds at its register**: the computed coordinates are
 the round's payload, so the trip stops at the register the layout names by the
 member tuple. -/
-theorem ixExpMatch_ixExpFam (hzo : zero ≠ one) (hix : IsLinOrd F.le)
+private theorem ixExpMatch_ixExpFam (hzo : zero ≠ one) (hix : IsLinOrd F.le)
     (hsep : F.toLayout.NameSep zero dt.dd0Le)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) (r : Fin (dt.relNr e τ)) :
@@ -360,7 +372,7 @@ theorem ixExpMatch_ixExpFam (hzo : zero ≠ one) (hix : IsLinOrd F.le)
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A leaf read's guard identifies its register.** -/
-theorem ixExpMatch_ixExpFam_uniq (hzo : zero ≠ one) (hix : IsLinOrd F.le)
+private theorem ixExpMatch_ixExpFam_uniq (hzo : zero ≠ one) (hix : IsLinOrd F.le)
     (hsep : F.toLayout.NameSep zero dt.dd0Le)
     (f₀ : dt.CtlIx → A) (a : Lex (Fin dt.eDim → A))
     (j : Fin (dt.relNr e τ + 1)) (r : Fin (dt.relNr e τ))
@@ -390,7 +402,7 @@ omit [Fintype dt.SlotIx] [Nonempty A] in
 /-- **What a leaf trip's digit means**, at the file: at a round's register, the
 bit is the block atom's value at the points the addresses encode, read at the
 valuation the round's tuple spells. -/
-theorem ixExpESet_ixExpECell_iff (hzo : zero ≠ one)
+private theorem ixExpESet_ixExpECell_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hinj : Function.Injective elt)
     (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
@@ -668,14 +680,14 @@ variable (helt : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
 /-- **The branch's leaf, over the wide valuation**: the defining sentence's
 matrix at the points' assignments, its levels read off the first `n`
 coordinates of the wide tuple. -/
-noncomputable def ixExpLeafP (pts : Fin k → dt.X.Map A)
+private noncomputable def ixExpLeafP (pts : Fin k → dt.X.Map A)
     (v : Fin dt.eDim → A) : Prop :=
   dt.expLeaf e τ (fun ℓ => (pts ℓ).1.2) fun j => v (Fin.castLE hnτ j)
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The leaf-read flags read back**: at a round's end, the flag of the
 `r`-th block atom holds the digit of the round's cell. -/
-theorem ctlBit_rdf_ixExpFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
+private theorem ctlBit_rdf_ixExpFam (hzo : zero ≠ one) (f₀ : dt.CtlIx → A)
     (a : Lex (Fin dt.eDim → A)) (r : Fin (dt.relNr e τ)) :
     dt.ctlBit one
         (dt.ixExpFam F hhas one vi ts e av st τ hk hn hrd vAdr f₀ a
@@ -704,7 +716,7 @@ include hinj helt in
 the flags holding the block atoms' bits and the loop element the round's
 tuple, the Boolean function the control computes is the leaf predicate at
 that tuple. -/
-theorem expLeafVal_ixExpFam (hzo : zero ≠ one)
+private theorem expLeafVal_ixExpFam (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
@@ -736,7 +748,7 @@ omit [Fintype dt.SlotIx] in
 /-- **The sub-fold's accumulators fold the strict prefix**: at every round's
 entry, the `sac` slots hold the completed-subtree contributions of the
 branch's prefix at the round's tuple. -/
-theorem readSac_ixExpIter (hzo : zero ≠ one)
+private theorem readSac_ixExpIter (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
@@ -891,7 +903,7 @@ of the branch's whole prefix at the points' assignments – the value
 `DescriptiveComplexity.Draw.Data.expLeaf`'s prefix takes over every wide
 tuple, which `DescriptiveComplexity.Problems.Wide.DrawExp` reads as the
 expansion atom's truth. -/
-theorem ctlBit_avC_ixExp_exit (hzo : zero ≠ one)
+private theorem ctlBit_avC_ixExp_exit (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,
@@ -951,7 +963,7 @@ omit [Fintype dt.SlotIx] in
 the registers encode, the bit the exit control files in the atom's slot is
 `RelMap` of the expansion – the machine has evaluated the defining
 sentence. -/
-theorem ctlBit_avC_ixExp_relMap (hzo : zero ≠ one)
+private theorem ctlBit_avC_ixExp_relMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (pts : Fin k → dt.X.Map A)
     (hENC : ∀ ℓ : Fin k,

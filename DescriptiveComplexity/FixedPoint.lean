@@ -12,6 +12,9 @@ public import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.SecondOrderHornPull
 public import DescriptiveComplexity.Padding
 public import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderHornPull
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # FO(LFP): first-order logic with a least fixed point
@@ -175,10 +178,10 @@ def derivesIn (rules : List (HornClause Lg B k)) : ℕ → BAtom B A → Prop
   | 0 => fun _ => False
   | n + 1 => fun q => derivesIn rules n q ∨ stepDerives rules (derivesIn rules n) q
 
-theorem derivesIn_succ {rules : List (HornClause Lg B k)} {n : ℕ} {q : BAtom B A}
+private theorem derivesIn_succ {rules : List (HornClause Lg B k)} {n : ℕ} {q : BAtom B A}
     (h : derivesIn rules n q) : derivesIn rules (n + 1) q := Or.inl h
 
-theorem derivesIn_le {rules : List (HornClause Lg B k)} {m n : ℕ} (hmn : m ≤ n)
+private theorem derivesIn_le {rules : List (HornClause Lg B k)} {m n : ℕ} (hmn : m ≤ n)
     {q : BAtom B A} (h : derivesIn rules m q) : derivesIn rules n q := by
   induction n with
   | zero => rwa [Nat.le_zero.mp hmn] at h
@@ -202,7 +205,7 @@ private theorem exists_common_stage {rules : List (HornClause Lg B k)}
     · exact derivesIn_le (le_max_right _ _) (hN r hr')
 
 /-- The stages exhaust the least fixed point. -/
-theorem derives_iff_derivesIn {rules : List (HornClause Lg B k)} {q : BAtom B A} :
+private theorem derives_iff_derivesIn {rules : List (HornClause Lg B k)} {q : BAtom B A} :
     Derives rules q ↔ ∃ n, derivesIn rules n q := by
   constructor
   · intro h
@@ -230,11 +233,11 @@ theorem derives_iff_derivesIn {rules : List (HornClause Lg B k)} {q : BAtom B A}
 noncomputable def depth (rules : List (HornClause Lg B k)) (q : BAtom B A) : ℕ :=
   sInf {n | derivesIn rules n q}
 
-theorem derivesIn_depth {rules : List (HornClause Lg B k)} {q : BAtom B A}
+private theorem derivesIn_depth {rules : List (HornClause Lg B k)} {q : BAtom B A}
     (h : Derives rules q) : derivesIn rules (depth rules q) q :=
   Nat.sInf_mem (derives_iff_derivesIn.mp h)
 
-theorem depth_le {rules : List (HornClause Lg B k)} {n : ℕ} {q : BAtom B A}
+private theorem depth_le {rules : List (HornClause Lg B k)} {n : ℕ} {q : BAtom B A}
     (h : derivesIn rules n q) : depth rules q ≤ n :=
   Nat.sInf_le h
 
@@ -361,7 +364,7 @@ variable {M N : Type} [Lg.Structure M] [Lg.Structure N]
 
 /-- Derivability transports along an isomorphism of structures: the rules only
 see the guards, which an isomorphism preserves. -/
-theorem derives_map (e : M ≃[Lg] N) {rules : List (HornClause Lg B k)}
+private theorem derives_map (e : M ≃[Lg] N) {rules : List (HornClause Lg B k)}
     {q : BAtom B M} (h : Derives rules q) :
     Derives rules (⟨q.1, fun j => e (q.2 j)⟩ : BAtom B N) := by
   induction h with
@@ -370,7 +373,7 @@ theorem derives_map (e : M ≃[Lg] N) {rules : List (HornClause Lg B k)}
     exact (StrongHomClass.realize_formula e c.guard).mpr hg
 
 /-- The least fixed point transports along an isomorphism. -/
-theorem lfpAssign_map (e : M ≃[Lg] N) (rules : List (HornClause Lg B k)) :
+private theorem lfpAssign_map (e : M ≃[Lg] N) (rules : List (HornClause Lg B k)) :
     lfpAssign (A := N) rules = B.mapAssign e.toEquiv (lfpAssign (A := M) rules) := by
   funext i x
   refine propext ⟨fun h => ?_, fun h => ?_⟩
@@ -467,10 +470,10 @@ def Holds (A : Type) [L.Structure A] [LinearOrder A] : Prop :=
 
 /-- Negating the output complements the defined property: FO(LFP) is closed
 under complement *by construction*, being a logic rather than a fragment. -/
-def not : LFPDef L :=
+private def not : LFPDef L :=
   { B := d.B, k := d.k, rules := d.rules, out := ∼d.out }
 
-theorem holds_not (A : Type) [L.Structure A] [LinearOrder A] :
+private theorem holds_not (A : Type) [L.Structure A] [LinearOrder A] :
     d.not.Holds A ↔ ¬d.Holds A :=
   Iff.rfl
 
@@ -574,7 +577,7 @@ section Realize
 
 variable {A : Type} [L.Structure A] [LinearOrder A] (ρ : B.Assignment A)
 
-theorem realize_atomF (a : SOAtom B k) (v : (Empty ⊕ Fin k) → A) :
+private theorem realize_atomF (a : SOAtom B k) (v : (Empty ⊕ Fin k) → A) :
     (@Formula.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) _ (atomF a) v) ↔
       a.Holds ρ fun j => v (Sum.inr j) := by
@@ -582,7 +585,7 @@ theorem realize_atomF (a : SOAtom B k) (v : (Empty ⊕ Fin k) → A) :
   rw [atomF, Formula.realize_rel]
   exact Iff.rfl
 
-theorem realize_guardOutF (φ : (L.sum Language.order).Formula (Fin k))
+private theorem realize_guardOutF (φ : (L.sum Language.order).Formula (Fin k))
     (v : (Empty ⊕ Fin k) → A) :
     (@Formula.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) _ (guardOutF φ) v) ↔
@@ -591,7 +594,7 @@ theorem realize_guardOutF (φ : (L.sum Language.order).Formula (Fin k))
   rw [guardOutF, Formula.realize_relabel, LHom.realize_onFormula]
   rfl
 
-theorem realize_goalOutF (c : HornClause (L.sum Language.order) B k) :
+private theorem realize_goalOutF (c : HornClause (L.sum Language.order) B k) :
     (@Sentence.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) (goalOutF c)) ↔
       ∀ v : Fin k → A, ¬(c.guard.Realize v ∧ ∀ b ∈ c.body, b.Holds ρ v) := by
@@ -605,7 +608,7 @@ theorem realize_goalOutF (c : HornClause (L.sum Language.order) B k) :
     exact (realize_atomF ρ b _).mpr (hv.2 b hb)
   · exact (realize_atomF ρ b _).mp (hi.2 _ (List.mem_map_of_mem hb))
 
-theorem realize_hornOutF (prog : HornProgram (L.sum Language.order) B k) :
+private theorem realize_hornOutF (prog : HornProgram (L.sum Language.order) B k) :
     (@Sentence.Realize ((L.sum Language.order).sum B.lang) A
         (@sumStructure _ _ A _ (B.structure ρ)) (hornOutF prog)) ↔
       ∀ c ∈ prog, c.head = none →

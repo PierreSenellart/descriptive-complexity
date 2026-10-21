@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Exponential.Kernel
 public import DescriptiveComplexity.SecondOrderParam
+import all DescriptiveComplexity.SecondOrderParam
 
 /-!
 # Giving every guessed variable an argument
@@ -71,7 +72,7 @@ def arityLift :
 
 variable {B p} {N : Type} [instN : Lb.Structure N]
 
-theorem realize_argTerm {β : Type} (ρ : B.withParam.Assignment N) (c : N)
+private theorem realize_argTerm {β : Type} (ρ : B.withParam.Assignment N) (c : N)
     (v : β → N) (t : (Lb.sum B.lang).Term β) :
     letI := @sumStructure Lb B.withParam.lang N instN (B.withParam.structure ρ)
     letI := @sumStructure Lb B.lang N instN (B.structure (B.atParam ρ c))
@@ -158,7 +159,7 @@ theorem NexKernel.withArg_X (K : NexKernel L) : K.withArg.X = K.X := rfl
 theorem NexKernel.withArg_B (K : NexKernel L) : K.withArg.B = K.B.withParam := rfl
 
 /-- **Every variable of the padded kernel's block has an argument.** -/
-theorem NexKernel.withArg_arity_pos (K : NexKernel L) (i : K.withArg.B.ι) :
+private theorem NexKernel.withArg_arity_pos (K : NexKernel L) (i : K.withArg.B.ι) :
     0 < K.withArg.B.arity i := Nat.succ_pos _
 
 /-- **An assignment that ignores the extra argument**: what the padded kernel is

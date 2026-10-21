@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.Machine
+import all DescriptiveComplexity.LogTime.Machine
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The arithmetic a sweep can do: comparison and addition, bit by bit
@@ -52,7 +54,7 @@ open Language
 /-! ### Peeling a bit off a remainder -/
 
 /-- The remainder modulo the next power of two adds one bit. -/
-theorem mod_two_pow_succ (x k : ℕ) :
+private theorem mod_two_pow_succ (x k : ℕ) :
     x % 2 ^ (k + 1) = x % 2 ^ k + (if x.testBit k then 2 ^ k else 0) := by
   rw [Nat.mod_pow_succ]
   cases hb : x.testBit k with
@@ -70,7 +72,7 @@ theorem mod_two_pow_succ (x k : ℕ) :
 
 /-- A rank is its own remainder modulo the place value above the top
 position. -/
-theorem orank_mod_two_pow_posCount {A : Type} [LinearOrder A] [Finite A] (a : A) :
+private theorem orank_mod_two_pow_posCount {A : Type} [LinearOrder A] [Finite A] (a : A) :
     orank a % 2 ^ posCount A = orank a :=
   Nat.mod_eq_of_lt (lt_of_lt_of_le (orank_lt_card a) (Nat.le_pow_clog (by norm_num) _))
 
@@ -97,7 +99,7 @@ variable {A : Type} [LinearOrder A] [Finite A]
 omit [Finite A] in
 /-- The invariant of the comparison sweep: after the positions below `i`, the
 state bit compares the two registers modulo `2 ^ i`. -/
-theorem leSweep_state (x : Fin 2 → A) :
+private theorem leSweep_state (x : Fin 2 → A) :
     ∀ i : ℕ, (leSweep.state x i 0 = true ↔ orank (x 0) % 2 ^ i ≤ orank (x 1) % 2 ^ i) := by
   intro i
   induction i with
@@ -168,7 +170,7 @@ variable {A : Type} [LinearOrder A] [Finite A]
 
 omit [Finite A] in
 /-- The carry of the addition sweep is the carry of the two remainders. -/
-theorem plusSweep_carry (x : Fin 3 → A) :
+private theorem plusSweep_carry (x : Fin 3 → A) :
     ∀ i : ℕ, (plusSweep.state x i 0 = true ↔
       2 ^ i ≤ orank (x 0) % 2 ^ i + orank (x 1) % 2 ^ i) := by
   intro i
@@ -190,7 +192,7 @@ theorem plusSweep_carry (x : Fin 3 → A) :
       simp only [ih, reduceIte, Bool.false_eq_true, and_true, and_false, false_and, true_and,
         or_false, false_or, true_iff, false_iff, true_or] <;> omega
 
-theorem carry_succ (a b i : ℕ) :
+private theorem carry_succ (a b i : ℕ) :
     2 ^ (i + 1) ≤ a % 2 ^ (i + 1) + b % 2 ^ (i + 1) ↔
       ((a.testBit i = true ∧ b.testBit i = true) ∨
         ((a.testBit i = true ∨ b.testBit i = true) ∧ 2 ^ i ≤ a % 2 ^ i + b % 2 ^ i)) := by
@@ -208,7 +210,7 @@ addition in it, which is what makes `+` a *derived* predicate of the bit-level
 logic rather than an atom of it (`DescriptiveComplexity.BitAtom.plus` is kept
 all the same: `plusSweep_accepts` is half of what shows the model has to build
 its arithmetic instead of reading it). -/
-theorem carry_iff_lookahead (a b : ℕ) :
+private theorem carry_iff_lookahead (a b : ℕ) :
     ∀ i : ℕ, 2 ^ i ≤ a % 2 ^ i + b % 2 ^ i ↔
       ∃ j < i, a.testBit j = true ∧ b.testBit j = true ∧
         ∀ k, j < k → k < i → (a.testBit k = true ∨ b.testBit k = true) := by
@@ -237,7 +239,7 @@ with those of `c` – up to the carry leaving position `i` – exactly when the
 full-adder equation holds at every position below `i`. The equation is written
 as an iff-chain, which for three propositions is the parity of their truth
 values, that is, the exclusive or of the two input bits and the carry. -/
-theorem add_mod_iff_bits (a b c : ℕ) :
+private theorem add_mod_iff_bits (a b c : ℕ) :
     ∀ i : ℕ, (a % 2 ^ i + b % 2 ^ i =
         c % 2 ^ i + (if 2 ^ i ≤ a % 2 ^ i + b % 2 ^ i then 2 ^ i else 0)) ↔
       ∀ j < i, (c.testBit j = true ↔
@@ -291,13 +293,13 @@ theorem add_mod_iff_bits (a b c : ℕ) :
 
 omit [Finite A] in
 /-- The carry bit is set when the remainders overflow. -/
-theorem plusSweep_carry_true (x : Fin 3 → A) (i : ℕ)
+private theorem plusSweep_carry_true (x : Fin 3 → A) (i : ℕ)
     (h : 2 ^ i ≤ orank (x 0) % 2 ^ i + orank (x 1) % 2 ^ i) :
     plusSweep.state x i 0 = true := (plusSweep_carry x i).mpr h
 
 omit [Finite A] in
 /-- The carry bit is clear when the remainders do not overflow. -/
-theorem plusSweep_carry_false (x : Fin 3 → A) (i : ℕ)
+private theorem plusSweep_carry_false (x : Fin 3 → A) (i : ℕ)
     (h : ¬ 2 ^ i ≤ orank (x 0) % 2 ^ i + orank (x 1) % 2 ^ i) :
     plusSweep.state x i 0 = false := by
   cases hk : plusSweep.state x i 0 with
@@ -307,7 +309,7 @@ theorem plusSweep_carry_false (x : Fin 3 → A) (i : ℕ)
 omit [Finite A] in
 /-- The match bit of the addition sweep records that the two remainders add up,
 up to the carry it has produced. -/
-theorem plusSweep_ok (x : Fin 3 → A) :
+private theorem plusSweep_ok (x : Fin 3 → A) :
     ∀ i : ℕ, (plusSweep.state x i 1 = true ↔
       orank (x 0) % 2 ^ i + orank (x 1) % 2 ^ i =
         orank (x 2) % 2 ^ i +

@@ -10,6 +10,9 @@ import DescriptiveComplexity.Problems.Machine.HaltMem
 import DescriptiveComplexity.Problems.FinSat
 public import DescriptiveComplexity.Computability.Catalog
 import DescriptiveComplexity.Computability.CodeHalt
+import all DescriptiveComplexity.Problems.FinSat
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Correct
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Input
 
 /-!
 # The halting problem is RE-complete

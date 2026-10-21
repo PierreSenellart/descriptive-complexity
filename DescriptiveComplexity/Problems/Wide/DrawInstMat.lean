@@ -6,6 +6,15 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstGate
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawInstExp
+import all DescriptiveComplexity.Problems.Wide.DrawInstGate
+import all DescriptiveComplexity.Problems.Wide.DrawInstStage
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The matrix's stages: the atom runs in the sequencer's shape
@@ -174,7 +183,7 @@ include hrules hR hlin hordM hbot hv hvi hwkSt in
 /-- **The comparison atom, entered by a dispatch**: from its entry
 checkpoint one cell to the marker's right, at the `Slot.val`-walked
 presentation, to the exit phase back at the same cell. -/
-theorem cmp_hStage (f : dt.CtlIx → A) :
+private theorem cmp_hStage (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb .e0) f), Sum.inl v',
         wideTape (PR.trackTapeAt RF.cell Slot.val
@@ -261,7 +270,7 @@ include hrules hR hlin hordM hbot hv hvi hwkSt hENC in
 /-- **The expansion atom, entered by a dispatch**: from its first phase one
 cell to the marker's right, at the `Slot.val`-walked presentation, to the
 exit phase back at the same cell. -/
-theorem exp_hStage (f : dt.CtlIx → A) :
+private theorem exp_hStage (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) f), Sum.inl v',
         wideTape (PR.trackTapeAt RF.cell Slot.val
@@ -342,7 +351,7 @@ include hrules hR hlin hord htop hbot hwork hv hvi hwkSt hmirSt hbotSt hsav htgt
 /-- **The stage atom, entered by a dispatch**: at the boundary discipline –
 SAV and TARGET at the home address – the random access runs and restores
 the state, so the sequencer's background is untouched. -/
-theorem stage_hStage (b : Bool)
+private theorem stage_hStage (b : Bool)
     (hb : st.old iv (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)) ↔
       b = true)
     (f : dt.CtlIx → A) :
@@ -380,7 +389,7 @@ This is the form the outer sweep needs: at a swept address SAV and TARGET
 still hold the *previous* address (the advance refreshes only the marker and
 the mirror), so `stage_hStage`'s two hypotheses are unavailable there and
 the normalization has to be carried instead of assumed. -/
-theorem stage_hStage_thread (b : Bool)
+private theorem stage_hStage_thread (b : Bool)
     (hb : st.old iv (dt.stageTgtD PR.zero vi iv ts st v (dt.d.B.arity iv)) ↔
       b = true)
     (f : dt.CtlIx → A) :
@@ -544,7 +553,7 @@ include hrules hR hlin hord htop hbot hv hvi hwkSt hcompat in
 /-- **A failing gate block**: some register is not well-shaped, so the file
 test fails and the block leaves the whole gate sequence through the failing
 exit, the fail store applied at the marker's symbol. -/
-theorem gateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
+private theorem gateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
     (hTest : ¬Test u) (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .up)) f), Sum.inl v',

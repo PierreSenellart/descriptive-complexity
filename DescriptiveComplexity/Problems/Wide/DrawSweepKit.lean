@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSweep
 import DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawSweep
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # Kits for the plain sweeps
@@ -106,7 +110,7 @@ def rule : SweepRule → Rule A Q W P
       moveRight := True }
 
 /-- **In-shape separation.** -/
-theorem sep (hemb : Function.Injective κ.emb) :
+private theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : SweepRule) (f : Q → A) (g : W → A),
       (κ.rule one ρ).guard f g → (κ.rule one ρ').guard f g →
       (κ.rule one ρ).srcPh = (κ.rule one ρ').srcPh → ρ = ρ' := by
@@ -120,7 +124,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
 /-- **Exit disjointness**: no kit rule fires at the end-marked cell, in any
 phase – the caller's exit rules there, guarded `ltp = one`, are disjoint from
 the whole kit. -/
-theorem exit_disjoint : ∀ (ρ : SweepRule) (f : Q → A) (g : W → A),
+private theorem exit_disjoint : ∀ (ρ : SweepRule) (f : Q → A) (g : W → A),
     (κ.rule one ρ).guard f g → g κ.ltp = one → False := by
   intro ρ f g hg hltp
   cases ρ <;> simp only [rule] at hg <;> first
@@ -168,7 +172,7 @@ include hrules hR hlin hneltp hltp hcompat in
 /-- **The kit runs its sweep**: one step per address of the stretch, the
 verdict in the phase via `DescriptiveComplexity.sweepState`. The stretch's
 top must sit at or below the end marker's address. -/
-theorem reachesIn {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
+private theorem reachesIn {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
     (htp : WMSetLe WMLe s₁ ltpAddr) :
     (wideData (Univ A R P K dd)).ReachesIn (wideRank s₁ - wideRank s₀)
       ⟨Sum.inr (sweepState Test (PR.stElt (κ.emb .py) fc) (PR.stElt (κ.emb .pn) fc) s₀),
@@ -255,7 +259,7 @@ def rule : WSweepRule → Rule A Q W P
       moveRight := True }
 
 /-- **In-shape separation**: one rule, nothing to separate. -/
-theorem sep : ∀ (ρ ρ' : WSweepRule) (f : Q → A) (g : W → A),
+private theorem sep : ∀ (ρ ρ' : WSweepRule) (f : Q → A) (g : W → A),
     (κ.rule one ρ).guard f g → (κ.rule one ρ').guard f g →
     (κ.rule one ρ).srcPh = (κ.rule one ρ').srcPh → ρ = ρ' := by
   intro ρ ρ' _f _g _hg _hg' _hph
@@ -263,7 +267,7 @@ theorem sep : ∀ (ρ ρ' : WSweepRule) (f : Q → A) (g : W → A),
 
 /-- **Exit disjointness**: the single rule never fires at the end-marked
 cell. -/
-theorem exit_disjoint : ∀ (ρ : WSweepRule) (f : Q → A) (g : W → A),
+private theorem exit_disjoint : ∀ (ρ : WSweepRule) (f : Q → A) (g : W → A),
     (κ.rule one ρ).guard f g → g κ.ltp = one → False := by
   intro ρ f g hg hltp
   cases ρ
@@ -294,7 +298,7 @@ include hrules hR hlin hneltp hltp in
 /-- **The kit runs its sweep**: one rewrite per address, the background a
 function of the frontier. The rewrite the kit's rule computes must match the
 background's change at each cell, which is the one semantic hypothesis. -/
-theorem reachesIn {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
+private theorem reachesIn {s₀ s₁ : Univ A R P K dd → Prop} (hle : WMSetLe WMLe s₀ s₁)
     (htp : WMSetLe WMLe s₁ ltpAddr)
     (hframe : ∀ s u : Univ A R P K dd → Prop, WMIncr WMLe s u →
       WMSetLe WMLe s₀ s → WMSetLe WMLe u s₁ →

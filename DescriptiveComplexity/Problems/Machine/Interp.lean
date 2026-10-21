@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.Machine.Defs
 public import DescriptiveComplexity.Problems.Machine.Hardness
 public import DescriptiveComplexity.OccurrenceFormulas
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Machine.Hardness
+import all DescriptiveComplexity.Problems.Machine.Tape
 
 /-!
 # The transcription: `SAT ≤ᶠᵒ[≤] NTMAccept`
@@ -90,19 +92,19 @@ section BuilderRealize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
-theorem realize_minClF {x : α} {c : A} (h : v x = c) :
+private theorem realize_minClF {x : α} {c : A} (h : v x = c) :
     (minClF x).Realize v ↔ SatMinCl c := by
   simp only [minClF, Formula.realize_inf, realize_clF, Formula.realize_iAlls,
     Formula.realize_imp, SatOcc.realize_leF, Sum.elim_inl, Sum.elim_inr, h, SatMinCl]
   exact and_congr Iff.rfl ⟨fun hh e he => hh (fun _ => e) he, fun hh i hi => hh (i ()) hi⟩
 
-theorem realize_maxClF {x : α} {c : A} (h : v x = c) :
+private theorem realize_maxClF {x : α} {c : A} (h : v x = c) :
     (maxClF x).Realize v ↔ SatMaxCl c := by
   simp only [maxClF, Formula.realize_inf, realize_clF, Formula.realize_iAlls,
     Formula.realize_imp, SatOcc.realize_leF, Sum.elim_inl, Sum.elim_inr, h, SatMaxCl]
   exact and_congr Iff.rfl ⟨fun hh e he => hh (fun _ => e) he, fun hh i hi => hh (i ()) hi⟩
 
-theorem realize_nextClF {x y : α} {c c' : A} (hx : v x = c) (hy : v y = c') :
+private theorem realize_nextClF {x y : α} {c c' : A} (hx : v x = c) (hy : v y = c') :
     (nextClF x y).Realize v ↔ SatNextCl c c' := by
   simp only [nextClF, Formula.realize_inf, realize_clF, SatOcc.realize_ltF,
     Formula.realize_iAlls, Formula.realize_imp, SatOcc.realize_leF, Sum.elim_inl,
@@ -113,11 +115,11 @@ theorem realize_nextClF {x y : α} {c c' : A} (hx : v x = c) (hy : v y = c') :
   · rintro ⟨h1, h2, h3, h4⟩
     exact ⟨⟨⟨h1, h2⟩, h3⟩, fun i hi => h4 (i ()) hi.1 hi.2⟩
 
-theorem realize_noClF : (noClF (α := α)).Realize v ↔ ∀ e : A, ¬ SatCl e := by
+private theorem realize_noClF : (noClF (α := α)).Realize v ↔ ∀ e : A, ¬ SatCl e := by
   simp only [noClF, Formula.realize_iAlls, Formula.realize_not, realize_clF, Sum.elim_inr]
   exact ⟨fun h e => h fun _ => e, fun h i => h (i ())⟩
 
-theorem realize_varF {x : α} {a : A} (h : v x = a) :
+private theorem realize_varF {x : α} {a : A} (h : v x = a) :
     (varF x).Realize v ↔ SatVar a := by
   simp only [varF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
     realize_clF, SatOcc.realize_posF, SatOcc.realize_negF, Sum.elim_inl, Sum.elim_inr, h]
@@ -143,7 +145,7 @@ noncomputable def oneF (s : SatTag) (x : Fin 2 × Fin 2) (t' : SatTag) :
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable {v : Fin 2 × Fin 2 → A}
 
-theorem realize_cstF {s : SatTag} {q : SatV A}
+private theorem realize_cstF {s : SatTag} {q : SatV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) :
     (cstF s q.1).Realize v ↔ q = cst s := by
   rw [cstF]
@@ -159,7 +161,7 @@ theorem realize_cstF {s : SatTag} {q : SatV A}
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
-theorem realize_oneF {s : SatTag} {x : Fin 2 × Fin 2} {q : SatV A}
+private theorem realize_oneF {s : SatTag} {x : Fin 2 × Fin 2} {q : SatV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) :
     (oneF s x q.1).Realize v ↔ q = one s (v x) := by
   rw [oneF]
@@ -450,7 +452,7 @@ theorem relMap_le (p q : SatV A) :
 
 omit [Language.sat.Structure A] in
 /-- The three shapes of the initial tape, per tag of the cell. -/
-theorem satInp_pStart_iff {w : Fin 2 → A} {a : SatV A} :
+private theorem satInp_pStart_iff {w : Fin 2 → A} {a : SatV A} :
     SatInp ((SatTag.pStart, w) : SatV A) a ↔ a = symStart := by
   constructor
   · rintro (⟨-, h1, h2⟩ | ⟨h, -⟩ | ⟨h, -⟩)
@@ -482,7 +484,7 @@ theorem satInp_pEnd_iff {w : Fin 2 → A} {a : SatV A} :
   · rintro rfl
     exact Or.inr (Or.inr ⟨rfl, rfl, isMinTup_bot⟩)
 
-theorem relMap_inp (p q : SatV A) :
+private theorem relMap_inp (p q : SatV A) :
     TMInp (satMapEquiv p) (satMapEquiv q) ↔ SatInp p q := by
   rw [TMInp, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -494,7 +496,7 @@ theorem relMap_inp (p q : SatV A) :
     refine iff_of_false (by exact fun h => h) ?_
     rintro (⟨h, -⟩ | ⟨h, -⟩ | ⟨h, -⟩) <;> exact SatTag.noConfusion h
 
-theorem relMap_tsrc (p q : SatV A) :
+private theorem relMap_tsrc (p q : SatV A) :
     TMSrc (satMapEquiv p) (satMapEquiv q) ↔ SatSrc p q := by
   rw [TMSrc, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -508,7 +510,7 @@ theorem relMap_tsrc (p q : SatV A) :
   case tTurnAcc d => exact realize_oneF rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tread (p q : SatV A) :
+private theorem relMap_tread (p q : SatV A) :
     TMRead (satMapEquiv p) (satMapEquiv q) ↔ SatRead p q := by
   rw [TMRead, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -522,7 +524,7 @@ theorem relMap_tread (p q : SatV A) :
   case tTurnAcc d => cases d <;> exact realize_cstF rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_twrite (p q : SatV A) :
+private theorem relMap_twrite (p q : SatV A) :
     TMWrite (satMapEquiv p) (satMapEquiv q) ↔ SatWrite p q := by
   rw [TMWrite, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -538,7 +540,7 @@ theorem relMap_twrite (p q : SatV A) :
 
 omit [Finite A] [Nonempty A] in
 /-- The check clause's new flag, realized: the literal test on the source. -/
-theorem realize_chkLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 2 → A}
+private theorem realize_chkLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 2 → A}
     (h0 : v (0, 0) = c) (h1 : v (0, 1) = x) :
     (chkLitF b).Realize v ↔ SatLit c x b := by
   cases b
@@ -549,7 +551,7 @@ theorem realize_chkLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 2 → A}
     simp only [SatOcc.realize_posF, h0, h1, SatLit, SatPos, SatNeg, SatOcc.PosIn]
     simp
 
-theorem relMap_tdst (p q : SatV A) :
+private theorem relMap_tdst (p q : SatV A) :
     TMDst (satMapEquiv p) (satMapEquiv q) ↔ SatDst p q := by
   rw [TMDst, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -589,7 +591,7 @@ theorem relMap_tdst (p q : SatV A) :
 /-- **The interpreted structure describes the machine of the instance**: every
 field of `DescriptiveComplexity.tmData` on the interpreted structure agrees, along the
 identity equivalence, with `DescriptiveComplexity.satMachine`. -/
-theorem agree_satMachine :
+private theorem agree_satMachine :
     TMData.Agree (satMapEquiv (A := A)) (satMachine A)
       (tmData (satTuringInterp.Map A)) where
   posn b := (relMap_posn b).symm
@@ -611,7 +613,7 @@ satisfiable. Well-formedness holds unconditionally
 (`DescriptiveComplexity.satMachine_wellFormed`), and acceptance is
 `DescriptiveComplexity.satMachine_accepts_iff_satisfiable`, both transported along the
 agreement. -/
-theorem ntmAccept_map_iff_satisfiable :
+private theorem ntmAccept_map_iff_satisfiable :
     NTMAccept (satTuringInterp.Map A) ↔ Satisfiable A := by
   have hag := agree_satMachine (A := A)
   constructor
@@ -625,7 +627,7 @@ end Characterize
 
 /-- **SAT reduces to acceptance by a nondeterministic machine**: the ordered
 first-order reduction building `M_φ` inside the instance. -/
-noncomputable def sat_ordered_fo_reduction_ntmAccept : SAT ≤ᶠᵒ[≤] NTMAccept where
+private noncomputable def sat_ordered_fo_reduction_ntmAccept : SAT ≤ᶠᵒ[≤] NTMAccept where
   Tag := SatTag
   dim := 2
   toInterpretation := satTuringInterp

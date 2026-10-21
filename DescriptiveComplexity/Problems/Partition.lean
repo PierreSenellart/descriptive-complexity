@@ -10,6 +10,9 @@ import DescriptiveComplexity.Problems.Partition.Membership
 public import DescriptiveComplexity.Problems.Partition.Hardness
 import DescriptiveComplexity.Problems.NaeSat
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.NaeSat
+import all DescriptiveComplexity.Problems.Partition.Hardness
+import all DescriptiveComplexity.Problems.Partition.Membership
 
 /-!
 # Partition

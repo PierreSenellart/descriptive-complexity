@@ -8,6 +8,7 @@ module
 public import Mathlib.Data.Set.Card
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Qsat.Defs
+import all DescriptiveComplexity.Problems.Qsat.Defs
 
 /-!
 # QSAT is in PSPACE
@@ -76,12 +77,12 @@ variable {L' : Language.{0, 0}} {γ M : Type} [L'.Structure M]
 def bitF (R : L'.Relations 0) : L'.Formula γ :=
   R.formula (Fin.elim0 : Fin 0 → L'.Term γ)
 
-theorem realize_bitF (R : L'.Relations 0) (v : γ → M) :
+private theorem realize_bitF (R : L'.Relations 0) (v : γ → M) :
     (bitF R).Realize v ↔ RelMap R (![] : Fin 0 → M) := by
   rw [bitF, Formula.realize_rel]
   exact iff_of_eq (congrArg (RelMap R) (Subsingleton.elim _ _))
 
-theorem realize_bitS (R : L'.Relations 0) :
+private theorem realize_bitS (R : L'.Relations 0) :
     M ⊨ (bitF R : L'.Sentence) ↔ RelMap R (![] : Fin 0 → M) :=
   realize_bitF R default
 
@@ -91,7 +92,7 @@ noncomputable def leastF (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (x : γ) : L'.Formula γ :=
   fo%[x] (mark(x) ∧ ¬ d(x)) ∧ ∀ y, mark(y) ∧ ¬ d(y) → ¬ prec(y, x)
 
-theorem realize_leastF (mark d : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_leastF (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (x : γ) (v : γ → M) :
     (leastF mark d prec x).Realize v ↔
       (RelMap mark ![v x] ∧ ¬RelMap d ![v x] ∧
@@ -110,7 +111,7 @@ noncomputable def greatestF (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (x : γ) : L'.Formula γ :=
   fo%[x] (mark(x) ∧ d(x)) ∧ ∀ y, mark(y) ∧ d(y) → ¬ prec(x, y)
 
-theorem realize_greatestF (mark d : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_greatestF (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (x : γ) (v : γ → M) :
     (greatestF mark d prec x).Realize v ↔
       (RelMap mark ![v x] ∧ RelMap d ![v x] ∧
@@ -127,7 +128,7 @@ theorem realize_greatestF (mark d : L'.Relations 1) (prec : L'.Relations 2)
 noncomputable def coveredF (mark d : L'.Relations 1) : L'.Formula γ :=
   fo% ∀ y, mark(y) → d(y)
 
-theorem realize_coveredF (mark d : L'.Relations 1) (v : γ → M) :
+private theorem realize_coveredF (mark d : L'.Relations 1) (v : γ → M) :
     (coveredF (γ := γ) mark d).Realize v ↔ ∀ y : M, RelMap mark ![y] → RelMap d ![y] := by
   rw [coveredF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, Formula.realize_rel₁, Term.realize_var]
@@ -137,7 +138,7 @@ theorem realize_coveredF (mark d : L'.Relations 1) (v : γ → M) :
 noncomputable def emptyF (d : L'.Relations 1) : L'.Formula γ :=
   fo% ∀ y, ¬ d(y)
 
-theorem realize_emptyF (d : L'.Relations 1) (v : γ → M) :
+private theorem realize_emptyF (d : L'.Relations 1) (v : γ → M) :
     (emptyF (γ := γ) d).Realize v ↔ ∀ y : M, ¬RelMap d ![y] := by
   rw [emptyF]
   simp only [Formula.realize_iAlls, Formula.realize_not, Formula.realize_rel₁, Term.realize_var]
@@ -149,7 +150,7 @@ noncomputable def matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
     (t : L'.Relations 1) : L'.Formula γ :=
   fo% ∀ c, cl(c) → ∃ y, mark(y) ∧ ((pos(c, y) ∧ t(y)) ∨ (neg(c, y) ∧ ¬ t(y)))
 
-theorem realize_matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
+private theorem realize_matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
     (t : L'.Relations 1) (v : γ → M) :
     (matrixF (γ := γ) cl mark pos neg t).Realize v ↔
       ∀ c : M, RelMap cl ![c] → ∃ y : M, RelMap mark ![y] ∧
@@ -170,7 +171,7 @@ theorem realize_matrixF (cl mark : L'.Relations 1) (pos neg : L'.Relations 2)
 def sameF (a' a : L'.Relations 1) (y : γ) : L'.Formula γ :=
   (Relations.formula₁ a' (Term.var y)).iff (Relations.formula₁ a (Term.var y))
 
-theorem realize_sameF (a' a : L'.Relations 1) (y : γ) (v : γ → M) :
+private theorem realize_sameF (a' a : L'.Relations 1) (y : γ) (v : γ → M) :
     (sameF a' a y).Realize v ↔ (RelMap a' ![v y] ↔ RelMap a ![v y]) := by
   rw [sameF]
   simp only [Formula.realize_iff, Formula.realize_rel₁, Term.realize_var]
@@ -182,7 +183,7 @@ def updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : γ) : L'.Formula γ
     (((Term.var y).equal (Term.var x) ⊓ φ) ⊔
       (∼((Term.var y).equal (Term.var x)) ⊓ Relations.formula₁ a (Term.var y)))
 
-theorem realize_updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : γ) (v : γ → M) :
+private theorem realize_updF (a' a : L'.Relations 1) (φ : L'.Formula γ) (x y : γ) (v : γ → M) :
     (updF a' a φ x y).Realize v ↔
       (RelMap a' ![v y] ↔ ((v y = v x ∧ φ.Realize v) ∨ (v y ≠ v x ∧ RelMap a ![v y]))) := by
   rw [updF]
@@ -214,7 +215,7 @@ the marked elements. -/
 noncomputable def wfF (mark : L'.Relations 1) (prec : L'.Relations 2) : L'.Formula γ :=
   wfMarkedF mark prec ⊓ wfIrreflF prec ⊓ wfTransF prec ⊓ wfTotalF mark prec
 
-theorem realize_wfF (mark : L'.Relations 1) (prec : L'.Relations 2) (v : γ → M) :
+private theorem realize_wfF (mark : L'.Relations 1) (prec : L'.Relations 2) (v : γ → M) :
     (wfF (γ := γ) mark prec).Realize v ↔
       ((∀ x y : M, RelMap prec ![x, y] → RelMap mark ![x] ∧ RelMap mark ![y]) ∧
         (∀ x : M, ¬RelMap prec ![x, x]) ∧
@@ -236,7 +237,7 @@ theorem realize_wfF (mark : L'.Relations 1) (prec : L'.Relations 2) (v : γ → 
     refine ⟨fun i hi => h1 (i 0) (i 1) hi, fun i => h2 (i 0), fun i hi => h3 (i 0) (i 1) (i 2)
       hi.1 hi.2, fun i hi => h4 (i 0) (i 1) hi.1 hi.2.1 hi.2.2⟩
 
-theorem realize_wfS (mark : L'.Relations 1) (prec : L'.Relations 2) :
+private theorem realize_wfS (mark : L'.Relations 1) (prec : L'.Relations 2) :
     M ⊨ (wfF mark prec : L'.Sentence) ↔
       ((∀ x y : M, RelMap prec ![x, y] → RelMap mark ![x] ∧ RelMap mark ![y]) ∧
         (∀ x : M, ¬RelMap prec ![x, x]) ∧
@@ -245,7 +246,7 @@ theorem realize_wfS (mark : L'.Relations 1) (prec : L'.Relations 2) :
           RelMap prec ![x, y] ∨ RelMap prec ![y, x])) :=
   realize_wfF mark prec default
 
-theorem realize_emptyS (d : L'.Relations 1) :
+private theorem realize_emptyS (d : L'.Relations 1) :
     M ⊨ (emptyF d : L'.Sentence) ↔ ∀ y : M, ¬RelMap d ![y] :=
   realize_emptyF d default
 
@@ -270,7 +271,7 @@ def popF (allv t : L'.Relations 1) (r : L'.Relations 0) {γ : Type} (x : γ) : L
     ((Relations.formula₁ allv (Term.var x) ⊓ ∼(bitF r)) ⊔
       (∼(Relations.formula₁ allv (Term.var x)) ⊓ bitF r))
 
-theorem realize_popF (allv t : L'.Relations 1) (r : L'.Relations 0) {γ : Type}
+private theorem realize_popF (allv t : L'.Relations 1) (r : L'.Relations 0) {γ : Type}
     (x : γ) (v : γ → M) :
     (popF allv t r x).Realize v ↔
       (RelMap t ![v x] ∨
@@ -286,7 +287,7 @@ noncomputable def downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relation
     L'.Sentence :=
   fo% ∀ x y, (leastF mark d prec)⟨x⟩ → (updF d' d ⊤)⟨x, y⟩ ∧ (updF t' t ⊥)⟨x, y⟩
 
-theorem realize_downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relations 2) :
+private theorem realize_downSetS (mark d t d' t' : L'.Relations 1) (prec : L'.Relations 2) :
     M ⊨ downSetS mark d t d' t' prec ↔
       ∀ x y : M, (RelMap mark ![x] ∧ ¬RelMap d ![x] ∧
           ∀ z : M, RelMap mark ![z] → ¬RelMap d ![z] → ¬RelMap prec ![z, x]) →
@@ -304,7 +305,7 @@ noncomputable def downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) : L'.Sentence :=
   fo% ∀ x, (leastF mark d prec)⟨x⟩ → ¬ !(bitF u') ∧ (!(bitF r') ↔ !(bitF r))
 
-theorem realize_downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) :
     M ⊨ downBitsS mark d prec u' r' r ↔
       ∀ x : M, (RelMap mark ![x] ∧ ¬RelMap d ![x] ∧
@@ -320,7 +321,7 @@ theorem realize_downBitsS (mark d : L'.Relations 1) (prec : L'.Relations 2)
 noncomputable def leafSetS (mark d t d' t' : L'.Relations 1) : L'.Sentence :=
   fo% !(coveredF mark d) → ∀ y, (sameF d' d)⟨y⟩ ∧ (sameF t' t)⟨y⟩
 
-theorem realize_leafSetS (mark d t d' t' : L'.Relations 1) :
+private theorem realize_leafSetS (mark d t d' t' : L'.Relations 1) :
     M ⊨ leafSetS mark d t d' t' ↔
       ((∀ z : M, RelMap mark ![z] → RelMap d ![z]) →
         ∀ y : M, (RelMap d' ![y] ↔ RelMap d ![y]) ∧ (RelMap t' ![y] ↔ RelMap t ![y])) := by
@@ -334,7 +335,7 @@ noncomputable def leafBitsS (cl mark d t : L'.Relations 1) (pos neg : L'.Relatio
     (u' r' : L'.Relations 0) : L'.Sentence :=
   (coveredF mark d).imp (bitF u' ⊓ (bitF r').iff (matrixF cl mark pos neg t))
 
-theorem realize_leafBitsS (cl mark d t : L'.Relations 1) (pos neg : L'.Relations 2)
+private theorem realize_leafBitsS (cl mark d t : L'.Relations 1) (pos neg : L'.Relations 2)
     (u' r' : L'.Relations 0) :
     M ⊨ leafBitsS cl mark d t pos neg u' r' ↔
       ((∀ z : M, RelMap mark ![z] → RelMap d ![z]) →
@@ -351,7 +352,7 @@ theorem realize_leafBitsS (cl mark d t : L'.Relations 1) (pos neg : L'.Relations
 noncomputable def upExS (mark d : L'.Relations 1) (prec : L'.Relations 2) : L'.Sentence :=
   fo% ∃ x, (greatestF mark d prec)⟨x⟩
 
-theorem realize_upExS (mark d : L'.Relations 1) (prec : L'.Relations 2) :
+private theorem realize_upExS (mark d : L'.Relations 1) (prec : L'.Relations 2) :
     M ⊨ upExS mark d prec ↔
       ∃ x : M, RelMap mark ![x] ∧ RelMap d ![x] ∧
         ∀ z : M, RelMap mark ![z] → RelMap d ![z] → ¬RelMap prec ![x, z] := by
@@ -397,7 +398,7 @@ def isPopM (allv t : L'.Relations 1) (r : L'.Relations 0) (x : M) : Prop :=
   RelMap t ![x] ∨ ((RelMap allv ![x] ∧ ¬RelMap r (![] : Fin 0 → M)) ∨
     (¬RelMap allv ![x] ∧ RelMap r (![] : Fin 0 → M)))
 
-theorem realize_popSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_popSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
     (r : L'.Relations 0) :
     M ⊨ popSetS mark allv d t d' t' prec r ↔
       ∀ x y : M, isLastM mark d prec x → isPopM allv t r x →
@@ -409,7 +410,7 @@ theorem realize_popSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relati
     Formula.realize_bot, isLastM, isPopM, and_imp]
   exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
 
-theorem realize_flipSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_flipSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relations 2)
     (r : L'.Relations 0) :
     M ⊨ flipSetS mark allv d t d' t' prec r ↔
       ∀ x y : M, isLastM mark d prec x → ¬isPopM allv t r x →
@@ -421,7 +422,7 @@ theorem realize_flipSetS (mark allv d t d' t' : L'.Relations 1) (prec : L'.Relat
     Sum.elim_inr, Formula.realize_top, isLastM, isPopM, and_imp]
   exact ⟨fun h x y => h ![x, y], fun h i => h (i 0) (i 1)⟩
 
-theorem realize_popBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_popBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) :
     M ⊨ popBitsS mark allv d t prec u' r' r ↔
       ∀ x : M, isLastM mark d prec x → isPopM allv t r x →
@@ -433,7 +434,7 @@ theorem realize_popBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2
     Sum.elim_inr, isLastM, isPopM, and_imp]
   exact ⟨fun h x => h fun _ => x, fun h i => h (i 0)⟩
 
-theorem realize_flipBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
+private theorem realize_flipBitsS (mark allv d t : L'.Relations 1) (prec : L'.Relations 2)
     (u' r' r : L'.Relations 0) :
     M ⊨ flipBitsS mark allv d t prec u' r' r ↔
       ∀ x : M, isLastM mark d prec x → ¬isPopM allv t r x →
@@ -585,7 +586,7 @@ theorem qsRes_qsLift (D T : A → Prop) (u r : Prop) : qsRes (qsLift D T u r) = 
 
 omit [Language.qsat.Structure A] [LinearOrder A] in
 /-- A state is determined by its four components. -/
-theorem qsAssignment_ext {ρ σ : qsBlock.Assignment A}
+private theorem qsAssignment_ext {ρ σ : qsBlock.Assignment A}
     (hD : ∀ a : A, qsSet ρ a ↔ qsSet σ a) (hT : ∀ a : A, qsVal ρ a ↔ qsVal σ a)
     (hu : qsUp ρ ↔ qsUp σ) (hr : qsRes ρ ↔ qsRes σ) : ρ = σ := by
   funext i
@@ -603,44 +604,44 @@ theorem qsAssignment_ext {ρ σ : qsBlock.Assignment A}
     | false => exact propext (hv ▸ hu)
     | true => exact propext (hv ▸ hr)
 
-theorem relMap_qsVar₁ (ρ : qsBlock.Assignment A) (i : Bool) (w : Fin 1 → A) :
+private theorem relMap_qsVar₁ (ρ : qsBlock.Assignment A) (i : Bool) (w : Fin 1 → A) :
     @RelMap qsLang₁ A (qsBlock.structure₁ (L := qsBase) ρ) 1 (qsVar₁ i) w ↔ qsPred ρ i (w 0) := by
   change ρ _ _ ↔ ρ _ _
   exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
 
-theorem relMap_qsBit₁ (ρ : qsBlock.Assignment A) (i : Bool) (w : Fin 0 → A) :
+private theorem relMap_qsBit₁ (ρ : qsBlock.Assignment A) (i : Bool) (w : Fin 0 → A) :
     @RelMap qsLang₁ A (qsBlock.structure₁ (L := qsBase) ρ) 0 (qsBit₁ i) w ↔ qsBit ρ i := by
   change ρ _ _ ↔ ρ _ _
   exact iff_of_eq (congrArg _ (funext fun j => j.elim0))
 
-theorem relMap_qsIn₁ {n : ℕ} (ρ : qsBlock.Assignment A) (r : Language.qsat.Relations n)
+private theorem relMap_qsIn₁ {n : ℕ} (ρ : qsBlock.Assignment A) (r : Language.qsat.Relations n)
     (w : Fin n → A) :
     @RelMap qsLang₁ A (qsBlock.structure₁ (L := qsBase) ρ) n (qsIn₁ r) w ↔ RelMap r w :=
   Iff.rfl
 
-theorem relMap_qsCur₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 1 → A) :
+private theorem relMap_qsCur₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 1 → A) :
     @RelMap qsLang₂ A (qsBlock.structure₂ (L := qsBase) ρ σ) 1 (qsCur₂ i) w ↔
       qsPred ρ i (w 0) := by
   change ρ _ _ ↔ ρ _ _
   exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
 
-theorem relMap_qsNext₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 1 → A) :
+private theorem relMap_qsNext₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 1 → A) :
     @RelMap qsLang₂ A (qsBlock.structure₂ (L := qsBase) ρ σ) 1 (qsNext₂ i) w ↔
       qsPred σ i (w 0) := by
   change σ _ _ ↔ σ _ _
   exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
 
-theorem relMap_qsCurBit₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 0 → A) :
+private theorem relMap_qsCurBit₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 0 → A) :
     @RelMap qsLang₂ A (qsBlock.structure₂ (L := qsBase) ρ σ) 0 (qsCurBit₂ i) w ↔ qsBit ρ i := by
   change ρ _ _ ↔ ρ _ _
   exact iff_of_eq (congrArg _ (funext fun j => j.elim0))
 
-theorem relMap_qsNextBit₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 0 → A) :
+private theorem relMap_qsNextBit₂ (ρ σ : qsBlock.Assignment A) (i : Bool) (w : Fin 0 → A) :
     @RelMap qsLang₂ A (qsBlock.structure₂ (L := qsBase) ρ σ) 0 (qsNextBit₂ i) w ↔ qsBit σ i := by
   change σ _ _ ↔ σ _ _
   exact iff_of_eq (congrArg _ (funext fun j => j.elim0))
 
-theorem relMap_qsIn₂ {n : ℕ} (ρ σ : qsBlock.Assignment A) (r : Language.qsat.Relations n)
+private theorem relMap_qsIn₂ {n : ℕ} (ρ σ : qsBlock.Assignment A) (r : Language.qsat.Relations n)
     (w : Fin n → A) :
     @RelMap qsLang₂ A (qsBlock.structure₂ (L := qsBase) ρ σ) n (qsIn₂ r) w ↔ RelMap r w :=
   Iff.rfl
@@ -650,28 +651,28 @@ theorem relMap_qsIn₂ {n : ℕ} (ρ σ : qsBlock.Assignment A) (r : Language.qs
 Instance search does not see through a specification's block, so the
 propositional connectives of the three sentences are split by hand. -/
 
-theorem qsRealize_inf₁ (ρ : qsBlock.Assignment A) (φ ψ : qsLang₁.Sentence) :
+private theorem qsRealize_inf₁ (ρ : qsBlock.Assignment A) (φ ψ : qsLang₁.Sentence) :
     @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) (φ ⊓ ψ) ↔
       (@Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) φ ∧
         @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) ψ) :=
   letI := qsBlock.structure₁ (L := qsBase) ρ
   Formula.realize_inf
 
-theorem qsRealize_inf₂ (ρ σ : qsBlock.Assignment A) (φ ψ : qsLang₂.Sentence) :
+private theorem qsRealize_inf₂ (ρ σ : qsBlock.Assignment A) (φ ψ : qsLang₂.Sentence) :
     @Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) (φ ⊓ ψ) ↔
       (@Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) φ ∧
         @Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) ψ) :=
   letI := qsBlock.structure₂ (L := qsBase) ρ σ
   Formula.realize_inf
 
-theorem qsRealize_imp₂ (ρ σ : qsBlock.Assignment A) (φ ψ : qsLang₂.Sentence) :
+private theorem qsRealize_imp₂ (ρ σ : qsBlock.Assignment A) (φ ψ : qsLang₂.Sentence) :
     @Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) (φ.imp ψ) ↔
       (@Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) φ →
         @Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) ψ) :=
   letI := qsBlock.structure₂ (L := qsBase) ρ σ
   Formula.realize_imp
 
-theorem qsRealize_not₂ (ρ σ : qsBlock.Assignment A) (φ : qsLang₂.Sentence) :
+private theorem qsRealize_not₂ (ρ σ : qsBlock.Assignment A) (φ : qsLang₂.Sentence) :
     @Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) (∼φ) ↔
       ¬@Sentence.Realize _ A (qsBlock.structure₂ (L := qsBase) ρ σ) φ :=
   letI := qsBlock.structure₂ (L := qsBase) ρ σ
@@ -734,7 +735,7 @@ theorem qsSpec_step_iff (ρ σ : qsBlock.Assignment A) :
     IsQVar, IsQAll, QPrec, QsatMatrix, qsSet, qsVal, qsUp, qsRes, and_true, and_false,
     and_assoc, Bool.false_eq_true, false_or]
 
-theorem qsRealize_not₁ (ρ : qsBlock.Assignment A) (φ : qsLang₁.Sentence) :
+private theorem qsRealize_not₁ (ρ : qsBlock.Assignment A) (φ : qsLang₁.Sentence) :
     @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) (∼φ) ↔
       ¬@Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) φ :=
   letI := qsBlock.structure₁ (L := qsBase) ρ
@@ -742,7 +743,7 @@ theorem qsRealize_not₁ (ρ : qsBlock.Assignment A) (φ : qsLang₁.Sentence) :
 
 /-- **The starting states**: a well-formed instance at the initial position –
 nothing quantified, about to descend. -/
-theorem qsSpec_isSrc_iff (ρ : qsBlock.Assignment A) :
+private theorem qsSpec_isSrc_iff (ρ : qsBlock.Assignment A) :
     qsSpec.IsSrc ρ ↔ (QsatWf A ∧ ((∀ y : A, ¬qsSet ρ y) ∧ ¬qsUp ρ)) := by
   have h : qsSpec.IsSrc ρ ↔
       (((∀ x y : A, QPrec x y → IsQVar x ∧ IsQVar y) ∧ (∀ x : A, ¬QPrec x x) ∧
@@ -760,7 +761,7 @@ theorem qsSpec_isSrc_iff (ρ : qsBlock.Assignment A) :
 
 /-- **The accepting states**: back at the initial position, returning the value
 `true`. -/
-theorem qsSpec_isTgt_iff (ρ : qsBlock.Assignment A) :
+private theorem qsSpec_isTgt_iff (ρ : qsBlock.Assignment A) :
     qsSpec.IsTgt ρ ↔ ((∀ y : A, ¬qsSet ρ y) ∧ (qsUp ρ ∧ qsRes ρ)) := by
   rw [show qsSpec.IsTgt ρ =
     @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) qsSpec.tgt from rfl]
@@ -776,7 +777,7 @@ section Correctness
 variable {A : Type}
 
 /-- Setting a variable to `true` is adding it. -/
-theorem qUpd_true_eq_qAdd (D : A → Prop) (x : A) : qUpd D x true = qAdd D x := by
+private theorem qUpd_true_eq_qAdd (D : A → Prop) (x : A) : qUpd D x true = qAdd D x := by
   classical
   funext y
   refine propext ⟨fun h => ?_, fun h => ?_⟩
@@ -789,7 +790,7 @@ theorem qUpd_true_eq_qAdd (D : A → Prop) (x : A) : qUpd D x true = qAdd D x :=
       · exact Or.inl ⟨hyx, rfl⟩
       · exact Or.inr ⟨hyx, hy⟩
 
-theorem qsLift_congr {D D' T T' : A → Prop} {u u' r r' : Prop}
+private theorem qsLift_congr {D D' T T' : A → Prop} {u u' r r' : Prop}
     (hD : ∀ y : A, D y ↔ D' y) (hT : ∀ y : A, T y ↔ T' y) (hu : u ↔ u') (hr : r ↔ r') :
     qsLift D T u r = qsLift D' T' u' r' :=
   qsAssignment_ext (by simpa using hD) (by simpa using hT) (by simpa using hu)
@@ -801,9 +802,9 @@ variable [Language.qsat.Structure A]
 the variables already played are an initial segment. -/
 def QDownClosed (D : A → Prop) : Prop := ∀ y z : A, IsQVar y → QPrec y z → D z → D y
 
-theorem qDownClosed_empty : QDownClosed (fun _ : A => False) := fun _ _ _ _ h => h.elim
+private theorem qDownClosed_empty : QDownClosed (fun _ : A => False) := fun _ _ _ _ h => h.elim
 
-theorem QLeast.qDownClosed_qAdd {D : A → Prop} {x : A} (hx : QLeast D x)
+private theorem QLeast.qDownClosed_qAdd {D : A → Prop} {x : A} (hx : QLeast D x)
     (hD : QDownClosed D) : QDownClosed (qAdd D x) := by
   classical
   intro y z hy hyz hz
@@ -815,7 +816,7 @@ theorem QLeast.qDownClosed_qAdd {D : A → Prop} {x : A} (hx : QLeast D x)
   · exact Or.inr (hD y z hy hyz hz)
 
 /-- The variable just played is the last one of the branch. -/
-theorem QLeast.qGreatest_qAdd (hwf : QsatWf A) {D : A → Prop} {x : A} (hx : QLeast D x)
+private theorem QLeast.qGreatest_qAdd (hwf : QsatWf A) {D : A → Prop} {x : A} (hx : QLeast D x)
     (hD : QDownClosed D) : QGreatest (qAdd D x) x := by
   refine ⟨hx.1, qAdd_self D x, fun y hy hay hxy => ?_⟩
   rcases hay with hyx | hy'
@@ -823,7 +824,7 @@ theorem QLeast.qGreatest_qAdd (hwf : QsatWf A) {D : A → Prop} {x : A} (hx : QL
   · exact hx.2.1 (hD x y hx.1 hxy hy')
 
 /-- Popping the variable just played returns to the position before it. -/
-theorem QLeast.qRem_qAdd {D : A → Prop} {x : A} (hx : QLeast D x) :
+private theorem QLeast.qRem_qAdd {D : A → Prop} {x : A} (hx : QLeast D x) :
     qRem (qAdd D x) x = D := by
   funext y
   refine propext ⟨fun h => h.2.resolve_left h.1, fun h => ⟨fun hyx => hx.2.1 (hyx ▸ h), Or.inr h⟩⟩
@@ -832,7 +833,7 @@ theorem QLeast.qRem_qAdd {D : A → Prop} {x : A} (hx : QLeast D x) :
 
 variable [LinearOrder A]
 
-theorem qsStep_leaf {D τ : A → Prop} (hcov : ∀ z : A, IsQVar z → D z) (r : Prop) :
+private theorem qsStep_leaf {D τ : A → Prop} (hcov : ∀ z : A, IsQVar z → D z) (r : Prop) :
     qsSpec.Step (qsLift D τ False r) (qsLift D τ True (QsatMatrix τ)) := by
   refine (qsSpec_step_iff _ _).mpr ⟨fun _ => ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩, fun hup => hup.elim⟩
   · intro x _ hx
@@ -842,7 +843,7 @@ theorem qsStep_leaf {D τ : A → Prop} (hcov : ∀ z : A, IsQVar z → D z) (r 
   · exact fun _ _ => ⟨Iff.rfl, Iff.rfl⟩
   · exact fun _ => ⟨trivial, Iff.rfl⟩
 
-theorem qsStep_push (hwf : QsatWf A) {D τ : A → Prop} {x : A} (hx : QLeast D x) (r : Prop) :
+private theorem qsStep_push (hwf : QsatWf A) {D τ : A → Prop} {x : A} (hx : QLeast D x) (r : Prop) :
     qsSpec.Step (qsLift D τ False r) (qsLift (qAdd D x) (qUpd τ x false) False r) := by
   refine (qsSpec_step_iff _ _).mpr ⟨fun _ => ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩, fun hup => hup.elim⟩
   · intro x' y hx'
@@ -855,7 +856,7 @@ theorem qsStep_push (hwf : QsatWf A) {D τ : A → Prop} {x : A} (hx : QLeast D 
   · exact fun hcov => absurd (hcov x hx.1) hx.2.1
   · exact fun hcov => absurd (hcov x hx.1) hx.2.1
 
-theorem qsStep_pop (hwf : QsatWf A) {D τ : A → Prop} {x : A} {v : Prop}
+private theorem qsStep_pop (hwf : QsatWf A) {D τ : A → Prop} {x : A} {v : Prop}
     (hx : QGreatest D x) (hp : QPop τ v x) :
     qsSpec.Step (qsLift D τ True v) (qsLift (qRem D x) τ True v) := by
   refine (qsSpec_step_iff _ _).mpr
@@ -874,7 +875,7 @@ theorem qsStep_pop (hwf : QsatWf A) {D τ : A → Prop} {x : A} {v : Prop}
     have hp'' : ¬QPop τ v x' := hp'
     exact absurd hp (hxx ▸ hp'')
 
-theorem qsStep_flip (hwf : QsatWf A) {D τ : A → Prop} {x : A} {v : Prop}
+private theorem qsStep_flip (hwf : QsatWf A) {D τ : A → Prop} {x : A} {v : Prop}
     (hx : QGreatest D x) (hp : ¬QPop τ v x) :
     qsSpec.Step (qsLift D τ True v) (qsLift D (qUpd τ x true) False v) := by
   refine (qsSpec_step_iff _ _).mpr
@@ -900,7 +901,7 @@ variable [Finite A]
 omit [LinearOrder A] in
 /-- On a finite well-formed instance a position that is not a leaf has a next
 variable. -/
-theorem exists_qLeast (hwf : QsatWf A) {D : A → Prop} (h : ∃ z : A, IsQVar z ∧ ¬D z) :
+private theorem exists_qLeast (hwf : QsatWf A) {D : A → Prop} (h : ∃ z : A, IsQVar z ∧ ¬D z) :
     ∃ x : A, QLeast D x := by
   have : IsTrans A (QPrec (A := A)) := ⟨fun a b c => hwf.trans a b c⟩
   have : Std.Irrefl (QPrec (A := A)) := ⟨hwf.irrefl⟩
@@ -949,7 +950,7 @@ theorem qsSpec_step_unique (hwf : QsatWf A) {ρ σ σ' : qsBlock.Assignment A}
 omit [Finite A] in
 /-- A state returning a value at the empty branch is a dead end: the walk is
 over. -/
-theorem qsSpec_no_step_of_empty {ρ σ : qsBlock.Assignment A} (hempty : ∀ y : A, ¬qsSet ρ y)
+private theorem qsSpec_no_step_of_empty {ρ σ : qsBlock.Assignment A} (hempty : ∀ y : A, ¬qsSet ρ y)
     (hup : qsUp ρ) : ¬qsSpec.Step ρ σ := by
   intro h
   obtain ⟨⟨x, hx⟩, -⟩ := ((qsSpec_step_iff ρ σ).mp h).2 hup
@@ -958,7 +959,7 @@ theorem qsSpec_no_step_of_empty {ρ σ : qsBlock.Assignment A} (hempty : ∀ y :
 /-! #### The run of the walk -/
 
 omit [Finite A] in
-private theorem qsRun_leaf {D τ : A → Prop} (hcov : ∀ z : A, IsQVar z → D z) (r : Prop) :
+theorem qsRun_leaf {D τ : A → Prop} (hcov : ∀ z : A, IsQVar z → D z) (r : Prop) :
     qsSpec.Reach (qsLift D τ False r) (qsLift D τ True (QsatWins D τ)) := by
   have he : qsLift D τ True (QsatMatrix τ) = qsLift D τ True (QsatWins D τ) :=
     qsLift_congr (fun _ => Iff.rfl) (fun _ => Iff.rfl) Iff.rfl (qsatWins_leaf_iff hcov).symm
@@ -1072,7 +1073,7 @@ private theorem qsReach_eq_of_terminal {a b : qsBlock.Assignment A}
 
 /-- **The specification is correct**: the walk accepts an instance exactly when
 the quantified formula it describes is true. -/
-theorem qsatHolds_iff_accepts : QsatHolds A ↔ qsSpec.Accepts A := by
+private theorem qsatHolds_iff_accepts : QsatHolds A ↔ qsSpec.Accepts A := by
   constructor
   · rintro ⟨hwf, hw⟩
     obtain ⟨τ', -, hreach⟩ := qsSpec_run hwf

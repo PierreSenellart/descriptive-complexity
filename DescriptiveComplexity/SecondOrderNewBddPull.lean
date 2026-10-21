@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrderNewBdd
 public import DescriptiveComplexity.SecondOrderNewPull
+import all DescriptiveComplexity.SecondOrderNewPull
 
 /-!
 # A bounded extension lives inside the instance's own tuples
@@ -245,7 +246,7 @@ theorem bddPoint_surjective {e : Fin m → Fin d → A}
 /-- **The assignment of the kernel's block on the extended universe**, read off
 a guessed assignment on the instance: the pulled variable selected by the tags
 of the arguments, at their coordinates. -/
-def bddTargetAssign (e : Fin m → Fin d → A) (ρ : (bddBlock d B).Assignment A) :
+private def bddTargetAssign (e : Fin m → Fin d → A) (ρ : (bddBlock d B).Assignment A) :
     B.Assignment (A ⊕ Fin m) :=
   fun i y => ρ (Sum.inr ⟨i, fun k => (bddPoint e (y k)).1⟩)
     fun mm => (bddPoint e (y (finProdFinEquiv.symm mm).1)).2 (finProdFinEquiv.symm mm).2
@@ -262,7 +263,7 @@ variable {A : Type} [L.Structure A] (ρ : (bddBlock d B).Assignment A)
 omit [L.IsRelational] in
 /-- **A base symbol at original points**: the relation of the instance, at the
 elements the diagonals carry. -/
-theorem realize_bddRelF_base {k : ℕ} (R : L.Relations k) (a : Fin k → A)
+private theorem realize_bddRelF_base {k : ℕ} (R : L.Relations k) (a : Fin k → A)
     (w : Fin k × Fin d → A) (hw : ∀ (i : Fin k) (j : Fin d), w (i, j) = a i) :
     letI := bddHostStruc (L := L) A ρ
     (bddRelF L d B (Sum.inl (Sum.inl R)) (fun _ => false)).Realize w ↔ RelMap R a := by
@@ -272,13 +273,13 @@ theorem realize_bddRelF_base {k : ℕ} (R : L.Relations k) (a : Fin k → A)
 
 omit [L.IsRelational] [L.Structure A] in
 /-- **A base symbol never holds of an invented point.** -/
-theorem bddRelF_base_eq_bot {k : ℕ} (R : L.Relations k) (τ : Fin k → Bool)
+private theorem bddRelF_base_eq_bot {k : ℕ} (R : L.Relations k) (τ : Fin k → Bool)
     (h : ¬∀ i, τ i = false) : bddRelF L d B (Sum.inl (Sum.inl R)) τ = ⊥ := by
   rw [bddRelF, ite_eq_right h]
 
 omit [L.IsRelational] in
 /-- **The marker `old` holds exactly of the original points.** -/
-theorem realize_bddRelF_old (τ : Fin 1 → Bool) (w : Fin 1 × Fin d → A) :
+private theorem realize_bddRelF_old (τ : Fin 1 → Bool) (w : Fin 1 × Fin d → A) :
     letI := bddHostStruc (L := L) A ρ
     (bddRelF L d B (Sum.inl (Sum.inr .old)) τ).Realize w ↔ τ 0 = false := by
   let := bddHostStruc (L := L) A ρ
@@ -290,7 +291,7 @@ theorem realize_bddRelF_old (τ : Fin 1 → Bool) (w : Fin 1 × Fin d → A) :
 omit [L.IsRelational] in
 /-- **A relation variable of the block** is read off the pulled variable
 selected by the tags. -/
-theorem realize_bddRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k → Bool)
+private theorem realize_bddRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k → Bool)
     (w : Fin k × Fin d → A) :
     letI := bddHostStruc (L := L) A ρ
     (bddRelF L d B (Sum.inr r) τ).Realize w ↔
@@ -314,7 +315,7 @@ variable {A : Type} [L.Structure A] {m : ℕ}
 point of `A ⊕ Fin m` to its tagged tuple is an isomorphism over the extended
 vocabulary, the block being interpreted by
 `DescriptiveComplexity.bddTargetAssign`. -/
-noncomputable def bddTargetEquiv (e : Fin m → Fin d → A) (he : Function.Injective e)
+private noncomputable def bddTargetEquiv (e : Fin m → Fin d → A) (he : Function.Injective e)
     (ρ : (bddBlock d B).Assignment A)
     (hN : ∀ v : Fin d → A, newSet ρ v ↔ ∃ i, e i = v) :
     letI := bddHostStruc (L := L) A ρ
@@ -398,11 +399,11 @@ open Classical in
 /-- **The point a tag and a tuple name**: an original element on a diagonal, the
 invented value the embedding puts there. Off the embedding's image the value is
 junk, which no formula reaches – the domain formula rules those tuples out. -/
-noncomputable def bddBack (e : Fin m → Fin d → A) : Bool → (Fin d → A) → A ⊕ Fin m
+private noncomputable def bddBack (e : Fin m → Fin d → A) : Bool → (Fin d → A) → A ⊕ Fin m
   | false, v => Sum.inl (v 0)
   | true, v => if h : ∃ i, e i = v then Sum.inr h.choose else Sum.inl (v 0)
 
-theorem bddBack_bddPoint {e : Fin m → Fin d → A} (he : Function.Injective e)
+private theorem bddBack_bddPoint {e : Fin m → Fin d → A} (he : Function.Injective e)
     (x : A ⊕ Fin m) : bddBack e (bddPoint e x).1 (bddPoint e x).2 = x := by
   classical
   cases x with
@@ -418,19 +419,19 @@ open Classical in
 extended universe: the invented values are the embedding's image, and a pulled
 variable holds where the original one holds of the points its tags and
 coordinates name. -/
-noncomputable def bddSourceAssign (e : Fin m → Fin d → A) (σ : B.Assignment (A ⊕ Fin m)) :
+private noncomputable def bddSourceAssign (e : Fin m → Fin d → A) (σ : B.Assignment (A ⊕ Fin m)) :
     (bddBlock d B).Assignment A
   | Sum.inl _, v => ∃ i, e i = v
   | Sum.inr p, x => σ p.1 fun k => bddBack e (p.2 k) fun j => x (finProdFinEquiv (k, j))
 
-theorem newSet_bddSourceAssign (e : Fin m → Fin d → A) (σ : B.Assignment (A ⊕ Fin m))
+private theorem newSet_bddSourceAssign (e : Fin m → Fin d → A) (σ : B.Assignment (A ⊕ Fin m))
     (v : Fin d → A) : newSet (d := d) (B := B) (bddSourceAssign e σ) v ↔ ∃ i, e i = v :=
   Iff.rfl
 
 /-- **The two assignment transfers are inverse**, in the direction an
 existential block needs: what the instance guesses is read back as what was
 guessed on the extended universe. -/
-theorem bddTargetAssign_bddSourceAssign {e : Fin m → Fin d → A}
+private theorem bddTargetAssign_bddSourceAssign {e : Fin m → Fin d → A}
     (he : Function.Injective e) (σ : B.Assignment (A ⊕ Fin m)) :
     bddTargetAssign e (bddSourceAssign e σ) = σ := by
   classical
@@ -456,7 +457,7 @@ variable {A : Type} [L.Structure A] {m : ℕ}
 
 /-- **Sentence transfer**: what the kernel says in the extended universe, it says
 in the interpreted one. -/
-theorem realize_bddTransfer {e : Fin m → Fin d → A} (he : Function.Injective e)
+private theorem realize_bddTransfer {e : Fin m → Fin d → A} (he : Function.Injective e)
     (ρ : (bddBlock d B).Assignment A) (hN : ∀ v : Fin d → A, newSet ρ v ↔ ∃ i, e i = v)
     (σ : B.Assignment (A ⊕ Fin m)) (hσ : bddTargetAssign e ρ = σ)
     (φ : (bddTarget L B).Sentence) :
@@ -522,7 +523,7 @@ logic over the instance itself. The invented values are taken to be `d`-tuples,
 guessed as one more relation variable, and the kernel is pulled back through the
 two-tag interpretation. With
 `DescriptiveComplexity.SigmaSODefinable.toNewBdd` this is `∃SO[new, d] = NP`. -/
-theorem SigmaSONewBddDefinable.toSigmaSO (h : SigmaSONewBddDefinable d P) :
+private theorem SigmaSONewBddDefinable.toSigmaSO (h : SigmaSONewBddDefinable d P) :
     SigmaSODefinable 1 P := by
   obtain ⟨B, φ, hφ⟩ := h
   refine ⟨[bddBlock d B], rfl, (bddInterp L d B).pullRelSentence φ, ?_⟩

@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.OneInSat.Defs
 public import DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.OneInSat.Defs
+import all DescriptiveComplexity.Problems.Sat.Counting
 
 /-!
 # #1-in-SAT: counting exactly-one models
@@ -40,7 +44,7 @@ noncomputable def sharpOneInKernel : satSOLang.Sentence :=
   oneInKernel ⊓ satVarKernel
 
 /-- Realization of the kernel of #1-in-SAT. -/
-theorem realize_sharpOneInKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_sharpOneInKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpOneInKernel) ↔
@@ -67,13 +71,13 @@ noncomputable def SharpOneInSAT : CountingProblem Language.sat where
     rw [card_oneInModel_eq_witnessCount A, card_oneInModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock sharpOneInKernel e
 
-theorem sharpOneInSat_apply (A : Type) [Language.sat.Structure A] :
+private theorem sharpOneInSat_apply (A : Type) [Language.sat.Structure A] :
     SharpOneInSAT A = Nat.card {ν : A → Prop // OneInModel A ν} :=
   rfl
 
 /-- An exactly-one proper assignment restricts to an exactly-one model: only
 its values at the variables of the formula matter. -/
-theorem oneInModel_restrict {A : Type} [Language.sat.Structure A] {ν : A → Prop}
+private theorem oneInModel_restrict {A : Type} [Language.sat.Structure A] {ν : A → Prop}
     (h : OneInProper ν) : OneInModel A fun x => ν x ∧ SatOccurs A x := by
   have hlit : ∀ c y t, OccIn c y t →
       (LitTrue (fun x => ν x ∧ SatOccurs A x) y t ↔ LitTrue ν y t) := by
@@ -93,7 +97,7 @@ theorem oneInModel_restrict {A : Type} [Language.sat.Structure A] {ν : A → Pr
 /-- **The support of #1-in-SAT is 1-in-SAT.**
 Registered in the Lax archive as
 [`Lax280166.OneInSATComplete.sharpOneInSat_support_iff`](https://laxarchive.org/lax-280166/Lax280166.OneInSATComplete.html#s-Lax280166.OneInSATComplete.sharpOneInSat_support_iff). -/
-theorem sharpOneInSat_support_iff (A : Type) [Language.sat.Structure A] [Finite A] :
+private theorem sharpOneInSat_support_iff (A : Type) [Language.sat.Structure A] [Finite A] :
     SharpOneInSAT.support A ↔ OneInSAT A := by
   rw [CountingProblem.support_iff, sharpOneInSat_apply, Nat.card_pos_iff]
   constructor

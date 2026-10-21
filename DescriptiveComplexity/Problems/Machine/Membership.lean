@@ -11,6 +11,7 @@ public import DescriptiveComplexity.Problems.Machine.Defs
 import DescriptiveComplexity.SecondOrder
 public import DescriptiveComplexity.Hierarchy
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Machine acceptance is existential second-order definable
@@ -388,7 +389,7 @@ variable {α : Type} (v : α → A)
       Bool.false_eq_true] <;>
     exact ⟨fun h p p' h₁ h₂ => h ![p, p'] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
 
-theorem realize_tqStepBodyF (t t' τ : α) :
+private theorem realize_tqStepBodyF (t t' τ : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqStepBodyF t t' τ) v) ↔
       TMTr (v τ) ∧ (∀ q, ρ .state ![v t, q] → TMSrc (v τ) q) ∧
         (∀ p a, ρ .head ![v t, p] → ρ .tape ![v t, p, a] → TMRead (v τ) a) ∧
@@ -413,7 +414,7 @@ theorem realize_tqStepBodyF (t t' τ : α) :
   · exact ⟨fun h p a h₁ h₂ => h ![p, a] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
   · exact ⟨fun h p a hp => h ![p, a] hp, fun h i hi => h (i 0) (i 1) hi⟩
 
-theorem realize_tqStutterBodyF (t t' : α) :
+private theorem realize_tqStutterBodyF (t t' : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqStutterBodyF t t') v) ↔
       (∀ q, ρ .state ![v t, q] → TMAcc q) ∧
         (∀ q, ρ .state ![v t', q] ↔ ρ .state ![v t, q]) ∧
@@ -527,7 +528,7 @@ variable {A : Type} [Language.turing.Structure A] (ρ : tmGuessBlock.Assignment 
 local notation "SOStruc" => @sumStructure Language.turing tmGuessBlock.lang A _
   (tmGuessBlock.structure ρ)
 
-theorem realize_tqStateExClause :
+private theorem realize_tqStateExClause :
     (@Sentence.Realize tqSOLang A SOStruc tqStateExClause) ↔
       ∀ t, ∃ q, ρ .state ![t, q] := by
   simp only [tqStateExClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
@@ -540,7 +541,7 @@ theorem realize_tqStateExClause :
     obtain ⟨q, hq⟩ := h (i 0)
     exact ⟨fun _ => q, by simpa using hq⟩
 
-theorem realize_tqStateUniqClause :
+private theorem realize_tqStateUniqClause :
     (@Sentence.Realize tqSOLang A SOStruc tqStateUniqClause) ↔
       ∀ t q q', ρ .state ![t, q] → ρ .state ![t, q'] → q = q' := by
   simp only [tqStateUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -548,7 +549,7 @@ theorem realize_tqStateUniqClause :
   exact ⟨fun h t q q' h₁ h₂ => h ![t, q, q'] ⟨h₁, h₂⟩,
     fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
 
-theorem realize_tqHeadExClause :
+private theorem realize_tqHeadExClause :
     (@Sentence.Realize tqSOLang A SOStruc tqHeadExClause) ↔
       ∀ t, ∃ p, ρ .head ![t, p] := by
   simp only [tqHeadExClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
@@ -561,7 +562,7 @@ theorem realize_tqHeadExClause :
     obtain ⟨q, hq⟩ := h (i 0)
     exact ⟨fun _ => q, by simpa using hq⟩
 
-theorem realize_tqHeadUniqClause :
+private theorem realize_tqHeadUniqClause :
     (@Sentence.Realize tqSOLang A SOStruc tqHeadUniqClause) ↔
       ∀ t p p', ρ .head ![t, p] → ρ .head ![t, p'] → p = p' := by
   simp only [tqHeadUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -569,7 +570,7 @@ theorem realize_tqHeadUniqClause :
   exact ⟨fun h t p p' h₁ h₂ => h ![t, p, p'] ⟨h₁, h₂⟩,
     fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
 
-theorem realize_tqTapeExClause :
+private theorem realize_tqTapeExClause :
     (@Sentence.Realize tqSOLang A SOStruc tqTapeExClause) ↔
       ∀ t p, ∃ a, ρ .tape ![t, p, a] := by
   simp only [tqTapeExClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
@@ -582,7 +583,7 @@ theorem realize_tqTapeExClause :
     obtain ⟨a, ha⟩ := h (i 0) (i 1)
     exact ⟨fun _ => a, by simpa using ha⟩
 
-theorem realize_tqTapeUniqClause :
+private theorem realize_tqTapeUniqClause :
     (@Sentence.Realize tqSOLang A SOStruc tqTapeUniqClause) ↔
       ∀ t p a a', ρ .tape ![t, p, a] → ρ .tape ![t, p, a'] → a = a' := by
   simp only [tqTapeUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -590,7 +591,7 @@ theorem realize_tqTapeUniqClause :
   exact ⟨fun h t p a a' h₁ h₂ => h ![t, p, a, a'] ⟨h₁, h₂⟩,
     fun h i hi => h (i 0) (i 1) (i 2) (i 3) hi.1 hi.2⟩
 
-theorem realize_tqAccClause :
+private theorem realize_tqAccClause :
     (@Sentence.Realize tqSOLang A SOStruc tqAccClause) ↔
       ∀ t, MaxPos TMLe TMPosn t → ∀ q, ρ .state ![t, q] → TMAcc q := by
   simp only [tqAccClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -598,7 +599,7 @@ theorem realize_tqAccClause :
   exact ⟨fun h t ht q hq => h ![t, q] ⟨ht, hq⟩,
     fun h i hi => h (i 0) hi.1 (i 1) hi.2⟩
 
-theorem realize_tqInitClause :
+private theorem realize_tqInitClause :
     (@Sentence.Realize tqSOLang A SOStruc tqInitClause) ↔
       ∀ t, MinPos TMLe TMPosn t →
         (∀ q, ρ .state ![t, q] → TMStart q) ∧
@@ -616,59 +617,59 @@ theorem realize_tqInitClause :
     obtain ⟨h1, h2, h3⟩ := h (i 0) hi
     exact ⟨fun j hj => h1 (j 0) hj, fun j hj => h2 (j 0) hj, fun j hj => h3 (j 0) (j 1) hj⟩
 
-theorem realize_tqReflClause :
+private theorem realize_tqReflClause :
     (@Sentence.Realize tqSOLang A SOStruc tqReflClause) ↔ ∀ a : A, TMLe a a := by
   simp only [tqReflClause, Sentence.Realize, Formula.realize_iAlls, realize_tqLeF, Sum.elim_inr]
   exact ⟨fun h a => h fun _ => a, fun h i => h (i 0)⟩
 
-theorem realize_tqTransClause :
+private theorem realize_tqTransClause :
     (@Sentence.Realize tqSOLang A SOStruc tqTransClause) ↔
       ∀ a b c : A, TMLe a b → TMLe b c → TMLe a c := by
   simp only [tqTransClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tqLeF, Sum.elim_inr]
   exact ⟨fun h a b c h₁ h₂ => h ![a, b, c] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
 
-theorem realize_tqAntisymClause :
+private theorem realize_tqAntisymClause :
     (@Sentence.Realize tqSOLang A SOStruc tqAntisymClause) ↔
       ∀ a b : A, TMLe a b → TMLe b a → a = b := by
   simp only [tqAntisymClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tqLeF, realize_tqEqF, Sum.elim_inr]
   exact ⟨fun h a b h₁ h₂ => h ![a, b] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
 
-theorem realize_tqTotalClause :
+private theorem realize_tqTotalClause :
     (@Sentence.Realize tqSOLang A SOStruc tqTotalClause) ↔
       ∀ a b : A, TMLe a b ∨ TMLe b a := by
   simp only [tqTotalClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_sup,
     realize_tqLeF, Sum.elim_inr]
   exact ⟨fun h a b => h ![a, b], fun h i => h (i 0) (i 1)⟩
 
-theorem realize_tqPosnExClause :
+private theorem realize_tqPosnExClause :
     (@Sentence.Realize tqSOLang A SOStruc tqPosnExClause) ↔ ∃ p : A, TMPosn p := by
   simp only [tqPosnExClause, Sentence.Realize, Formula.realize_iExs, realize_tqPosnF,
     Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨p, hp⟩ => ⟨fun _ => p, hp⟩⟩
 
-theorem realize_tqInpFunClause :
+private theorem realize_tqInpFunClause :
     (@Sentence.Realize tqSOLang A SOStruc tqInpFunClause) ↔
       ∀ p a b : A, TMInp p a → TMInp p b → a = b := by
   simp only [tqInpFunClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tqInpF, realize_tqEqF, Sum.elim_inr]
   exact ⟨fun h p a b h₁ h₂ => h ![p, a, b] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) (i 2) hi.1 hi.2⟩
 
-theorem realize_tqBlankExClause :
+private theorem realize_tqBlankExClause :
     (@Sentence.Realize tqSOLang A SOStruc tqBlankExClause) ↔ ∃ b : A, TMBlank b := by
   simp only [tqBlankExClause, Sentence.Realize, Formula.realize_iExs, realize_tqBlankF,
     Sum.elim_inr]
   exact ⟨fun ⟨i, hi⟩ => ⟨i 0, hi⟩, fun ⟨b, hb⟩ => ⟨fun _ => b, hb⟩⟩
 
-theorem realize_tqBlankUniqClause :
+private theorem realize_tqBlankUniqClause :
     (@Sentence.Realize tqSOLang A SOStruc tqBlankUniqClause) ↔
       ∀ a b : A, TMBlank a → TMBlank b → a = b := by
   simp only [tqBlankUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_inf, realize_tqBlankF, realize_tqEqF, Sum.elim_inr]
   exact ⟨fun h a b h₁ h₂ => h ![a, b] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
 
-theorem realize_tqStepClause :
+private theorem realize_tqStepClause :
     (@Sentence.Realize tqSOLang A SOStruc tqStepClause) ↔
       ∀ t t', SuccPos TMLe TMPosn t t' →
         (∃ τ, TMTr τ ∧ (∀ q, ρ .state ![t, q] → TMSrc τ q) ∧
@@ -705,7 +706,7 @@ private theorem realize_inf_sentence (φ ψ : tqSOLang.Sentence) :
 
 /-- **The kernel says exactly what it should**: the instance is well formed and
 the guessed relations are a run. -/
-theorem realize_tqKernel :
+private theorem realize_tqKernel :
     (@Sentence.Realize tqSOLang A SOStruc tqKernel) ↔
       (tmData A).WellFormed ∧
         (tmData A).RelWalk (fun t q => ρ .state ![t, q]) (fun t p => ρ .head ![t, p])
@@ -730,7 +731,7 @@ end RealizeClauses
 /-- **Machine acceptance is `Σ₁`-definable**: one existential block guesses the
 run – the state, the head cell and the tape contents at each time – and the
 first-order kernel checks that it is one. -/
-theorem ntmAccept_sigmaSODefinable : SigmaSODefinable 1 NTMAccept := by
+private theorem ntmAccept_sigmaSODefinable : SigmaSODefinable 1 NTMAccept := by
   refine ⟨[tmGuessBlock], rfl, tqKernel, ?_⟩
   intro A _ _ _
   constructor

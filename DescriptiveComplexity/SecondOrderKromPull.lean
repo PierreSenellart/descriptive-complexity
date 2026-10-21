@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.SecondOrderKrom
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Pulling SO-Krom definability back through an interpretation
@@ -94,7 +96,7 @@ noncomputable def KromClause.pull (I : FOInterpretation L₁ L₂ Tag d)
   lit₁ := c.lit₁.map fun l => l.pull d t
   lit₂ := c.lit₂.map fun l => l.pull d t
 
-theorem KromClause.pull_holds {A : Type} [L₁.Structure A]
+private theorem KromClause.pull_holds {A : Type} [L₁.Structure A]
     (I : FOInterpretation L₁ L₂ Tag d) (c : KromClause L₂ B k) (t : Fin k → Tag)
     (ρ : B.Assignment (I.Map A)) (w : Fin (k * d) → A) :
     (c.pull I t).Holds (B.pullAssign ρ) w ↔ c.Holds ρ (tagVal I t w) := by
@@ -108,13 +110,13 @@ noncomputable def KromProgram.pull (I : FOInterpretation L₁ L₂ Tag d)
     (prog : KromProgram L₂ B k) : KromProgram L₁ (B.pull Tag d) (k * d) :=
   prog.flatMap fun c => (allTagAssign Tag k).map fun t => c.pull I t
 
-theorem KromProgram.pull_mem (I : FOInterpretation L₁ L₂ Tag d)
+private theorem KromProgram.pull_mem (I : FOInterpretation L₁ L₂ Tag d)
     {prog : KromProgram L₂ B k} {c : KromClause L₂ B k} (hc : c ∈ prog)
     (t : Fin k → Tag) : c.pull I t ∈ prog.pull I := by
   rw [KromProgram.pull, List.mem_flatMap]
   exact ⟨c, hc, List.mem_map.mpr ⟨t, mem_allTagAssign t, rfl⟩⟩
 
-theorem KromProgram.pull_cases (I : FOInterpretation L₁ L₂ Tag d)
+private theorem KromProgram.pull_cases (I : FOInterpretation L₁ L₂ Tag d)
     {prog : KromProgram L₂ B k} {c' : KromClause L₁ (B.pull Tag d) (k * d)}
     (hc' : c' ∈ prog.pull I) : ∃ c ∈ prog, ∃ t : Fin k → Tag, c' = c.pull I t := by
   rw [KromProgram.pull, List.mem_flatMap] at hc'
@@ -131,7 +133,7 @@ variable (prog : KromProgram L₂ B k)
 
 /-- An assignment satisfies a program on the interpreted structure iff its
 transfer satisfies the pulled program on the base structure. -/
-theorem KromProgram.pull_holds (ρ : B.Assignment (I.Map A)) :
+private theorem KromProgram.pull_holds (ρ : B.Assignment (I.Map A)) :
     (prog.pull I).Holds (B.pullAssign ρ) ↔ prog.Holds ρ := by
   constructor
   · intro h v c hc
@@ -145,7 +147,7 @@ theorem KromProgram.pull_holds (ρ : B.Assignment (I.Map A)) :
 
 /-- **The pullback is correct**: the program is satisfiable on the interpreted
 structure iff its pullback is satisfiable on the base structure. -/
-theorem KromProgram.exists_holds_pull :
+private theorem KromProgram.exists_holds_pull :
     (∃ ρ : B.Assignment (I.Map A), prog.Holds ρ) ↔
       ∃ σ : (B.pull Tag d).Assignment A, (prog.pull I).Holds σ := by
   constructor

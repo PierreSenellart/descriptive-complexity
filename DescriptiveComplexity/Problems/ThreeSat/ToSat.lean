@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.ThreeSat.Defs
 public import DescriptiveComplexity.OccurrenceFormulas
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
 
 /-!
 # 3SAT FO-reduces to SAT
@@ -116,7 +117,7 @@ def Wide : Prop :=
   ∃ (c : A) (x : Fin 4 → A) (s : Fin 4 → Bool),
     (∀ i, OccIn c (x i) (s i)) ∧ ∀ i j, i ≠ j → s i = s j → x i ≠ x j
 
-theorem wide_iff_not_widthAtMostThree : Wide A ↔ ¬WidthAtMostThree A := by
+private theorem wide_iff_not_widthAtMostThree : Wide A ↔ ¬WidthAtMostThree A := by
   constructor
   · rintro ⟨c, x, s, hocc, hdist⟩ h
     obtain ⟨i, j, hij, hx, hs⟩ := h c x s hocc
@@ -219,7 +220,7 @@ end Characterizations
 
 /-- Correctness of the reduction: a CNF structure is a yes-instance of 3SAT
 iff the interpreted CNF structure is satisfiable. -/
-theorem threeSatisfiable_iff_satisfiable (A : Type) [Language.sat.Structure A] :
+private theorem threeSatisfiable_iff_satisfiable (A : Type) [Language.sat.Structure A] :
     ThreeSatisfiable A ↔ Satisfiable (threeSatToSat.Map A) := by
   by_cases hw : Wide A
   · -- wide input: both sides fail
@@ -267,7 +268,7 @@ open ThreeSatToSat in
 `ThreeSatToSat.threeSatToSat`, gated on the first-order width check, maps a
 CNF structure to a satisfiable CNF instance iff it is a yes-instance of
 3SAT. -/
-noncomputable def threeSat_fo_reduction_sat : ThreeSAT ≤ᶠᵒ SAT where
+private noncomputable def threeSat_fo_reduction_sat : ThreeSAT ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := threeSatToSat

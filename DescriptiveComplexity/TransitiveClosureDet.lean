@@ -128,7 +128,7 @@ section DetSemantics
 
 variable (spec : TCSpec L) {A : Type} [L.Structure A] [LinearOrder A]
 
-theorem realize_detStep (m n : spec.Mode) (x y : Fin spec.k → A) :
+private theorem realize_detStep (m n : spec.Mode) (x y : Fin spec.k → A) :
     (spec.detStep m n).Realize (Sum.elim x y) ↔
       (spec.step m n).Realize (Sum.elim x y) ∧
         ∀ (m' : spec.Mode) (z : Fin spec.k → A),

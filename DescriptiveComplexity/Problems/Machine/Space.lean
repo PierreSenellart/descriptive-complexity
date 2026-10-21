@@ -561,42 +561,42 @@ theorem mTape_cfgOf {ρ : mBlock.Assignment A} (h : IsCfgOn ρ) (p a : A) :
 
 /-! #### The symbols, read back -/
 
-theorem relMap_mIn₁ {n : ℕ} (ρ : mBlock.Assignment A) (r : Language.turing.Relations n)
+private theorem relMap_mIn₁ {n : ℕ} (ρ : mBlock.Assignment A) (r : Language.turing.Relations n)
     (w : Fin n → A) :
     @RelMap mLang₁ A (mBlock.structure₁ (L := mBase) ρ) n (mIn₁ r) w ↔ RelMap r w := Iff.rfl
 
-theorem relMap_mT₁ (ρ : mBlock.Assignment A) (p a : A) :
+private theorem relMap_mT₁ (ρ : mBlock.Assignment A) (p a : A) :
     @RelMap mLang₁ A (mBlock.structure₁ (L := mBase) ρ) 2 mT₁ ![p, a] ↔ mTape ρ p a := Iff.rfl
 
-theorem relMap_mS₁ (ρ : mBlock.Assignment A) (q : A) :
+private theorem relMap_mS₁ (ρ : mBlock.Assignment A) (q : A) :
     @RelMap mLang₁ A (mBlock.structure₁ (L := mBase) ρ) 1 mS₁ ![q] ↔ mState ρ q := Iff.rfl
 
-theorem relMap_mH₁ (ρ : mBlock.Assignment A) (p : A) :
+private theorem relMap_mH₁ (ρ : mBlock.Assignment A) (p : A) :
     @RelMap mLang₁ A (mBlock.structure₁ (L := mBase) ρ) 1 mH₁ ![p] ↔ mHead ρ p := Iff.rfl
 
-theorem relMap_mIn₂ {n : ℕ} (ρ σ : mBlock.Assignment A) (r : Language.turing.Relations n)
+private theorem relMap_mIn₂ {n : ℕ} (ρ σ : mBlock.Assignment A) (r : Language.turing.Relations n)
     (w : Fin n → A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) n (mIn₂ r) w ↔ RelMap r w := Iff.rfl
 
-theorem relMap_mTc₂ (ρ σ : mBlock.Assignment A) (p a : A) :
+private theorem relMap_mTc₂ (ρ σ : mBlock.Assignment A) (p a : A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) 2 mTc₂ ![p, a] ↔ mTape ρ p a := Iff.rfl
 
-theorem relMap_mSc₂ (ρ σ : mBlock.Assignment A) (q : A) :
+private theorem relMap_mSc₂ (ρ σ : mBlock.Assignment A) (q : A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) 1 mSc₂ ![q] ↔ mState ρ q := Iff.rfl
 
-theorem relMap_mHc₂ (ρ σ : mBlock.Assignment A) (p : A) :
+private theorem relMap_mHc₂ (ρ σ : mBlock.Assignment A) (p : A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) 1 mHc₂ ![p] ↔ mHead ρ p := Iff.rfl
 
-theorem relMap_mTn₂ (ρ σ : mBlock.Assignment A) (p a : A) :
+private theorem relMap_mTn₂ (ρ σ : mBlock.Assignment A) (p a : A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) 2 mTn₂ ![p, a] ↔ mTape σ p a := Iff.rfl
 
-theorem relMap_mSn₂ (ρ σ : mBlock.Assignment A) (q : A) :
+private theorem relMap_mSn₂ (ρ σ : mBlock.Assignment A) (q : A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) 1 mSn₂ ![q] ↔ mState σ q := Iff.rfl
 
-theorem relMap_mHn₂ (ρ σ : mBlock.Assignment A) (p : A) :
+private theorem relMap_mHn₂ (ρ σ : mBlock.Assignment A) (p : A) :
     @RelMap mLang₂ A (mBlock.structure₂ (L := mBase) ρ σ) 1 mHn₂ ![p] ↔ mHead σ p := Iff.rfl
 
-theorem mRealize_inf₁ (ρ : mBlock.Assignment A) (φ ψ : mLang₁.Sentence) :
+private theorem mRealize_inf₁ (ρ : mBlock.Assignment A) (φ ψ : mLang₁.Sentence) :
     @Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ) (φ ⊓ ψ) ↔
       (@Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ) φ ∧
         @Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ) ψ) :=
@@ -625,7 +625,7 @@ section Correct
 variable {A : Type} [Language.turing.Structure A] [LinearOrder A]
 
 /-- One step of the machine, read off two states of the walk. -/
-def StepOn (ρ σ : mBlock.Assignment A) : Prop :=
+private def StepOn (ρ σ : mBlock.Assignment A) : Prop :=
   ∃ τ : A, ((tmData A).Tr τ ∧
       ((∀ q : A, mState ρ q → (tmData A).Src τ q) ∧
         ∀ p a : A, mHead ρ p → mTape ρ p a → (tmData A).Read τ a)) ∧
@@ -637,7 +637,7 @@ def StepOn (ρ σ : mBlock.Assignment A) : Prop :=
           (¬(tmData A).Right τ ∧ ∀ p p' : A, mHead ρ p → mHead σ p' →
             SuccPos (tmData A).Le (tmData A).Posn p' p))))
 
-theorem mSpec_isSrc_iff (ρ : mBlock.Assignment A) :
+private theorem mSpec_isSrc_iff (ρ : mBlock.Assignment A) :
     mSpec.IsSrc ρ ↔ ((tmData A).WellFormed ∧ (IsCfgOn ρ ∧
       ((∀ q : A, mState ρ q → (tmData A).Start q) ∧
         ((∀ p : A, mHead ρ p → MinPos (tmData A).Le (tmData A).Posn p) ∧
@@ -648,13 +648,13 @@ theorem mSpec_isSrc_iff (ρ : mBlock.Assignment A) :
     relMap_mS₁, relMap_mH₁]
   exact Iff.rfl
 
-theorem mSpec_isTgt_iff (ρ : mBlock.Assignment A) :
+private theorem mSpec_isTgt_iff (ρ : mBlock.Assignment A) :
     mSpec.IsTgt ρ ↔ ∀ q : A, mState ρ q → (tmData A).Acc q := by
   change @Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ) mSpec.tgt ↔ _
   simp only [mSpec, Sentence.Realize, realize_markImpF, relMap_mIn₁, relMap_mS₁]
   exact Iff.rfl
 
-theorem mSpec_step_iff (ρ σ : mBlock.Assignment A) :
+private theorem mSpec_step_iff (ρ σ : mBlock.Assignment A) :
     mSpec.Step ρ σ ↔ (StepOn ρ σ ∧ IsCfgOn σ) := by
   change @Sentence.Realize _ A (mBlock.structure₂ (L := mBase) ρ σ) mSpec.step ↔ _
   simp only [mSpec, Sentence.Realize, Formula.realize_inf, realize_stepF, realize_cfgF,
@@ -664,7 +664,7 @@ theorem mSpec_step_iff (ρ σ : mBlock.Assignment A) :
 omit [LinearOrder A] in
 /-- **The transition sentence is one step of the machine**, on states that
 represent configurations. -/
-theorem stepOn_iff {ρ σ : mBlock.Assignment A} {c d : Config A}
+private theorem stepOn_iff {ρ σ : mBlock.Assignment A} {c d : Config A}
     (hρ : Represents ρ c) (hσ : Represents σ d) :
     StepOn ρ σ ↔ (tmData A).Step c d := by
   rw [StepOn, TMData.Step]
@@ -697,7 +697,7 @@ theorem stepOn_iff {ρ σ : mBlock.Assignment A} {c d : Config A}
 
 /-- Every state reachable from one representing a configuration represents one
 too, and the walk is a run of the machine. -/
-theorem mSpec_reach {ρ σ : mBlock.Assignment A} (h : mSpec.Reach ρ σ) {c : Config A}
+private theorem mSpec_reach {ρ σ : mBlock.Assignment A} (h : mSpec.Reach ρ σ) {c : Config A}
     (hρ : Represents ρ c) :
     ∃ d : Config A, Represents σ d ∧ Relation.ReflTransGen (tmData A).Step c d := by
   induction h with
@@ -708,7 +708,7 @@ theorem mSpec_reach {ρ σ : mBlock.Assignment A} (h : mSpec.Reach ρ σ) {c : C
     obtain ⟨e, he⟩ := exists_represents hcfg
     exact ⟨e, he, hreach.tail ((stepOn_iff hd he).mp hstep)⟩
 
-theorem mSpec_reach_of {c d : Config A} (h : Relation.ReflTransGen (tmData A).Step c d) :
+private theorem mSpec_reach_of {c d : Config A} (h : Relation.ReflTransGen (tmData A).Step c d) :
     mSpec.Reach (cfgAssign c) (cfgAssign d) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -719,7 +719,7 @@ theorem mSpec_reach_of {c d : Config A} (h : Relation.ReflTransGen (tmData A).St
 
 /-- **The specification is correct**: its walk accepts exactly the well-formed
 instances whose machine accepts in bounded space. -/
-theorem mSpec_accepts_iff :
+private theorem mSpec_accepts_iff :
     mSpec.Accepts A ↔ ((tmData A).WellFormed ∧ (tmData A).AcceptsSpace) := by
   constructor
   · rintro ⟨ρ, σ, hsrc, htgt, hreach⟩
@@ -743,7 +743,7 @@ section Det
 
 variable {A : Type} [Language.turing.Structure A] [LinearOrder A]
 
-theorem mSpecDet_isSrc_iff (ρ : mBlock.Assignment A) :
+private theorem mSpecDet_isSrc_iff (ρ : mBlock.Assignment A) :
     mSpecDet.IsSrc ρ ↔ ((tmData A).Deterministic ∧ mSpec.IsSrc ρ) := by
   have h : mSpecDet.IsSrc ρ ↔
       (@Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ)
@@ -758,7 +758,7 @@ theorem mSpecDet_isSrc_iff (ρ : mBlock.Assignment A) :
   simp only [realize_detF, relMap_mIn₁]
   exact Iff.rfl
 
-theorem mSpecDet_accepts_iff :
+private theorem mSpecDet_accepts_iff :
     mSpecDet.Accepts A ↔ ((tmData A).Deterministic ∧ mSpec.Accepts A) := by
   constructor
   · rintro ⟨ρ, σ, hsrc, htgt, hreach⟩

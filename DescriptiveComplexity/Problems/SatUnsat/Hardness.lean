@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.SatUnsat
 public import DescriptiveComplexity.Problems.Sat.Hardness
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Difference
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.SatUnsat
 
 /-!
 # DP-hardness of SAT-UNSAT
@@ -73,7 +76,7 @@ variable {A B : Type} [Language.satPair.Structure A] [Language.sat.Structure B]
 /-- **Satisfiability of a side transfers along a clause-covering embedding**:
 the elements of the paired instance outside the image of `j` are neither
 clauses nor occurrences of that side, so they constrain nothing. -/
-theorem satWith_iff_of_cover (isCl : Language.satPair.Relations 1)
+private theorem satWith_iff_of_cover (isCl : Language.satPair.Relations 1)
     (pos neg : Language.satPair.Relations 2) (j : B → A) (hj : Function.Injective j)
     (hcl : ∀ b : B, RelMap isCl ![j b] ↔ RelMap satIsClause ![b])
     (hpos : ∀ b b' : B, RelMap pos ![j b, j b'] ↔ RelMap satPosIn ![b, b'])
@@ -133,7 +136,7 @@ noncomputable def sideFml (I : FOInterpretation (L.sum Language.order) Language.
   else ⊥
 
 /-- A tag of the other side makes a side's defining formula `⊥`. -/
-theorem sideFml_eq_bot (I : FOInterpretation (L.sum Language.order) Language.sat T dm)
+private theorem sideFml_eq_bot (I : FOInterpretation (L.sum Language.order) Language.sat T dm)
     (hd : dm ≤ d) (get : Tg → Option T) {n : ℕ} (R : Language.sat.Relations n)
     (t : Fin n → Tg) (h : ¬∀ i, (get (t i)).isSome) : sideFml I hd get R t = ⊥ :=
   dite_eq_right h
@@ -141,7 +144,7 @@ theorem sideFml_eq_bot (I : FOInterpretation (L.sum Language.order) Language.sat
 /-- Realization of a side's defining formula at tags that all belong to it:
 this side's own formula holds of the prefixes, and every argument tuple is
 canonically padded. -/
-theorem realize_sideFml (I : FOInterpretation (L.sum Language.order) Language.sat T dm)
+private theorem realize_sideFml (I : FOInterpretation (L.sum Language.order) Language.sat T dm)
     (hd : dm ≤ d) (get : Tg → Option T) {n : ℕ} (R : Language.sat.Relations n)
     (t : Fin n → Tg) (t' : Fin n → T) (ht : ∀ i, get (t i) = some (t' i))
     {A : Type} [L.Structure A] [LinearOrder A] (v : Fin n × Fin d → A) :
@@ -189,7 +192,7 @@ variable (I : FOInterpretation (L.sum Language.order) Language.sat T dm) (hd : d
 
 /-- **What a side's relations say**: at tags that all belong to the side, its
 own relation of the prefixes, plus canonicity of every argument tuple. -/
-theorem relMap_side
+private theorem relMap_side
     (hJ : ∀ (n : ℕ) (R : Language.sat.Relations n),
       J.relFormula (sym n R) = sideFml I hd get R)
     {n : ℕ} (R : Language.sat.Relations n) (xs : Fin n → J.Map A) (t : Fin n → T)
@@ -201,7 +204,7 @@ theorem relMap_side
   exact and_congr (I.relMap_map A R fun i => (t i, pref hd (xs i).2)).symm Iff.rfl
 
 /-- A side's relations only hold of tags belonging to it. -/
-theorem isSome_of_relMap_side
+private theorem isSome_of_relMap_side
     (hJ : ∀ (n : ℕ) (R : Language.sat.Relations n),
       J.relFormula (sym n R) = sideFml I hd get R)
     {n : ℕ} (R : Language.sat.Relations n) (xs : Fin n → J.Map A)
@@ -212,7 +215,7 @@ theorem isSome_of_relMap_side
   exact h
 
 /-- The tags of a tuple satisfying a side's relation, as a function. -/
-theorem exists_tags_of_relMap_side
+private theorem exists_tags_of_relMap_side
     (hJ : ∀ (n : ℕ) (R : Language.sat.Relations n),
       J.relFormula (sym n R) = sideFml I hd get R)
     {n : ℕ} (R : Language.sat.Relations n) (xs : Fin n → J.Map A)
@@ -224,7 +227,7 @@ theorem exists_tags_of_relMap_side
 /-- **A side's relations, read on its own points**: on the image of
 `DescriptiveComplexity.sidePt`, the paired instance's side is a faithful copy of the
 interpretation it came from. -/
-theorem relMap_side_pad (hget : ∀ t, get (inj t) = some t)
+private theorem relMap_side_pad (hget : ∀ t, get (inj t) = some t)
     (hJ : ∀ (n : ℕ) (R : Language.sat.Relations n),
       J.relFormula (sym n R) = sideFml I hd get R)
     {a₀ : A} (ha₀ : IsBot a₀) {n : ℕ} (R : Language.sat.Relations n)
@@ -241,7 +244,8 @@ theorem relMap_side_pad (hget : ∀ t, get (inj t) = some t)
   exact ⟨fun h => h1.mp h.1, fun h => ⟨h1.mpr h, fun i => canon_pad ha₀ _ _⟩⟩
 
 /-- Every point a side's relations mention is one of its own points. -/
-theorem exists_sidePt_of_relMap_side (hgetinv : ∀ (tg : Tg) (t : T), get tg = some t → tg = inj t)
+private theorem exists_sidePt_of_relMap_side
+    (hgetinv : ∀ (tg : Tg) (t : T), get tg = some t → tg = inj t)
     (hJ : ∀ (n : ℕ) (R : Language.sat.Relations n),
       J.relFormula (sym n R) = sideFml I hd get R)
     {a₀ : A} (ha₀ : IsBot a₀) {n : ℕ} (R : Language.sat.Relations n) (xs : Fin n → J.Map A)
@@ -256,7 +260,7 @@ theorem exists_sidePt_of_relMap_side (hgetinv : ∀ (tg : Tg) (t : T), get tg = 
 interpretation it came from is.** The junk of the paired universe – points of
 the other side, and tuples that are not canonically padded – is neither a
 clause nor an occurrence of this side, so it constrains no assignment. -/
-theorem satWith_side [Finite A] [Nonempty A] (hget : ∀ t, get (inj t) = some t)
+private theorem satWith_side [Finite A] [Nonempty A] (hget : ∀ t, get (inj t) = some t)
     (hgetinv : ∀ (tg : Tg) (t : T), get tg = some t → tg = inj t)
     (hJ : ∀ (n : ℕ) (R : Language.sat.Relations n),
       J.relFormula (sym n R) = sideFml I hd get R) :
@@ -337,14 +341,14 @@ noncomputable def pairInterp :
 
 /-- The paired interpretation defines the first side's symbols by the first
 interpretation's formulas. -/
-theorem pairInterp_relFormula_left (n : ℕ) (R : Language.sat.Relations n) :
+private theorem pairInterp_relFormula_left (n : ℕ) (R : Language.sat.Relations n) :
     (pairInterp I₁ I₂).relFormula (satPairL n R) =
       sideFml I₁ (le_max_left d₁ d₂) Sum.getLeft? R := by
   cases R <;> rfl
 
 /-- The paired interpretation defines the second side's symbols by the second
 interpretation's formulas. -/
-theorem pairInterp_relFormula_right (n : ℕ) (R : Language.sat.Relations n) :
+private theorem pairInterp_relFormula_right (n : ℕ) (R : Language.sat.Relations n) :
     (pairInterp I₁ I₂).relFormula (satPairR n R) =
       sideFml I₂ (le_max_right d₁ d₂) Sum.getRight? R := by
   cases R <;> rfl

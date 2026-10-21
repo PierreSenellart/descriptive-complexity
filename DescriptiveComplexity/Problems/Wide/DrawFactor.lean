@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawKit
 public import DescriptiveComplexity.EqPattern
+import all DescriptiveComplexity.EqPattern
+import all DescriptiveComplexity.Padding
 
 /-!
 # What a rule owes the interpretation, and the algebra that discharges it
@@ -85,7 +87,7 @@ abbrev baseSym {L : Language.{0, 0}} {m : ℕ} (r : L.Relations m) :
 variable {A : Type}
 
 /-- **The two halves of a rule's data, put back together**, is the data. -/
-theorem elim_unslot (w : Fin (Fintype.card (Q ⊕ W)) → A) (d : Q ⊕ W) :
+private theorem elim_unslot (w : Fin (Fintype.card (Q ⊕ W)) → A) (d : Q ⊕ W) :
     Sum.elim (fun q => unslot w (Sum.inl q)) (fun s => unslot w (Sum.inr s)) d =
       w (slotIx d) := by
   cases d <;> rfl
@@ -196,25 +198,25 @@ element; one slot is at most another; and a relation of the source vocabulary
 holds of a tuple of slots. The last two are what an equality pattern cannot
 say, and what a program that evaluates a logic needs. -/
 
-theorem uGDefinable_slotOne (d : Q ⊕ W) :
+private theorem uGDefinable_slotOne (d : Q ⊕ W) :
     UGDefinable (L := L) fun e f g => Sum.elim f g d = e.one :=
   ⟨topF (slotIx d), fun e w => by
     simp only [elim_unslot, realize_topF]
     exact (e.isTop_iff _).symm⟩
 
-theorem uGDefinable_slotZero (d : Q ⊕ W) :
+private theorem uGDefinable_slotZero (d : Q ⊕ W) :
     UGDefinable (L := L) fun e f g => Sum.elim f g d = e.zero :=
   ⟨botF (slotIx d), fun e w => by
     simp only [elim_unslot, realize_botF]
     exact (e.isBot_iff _).symm⟩
 
-theorem uGDefinable_slotEq (d d' : Q ⊕ W) :
+private theorem uGDefinable_slotEq (d d' : Q ⊕ W) :
     UGDefinable (L := L) fun _ f g => Sum.elim f g d = Sum.elim f g d' :=
   ⟨Term.equal (Term.var (slotIx d)) (Term.var (slotIx d')), fun _ _ => by
     simp only [elim_unslot, Formula.realize_equal, Term.realize_var]⟩
 
 /-- **One slot is at most another.** -/
-theorem uGDefinable_slotLe (d d' : Q ⊕ W) :
+private theorem uGDefinable_slotLe (d d' : Q ⊕ W) :
     UGDefinable (L := L) fun _ f g => Sum.elim f g d ≤ Sum.elim f g d' :=
   ⟨Relations.formula₂ leSymb (Term.var (slotIx d)) (Term.var (slotIx d')),
     fun _ _ => by
@@ -224,46 +226,46 @@ theorem uGDefinable_slotLe (d d' : Q ⊕ W) :
 /-- **A relation of the source vocabulary, of a tuple of slots**: the one thing
 a guard asks of the instance itself, and the reason a guard is a formula rather
 than a reading of the equality pattern. -/
-theorem uGDefinable_slotRel {m : ℕ} (r : L.Relations m) (ts : Fin m → Q ⊕ W) :
+private theorem uGDefinable_slotRel {m : ℕ} (r : L.Relations m) (ts : Fin m → Q ⊕ W) :
     UGDefinable (L := L) fun e f g =>
       @RelMap L e.α _ m r fun j => Sum.elim f g (ts j) :=
   ⟨Relations.formula (baseSym r) fun j => Term.var (slotIx (ts j)), fun _ _ => by
     rw [Formula.realize_rel]
     simp only [elim_unslot, baseSym, relMap_sumInl, Term.realize_var]⟩
 
-theorem uGDefinable_ctlOne (q : Q) :
+private theorem uGDefinable_ctlOne (q : Q) :
     UGDefinable (L := L) (W := W) fun e f _ => f q = e.one :=
   uGDefinable_slotOne (Sum.inl q)
 
-theorem uGDefinable_ctlZero (q : Q) :
+private theorem uGDefinable_ctlZero (q : Q) :
     UGDefinable (L := L) (W := W) fun e f _ => f q = e.zero :=
   uGDefinable_slotZero (Sum.inl q)
 
-theorem uGDefinable_trkOne (s : W) :
+private theorem uGDefinable_trkOne (s : W) :
     UGDefinable (L := L) (Q := Q) fun e _ g => g s = e.one :=
   uGDefinable_slotOne (Sum.inr s)
 
-theorem uGDefinable_trkZero (s : W) :
+private theorem uGDefinable_trkZero (s : W) :
     UGDefinable (L := L) (Q := Q) fun e _ g => g s = e.zero :=
   uGDefinable_slotZero (Sum.inr s)
 
-theorem uGDefinable_ctlEq (q q' : Q) :
+private theorem uGDefinable_ctlEq (q q' : Q) :
     UGDefinable (L := L) (W := W) fun _ f _ => f q = f q' :=
   uGDefinable_slotEq (W := W) (Sum.inl q) (Sum.inl q')
 
-theorem uGDefinable_trkEq (s s' : W) :
+private theorem uGDefinable_trkEq (s s' : W) :
     UGDefinable (L := L) (Q := Q) fun _ _ g => g s = g s' :=
   uGDefinable_slotEq (Q := Q) (Sum.inr s) (Sum.inr s')
 
-theorem uGDefinable_mixEq (q : Q) (s : W) :
+private theorem uGDefinable_mixEq (q : Q) (s : W) :
     UGDefinable (L := L) fun _ f g => f q = g s :=
   uGDefinable_slotEq (Sum.inl q) (Sum.inr s)
 
-theorem uGDefinable_ctlLe (q q' : Q) :
+private theorem uGDefinable_ctlLe (q q' : Q) :
     UGDefinable (L := L) (W := W) fun _ f _ => f q ≤ f q' :=
   uGDefinable_slotLe (W := W) (Sum.inl q) (Sum.inl q')
 
-theorem uGDefinable_ctlRel {m : ℕ} (r : L.Relations m) (ts : Fin m → Q) :
+private theorem uGDefinable_ctlRel {m : ℕ} (r : L.Relations m) (ts : Fin m → Q) :
     UGDefinable (L := L) (W := W) fun e f _ =>
       @RelMap L e.α _ m r fun j => f (ts j) :=
   uGDefinable_slotRel (W := W) r fun j => Sum.inl (ts j)
@@ -271,17 +273,17 @@ theorem uGDefinable_ctlRel {m : ℕ} (r : L.Relations m) (ts : Fin m → Q) :
 open Classical in
 /-- **A condition of the kit, not of the data**: decided when the formula is
 built, so any `Prop` will do – the two ends among them. -/
-theorem uGDefinable_const (p : Prop) :
+private theorem uGDefinable_const (p : Prop) :
     UGDefinable (L := L) (Q := Q) (W := W) fun _ _ _ => p := by
   by_cases hp : p
   · exact ⟨⊤, fun _ _ => iff_of_true hp (by simp)⟩
   · exact ⟨⊥, fun _ _ => iff_of_false hp (by simp)⟩
 
-theorem uGDefinable_true :
+private theorem uGDefinable_true :
     UGDefinable (L := L) (Q := Q) (W := W) fun _ _ _ => True :=
   uGDefinable_const True
 
-theorem uGDefinable_false :
+private theorem uGDefinable_false :
     UGDefinable (L := L) (Q := Q) (W := W) fun _ _ _ => False :=
   uGDefinable_const False
 
@@ -294,7 +296,7 @@ theorem UGDefinable.congr (h : UGDefinable N) (he : ∀ e f g, N' e f g ↔ N e 
     UGDefinable N' :=
   h.imp fun _ hφ e w => (he _ _ _).trans (hφ e w)
 
-theorem UGDefinable.and (h : UGDefinable N) (h' : UGDefinable N') :
+private theorem UGDefinable.and (h : UGDefinable N) (h' : UGDefinable N') :
     UGDefinable fun e f g => N e f g ∧ N' e f g := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨φ', hφ'⟩ := h'
@@ -302,7 +304,7 @@ theorem UGDefinable.and (h : UGDefinable N) (h' : UGDefinable N') :
     rw [Formula.realize_inf]
     exact and_congr (hφ e w) (hφ' e w)⟩
 
-theorem UGDefinable.or (h : UGDefinable N) (h' : UGDefinable N') :
+private theorem UGDefinable.or (h : UGDefinable N) (h' : UGDefinable N') :
     UGDefinable fun e f g => N e f g ∨ N' e f g := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨φ', hφ'⟩ := h'
@@ -310,7 +312,7 @@ theorem UGDefinable.or (h : UGDefinable N) (h' : UGDefinable N') :
     rw [Formula.realize_sup]
     exact or_congr (hφ e w) (hφ' e w)⟩
 
-theorem UGDefinable.not (h : UGDefinable N) :
+private theorem UGDefinable.not (h : UGDefinable N) :
     UGDefinable fun e f g => ¬N e f g := by
   obtain ⟨φ, hφ⟩ := h
   exact ⟨∼φ, fun e w => by
@@ -318,19 +320,19 @@ theorem UGDefinable.not (h : UGDefinable N) :
     exact not_congr (hφ e w)⟩
 
 open Classical in
-theorem UGDefinable.imp (h : UGDefinable N) (h' : UGDefinable N') :
+private theorem UGDefinable.imp (h : UGDefinable N) (h' : UGDefinable N') :
     UGDefinable fun e f g => N e f g → N' e f g :=
   (h.not.or h').congr fun _ _ _ => imp_iff_not_or
 
 open Classical in
-theorem UGDefinable.iff (h : UGDefinable N) (h' : UGDefinable N') :
+private theorem UGDefinable.iff (h : UGDefinable N) (h' : UGDefinable N') :
     UGDefinable fun e f g => (N e f g ↔ N' e f g) :=
   ((h.imp h').and (h'.imp h)).congr fun _ _ _ => iff_iff_implies_and_implies
 
 open Classical in
 /-- A conjunction over any finite index type – the shape a one-hot clause or a
 `Match` over a block of slots has. -/
-theorem uGDefinable_forall {ι : Type*} [Finite ι]
+private theorem uGDefinable_forall {ι : Type*} [Finite ι]
     {R : ι → ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     (h : ∀ i, UGDefinable (R i)) :
     UGDefinable fun e f g => ∀ i, R i e f g := by
@@ -348,7 +350,7 @@ theorem uGDefinable_forall {ι : Type*} [Finite ι]
 
 open Classical in
 /-- And a disjunction over any finite index type. -/
-theorem uGDefinable_exists {ι : Type*} [Finite ι]
+private theorem uGDefinable_exists {ι : Type*} [Finite ι]
     {R : ι → ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     (h : ∀ i, UGDefinable (R i)) :
     UGDefinable fun e f g => ∃ i, R i e f g := by
@@ -392,7 +394,7 @@ private theorem realize_liftG
 
 /-- **A source names a written value**: the three cases of
 `DescriptiveComplexity.SlotVal`, read at the payload coordinates. -/
-theorem uSlotDefinable_of_slotVal (sv : SlotVal (Fintype.card (Q ⊕ W)))
+private theorem uSlotDefinable_of_slotVal (sv : SlotVal (Fintype.card (Q ⊕ W)))
     {V : ∀ e : Env L, (Q → e.α) → (W → e.α) → e.α}
     (hV : ∀ (e : Env L) (w : Fin (Fintype.card (Q ⊕ W)) → e.α),
       V e (fun q => unslot w (Sum.inl q)) (fun s => unslot w (Sum.inr s)) =
@@ -403,29 +405,29 @@ theorem uSlotDefinable_of_slotVal (sv : SlotVal (Fintype.card (Q ⊕ W)))
   rw [realize_slotValF e.hbot e.htop, hV e w]
   exact Iff.rfl
 
-theorem uSlotDefinable_zero :
+private theorem uSlotDefinable_zero :
     USlotDefinable (L := L) (Q := Q) (W := W) fun e _ _ => e.zero :=
   uSlotDefinable_of_slotVal .bot fun _ _ => rfl
 
-theorem uSlotDefinable_one :
+private theorem uSlotDefinable_one :
     USlotDefinable (L := L) (Q := Q) (W := W) fun e _ _ => e.one :=
   uSlotDefinable_of_slotVal .top fun _ _ => rfl
 
-theorem uSlotDefinable_ctl (q : Q) :
+private theorem uSlotDefinable_ctl (q : Q) :
     USlotDefinable (L := L) (W := W) fun _ f _ => f q :=
   uSlotDefinable_of_slotVal (.copy (slotIx (Sum.inl q))) fun _ _ => rfl
 
-theorem uSlotDefinable_trk (s : W) :
+private theorem uSlotDefinable_trk (s : W) :
     USlotDefinable (L := L) (Q := Q) fun _ _ g => g s :=
   uSlotDefinable_of_slotVal (.copy (slotIx (Sum.inr s))) fun _ _ => rfl
 
 /-- **The next element after a control slot** – what advancing a loop variable
 writes, and the only source that reads the order. -/
-theorem uSlotDefinable_ctlSucc (q : Q) :
+private theorem uSlotDefinable_ctlSucc (q : Q) :
     USlotDefinable (L := L) (W := W) fun _ f _ => ordSucc (f q) :=
   uSlotDefinable_of_slotVal (.succ (slotIx (Sum.inl q))) fun _ _ => rfl
 
-theorem uSlotDefinable_trkSucc (s : W) :
+private theorem uSlotDefinable_trkSucc (s : W) :
     USlotDefinable (L := L) (Q := Q) fun _ _ g => ordSucc (g s) :=
   uSlotDefinable_of_slotVal (.succ (slotIx (Sum.inr s))) fun _ _ => rfl
 
@@ -438,7 +440,7 @@ theorem USlotDefinable.congr (h : USlotDefinable V)
 /-- **A bit is a written value**: the two designated elements, chosen by a
 guard – so every `DescriptiveComplexity.Draw.bitVal` a rule writes is definable
 as soon as the question behind it is. -/
-theorem uSlotDefinable_bitVal (h : UGDefinable N) :
+private theorem uSlotDefinable_bitVal (h : UGDefinable N) :
     USlotDefinable fun e f g => bitVal e.zero e.one (N e f g) := by
   obtain ⟨φ, hφ⟩ := h
   refine ⟨(liftG φ ⊓ topF (outVar (Q := Q) (W := W))) ⊔
@@ -459,7 +461,7 @@ theorem uSlotDefinable_bitVal (h : UGDefinable N) :
 
 /-- **A value chosen by a condition of the kit** – not of the data – is
 definable when both branches are. -/
-theorem USlotDefinable.ite {p : Prop} [Decidable p] (h : USlotDefinable V)
+private theorem USlotDefinable.ite {p : Prop} [Decidable p] (h : USlotDefinable V)
     (h' : USlotDefinable V') :
     USlotDefinable fun e f g => if p then V e f g else V' e f g := by
   by_cases hp : p
@@ -515,11 +517,11 @@ theorem uSlotDefinable_cases {ι : Type*} [Finite ι]
 
 /-- **A readable value**: one a slot may be compared with. Every written value
 is one, the comparison being the graph formula read at that slot. -/
-def UReadable (V : ∀ e : Env L, (Q → e.α) → (W → e.α) → e.α) : Prop :=
+private def UReadable (V : ∀ e : Env L, (Q → e.α) → (W → e.α) → e.α) : Prop :=
   ∀ s : W, UGDefinable fun e f g => g s = V e f g
 
 /-- **Every written value is readable.** -/
-theorem USlotDefinable.readable (h : USlotDefinable V) : UReadable V := by
+private theorem USlotDefinable.readable (h : USlotDefinable V) : UReadable V := by
   obtain ⟨ψ, hψ⟩ := h
   intro s
   refine ⟨ψ.relabel (Sum.elim id fun _ => slotIx (Sum.inr s)), fun e w => ?_⟩
@@ -527,24 +529,24 @@ theorem USlotDefinable.readable (h : USlotDefinable V) : UReadable V := by
   refine (hψ e w (w (slotIx (Sum.inr s)))).trans (iff_of_eq (congrArg _ (funext ?_)))
   rintro (k | ⟨⟩) <;> rfl
 
-theorem uReadable_zero :
+private theorem uReadable_zero :
     UReadable (L := L) (Q := Q) (W := W) fun e _ _ => e.zero :=
   fun s => uGDefinable_trkZero s
 
-theorem uReadable_one :
+private theorem uReadable_one :
     UReadable (L := L) (Q := Q) (W := W) fun e _ _ => e.one :=
   fun s => uGDefinable_trkOne s
 
-theorem uReadable_ctl (q : Q) :
+private theorem uReadable_ctl (q : Q) :
     UReadable (L := L) (W := W) fun _ f _ => f q :=
   fun s => (uGDefinable_mixEq (L := L) q s).congr fun _ _ _ => eq_comm
 
-theorem UReadable.congr (h : UReadable V) (he : ∀ e f g, V' e f g = V e f g) :
+private theorem UReadable.congr (h : UReadable V) (he : ∀ e f g, V' e f g = V e f g) :
     UReadable V' :=
   fun s => (h s).congr fun e f g => by rw [he]
 
 /-- A value chosen by a condition of the kit, not of the data. -/
-theorem UReadable.ite {p : Prop} [Decidable p] (h : UReadable V)
+private theorem UReadable.ite {p : Prop} [Decidable p] (h : UReadable V)
     (h' : UReadable V') :
     UReadable fun e f g => if p then V e f g else V' e f g := by
   by_cases hp : p
@@ -617,7 +619,7 @@ def UPayloadDefinable
 open Classical in
 /-- **A payload is definable when each of its coordinates is**, the coordinate
 formulas being conjoined at the output variables they name. -/
-theorem uPayloadDefinable_of_slots
+private theorem uPayloadDefinable_of_slots
     {F : ∀ e : Env L, (Fin (Fintype.card (Q ⊕ W)) → e.α) →
       Fin (Fintype.card (Q ⊕ W)) → e.α}
     {V : ∀ (_k : Fin (Fintype.card (Q ⊕ W))) (e : Env L),
@@ -690,14 +692,14 @@ theorem uPayloadDefinable_syPl (h : UTrDefinable G) :
 
 omit [Fintype Q] [Fintype W] in
 /-- A rule that always moves right. -/
-theorem uRight_of_true {rl : ∀ e : Env L, Rule e.α Q W P}
+private theorem uRight_of_true {rl : ∀ e : Env L, Rule e.α Q W P}
     (h : ∀ e : Env L, (rl e).moveRight) :
     ∃ b : Bool, ∀ e : Env L, ((rl e).moveRight ↔ b = true) :=
   ⟨true, fun e => iff_of_true (h e) rfl⟩
 
 omit [Fintype Q] [Fintype W] in
 /-- And one that always moves left. -/
-theorem uRight_of_false {rl : ∀ e : Env L, Rule e.α Q W P}
+private theorem uRight_of_false {rl : ∀ e : Env L, Rule e.α Q W P}
     (h : ∀ e : Env L, ¬(rl e).moveRight) :
     ∃ b : Bool, ∀ e : Env L, ((rl e).moveRight ↔ b = true) :=
   ⟨false, fun e => iff_of_false (h e) Bool.false_ne_true⟩
@@ -705,7 +707,7 @@ theorem uRight_of_false {rl : ∀ e : Env L, Rule e.α Q W P}
 /-! ### The shape of most of the program's rules -/
 
 /-- **A guard, with the pointer and the tracks riding along unchanged.** -/
-theorem uRuleDefinable_of_keep {rl : ∀ e : Env L, Rule e.α Q W P}
+private theorem uRuleDefinable_of_keep {rl : ∀ e : Env L, Rule e.α Q W P}
     (hst : (∃ p : P, ∀ e : Env L, (rl e).srcPh = p) ∧
       (∃ p : P, ∀ e : Env L, (rl e).dstPh = p) ∧
       ∃ b : Bool, ∀ e : Env L, ((rl e).moveRight ↔ b = true))
@@ -718,7 +720,7 @@ theorem uRuleDefinable_of_keep {rl : ∀ e : Env L, Rule e.α Q W P}
     (uTrDefinable_id (L := L) (Q := Q) (W := W)).congr fun e f g s => by rw [hw]⟩
 
 /-- **A rule that keeps its pointer**, writing only its tracks. -/
-theorem uRuleDefinable_of_keepSt {rl : ∀ e : Env L, Rule e.α Q W P}
+private theorem uRuleDefinable_of_keepSt {rl : ∀ e : Env L, Rule e.α Q W P}
     (hst : (∃ p : P, ∀ e : Env L, (rl e).srcPh = p) ∧
       (∃ p : P, ∀ e : Env L, (rl e).dstPh = p) ∧
       ∃ b : Bool, ∀ e : Env L, ((rl e).moveRight ↔ b = true))
@@ -731,7 +733,7 @@ theorem uRuleDefinable_of_keepSt {rl : ∀ e : Env L, Rule e.α Q W P}
 
 /-- **A rule that keeps its tracks**, writing only its pointer – every
 checkpoint's dispatch. -/
-theorem uRuleDefinable_of_keepWr {rl : ∀ e : Env L, Rule e.α Q W P}
+private theorem uRuleDefinable_of_keepWr {rl : ∀ e : Env L, Rule e.α Q W P}
     (hst : (∃ p : P, ∀ e : Env L, (rl e).srcPh = p) ∧
       (∃ p : P, ∀ e : Env L, (rl e).dstPh = p) ∧
       ∃ b : Bool, ∀ e : Env L, ((rl e).moveRight ↔ b = true))

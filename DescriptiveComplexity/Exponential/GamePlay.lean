@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Exponential.GameAsk
 import DescriptiveComplexity.Exponential.GameSweep
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.GameCtrl
+import all DescriptiveComplexity.Exponential.GameProgram
+import all DescriptiveComplexity.Exponential.GameRun
+import all DescriptiveComplexity.Exponential.GameTape
 
 /-!
 # The machine plays the game
@@ -75,11 +80,11 @@ local notation "𝕄" => gameMachine prog.vars prog.pol a₀ hdim
   (gameRule prog.vars prog.natoms prog.concOk prog.isTarget)
 
 omit [L.Structure A] [LinearOrder A] [Finite A] in
-private theorem not_true_of_eq_false {b : Bool} (h : b = false) : ¬ (b = true) := by
+theorem not_true_of_eq_false {b : Bool} (h : b = false) : ¬ (b = true) := by
   rw [h]; simp
 
 /-- **A branch that checks a question wins when the question holds.** -/
-theorem altWin_question (h₀ : IsBot a₀)
+private theorem altWin_question (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     {ρ₀ σ₀ : spec.B.Assignment A} {q : GameQuestion} {r par : Bool}
     {c : Config (GamePt spec.B V M A)}
@@ -92,7 +97,7 @@ theorem altWin_question (h₀ : IsBot a₀)
 omit [L.Structure A] [LinearOrder A] [Finite A] in
 /-- The pair of assignments that writes `σ` into the candidate region and
 leaves the current one alone. -/
-theorem cond_swap (r : Bool) (ρ₀ σ₀ σ : spec.B.Assignment A) :
+private theorem cond_swap (r : Bool) (ρ₀ σ₀ σ : spec.B.Assignment A) :
     cond r (cond r σ₀ σ) (cond r σ ρ₀) = cond r σ₀ ρ₀ ∧
       cond (!r) (cond r σ₀ σ) (cond r σ ρ₀) = σ := by
   cases r <;> exact ⟨rfl, rfl⟩
@@ -100,7 +105,7 @@ theorem cond_swap (r : Bool) (ρ₀ σ₀ σ : spec.B.Assignment A) :
 /-! ### The three clauses of `Wins` -/
 
 /-- **A state that wins outright**: the existential player claims `won`. -/
-theorem altWin_play_won (h₀ : IsBot a₀)
+private theorem altWin_play_won (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     {ρ₀ σ₀ : spec.B.Assignment A} {r par : Bool} {c : Config (GamePt spec.B V M A)}
     (hw : spec.IsWon (cond r σ₀ ρ₀))
@@ -120,7 +125,7 @@ theorem altWin_play_won (h₀ : IsBot a₀)
 /-- **An existential state with a winning move**: the existential player claims
 the existential clause, proves the state is its own and sweeps the move in;
 then the move is checked and the play goes on at the other region. -/
-theorem altWin_play_ex (h₀ : IsBot a₀)
+private theorem altWin_play_ex (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     {ρ₀ σ₀ : spec.B.Assignment A} {σ : spec.State A} {r par : Bool}
     {c : Config (GamePt spec.B V M A)}
@@ -179,7 +184,7 @@ theorem altWin_play_ex (h₀ : IsBot a₀)
 the universal clause, proves the state is universal, certifies that a move
 exists at all, and then answers every candidate the universal sweep may write –
 by refuting the move, or by playing on. -/
-theorem altWin_play_all (h₀ : IsBot a₀)
+private theorem altWin_play_all (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     {ρ₀ σ₀ : spec.B.Assignment A} {r par : Bool} {c : Config (GamePt spec.B V M A)}
     (hu : spec.IsUniv (cond r σ₀ ρ₀)) (hex : ∃ σ, spec.Move (cond r σ₀ ρ₀) σ)

@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Interpretation
+import all DescriptiveComplexity.Interpretation
 
 /-!
 # 3-dimensional matching: definition

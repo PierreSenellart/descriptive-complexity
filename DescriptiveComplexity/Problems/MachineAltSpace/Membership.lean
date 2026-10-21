@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.MachineAltSpace.Spec
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Problems.MachineAltSpace.Spec
 
 /-!
 # Alternating acceptance in bounded space is in EXPTIME
@@ -57,7 +59,7 @@ section Correct
 variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 
 /-- **A move is a step**, between configurations. -/
-theorem move_cfgOf (c c' : Config A) :
+private theorem move_cfgOf (c c' : Config A) :
     atmSpec.Move (cfgOf c) (cfgOf c') ↔ (atmData 2 A).toTMData.Step c c' := by
   let := cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')
   change (@Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c'))
@@ -68,7 +70,7 @@ theorem move_cfgOf (c c' : Config A) :
 
 /-- **A move lands on a configuration**: the move sentence says so outright,
 which is what keeps the walk out of the junk assignments. -/
-theorem move_isCfg {ρ σ : atmSpec.State A} (h : atmSpec.Move ρ σ) :
+private theorem move_isCfg {ρ σ : atmSpec.State A} (h : atmSpec.Move ρ σ) :
     ∃ c' : Config A, σ = cfgOf c' := by
   let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   have h' : @Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ)
@@ -76,20 +78,20 @@ theorem move_isCfg {ρ σ : atmSpec.State A} (h : atmSpec.Move ρ σ) :
   exact exists_cfgOf ((realize_isCfgBS ρ σ).mp (Formula.realize_inf.mp h').1)
 
 /-- **The universal states are the ones the second mark owns.** -/
-theorem isUniv_cfgOf (hsplit : (atmData 2 A).BlocksSplit) (c : Config A) :
+private theorem isUniv_cfgOf (hsplit : (atmData 2 A).BlocksSplit) (c : Config A) :
     atmSpec.IsUniv (cfgOf c) ↔ (atmData 2 A).IsUniv true c.state := by
   refine (realize_univS c).trans ?_
   refine Iff.trans ?_ (ATMData.isUniv_true_iff_blk_one hsplit c.state).symm
   exact ⟨fun h => ⟨by omega, h⟩, fun ⟨_, h⟩ => h⟩
 
 /-- **The states that win outright are the accepting ones.** -/
-theorem isWon_cfgOf (c : Config A) :
+private theorem isWon_cfgOf (c : Config A) :
     atmSpec.IsWon (cfgOf c) ↔ (atmData 2 A).Acc c.state :=
   realize_wonS c
 
 /-- **The starting states are the initial configurations**, of a machine whose
 two promises hold. -/
-theorem isStart_iff (ρ : atmSpec.State A) :
+private theorem isStart_iff (ρ : atmSpec.State A) :
     atmSpec.IsStart ρ ↔ ((atmData 2 A).toTMData.WellFormed ∧ (atmData 2 A).BlocksSplit ∧
       ∃ c : Config A, ρ = cfgOf c ∧ (atmData 2 A).toTMData.IsInit c) :=
   realize_startS ρ
@@ -97,11 +99,11 @@ theorem isStart_iff (ρ : atmSpec.State A) :
 /-! ### The bisimulation -/
 
 /-- What winning says about the configuration an assignment is. -/
-def WinsCfg (ρ : atmSpec.State A) : Prop :=
+private def WinsCfg (ρ : atmSpec.State A) : Prop :=
   ∀ c : Config A, ρ = cfgOf c → (atmData 2 A).AltWin true c
 
 /-- Winning the game is winning the machine's game. -/
-theorem altWin_of_wins (hsplit : (atmData 2 A).BlocksSplit) {ρ : atmSpec.State A}
+private theorem altWin_of_wins (hsplit : (atmData 2 A).BlocksSplit) {ρ : atmSpec.State A}
     (h : atmSpec.Wins ρ) : WinsCfg ρ := by
   induction h with
   | @won ρ hw =>
@@ -125,7 +127,7 @@ theorem altWin_of_wins (hsplit : (atmData 2 A).BlocksSplit) {ρ : atmSpec.State 
       exact ih (cfgOf d) ((move_cfgOf c d).mpr hd) d rfl
 
 /-- Winning the machine's game is winning the game. -/
-theorem wins_of_altWin (hsplit : (atmData 2 A).BlocksSplit) {c : Config A}
+private theorem wins_of_altWin (hsplit : (atmData 2 A).BlocksSplit) {c : Config A}
     (h : (atmData 2 A).AltWin true c) : atmSpec.Wins (cfgOf c) := by
   induction h with
   | @acc d ha => exact .won ((isWon_cfgOf d).mpr ha)
@@ -140,7 +142,7 @@ theorem wins_of_altWin (hsplit : (atmData 2 A).BlocksSplit) {c : Config A}
       exact ih e ((move_cfgOf d e).mp hσ)
 
 /-- **The game accepts exactly when the machine does.** -/
-theorem accepts_atmSpec : atmSpec.Accepts A ↔ ATMAcceptSpace A := by
+private theorem accepts_atmSpec : atmSpec.Accepts A ↔ ATMAcceptSpace A := by
   constructor
   · rintro ⟨ρ, hs, hw⟩
     obtain ⟨hwf, hsplit, c, rfl, hinit⟩ := (isStart_iff ρ).mp hs

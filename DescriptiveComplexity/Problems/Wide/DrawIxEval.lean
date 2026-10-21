@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxVar
 public import DescriptiveComplexity.Problems.Wide.DrawInstEval
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawIxRound
+import all DescriptiveComplexity.Problems.Wide.DrawIxVar
 
 /-!
 # The spine's legs at an arbitrary file
@@ -92,7 +96,7 @@ omit [Fintype dt.SlotIx]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 omit [Finite I] in
 /-- Off the marker, the post state's background is the round state's. -/
-theorem ixBack_postVarSt_off
+private theorem ixBack_postVarSt_off
     (r : Univ A R P dt.KIx dt.dd → Prop)
     (hr : r ≠ v) :
     dt.ixBack F.toLayout zero one dt.dd0Le (dt.ixPostVarSt v st m i b) r =
@@ -113,7 +117,7 @@ omit [Fintype dt.SlotIx]
 omit [Finite I] in
 /-- At the marker, the post state's background is the round state's with
 the variable's stage slot updated to the verdict bit. -/
-theorem ixBack_postVarSt_v :
+private theorem ixBack_postVarSt_v :
     dt.ixBack F.toLayout zero one dt.dd0Le (dt.ixPostVarSt v st m i b) v =
       Function.update (dt.ixBack F.toLayout zero one dt.dd0Le (dt.ixRoundSt st m) v)
         (Slot.new i) (bitVal zero one b) := by
@@ -274,7 +278,7 @@ variable (hTestF : ∀ a, a < aT → ∃ u : I, ¬dt.InnerFull F.blk (mV a) u)
 /-- **The control after one position's leg**: the machinery's exit fold –
 `DescriptiveComplexity.Draw.Data.ixVarMachine_reachesIn`'s final control, at the
 position's variable. -/
-noncomputable def ixLegCtl (j : Fin dt.nv)
+private noncomputable def ixLegCtl (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
     (semOf : ∀ a : ιV,
@@ -356,7 +360,7 @@ omit [Finite I] hord in
 registers and its stage bit, so the mirror, the marker, the bottom and end
 marks and the stage dictionary all ride – which is what carries the next
 position's pack and, one scale up, the sweep's own invariants. -/
-theorem ixLegStT_fields (j : Fin dt.nv)
+private theorem ixLegStT_fields (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
     (semT : ∀ (p : IxScratch dt A R P I)
@@ -424,7 +428,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite P] [Finite I] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
 /-- **A variable's whole cost is its width times the rounds and one more.** -/
-theorem ixVarCost_le_mul (vi : dt.VarIx) (w wP wR wK n : ℕ) :
+private theorem ixVarCost_le_mul (vi : dt.VarIx) (w wP wR wK n : ℕ) :
     dt.ixVarCost A vi w wP wR wK n ≤ dt.ixVarCD A vi w wP wR wK * (n + 1) := by
   have hle : 2 * wP + dt.ixRoundCost A vi w wP wR wK + 3 ≤
       dt.ixVarCD A vi w wP wR wK := by
@@ -441,7 +445,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite dt.KIx] in
 /-- **A leg's whole cost, and its dispatch, is its width times the rounds and
 one more.** -/
-theorem ixLegCost_le_mul (w wP wR wK n : ℕ) :
+private theorem ixLegCost_le_mul (w wP wR wK n : ℕ) :
     dt.ixLegCost A w wP wR wK n + 2 ≤ dt.ixLegWidth A w wP wR wK * (n + 1) := by
   classical
   have hsup : (Finset.univ.sup fun j : Fin dt.nv =>
@@ -470,7 +474,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 of positions – and the number of VAL rounds and one more. This is the shape the
 clock compares (`nexTotal_lt_two_pow`), so what an instantiation owes is a bound
 on each factor separately. -/
-theorem ixSpineCost_le_mul (w wP wR wK n : ℕ) :
+private theorem ixSpineCost_le_mul (w wP wR wK n : ℕ) :
     (dt.ixLegCost A w wP wR wK n + 2) * dt.nv ≤
       (dt.ixLegWidth A w wP wR wK * dt.nv) * (n + 1) :=
   le_trans (Nat.mul_le_mul_right _ (dt.ixLegCost_le_mul (A := A) w wP wR wK n))
@@ -503,7 +507,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 rounds and one more. This is what
 `DescriptiveComplexity.Draw.Data.nexProg_wideAccept_legs` asks of the
 evaluation leg – the run's count is exactly the left-hand side. -/
-theorem ixEvalCost_le_mul (w wP wR wK n : ℕ) :
+private theorem ixEvalCost_le_mul (w wP wR wK n : ℕ) :
     1 + (dt.ixLegCost A w wP wR wK n + 2) * dt.nv + 1 +
         dt.ixOutLegCost A w wP wR wK n ≤
       dt.ixEvalWidth A w wP wR wK * (n + 1) :=
@@ -956,7 +960,7 @@ tape. -/
 
 /-- **The VAL-loop thread of the output's leg**, at the entry-wrapped
 control. -/
-noncomputable def ixOutFM
+private noncomputable def ixOutFM
     (st : TapeSt dt A R P I)
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (semOf : ∀ a : ιV,
@@ -1020,7 +1024,7 @@ include hrulesOut hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork 
 the marker, back to it, through the out machinery, and – the verdict
 holding – out into the accepting phase, the marker rewritten with the
 value it already carries. -/
-theorem ixOutLeg_run
+private theorem ixOutLeg_run
     (st : TapeSt dt A R P I)
     (hwkSt : st.wk = fun r => r = v)
     (TestOf : Fin (dt.arOf (none : dt.VarIx)) → I → Prop)
@@ -1171,7 +1175,7 @@ verdict not assumed. The run is the same run – the exit fires either way – a
 what changes is only what it writes at the marker: the verdict's own bit. This
 is what a *backward* reading needs, where the verdict is what is being
 determined rather than assumed. -/
-theorem ixOutLeg_run_any
+private theorem ixOutLeg_run_any
     (st : TapeSt dt A R P I)
     (hwkSt : st.wk = fun r => r = v)
     (TestOf : Fin (dt.arOf (none : dt.VarIx)) → I → Prop)
@@ -1315,7 +1319,7 @@ theorem ixOutLeg_run_any
 
 /-- **The state the output's leg ends at – threaded**: the machinery's own
 exit state, the accepting write at the marker being idempotent. -/
-noncomputable def ixOutStE
+private noncomputable def ixOutStE
     (st : TapeSt dt A R P I)
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (semT : ∀ (p : IxScratch dt A R P I) (a : ιV),
@@ -1331,7 +1335,7 @@ noncomputable def ixOutStE
 
 /-- **The control after the output's leg – threaded**: the out machinery's
 exit fold, at the states its own thread produces. -/
-noncomputable def ixOutCtlT
+private noncomputable def ixOutCtlT
     (st : TapeSt dt A R P I)
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (semT : ∀ (p : IxScratch dt A R P I) (a : ιV),
@@ -1353,7 +1357,7 @@ open Classical in
 machinery's exit state with the marker rewritten by the accepting bit – so
 the marker survives a *true* verdict and is cleared by a false one, which is
 what makes a false output halt and reject. -/
-noncomputable def ixOutStA
+private noncomputable def ixOutStA
     (st : TapeSt dt A R P I)
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (semT : ∀ (p : IxScratch dt A R P I) (a : ιV),
@@ -1522,7 +1526,7 @@ open Classical in
 machinery's verdict at a gated position, `False` at the two ungated ones,
 which is what the stage dictionary holds where the blocks encode no
 point. -/
-noncomputable def ixLegBitB (j : Fin dt.nv)
+private noncomputable def ixLegBitB (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (semT : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st →
       ∀ (p : IxScratch dt A R P I) (a : ιV),
@@ -1550,7 +1554,7 @@ threads the two scratch registers alone
 write the stage bit directly. This is the branched twin of
 `DescriptiveComplexity.Draw.Data.new_postVarSt`, and the only thing the
 spine's dictionary lemmas need of a leg. -/
-theorem ixLegStB_new (j : Fin dt.nv)
+private theorem ixLegStB_new (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (semT : dt.ixGatedAt (PR := PR) (elt := elt) (F := F) j st →
       ∀ (p : IxScratch dt A R P I) (a : ιV),
@@ -1599,7 +1603,7 @@ include hrulesM hR hlin hix hsepP hhasP hinj heltP hord he₀ htop hbot hwork hv
 of the machinery under one statement, the case split on the gates made
 once and for all. This is what a sweep needs, since it visits junk
 addresses and gated ones alike. -/
-theorem ixVarLegB_reachesIn (j : Fin dt.nv)
+private theorem ixVarLegB_reachesIn (j : Fin dt.nv)
     (st : TapeSt dt A R P I)
     (hwkSt : st.wk = fun r => r = v) (hmir : st.mir = ixMark elt v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))

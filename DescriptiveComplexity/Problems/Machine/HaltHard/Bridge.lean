@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.Machine.HaltHard.Sim
 import DescriptiveComplexity.Machines
 public import DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
 import DescriptiveComplexity.Problems.Pcp.Hardness.History
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Zip
+import all DescriptiveComplexity.Problems.Pcp.Hardness.ConfigWord
+import all DescriptiveComplexity.Problems.Pcp.Hardness.History
 
 /-!
 # The simulating machine as rewriting, and the transport to a drawn machine
@@ -101,22 +104,22 @@ theorem symsOf_append (l l' : List (SimSym c)) :
 
 /-- **The word of a zipper configuration**: the recorded cells left to right
 between the endmarkers, the state letter wedged before the head's cell. -/
-def wordOf (x : LCfg c) : List (TapeLetter (SimU c)) :=
+private def wordOf (x : LCfg c) : List (TapeLetter (SimU c)) :=
   (TapeLetter.lft :: symsOf x.L.reverse) ++
     TapeLetter.state (stq x.q) ::
       TapeLetter.sym (sts x.s) :: (symsOf x.R ++ [TapeLetter.rgt])
 
-theorem halt_not_mem_wordOf (x : LCfg c) : TapeLetter.halt ∉ wordOf x := by
+private theorem halt_not_mem_wordOf (x : LCfg c) : TapeLetter.halt ∉ wordOf x := by
   simp [wordOf, symsOf]
 
-theorem boot_not_mem_wordOf (x : LCfg c) : TapeLetter.boot ∉ wordOf x := by
+private theorem boot_not_mem_wordOf (x : LCfg c) : TapeLetter.boot ∉ wordOf x := by
   simp [wordOf, symsOf]
 
 /-! ### Locating the unique marked letter -/
 
 /-- Splitting a list at a marked letter when the reference decomposition has
 none on either side: the two decompositions coincide. -/
-theorem eq_of_unique_marked {Γ : Type} {P : Γ → Prop} :
+private theorem eq_of_unique_marked {Γ : Type} {P : Γ → Prop} :
     ∀ {A : List Γ} {x : List Γ} {s s' : Γ} {B y : List Γ},
       (∀ a ∈ A, ¬P a) → (∀ a ∈ B, ¬P a) → P s' →
       A ++ s :: B = x ++ s' :: y → A = x ∧ s = s' ∧ B = y := by
@@ -144,9 +147,9 @@ theorem eq_of_unique_marked {Γ : Type} {P : Γ → Prop} :
       exact ⟨by rw [h1], h2, h3⟩
 
 /-- Being a state letter. -/
-def IsStateL (a : TapeLetter (SimU c)) : Prop := ∃ u, a = TapeLetter.state u
+private def IsStateL (a : TapeLetter (SimU c)) : Prop := ∃ u, a = TapeLetter.state u
 
-theorem not_isStateL_left (L : List (SimSym c)) :
+private theorem not_isStateL_left (L : List (SimSym c)) :
     ∀ a ∈ TapeLetter.lft :: symsOf (c := c) L, ¬IsStateL a := by
   rintro a ha ⟨u, rfl⟩
   rcases List.mem_cons.mp ha with h | h
@@ -154,7 +157,7 @@ theorem not_isStateL_left (L : List (SimSym c)) :
   · obtain ⟨σ, -, hh⟩ := List.mem_map.mp h
     simp at hh
 
-theorem not_isStateL_right (s : SimSym c) (R : List (SimSym c)) :
+private theorem not_isStateL_right (s : SimSym c) (R : List (SimSym c)) :
     ∀ a ∈ TapeLetter.sym (sts s) :: (symsOf (c := c) R ++ [TapeLetter.rgt]), ¬IsStateL a := by
   rintro a ha ⟨u, rfl⟩
   rcases List.mem_cons.mp ha with h | h
@@ -166,7 +169,7 @@ theorem not_isStateL_right (s : SimSym c) (R : List (SimSym c)) :
 
 /-- Splitting the word of a configuration at a state letter: the state letter
 is the configuration's, and the two sides are its two half-tapes. -/
-theorem wordOf_state_split {q : SimQ c} {L : List (SimSym c)} {s : SimSym c}
+private theorem wordOf_state_split {q : SimQ c} {L : List (SimSym c)} {s : SimSym c}
     {R : List (SimSym c)} {u v : List (TapeLetter (SimU c))} {w : SimU c}
     {m : List (TapeLetter (SimU c))}
     (h : wordOf ⟨q, L, s, R⟩ = u ++ (TapeLetter.state w :: m) ++ v) :
@@ -193,7 +196,7 @@ theorem wordOf_state_split {q : SimQ c} {L : List (SimSym c)} {s : SimSym c}
 
 /-- The attribute values of a transition of `simTM` all decode through one
 application of the table, and its direction is the `Right` predicate. -/
-theorem decode_attrs {τ u a u' b : SimU c} (hsrc : (simTM c).Src τ u)
+private theorem decode_attrs {τ u a u' b : SimU c} (hsrc : (simTM c).Src τ u)
     (hread : (simTM c).Read τ a) (hdst : (simTM c).Dst τ u')
     (hwrite : (simTM c).Write τ b) :
     ∃ q σ b₀ q₀ d, u = stq q ∧ a = sts σ ∧ simStep q σ = some (b₀, q₀, d) ∧
@@ -221,7 +224,7 @@ theorem decode_attrs {τ u a u' b : SimU c} (hsrc : (simTM c).Src τ u)
 /-! ### One machine step is one rewriting step -/
 
 /-- **Forward**: one zipper step rewrites the word by one move rule. -/
-theorem step_wordOf {x y : LCfg c} (h : lstep x = some y) :
+private theorem step_wordOf {x y : LCfg c} (h : lstep x = some y) :
     History.Step (MRule (simTM c)) (wordOf x) (wordOf y) := by
   obtain ⟨q, L, s, R⟩ := x
   rcases hs : simStep q s with - | ⟨b, q', d⟩
@@ -281,7 +284,7 @@ theorem step_wordOf {x y : LCfg c} (h : lstep x = some y) :
 /-- **Backward**: a rewriting step from a configuration word either performs
 the configuration's own machine step, or fires the halting rule – in which
 case the configuration accepts. -/
-theorem step_inversion_wordOf {x : LCfg c} {w : List (TapeLetter (SimU c))}
+private theorem step_inversion_wordOf {x : LCfg c} {w : List (TapeLetter (SimU c))}
     (h : History.Step (MRule (simTM c)) (wordOf x) w) :
     (∃ y, lstep x = some y ∧ w = wordOf y) ∨ x.q = SimQ.acc := by
   obtain ⟨q, L, s, R⟩ := x
@@ -434,7 +437,7 @@ theorem step_inversion_wordOf {x : LCfg c} {w : List (TapeLetter (SimU c))}
 /-! ### Whole runs -/
 
 /-- A run of the machine is a derivation between the two words. -/
-theorem derives_wordOf_of_reach {x y : LCfg c} (h : Reach x y) :
+private theorem derives_wordOf_of_reach {x y : LCfg c} (h : Reach x y) :
     History.Derives (MRule (simTM c)) (wordOf x) (wordOf y) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -442,7 +445,7 @@ theorem derives_wordOf_of_reach {x y : LCfg c} (h : Reach x y) :
 
 /-- From an accepting configuration the derivation closes: the state letter
 becomes the halting letter, which swallows the rest of the word. -/
-theorem derives_halt_of_acc {x : LCfg c} (hx : x.q = SimQ.acc) :
+private theorem derives_halt_of_acc {x : LCfg c} (hx : x.q = SimQ.acc) :
     History.Derives (MRule (simTM c)) (wordOf x) [TapeLetter.halt] := by
   obtain ⟨q, L, s, R⟩ := x
   obtain rfl : q = SimQ.acc := hx
@@ -492,7 +495,7 @@ theorem derives_halt_of_acc {x : LCfg c} (hx : x.q = SimQ.acc) :
 
 /-- **Backward**: a derivation of the halting word from a configuration word
 yields an accepting run of the machine. -/
-theorem reach_acc_of_derives : ∀ {w : List (TapeLetter (SimU c))},
+private theorem reach_acc_of_derives : ∀ {w : List (TapeLetter (SimU c))},
     History.Derives (MRule (simTM c)) w [TapeLetter.halt] →
     ∀ x : LCfg c, w = wordOf x → ∃ y, y.q = SimQ.acc ∧ Reach x y := by
   intro w hder
@@ -513,7 +516,7 @@ theorem reach_acc_of_derives : ∀ {w : List (TapeLetter (SimU c))},
 /-- **Derivability from the start word is machine acceptance**, at the
 zipper: the first step of any derivation is the boot rule, and boot lands the
 machine in the resting state at the left end of the spelled tape. -/
-theorem derives_startWord_iff (σ₀ : SimSym c) (R₀ : List (SimSym c)) :
+private theorem derives_startWord_iff (σ₀ : SimSym c) (R₀ : List (SimSym c)) :
     History.Derives (MRule (simTM c))
       (startWord ((σ₀ :: R₀).map sts)) [TapeLetter.halt] ↔
       ∃ y, y.q = SimQ.acc ∧ Reach (⟨.retL, [], σ₀, R₀⟩ : LCfg c) y := by
@@ -638,13 +641,13 @@ namespace TMEmbed
 variable {A B : Type} {f : A → B} {M : TMData A} {N : TMData B}
 
 /-- The start word is mapped letterwise. -/
-theorem _root_.DescriptiveComplexity.HaltPcp.startWord_map {A B : Type} (f : A → B)
+private theorem _root_.DescriptiveComplexity.HaltPcp.startWord_map {A B : Type} (f : A → B)
     (inp : List A) :
     (startWord inp).map (TapeLetter.map f) = startWord (inp.map f) := by
   simp [startWord, TapeLetter.map, List.map_map, Function.comp_def]
 
 /-- **Forward transport of a rule.** -/
-theorem mRule_map (h : TMEmbed f M N) {l r : List (TapeLetter A)} (hrule : MRule M l r) :
+private theorem mRule_map (h : TMEmbed f M N) {l r : List (TapeLetter A)} (hrule : MRule M l r) :
     MRule N (l.map (TapeLetter.map f)) (r.map (TapeLetter.map f)) := by
   cases hrule with
   | boot hst => exact MRule.boot ((h.start _).mpr ⟨_, rfl, hst⟩)
@@ -680,7 +683,7 @@ theorem mRule_map (h : TMEmbed f M N) {l r : List (TapeLetter A)} (hrule : MRule
 
 /-! #### Decomposing image words -/
 
-theorem cons_eq_map {α β : Type} {f : α → β} {x : β} {xs : List β} {l : List α}
+private theorem cons_eq_map {α β : Type} {f : α → β} {x : β} {xs : List β} {l : List α}
     (h : x :: xs = l.map f) : ∃ a l₀, l = a :: l₀ ∧ x = f a ∧ xs = l₀.map f := by
   cases l with
   | nil => simp at h
@@ -689,13 +692,13 @@ theorem cons_eq_map {α β : Type} {f : α → β} {x : β} {xs : List β} {l : 
     injection h with h1 h2
     exact ⟨a, l₀, rfl, h1, h2⟩
 
-theorem nil_eq_map {α β : Type} {f : α → β} {l : List α}
+private theorem nil_eq_map {α β : Type} {f : α → β} {l : List α}
     (h : ([] : List β) = l.map f) : l = [] := by
   cases l with
   | nil => rfl
   | cons a l₀ => simp at h
 
-theorem append_eq_map {α β : Type} {f : α → β} : ∀ {x y : List β} {l : List α},
+private theorem append_eq_map {α β : Type} {f : α → β} : ∀ {x y : List β} {l : List α},
     x ++ y = l.map f →
     ∃ lx ly, l = lx ++ ly ∧ x = lx.map f ∧ y = ly.map f := by
   intro x
@@ -714,34 +717,34 @@ section Letters
 
 variable {A B : Type} {f : A → B} {a : TapeLetter A}
 
-theorem eq_map_state {q : B} (h : TapeLetter.state q = TapeLetter.map f a) :
+private theorem eq_map_state {q : B} (h : TapeLetter.state q = TapeLetter.map f a) :
     ∃ q₀, a = TapeLetter.state q₀ ∧ q = f q₀ := by
   cases a <;> simp only [TapeLetter.map] at h
   case state q₀ => exact ⟨q₀, rfl, by injection h⟩
   all_goals exact absurd h (by simp)
 
-theorem eq_map_sym {q : B} (h : TapeLetter.sym q = TapeLetter.map f a) :
+private theorem eq_map_sym {q : B} (h : TapeLetter.sym q = TapeLetter.map f a) :
     ∃ q₀, a = TapeLetter.sym q₀ ∧ q = f q₀ := by
   cases a <;> simp only [TapeLetter.map] at h
   case sym q₀ => exact ⟨q₀, rfl, by injection h⟩
   all_goals exact absurd h (by simp)
 
-theorem eq_map_lft (h : TapeLetter.lft = TapeLetter.map f a) : a = TapeLetter.lft := by
+private theorem eq_map_lft (h : TapeLetter.lft = TapeLetter.map f a) : a = TapeLetter.lft := by
   cases a <;> simp only [TapeLetter.map] at h
   case lft => rfl
   all_goals exact absurd h (by simp)
 
-theorem eq_map_rgt (h : TapeLetter.rgt = TapeLetter.map f a) : a = TapeLetter.rgt := by
+private theorem eq_map_rgt (h : TapeLetter.rgt = TapeLetter.map f a) : a = TapeLetter.rgt := by
   cases a <;> simp only [TapeLetter.map] at h
   case rgt => rfl
   all_goals exact absurd h (by simp)
 
-theorem eq_map_boot (h : TapeLetter.boot = TapeLetter.map f a) : a = TapeLetter.boot := by
+private theorem eq_map_boot (h : TapeLetter.boot = TapeLetter.map f a) : a = TapeLetter.boot := by
   cases a <;> simp only [TapeLetter.map] at h
   case boot => rfl
   all_goals exact absurd h (by simp)
 
-theorem eq_map_halt (h : TapeLetter.halt = TapeLetter.map f a) : a = TapeLetter.halt := by
+private theorem eq_map_halt (h : TapeLetter.halt = TapeLetter.map f a) : a = TapeLetter.halt := by
   cases a <;> simp only [TapeLetter.map] at h
   case halt => rfl
   all_goals exact absurd h (by simp)
@@ -750,7 +753,7 @@ end Letters
 
 /-- **Backward transport of a rule**: a target rule whose left side is an
 image has an image right side, and comes from a source rule. -/
-theorem mRule_inv (h : TMEmbed f M N) {l' r' : List (TapeLetter B)}
+private theorem mRule_inv (h : TMEmbed f M N) {l' r' : List (TapeLetter B)}
     (hrule : MRule N l' r') {l : List (TapeLetter A)}
     (hl : l' = l.map (TapeLetter.map f)) :
     ∃ r, r' = r.map (TapeLetter.map f) ∧ MRule M l r := by
@@ -884,7 +887,7 @@ theorem mRule_inv (h : TMEmbed f M N) {l' r' : List (TapeLetter B)}
     exact ⟨[.halt], by simp [TapeLetter.map], MRule.eraseRgt⟩
 
 /-- Forward transport of a rewriting step. -/
-theorem step_map (h : TMEmbed f M N) {u v : List (TapeLetter A)}
+private theorem step_map (h : TMEmbed f M N) {u v : List (TapeLetter A)}
     (hs : History.Step (MRule M) u v) :
     History.Step (MRule N) (u.map (TapeLetter.map f)) (v.map (TapeLetter.map f)) := by
   obtain ⟨x, l, r, y, hrule, rfl, rfl⟩ := hs
@@ -893,7 +896,7 @@ theorem step_map (h : TMEmbed f M N) {u v : List (TapeLetter A)}
 
 /-- Backward transport of a rewriting step: from an image word, every step
 lands on an image word, by the image step. -/
-theorem step_inv (h : TMEmbed f M N) {W : List (TapeLetter A)}
+private theorem step_inv (h : TMEmbed f M N) {W : List (TapeLetter A)}
     {w' : List (TapeLetter B)}
     (hs : History.Step (MRule N) (W.map (TapeLetter.map f)) w') :
     ∃ V, w' = V.map (TapeLetter.map f) ∧ History.Step (MRule M) W V := by
@@ -906,7 +909,7 @@ theorem step_inv (h : TMEmbed f M N) {W : List (TapeLetter A)}
   simp
 
 /-- Forward transport of a derivation. -/
-theorem derives_map (h : TMEmbed f M N) {u v : List (TapeLetter A)}
+private theorem derives_map (h : TMEmbed f M N) {u v : List (TapeLetter A)}
     (hd : History.Derives (MRule M) u v) :
     History.Derives (MRule N) (u.map (TapeLetter.map f)) (v.map (TapeLetter.map f)) := by
   induction hd with
@@ -914,7 +917,7 @@ theorem derives_map (h : TMEmbed f M N) {u v : List (TapeLetter A)}
   | tail _ hstep ih => exact ih.tail (h.step_map hstep)
 
 /-- Backward transport of a derivation of the halting word. -/
-theorem derives_halt_of_map (h : TMEmbed f M N) : ∀ {w' : List (TapeLetter B)},
+private theorem derives_halt_of_map (h : TMEmbed f M N) : ∀ {w' : List (TapeLetter B)},
     History.Derives (MRule N) w' [TapeLetter.halt] →
     ∀ {w : List (TapeLetter A)}, w' = w.map (TapeLetter.map f) →
     History.Derives (MRule M) w [TapeLetter.halt] := by

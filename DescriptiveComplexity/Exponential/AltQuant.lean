@@ -83,13 +83,13 @@ def altQuantFrom {n : ℕ} (pol : ℕ → Bool) (P : (Fin n → A) → Prop) (j 
 variable {n : ℕ} {pol : ℕ → Bool} {P : (Fin n → A) → Prop}
 
 /-- Past the last variable, the prefix is the matrix. -/
-theorem altQuantFrom_of_le {j : ℕ} (h : n ≤ j) (v : Fin n → A) :
+private theorem altQuantFrom_of_le {j : ℕ} (h : n ≤ j) (v : Fin n → A) :
     altQuantFrom pol P j v = P v := by
   rw [altQuantFrom, show n - j = 0 from Nat.sub_eq_zero_of_le h]
   rfl
 
 /-- The prefix at its end is the matrix. -/
-theorem altQuantFrom_last (v : Fin n → A) : altQuantFrom pol P n v = P v :=
+private theorem altQuantFrom_last (v : Fin n → A) : altQuantFrom pol P n v = P v :=
   altQuantFrom_of_le le_rfl v
 
 private theorem altQuantAux_succ {r j : ℕ} (h : j < n) (v : Fin n → A) :
@@ -100,7 +100,7 @@ private theorem altQuantAux_succ {r j : ℕ} (h : j < n) (v : Fin n → A) :
 
 /-- **One existential step of the prefix**: the `j`-th variable is chosen by
 the existential player. -/
-theorem altQuantFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
+private theorem altQuantFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
     altQuantFrom pol P j v ↔
       ∃ a : A, altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
   rw [altQuantFrom, show n - j = (n - (j + 1)) + 1 by omega, altQuantAux_succ h, ite_eq_left hp]
@@ -108,7 +108,7 @@ theorem altQuantFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n →
 
 /-- **One universal step of the prefix**: the `j`-th variable is chosen by the
 universal player. -/
-theorem altQuantFrom_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
+private theorem altQuantFrom_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
     altQuantFrom pol P j v ↔
       ∀ a : A, altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
   rw [altQuantFrom, show n - j = (n - (j + 1)) + 1 by omega, altQuantAux_succ h,
@@ -131,7 +131,7 @@ private theorem altQuantAux_congr_pol {pol' : ℕ → Bool} :
 
 /-- **The prefix only reads the polarities of the variables it still has to
 choose.** -/
-theorem altQuantFrom_congr_pol {pol' : ℕ → Bool} {j : ℕ}
+private theorem altQuantFrom_congr_pol {pol' : ℕ → Bool} {j : ℕ}
     (hagree : ∀ i, j ≤ i → pol i = pol' i) (v : Fin n → A) :
     altQuantFrom pol P j v = altQuantFrom pol' P j v :=
   altQuantAux_congr_pol _ j hagree v
@@ -169,7 +169,7 @@ theorem altQuantFrom_congr_val {j : ℕ} (v v' : Fin n → A)
 
 /-- Extending a restricted valuation by one element is updating the unrestricted
 one at the next coordinate: the step the prefix takes, read on `Fin.snoc`. -/
-theorem snoc_castLE_update {k n : ℕ} (hk : k < n) (hkn : k + 1 ≤ n) {v : Fin n → A}
+private theorem snoc_castLE_update {k n : ℕ} (hk : k < n) (hkn : k + 1 ≤ n) {v : Fin n → A}
     {xs : Fin k → A} (hagree : ∀ i, xs i = v (Fin.castLE hk.le i)) (a : A) (i : Fin (k + 1)) :
     (Fin.snoc xs a : Fin (k + 1) → A) i = Function.update v ⟨k, hk⟩ a (Fin.castLE hkn i) := by
   refine Fin.lastCases ?_ ?_ i
@@ -199,7 +199,7 @@ remaining `n - k`.
 The total length `n` comes from the induction hypothesis and never changes, so
 the matrix is never transported along an arithmetic identity; what grows is the
 number of bound variables. -/
-theorem exists_altQuant_of_isPrenex :
+private theorem exists_altQuant_of_isPrenex :
     ∀ {k : ℕ} {ψ : M.BoundedFormula Empty k}, ψ.IsPrenex →
       ∃ (n : ℕ) (hkn : k ≤ n) (pol : ℕ → Bool) (mat : M.BoundedFormula Empty n), mat.IsQF ∧
         ∀ (A : Type) [M.Structure A] (v : Fin n → A) (xs : Fin k → A),

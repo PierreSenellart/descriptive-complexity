@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.MachinesAlt
 
 /-!
 # One block at a time: collapsing the moves of a player into a single play
@@ -54,13 +55,13 @@ variable {A : Type} {M : ATMData A} {k : ℕ}
 /-! ### Reading the block structure -/
 
 /-- **A state has only one block.** -/
-theorem blk_unique (hbwf : M.BlocksWellFormed k) {q : A} {j j' : ℕ}
+private theorem blk_unique (hbwf : M.BlocksWellFormed k) {q : A} {j j' : ℕ}
     (h : M.Blk j q) (h' : M.Blk j' q) : j = j' := by
   obtain ⟨j₀, -, -, huniq⟩ := hbwf.1 q
   exact (huniq j h).trans (huniq j' h').symm
 
 /-- A state of an existential block belongs to the existential player. -/
-theorem not_isUniv_of_blk (hbwf : M.BlocksWellFormed k) {start : Bool} {i : ℕ} {q : A}
+private theorem not_isUniv_of_blk (hbwf : M.BlocksWellFormed k) {start : Bool} {i : ℕ} {q : A}
     (h : M.Blk i q) (hpol : blockPol start i = true) : ¬M.IsUniv start q := by
   rintro ⟨j, hj, hpolj⟩
   rw [blk_unique hbwf hj h] at hpolj
@@ -68,13 +69,13 @@ theorem not_isUniv_of_blk (hbwf : M.BlocksWellFormed k) {start : Bool} {i : ℕ}
   exact Bool.noConfusion hpolj
 
 /-- A state of a universal block belongs to the universal player. -/
-theorem isUniv_of_blk {start : Bool} {i : ℕ} {q : A} (h : M.Blk i q)
+private theorem isUniv_of_blk {start : Bool} {i : ℕ} {q : A} (h : M.Blk i q)
     (hpol : blockPol start i = false) : M.IsUniv start q :=
   ⟨i, h, hpol⟩
 
 /-- **A step stays in its block or moves to the next one**: the alternation
 bound, read on a single step. -/
-theorem blk_step (hbwf : M.BlocksWellFormed k) {i : ℕ} {c d : Config A}
+private theorem blk_step (hbwf : M.BlocksWellFormed k) {i : ℕ} {c d : Config A}
     (hstep : M.Step c d) (hi : M.Blk i c.state) :
     M.Blk i d.state ∨ M.Blk (i + 1) d.state := by
   obtain ⟨τ, hτ, hsrc, -, hdst, -, -, -⟩ := hstep
@@ -136,7 +137,7 @@ theorem BlockPlay.cons {i : ℕ} {c d : Config A} {ℓ : ℕ} {f : ℕ → Confi
     | succ j => exact hfb j (by omega)
 
 /-- The play `f` with its first configuration dropped. -/
-theorem BlockPlay.tail {i : ℕ} {c : Config A} {ℓ : ℕ} {f : ℕ → Config A}
+private theorem BlockPlay.tail {i : ℕ} {c : Config A} {ℓ : ℕ} {f : ℕ → Config A}
     (h : M.BlockPlay i c (ℓ + 1) f) : M.BlockPlay i (f 1) ℓ (fun j => f (j + 1)) :=
   ⟨rfl, fun j hj => h.2.1 (j + 1) (by omega), fun j hj => h.2.2 (j + 1) (by omega)⟩
 
@@ -145,7 +146,7 @@ theorem BlockPlay.tail {i : ℕ} {c : Config A} {ℓ : ℕ} {f : ℕ → Config 
 /-- **A run of moves that all belong to the existential player accepts as soon
 as its end does.** This is the “easy” half of both collapses: the budget is
 spent one step at a time, and each step is a legitimate existential choice. -/
-theorem altAcc_of_steps {start : Bool} :
+private theorem altAcc_of_steps {start : Bool} :
     ∀ (ℓ n : ℕ) (f : ℕ → Config A), ℓ ≤ n →
       (∀ j, j < ℓ → M.Step (f j) (f (j + 1))) →
       (∀ j, j < ℓ → ¬M.IsUniv start (f j).state) →

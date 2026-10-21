@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.FixedPointInflationaryLFP
 public import DescriptiveComplexity.SecondOrderNew
 public import DescriptiveComplexity.SecondOrderParam
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.SecondOrderParam
 
 /-!
 # An element, quantified in front of a fixed point
@@ -117,7 +119,7 @@ variable {B p}
 
 variable [L.Structure N] [LinearOrder N]
 
-theorem realize_paramTerm {β : Type} (ρ : B.withParam.Assignment N) (c : N)
+private theorem realize_paramTerm {β : Type} (ρ : B.withParam.Assignment N) (c : N)
     (v : β → N) (t : (((newLang L).sum Language.order).sum B.lang).Term β) :
     letI := (B.withParam.structure₁ (L := L.sum Language.order) ρ)
     letI := @SOBlock.structure₁ ((newLang L).sum Language.order) B N
@@ -131,7 +133,7 @@ theorem realize_paramTerm {β : Type} (ρ : B.withParam.Assignment N) (c : N)
 extended block, the substituted formula says what the original said in the
 instance whose mark is the parameter, at that assignment read at the
 parameter. -/
-theorem realize_paramLift (ρ : B.withParam.Assignment N) (v : α → N) :
+private theorem realize_paramLift (ρ : B.withParam.Assignment N) (v : α → N) :
     ∀ {n : ℕ} (φ : (((newLang L).sum Language.order).sum B.lang).BoundedFormula α n)
       (xs : Fin n → N),
       letI := (B.withParam.structure₁ (L := L.sum Language.order) ρ)
@@ -225,7 +227,7 @@ variable {d} {N : Type} [L.Structure N] [LinearOrder N]
 
 /-- One step of the parameterized definition, read at a parameter, is one step
 of the original in the instance that parameter marks. -/
-theorem next_param (ρ : d.param.B.Assignment N) (c : N) :
+private theorem next_param (ρ : d.param.B.Assignment N) (c : N) :
     d.B.atParam (d.param.next ρ) c = @StepDef.next _ d N (markOneOrd L c) (d.B.atParam ρ c) := by
   funext i x
   let := markOneOrd L c
@@ -244,7 +246,7 @@ theorem next_param (ρ : d.param.B.Assignment N) (c : N) :
 
 /-- The inflationary step of the parameterized definition, read at a
 parameter. -/
-theorem inflStep_param (ρ : d.param.B.Assignment N) (c : N) :
+private theorem inflStep_param (ρ : d.param.B.Assignment N) (c : N) :
     d.B.atParam (d.param.inflStep ρ) c =
       @StepDef.inflStep _ d N (markOneOrd L c) (d.B.atParam ρ c) := by
   funext i x
@@ -268,7 +270,7 @@ theorem inflStage_param (c : N) :
     exact inflStep_param (d := d) (d.param.inflStage N k) c
 
 /-- The value of the parameterized iteration, read at a parameter. -/
-theorem inflLimit_param (c : N) :
+private theorem inflLimit_param (c : N) :
     d.B.atParam (d.param.inflLimit N) c = @StepDef.inflLimit _ d N (markOneOrd L c) := by
   funext i x
   exact propext (exists_congr fun k =>
@@ -276,7 +278,7 @@ theorem inflLimit_param (c : N) :
 
 /-- **What the parameterized definition defines**: the original one, at some
 element of the instance. -/
-theorem ifpHolds_param :
+private theorem ifpHolds_param :
     d.param.IFPHolds N ↔ ∃ c : N, @StepDef.IFPHolds _ d N (markOneOrd L c) := by
   let := d.param.B.structure₁ (L := L.sum Language.order) (d.param.inflLimit N)
   have hcongr : ∀ (c : N) (σ τ : d.B.Assignment N), σ = τ →

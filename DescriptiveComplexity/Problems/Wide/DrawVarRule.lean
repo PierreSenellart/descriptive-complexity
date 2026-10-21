@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawKindRule
+import all DescriptiveComplexity.Problems.Wide.DrawKindRule
+import all DescriptiveComplexity.Problems.Wide.DrawSeq
+import all DescriptiveComplexity.Problems.Wide.DrawTagged
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
 
 /-!
 # The matrix's and the gates' rules
@@ -58,7 +62,7 @@ noncomputable def matrixRule :
 variable {emb}
 
 /-- **Every rule of the matrix fires from a phase its site owns.** -/
-theorem matrixHosrc :
+private theorem matrixHosrc :
     ∀ (i : dt.MatrixSite v) (ρ : dt.MatrixSh v i),
       ∃ p : dt.MatrixPh v,
         (dt.matrixRule zero one v emb argsA enterSt exitPh i ρ).srcPh = emb p ∧
@@ -75,7 +79,7 @@ theorem matrixHosrc :
 /-- **A property of the matrix's phases and its exit holds of every phase it can
 move to**: each atom's machinery stays inside its own and its verdict goes to
 the next checkpoint. -/
-theorem matrixRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.MatrixPh v, S (emb p))
+private theorem matrixRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.MatrixPh v, S (emb p))
     (hexit : S exitPh) (i : dt.MatrixSite v) (ρ : dt.MatrixSh v i) :
     S (dt.matrixRule zero one v emb argsA enterSt exitPh i ρ).dstPh :=
   seqRule_dstIn (emb := emb) one Slot.wk Slot.reg _
@@ -85,7 +89,7 @@ theorem matrixRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.MatrixPh v, S (emb 
       (fun p => hemb (.sub a p)) (hemb (.chk a.succ)) s ρ) i ρ
 
 /-- **The matrix separates in-shape.** -/
-theorem matrixSep (hzo : zero ≠ one) (hemb : Function.Injective emb) :
+private theorem matrixSep (hzo : zero ≠ one) (hemb : Function.Injective emb) :
     ∀ (i : dt.MatrixSite v) (ρ ρ' : dt.MatrixSh v i) (f : Q → A)
       (g : dt.SlotIx → A),
       (dt.matrixRule zero one v emb argsA enterSt exitPh i ρ).guard f g →
@@ -148,7 +152,7 @@ variable {emb}
 /-- **A gate block leaves only into its own phases, its failing exit or its
 exit**: the file test's trip stays inside it, its passing exit enters the domain
 evaluation, and the tag machinery's rules leave only where it leaves. -/
-theorem gateBlockRule_dstPh (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
+private theorem gateBlockRule_dstPh (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
     (∃ p : dt.GateBlockPh,
       (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
         (setFail := setFail) (failPh := failPh) (exitPh := exitPh) i ρ).dstPh =
@@ -187,7 +191,7 @@ theorem gateBlockRule_dstPh (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
 
 /-- **A property of a gate block's phases, its failing exit and its exit holds
 of every phase it can move to.** -/
-theorem gateBlockRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GateBlockPh, S (emb p))
+private theorem gateBlockRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GateBlockPh, S (emb p))
     (hfail : S failPh) (hexit : S exitPh)
     (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i) :
     S (dt.gateBlockRule (one := one) (emb := emb) (args := args) (wellG := wellG)
@@ -200,7 +204,7 @@ theorem gateBlockRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GateBlockPh, S (
   · rw [hp]; exact hexit
 
 /-- **Every rule of a gate block fires from a phase its site owns.** -/
-theorem gateBlockHosrc :
+private theorem gateBlockHosrc :
     ∀ (i : dt.GateBlockSite) (ρ : dt.GateBlockSh i),
       ∃ p : dt.GateBlockPh,
         (dt.gateBlockRule (one := one) (emb := emb) (args := args)
@@ -220,7 +224,7 @@ theorem gateBlockHosrc :
     exact ⟨Sum.inr p, hp, congrArg Sum.inr ho⟩
 
 /-- **One gate block separates in-shape.** -/
-theorem gateBlockSep (hemb : Function.Injective emb) :
+private theorem gateBlockSep (hemb : Function.Injective emb) :
     ∀ (i : dt.GateBlockSite) (ρ ρ' : dt.GateBlockSh i) (f : Q → A)
       (g : dt.SlotIx → A),
       (dt.gateBlockRule (one := one) (emb := emb) (args := args)
@@ -297,7 +301,7 @@ variable {emb}
 
 /-- **A property of the gates' phases, their failing exit and their exit holds
 of every phase they can move to.** -/
-theorem gatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GatesPh v, S (emb p))
+private theorem gatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.GatesPh v, S (emb p))
     (hfail : S failPh) (hexit : S exitPh)
     (i : dt.GatesSite v) (ρ : dt.GatesSh v i) :
     S (dt.gatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
@@ -332,7 +336,7 @@ theorem gatesHosrc :
         s ρ)
 
 /-- **The gates separate in-shape.** -/
-theorem gatesSep (hemb : Function.Injective emb) :
+private theorem gatesSep (hemb : Function.Injective emb) :
     ∀ (i : dt.GatesSite v) (ρ ρ' : dt.GatesSh v i) (f : Q → A)
       (g : dt.SlotIx → A),
       (dt.gatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
@@ -400,7 +404,7 @@ variable {emb}
 /-- **A property of the inner gates' phases and their exit holds of every phase
 they can move to**: a failing inner gate leaves into the next checkpoint, which
 is one of their own. -/
-theorem igatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.IGatesPh v, S (emb p))
+private theorem igatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.IGatesPh v, S (emb p))
     (hexit : S exitPh) (i : dt.IGatesSite v) (ρ : dt.IGatesSh v i) :
     S (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
       (wellGOf := wellGOf) (setFailOf := setFailOf) (enterSt := enterSt)
@@ -414,7 +418,7 @@ theorem igatesRule_dstIn {S : P → Prop} (hemb : ∀ p : dt.IGatesPh v, S (emb 
       (fun p => hemb (.sub b p)) (hemb (.chk b.succ)) (hemb (.chk b.succ)) s ρ) i ρ
 
 /-- **Every rule of the inner gates fires from a phase its site owns.** -/
-theorem igatesHosrc :
+private theorem igatesHosrc :
     ∀ (i : dt.IGatesSite v) (ρ : dt.IGatesSh v i),
       ∃ p : dt.IGatesPh v,
         (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)
@@ -435,7 +439,7 @@ theorem igatesHosrc :
         (exitPh := emb (.chk b.succ)) s ρ)
 
 /-- **The inner gates separate in-shape.** -/
-theorem igatesSep (hemb : Function.Injective emb) :
+private theorem igatesSep (hemb : Function.Injective emb) :
     ∀ (i : dt.IGatesSite v) (ρ ρ' : dt.IGatesSh v i) (f : Q → A)
       (g : dt.SlotIx → A),
       (dt.igatesRule (one := one) (v := v) (emb := emb) (argsG := argsG)

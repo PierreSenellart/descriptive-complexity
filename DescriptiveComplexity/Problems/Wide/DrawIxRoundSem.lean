@@ -7,6 +7,15 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxVar
 public import DescriptiveComplexity.Problems.Wide.DrawRoundSem
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Problems.Wide.DrawData
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawIxRound
+import all DescriptiveComplexity.Problems.Wide.DrawIxStage
+import all DescriptiveComplexity.Problems.Wide.DrawLeaf
+import all DescriptiveComplexity.Problems.Wide.DrawRoundSem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
 
 /-!
 # The round flags and the pass's pack, at an arbitrary file
@@ -66,7 +75,7 @@ omit [Finite I] [Finite R] [Finite P] in
 /-- **Without quantified levels the two flags are constant along the VAL
 loop**: the entry seeded them `True`, the inner-gates thread is empty, and
 no fold update writes a flag. -/
-theorem ixCtlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
+private theorem ixCtlBit_flag_varFM_of_nIn_zero (hzo : PR.zero ≠ PR.one)
     (hn0 : dt.nIn vi = 0) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (v : Univ A R P dt.KIx dt.dd → Prop) (fG : dt.CtlIx → A) (a : ιV) :
@@ -161,7 +170,7 @@ omit [Finite I] [Finite R] [Finite P] in
 /-- **A round flag at the round's exit reads as the per-polarity pass**:
 every quantified level of the flag's polarity holds an encoding-shaped,
 one-hot, domain-satisfying block value. The capstone's `hEx`/`hAll`. -/
-theorem ixCtlBit_roundFX_pass_iff (hzo : PR.zero ≠ PR.one) {q : dt.CtlIx}
+private theorem ixCtlBit_roundFX_pass_iff (hzo : PR.zero ≠ PR.one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (v : Univ A R P dt.KIx dt.dd → Prop) (fG : dt.CtlIx → A) (a : ιV) :
     dt.ctlBit PR.one
@@ -211,7 +220,7 @@ variable {vi} in
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational] in
 /-- **The two polarity readings deliver the full pass**: every level's
 flag is one of the two. The capstone's `hPass`. -/
-theorem ixRoundPass_of_polarities {zero one : A} {stV : TapeSt dt A R P I}
+private theorem ixRoundPass_of_polarities {zero one : A} {stV : TapeSt dt A R P I}
     (hEx : ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.existGateC →
       dt.ixIGPassP (elt := elt) F zero one vi stV ℓ)
     (hAl : ∀ ℓ : Fin (dt.nIn vi), dt.igFlag vi ℓ = dt.allGateC →
@@ -344,7 +353,7 @@ include hinj helt in
 the elementwise closed form – the destination cells are the elements the
 destination registers stand for, and the source bits are read at the source
 registers' elements. -/
-theorem ixAddr_ixStageTgt_iff (vi : dt.VarIx) (iv : dt.d.B.ι)
+private theorem ixAddr_ixStageTgt_iff (vi : dt.VarIx) (iv : dt.d.B.ι)
     (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
     (st : TapeSt dt A R P I) (n : ℕ) (x : Univ A R P dt.KIx dt.dd) :
     ixAddr elt (dt.ixStageTgt F hhas vi ts st n) x ↔
@@ -378,7 +387,7 @@ include hinj helt in
 /-- **The composed TARGET's argument blocks are the sources'**: after all
 copy loops, block `ℓ` of TARGET is the position's source block – the copy
 is faithful on the padded cells, and an encoding holds no others. -/
-theorem ixWmBlk_stageTgtD_eq_encMap
+private theorem ixWmBlk_stageTgtD_eq_encMap
     (vi : dt.VarIx) (iv : dt.d.B.ι)
     (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
     (stV : TapeSt dt A R P I)
@@ -450,7 +459,7 @@ its blocks below the arity are their encodings and it marks nothing else, which
 is `tupAddr_of_blocks`. This is what lets a dictionary be asked for at canonical
 addresses alone – and so lets one be *read off* an arbitrary set of marked
 addresses, which is what a backward reading of a run has to do. -/
-theorem ixAddr_ixStageTgt_eq_tupAddr
+private theorem ixAddr_ixStageTgt_eq_tupAddr
     (vi : dt.VarIx) (iv : dt.d.B.ι) (ha : dt.d.B.arity iv ≤ dt.ko)
     (ts : Fin (dt.d.B.arity iv) → Fin (dt.nOf vi))
     (stV : TapeSt dt A R P I)
@@ -500,7 +509,7 @@ has to know about its stage tracks is one bit per tuple, not one per address.
 Forwards that is weaker than asking for the dictionary at every address, and
 the guess supplies it just the same; backwards it is the difference between a
 dictionary that can be read off a run and one that cannot. -/
-theorem ixOld_stage_of_dict
+private theorem ixOld_stage_of_dict
     (vi : dt.VarIx) (iv : dt.d.B.ι) (ha : dt.d.B.arity iv ≤ dt.ko)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (stV : TapeSt dt A R P I)
@@ -547,7 +556,7 @@ variable {zero one} in
 include hpassEnc in
 /-- **A per-polarity pass is the split's gate clause**, reindexed from the
 quantified levels to the pack's indices. -/
-theorem ixRoundPass_iff_split_gen (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixRoundPass_iff_split_gen (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     {q : dt.CtlIx} {bpol : Bool}
     (hqiff : ∀ ℓ : Fin (dt.nIn vi),
       dt.igFlag vi ℓ = q ↔ dt.polOf vi (dt.arOf vi + (ℓ : ℕ)) = bpol) :
@@ -615,7 +624,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite I] [L.IsRelational]
 include hpassEnc in
 /-- **The valuation the leaf decodes is the pass's**: every level's block
 of the leaf's reading encodes `ixPassW`'s point. -/
-theorem ixLevelVal_encMap (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixLevelVal_encMap (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (hp : ∀ ℓ : Fin (dt.nIn vi), dt.ixIGPassP (elt := elt) F zero one vi stV ℓ)
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
@@ -663,7 +672,7 @@ include hpassEnc in
 /-- **The leaf at a passing round is the matrix's value at the pass's
 points** – the capstone's `hPsPass`, with `Ps` the gated matrix
 `DescriptiveComplexity.Draw.Data.leafP`. -/
-theorem ixLeafP_pass_iff (hzo : zero ≠ one) (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixLeafP_pass_iff (hzo : zero ≠ one) (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)
@@ -738,7 +747,7 @@ include hpassEnc in
 /-- **The leaf at a failing round is the ∃-clause alone** – the capstone's
 `hPsFail`: the ∀-clause's implication is vacuous when the two readings do
 not both hold. -/
-theorem ixLeafP_fail_iff (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixLeafP_fail_iff (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (mbW : Fin (dt.arOf vi) → dt.X.Map A)

@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.SuccinctReach.Membership
 public import DescriptiveComplexity.Problems.SuccinctReach.Double
 public import DescriptiveComplexity.Problems.Sat.TseitinFormulas
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Sat.Tseitin
+import all DescriptiveComplexity.Problems.SuccinctReach.Double
 
 /-!
 # SUCCINCT-REACH is PSPACE-hard
@@ -173,15 +176,15 @@ abbrev tagTgtGate (σp : TgtNode B tgtS) : SRTag B stepS srcS tgtS :=
 
 /-- The Tseitin variable tags of the transition group, as tags of the
 interpretation. -/
-def stepVar : (B.double.ι ⊕ StepNode B stepS) → SRTag B stepS srcS tgtS :=
+private def stepVar : (B.double.ι ⊕ StepNode B stepS) → SRTag B stepS srcS tgtS :=
   Sum.elim tagAtom tagStepGate
 
 /-- The Tseitin variable tags of the source group, as tags. -/
-def srcVar : (B.double.ι ⊕ SrcNode B srcS) → SRTag B stepS srcS tgtS :=
+private def srcVar : (B.double.ι ⊕ SrcNode B srcS) → SRTag B stepS srcS tgtS :=
   Sum.elim tagAtom tagSrcGate
 
 /-- The Tseitin variable tags of the target group, as tags. -/
-def tgtVar : (B.double.ι ⊕ TgtNode B tgtS) → SRTag B stepS srcS tgtS :=
+private def tgtVar : (B.double.ι ⊕ TgtNode B tgtS) → SRTag B stepS srcS tgtS :=
   Sum.elim tagAtom tagTgtGate
 
 variable (B stepS srcS tgtS)
@@ -376,20 +379,20 @@ section Characterizations
 variable {B stepS srcS tgtS} {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- Semantic counterpart of `DescriptiveComplexity.SuccinctReachHard.srStateFml`. -/
-def srStateSem (t : SRTag B stepS srcS tgtS) : Prop :=
+private def srStateSem (t : SRTag B stepS srcS tgtS) : Prop :=
   match t with
   | Sum.inr (Sum.inl (Sum.inl _)) => True
   | _ => False
 
 /-- Semantic counterpart of `DescriptiveComplexity.SuccinctReachHard.srNextFml`. -/
-def srNextSem (t₁ t₂ : SRTag B stepS srcS tgtS)
+private def srNextSem (t₁ t₂ : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) : Prop :=
   match t₁, t₂ with
   | Sum.inr (Sum.inl (Sum.inl i)), Sum.inr (Sum.inl (Sum.inr i')) => i = i' ∧ x = u
   | _, _ => False
 
 /-- Semantic counterpart of `DescriptiveComplexity.SuccinctReachHard.srClFml`. -/
-def srClSem (t : SRTag B stepS srcS tgtS)
+private def srClSem (t : SRTag B stepS srcS tgtS)
     (u : Fin (srDim B stepS srcS tgtS) → A) : Prop :=
   match t with
   | Sum.inl (Sum.inl (Sum.inl (σp, k))) =>
@@ -398,7 +401,7 @@ def srClSem (t : SRTag B stepS srcS tgtS)
   | _ => False
 
 /-- Semantic counterpart of `DescriptiveComplexity.SuccinctReachHard.srSrcClFml`. -/
-def srSrcClSem (t : SRTag B stepS srcS tgtS)
+private def srSrcClSem (t : SRTag B stepS srcS tgtS)
     (u : Fin (srDim B stepS srcS tgtS) → A) : Prop :=
   match t with
   | Sum.inl (Sum.inr (Sum.inl (Sum.inl (σp, k)))) =>
@@ -407,7 +410,7 @@ def srSrcClSem (t : SRTag B stepS srcS tgtS)
   | _ => False
 
 /-- Semantic counterpart of `DescriptiveComplexity.SuccinctReachHard.srTgtClFml`. -/
-def srTgtClSem (t : SRTag B stepS srcS tgtS)
+private def srTgtClSem (t : SRTag B stepS srcS tgtS)
     (u : Fin (srDim B stepS srcS tgtS) → A) : Prop :=
   match t with
   | Sum.inl (Sum.inr (Sum.inr (Sum.inl (σp, k)))) =>
@@ -506,7 +509,7 @@ private theorem realize_topLit {L' : Language.{0, 0}} {n : ℕ}
 
 variable {B stepS srcS tgtS}
 
-theorem sr_stateVar_iff (t : SRTag B stepS srcS tgtS)
+private theorem sr_stateVar_iff (t : SRTag B stepS srcS tgtS)
     (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsStateVar ![(t, u)] ↔
       srStateSem t := by
@@ -517,7 +520,7 @@ theorem sr_stateVar_iff (t : SRTag B stepS srcS tgtS)
   | Sum.inr (Sum.inr _) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem sr_next_iff (t₁ t₂ : SRTag B stepS srcS tgtS)
+private theorem sr_next_iff (t₁ t₂ : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsNext ![(t₁, u), (t₂, x)] ↔
       srNextSem t₁ t₂ u x := by
@@ -539,7 +542,7 @@ theorem sr_next_iff (t₁ t₂ : SRTag B stepS srcS tgtS)
   | Sum.inr (Sum.inr _), _ => exact Formula.realize_bot
   | Sum.inl _, _ => exact Formula.realize_bot
 
-theorem realize_srLitStep (s : Bool) (σp : StepNode B stepS) (k : Fin 3)
+private theorem realize_srLitStep (s : Bool) (σp : StepNode B stepS) (k : Fin 3)
     (tx : SRTag B stepS srcS tgtS) (v : Fin 2 × Fin (srDim B stepS srcS tgtS) → A) :
     (srLitStep B stepS srcS tgtS s σp k tx).Realize v ↔
       srLitStepSem s σp k tx (fun j => v (selA B stepS srcS tgtS j))
@@ -552,7 +555,7 @@ theorem realize_srLitStep (s : Bool) (σp : StepNode B stepS) (k : Fin 3)
   | Sum.inr (Sum.inr (Sum.inr _)) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem realize_srLitSrc (s : Bool) (σp : SrcNode B srcS) (k : Fin 3)
+private theorem realize_srLitSrc (s : Bool) (σp : SrcNode B srcS) (k : Fin 3)
     (tx : SRTag B stepS srcS tgtS) (v : Fin 2 × Fin (srDim B stepS srcS tgtS) → A) :
     (srLitSrc B stepS srcS tgtS s σp k tx).Realize v ↔
       srLitSrcSem s σp k tx (fun j => v (selA B stepS srcS tgtS j))
@@ -566,7 +569,7 @@ theorem realize_srLitSrc (s : Bool) (σp : SrcNode B srcS) (k : Fin 3)
   | Sum.inr (Sum.inr (Sum.inr (Sum.inr _))) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem realize_srLitTgt (s : Bool) (σp : TgtNode B tgtS) (k : Fin 3)
+private theorem realize_srLitTgt (s : Bool) (σp : TgtNode B tgtS) (k : Fin 3)
     (tx : SRTag B stepS srcS tgtS) (v : Fin 2 × Fin (srDim B stepS srcS tgtS) → A) :
     (srLitTgt B stepS srcS tgtS s σp k tx).Realize v ↔
       srLitTgtSem s σp k tx (fun j => v (selA B stepS srcS tgtS j))
@@ -580,7 +583,7 @@ theorem realize_srLitTgt (s : Bool) (σp : TgtNode B tgtS) (k : Fin 3)
   | Sum.inr (Sum.inr (Sum.inr (Sum.inl _))) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem realize_srLitStepTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
+private theorem realize_srLitStepTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
     (v : Fin 2 × Fin (srDim B stepS srcS tgtS) → A) :
     (srLitStepTop B stepS srcS tgtS s tx).Realize v ↔
       srLitStepTopSem s tx (fun j => v (selA B stepS srcS tgtS j))
@@ -592,7 +595,7 @@ theorem realize_srLitStepTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
   | Sum.inr (Sum.inl _) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem realize_srLitSrcTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
+private theorem realize_srLitSrcTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
     (v : Fin 2 × Fin (srDim B stepS srcS tgtS) → A) :
     (srLitSrcTop B stepS srcS tgtS s tx).Realize v ↔
       srLitSrcTopSem s tx (fun j => v (selA B stepS srcS tgtS j))
@@ -605,7 +608,7 @@ theorem realize_srLitSrcTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
   | Sum.inr (Sum.inl _) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem realize_srLitTgtTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
+private theorem realize_srLitTgtTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
     (v : Fin 2 × Fin (srDim B stepS srcS tgtS) → A) :
     (srLitTgtTop B stepS srcS tgtS s tx).Realize v ↔
       srLitTgtTopSem s tx (fun j => v (selA B stepS srcS tgtS j))
@@ -618,7 +621,8 @@ theorem realize_srLitTgtTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
   | Sum.inr (Sum.inl _) => exact Formula.realize_bot
   | Sum.inl _ => exact Formula.realize_bot
 
-theorem sr_stepCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
+private theorem sr_stepCl_iff
+    (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsStepCl ![(t, u)] ↔ srClSem t u := by
   rw [FOInterpretation.relMap_map]
   match t with
@@ -628,7 +632,7 @@ theorem sr_stepCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS
   | Sum.inl (Sum.inr _) => exact Formula.realize_bot
   | Sum.inr _ => exact Formula.realize_bot
 
-theorem sr_srcCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
+private theorem sr_srcCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsSrcCl ![(t, u)] ↔ srSrcClSem t u := by
   rw [FOInterpretation.relMap_map]
   match t with
@@ -639,7 +643,7 @@ theorem sr_srcCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS 
   | Sum.inl (Sum.inr (Sum.inr _)) => exact Formula.realize_bot
   | Sum.inr _ => exact Formula.realize_bot
 
-theorem sr_tgtCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
+private theorem sr_tgtCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsTgtCl ![(t, u)] ↔ srTgtClSem t u := by
   rw [FOInterpretation.relMap_map]
   match t with
@@ -650,7 +654,7 @@ theorem sr_tgtCl_iff (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS 
   | Sum.inl (Sum.inr (Sum.inl _)) => exact Formula.realize_bot
   | Sum.inr _ => exact Formula.realize_bot
 
-theorem sr_lit_iff (s : Bool) (tc tx : SRTag B stepS srcS tgtS)
+private theorem sr_lit_iff (s : Bool) (tc tx : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) (if s then tsPosIn else tsNegIn)
         ![(tc, u), (tx, x)] ↔ srLitSem s tc tx u x := by
@@ -687,13 +691,13 @@ section Semantic
 
 variable {B stepS srcS tgtS} {A : Type} [L.Structure A] [LinearOrder A]
 
-theorem sr_pos_iff (tc tx : SRTag B stepS srcS tgtS)
+private theorem sr_pos_iff (tc tx : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsPosIn ![(tc, u), (tx, x)] ↔
       srLitSem true tc tx u x :=
   sr_lit_iff true tc tx u x
 
-theorem sr_neg_iff (tc tx : SRTag B stepS srcS tgtS)
+private theorem sr_neg_iff (tc tx : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsNegIn ![(tc, u), (tx, x)] ↔
       srLitSem false tc tx u x :=
@@ -761,7 +765,8 @@ theorem clausesHold_group_iff (h₀ : IsBot a₀)
       exact (sr_pos_iff _ _ u _).mpr
         ((hlitTop true _ u _).mpr ⟨rfl, rfl, hu, canon_pad h₀ 0 _⟩)
 
-theorem sr_step_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
+private theorem sr_step_cases
+    (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsStepCl ![(t, u)] ↔
       ((∃ σp k, t = tagStepCl σp k
         ∧ IsClauseSem (stepK B stepS) (ctx_step B stepS srcS tgtS) σp.2 k u) ∨
@@ -777,7 +782,7 @@ theorem sr_step_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS
   | Sum.inr _ =>
       simp [srClSem, tagStepCl, tagStepTop]
 
-theorem sr_step_litNode (s : Bool) (σp : Σ m, NodeAt (stepK B stepS) m) (k : Fin 3)
+private theorem sr_step_litNode (s : Bool) (σp : Σ m, NodeAt (stepK B stepS) m) (k : Fin 3)
     (tx : SRTag B stepS srcS tgtS) (u x : Fin (srDim B stepS srcS tgtS) → A) :
     srLitSem s (tagStepCl σp k) tx u x ↔
       ∃ vt, tx = stepVar vt
@@ -794,7 +799,7 @@ theorem sr_step_litNode (s : Bool) (σp : Σ m, NodeAt (stepK B stepS) m) (k : F
   | Sum.inl _ =>
       simp [srLitSem, srLitStepSem, stepVar, tagAtom, tagStepGate]
 
-theorem sr_step_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
+private theorem sr_step_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     srLitSem s tagStepTop tx u x ↔
       (s = true ∧ tx = stepVar (Sum.inr ⟨0, rootAt (stepK B stepS)⟩) ∧ Canon 0 u ∧ Canon 0 x) := by
@@ -810,7 +815,7 @@ theorem sr_step_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
   | Sum.inl _ =>
       simp [srLitSem, srLitStepTopSem, stepVar, tagStepGate]
 
-theorem sr_src_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
+private theorem sr_src_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsSrcCl ![(t, u)] ↔
       ((∃ σp k, t = tagSrcCl σp k
         ∧ IsClauseSem (srcK B srcS) (ctx_src B stepS srcS tgtS) σp.2 k u) ∨
@@ -828,7 +833,7 @@ theorem sr_src_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS 
   | Sum.inr _ =>
       simp [srSrcClSem, tagSrcCl, tagSrcTop]
 
-theorem sr_src_litNode (s : Bool) (σp : Σ m, NodeAt (srcK B srcS) m) (k : Fin 3)
+private theorem sr_src_litNode (s : Bool) (σp : Σ m, NodeAt (srcK B srcS) m) (k : Fin 3)
     (tx : SRTag B stepS srcS tgtS) (u x : Fin (srDim B stepS srcS tgtS) → A) :
     srLitSem s (tagSrcCl σp k) tx u x ↔
       ∃ vt, tx = srcVar vt ∧ LitSem s (srcK B srcS) (ctx_src B stepS srcS tgtS) σp.2 k u vt x := by
@@ -844,7 +849,7 @@ theorem sr_src_litNode (s : Bool) (σp : Σ m, NodeAt (srcK B srcS) m) (k : Fin 
   | Sum.inl _ =>
       simp [srLitSem, srLitSrcSem, srcVar, tagAtom, tagSrcGate]
 
-theorem sr_src_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
+private theorem sr_src_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     srLitSem s tagSrcTop tx u x ↔
       (s = true ∧ tx = srcVar (Sum.inr ⟨0, rootAt (srcK B srcS)⟩) ∧ Canon 0 u ∧ Canon 0 x) := by
@@ -860,7 +865,7 @@ theorem sr_src_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
   | Sum.inl _ =>
       simp [srLitSem, srLitSrcTopSem, srcVar, tagSrcGate]
 
-theorem sr_tgt_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
+private theorem sr_tgt_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS tgtS) → A) :
     RelMap (M := (srInterp B stepS srcS tgtS).Map A) tsTgtCl ![(t, u)] ↔
       ((∃ σp k, t = tagTgtCl σp k
         ∧ IsClauseSem (tgtK B tgtS) (ctx_tgt B stepS srcS tgtS) σp.2 k u) ∨
@@ -878,7 +883,7 @@ theorem sr_tgt_cases (t : SRTag B stepS srcS tgtS) (u : Fin (srDim B stepS srcS 
   | Sum.inr _ =>
       simp [srTgtClSem, tagTgtCl, tagTgtTop]
 
-theorem sr_tgt_litNode (s : Bool) (σp : Σ m, NodeAt (tgtK B tgtS) m) (k : Fin 3)
+private theorem sr_tgt_litNode (s : Bool) (σp : Σ m, NodeAt (tgtK B tgtS) m) (k : Fin 3)
     (tx : SRTag B stepS srcS tgtS) (u x : Fin (srDim B stepS srcS tgtS) → A) :
     srLitSem s (tagTgtCl σp k) tx u x ↔
       ∃ vt, tx = tgtVar vt ∧ LitSem s (tgtK B tgtS) (ctx_tgt B stepS srcS tgtS) σp.2 k u vt x := by
@@ -894,7 +899,7 @@ theorem sr_tgt_litNode (s : Bool) (σp : Σ m, NodeAt (tgtK B tgtS) m) (k : Fin 
   | Sum.inl _ =>
       simp [srLitSem, srLitTgtSem, tgtVar, tagAtom, tagTgtGate]
 
-theorem sr_tgt_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
+private theorem sr_tgt_litTop (s : Bool) (tx : SRTag B stepS srcS tgtS)
     (u x : Fin (srDim B stepS srcS tgtS) → A) :
     srLitSem s tagTgtTop tx u x ↔
       (s = true ∧ tx = tgtVar (Sum.inr ⟨0, rootAt (tgtK B tgtS)⟩) ∧ Canon 0 u ∧ Canon 0 x) := by
@@ -935,21 +940,21 @@ noncomputable def canonTv (μ : B.double.Assignment A)
     | Sum.inl i => μ i (pref (arity_le_srDim B stepS srcS tgtS i) u)
     | Sum.inr σp => canonVal μ f σp.1 σp.2 (pref ((nodeAt_le_maxCtx f σp.2).trans hctx) u)
 
-theorem padAssign_canonTv (μ : B.double.Assignment A)
+private theorem padAssign_canonTv (μ : B.double.Assignment A)
     (f : ((L.sum Language.order).sum B.double.lang).Sentence)
     (hctx : maxCtx f ≤ srDim B stepS srcS tgtS) :
     padAssign a₀ (canonTv μ f hctx) = μ := by
   funext i a
   exact congrArg (μ i) (pref_pad a₀ _ a)
 
-theorem padVal_canonTv (μ : B.double.Assignment A)
+private theorem padVal_canonTv (μ : B.double.Assignment A)
     (f : ((L.sum Language.order).sum B.double.lang).Sentence)
     (hctx : maxCtx f ≤ srDim B stepS srcS tgtS) :
     padVal a₀ (canonTv μ f hctx) = canonVal μ f := by
   funext m q w
   exact congrArg (canonVal μ f m q) (pref_pad a₀ _ w)
 
-theorem satCond_canonTv (h₀ : IsBot a₀) (μ : B.double.Assignment A)
+private theorem satCond_canonTv (h₀ : IsBot a₀) (μ : B.double.Assignment A)
     (f : ((L.sum Language.order).sum B.double.lang).Sentence)
     (hctx : maxCtx f ≤ srDim B stepS srcS tgtS) :
     SatCond f hctx (canonTv μ f hctx) := by
@@ -957,7 +962,7 @@ theorem satCond_canonTv (h₀ : IsBot a₀) (μ : B.double.Assignment A)
   rw [padAssign_canonTv, padVal_canonTv]
   exact gates_canonVal μ f
 
-theorem root_canonTv (μ : B.double.Assignment A)
+private theorem root_canonTv (μ : B.double.Assignment A)
     (f : ((L.sum Language.order).sum B.double.lang).Sentence)
     (hctx : maxCtx f ≤ srDim B stepS srcS tgtS) :
     canonTv μ f hctx (Sum.inr ⟨0, rootAt f⟩) (pad a₀ finZeroElim) ↔
@@ -970,7 +975,7 @@ theorem root_canonTv (μ : B.double.Assignment A)
 
 /-- The Tseitin valuation induced by a kernel's satisfaction of its clauses
 realizes the kernel. -/
-theorem realizeWith_of_satCond (h₀ : IsBot a₀)
+private theorem realizeWith_of_satCond (h₀ : IsBot a₀)
     (f : ((L.sum Language.order).sum B.double.lang).Sentence)
     (hctx : maxCtx f ≤ srDim B stepS srcS tgtS)
     (tv : (B.double.ι ⊕ Σ m, NodeAt f m) → (Fin (srDim B stepS srcS tgtS) → A) → Prop)
@@ -981,7 +986,7 @@ theorem realizeWith_of_satCond (h₀ : IsBot a₀)
     finZeroElim).mp hroot
 
 /-- Realization of a kernel is realization of the sentence it renames. -/
-theorem realizeWith_iff (μ : B.double.Assignment A)
+private theorem realizeWith_iff (μ : B.double.Assignment A)
     (f : ((L.sum Language.order).sum B.double.lang).Sentence) :
     RealizeWith μ f finZeroElim ↔ @Sentence.Realize _ A (B.double.structure₁ μ) f :=
   iff_of_eq (congrArg₂
@@ -993,7 +998,7 @@ theorem realizeWith_iff (μ : B.double.Assignment A)
 
 /-- The state of the interpreted system carried by an assignment of `B`: the
 atoms of the first copy that it satisfies. -/
-def srStateOf (ρ : B.Assignment A) : (srInterp B stepS srcS tgtS).Map A → Prop := fun e =>
+private def srStateOf (ρ : B.Assignment A) : (srInterp B stepS srcS tgtS).Map A → Prop := fun e =>
   match e.1 with
   | Sum.inr (Sum.inl (Sum.inl i)) =>
       ρ i (pref (arity_le_srDim B stepS srcS tgtS (Sum.inl i)) e.2)
@@ -1001,13 +1006,13 @@ def srStateOf (ρ : B.Assignment A) : (srInterp B stepS srcS tgtS).Map A → Pro
 
 /-- The assignment of `B` read off a state of the interpreted system: its
 canonically padded atoms of the first copy. -/
-def srAssignOf (a₀ : A) (S : (srInterp B stepS srcS tgtS).Map A → Prop) :
+private def srAssignOf (a₀ : A) (S : (srInterp B stepS srcS tgtS).Map A → Prop) :
     B.Assignment A :=
   fun i w => S (tagAtom (Sum.inl i), pad a₀ w)
 
 /-- The canonical valuation of the interpreted instance under an assignment of
 the doubled block. -/
-noncomputable def srCanon (μ : B.double.Assignment A) :
+private noncomputable def srCanon (μ : B.double.Assignment A) :
     (srInterp B stepS srcS tgtS).Map A → Prop := fun e =>
   match e.1 with
   | Sum.inr (Sum.inl i) => canonTv μ (stepK B stepS) (ctx_step B stepS srcS tgtS)
@@ -1020,7 +1025,7 @@ noncomputable def srCanon (μ : B.double.Assignment A) :
       canonTv μ (tgtK B tgtS) (ctx_tgt B stepS srcS tgtS) (Sum.inr σp) e.2
   | Sum.inl _ => False
 
-theorem srCanon_step (μ : B.double.Assignment A) :
+private theorem srCanon_step (μ : B.double.Assignment A) :
     (fun w u => srCanon μ (stepVar w, u)) =
       canonTv μ (stepK B stepS) (ctx_step B stepS srcS tgtS) := by
   funext w u
@@ -1028,7 +1033,7 @@ theorem srCanon_step (μ : B.double.Assignment A) :
   | Sum.inl i => rfl
   | Sum.inr σp => rfl
 
-theorem srCanon_src (μ : B.double.Assignment A) :
+private theorem srCanon_src (μ : B.double.Assignment A) :
     (fun w u => srCanon μ (srcVar w, u)) =
       canonTv μ (srcK B srcS) (ctx_src B stepS srcS tgtS) := by
   funext w u
@@ -1036,7 +1041,7 @@ theorem srCanon_src (μ : B.double.Assignment A) :
   | Sum.inl i => rfl
   | Sum.inr σp => rfl
 
-theorem srCanon_tgt (μ : B.double.Assignment A) :
+private theorem srCanon_tgt (μ : B.double.Assignment A) :
     (fun w u => srCanon μ (tgtVar w, u)) =
       canonTv μ (tgtK B tgtS) (ctx_tgt B stepS srcS tgtS) := by
   funext w u
@@ -1046,7 +1051,7 @@ theorem srCanon_tgt (μ : B.double.Assignment A) :
 
 /-- The canonical valuation reads the state its assignment's first copy
 carries. -/
-theorem readsCur_srCanon (μ : B.double.Assignment A) :
+private theorem readsCur_srCanon (μ : B.double.Assignment A) :
     ReadsCur ((srInterp B stepS srcS tgtS).Map A) (srCanon μ)
       (srStateOf (B.fstAssign μ)) := by
   rintro ⟨t, u⟩ ht
@@ -1059,7 +1064,7 @@ theorem readsCur_srCanon (μ : B.double.Assignment A) :
 
 /-- The canonical valuation writes the state its assignment's second copy
 carries. -/
-theorem writesNext_srCanon (μ : B.double.Assignment A) :
+private theorem writesNext_srCanon (μ : B.double.Assignment A) :
     WritesNext ((srInterp B stepS srcS tgtS).Map A) (srCanon μ)
       (srStateOf (B.sndAssign μ)) := by
   rintro ⟨t, u⟩ ⟨t', u'⟩ ht htt
@@ -1115,7 +1120,7 @@ private theorem clausesHold_canon_tgt (h₀ : IsBot a₀) (μ : B.double.Assignm
 
 /-- A transition of the specification is a transition of the interpreted
 system. -/
-theorem stepRel_srStateOf (h₀ : IsBot a₀) (ρ σ : B.Assignment A)
+private theorem stepRel_srStateOf (h₀ : IsBot a₀) (ρ σ : B.Assignment A)
     (h : @Sentence.Realize _ A (B.structure₂ ρ σ) stepS) :
     StepRel ((srInterp B stepS srcS tgtS).Map A) (srStateOf ρ) (srStateOf σ) := by
   refine ⟨srCanon (B.joinAssign ρ σ), clausesHold_canon_step h₀ _ ?_,
@@ -1124,7 +1129,7 @@ theorem stepRel_srStateOf (h₀ : IsBot a₀) (ρ σ : B.Assignment A)
 
 /-- A source state of the specification is a source state of the interpreted
 system. -/
-theorem isStart_srStateOf (h₀ : IsBot a₀) (ρ : B.Assignment A)
+private theorem isStart_srStateOf (h₀ : IsBot a₀) (ρ : B.Assignment A)
     (h : @Sentence.Realize _ A (B.structure₁ ρ) srcS) :
     IsStart ((srInterp B stepS srcS tgtS).Map A) (srStateOf ρ) := by
   refine ⟨srCanon (B.joinAssign ρ ρ), clausesHold_canon_src h₀ _ ?_, readsCur_srCanon _⟩
@@ -1132,7 +1137,7 @@ theorem isStart_srStateOf (h₀ : IsBot a₀) (ρ : B.Assignment A)
 
 /-- A target state of the specification is a target state of the interpreted
 system. -/
-theorem isGoal_srStateOf (h₀ : IsBot a₀) (ρ : B.Assignment A)
+private theorem isGoal_srStateOf (h₀ : IsBot a₀) (ρ : B.Assignment A)
     (h : @Sentence.Realize _ A (B.structure₁ ρ) tgtS) :
     IsGoal ((srInterp B stepS srcS tgtS).Map A) (srStateOf ρ) := by
   refine ⟨srCanon (B.joinAssign ρ ρ), clausesHold_canon_tgt h₀ _ ?_, readsCur_srCanon _⟩
@@ -1148,7 +1153,7 @@ variable {B stepS srcS tgtS} {A : Type} [L.Structure A] [LinearOrder A] {a₀ : 
 
 /-- A transition of the interpreted system is a transition of the
 specification, between the assignments its two states carry. -/
-theorem realize_step_of_stepRel (h₀ : IsBot a₀)
+private theorem realize_step_of_stepRel (h₀ : IsBot a₀)
     (S S' : (srInterp B stepS srcS tgtS).Map A → Prop)
     (h : StepRel ((srInterp B stepS srcS tgtS).Map A) S S') :
     @Sentence.Realize _ A
@@ -1174,7 +1179,7 @@ theorem realize_step_of_stepRel (h₀ : IsBot a₀)
 
 /-- A source state of the interpreted system carries an assignment satisfying
 the source sentence. -/
-theorem realize_src_of_isStart (h₀ : IsBot a₀)
+private theorem realize_src_of_isStart (h₀ : IsBot a₀)
     (S : (srInterp B stepS srcS tgtS).Map A → Prop)
     (h : IsStart ((srInterp B stepS srcS tgtS).Map A) S) :
     @Sentence.Realize _ A (B.structure₁ (srAssignOf a₀ S)) srcS := by
@@ -1194,7 +1199,7 @@ theorem realize_src_of_isStart (h₀ : IsBot a₀)
 
 /-- A target state of the interpreted system carries an assignment satisfying
 the target sentence. -/
-theorem realize_tgt_of_isGoal (h₀ : IsBot a₀)
+private theorem realize_tgt_of_isGoal (h₀ : IsBot a₀)
     (S : (srInterp B stepS srcS tgtS).Map A → Prop)
     (h : IsGoal ((srInterp B stepS srcS tgtS).Map A) S) :
     @Sentence.Realize _ A (B.structure₁ (srAssignOf a₀ S)) tgtS := by

@@ -11,6 +11,11 @@ public import DescriptiveComplexity.Problems.SetFamily.FromGraphs
 import DescriptiveComplexity.Problems.SetFamily.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Composition
+import all DescriptiveComplexity.Problems.CliqueFamily
+import all DescriptiveComplexity.Problems.SetFamily.Defs
+import all DescriptiveComplexity.Problems.SetFamily.FromGraphs
+import all DescriptiveComplexity.Problems.SetFamily.Membership
+import all DescriptiveComplexity.Problems.SetFamily.Reductions
 
 /-!
 # The set family is NP-complete
@@ -56,7 +61,7 @@ edge-incidence reading of a graph with the transposition of a set system. In
 the composite, the vertices are the ground elements and the edges are the sets
 to be hit – the textbook rendering of Vertex Cover as a hitting-set
 problem. -/
-noncomputable def vertexCover_fo_reduction_hittingSet : VertexCover ≤ᶠᵒ HittingSet :=
+private noncomputable def vertexCover_fo_reduction_hittingSet : VertexCover ≤ᶠᵒ HittingSet :=
   vertexCover_fo_reduction_setCover.trans setCover_fo_reduction_hittingSet
 
 /-! ### NP-completeness -/

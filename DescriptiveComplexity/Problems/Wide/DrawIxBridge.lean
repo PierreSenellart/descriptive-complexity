@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawGateFacts
 import DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.IxAddr
 
 /-!
 # What a coarse file's gate test is, elementwise
@@ -51,7 +52,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A] in
 /-- **A coarse background's block one-hot, at a register**: the register's own
 block, which by `hblkP` is the block of the element it stands for. -/
-theorem ixBack_blk_cell_eq (hinj : Function.Injective lay.cell)
+private theorem ixBack_blk_cell_eq (hinj : Function.Injective lay.cell)
     (st : TapeSt dt A R' P' I) (u : I) (b : Option (Fin dt.ko ⊕ Fin dt.ki)) :
     dt.ixBack lay zero one dt.dd0Le st (lay.cell u) (Slot.blk b) =
       bitVal zero one (lay.blk u = b) :=
@@ -63,7 +64,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A] in
 /-- **A coarse background's mirror bit, at a register**: the mirror at that
 register. -/
-theorem ixBack_mir_cell_eq (hinj : Function.Injective lay.cell)
+private theorem ixBack_mir_cell_eq (hinj : Function.Injective lay.cell)
     (st : TapeSt dt A R' P' I) (u : I) :
     dt.ixBack lay zero one dt.dd0Le st (lay.cell u) Slot.mir =
       bitVal zero one (st.mir u) :=
@@ -75,7 +76,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A] in
 /-- **A coarse background's padding flag, at a register**: the register's tuple
 is `zero` above `dd₀`. -/
-theorem ixBack_pdd_cell_eq (hinj : Function.Injective lay.cell)
+private theorem ixBack_pdd_cell_eq (hinj : Function.Injective lay.cell)
     (st : TapeSt dt A R' P' I) (u : I) :
     dt.ixBack lay zero one dt.dd0Le st (lay.cell u) Slot.pdd =
       bitVal zero one (∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → lay.arg u j = zero) :=
@@ -87,7 +88,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A] in
 /-- **A coarse background's name slots, at a register**: the register's own
 tuple. -/
-theorem ixBack_name_cell_eq (hinj : Function.Injective lay.cell)
+private theorem ixBack_name_cell_eq (hinj : Function.Injective lay.cell)
     (st : TapeSt dt A R' P' I) (u : I) (j : Fin dt.dd0) :
     dt.ixBack lay zero one dt.dd0Le st (lay.cell u) (Slot.name j) =
       lay.arg u (Fin.castLE dt.dd0Le j) := by
@@ -102,7 +103,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] [Finite A] [Finite R']
   [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A] in
 /-- **A coarse background's VAL bit, at a register**: VAL at that register. -/
-theorem ixBack_val_cell_eq (hinj : Function.Injective lay.cell)
+private theorem ixBack_val_cell_eq (hinj : Function.Injective lay.cell)
     (st : TapeSt dt A R' P' I) (u : I) :
     dt.ixBack lay zero one dt.dd0Le st (lay.cell u) Slot.val =
       bitVal zero one (st.val u) :=
@@ -186,7 +187,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A] in
 /-- **An inner gate's shape test is the elementwise one too**: the same four
 slots, with VAL where the outer gate reads the mirror. -/
-theorem wellShapedIG_ixBack_iff (hinj : Function.Injective lay.cell)
+private theorem wellShapedIG_ixBack_iff (hinj : Function.Injective lay.cell)
     (heltInj : Function.Injective elt)
     (hblkP : ∀ u : I, lay.blk u = tagBlk (elt u).1)
     (hargP : ∀ u : I, lay.arg u = (elt u).2)
@@ -260,7 +261,7 @@ registers are not the elements: the shape test is the same question
 nothing: an element that fails the shape test is one the *address* holds, so it
 is a register's element already, and no file has to have a register for every
 element of a block. -/
-theorem ix_gate_trichotomy (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
+private theorem ix_gate_trichotomy (RF : RegFile (Univ A R' P' dt.KIx dt.dd))
     (hinj : Function.Injective lay.cell) (heltInj : Function.Injective elt)
     (hblkP : ∀ u : I, lay.blk u = tagBlk (elt u).1)
     (hargP : ∀ u : I, lay.arg u = (elt u).2)

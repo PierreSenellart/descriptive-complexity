@@ -13,6 +13,7 @@ public import Mathlib.Tactic.Ring
 public import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
 public import Mathlib.Tactic.FinCases
 public import Mathlib.Algebra.Group.Action.Defs
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # A count-preserving 3-coloring gadget graph of a CNF formula
@@ -121,11 +122,11 @@ noncomputable def prefixBv {c y : A} {t : Bool} (h : OccIn c y t) : Bv A × Bool
   if hm : MinOcc c y t then (Sum.inl ⟨y, satOccurs_of_occIn h⟩, t)
   else (Sum.inr ⟨(c, y, t), h, hm⟩, true)
 
-theorem prefixBv_of_min {c y : A} {t : Bool} (h : OccIn c y t) (hm : MinOcc c y t) :
+private theorem prefixBv_of_min {c y : A} {t : Bool} (h : OccIn c y t) (hm : MinOcc c y t) :
     prefixBv h = (Sum.inl ⟨y, satOccurs_of_occIn h⟩, t) := by
   rw [prefixBv, dite_eq_left hm]
 
-theorem prefixBv_of_chained {c y : A} {t : Bool} (h : Chained c y t) :
+private theorem prefixBv_of_chained {c y : A} {t : Bool} (h : Chained c y t) :
     prefixBv h.1 = (Sum.inr ⟨(c, y, t), h⟩, true) := by
   rw [prefixBv, dite_eq_right h.2]
 
@@ -189,10 +190,10 @@ abbrev bvV (w : Bv A × Bool) : Core A := Sum.inr (Sum.inl w)
 abbrev spV (c : {c : A // EmptyCl c}) : Core A := Sum.inr (Sum.inr c)
 
 /-- The palette is colored `0`, `1`, `2`. -/
-def Norm (χ : V A → Fin 3) : Prop :=
+private def Norm (χ : V A → Fin 3) : Prop :=
   χ (Sum.inl (palV .T)) = 0 ∧ χ (Sum.inl (palV .F)) = 1 ∧ χ (Sum.inl (palV .B)) = 2
 
-theorem pal_injective {χ : V A → Fin 3} (hχ : Proper χ) :
+private theorem pal_injective {χ : V A → Fin 3} (hχ : Proper χ) :
     Function.Injective ![χ (Sum.inl (palV .T)), χ (Sum.inl (palV .F)), χ (Sum.inl (palV .B))] := by
   have h : ∀ p q : Pal, p ≠ q → χ (Sum.inl (palV p)) ≠ χ (Sum.inl (palV q)) :=
     fun p q hpq => hχ _ _ hpq
@@ -207,16 +208,16 @@ theorem pal_injective {χ : V A → Fin 3} (hχ : Proper χ) :
     | exact absurd hij.symm hTF | exact absurd hij.symm hTB | exact absurd hij.symm hFB
 
 /-- The permutation of the colors the palette is colored with. -/
-noncomputable def palPerm (χ : V A → Fin 3) (hχ : Proper χ) : Equiv.Perm (Fin 3) :=
+private noncomputable def palPerm (χ : V A → Fin 3) (hχ : Proper χ) : Equiv.Perm (Fin 3) :=
   Equiv.ofBijective _ (Finite.injective_iff_bijective.mp (pal_injective hχ))
 
-theorem proper_comp {χ : V A → Fin 3} (hχ : Proper χ) {f : Fin 3 → Fin 3}
+private theorem proper_comp {χ : V A → Fin 3} (hχ : Proper χ) {f : Fin 3 → Fin 3}
     (hf : Function.Injective f) : Proper (f ∘ χ) :=
   fun u v huv h => hχ u v huv (hf h)
 
 /-- **Normalizing the palette**: a proper coloring is a permutation of the
 colors and a proper coloring with the palette colored `0`, `1`, `2`. -/
-noncomputable def normEquiv :
+private noncomputable def normEquiv :
     {χ : V A → Fin 3 // Proper χ} ≃
       Equiv.Perm (Fin 3) × {χ : V A → Fin 3 // Proper χ ∧ Norm χ} where
   toFun χ := (palPerm χ.1 χ.2, ⟨(palPerm χ.1 χ.2).symm ∘ χ.1,
@@ -250,16 +251,16 @@ def NormC (κ : Core A → Fin 3) : Prop :=
   κ (palV .T) = 0 ∧ κ (palV .F) = 1 ∧ κ (palV .B) = 2
 
 /-- A coloring of the triangle `j` of the gate `g`. -/
-def TriOk (κ : Core A → Fin 3) (g : Gate A) (j : Fin 3) (t : Fin 3 → Fin 3) : Prop :=
+private def TriOk (κ : Core A → Fin 3) (g : Gate A) (j : Fin 3) (t : Fin 3 → Fin 3) : Prop :=
   (t 0 ≠ t 1 ∧ t 0 ≠ t 2 ∧ t 1 ≠ t 2) ∧ t 0 ≠ κ (outer g j 0) ∧ t 1 ≠ κ (outer g j 1) ∧
     t 2 ≠ κ (outer g j 2)
 
-theorem TriOk.ne {κ : Core A → Fin 3} {g : Gate A} {j : Fin 3} {t : Fin 3 → Fin 3}
+private theorem TriOk.ne {κ : Core A → Fin 3} {g : Gate A} {j : Fin 3} {t : Fin 3 → Fin 3}
     (h : TriOk κ g j t) {r r' : Fin 3} (hr : r ≠ r') : t r ≠ t r' := by
   obtain ⟨⟨h01, h02, h12⟩, -⟩ := h
   fin_cases r <;> fin_cases r' <;> simp_all [Ne.symm]
 
-theorem TriOk.outer_ne {κ : Core A → Fin 3} {g : Gate A} {j : Fin 3} {t : Fin 3 → Fin 3}
+private theorem TriOk.outer_ne {κ : Core A → Fin 3} {g : Gate A} {j : Fin 3} {t : Fin 3 → Fin 3}
     (h : TriOk κ g j t) (r : Fin 3) : t r ≠ κ (outer g j r) := by
   obtain ⟨-, h0, h1, h2⟩ := h
   fin_cases r
@@ -269,7 +270,7 @@ theorem TriOk.outer_ne {κ : Core A → Fin 3} {g : Gate A} {j : Fin 3} {t : Fin
 
 /-- **The triangles split off**: a normalized proper coloring is a proper
 coloring of the core and a coloring of each triangle. -/
-noncomputable def triEquiv :
+private noncomputable def triEquiv :
     {χ : V A → Fin 3 // Proper χ ∧ Norm χ} ≃
       Σ κ : {κ : Core A → Fin 3 // CoreProper κ ∧ NormC κ},
         ∀ q : Gate A × Fin 3, {t : Fin 3 → Fin 3 // TriOk κ.1 q.1 q.2 t} where
@@ -300,11 +301,11 @@ noncomputable def triEquiv :
 def AllNAE (κ : Core A → Fin 3) : Prop :=
   ∀ (g : Gate A) (j : Fin 3), NAE3 (κ (outer g j 0)) (κ (outer g j 1)) (κ (outer g j 2))
 
-theorem fin3_bc : ∀ a : Fin 3, a ≠ 2 → a = bc (decide (a = 0)) := by decide
+private theorem fin3_bc : ∀ a : Fin 3, a ≠ 2 → a = bc (decide (a = 0)) := by decide
 
-theorem fin3_compl : ∀ a b : Fin 3, a ≠ 2 → b ≠ 2 → a ≠ b → (b = 0 ↔ a ≠ 0) := by decide
+private theorem fin3_compl : ∀ a b : Fin 3, a ≠ 2 → b ≠ 2 → a ≠ b → (b = 0 ↔ a ≠ 0) := by decide
 
-theorem fin3_ne_all : ∀ a : Fin 3, a ≠ 0 → a ≠ 1 → a ≠ 2 → False := by decide
+private theorem fin3_ne_all : ∀ a : Fin 3, a ≠ 0 → a ≠ 1 → a ≠ 2 → False := by decide
 
 /-- The assignment read off a core coloring. -/
 def modelOf (κ : Core A → Fin 3) (x : A) : Prop :=
@@ -317,7 +318,7 @@ theorem modelOf_iff (κ : Core A → Fin 3) (x : Var A) :
 
 omit [Language.sat.Structure A] in
 /-- The order of the occurrences is well founded. -/
-theorem occLt_wf : WellFounded fun p q : A × Bool => occLt p.1 p.2 q.1 q.2 := by
+private theorem occLt_wf : WellFounded fun p q : A × Bool => occLt p.1 p.2 q.1 q.2 := by
   have : IsTrans (A × Bool) fun p q => occLt p.1 p.2 q.1 q.2 :=
     ⟨fun _ _ _ h₁ h₂ => occLt_trans h₁ h₂⟩
   have : Std.Irrefl fun p q : A × Bool => occLt p.1 p.2 q.1 q.2 :=
@@ -338,7 +339,7 @@ theorem bv_flip (b : Bv A) (s : Bool) : κ (bvV (b, !s)) = 0 ↔ κ (bvV (b, s))
 
 omit [Finite A] in
 /-- No clause is empty. -/
-theorem not_emptyCl (c : {c : A // EmptyCl c}) : False :=
+private theorem not_emptyCl (c : {c : A // EmptyCl c}) : False :=
   fin3_ne_all (κ (spV c)) (hn.1 ▸ hκ _ (palV .T) trivial) (hn.2.1 ▸ hκ _ (palV .F) trivial)
     (hn.2.2 ▸ hκ _ (palV .B) trivial)
 
@@ -352,7 +353,7 @@ theorem lit_iff (x : Var A) (s : Bool) :
 
 /-- **The gate of a non-first occurrence computes the prefix
 disjunction.** -/
-theorem gate_value (hall : AllNAE κ) (g : Gate A) :
+private theorem gate_value (hall : AllNAE κ) (g : Gate A) :
     κ (zV g) = 0 ↔ κ (bvV (prefixBv (pred_spec g).1)) = 0 ∨
       κ (bvV (Sum.inl ⟨g.1.2.1, satOccurs_of_occIn g.2.1⟩, g.1.2.2)) = 0 := by
   set z := decide (κ (zV g) = 0) with hz
@@ -389,7 +390,7 @@ theorem gate_value (hall : AllNAE κ) (g : Gate A) :
 
 /-- **The prefix vertex of every occurrence is colored by the prefix
 disjunction.** -/
-theorem prefix_value (hall : AllNAE κ) (c : A) :
+private theorem prefix_value (hall : AllNAE κ) (c : A) :
     ∀ (p : A × Bool) (h : OccIn c p.1 p.2),
       κ (bvV (prefixBv h)) = 0 ↔ PrefixOr (modelOf κ) c p.1 p.2 := by
   intro p
@@ -410,14 +411,14 @@ theorem prefix_value (hall : AllNAE κ) (c : A) :
 
 end Core
 
-theorem fin3_zero : ∀ a : Fin 3, a ≠ 1 → a ≠ 2 → a = 0 := by decide
+private theorem fin3_zero : ∀ a : Fin 3, a ≠ 1 → a ≠ 2 → a = 0 := by decide
 
-theorem bc_eq_zero (b : Bool) : bc b = 0 ↔ b = true := by cases b <;> decide
+private theorem bc_eq_zero (b : Bool) : bc b = 0 ↔ b = true := by cases b <;> decide
 
-theorem bc_ne_two (b : Bool) : bc b ≠ 2 := by cases b <;> decide
+private theorem bc_ne_two (b : Bool) : bc b ≠ 2 := by cases b <;> decide
 
 /-- **A core coloring gives a model.** -/
-theorem satModel_modelOf {κ : Core A → Fin 3} (hκ : CoreProper κ) (hn : NormC κ)
+private theorem satModel_modelOf {κ : Core A → Fin 3} (hκ : CoreProper κ) (hn : NormC κ)
     (hall : AllNAE κ) : SatModel A (modelOf κ) := by
   refine ⟨fun c hc => ?_, fun x hx => hx.1⟩
   by_cases hex : ∃ x s, OccIn c x s
@@ -558,7 +559,7 @@ theorem allNAE_colOf : AllNAE (colOf ν) := by
 end OfModel
 
 /-- **The core colorings are the models.** -/
-noncomputable def modelEquiv :
+private noncomputable def modelEquiv :
     {κ : Core A → Fin 3 // (CoreProper κ ∧ NormC κ) ∧ AllNAE κ} ≃
       {ν : A → Prop // SatModel A ν} where
   toFun κ := ⟨modelOf κ.1, satModel_modelOf κ.2.1.1 κ.2.1.2 κ.2.2⟩
@@ -604,7 +605,7 @@ noncomputable def modelEquiv :
 
 /-! ### The count -/
 
-theorem outer_ne_two {κ : Core A → Fin 3} (hκ : CoreProper κ) (hn : NormC κ) (g : Gate A)
+private theorem outer_ne_two {κ : Core A → Fin 3} (hκ : CoreProper κ) (hn : NormC κ) (g : Gate A)
     (j r : Fin 3) : κ (outer g j r) ≠ 2 := by
   have hF : κ (palV .F) ≠ 2 := by rw [hn.2.1]; decide
   fin_cases j <;> fin_cases r

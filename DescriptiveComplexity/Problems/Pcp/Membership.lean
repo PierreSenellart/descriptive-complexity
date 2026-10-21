@@ -10,6 +10,8 @@ public import DescriptiveComplexity.Problems.Pcp.Cert
 import DescriptiveComplexity.RecursivelyEnumerable
 public import DescriptiveComplexity.Problems.FinSat
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Pcp.Cert
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # `PCP` is in RE
@@ -119,7 +121,7 @@ A relation of the instance holds on the extended universe only of original
 elements, and there of what it holds of in the instance – so at original
 arguments the kernel reads the instance itself. -/
 
-theorem relMap_inl {k : ℕ} (R : Language.pcp.Relations k) (y : Fin k → A) :
+private theorem relMap_inl {k : ℕ} (R : Language.pcp.Relations k) (y : Fin k → A) :
     RelMap (L := Language.pcp) (M := A ⊕ Fin m) R (fun i => Sum.inl (y i)) ↔ RelMap R y := by
   constructor
   · rintro ⟨y', hy', h⟩
@@ -275,16 +277,16 @@ theorem realize_mtF (s p s' p' : γ) (v : γ → A ⊕ Fin m) :
 /-! ### Naming the symbols of the instance -/
 
 /-- The position `x` precedes the position `y`. -/
-noncomputable def ordF (x y : γ) : certLang.Formula γ := instF₂ Language.pcpLeSym x y
+private noncomputable def ordF (x y : γ) : certLang.Formula γ := instF₂ Language.pcpLeSym x y
 
 /-- The element `d` is one of the dominoes. -/
-noncomputable def domF (d : γ) : certLang.Formula γ := instF₁ Language.pcpDomSym d
+private noncomputable def domF (d : γ) : certLang.Formula γ := instF₁ Language.pcpDomSym d
 
 /-- The top word of `d` carries the letter `ℓ` at the position `p`. -/
-noncomputable def uAtF (d p ℓ : γ) : certLang.Formula γ := instF₃ Language.pcpUSym d p ℓ
+private noncomputable def uAtF (d p ℓ : γ) : certLang.Formula γ := instF₃ Language.pcpUSym d p ℓ
 
 /-- The bottom word of `d` carries the letter `ℓ` at the position `p`. -/
-noncomputable def vAtF (d p ℓ : γ) : certLang.Formula γ := instF₃ Language.pcpVSym d p ℓ
+private noncomputable def vAtF (d p ℓ : γ) : certLang.Formula γ := instF₃ Language.pcpVSym d p ℓ
 
 /-! ### Guarded quantifiers
 
@@ -411,133 +413,134 @@ theorem realize_allNewF (φ : certLang.Formula (γ ⊕ Unit)) (v : γ → A ⊕ 
 /-! ### Well-formedness of the instance -/
 
 /-- The order of the positions is reflexive. -/
-noncomputable def ordReflS : certLang.Sentence := allOldF (ordF vr0 vr0)
+private noncomputable def ordReflS : certLang.Sentence := allOldF (ordF vr0 vr0)
 
 /-- The order of the positions is transitive. -/
-noncomputable def ordTransS : certLang.Sentence :=
+private noncomputable def ordTransS : certLang.Sentence :=
   allOldF (allOldF (allOldF (ordF vr2 vr1 ⟹ ordF vr1 vr0 ⟹ ordF vr2 vr0)))
 
 /-- The order of the positions is antisymmetric. -/
-noncomputable def ordAntisymmS : certLang.Sentence :=
+private noncomputable def ordAntisymmS : certLang.Sentence :=
   allOldF (allOldF (ordF vr1 vr0 ⟹ ordF vr0 vr1 ⟹ eqF vr1 vr0))
 
 /-- The order of the positions is total. -/
-noncomputable def ordTotalS : certLang.Sentence :=
+private noncomputable def ordTotalS : certLang.Sentence :=
   allOldF (allOldF (ordF vr1 vr0 ⊔ ordF vr0 vr1))
 
 /-- A top word carries at most one letter at each position. -/
-noncomputable def uFunS : certLang.Sentence :=
+private noncomputable def uFunS : certLang.Sentence :=
   allOldF (allOldF (allOldF (allOldF (uAtF vr3 vr2 vr1 ⟹ uAtF vr3 vr2 vr0 ⟹ eqF vr1 vr0))))
 
 /-- A bottom word carries at most one letter at each position. -/
-noncomputable def vFunS : certLang.Sentence :=
+private noncomputable def vFunS : certLang.Sentence :=
   allOldF (allOldF (allOldF (allOldF (vAtF vr3 vr2 vr1 ⟹ vAtF vr3 vr2 vr0 ⟹ eqF vr1 vr0))))
 
 /-- **The instance is a well-formed Post system**: the six conditions of
 `DescriptiveComplexity.Pcp.IsWF`, conjoined. -/
-noncomputable def wfS : certLang.Sentence :=
+private noncomputable def wfS : certLang.Sentence :=
   ordReflS ⊓ (ordTransS ⊓ (ordAntisymmS ⊓ (ordTotalS ⊓ (uFunS ⊓ vFunS))))
 
 /-! ### The shapes that repeat -/
 
 /-- The position `x` strictly precedes the position `y`. -/
-noncomputable def ordLtF (x y : γ) : certLang.Formula γ := fo%[x, y] ordF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
+private noncomputable def ordLtF
+    (x y : γ) : certLang.Formula γ := fo%[x, y] ordF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
 
 /-- The slot `s` strictly precedes the slot `t`. -/
-noncomputable def sltF (s t : γ) : certLang.Formula γ := fo%[s, t] sleF⟨s, t⟩ ∧ ¬ eqF⟨s, t⟩
+private noncomputable def sltF (s t : γ) : certLang.Formula γ := fo%[s, t] sleF⟨s, t⟩ ∧ ¬ eqF⟨s, t⟩
 
 /-- The position `p` carries a letter of the top word of `d`. -/
-noncomputable def usedUF (d p : γ) : certLang.Formula γ :=
+private noncomputable def usedUF (d p : γ) : certLang.Formula γ :=
   exOldF (uAtF (up d) (up p) vr0)
 
 /-- The position `p` carries a letter of the bottom word of `d`. -/
-noncomputable def usedVF (d p : γ) : certLang.Formula γ :=
+private noncomputable def usedVF (d p : γ) : certLang.Formula γ :=
   exOldF (vAtF (up d) (up p) vr0)
 
 /-- `(s, p)` is an index of the top parse. -/
-noncomputable def topIxF (s p : γ) : certLang.Formula γ :=
+private noncomputable def topIxF (s p : γ) : certLang.Formula γ :=
   exOldF (dmF (up s) vr0 ⊓ usedUF vr0 (up p))
 
 /-- `(s, p)` is an index of the bottom parse. -/
-noncomputable def botIxF (s p : γ) : certLang.Formula γ :=
+private noncomputable def botIxF (s p : γ) : certLang.Formula γ :=
   exOldF (dmF (up s) vr0 ⊓ usedVF vr0 (up p))
 
 /-- `(s, p)` precedes `(t, q)` in the lexicographic order of a parse. -/
-noncomputable def lexLtF (s p t q : γ) : certLang.Formula γ :=
+private noncomputable def lexLtF (s p t q : γ) : certLang.Formula γ :=
   fo%[s, p, t, q] sltF⟨s, t⟩ ∨ (eqF⟨s, t⟩ ∧ ordLtF⟨p, q⟩)
 
 /-! ### The conditions on the certificate -/
 
 /-- The order of the slots is reflexive. -/
-noncomputable def sleReflS : certLang.Sentence := allNewF (sleF vr0 vr0)
+private noncomputable def sleReflS : certLang.Sentence := allNewF (sleF vr0 vr0)
 
 /-- The order of the slots is transitive. -/
-noncomputable def sleTransS : certLang.Sentence :=
+private noncomputable def sleTransS : certLang.Sentence :=
   allNewF (allNewF (allNewF (sleF vr2 vr1 ⟹ sleF vr1 vr0 ⟹ sleF vr2 vr0)))
 
 /-- The order of the slots is antisymmetric. -/
-noncomputable def sleAntisymmS : certLang.Sentence :=
+private noncomputable def sleAntisymmS : certLang.Sentence :=
   allNewF (allNewF (sleF vr1 vr0 ⟹ sleF vr0 vr1 ⟹ eqF vr1 vr0))
 
 /-- The order of the slots is total. -/
-noncomputable def sleTotalS : certLang.Sentence :=
+private noncomputable def sleTotalS : certLang.Sentence :=
   allNewF (allNewF (sleF vr1 vr0 ⊔ sleF vr0 vr1))
 
 /-- The slots are linearly ordered. -/
-noncomputable def sleLinS : certLang.Sentence :=
+private noncomputable def sleLinS : certLang.Sentence :=
   sleReflS ⊓ (sleTransS ⊓ (sleAntisymmS ⊓ sleTotalS))
 
 /-- There is at least one slot. -/
-noncomputable def slotExS : certLang.Sentence := exNewF (sleF vr0 vr0)
+private noncomputable def slotExS : certLang.Sentence := exNewF (sleF vr0 vr0)
 
 /-- Every slot carries a domino. -/
-noncomputable def dmTotS : certLang.Sentence := allNewF (exOldF (dmF vr1 vr0))
+private noncomputable def dmTotS : certLang.Sentence := allNewF (exOldF (dmF vr1 vr0))
 
 /-- A slot carries only one domino. -/
-noncomputable def dmFunS : certLang.Sentence :=
+private noncomputable def dmFunS : certLang.Sentence :=
   allNewF (allOldF (allOldF (dmF vr2 vr1 ⟹ dmF vr2 vr0 ⟹ eqF vr1 vr0)))
 
 /-- What a slot carries is a domino of the instance. -/
-noncomputable def dmDomS : certLang.Sentence :=
+private noncomputable def dmDomS : certLang.Sentence :=
   allNewF (allOldF (dmF vr1 vr0 ⟹ domF vr0))
 
 /-- The matching relates an index of the top parse to one of the bottom
 parse. -/
-noncomputable def mtIxS : certLang.Sentence :=
+private noncomputable def mtIxS : certLang.Sentence :=
   allNewF (allOldF (allNewF (allOldF (mtF vr3 vr2 vr1 vr0 ⟹
     topIxF vr3 vr2 ⊓ botIxF vr1 vr0))))
 
 /-- Every index of the top parse is matched. -/
-noncomputable def mtLeftS : certLang.Sentence :=
+private noncomputable def mtLeftS : certLang.Sentence :=
   allNewF (allOldF (topIxF vr1 vr0 ⟹ exNewF (exOldF (mtF vr3 vr2 vr1 vr0))))
 
 /-- Every index of the bottom parse is matched. -/
-noncomputable def mtRightS : certLang.Sentence :=
+private noncomputable def mtRightS : certLang.Sentence :=
   allNewF (allOldF (botIxF vr1 vr0 ⟹ exNewF (exOldF (mtF vr1 vr0 vr3 vr2))))
 
 /-- The matching reflects the lexicographic order of the two parses. Eight
 guarded quantifiers, alternating slot and position: the two matched pairs on
 the top side and the two on the bottom side. -/
-noncomputable def mtMonoS : certLang.Sentence :=
+private noncomputable def mtMonoS : certLang.Sentence :=
   allNewF (allOldF (allNewF (allOldF (allNewF (allOldF (allNewF (allOldF (
     mtF vr7 vr6 vr5 vr4 ⟹ mtF vr3 vr2 vr1 vr0 ⟹
       (lexLtF vr7 vr6 vr3 vr2 ⇔ lexLtF vr5 vr4 vr1 vr0)))))))))
 
 /-- Matched indices carry the same letter. -/
-noncomputable def mtLabS : certLang.Sentence :=
+private noncomputable def mtLabS : certLang.Sentence :=
   allNewF (allOldF (allNewF (allOldF (allOldF (allOldF (allOldF (
     mtF vr6 vr5 vr4 vr3 ⟹ dmF vr6 vr2 ⟹ dmF vr4 vr1 ⟹
       (uAtF vr2 vr5 vr0 ⇔ vAtF vr1 vr3 vr0))))))))
 
 /-- **The assignment is a certificate**: the ten conditions of
 `DescriptiveComplexity.Pcp.CertOK` beyond well-formedness, conjoined. -/
-noncomputable def certS : certLang.Sentence :=
+private noncomputable def certS : certLang.Sentence :=
   sleLinS ⊓ (slotExS ⊓ (dmTotS ⊓ (dmFunS ⊓ (dmDomS ⊓ (mtIxS ⊓
     (mtLeftS ⊓ (mtRightS ⊓ (mtMonoS ⊓ mtLabS))))))))
 
 /-- **The kernel**: the instance is a well-formed Post system, and the invented
 slots carry a match of it. -/
-noncomputable def kernelS : certLang.Sentence := wfS ⊓ certS
+private noncomputable def kernelS : certLang.Sentence := wfS ⊓ certS
 
 /-! ### What the kernel says -/
 
@@ -644,7 +647,7 @@ private theorem realize_mtLabS :
 
 end CertRealize
 
-theorem realize_kernelS :
+private theorem realize_kernelS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) kernelS ↔ CertOK (certOf ρ) := by
   simp only [kernelS, certS, realize_inf_sentence, realize_wfS, realize_sleLinS, realize_slotExS,
     realize_dmTotS, realize_dmFunS, realize_dmDomS, realize_mtIxS, realize_mtLeftS,

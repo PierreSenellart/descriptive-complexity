@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.CircuitNumber.Defs
 public import DescriptiveComplexity.Problems.HornSat.Hardness
 import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.ClauseDischarge
+import all DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Problems.HornSat.Hardness
 
 /-!
 # The circuit of a system of rules
@@ -134,7 +137,7 @@ variable {prog : HornProgram (L.sum Language.order) B k} {c : ℕ} {bit : Fin c 
 
 omit [LinearOrder A] in
 /-- A formula present under a condition. -/
-theorem realize_ite_bot {L' : Language.{0, 0}} [L'.Structure A] {α : Type} (p : Prop)
+private theorem realize_ite_bot {L' : Language.{0, 0}} [L'.Structure A] {α : Type} (p : Prop)
     [Decidable p] (φ : L'.Formula α) (v : α → A) :
     (if p then φ else ⊥).Realize v ↔ p ∧ φ.Realize v := by
   split_ifs with h
@@ -142,7 +145,7 @@ theorem realize_ite_bot {L' : Language.{0, 0}} [L'.Structure A] {α : Type} (p :
   · exact iff_of_false id fun h' => h h'.1
 
 /-- The constants `1` are the ends of the conjunction chains. -/
-theorem isTrue_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
+private theorem isTrue_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
     (w : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) circIsTrue ![(stepTag c j, w)] ↔
       (j : ℕ) = (clauseAt prog c).body.length := by
@@ -150,12 +153,12 @@ theorem isTrue_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.lengt
   rw [FOInterpretation.relMap_map]
   exact (realize_ite_bot _ _ _).trans (and_iff_left (Formula.realize_top.mpr trivial))
 
-theorem not_isTrue_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem not_isTrue_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circIsTrue ![(atomTag i, w)] :=
   fun h => h.elim
 
 /-- The conjunction gates are the links of the conjunction chains. -/
-theorem isAnd_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
+private theorem isAnd_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
     (w : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) circIsAnd ![(stepTag c j, w)] ↔
       (j : ℕ) < (clauseAt prog c).body.length := by
@@ -163,37 +166,37 @@ theorem isAnd_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length
   rw [FOInterpretation.relMap_map]
   exact (realize_ite_bot _ _ _).trans (and_iff_left (Formula.realize_top.mpr trivial))
 
-theorem not_isAnd_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem not_isAnd_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circIsAnd ![(atomTag i, w)] :=
   fun h => h.elim
 
 /-- The disjunction gates are the atoms. -/
-theorem isOr_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem isOr_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) circIsOr ![(atomTag i, w)] := by
   change RelMap (M := (drawInterp prog bit).Map A) ncIsOr ![(atomTag i, w)]
   rw [FOInterpretation.relMap_map]
   exact Formula.realize_top.mpr trivial
 
-theorem not_isOr_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
+private theorem not_isOr_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
     (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circIsOr ![(stepTag c j, w)] :=
   fun h => h.elim
 
 /-- **The circuit is monotone**: it has no negation gate. -/
-theorem not_isNot (p : (drawInterp prog bit).Map A) :
+private theorem not_isNot (p : (drawInterp prog bit).Map A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circIsNot ![p] :=
   fun h => h.elim
 
 open Classical in
 /-- The outputs are the canonically padded atoms of the relation variables
 `bit τ`. -/
-theorem out_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem out_atom (i : B.ι) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) ncOut ![(atomTag i, w)] ↔
       (∃ τ, bit τ = i) ∧ Canon (B.arity i) w := by
   rw [FOInterpretation.relMap_map]
   exact (realize_ite_bot _ _ _).trans (and_congr Iff.rfl realize_canonF)
 
-theorem not_out_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
+private theorem not_out_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
     (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) ncOut ![(stepTag c j, w)] :=
   fun h => h.elim
@@ -201,7 +204,7 @@ theorem not_out_step (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.leng
 /-- **The inputs of an atom**: the conjunction chains, read at their start, of
 the rules whose head is that atom, at the valuations satisfying their
 guard. -/
-theorem left_atom_step (i : B.ι) (w : Fin (clauseDim B k) → A) (c : Fin prog.length)
+private theorem left_atom_step (i : B.ι) (w : Fin (clauseDim B k) → A) (c : Fin prog.length)
     (j : Fin ((clauseAt prog c).body.length + 1)) (u : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) circLeft ![(atomTag i, w), (stepTag c j, u)] ↔
       (j : ℕ) = 0 ∧ (clauseAt prog c).guard.Realize (pref le_clauseDim u) ∧
@@ -211,13 +214,13 @@ theorem left_atom_step (i : B.ι) (w : Fin (clauseDim B k) → A) (c : Fin prog.
   exact (realize_ite_bot _ _ _).trans (and_congr Iff.rfl
     (Formula.realize_inf.trans (and_congr realize_guardF realize_headOccF)))
 
-theorem not_left_atom_atom (i i' : B.ι) (w w' : Fin (clauseDim B k) → A) :
+private theorem not_left_atom_atom (i i' : B.ι) (w w' : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circLeft ![(atomTag i, w), (atomTag i', w')] :=
   fun h => h.elim
 
 open Classical in
 /-- **The left input of a link** of a conjunction chain: its body atom. -/
-theorem left_step_atom (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
+private theorem left_step_atom (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.length + 1))
     (u : Fin (clauseDim B k) → A) (i : B.ι) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) circLeft ![(stepTag c j, u), (atomTag i, w)] ↔
       ∃ a, (clauseAt prog c).body[(j : ℕ)]? = some a ∧ a.idx = i ∧
@@ -237,7 +240,7 @@ theorem left_step_atom (c : Fin prog.length) (j : Fin ((clauseAt prog c).body.le
     obtain rfl : a = a' := Option.some.inj ha'
     exact ⟨hi, realize_atomOccF.mpr hp⟩
 
-theorem not_left_step_step (c c' : Fin prog.length)
+private theorem not_left_step_step (c c' : Fin prog.length)
     (j : Fin ((clauseAt prog c).body.length + 1))
     (j' : Fin ((clauseAt prog c').body.length + 1)) (u u' : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circLeft ![(stepTag c j, u), (stepTag c' j', u')] :=
@@ -245,7 +248,7 @@ theorem not_left_step_step (c c' : Fin prog.length)
 
 /-- **The right input of a link** of a conjunction chain: the next link, at
 the same valuation. -/
-theorem right_step_step (c c' : Fin prog.length)
+private theorem right_step_step (c c' : Fin prog.length)
     (j : Fin ((clauseAt prog c).body.length + 1))
     (j' : Fin ((clauseAt prog c').body.length + 1)) (u u' : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) circRight
@@ -256,13 +259,13 @@ theorem right_step_step (c c' : Fin prog.length)
   rw [FOInterpretation.relMap_map]
   exact (realize_ite_bot _ _ _).trans (and_congr Iff.rfl realize_eqTupF)
 
-theorem not_right_atom (i : B.ι) (w : Fin (clauseDim B k) → A)
+private theorem not_right_atom (i : B.ι) (w : Fin (clauseDim B k) → A)
     (q : (drawInterp prog bit).Map A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circRight ![(atomTag i, w), q] := by
   obtain ⟨t, u⟩ := q
   rcases t with i' | ⟨c, j⟩ <;> exact fun h => h.elim
 
-theorem not_right_step_atom (c : Fin prog.length)
+private theorem not_right_step_atom (c : Fin prog.length)
     (j : Fin ((clauseAt prog c).body.length + 1)) (u : Fin (clauseDim B k) → A) (i : B.ι)
     (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (drawInterp prog bit).Map A) circRight ![(stepTag c j, u), (atomTag i, w)] :=
@@ -271,7 +274,7 @@ theorem not_right_step_atom (c : Fin prog.length)
 open Classical in
 /-- The output atoms are compared by their relation variable, then
 lexicographically. -/
-theorem below_bit_bit (hinj : Function.Injective bit) (τ τ' : Fin c)
+private theorem below_bit_bit (hinj : Function.Injective bit) (τ τ' : Fin c)
     (w w' : Fin (clauseDim B k) → A) :
     RelMap (M := (drawInterp prog bit).Map A) ncBelow
         ![(atomTag (bit τ), w), (atomTag (bit τ'), w')] ↔

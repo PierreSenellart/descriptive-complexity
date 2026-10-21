@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.TransitiveClosureDecideFormula
 public import DescriptiveComplexity.TransitiveClosureCompl
+import all DescriptiveComplexity.TransitiveClosureCompl
+import all DescriptiveComplexity.TransitiveClosureDecide
 
 /-!
 # Deciding reachability in a walk: Immerman–Szelepcsényi with parameters
@@ -82,7 +84,7 @@ noncomputable def constStructure (c : γ → A) : (withPar (L₀.sum Language.or
   letI := constantsOn.structure c
   inferInstance
 
-theorem realize_toConst {β : Type} (c : γ → A) (φ : (L₀.sum Language.order).Formula (γ ⊕ β))
+private theorem realize_toConst {β : Type} (c : γ → A) (φ : (L₀.sum Language.order).Formula (γ ⊕ β))
     (u : β → A) :
     (@Formula.Realize _ A (letI := constStructure (L₀ := L₀) c; inferInstance) _ (toConst φ) u) ↔
       φ.Realize (Sum.elim c u) := by
@@ -95,7 +97,7 @@ theorem realize_toConst {β : Type} (c : γ → A) (φ : (L₀.sum Language.orde
   rw [Equiv.apply_symm_apply, hcon] at this
   exact this.symm
 
-theorem realize_fromConst {β : Type} (c : γ → A)
+private theorem realize_fromConst {β : Type} (c : γ → A)
     (φ : ((withPar (L₀.sum Language.order) γ).sum Language.order).Formula β) (u : β → A) :
     (fromConst φ).Realize (Sum.elim c u) ↔
       (@Formula.Realize _ A (letI := constStructure (L₀ := L₀) c; inferInstance) _ φ u) := by
@@ -159,7 +161,7 @@ noncomputable def constSpec (ma mb : W.Mode) :
 
 variable {A : Type} [L.Structure A] [LinearOrder A] (ma mb : W.Mode) (w : W.AtomPar → A)
 
-theorem constSpec_step (a b : W.Node A) :
+private theorem constSpec_step (a b : W.Node A) :
     (letI := constStructure (L₀ := L) w; (W.constSpec ma mb).Step a b) ↔
       W.StepAt (w ∘ W.parIx) a b := by
   change (@Formula.Realize _ A (letI := constStructure (L₀ := L) w; inferInstance) _
@@ -168,7 +170,7 @@ theorem constSpec_step (a b : W.Node A) :
   refine iff_of_eq (congrArg (Formula.Realize (M := A) (W.step a.1 b.1)) (funext fun i => ?_))
   rcases i with (i | i) | i <;> rfl
 
-theorem constSpec_isSrc (a : W.Node A) :
+private theorem constSpec_isSrc (a : W.Node A) :
     (letI := constStructure (L₀ := L) w; (W.constSpec ma mb).IsSrc a) ↔
       a.1 = ma ∧ a.2 = w ∘ W.leftIx := by
   classical
@@ -181,7 +183,7 @@ theorem constSpec_isSrc (a : W.Node A) :
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem constSpec_isTgt (a : W.Node A) :
+private theorem constSpec_isTgt (a : W.Node A) :
     (letI := constStructure (L₀ := L) w; (W.constSpec ma mb).IsTgt a) ↔
       a.1 = mb ∧ a.2 = w ∘ W.rightIx := by
   classical
@@ -194,7 +196,7 @@ theorem constSpec_isTgt (a : W.Node A) :
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem constSpec_reach (a b : W.Node A) :
+private theorem constSpec_reach (a b : W.Node A) :
     (letI := constStructure (L₀ := L) w; (W.constSpec ma mb).Reach a b) ↔
       W.ReachAt (w ∘ W.parIx) a b := by
   let := constStructure (L₀ := L) w
@@ -209,7 +211,7 @@ theorem constSpec_reach (a b : W.Node A) :
     | @tail c d _ hcd ih => exact ih.tail ((W.constSpec_step ma mb w c d).mpr hcd)
 
 /-- **The sentence says reachability** between the two endpoints. -/
-theorem constSpec_accepts :
+private theorem constSpec_accepts :
     (letI := constStructure (L₀ := L) w; (W.constSpec ma mb).Accepts A) ↔
       W.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx) := by
   let := constStructure (L₀ := L) w
@@ -234,7 +236,7 @@ noncomputable def coSpec (ma mb : W.Mode) : TCSpec (withPar (L.sum Language.orde
 
 /-- **The complement accepts exactly when the second endpoint is not
 reached.** -/
-theorem coSpec_accepts [Finite A] [Nonempty A] :
+private theorem coSpec_accepts [Finite A] [Nonempty A] :
     (letI := constStructure (L₀ := L) w; (W.coSpec ma mb).Accepts A) ↔
       ¬W.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx) := by
   let := constStructure (L₀ := L) w
@@ -321,7 +323,7 @@ section Semantics
 
 variable {ma mb}
 
-theorem reachDecider_stepAt_none_inl (m : W.Mode)
+private theorem reachDecider_stepAt_none_inl (m : W.Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).StepAt w (none, t) (some (Sum.inl m), t') ↔
       m = ma ∧ t' ∘ Sum.inl = w ∘ W.leftIx ∧ t' ∘ Sum.inr = t ∘ Sum.inr := by
@@ -341,7 +343,7 @@ theorem reachDecider_stepAt_none_inl (m : W.Mode)
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem reachDecider_stepAt_none_inr (c : (W.coSpec ma mb).Mode)
+private theorem reachDecider_stepAt_none_inr (c : (W.coSpec ma mb).Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).StepAt w (none, t) (some (Sum.inr c), t') ↔
       (letI := constStructure (L₀ := L) w; (W.coSpec ma mb).IsSrc (c, t' ∘ Sum.inr)) ∧
@@ -357,7 +359,7 @@ theorem reachDecider_stepAt_none_inr (c : (W.coSpec ma mb).Mode)
   refine Iff.trans (iff_of_eq (congrArg (Formula.Realize (M := A) _) (funext fun i => ?_))) this
   rcases i with i | i <;> rfl
 
-theorem reachDecider_stepAt_inl_inl (m n : W.Mode)
+private theorem reachDecider_stepAt_inl_inl (m n : W.Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).StepAt w (some (Sum.inl m), t) (some (Sum.inl n), t') ↔
       W.StepAt (w ∘ W.parIx) (m, t ∘ Sum.inl) (n, t' ∘ Sum.inl) ∧ t' ∘ Sum.inr = t ∘ Sum.inr := by
@@ -371,7 +373,7 @@ theorem reachDecider_stepAt_inl_inl (m n : W.Mode)
     (funext fun i => ?_))) Iff.rfl
   rcases i with (i | i) | i <;> rfl
 
-theorem reachDecider_stepAt_inr_inr (c c' : (W.coSpec ma mb).Mode)
+private theorem reachDecider_stepAt_inr_inr (c c' : (W.coSpec ma mb).Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).StepAt w (some (Sum.inr c), t) (some (Sum.inr c'), t') ↔
       (letI := constStructure (L₀ := L) w;
@@ -389,26 +391,27 @@ theorem reachDecider_stepAt_inr_inr (c c' : (W.coSpec ma mb).Mode)
   refine Iff.trans (iff_of_eq (congrArg (Formula.Realize (M := A) _) (funext fun i => ?_))) this
   rcases i with i | (i | i) <;> rfl
 
-theorem reachDecider_not_stepAt_none_none (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
+private theorem reachDecider_not_stepAt_none_none (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     ¬(W.reachDecider ma mb).StepAt w (none, t) (none, t') :=
   fun h => h
 
-theorem reachDecider_not_stepAt_some_none (m : W.Mode ⊕ (W.coSpec ma mb).Mode)
+private theorem reachDecider_not_stepAt_some_none (m : W.Mode ⊕ (W.coSpec ma mb).Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     ¬(W.reachDecider ma mb).StepAt w (some m, t) (none, t') := by
   rcases m with m | m <;> exact fun h => h
 
-theorem reachDecider_not_stepAt_inl_inr (m : W.Mode) (c : (W.coSpec ma mb).Mode)
+private theorem reachDecider_not_stepAt_inl_inr (m : W.Mode) (c : (W.coSpec ma mb).Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     ¬(W.reachDecider ma mb).StepAt w (some (Sum.inl m), t) (some (Sum.inr c), t') :=
   fun h => h
 
-theorem reachDecider_not_stepAt_inr_inl (c : (W.coSpec ma mb).Mode) (m : W.Mode)
+private theorem reachDecider_not_stepAt_inr_inl (c : (W.coSpec ma mb).Mode) (m : W.Mode)
     (t t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     ¬(W.reachDecider ma mb).StepAt w (some (Sum.inr c), t) (some (Sum.inl m), t') :=
   fun h => h
 
-theorem reachDecider_exitAt_inl_true (m : W.Mode) (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
+private theorem reachDecider_exitAt_inl_true
+    (m : W.Mode) (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).ExitAt w (some (Sum.inl m), t) true ↔
       m = mb ∧ t ∘ Sum.inl = w ∘ W.rightIx := by
   classical
@@ -425,12 +428,12 @@ theorem reachDecider_exitAt_inl_true (m : W.Mode) (t : Fin W.k ⊕ Fin (W.coSpec
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem reachDecider_not_exitAt_inl_false (m : W.Mode)
+private theorem reachDecider_not_exitAt_inl_false (m : W.Mode)
     (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     ¬(W.reachDecider ma mb).ExitAt w (some (Sum.inl m), t) false :=
   fun h => h
 
-theorem reachDecider_exitAt_inr_false (c : (W.coSpec ma mb).Mode)
+private theorem reachDecider_exitAt_inr_false (c : (W.coSpec ma mb).Mode)
     (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).ExitAt w (some (Sum.inr c), t) false ↔
       (letI := constStructure (L₀ := L) w; (W.coSpec ma mb).IsTgt (c, t ∘ Sum.inr)) := by
@@ -442,19 +445,19 @@ theorem reachDecider_exitAt_inr_false (c : (W.coSpec ma mb).Mode)
   refine Iff.trans (iff_of_eq (congrArg (Formula.Realize (M := A) _) (funext fun i => ?_))) this
   rcases i with i | i <;> rfl
 
-theorem reachDecider_not_exitAt_inr_true (c : (W.coSpec ma mb).Mode)
+private theorem reachDecider_not_exitAt_inr_true (c : (W.coSpec ma mb).Mode)
     (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) :
     ¬(W.reachDecider ma mb).ExitAt w (some (Sum.inr c), t) true :=
   fun h => h
 
-theorem reachDecider_not_exitAt_none (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) (o : Bool) :
+private theorem reachDecider_not_exitAt_none (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) (o : Bool) :
     ¬(W.reachDecider ma mb).ExitAt w (none, t) o := by
   cases o <;> exact fun h => h
 
 /-! #### Lifting the two walks -/
 
 /-- A path of the walk lifts to the `yes` branch. -/
-theorem reachDecider_reachAt_of_reachAt {a b : W.Node A} (h : W.ReachAt (w ∘ W.parIx) a b)
+private theorem reachDecider_reachAt_of_reachAt {a b : W.Node A} (h : W.ReachAt (w ∘ W.parIx) a b)
     (r : Fin (W.coSpec ma mb).k → A) :
     (W.reachDecider ma mb).ReachAt w (some (Sum.inl a.1), Sum.elim a.2 r)
       (some (Sum.inl b.1), Sum.elim b.2 r) := by
@@ -463,7 +466,7 @@ theorem reachDecider_reachAt_of_reachAt {a b : W.Node A} (h : W.ReachAt (w ∘ W
   exact (W.reachDecider_stepAt_inl_inl w c.1 d.1 _ _).mpr ⟨by simpa using hcd, rfl⟩
 
 /-- A path of the complement lifts to the `no` branch. -/
-theorem reachDecider_reachAt_of_coReach {a b : (W.coSpec ma mb).Node A}
+private theorem reachDecider_reachAt_of_coReach {a b : (W.coSpec ma mb).Node A}
     (h : letI := constStructure (L₀ := L) w; (W.coSpec ma mb).Reach a b) (l : Fin W.k → A) :
     (W.reachDecider ma mb).ReachAt w (some (Sum.inr a.1), Sum.elim l a.2)
       (some (Sum.inr b.1), Sum.elim l b.2) := by
@@ -476,7 +479,8 @@ theorem reachDecider_reachAt_of_coReach {a b : (W.coSpec ma mb).Node A}
 /-- What the decider may have reached: its start, a node of the walk reached
 from the first endpoint, or a node of the complement reached from one of its
 sources. -/
-def ReachInv (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) (c : (W.reachDecider ma mb).Node A) :
+private def ReachInv
+    (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) (c : (W.reachDecider ma mb).Node A) :
     Prop :=
   c = (none, t) ∨
     (∃ (m : W.Mode) (t' : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A), c = (some (Sum.inl m), t') ∧
@@ -487,7 +491,7 @@ def ReachInv (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A) (c : (W.reachDecider
         ∃ s : (W.coSpec ma mb).Node A, (W.coSpec ma mb).IsSrc s ∧
           (W.coSpec ma mb).Reach s (d, t' ∘ Sum.inr)))
 
-theorem reachInv_of_reachAt (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A)
+private theorem reachInv_of_reachAt (t : Fin W.k ⊕ Fin (W.coSpec ma mb).k → A)
     {c : (W.reachDecider ma mb).Node A} (h : (W.reachDecider ma mb).ReachAt w (none, t) c) :
     W.ReachInv w t c := by
   let := constStructure (L₀ := L) w
@@ -516,7 +520,7 @@ variable [Finite A] [Nonempty A]
 
 /-- **The decider decides reachability** between its two modes, at the two
 endpoints and the parameters. -/
-theorem decides_reachDecider :
+private theorem decides_reachDecider :
     (W.reachDecider ma mb).Decides w
       (W.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx)) := by
   let := constStructure (L₀ := L) w

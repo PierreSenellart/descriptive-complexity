@@ -9,6 +9,11 @@ public import DescriptiveComplexity.Problems.Wide.NexSpec
 public import DescriptiveComplexity.Problems.Wide.DrawProg
 import DescriptiveComplexity.Problems.Wide.NexOuter
 import DescriptiveComplexity.Problems.Wide.DrawRunEval
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawProg
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The clocked evaluation's spine
@@ -114,7 +119,7 @@ variable {exitPh : NexPh B (EvalPh nv PM)}
 
 /-- **Every clocked spine rule fires from a phase its site owns**; the
 sub-machineries' obligation is the parameter. -/
-theorem nexEvalHosrc
+private theorem nexEvalHosrc
     (hosrcM : ∀ (s : SM) (ρ : ShM s),
       ∃ p : PM, (ruleM s ρ).srcPh = .evalP (.sub p) ∧ ownM p = s) :
     ∀ (e : EvalSite nv SM) (ρ : NexEvalSh nv SM ShM e),
@@ -134,7 +139,7 @@ theorem nexEvalHosrc
 
 /-- **The clocked spine separates in-shape**: per checkpoint, the walk's guard
 is disjoint from the dispatch's, and there is no third rule to tell apart. -/
-theorem nexEvalSep
+private theorem nexEvalSep
     (hsepM : ∀ (s : SM) (ρ ρ' : ShM s) (f : Q → A) (g : dt.SlotIx → A),
       (ruleM s ρ).guard f g → (ruleM s ρ').guard f g →
       (ruleM s ρ).srcPh = (ruleM s ρ').srcPh → ρ = ρ') :
@@ -169,7 +174,7 @@ theorem nexEvalSep
 
 /-- **A property of the spine's phases and its exit holds of every phase it can
 move to**, given it holds of every phase a machinery can move to. -/
-theorem nexEvalRule_dstIn {S : NexPh B (EvalPh nv PM) → Prop}
+private theorem nexEvalRule_dstIn {S : NexPh B (EvalPh nv PM) → Prop}
     (hemb : ∀ p : EvalPh nv PM, S (NexPh.evalP p)) (hexit : S exitPh)
     (hM : ∀ (s : SM) (ρ : ShM s), S (ruleM s ρ).dstPh)
     (e : EvalSite nv SM) (ρ : NexEvalSh nv SM ShM e) :
@@ -230,7 +235,7 @@ variable {dt zero one}
 omit [Fintype Q] [Fintype dt.SlotIx] in
 /-- **Every rule of the clocked evaluation's machineries fires from a phase its
 site owns.** -/
-theorem nexSmHosrc (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
+private theorem nexSmHosrc (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     ∀ (s : dt.SMF) (ρ : dt.SMSh s),
       ∃ p : dt.PMF,
         (dt.nexSmRule (B := B) zero one args s ρ).srcPh =
@@ -254,7 +259,7 @@ theorem nexSmHosrc (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
 
 omit [Fintype Q] [Fintype dt.SlotIx] in
 /-- **The clocked evaluation's machineries separate in-shape.** -/
-theorem nexSmSep (hzo : zero ≠ one)
+private theorem nexSmSep (hzo : zero ≠ one)
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     ∀ (s : dt.SMF) (ρ ρ' : dt.SMSh s) (f : Q → A) (g : dt.SlotIx → A),
       (dt.nexSmRule (B := B) zero one args s ρ).guard f g →
@@ -290,7 +295,7 @@ theorem nexSmSep (hzo : zero ≠ one)
 omit [Fintype Q] [Fintype dt.SlotIx] in
 /-- **Every rule of the clocked evaluation fires from a phase its site
 owns.** -/
-theorem nexEvalHosrcF (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
+private theorem nexEvalHosrcF (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     ∀ (e : dt.SEF) (ρ : dt.NexSESh e),
       ∃ p : EvalPh dt.nv dt.PMF,
         (dt.nexEvalRuleF (B := B) zero one args e ρ).srcPh = .evalP p ∧
@@ -299,7 +304,7 @@ theorem nexEvalHosrcF (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) 
 
 omit [Fintype Q] [Fintype dt.SlotIx] in
 /-- **The clocked evaluation separates in-shape.** -/
-theorem nexEvalSepF (hzo : zero ≠ one)
+private theorem nexEvalSepF (hzo : zero ≠ one)
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := Q) v) :
     ∀ (e : dt.SEF) (ρ ρ' : dt.NexSESh e) (f : Q → A) (g : dt.SlotIx → A),
       (dt.nexEvalRuleF (B := B) zero one args e ρ).guard f g →
@@ -312,7 +317,7 @@ theorem nexEvalSepF (hzo : zero ≠ one)
 omit [Fintype dt.SlotIx] in
 /-- **A property of the evaluation's phases and its accepting phase holds of
 every phase a machinery can move to.** -/
-theorem nexSmRule_dstIn {S : NexPh B (EvalPh dt.nv dt.PMF) → Prop}
+private theorem nexSmRule_dstIn {S : NexPh B (EvalPh dt.nv dt.PMF) → Prop}
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v)
     (hemb : ∀ p : EvalPh dt.nv dt.PMF, S (NexPh.evalP p)) (hacc : S NexPh.acceptP)
     (s : dt.SMF) (ρ : dt.SMSh s) :
@@ -333,7 +338,7 @@ its rules can move to is the evaluation's own or the accepting one, and
 `NexPh.PostGuess` holds of both. This is the one fact
 `DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom` takes from the
 evaluation, and the tower discharges it layer by layer down to the trips. -/
-theorem nexEvalRuleF_postGuess
+private theorem nexEvalRuleF_postGuess
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v)
     (e : dt.SEF) (ρ : dt.NexSESh e) :
     NexPh.PostGuess ((dt.nexEvalRuleF (B := B) zero one args) e ρ).dstPh :=
@@ -404,7 +409,7 @@ omit [LinearOrder (dt.NexRIx (G := G))]
   [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))] in
 /-- **The clocked program's rules, at a rule name**: what every run lemma's
 rule hypothesis is discharged by. -/
-theorem nexProg_rules (hzo : zero ≠ one)
+private theorem nexProg_rules (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -628,7 +633,7 @@ include hrules in
 leaves the head one cell to the right of the marker, and a checkpoint's `stay`
 rule walks it back. This is the step between the opening and
 `DescriptiveComplexity.Draw.Data.nexEval_reachesIn`. -/
-theorem step_nexEvalBack (hR : PR.table.Reads)
+private theorem step_nexEvalBack (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd)))
     {v v' : Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v')
@@ -654,7 +659,7 @@ include hrules in
 /-- **The evaluation's exit**: at the last checkpoint the spine leaves into the
 phase the caller named, one cell to the right of the marker. This is the step
 between `nexEval_reachesIn` and the accepting phase. -/
-theorem step_nexEvalExit (hR : PR.table.Reads)
+private theorem step_nexEvalExit (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd)))
     {v v' : Univ A R (NexPh B (EvalPh nv PM)) dt.KIx dt.dd → Prop}
     (hvi : WMIncr WMLe v v')

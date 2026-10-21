@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawData
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The control's dictionary: which slot plays which role
@@ -97,12 +98,12 @@ dead once the verdict checkpoint has dispatched on it – nothing inside the
 VAL loop reads it again. -/
 noncomputable def allGateC : dt.CtlIx := .flag 0
 
-theorem scratchC_injective : Function.Injective dt.scratchC := by
+private theorem scratchC_injective : Function.Injective dt.scratchC := by
   intro k k' h
   have h' : k.addNat 2 = k'.addNat 2 := by injection h
   exact Fin.ext (by simpa using congrArg Fin.val h')
 
-theorem gateFlagC_ne_scratchC (k : Fin 6) : dt.gateFlagC ≠ dt.scratchC k := by
+private theorem gateFlagC_ne_scratchC (k : Fin 6) : dt.gateFlagC ≠ dt.scratchC k := by
   intro h
   have h' : (0 : Fin 8) = k.addNat 2 := by injection h
   exact absurd (congrArg Fin.val h') (by simp)
@@ -114,25 +115,25 @@ is a matter of constructors – except inside a family, where it is the index.
 These are the facts an update needs: writing one slot leaves the others
 alone. -/
 
-theorem lvC_injective : Function.Injective dt.lvC := by
+private theorem lvC_injective : Function.Injective dt.lvC := by
   intro j j' h
   have h' : Fin.castLE dt.dd0_le_eDim j = Fin.castLE dt.dd0_le_eDim j' := by
     injection h
   exact Fin.ext (by simpa using congrArg Fin.val h')
 
-theorem accC_injective : Function.Injective dt.accC := by
+private theorem accC_injective : Function.Injective dt.accC := by
   intro j j' h
   injection h
 
-theorem rdfC_injective : Function.Injective dt.rdfC := by
+private theorem rdfC_injective : Function.Injective dt.rdfC := by
   intro a a' h
   injection h
 
-theorem tgfC_injective : Function.Injective dt.tgfC := by
+private theorem tgfC_injective : Function.Injective dt.tgfC := by
   intro a a' h
   injection h
 
-theorem lvC_ne_bitFlagC (j : Fin dt.dd0) : dt.lvC j ≠ dt.bitFlagC :=
+private theorem lvC_ne_bitFlagC (j : Fin dt.dd0) : dt.lvC j ≠ dt.bitFlagC :=
   fun h => nomatch h
 
 /-! ### Reading and writing one slot -/
@@ -166,7 +167,7 @@ theorem ctlBit_setCtl_of_ne {q q' : dt.CtlIx} (hne : q' ≠ q) (b : Prop)
   rw [Function.update_of_ne hne]
 
 /-- A write leaves the other slots' *values* alone, not only their bits. -/
-theorem setCtl_of_ne {q q' : dt.CtlIx} (hne : q' ≠ q) (b : Prop)
+private theorem setCtl_of_ne {q q' : dt.CtlIx} (hne : q' ≠ q) (b : Prop)
     (f : dt.CtlIx → A) : dt.setCtl zero one q b f q' = f q' := by
   classical
   exact Function.update_of_ne hne _ _
@@ -191,7 +192,7 @@ lexicographic top. -/
 def IsMaxTup (t : Fin D → A) : Prop := ∀ (p : Fin D) (a : A), a ≤ t p
 
 /-- **A non-exhausted tuple has a successor.** -/
-theorem exists_tupSucc_of_not_isMaxTup {t : Fin D → A} (h : ¬IsMaxTup t) :
+private theorem exists_tupSucc_of_not_isMaxTup {t : Fin D → A} (h : ¬IsMaxTup t) :
     ∃ w : Fin D → A, TupSucc t w := by
   classical
   obtain ⟨w, hw, hnb⟩ :=
@@ -205,7 +206,7 @@ noncomputable def tupNext (t : Fin D → A) : Fin D → A :=
   if h : ∃ w : Fin D → A, TupSucc t w then h.choose else t
 
 /-- Below the top, the next tuple is a successor. -/
-theorem tupSucc_tupNext {t : Fin D → A} (h : ¬IsMaxTup t) :
+private theorem tupSucc_tupNext {t : Fin D → A} (h : ¬IsMaxTup t) :
     TupSucc t (tupNext t) := by
   classical
   have hex := exists_tupSucc_of_not_isMaxTup h
@@ -228,7 +229,7 @@ def TupSuccAt (p : Fin D) (t t' : Fin D → A) : Prop :=
 omit [Finite A] in
 /-- **The carried coordinate is unique**: above it every coordinate is
 already maximal, and it is not. -/
-theorem tupSuccAt_unique {p p' : Fin D} {t t' : Fin D → A}
+private theorem tupSuccAt_unique {p p' : Fin D} {t t' : Fin D → A}
     (h : TupSuccAt p t t') (h' : TupSuccAt p' t t') : p = p' := by
   rcases lt_trichotomy p p' with hlt | heq | hlt
   · exact absurd ((h.2.2 p' hlt).1 (t' p')) (not_le_of_gt h'.2.1.1)
@@ -245,7 +246,7 @@ noncomputable def tupCarry (t : Fin D → A) : ℕ :=
 omit [Finite A] in
 /-- **What the carried coordinate is**: the witness of the tuple's step,
 which is unique. -/
-theorem tupCarry_eq {t : Fin D → A} {p : Fin D}
+private theorem tupCarry_eq {t : Fin D → A} {p : Fin D}
     (hp : TupSuccAt p t (tupNext t)) : tupCarry t = (p : ℕ) := by
   classical
   have hex : ∃ p : Fin D, TupSuccAt p t (tupNext t) := ⟨p, hp⟩
@@ -254,7 +255,7 @@ theorem tupCarry_eq {t : Fin D → A} {p : Fin D}
 
 /-- **Below the top the carried coordinate is a level**, and the round steps
 there. -/
-theorem tupSuccAt_tupCarry [Nonempty A] {t : Fin D → A} (h : ¬IsMaxTup t) :
+private theorem tupSuccAt_tupCarry [Nonempty A] {t : Fin D → A} (h : ¬IsMaxTup t) :
     ∃ p : Fin D, (p : ℕ) = tupCarry t ∧ TupSuccAt p t (tupNext t) := by
   obtain ⟨p, hp⟩ : ∃ p : Fin D, TupSuccAt p t (tupNext t) := tupSucc_tupNext h
   exact ⟨p, (tupCarry_eq hp).symm, hp⟩
@@ -264,7 +265,7 @@ noncomputable def botTup [Nonempty A] : Fin D → A :=
   letI := Fintype.ofFinite A
   fun _ => Finset.univ.min' Finset.univ_nonempty
 
-theorem botTup_le [Nonempty A] (p : Fin D) (a : A) : (botTup : Fin D → A) p ≤ a :=
+private theorem botTup_le [Nonempty A] (p : Fin D) (a : A) : (botTup : Fin D → A) p ≤ a :=
   letI := Fintype.ofFinite A
   Finset.min'_le _ a (Finset.mem_univ a)
 
@@ -296,7 +297,7 @@ noncomputable def putLv (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) : dt.CtlIx �
 
 variable {dt}
 
-theorem putLv_of_not_lv {f : dt.CtlIx → A} {w : Fin dt.dd0 → A} {q : dt.CtlIx}
+private theorem putLv_of_not_lv {f : dt.CtlIx → A} {w : Fin dt.dd0 → A} {q : dt.CtlIx}
     (h : ∀ j : Fin dt.dd0, q ≠ dt.lvC j) : dt.putLv f w q = f q := by
   classical
   rw [putLv, dite_eq_right]
@@ -313,11 +314,11 @@ theorem readLv_putLv (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) :
   rw [dite_eq_left hex]
   exact congrArg w (dt.lvC_injective hex.choose_spec).symm
 
-theorem putLv_acc (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) (k : Fin dt.naDim) :
+private theorem putLv_acc (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) (k : Fin dt.naDim) :
     dt.putLv f w (dt.accC k) = f (dt.accC k) :=
   putLv_of_not_lv fun _ => fun h => nomatch h
 
-theorem putLv_av (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) (a : Fin dt.natMax) :
+private theorem putLv_av (f : dt.CtlIx → A) (w : Fin dt.dd0 → A) (a : Fin dt.natMax) :
     dt.putLv f w (dt.avC a) = f (dt.avC a) :=
   putLv_of_not_lv fun _ => fun h => nomatch h
 
@@ -326,11 +327,11 @@ variable (dt)
 /-- **A loop variable of an element loop**, at the full width. -/
 noncomputable def lvE (j : Fin dt.eDim) : dt.CtlIx := .lv j
 
-theorem lvE_injective : Function.Injective dt.lvE := by
+private theorem lvE_injective : Function.Injective dt.lvE := by
   intro j j' h
   injection h
 
-theorem lvC_eq_lvE (j : Fin dt.dd0) :
+private theorem lvC_eq_lvE (j : Fin dt.dd0) :
     dt.lvC j = dt.lvE (Fin.castLE dt.dd0_le_eDim j) := rfl
 
 /-- **The wide loop element**, read out of the control. -/
@@ -344,7 +345,7 @@ noncomputable def putLvE (f : dt.CtlIx → A) (w : Fin dt.eDim → A) : dt.CtlIx
 
 variable {dt}
 
-theorem putLvE_of_not_lv {f : dt.CtlIx → A} {w : Fin dt.eDim → A} {q : dt.CtlIx}
+private theorem putLvE_of_not_lv {f : dt.CtlIx → A} {w : Fin dt.eDim → A} {q : dt.CtlIx}
     (h : ∀ j : Fin dt.eDim, q ≠ dt.lvE j) : dt.putLvE f w q = f q := by
   classical
   rw [putLvE, dite_eq_right]
@@ -363,11 +364,11 @@ theorem readLvE_putLvE (f : dt.CtlIx → A) (w : Fin dt.eDim → A) :
 
 /-- The accumulators, the verdicts and the flags ride along a write of the
 wide loop element. -/
-theorem putLvE_acc (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (k : Fin dt.naDim) :
+private theorem putLvE_acc (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (k : Fin dt.naDim) :
     dt.putLvE f w (dt.accC k) = f (dt.accC k) :=
   putLvE_of_not_lv fun _ => fun h => nomatch h
 
-theorem putLvE_av (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (a : Fin dt.natMax) :
+private theorem putLvE_av (f : dt.CtlIx → A) (w : Fin dt.eDim → A) (a : Fin dt.natMax) :
     dt.putLvE f w (dt.avC a) = f (dt.avC a) :=
   putLvE_of_not_lv fun _ => fun h => nomatch h
 

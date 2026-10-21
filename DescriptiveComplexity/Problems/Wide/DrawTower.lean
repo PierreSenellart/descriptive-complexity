@@ -284,7 +284,7 @@ noncomputable def seOwn : dt.PEF → dt.SEF :=
   evalOwn (ownM := dt.smOwn)
 
 /-- **The owner map of the program's phases.** -/
-noncomputable def sfOwn : dt.PF → dt.SF :=
+private noncomputable def sfOwn : dt.PF → dt.SF :=
   outerOwner (ownE := dt.seOwn)
 
 end Data

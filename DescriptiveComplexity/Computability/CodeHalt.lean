@@ -10,6 +10,10 @@ public import DescriptiveComplexity.Computability.Catalog
 public import DescriptiveComplexity.Problems.CodeHalt.Membership
 import Mathlib.Tactic.FinCases
 import DescriptiveComplexity.Computability.Reduction
+import all DescriptiveComplexity.Computability.Eval
+import all DescriptiveComplexity.Computability.FinStruct
+import all DescriptiveComplexity.Problems.FinSat
+import all DescriptiveComplexity.RecursivelyEnumerable
 
 /-!
 # Drawing a partial recursive code as a concrete instance
@@ -82,41 +86,41 @@ def codeNodes : Nat.Partrec.Code → List (ℕ × ℕ × ℕ)
   | .prec cf cg => (6, 1, (codeNodes cf).length + 1) :: (codeNodes cf ++ codeNodes cg)
   | .rfind' cf => (7, 1, 0) :: codeNodes cf
 
-theorem flat_ne_nil : ∀ c : Nat.Partrec.Code, codeNodes c ≠ []
+private theorem flat_ne_nil : ∀ c : Nat.Partrec.Code, codeNodes c ≠ []
   | .zero | .succ | .left | .right => by simp [codeNodes]
   | .pair _ _ | .comp _ _ | .prec _ _ | .rfind' _ => by simp [codeNodes]
 
-theorem flat_length_pos (c : Nat.Partrec.Code) : 0 < (codeNodes c).length :=
+private theorem flat_length_pos (c : Nat.Partrec.Code) : 0 < (codeNodes c).length :=
   List.length_pos_iff.mpr (flat_ne_nil c)
 
 /-! ### Segments -/
 
 /-- `Seg L M i`: the list `M` sits inside `L` starting at index `i`. -/
-def Seg (L M : List (ℕ × ℕ × ℕ)) (i : ℕ) : Prop :=
+private def Seg (L M : List (ℕ × ℕ × ℕ)) (i : ℕ) : Prop :=
   i + M.length ≤ L.length ∧ ∀ k, k < M.length → L.getD (i + k) nodeNone = M.getD k nodeNone
 
-theorem seg_self (M : List (ℕ × ℕ × ℕ)) : Seg M M 0 :=
+private theorem seg_self (M : List (ℕ × ℕ × ℕ)) : Seg M M 0 :=
   ⟨by simp, fun k _ => by simp⟩
 
-theorem Seg.head {L M : List (ℕ × ℕ × ℕ)} {i : ℕ} (h : Seg L M i) (hM : M ≠ []) :
+private theorem Seg.head {L M : List (ℕ × ℕ × ℕ)} {i : ℕ} (h : Seg L M i) (hM : M ≠ []) :
     L.getD i nodeNone = M.getD 0 nodeNone := by
   have := h.2 0 (List.length_pos_iff.mpr hM)
   simpa using this
 
-theorem Seg.tail {L : List (ℕ × ℕ × ℕ)} {a : ℕ × ℕ × ℕ} {M : List (ℕ × ℕ × ℕ)} {i : ℕ}
+private theorem Seg.tail {L : List (ℕ × ℕ × ℕ)} {a : ℕ × ℕ × ℕ} {M : List (ℕ × ℕ × ℕ)} {i : ℕ}
     (h : Seg L (a :: M) i) : Seg L M (i + 1) := by
   refine ⟨by simpa [Nat.add_assoc, Nat.add_comm 1] using h.1, fun k hk => ?_⟩
   have := h.2 (k + 1) (by simpa using hk)
   simpa [Nat.add_assoc, Nat.add_comm 1, Nat.add_left_comm] using this
 
-theorem Seg.appendLeft {L M N : List (ℕ × ℕ × ℕ)} {i : ℕ} (h : Seg L (M ++ N) i) :
+private theorem Seg.appendLeft {L M N : List (ℕ × ℕ × ℕ)} {i : ℕ} (h : Seg L (M ++ N) i) :
     Seg L M i := by
   refine ⟨by simpa using le_trans (by simp) h.1, fun k hk => ?_⟩
   have := h.2 k (by simpa using Nat.lt_of_lt_of_le hk (by simp))
   rw [this]
   simp [List.getD_eq_getElem?_getD, List.getElem?_append_left hk]
 
-theorem Seg.appendRight {L M N : List (ℕ × ℕ × ℕ)} {i : ℕ} (h : Seg L (M ++ N) i) :
+private theorem Seg.appendRight {L M N : List (ℕ × ℕ × ℕ)} {i : ℕ} (h : Seg L (M ++ N) i) :
     Seg L N (i + M.length) := by
   refine ⟨by simpa [Nat.add_assoc] using h.1, fun k hk => ?_⟩
   have := h.2 (M.length + k) (by simpa using hk)
@@ -164,7 +168,7 @@ def codeStruct (c : Nat.Partrec.Code) : FinStruct codeVocab := listStruct (codeN
 @[simp] theorem card_listStruct (L : List (ℕ × ℕ × ℕ)) :
     (listStruct L).card = L.length + 1 := rfl
 
-theorem relMapBool_listStruct (L : List (ℕ × ℕ × ℕ)) {n : ℕ} (R : Language.code.Relations n)
+private theorem relMapBool_listStruct (L : List (ℕ × ℕ × ℕ)) {n : ℕ} (R : Language.code.Relations n)
     (x : Fin n → (listStruct L).Univ) :
     (listStruct L).relMapBool R x = codeRelBool L R x :=
   FinStruct.relMapBool_ofTable _ _ _ R x
@@ -173,54 +177,54 @@ section Sem
 
 variable (L : List (ℕ × ℕ × ℕ))
 
-theorem cRoot_iff (i : (listStruct L).Univ) : CRoot i ↔ (i : ℕ) = 0 := by
+private theorem cRoot_iff (i : (listStruct L).Univ) : CRoot i ↔ (i : ℕ) = 0 := by
   rw [CRoot, FinStruct.relMap_iff, relMapBool_listStruct]
   simp only [codeRelBool, Matrix.cons_val_zero]
   exact Iff.of_eq (decide_eq_true_eq (p := ((i : ℕ) = 0)))
 
-theorem cZero_iff (i : (listStruct L).Univ) : CZero i ↔ tagAt L i = 0 := by
+private theorem cZero_iff (i : (listStruct L).Univ) : CZero i ↔ tagAt L i = 0 := by
   rw [CZero, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cSucc_iff (i : (listStruct L).Univ) : CSucc i ↔ tagAt L i = 1 := by
+private theorem cSucc_iff (i : (listStruct L).Univ) : CSucc i ↔ tagAt L i = 1 := by
   rw [CSucc, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cLeft_iff (i : (listStruct L).Univ) : CLeft i ↔ tagAt L i = 2 := by
+private theorem cLeft_iff (i : (listStruct L).Univ) : CLeft i ↔ tagAt L i = 2 := by
   rw [CLeft, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cRight_iff (i : (listStruct L).Univ) : CRight i ↔ tagAt L i = 3 := by
+private theorem cRight_iff (i : (listStruct L).Univ) : CRight i ↔ tagAt L i = 3 := by
   rw [CRight, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cPair_iff (i : (listStruct L).Univ) : CPair i ↔ tagAt L i = 4 := by
+private theorem cPair_iff (i : (listStruct L).Univ) : CPair i ↔ tagAt L i = 4 := by
   rw [CPair, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cComp_iff (i : (listStruct L).Univ) : CComp i ↔ tagAt L i = 5 := by
+private theorem cComp_iff (i : (listStruct L).Univ) : CComp i ↔ tagAt L i = 5 := by
   rw [CComp, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cPrec_iff (i : (listStruct L).Univ) : CPrec i ↔ tagAt L i = 6 := by
+private theorem cPrec_iff (i : (listStruct L).Univ) : CPrec i ↔ tagAt L i = 6 := by
   rw [CPrec, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cRfind_iff (i : (listStruct L).Univ) : CRfind i ↔ tagAt L i = 7 := by
+private theorem cRfind_iff (i : (listStruct L).Univ) : CRfind i ↔ tagAt L i = 7 := by
   rw [CRfind, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cArg1_iff (i j : (listStruct L).Univ) :
+private theorem cArg1_iff (i j : (listStruct L).Univ) :
     CArg1 i j ↔ off1At L i ≠ 0 ∧ (j : ℕ) = (i : ℕ) + off1At L i := by
   rw [CArg1, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem cArg2_iff (i j : (listStruct L).Univ) :
+private theorem cArg2_iff (i j : (listStruct L).Univ) :
     CArg2 i j ↔ off2At L i ≠ 0 ∧ (j : ℕ) = (i : ℕ) + off2At L i := by
   rw [CArg2, FinStruct.relMap_iff, relMapBool_listStruct]
   simp [codeRelBool]
 
-theorem head_flat {L : List (ℕ × ℕ × ℕ)} {c : Nat.Partrec.Code} {i : ℕ}
+private theorem head_flat {L : List (ℕ × ℕ × ℕ)} {c : Nat.Partrec.Code} {i : ℕ}
     (h : Seg L (codeNodes c) i) : L.getD i nodeNone = (codeNodes c).getD 0 nodeNone :=
   h.head (flat_ne_nil c)
 
@@ -229,7 +233,7 @@ end Sem
 /-! ### The instance a code draws does draw it -/
 
 /-- **Every subterm is drawn at its segment.** -/
-theorem decodesTo_of_seg (L : List (ℕ × ℕ × ℕ)) :
+private theorem decodesTo_of_seg (L : List (ℕ × ℕ × ℕ)) :
     ∀ (c : Nat.Partrec.Code) (i : ℕ) (hi : i < L.length + 1), Seg L (codeNodes c) i →
       DecodesTo (⟨i, hi⟩ : (listStruct L).Univ) c := by
   intro c
@@ -353,14 +357,14 @@ theorem decodesTo_of_seg (L : List (ℕ × ℕ × ℕ)) :
     exact ⟨(cRfind_iff L _).mpr ht, ⟨i + 1, hbf⟩, ha1, ihf _ hbf hf⟩
 
 /-- The root of the instance a code draws does draw that code. -/
-theorem decodesTo_root (c : Nat.Partrec.Code) :
+private theorem decodesTo_root (c : Nat.Partrec.Code) :
     DecodesTo (⟨0, by simp⟩ : (codeStruct c).Univ) c :=
   decodesTo_of_seg (codeNodes c) c 0 (by simp) (seg_self (codeNodes c))
 
 /-! ### The instance a code draws is well formed -/
 
 /-- The tag number a constructor tag is drawn with. -/
-def tagNum : CodeTag → ℕ
+private def tagNum : CodeTag → ℕ
   | .zero => 0
   | .succ => 1
   | .left => 2
@@ -370,7 +374,7 @@ def tagNum : CodeTag → ℕ
   | .prec => 6
   | .rfind => 7
 
-theorem mark_iff (L : List (ℕ × ℕ × ℕ)) (t : CodeTag) (a : (listStruct L).Univ) :
+private theorem mark_iff (L : List (ℕ × ℕ × ℕ)) (t : CodeTag) (a : (listStruct L).Univ) :
     Mark t a ↔ tagAt L a = tagNum t := by
   cases t
   · exact cZero_iff L a
@@ -382,7 +386,7 @@ theorem mark_iff (L : List (ℕ × ℕ × ℕ)) (t : CodeTag) (a : (listStruct L
   · exact cPrec_iff L a
   · exact cRfind_iff L a
 
-theorem codeWF_listStruct (L : List (ℕ × ℕ × ℕ)) : CodeWF (listStruct L).Univ where
+private theorem codeWF_listStruct (L : List (ℕ × ℕ × ℕ)) : CodeWF (listStruct L).Univ where
   exclusive a t t' h1 h2 := by
     have e1 := (mark_iff L t a).mp h1
     have e2 := (mark_iff L t' a).mp h2
@@ -397,7 +401,7 @@ theorem codeWF_listStruct (L : List (ℕ × ℕ × ℕ)) : CodeWF (listStruct L)
 
 /-- **The instance a code draws is a yes-instance exactly when the code halts
 on `0`.** -/
-theorem codehalt_codeStruct (c : Nat.Partrec.Code) :
+private theorem codehalt_codeStruct (c : Nat.Partrec.Code) :
     CODEHALT (codeStruct c).Univ ↔ (Nat.Partrec.Code.eval c 0).Dom := by
   constructor
   · rintro ⟨n, c', hr, hd, hh⟩
@@ -414,7 +418,7 @@ theorem codehalt_toPred_codeStruct (c : Nat.Partrec.Code) :
 
 /-! ### The map is primitive recursive -/
 
-theorem primrec_flat : Primrec codeNodes := by
+private theorem primrec_flat : Primrec codeNodes := by
   have hmk : ∀ t : ℕ, Primrec fun a : Nat.Partrec.Code × Nat.Partrec.Code × Nat.Partrec.Code ×
       List (ℕ × ℕ × ℕ) × List (ℕ × ℕ × ℕ) =>
       ((t, 1, a.2.2.2.1.length + 1) :: (a.2.2.2.1 ++ a.2.2.2.2)) := by
@@ -453,7 +457,7 @@ theorem primrec_flat : Primrec codeNodes := by
   | prec cf cg ihf ihg => simp only [codeNodes]; rw [← ihf, ← ihg]
   | rfind' cf ihf => simp only [codeNodes]; rw [← ihf]
 
-theorem primrec_codeStruct : Primrec codeStruct := by
+private theorem primrec_codeStruct : Primrec codeStruct := by
   have hflat : Primrec codeNodes := primrec_flat
   have hlen : Primrec fun c : Nat.Partrec.Code => (codeNodes c).length :=
     Primrec.list_length.comp hflat

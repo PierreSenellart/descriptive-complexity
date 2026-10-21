@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Sat.Tseitin
 import DescriptiveComplexity.Ordered
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Sat.Tseitin
 
 /-!
 # The Tseitin encoding of a first-order kernel: defining formulas
@@ -92,7 +94,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
 variable {B : SOBlock}
 
-theorem realize_tTerm {m : ℕ} (h : m ≤ D)
+private theorem realize_tTerm {m : ℕ} (h : m ≤ D)
     (t : (L.sum B.lang).Term (Empty ⊕ Fin m)) (c : Fin D → γ) :
     (tTerm h t c).realize v =
       (termToL t).realize (Sum.elim isEmptyElim fun j => v (c (Fin.castLE h j))) := by
@@ -102,13 +104,13 @@ theorem realize_tTerm {m : ℕ} (h : m ≤ D)
   | inl e => exact isEmptyElim e
   | inr j => rfl
 
-theorem realize_termEqF {m : ℕ} (h : m ≤ D)
+private theorem realize_termEqF {m : ℕ} (h : m ≤ D)
     (t₁ t₂ : (L.sum B.lang).Term (Empty ⊕ Fin m)) (c : Fin D → γ) :
     (termEqF h t₁ t₂ c).Realize v ↔
       eqGuard (A := A) t₁ t₂ fun j => v (c (Fin.castLE h j)) := by
   rw [termEqF, Formula.realize_equal, realize_tTerm, realize_tTerm, eqGuard]
 
-theorem realize_relAtF {m l : ℕ} (h : m ≤ D) (r : L.Relations l)
+private theorem realize_relAtF {m l : ℕ} (h : m ≤ D) (r : L.Relations l)
     (ts : Fin l → (L.sum B.lang).Term (Empty ⊕ Fin m)) (c : Fin D → γ) :
     (relAtF h r ts c).Realize v ↔
       relGuard (A := A) r ts fun j => v (c (Fin.castLE h j)) := by
@@ -116,7 +118,7 @@ theorem realize_relAtF {m l : ℕ} (h : m ≤ D) (r : L.Relations l)
   simp only [Formula.realize_rel, realize_tTerm]
   exact Iff.rfl
 
-theorem realize_atomLitF {m l : ℕ} (h : m ≤ D)
+private theorem realize_atomLitF {m l : ℕ} (h : m ≤ D)
     (ts : Fin l → (L.sum B.lang).Term (Empty ⊕ Fin m)) (u x : Fin D → γ) :
     (atomLitF h ts u x).Realize v ↔
       atomLit ts (fun j => v (u (Fin.castLE h j))) fun j => v (x j) := by

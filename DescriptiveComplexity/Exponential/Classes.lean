@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.SecondOrderFixedPoint
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Exponential.Class
 
 /-!
 # The exponential classes: EXPTIME, NEXPTIME, EXPSPACE
@@ -110,13 +112,13 @@ noncomputable abbrev coNEXPTIME : ComplexityClass := NEXPTIME.compl
 
 /-! ### Membership, unfolded -/
 
-theorem mem_EXPTIME_iff (P : DecisionProblem L) : P ∈ EXPTIME ↔ SOLFPDefinable P :=
+private theorem mem_EXPTIME_iff (P : DecisionProblem L) : P ∈ EXPTIME ↔ SOLFPDefinable P :=
   Iff.rfl
 
-theorem mem_EXPSPACE_iff (P : DecisionProblem L) : P ∈ EXPSPACE ↔ SOPFPDefinable P :=
+private theorem mem_EXPSPACE_iff (P : DecisionProblem L) : P ∈ EXPSPACE ↔ SOPFPDefinable P :=
   Iff.rfl
 
-theorem mem_NEXPTIME_iff (P : DecisionProblem L) : P ∈ NEXPTIME ↔ ExpDefinable NP P :=
+private theorem mem_NEXPTIME_iff (P : DecisionProblem L) : P ∈ NEXPTIME ↔ ExpDefinable NP P :=
   Iff.rfl
 
 /-! ### The bridge theorems
@@ -141,7 +143,7 @@ theorem EXPSPACE_eq_PSPACE_exp : EXPSPACE = PSPACE.exp :=
     fun P => cofinalHard_congr_mem (fun Q => sopfpDefinable_iff_expDefinable Q) P
 
 /-- **NEXPTIME is NP on succinct instances**, by definition. -/
-theorem NEXPTIME_eq_NP_exp : NEXPTIME = NP.exp := rfl
+private theorem NEXPTIME_eq_NP_exp : NEXPTIME = NP.exp := rfl
 
 /-! ### Hardness over relational vocabularies
 
@@ -149,19 +151,19 @@ The shape every hardness proof of the exponential catalog discharges, one per
 class; each is `DescriptiveComplexity.cofinalHard_iff` read through the bridge
 theorem. -/
 
-theorem hard_EXPTIME_iff (P : DecisionProblem L) :
+private theorem hard_EXPTIME_iff (P : DecisionProblem L) :
     EXPTIME.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SOLFPDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
-theorem hard_EXPSPACE_iff (P : DecisionProblem L) :
+private theorem hard_EXPSPACE_iff (P : DecisionProblem L) :
     EXPSPACE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SOPFPDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
   cofinalHard_iff _ P
 
-theorem hard_NEXPTIME_iff (P : DecisionProblem L) :
+private theorem hard_NEXPTIME_iff (P : DecisionProblem L) :
     NEXPTIME.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         ExpDefinable NP Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=

@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.FixedPointReduction
 public import DescriptiveComplexity.FixedPointStratify
 public import DescriptiveComplexity.FixedPointStepRel
+import all DescriptiveComplexity.FixedPointReduction
+import all DescriptiveComplexity.FixedPointStepRel
+import all DescriptiveComplexity.FixedPointStratify
 
 /-!
 # Composition of FO(LFP) reductions

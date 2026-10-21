@@ -218,7 +218,7 @@ parent's. The two functions below are the code-level shadows of
 two readings. -/
 
 /-- The left immediate subterm of a code. -/
-def lchild? : Code → Option Code
+private def lchild? : Code → Option Code
   | .cons f _ => some f
   | .comp f _ => some f
   | .case f _ => some f
@@ -226,7 +226,7 @@ def lchild? : Code → Option Code
   | _ => none
 
 /-- The right immediate subterm of a code. -/
-def rchild? : Code → Option Code
+private def rchild? : Code → Option Code
   | .cons _ fs => some fs
   | .comp _ g => some g
   | .case _ g => some g
@@ -234,7 +234,7 @@ def rchild? : Code → Option Code
 
 /-- The code at the first child is the first subterm of the code at the
 position. -/
-theorem codeAt_child₁ : ∀ {c : Code} (p : CPos c),
+private theorem codeAt_child₁ : ∀ {c : Code} (p : CPos c),
     (child₁ p).map (fun q => codeAt q) = lchild? (codeAt p)
   | .zero', _ => rfl
   | .succ, _ => rfl
@@ -253,7 +253,7 @@ theorem codeAt_child₁ : ∀ {c : Code} (p : CPos c),
 
 /-- The code at the second child is the second subterm of the code at the
 position. -/
-theorem codeAt_child₂ : ∀ {c : Code} (p : CPos c),
+private theorem codeAt_child₂ : ∀ {c : Code} (p : CPos c),
     (child₂ p).map (fun q => codeAt q) = rchild? (codeAt p)
   | .zero', _ => rfl
   | .succ, _ => rfl
@@ -281,7 +281,7 @@ def c₂ (p : CPos c) : CPos c := (child₂ p).getD (cRoot c)
 
 /-- The code at the first child, when the position holds a code with a first
 subterm. -/
-theorem codeAt_c₁ {p : CPos c} {f : Code} (h : lchild? (codeAt p) = some f) :
+private theorem codeAt_c₁ {p : CPos c} {f : Code} (h : lchild? (codeAt p) = some f) :
     codeAt (c₁ p) = f := by
   have hm := codeAt_child₁ p
   rw [h] at hm
@@ -294,7 +294,7 @@ theorem codeAt_c₁ {p : CPos c} {f : Code} (h : lchild? (codeAt p) = some f) :
 
 /-- The code at the second child, when the position holds a code with a
 second subterm. -/
-theorem codeAt_c₂ {p : CPos c} {g : Code} (h : rchild? (codeAt p) = some g) :
+private theorem codeAt_c₂ {p : CPos c} {g : Code} (h : rchild? (codeAt p) = some g) :
     codeAt (c₂ p) = g := by
   have hm := codeAt_child₂ p
   rw [h] at hm

@@ -106,7 +106,8 @@ theorem replicatePullHom_arity :
 
 /-- The vocabulary morphism reading a sentence over the pullback of the
 replicated block inside the replication of the pulled block. -/
-def replicatePullLHom : ((B.replicate n).pull T d).lang →ᴸ ((B.pull T d).replicate n).lang :=
+private def replicatePullLHom
+    : ((B.replicate n).pull T d).lang →ᴸ ((B.pull T d).replicate n).lang :=
   homLHom (B.replicatePullHom T d n) (B.replicatePullHom_arity T d n)
 
 /-- **The commutation `DescriptiveComplexity.Exponential.Pull` rests on**:

@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Coloring.Membership
 import DescriptiveComplexity.Problems.ThreeColorability.Defs
 public import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # #3-Colorability: counting the proper 3-colorings
@@ -125,7 +126,7 @@ noncomputable def SharpThreeCol : CountingProblem Language.graph where
     rw [← Nat.card_congr (threeColEquiv A), ← Nat.card_congr (threeColEquiv B)]
     exact witnessCount_iso (colorGuessBlock 3) sharpThreeColKernel e
 
-theorem sharpThreeCol_apply (V : Type) [Language.graph.Structure V] :
+private theorem sharpThreeCol_apply (V : Type) [Language.graph.Structure V] :
     SharpThreeCol V = Nat.card {χ : V → Fin 3 // ∀ x y : V, RelMap adj ![x, y] → χ x ≠ χ y} :=
   rfl
 

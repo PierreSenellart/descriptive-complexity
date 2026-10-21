@@ -10,6 +10,8 @@ import DescriptiveComplexity.Problems.Wide.Increment
 public import DescriptiveComplexity.Exponential.Order
 import DescriptiveComplexity.OrderedComposition
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Exponential.Order
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The order the reduction puts on the points
@@ -53,7 +55,7 @@ section SetLe
 variable {dd : ℕ} {A : Type} [LinearOrder A]
 
 /-- The lexicographic comparison of tuples is the `Lex` order. -/
-theorem tupLeLex_iff_toLex_le (x y : Fin dd → A) :
+private theorem tupLeLex_iff_toLex_le (x y : Fin dd → A) :
     tupLeLex x y ↔ toLex x ≤ toLex y := by
   rw [tupLeLex, le_iff_lt_or_eq]
   constructor
@@ -65,7 +67,7 @@ theorem tupLeLex_iff_toLex_le (x y : Fin dd → A) :
     · exact Or.inl (toLex.injective h)
 
 /-- The strict lexicographic comparison of tuples is the strict `Lex` order. -/
-theorem wmLt_tupLeLex_iff (x y : Fin dd → A) :
+private theorem wmLt_tupLeLex_iff (x y : Fin dd → A) :
     WMLt tupLeLex x y ↔ toLex x < toLex y := by
   rw [WMLt, tupLeLex_iff_toLex_le, tupLeLex_iff_toLex_le]
   exact ⟨fun h => lt_of_le_not_ge h.1 h.2, fun h => ⟨le_of_lt h, not_le_of_gt h⟩⟩

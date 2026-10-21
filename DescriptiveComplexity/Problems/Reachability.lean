@@ -12,6 +12,7 @@ import DescriptiveComplexity.FixedPointHorn
 public import DescriptiveComplexity.LogSpace
 public import DescriptiveComplexity.TransitiveClosure
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.FixedPoint
 
 /-!
 # Reachability, and the Horn fragment at work
@@ -225,7 +226,7 @@ variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A]
 def TRel (ρ : reachBlock.Assignment A) (x y : A) : Prop := ρ () ![x, y]
 
 omit [Language.stGraph.Structure A] [LinearOrder A] in
-private theorem tAtom_holds (ρ : reachBlock.Assignment A) (v : Fin 3 → A) (i j : Fin 3) :
+theorem tAtom_holds (ρ : reachBlock.Assignment A) (v : Fin 3 → A) (i j : Fin 3) :
     (tAtom i j).Holds ρ v ↔ TRel ρ (v i) (v j) := by
   refine iff_of_eq (congrArg (ρ ()) (funext fun l => ?_))
   fin_cases l <;> rfl
@@ -252,7 +253,7 @@ private theorem realize_srcTgtG (v : Fin 3 → A) (i j : Fin 3) :
 /-- What it means for an assignment to satisfy the program: the guessed
 relation contains the transitive closure of the edge relation, and meets no
 source-target pair. -/
-theorem reachProgram_holds_iff (ρ : reachBlock.Assignment A) :
+private theorem reachProgram_holds_iff (ρ : reachBlock.Assignment A) :
     reachProgram.Holds ρ ↔
       ((∀ x y : A, SGEdge x y → TRel ρ x y) ∧
         (∀ x y z : A, TRel ρ x y → SGEdge y z → TRel ρ x z)) ∧
@@ -308,7 +309,7 @@ theorem tRel_transClosureAssign (x y : A) :
 omit [LinearOrder A] in
 /-- Any model of the two rules of the program contains the transitive closure
 of the edge relation. -/
-theorem transGen_tRel {ρ : reachBlock.Assignment A}
+private theorem transGen_tRel {ρ : reachBlock.Assignment A}
     (h1 : ∀ x y : A, SGEdge x y → TRel ρ x y)
     (h2 : ∀ x y z : A, TRel ρ x y → SGEdge y z → TRel ρ x z) {a b : A}
     (h : Relation.TransGen SGEdge a b) : TRel ρ a b := by
@@ -417,7 +418,7 @@ variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A]
 def URel (ρ : uBlock.Assignment A) (x : A) : Prop := ρ () ![x]
 
 omit [Language.stGraph.Structure A] [LinearOrder A] in
-private theorem uLit_holds (ρ : uBlock.Assignment A) (v : Fin 3 → A) (i : Fin 3)
+theorem uLit_holds (ρ : uBlock.Assignment A) (v : Fin 3 → A) (i : Fin 3)
     (pos : Bool) : (uLit i pos).Holds ρ v ↔ (if pos then URel ρ (v i) else ¬URel ρ (v i)) := by
   have hatom : (uAtom i).Holds ρ v ↔ URel ρ (v i) := by
     refine iff_of_eq (congrArg (ρ ()) (funext fun l => ?_))
@@ -445,7 +446,7 @@ private theorem realize_targetG' (v : Fin 3 → A) (i : Fin 3) :
 /-- What it means for an assignment to satisfy the Krom program: the guessed
 set contains the marked targets, is closed under predecessors, and avoids the
 marked sources. -/
-theorem unreachKromProgram_holds_iff (ρ : uBlock.Assignment A) :
+private theorem unreachKromProgram_holds_iff (ρ : uBlock.Assignment A) :
     unreachKromProgram.Holds ρ ↔
       (∀ x : A, SGTarget x → URel ρ x) ∧
       (∀ x y : A, SGEdge x y → URel ρ y → URel ρ x) ∧
@@ -503,7 +504,7 @@ theorem uRel_coReachAssign (x : A) :
 omit [LinearOrder A] in
 /-- A set closed under predecessors and containing the marked targets contains
 every vertex from which a marked target is reachable. -/
-theorem uRel_of_reflTransGen {ρ : uBlock.Assignment A}
+private theorem uRel_of_reflTransGen {ρ : uBlock.Assignment A}
     (h2 : ∀ x y : A, SGEdge x y → URel ρ y → URel ρ x) {x y : A}
     (h : Relation.ReflTransGen SGEdge x y) : URel ρ y → URel ρ x := by
   induction h with
@@ -590,7 +591,7 @@ theorem realize_tcTargetF (v : Fin 1 → A) : tcTargetF.Realize v ↔ SGTarget (
   exact Iff.rfl
 
 /-- A path in the graph is a walk of the specification. -/
-theorem reach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen SGEdge x y) :
+private theorem reach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen SGEdge x y) :
     reachSpec.Reach ((), fun _ => x) ((), fun _ => y) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -598,7 +599,7 @@ theorem reach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen SGEdge x y) :
     exact ih.tail ((step_reachSpec ((), fun _ => b) ((), fun _ => c)).mpr hbc)
 
 /-- A walk of the specification is a path in the graph. -/
-theorem reflTransGen_of_reach {u v : reachSpec.Node A} (h : reachSpec.Reach u v) :
+private theorem reflTransGen_of_reach {u v : reachSpec.Node A} (h : reachSpec.Reach u v) :
     Relation.ReflTransGen SGEdge (u.2 0) (v.2 0) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl

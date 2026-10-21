@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefTags
 import DescriptiveComplexity.Problems.Wide.DrawName
+import all DescriptiveComplexity.Problems.Wide.DrawDefAcc
+import all DescriptiveComplexity.Problems.Wide.DrawDefCtl
+import all DescriptiveComplexity.Problems.Wide.DrawDefStage
+import all DescriptiveComplexity.Problems.Wide.DrawEnc
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The names a trip walks to are definable
@@ -48,7 +53,7 @@ omit [L.IsRelational] in
 /-- **A coordinate of an encoded tuple is readable**: the code coordinates hold
 a designated element, the payload coordinates the payload, the rest the clear
 element – three cases the layout decides, not the data. -/
-theorem uReadable_encTup {c : PtCode dt.X}
+private theorem uReadable_encTup {c : PtCode dt.X}
     {pay : ∀ e : Env L, (Q → e.α) → Fin (blockArityBound dt.X.B) → e.α}
     (hpay : ∀ p : Fin (blockArityBound dt.X.B),
       UReadable fun e f (_ : dt.SlotIx → e.α) => pay e f p) (k : Fin dt.dd) :
@@ -71,7 +76,7 @@ theorem uReadable_encTup {c : PtCode dt.X}
 
 omit [L.IsRelational] in
 /-- **A name coordinate the control computes is readable.** -/
-theorem uReadable_encCoord (c : PtCode dt.X)
+private theorem uReadable_encCoord (c : PtCode dt.X)
     {pay : ∀ e : Env L, (Q → e.α) → Fin (blockArityBound dt.X.B) → e.α}
     (hpay : ∀ p : Fin (blockArityBound dt.X.B),
       UReadable fun e f (_ : dt.SlotIx → e.α) => pay e f p) (j : Fin dt.dd0) :
@@ -85,7 +90,7 @@ omit [L.IsRelational] in
 /-- **A naming guard whose coordinates are readable is definable.** This is
 `DescriptiveComplexity.Draw.Data.uGDefinable_nameGF` with its hypothesis in
 the form the encoded names supply it. -/
-theorem uGDefinable_nameGF_of_readable {b : Fin dt.ko ⊕ Fin dt.ki}
+private theorem uGDefinable_nameGF_of_readable {b : Fin dt.ko ⊕ Fin dt.ki}
     {cf : ∀ e : Env L, (Q → e.α) → Fin dt.dd0 → e.α}
     (hcf : ∀ j : Fin dt.dd0,
       UReadable fun e f (_ : dt.SlotIx → e.α) => cf e f j) :
@@ -95,7 +100,7 @@ theorem uGDefinable_nameGF_of_readable {b : Fin dt.ko ⊕ Fin dt.ki}
 omit [L.IsRelational] in
 /-- **A witness read's name is definable**: the tag's encoded tuple, whose
 payload is the clear element throughout. -/
-theorem uGDefinable_tagWitnessMatch (b : Fin dt.ko ⊕ Fin dt.ki) (t : dt.X.Tag) :
+private theorem uGDefinable_tagWitnessMatch (b : Fin dt.ko ⊕ Fin dt.ki) (t : dt.X.Tag) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f g =>
       dt.tagWitnessMatch e.zero e.one b t f g :=
   uGDefinable_nameGF_of_readable fun j =>
@@ -107,7 +112,7 @@ omit [L.IsRelational] in
 /-- **A padded payload of control slots is readable**, position by position:
 below the arity a slot of the control, beyond it the clear element – and which
 is which the arity decides. -/
-theorem uReadable_pad_ctl {c : ℕ} {q : Fin c → dt.CtlIx}
+private theorem uReadable_pad_ctl {c : ℕ} {q : Fin c → dt.CtlIx}
     (p : Fin (blockArityBound dt.X.B)) :
     UReadable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f _ =>
       pad (dd := blockArityBound dt.X.B) e.zero (fun i => f (q i)) p := by
@@ -119,7 +124,7 @@ theorem uReadable_pad_ctl {c : ℕ} {q : Fin c → dt.CtlIx}
 
 /-- **A domain read leaf's name is definable**: its payload is the loop
 element at the levels the leaf's atom reads, padded. -/
-theorem uGDefinable_domMatch (b : Fin dt.ko ⊕ Fin dt.ki) (t : dt.X.Tag)
+private theorem uGDefinable_domMatch (b : Fin dt.ko ⊕ Fin dt.ki) (t : dt.X.Tag)
     (r : Fin (dt.domNr t)) (hn : (dt.domPk t).n ≤ dt.eDim) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f g =>
       dt.domMatch e.zero e.one b t r hn f g :=
@@ -144,7 +149,7 @@ variable (dt)
 
 /-- **A name coordinate the payload reaches**: the encoded tuple is free
 there, so a well-shapedness test must not ask anything of it. -/
-def PayCoord (i : dt.X.B.ι) (j : Fin dt.dd0) : Prop :=
+private def PayCoord (i : dt.X.B.ι) (j : Fin dt.dd0) : Prop :=
   ∃ p : Fin (blockArityBound dt.X.B),
     (p : ℕ) < dt.X.B.arity i ∧ dt.ly.pIx p = Fin.castLE dt.dd0Le j
 
@@ -152,7 +157,7 @@ variable {dt}
 
 omit [L.IsRelational] [Fintype Q] [Fintype dt.SlotIx] in
 /-- **Away from the payload the encoded tuple does not depend on it.** -/
-theorem encAsgTup_congr_of_not_payCoord {A : Type} {zero one : A}
+private theorem encAsgTup_congr_of_not_payCoord {A : Type} {zero one : A}
     {i : dt.X.B.ι} {j : Fin dt.dd0} (h : ¬dt.PayCoord i j)
     (w w' : Fin (dt.X.B.arity i) → A) :
     encAsgTup dt.ly zero one i w (Fin.castLE dt.dd0Le j) =
@@ -175,7 +180,7 @@ open Classical in
 /-- **A member of a relation variable is a definable question of the cell**:
 the payload coordinates carry no condition – a witness is read off the cell
 there – and every other coordinate is pinned by the code and the padding. -/
-theorem uGDefinable_exists_encAsgTup (i : dt.X.B.ι) :
+private theorem uGDefinable_exists_encAsgTup (i : dt.X.B.ι) :
     UGDefinable (L := L) (Q := Q) (W := dt.SlotIx) fun e _ g =>
       ∃ w : Fin (dt.X.B.arity i) → e.α, ∀ j : Fin dt.dd0,
         g (Slot.name j) = encAsgTup dt.ly e.zero e.one i w (Fin.castLE dt.dd0Le j) := by
@@ -221,7 +226,7 @@ theorem uGDefinable_exists_encAsgTup (i : dt.X.B.ι) :
 
 omit [L.IsRelational] in
 /-- **The tag witness is a definable question of the cell.** -/
-theorem uGDefinable_eq_encTagTup (t : dt.X.Tag) (j : Fin dt.dd0) :
+private theorem uGDefinable_eq_encTagTup (t : dt.X.Tag) (j : Fin dt.dd0) :
     UGDefinable (L := L) (Q := Q) (W := dt.SlotIx) fun e _ g =>
       g (Slot.name j) = encTagTup dt.ly e.zero e.one t (Fin.castLE dt.dd0Le j) :=
   uReadable_encTup (Q := Q) (c := Sum.inl t)
@@ -230,7 +235,7 @@ theorem uGDefinable_eq_encTagTup (t : dt.X.Tag) (j : Fin dt.dd0) :
 
 omit [L.IsRelational] in
 /-- **A gate's well-shapedness question is definable.** -/
-theorem uGDefinable_wellShapedG (b : Fin dt.ko ⊕ Fin dt.ki) :
+private theorem uGDefinable_wellShapedG (b : Fin dt.ko ⊕ Fin dt.ki) :
     UGDefinable (L := L) (Q := Q) (W := dt.SlotIx) fun e _ g =>
       dt.wellShapedG e.zero e.one b g :=
   ((uGDefinable_trkOne (L := L) (Q := Q) (Slot.blk (some b) : dt.SlotIx)).imp
@@ -243,7 +248,7 @@ theorem uGDefinable_wellShapedG (b : Fin dt.ko ⊕ Fin dt.ki) :
 
 omit [L.IsRelational] in
 /-- **And so is an inner gate's**, the digit read off the VAL register. -/
-theorem uGDefinable_wellShapedIG (b : Fin dt.ko ⊕ Fin dt.ki) :
+private theorem uGDefinable_wellShapedIG (b : Fin dt.ko ⊕ Fin dt.ki) :
     UGDefinable (L := L) (Q := Q) (W := dt.SlotIx) fun e _ g =>
       dt.wellShapedIG e.zero e.one b g :=
   ((uGDefinable_trkOne (L := L) (Q := Q) (Slot.blk (some b) : dt.SlotIx)).imp
@@ -263,7 +268,7 @@ open Classical in
 its block atoms are read flags, and its other atoms are the questions a guard
 may ask of the instance – an equality, an order comparison, a relation of the
 source vocabulary – at the loop element. -/
-theorem uGDefinable_domLeafVal (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
+private theorem uGDefinable_domLeafVal (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
     (hrd : dt.domNr t ≤ dt.nfDim) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f _ =>
       dt.domLeafVal e.one t hn hrd f := by

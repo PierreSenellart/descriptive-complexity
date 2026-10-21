@@ -9,6 +9,11 @@ public import DescriptiveComplexity.Problems.Taut
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 public import DescriptiveComplexity.Problems.ThreeSat.FromSat
 import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # 3-DNF-TAUT is coNP-complete
@@ -129,7 +134,7 @@ variable {A : Type} [Language.sat.Structure A]
 
 /-- The occurrences of the sign swap are the occurrences of the input, with
 the opposite sign. -/
-theorem swapSign_occIn (p q : swapSignInterp.Map A) (s : Bool) :
+private theorem swapSign_occIn (p q : swapSignInterp.Map A) (s : Bool) :
     OccIn p q s ↔ OccIn (p.2 0) (q.2 0) (!s) := by
   obtain ⟨⟨⟩, wp⟩ := p
   obtain ⟨⟨⟩, wq⟩ := q
@@ -170,7 +175,7 @@ open SatToThreeSat
 /-- Correctness of the hardness reduction: an ordered CNF structure is
 unsatisfiable iff its width-three split is a yes-instance of 3-UNSAT. The
 width half is the promise `SatToThreeSat.widthAtMostThree_map`. -/
-theorem not_satisfiable_iff_threeUnsatisfiable (A : Type) [Language.sat.Structure A]
+private theorem not_satisfiable_iff_threeUnsatisfiable (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] :
     ¬Satisfiable A ↔ ThreeUnsatisfiable (satToThreeSat.Map A) := by
   rw [ThreeUnsatisfiable, and_iff_right widthAtMostThree_map]
@@ -180,7 +185,7 @@ theorem not_satisfiable_iff_threeUnsatisfiable (A : Type) [Language.sat.Structur
 clause-splitting interpretation `SatToThreeSat.satToThreeSat`, applied
 unchanged: it preserves satisfiability, and its output always meets the width
 bound. -/
-noncomputable def sat_compl_ordered_fo_reduction_threeUnsat : SATᶜ ≤ᶠᵒ[≤] ThreeUNSAT where
+private noncomputable def sat_compl_ordered_fo_reduction_threeUnsat : SATᶜ ≤ᶠᵒ[≤] ThreeUNSAT where
   Tag := SplitTag
   dim := 2
   toInterpretation := satToThreeSat
@@ -189,14 +194,14 @@ noncomputable def sat_compl_ordered_fo_reduction_threeUnsat : SATᶜ ≤ᶠᵒ[�
 /-- Correctness of the sign swap between the two readings: a width-three CNF
 structure is unsatisfiable iff its sign swap is a width-three DNF
 tautology. -/
-theorem threeUnsatisfiable_iff_threeDnfTautology_map (A : Type) [Language.sat.Structure A] :
+private theorem threeUnsatisfiable_iff_threeDnfTautology_map (A : Type) [Language.sat.Structure A] :
     ThreeUnsatisfiable A ↔ ThreeDnfTautology (swapSignInterp.Map A) :=
   and_congr widthAtMostThree_swapSign.symm (tautology_map_iff_not_satisfiable A).symm
 
 /-- **3-UNSAT FO-reduces to 3-DNF-TAUT**, by TAUT's sign swap
 `swapSignInterp`: De Morgan on the satisfiability half, and the width bound is
 insensitive to the swap. -/
-def threeUnsat_fo_reduction_threeDnfTaut : ThreeUNSAT ≤ᶠᵒ ThreeDnfTAUT where
+private def threeUnsat_fo_reduction_threeDnfTaut : ThreeUNSAT ≤ᶠᵒ ThreeDnfTAUT where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
@@ -252,7 +257,7 @@ end Characterizations
 width-three tautology exactly when its gated sign swap is satisfiable. A wide
 input has no clause in its image, hence a satisfiable one; a narrow input is
 sign-swapped faithfully, and De Morgan applies. -/
-theorem not_threeDnfTautology_iff_satisfiable (A : Type) [Language.sat.Structure A] :
+private theorem not_threeDnfTautology_iff_satisfiable (A : Type) [Language.sat.Structure A] :
     ¬ThreeDnfTautology A ↔ Satisfiable (gatedSwap.Map A) := by
   by_cases hw : Wide A
   · -- wide input: the promise fails, and the image has no clause at all
@@ -278,7 +283,7 @@ open ThreeDnfTautToSat in
 /-- **The complement of 3-DNF-TAUT FO-reduces to SAT.** The gated sign swap
 `ThreeDnfTautToSat.gatedSwap` maps a DNF structure to a satisfiable CNF
 instance iff it is not a width-three tautology. -/
-noncomputable def threeDnfTaut_compl_fo_reduction_sat : ThreeDnfTAUTᶜ ≤ᶠᵒ SAT where
+private noncomputable def threeDnfTaut_compl_fo_reduction_sat : ThreeDnfTAUTᶜ ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := gatedSwap
@@ -288,12 +293,12 @@ noncomputable def threeDnfTaut_compl_fo_reduction_sat : ThreeDnfTAUTᶜ ≤ᶠ�
 
 /-- **3-DNF-TAUT is in coNP**: its complement FO-reduces to SAT, hence is in
 NP. -/
-theorem threeDnfTaut_mem_coNP : ThreeDnfTAUT ∈ coNP :=
+private theorem threeDnfTaut_mem_coNP : ThreeDnfTAUT ∈ coNP :=
   (mem_piP_iff 1 ThreeDnfTAUT).mpr
     (NP.mem_of_foReduction threeDnfTaut_compl_fo_reduction_sat sat_mem_NP)
 
 /-- **3-UNSAT is in coNP**: it FO-reduces to 3-DNF-TAUT, which is in coNP. -/
-theorem threeUnsat_mem_coNP : ThreeUNSAT ∈ coNP :=
+private theorem threeUnsat_mem_coNP : ThreeUNSAT ∈ coNP :=
   coNP.mem_of_foReduction threeUnsat_fo_reduction_threeDnfTaut threeDnfTaut_mem_coNP
 
 /-- **coNP-hardness of 3-UNSAT**, by complementing the Cook–Levin discharge

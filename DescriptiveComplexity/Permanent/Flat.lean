@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Permanent.AttachAll
+import all DescriptiveComplexity.Permanent.Attach
+import all DescriptiveComplexity.Permanent.Basic
 
 /-!
 # The gadgets attached at every site, flattened
@@ -44,7 +46,7 @@ def flatAttach (M₀ : V → V → ℤ) (site : S → Site V) :
 omit [Fintype V] in
 /-- The flat matrix only depends on the sites through the sites themselves:
 it is invariant under an injective reindexing of the sites. -/
-theorem flatAttach_map {S' : Type} [DecidableEq S'] (M₀ : V → V → ℤ) (site : S → Site V)
+private theorem flatAttach_map {S' : Type} [DecidableEq S'] (M₀ : V → V → ℤ) (site : S → Site V)
     (site' : S' → Site V) (f : S → S') (hf : Function.Injective f)
     (hsite : ∀ s, site' (f s) = site s) (n n' : V ⊕ (S × Fin 4)) :
     flatAttach M₀ site' (n.map id (Prod.map f id)) (n'.map id (Prod.map f id)) =
@@ -126,7 +128,7 @@ theorem toFlat_ofFlat : ∀ (l : List S) (n : V ⊕ ({s // s ∈ l} × Fin 4)),
       rfl
 
 /-- **The nested and the flat node types are in bijection.** -/
-def flatEquiv (l : List S) (hl : l.Nodup) :
+private def flatEquiv (l : List S) (hl : l.Nodup) :
     AttachType V (l.map site) ≃ V ⊕ ({s // s ∈ l} × Fin 4) where
   toFun := toFlat site l
   invFun := ofFlat site l
@@ -146,7 +148,7 @@ theorem toFlat_eq_inl_iff (l : List S) (hl : l.Nodup) (n : AttachType V (l.map s
 
 omit [Fintype V] in
 /-- **The attached matrix, entry by entry, is the flat one.** -/
-theorem attachAll_eq_flatAttach (M₀ : V → V → ℤ) :
+private theorem attachAll_eq_flatAttach (M₀ : V → V → ℤ) :
     ∀ (l : List S), l.Nodup → ∀ n n' : AttachType V (l.map site),
       attachAll M₀ (l.map site) n n' =
         flatAttach M₀ (fun s : {s // s ∈ l} => site s.1) (toFlat site l n) (toFlat site l n')
@@ -206,7 +208,7 @@ theorem attachAll_eq_flatAttach (M₀ : V → V → ℤ) :
 
 /-- The permanent of the flat attachment along a list is that of the nested
 one. -/
-theorem bperm_flatAttach_list (M₀ : V → V → ℤ) (l : List S) (hl : l.Nodup) :
+private theorem bperm_flatAttach_list (M₀ : V → V → ℤ) (l : List S) (hl : l.Nodup) :
     bperm (flatAttach M₀ fun s : {s // s ∈ l} => site s.1) =
       bperm (attachAll M₀ (l.map site)) := by
   refine (congrArg bperm (funext fun n => funext fun n' => ?_)).trans

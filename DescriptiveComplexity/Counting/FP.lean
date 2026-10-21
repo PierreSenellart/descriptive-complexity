@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Counting.QuantitativePull
 import DescriptiveComplexity.FixedPoint
+import all DescriptiveComplexity.Counting.Quantitative
+import all DescriptiveComplexity.FixedPoint
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # The class FP
@@ -99,7 +102,7 @@ theorem FPDefinable.of_orderedParsimonious (f : C ≤ᵖ[≤] D) (h : FPDefinabl
   exact h1.trans (hout.trans (hpull.symm.trans (congrArg _ (Subsingleton.elim _ _))))
 
 /-- FP is closed under parsimonious reductions. -/
-theorem FPDefinable.of_parsimonious (f : C ≤ᵖ D) (h : FPDefinable D) : FPDefinable C :=
+private theorem FPDefinable.of_parsimonious (f : C ≤ᵖ D) (h : FPDefinable D) : FPDefinable C :=
   h.of_orderedParsimonious f.toOrdered
 
 end Closure
@@ -116,7 +119,7 @@ noncomputable def FP : CountingClass :=
 
 variable {L : Language.{0, 0}} [L.IsRelational]
 
-theorem mem_FP_iff (C : CountingProblem L) : C ∈ FP ↔ FPDefinable C :=
+private theorem mem_FP_iff (C : CountingProblem L) : C ∈ FP ↔ FPDefinable C :=
   Iff.rfl
 
 /-- The support of a problem of FP is in PTIME.

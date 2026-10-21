@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.TransitiveClosureDecideReach
 public import DescriptiveComplexity.TransitiveClosureReductionDet
 public import DescriptiveComplexity.WalkBudget
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Permanent.Ladder
+import all DescriptiveComplexity.TransitiveClosureDecide
+import all DescriptiveComplexity.WalkBudget
 
 /-!
 # Deciding reachability in a deterministic walk: a step budget
@@ -41,7 +45,8 @@ open FirstOrder
 open Language Structure
 
 /-- In a linear order, an element covers at most one element. -/
-theorem covBy_right_unique {α : Type} [LinearOrder α] {a b c : α} (hb : a ⋖ b) (hc : a ⋖ c) :
+private theorem covBy_right_unique
+    {α : Type} [LinearOrder α] {a b c : α} (hb : a ⋖ b) (hc : a ⋖ c) :
     b = c := by
   rcases lt_trichotomy b c with h | h | h
   · exact absurd h (hc.2 hb.1)
@@ -152,7 +157,7 @@ section Semantics
 
 variable {A : Type} [L.Structure A] [LinearOrder A] (ma mb : W.Mode) (w : W.AtomPar → A)
 
-theorem realize_atTgtF (m : W.Mode) (t : W.DCoord → A) :
+private theorem realize_atTgtF (m : W.Mode) (t : W.DCoord → A) :
     (W.atTgtF mb m).Realize (Sum.elim t w) ↔ m = mb ∧ t ∘ Sum.inl = w ∘ W.rightIx := by
   classical
   rw [atTgtF]
@@ -165,7 +170,7 @@ theorem realize_atTgtF (m : W.Mode) (t : W.DCoord → A) :
 
 variable [Nonempty A]
 
-theorem realize_cntSuccF (c c' : W.Mode) (t t' : W.DCoord → A) :
+private theorem realize_cntSuccF (c c' : W.Mode) (t t' : W.DCoord → A) :
     (W.cntSuccF c c').Realize (Sum.elim (Sum.elim t t') w) ↔
       (letI := W.modeOrder; W.cntOf c (t ∘ Sum.inr) ⋖ W.cntOf c' (t' ∘ Sum.inr)) := by
   classical
@@ -190,7 +195,7 @@ theorem realize_cntSuccF (c c' : W.Mode) (t t' : W.DCoord → A) :
   · simp only [Formula.realize_bot, false_iff, not_or, not_and]
     exact ⟨fun h => absurd h.symm h1, fun h => absurd h h2⟩
 
-theorem realize_runStepF (m c m' c' : W.Mode) (t t' : W.DCoord → A) :
+private theorem realize_runStepF (m c m' c' : W.Mode) (t t' : W.DCoord → A) :
     (W.runStepF mb m c m' c').Realize (Sum.elim (Sum.elim t t') w) ↔
       W.det.StepAt (w ∘ W.parIx) (m, t ∘ Sum.inl) (m', t' ∘ Sum.inl) ∧
         ¬(m = mb ∧ t ∘ Sum.inl = w ∘ W.rightIx) ∧
@@ -229,7 +234,7 @@ theorem detReachDecider_stepAt_none_some (m c : W.Mode) (t t' : W.DCoord → A) 
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h1 h2 => absurd ⟨h1, h2⟩ h
 
-theorem detReachDecider_stepAt_some_some (m c m' c' : W.Mode) (t t' : W.DCoord → A) :
+private theorem detReachDecider_stepAt_some_some (m c m' c' : W.Mode) (t t' : W.DCoord → A) :
     (W.detReachDecider ma mb).StepAt w (some (m, c), t) (some (m', c'), t') ↔
       W.det.StepAt (w ∘ W.parIx) (m, t ∘ Sum.inl) (m', t' ∘ Sum.inl) ∧
         ¬(m = mb ∧ t ∘ Sum.inl = w ∘ W.rightIx) ∧
@@ -299,14 +304,14 @@ theorem detNext_functional (u v v' : W.Node A) (hv : W.det.StepAt (w ∘ W.parIx
 /-- What a node of the decider records: the current node is the `i`-th of the
 run from the first endpoint, the counter has rank `i`, and no earlier node of
 the run was the second endpoint. -/
-def DetInv (i : ℕ) (m c : W.Mode) (t : W.DCoord → A) : Prop :=
+private def DetInv (i : ℕ) (m c : W.Mode) (t : W.DCoord → A) : Prop :=
   (m, t ∘ Sum.inl) = (W.detNext w)^[i] (ma, w ∘ W.leftIx) ∧
     (letI := W.modeOrder; orank (W.cntOf c (t ∘ Sum.inr)) = i) ∧
     ∀ j < i, (W.detNext w)^[j] (ma, w ∘ W.leftIx) ≠ (mb, w ∘ W.rightIx)
 
 omit [Nonempty A] [Finite A] in
 /-- Reachability in the determinized walk is iteration of its step. -/
-theorem det_reachAt_iff :
+private theorem det_reachAt_iff :
     W.det.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx) ↔
       ∃ n, (W.detNext w)^[n] (ma, w ∘ W.leftIx) = (mb, w ∘ W.rightIx) :=
   reach_iff_iterate (W.detNext_functional w) _ _
@@ -316,7 +321,7 @@ theorem card_counter : Nat.card (W.Counter A) = Nat.card (W.Node A) :=
   Nat.card_congr (toLex.symm.trans (Equiv.prodCongr (Equiv.refl _) toLex.symm))
 
 /-- **A stuck run does not reach the target.** -/
-theorem not_reach_of_stuck {i : ℕ} {m c : W.Mode} {t : W.DCoord → A}
+private theorem not_reach_of_stuck {i : ℕ} {m c : W.Mode} {t : W.DCoord → A}
     (hinv : W.DetInv ma mb w i m c t) (htgt : ¬(m = mb ∧ t ∘ Sum.inl = w ∘ W.rightIx))
     (hstuck : ¬∃ b, (W.detReachDecider ma mb).StepAt w (some (m, c), t) b) :
     ¬W.det.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx) := by
@@ -356,7 +361,7 @@ theorem not_reach_of_stuck {i : ℕ} {m c : W.Mode} {t : W.DCoord → A}
 
 /-- **The run decides**, from any node the invariant admits: it exits `yes` if
 the target is reachable, `no` if not. Proved downwards along the counter. -/
-theorem detReachDecider_run (κ : W.Counter A) :
+private theorem detReachDecider_run (κ : W.Counter A) :
     ∀ (m c : W.Mode) (t : W.DCoord → A) (i : ℕ),
       (letI := W.modeOrder; W.cntOf c (t ∘ Sum.inr) = κ) → W.DetInv ma mb w i m c t →
         (W.det.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx) →
@@ -431,7 +436,7 @@ theorem detReachDecider_run (κ : W.Counter A) :
 
 /-- What the decider may have reached from its start: its start, or a node
 the invariant admits. -/
-theorem detReachDecider_inv (t : W.DCoord → A) {b : (W.detReachDecider ma mb).Node A}
+private theorem detReachDecider_inv (t : W.DCoord → A) {b : (W.detReachDecider ma mb).Node A}
     (h : (W.detReachDecider ma mb).ReachAt w (none, t) b) :
     b = (none, t) ∨ ∃ (m c : W.Mode) (t' : W.DCoord → A) (i : ℕ),
       b = (some (m, c), t') ∧ W.DetInv ma mb w i m c t' := by
@@ -461,7 +466,7 @@ theorem detReachDecider_inv (t : W.DCoord → A) {b : (W.detReachDecider ma mb).
 
 /-- **The decider decides reachability in the deterministic reading** between
 its two modes, at the two endpoints and the parameters. -/
-theorem decides_detReachDecider :
+private theorem decides_detReachDecider :
     (W.detReachDecider ma mb).Decides w
       (W.det.ReachAt (w ∘ W.parIx) (ma, w ∘ W.leftIx) (mb, w ∘ W.rightIx)) := by
   let := W.modeOrder
@@ -509,7 +514,7 @@ theorem decides_detReachDecider :
 
 omit [Finite A] in
 /-- **The decider is functional.** -/
-theorem functional_detReachDecider : (W.detReachDecider ma mb).Functional A := by
+private theorem functional_detReachDecider : (W.detReachDecider ma mb).Functional A := by
   let := W.modeOrder
   refine Decider.functional_of ?_ ?_ ?_
   · rintro w ⟨m, t⟩ ⟨mb₁, t₁⟩ ⟨mb₂, t₂⟩ h₁ h₂

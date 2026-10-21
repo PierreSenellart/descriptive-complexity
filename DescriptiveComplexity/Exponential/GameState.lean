@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameGraph
+import all DescriptiveComplexity.Exponential.PointAtoms
+import all DescriptiveComplexity.Padding
 
 /-!
 # The states of the graph game
@@ -92,7 +94,7 @@ variable {T : Type} {Dm : ℕ}
 
 /-- The phases, coded into a sum of products, so that finiteness is
 inherited. -/
-def code : Ph T Dm →
+private def code : Ph T Dm →
     T ⊕ T ⊕ (T × T) ⊕ (T × T) ⊕ (T × T) ⊕ (Sub × T × T × Fin (Dm + 1) × Bool)
   | .startPick tx => .inl tx
   | .main tx => .inr (.inl tx)
@@ -177,7 +179,7 @@ theorem realize_allRoundsPointF (ρs : Fin n → X.pointBlock.Assignment A) :
 
 omit [Finite A] [Nonempty A] in
 /-- **A state all of whose rounds are points carries a tuple of points.** -/
-theorem exists_points_of_allRoundsPoint {ρs : Fin n → X.pointBlock.Assignment A}
+private theorem exists_points_of_allRoundsPoint {ρs : Fin n → X.pointBlock.Assignment A}
     (h : ∀ i, IsPointAssign (X := X) (ρs i)) :
     ∃ pts : Fin n → X.Map A, ρs = fun i => pointAssign (pts i) := by
   classical

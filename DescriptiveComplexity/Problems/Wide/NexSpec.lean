@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.BlkLayout
 public import DescriptiveComplexity.Problems.Wide.NexOuter
+import all DescriptiveComplexity.Problems.Wide.BlkFile
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # What the clocked program's file-laying sweep writes
@@ -188,7 +193,7 @@ omit [LinearOrder A] [Finite A] [Nonempty A] [Finite R'] [Finite P'] [Finite dt.
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite (Univ A R' P' dt.KIx dt.dd)] in
 /-- The pointer reads back the tuple it was set to. -/
-theorem ptrTup_ctlOf {coord : Fin dt.dd → dt.CtlIx} (hcoord : Function.Injective coord)
+private theorem ptrTup_ctlOf {coord : Fin dt.dd → dt.CtlIx} (hcoord : Function.Injective coord)
     (f₀ : dt.CtlIx → A) (t : Fin dt.dd → A) :
     dt.ptrTup coord (dt.ctlOf coord f₀ t) = t := by
   classical
@@ -204,7 +209,7 @@ omit [LinearOrder A] [Finite A] [Nonempty A] [Finite R'] [Finite P'] [Finite dt.
 slots are overwritten and every other slot rides along, so the exit's reset of
 the pointer to the file's first register lands exactly where the next sweep
 starts. -/
-theorem ctlOf_ctlOf (coord : Fin dt.dd → dt.CtlIx) (f₀ : dt.CtlIx → A)
+private theorem ctlOf_ctlOf (coord : Fin dt.dd → dt.CtlIx) (f₀ : dt.CtlIx → A)
     (t t' : Fin dt.dd → A) :
     dt.ctlOf coord (dt.ctlOf coord f₀ t') t = dt.ctlOf coord f₀ t := by
   classical
@@ -227,7 +232,7 @@ omit [Nonempty A] [Finite R'] [Finite P']
   [Finite (Univ A R' P' dt.KIx dt.dd)] in
 /-- **The advance carries the pointer from one register to the next**: at a
 control holding a register's tuple, the advance holds the next register's. -/
-theorem ptrNext_ctlOf {coord : Fin dt.dd → dt.CtlIx} (hcoord : Function.Injective coord)
+private theorem ptrNext_ctlOf {coord : Fin dt.dd → dt.CtlIx} (hcoord : Function.Injective coord)
     (f₀ : dt.CtlIx → A) (b : Option dt.KIx) (t : Fin dt.dd → A) :
     dt.ptrNext coord b (dt.ctlOf coord f₀ t) =
       dt.ctlOf coord f₀ (blkNext A dt.KIx dt.dd (b, t)).2 := by
@@ -290,7 +295,7 @@ omit [Finite R'] [Finite P'] [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd
 /-- **A roll-over lands in the next block's first register**, which is what
 `DescriptiveComplexity.Draw.SweepSpec.nx` being a function of the block alone
 buys: at the last tuple the advance's block is `blkNextB` of the current one. -/
-theorem blkNext_fst_of_roll (zero one : A) (coord : Fin dt.dd → dt.CtlIx)
+private theorem blkNext_fst_of_roll (zero one : A) (coord : Fin dt.dd → dt.CtlIx)
     {b : Option dt.KIx}
     {f : dt.CtlIx → A} (hroll : (dt.buildSpec zero one coord).Roll b f) :
     (blkNext A dt.KIx dt.dd (b, dt.ptrTup coord f)).1 =
@@ -346,7 +351,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A] [Nonempty A]
 /-- **The guess's write installs the guessed tracks**: at the cell under the
 head, the background of the state with its stage tracks replaced – which is what
 the guessing run asks of the rule, and all it asks. -/
-theorem guessWr_eq_passTracks {zero one : A} {hdd : dt.dd0 ≤ dt.dd}
+private theorem guessWr_eq_passTracks {zero one : A} {hdd : dt.dd0 ≤ dt.dd}
     {lay : Layout dt A R' P' I} {st : TapeSt dt A R' P' I}
     (σ : dt.d.B.ι → (Univ A R' P' dt.KIx dt.dd → Prop) → Prop)
     {t : dt.SlotIx} (hne : ∀ i : dt.d.B.ι, (Slot.old i : dt.SlotIx) ≠ t)

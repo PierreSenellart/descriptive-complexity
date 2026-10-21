@@ -68,7 +68,7 @@ theorem bitVal_iff (hne : zero ≠ one) : bitVal zero one P = one ↔ P := by
   · exact iff_of_false (by rw [bitVal_neg hp]; exact hne) hp
 
 /-- Bits that agree are the same element. -/
-theorem bitVal_congr (h : P ↔ Q) : bitVal zero one P = bitVal zero one Q := by
+private theorem bitVal_congr (h : P ↔ Q) : bitVal zero one P = bitVal zero one Q := by
   by_cases hp : P
   · rw [bitVal_pos hp, bitVal_pos (h.mp hp)]
   · rw [bitVal_neg hp, bitVal_neg fun hc => hp (h.mpr hc)]
@@ -93,14 +93,14 @@ theorem slotPl_apply (f : S → A) (s : S) : slotPl f (Fintype.equivFin S s) = f
 
 /-- **A payload is determined by its slots**, so a distinctness obligation about
 elements is one about the fields a program named. -/
-theorem slotPl_injective : Function.Injective (slotPl (S := S) (A := A)) := by
+private theorem slotPl_injective : Function.Injective (slotPl (S := S) (A := A)) := by
   intro f g h
   refine funext fun s => ?_
   have := congrFun h (Fintype.equivFin S s)
   rwa [slotPl_apply, slotPl_apply] at this
 
 /-- Payloads agreeing slot by slot are equal. -/
-theorem slotPl_congr {f g : S → A} (h : ∀ s, f s = g s) : slotPl f = slotPl g :=
+private theorem slotPl_congr {f g : S → A} (h : ∀ s, f s = g s) : slotPl f = slotPl g :=
   congrArg _ (funext h)
 
 /-- **Reading a payload by name**: the value a coordinate holds, addressed by its

@@ -11,6 +11,12 @@ public import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Syntax
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Hamilton.Cycle
+import all DescriptiveComplexity.Problems.Hamilton.Defs
+import all DescriptiveComplexity.Problems.Hamilton.Membership
 
 /-!
 # #Directed Hamilton Circuit: counting the circuits
@@ -60,7 +66,7 @@ def CycSucc (Le : A → A → Prop) (x y : A) : Prop :=
   SuccOf Le x y ∨ ((∀ z, Le z x) ∧ ∀ z, Le y z)
 
 /-- The cyclic successor along an increasing enumeration is the next index. -/
-theorem cycSucc_iff {Le : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
+private theorem cycSucc_iff {Le : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
     (hmono : ∀ j k : Fin n, Le (f j) (f k) ↔ j ≤ k) (x y : A) :
     CycSucc Le x y ↔ y = f (nextIdx (f.symm x)) := by
   constructor
@@ -87,7 +93,7 @@ def IsCircuit (R : A → A → Prop) (Nxt : A → A → Prop) : Prop :=
     ∀ x y, Nxt x y → R x y
 
 /-- A relation has a tour iff it has a circuit. -/
-theorem tourOn_iff_exists_circuit {R : A → A → Prop} :
+private theorem tourOn_iff_exists_circuit {R : A → A → Prop} :
     TourOn R ↔ ∃ Nxt, IsCircuit R Nxt := by
   constructor
   · rintro ⟨Le, hlin, hs, hw⟩
@@ -281,7 +287,7 @@ noncomputable def SharpDirHamCircuit : CountingProblem Language.digraph where
   iso_invariant := fun e => Nat.card_congr
     (circuitEquiv e.toEquiv fun a a' => relMap_equiv₂ e dgArc a a')
 
-theorem sharpDirHamCircuit_apply (A : Type) [Language.digraph.Structure A] :
+private theorem sharpDirHamCircuit_apply (A : Type) [Language.digraph.Structure A] :
     SharpDirHamCircuit A = Nat.card {Nxt : A → A → Prop // DirCircuit A Nxt} :=
   rfl
 
@@ -314,19 +320,19 @@ abbrev dhcOrdSym : dhcLang.Relations 2 := Sum.inl (Sum.inr leSymb)
 
 /-- Kernel conjunct: the guessed order starts where the order of the instance
 does. -/
-noncomputable def dhcRootClause : dhcLang.Sentence :=
+private noncomputable def dhcRootClause : dhcLang.Sentence :=
   fo% ∀ x, (∀ z, dhcOrdSym(x, z)) → ∀ y, dhcVarSym(x, y)
 
 /-- The guessed relation is a linear order carrying a tour – of the arcs when
 `dir` is true, of the edges otherwise – and it starts at the least element of
 the instance. -/
-noncomputable def rootedHamKernel (dir : Bool) : dhcLang.Sentence :=
+private noncomputable def rootedHamKernel (dir : Bool) : dhcLang.Sentence :=
   orderFreeKernel hamGuessBlock (hamKernel dir) ⊓ dhcRootClause
 
 /-- The first-order kernel of #Directed Hamilton Circuit: the guessed relation
 is a linear order carrying a tour, and it starts at the least element of the
 instance. -/
-noncomputable def sharpDirHamKernel : dhcLang.Sentence :=
+private noncomputable def sharpDirHamKernel : dhcLang.Sentence :=
   rootedHamKernel true
 
 section Kernel
@@ -334,7 +340,7 @@ section Kernel
 variable {A : Type} [Language.digraph.Structure A] [LinearOrder A]
 
 /-- Realization of the rooted tour kernel. -/
-theorem realize_rootedHamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
+private theorem realize_rootedHamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize dhcLang A
         (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) (rootedHamKernel dir)) ↔
       IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧
@@ -367,7 +373,7 @@ theorem realize_rootedHamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
   rw [and_assoc]
 
 /-- Realization of the kernel of #Directed Hamilton Circuit. -/
-theorem realize_sharpDirHamKernel (ρ : hamGuessBlock.Assignment A) :
+private theorem realize_sharpDirHamKernel (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize dhcLang A
         (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) sharpDirHamKernel) ↔
       IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧

@@ -96,7 +96,7 @@ theorem mem_coRE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ coRE ↔ S
 
 /-- Cofinal RE-hardness is the usual notion: every `∃SO[new]`-definable
 problem reduces to `P`. -/
-theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
+private theorem hard_RE_iff [L.IsRelational] (P : DecisionProblem L) :
     RE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SigmaSONewDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
@@ -110,7 +110,7 @@ theorem NP_subset_RE : NP ⊆ RE :=
   fun _ _ _ hP => SigmaSODefinable.toNew hP
 
 /-- `coNP ⊆ coRE`, by complementing `DescriptiveComplexity.NP_subset_RE`. -/
-theorem coNP_subset_coRE : coNP ⊆ coRE :=
+private theorem coNP_subset_coRE : coNP ⊆ coRE :=
   fun _ _ P hP => NP_subset_RE ((mem_piP_iff 1 P).mp hP)
 
 end DescriptiveComplexity

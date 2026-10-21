@@ -154,7 +154,7 @@ unchanged. -/
 variable {L' : Language.{0, 0}} [L'.IsRelational]
 
 /-- Strengthen the target of a reduction by an invariant its images satisfy. -/
-def FOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
+private def FOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
     {Q : DecisionProblem L'}
     (f : P ≤ᶠᵒ Q) (W : DecisionProblem L')
     (h : ∀ (A : Type) [L.Structure A] [Nonempty A], W (f.toInterpretation.Map A)) :
@@ -168,7 +168,7 @@ def FOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
 
 /-- Strengthen the target of an ordered reduction by an invariant its images
 satisfy. -/
-def OrderedFOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
+private def OrderedFOReduction.withInvariant [L.IsRelational] {P : DecisionProblem L}
     {Q : DecisionProblem L'}
     (f : P ≤ᶠᵒ[≤] Q) (W : DecisionProblem L')
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],

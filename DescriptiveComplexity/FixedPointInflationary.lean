@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.FixedPoint
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # FO(IFP): first-order logic with an inflationary fixed point
@@ -88,15 +92,15 @@ def IFPHolds (d : StepDef L) (A : Type) [L.Structure A] : Prop :=
 
 /-- Negating the output complements the defined property: FO(IFP) is closed
 under complement *by construction*, being a logic rather than a fragment. -/
-def not (d : StepDef L) : StepDef L :=
+private def not (d : StepDef L) : StepDef L :=
   { B := d.B, step := d.step, out := ∼d.out }
 
-theorem ifpHolds_not (d : StepDef L) (A : Type) [L.Structure A] :
+private theorem ifpHolds_not (d : StepDef L) (A : Type) [L.Structure A] :
     d.not.IFPHolds A ↔ ¬d.IFPHolds A :=
   Iff.rfl
 
 /-- The value of an inflationary definition is isomorphism-invariant. -/
-theorem ifpHolds_equiv (d : StepDef L) {M N : Type} [L.Structure M] [L.Structure N]
+private theorem ifpHolds_equiv (d : StepDef L) {M N : Type} [L.Structure M] [L.Structure N]
     (e : M ≃[L] N) : d.IFPHolds M ↔ d.IFPHolds N := by
   rw [IFPHolds, IFPHolds, d.inflLimit_map e]
   exact realize_sentence_of_equiv (d.B.extendEquiv' (L' := L) e (d.inflLimit M)) d.out
@@ -127,7 +131,7 @@ def IFPDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
 
 /-- Order-free FO(IFP) definability only depends on the finite instances of a
 problem. -/
-theorem ifpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
+private theorem ifpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     IFPDefinableFree P ↔ IFPDefinableFree Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _
@@ -136,7 +140,7 @@ theorem ifpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
 
 /-- FO(≤, IFP) definability only depends on the finite instances of a
 problem. -/
-theorem ifpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
+private theorem ifpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     IFPDefinable P ↔ IFPDefinable Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _ _
@@ -301,14 +305,14 @@ section Realize
 
 variable {A : Type} [L.Structure A] (ρ : B.Assignment A)
 
-theorem realize_bodyAtomF (b : SOAtom B k) {n : ℕ} (w : Fin n ⊕ Fin k → A) :
+private theorem realize_bodyAtomF (b : SOAtom B k) {n : ℕ} (w : Fin n ⊕ Fin k → A) :
     (@Formula.Realize _ A (B.structure₁ (L := L) ρ) _ (bodyAtomF b) w) ↔
       b.Holds ρ fun q => w (Sum.inr q) := by
   let := B.structure₁ (L := L) ρ
   rw [bodyAtomF, Formula.realize_rel]
   exact Iff.rfl
 
-theorem realize_guardStepF (φ : L.Formula (Fin k)) {n : ℕ} (w : Fin n ⊕ Fin k → A) :
+private theorem realize_guardStepF (φ : L.Formula (Fin k)) {n : ℕ} (w : Fin n ⊕ Fin k → A) :
     (@Formula.Realize _ A (B.structure₁ (L := L) ρ) _ (guardStepF (B := B) φ) w) ↔
       φ.Realize fun q => w (Sum.inr q) := by
   let := B.structure₁ (L := L) ρ
@@ -317,7 +321,7 @@ theorem realize_guardStepF (φ : L.Formula (Fin k)) {n : ℕ} (w : Fin n ⊕ Fin
 
 /-- **The step formula induced by a list of rules realizes as one round of
 rule application** (`DescriptiveComplexity.stepDerives`). -/
-theorem realize_hornStepF (rules : List (HornClause L B k)) (i : B.ι)
+private theorem realize_hornStepF (rules : List (HornClause L B k)) (i : B.ι)
     (x : Fin (B.arity i) → A) :
     (@Formula.Realize _ A (B.structure₁ (L := L) ρ) _ (hornStepF rules i) x) ↔
       stepDerives rules (fun q => ρ q.1 q.2) (⟨i, x⟩ : BAtom B A) := by
@@ -404,7 +408,7 @@ theorem inflStage_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrd
 
 /-- The value of the induced inflationary iteration is the least fixed point
 of the rules. -/
-theorem inflLimit_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrder A] :
+private theorem inflLimit_toStepDef (d : LFPDef L) (A : Type) [L.Structure A] [LinearOrder A] :
     d.toStepDef.inflLimit A = lfpAssign d.rules := by
   funext i x
   refine propext ?_

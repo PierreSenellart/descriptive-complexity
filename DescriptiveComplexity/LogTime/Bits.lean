@@ -10,6 +10,8 @@ public import Mathlib.Data.Nat.Log
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.Fintype.Lattice
 public import DescriptiveComplexity.LogTime.Definable
+import all DescriptiveComplexity.LogTime.Definable
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The bit layer of a finite ordered universe
@@ -80,7 +82,7 @@ section NatBits
 
 /-- **A bit is a comparison of the remainder**: the bit of `x` at place value
 `2 ^ i` is set exactly when `x` is at least `2 ^ i` modulo `2 ^ (i + 1)`. -/
-theorem testBit_iff_two_pow_le_mod (x i : ℕ) :
+private theorem testBit_iff_two_pow_le_mod (x i : ℕ) :
     x.testBit i = true ↔ 2 ^ i ≤ x % 2 ^ (i + 1) := by
   have h2 : (0 : ℕ) < 2 ^ i := Nat.two_pow_pos i
   have key : x % 2 ^ (i + 1) / 2 ^ i = x / 2 ^ i % 2 := by
@@ -105,7 +107,7 @@ theorem testBit_iff_two_pow_le_mod (x i : ℕ) :
 exactly when `x` splits as a multiple of `2 ^ (i + 1)` plus a remainder between
 `2 ^ i` and `2 ^ (i + 1)`. Every witness is at most `x`, which is what makes the
 statement survive the truncation of a finite universe. -/
-theorem testBit_iff_exists_split (x i : ℕ) :
+private theorem testBit_iff_exists_split (x i : ℕ) :
     x.testBit i = true ↔
       ∃ u v : ℕ, u + v = x ∧ 2 ^ i ≤ v ∧ v < 2 ^ (i + 1) ∧ 2 ^ (i + 1) ∣ u := by
   rw [testBit_iff_two_pow_le_mod]
@@ -123,14 +125,14 @@ theorem testBit_iff_exists_split (x i : ℕ) :
 
 /-- Below `2 ^ (i + 1)` a bit is just a comparison: the truncated case, where
 the doubling of the place value has overflowed the universe. -/
-theorem testBit_iff_le_of_lt {x i : ℕ} (h : x < 2 ^ (i + 1)) :
+private theorem testBit_iff_le_of_lt {x i : ℕ} (h : x < 2 ^ (i + 1)) :
     x.testBit i = true ↔ 2 ^ i ≤ x := by
   rw [testBit_iff_two_pow_le_mod, Nat.mod_eq_of_lt h]
 
 /-- **Powers of two, by their divisors**: a nonzero number all of whose divisors
 are `1` or even is a power of two. This is the first-order reading of “`p` is a
 position”, and it needs no primality. -/
-theorem eq_two_pow_of_forall_dvd :
+private theorem eq_two_pow_of_forall_dvd :
     ∀ p : ℕ, p ≠ 0 → (∀ d, d ∣ p → d = 1 ∨ 2 ∣ d) → ∃ i, p = 2 ^ i := by
   intro p
   induction p using Nat.strong_induction_on with
@@ -144,7 +146,7 @@ theorem eq_two_pow_of_forall_dvd :
       exact ⟨i + 1, by rw [hi, pow_succ, Nat.mul_comm]⟩
 
 /-- The converse: every divisor of a power of two is `1` or even. -/
-theorem forall_dvd_of_eq_two_pow {p : ℕ} {i : ℕ} (hp : p = 2 ^ i) :
+private theorem forall_dvd_of_eq_two_pow {p : ℕ} {i : ℕ} (hp : p = 2 ^ i) :
     ∀ d, d ∣ p → d = 1 ∨ 2 ∣ d := by
   subst hp
   intro d hd
@@ -158,18 +160,18 @@ noncomputable def bitsVal (b : ℕ → Bool) (m : ℕ) : ℕ :=
   ∑ i ∈ Finset.range m, if b i then 2 ^ i else 0
 
 /-- Peeling the top bit of a finite bit vector. -/
-theorem bitsVal_succ (b : ℕ → Bool) (m : ℕ) :
+private theorem bitsVal_succ (b : ℕ → Bool) (m : ℕ) :
     bitsVal b (m + 1) = bitsVal b m + (if b m then 2 ^ m else 0) := by
   rw [bitsVal, Finset.sum_range_succ, ← bitsVal]
 
-theorem bitsVal_lt (b : ℕ → Bool) (m : ℕ) : bitsVal b m < 2 ^ m := by
+private theorem bitsVal_lt (b : ℕ → Bool) (m : ℕ) : bitsVal b m < 2 ^ m := by
   induction m with
   | zero => simp [bitsVal]
   | succ m ih =>
     rw [bitsVal_succ, pow_succ]
     split <;> omega
 
-theorem testBit_bitsVal (b : ℕ → Bool) (m : ℕ) {i : ℕ} (hi : i < m) :
+private theorem testBit_bitsVal (b : ℕ → Bool) (m : ℕ) {i : ℕ} (hi : i < m) :
     (bitsVal b m).testBit i = b i := by
   induction m with
   | zero => omega
@@ -208,12 +210,12 @@ noncomputable def posCount (A : Type) [LinearOrder A] [Finite A] : ℕ :=
   Nat.clog 2 (Nat.card A)
 
 /-- A place value is that of a position exactly when it is a rank. -/
-theorem two_pow_lt_card_iff_lt_posCount (i : ℕ) :
+private theorem two_pow_lt_card_iff_lt_posCount (i : ℕ) :
     2 ^ i < Nat.card A ↔ i < posCount A :=
   (Nat.lt_clog_iff_pow_lt (by norm_num)).symm
 
 /-- Above the positions, every rank has a zero bit. -/
-theorem testBit_orank_eq_false {x : A} {i : ℕ} (hi : posCount A ≤ i) :
+private theorem testBit_orank_eq_false {x : A} {i : ℕ} (hi : posCount A ≤ i) :
     (orank x).testBit i = false := by
   refine Nat.testBit_lt_two_pow (lt_of_lt_of_le (orank_lt_card x) ?_)
   exact le_trans (Nat.le_pow_clog (by norm_num) _) (Nat.pow_le_pow_right (by norm_num) hi)
@@ -235,7 +237,7 @@ theorem orank_eq_two_pow_posExp {p : A} (h : IsPos p) : orank p = 2 ^ posExp p :
   rw [posExp_eq hi, hi]
 
 /-- Every exponent in range is the exponent of a position. -/
-theorem exists_isPos {i : ℕ} (hi : i < posCount A) : ∃ p : A, orank p = 2 ^ i :=
+private theorem exists_isPos {i : ℕ} (hi : i < posCount A) : ∃ p : A, orank p = 2 ^ i :=
   exists_orank_eq (two_pow_lt_card_iff_lt_posCount i |>.mpr hi)
 
 /-- **Being a position is first-order**: a nonzero rank all of whose divisors
@@ -331,7 +333,7 @@ def BitAt (p x : A) : Prop :=
 
 /-- **`BitAt` is `BIT`**: at a position of place value `2 ^ i`, it is the `i`-th
 bit of the rank. -/
-theorem bitAt_iff {p x : A} {i : ℕ} (hp : orank p = 2 ^ i) :
+private theorem bitAt_iff {p x : A} {i : ℕ} (hp : orank p = 2 ^ i) :
     BitAt p x ↔ (orank x).testBit i = true := by
   by_cases hq : ∃ q : A, orank p + orank p = orank q
   · obtain ⟨q, hqe⟩ := hq
@@ -401,14 +403,14 @@ omit [Finite A] in
 theorem bitIx_iff {i x : A} : BitIx i x ↔ (orank x).testBit (orank i) = true := Iff.rfl
 
 /-- **A bit that is set is at a position of the universe.** -/
-theorem orank_lt_posCount_of_bitIx {i x : A} (h : BitIx i x) : orank i < posCount A := by
+private theorem orank_lt_posCount_of_bitIx {i x : A} (h : BitIx i x) : orank i < posCount A := by
   by_contra hcon
   rw [bitIx_iff, testBit_orank_eq_false (by omega)] at h
   exact Bool.noConfusion h
 
 /-- A finite nonempty order has a greatest element – the one a formula reads
 the top index off. -/
-theorem exists_isMax (A : Type) [LinearOrder A] [Finite A] [Nonempty A] :
+private theorem exists_isMax (A : Type) [LinearOrder A] [Finite A] [Nonempty A] :
     ∃ m : A, ∀ k : A, k ≤ m := Finite.exists_max (fun a : A => a)
 
 /-- **The two namings agree**: the bit at the index `i` is the bit at the place
@@ -437,7 +439,7 @@ is `Nat.card A - 1`, which lies between `2 ^ (posCount A - 1)` and
 `2 ^ posCount A`. This is what lets a formula find the end of the tape without
 any arithmetic on exponents – it reads it off the bits of an element it
 already has. -/
-theorem bitIx_max_of_isTopIx {i m : A} (hm : ∀ k : A, k ≤ m) (h : IsTopIx i) :
+private theorem bitIx_max_of_isTopIx {i m : A} (hm : ∀ k : A, k ≤ m) (h : IsTopIx i) :
     BitIx i m := by
   have hcard : 0 < Nat.card A := lt_of_le_of_lt (Nat.zero_le _) (orank_lt_card m)
   have hpos : 0 < posCount A := by rw [IsTopIx] at h; omega
@@ -451,14 +453,14 @@ theorem bitIx_max_of_isTopIx {i m : A} (hm : ∀ k : A, k ≤ m) (h : IsTopIx i)
   exact Nat.le_sub_one_of_lt hlt
 
 /-- Every index below the count is the rank of an element. -/
-theorem lt_card_of_lt_posCount {d : ℕ} (h : d < posCount A) : d < Nat.card A :=
+private theorem lt_card_of_lt_posCount {d : ℕ} (h : d < posCount A) : d < Nat.card A :=
   lt_of_le_of_lt (Nat.le_of_lt (Nat.lt_two_pow_self))
     ((two_pow_lt_card_iff_lt_posCount d).mpr h)
 
 /-- **The count of positions is itself a rank**: there are never more bit
 positions than elements, so a formula may quantify over an index one above the
 top – which is what pins the absence of a carry out of the last position. -/
-theorem posCount_lt_card [Nonempty A] : posCount A < Nat.card A := by
+private theorem posCount_lt_card [Nonempty A] : posCount A < Nat.card A := by
   rcases Nat.eq_zero_or_pos (posCount A) with h0 | hpos
   · rw [h0]
     exact Nat.card_pos
@@ -492,7 +494,7 @@ theorem isTopIx_iff_bits {i m : A} (hm : ∀ k : A, k ≤ m) :
 
 /-- **A low index, read from the same bits**: one with a bit of the greatest
 element strictly above it. -/
-theorem isLowIx_iff_bits {i m : A} (hm : ∀ k : A, k ≤ m) :
+private theorem isLowIx_iff_bits {i m : A} (hm : ∀ k : A, k ≤ m) :
     IsLowIx i ↔ ∃ k : A, i < k ∧ BitIx k m := by
   constructor
   · intro h
@@ -519,19 +521,19 @@ section Definability
 variable {L : Language.{0, 0}} {α : Type}
 
 /-- The strict order between two variables is definable. -/
-theorem arithDef_lt (x y : α) :
+private theorem arithDef_lt (x y : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => v x < v y) :=
   ((arithDef_le x y).and (arithDef_le y x).not).congr fun _ _ _ _ _ _ =>
     lt_iff_le_not_ge.symm
 
 /-- A rank being zero is definable: `x + x = x` holds of the least element
 only. -/
-theorem arithDef_isZero (x : α) :
+private theorem arithDef_isZero (x : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => orank (v x) = 0) :=
   (arithDef_plus x x x).congr fun _ _ _ _ _ _ => by omega
 
 /-- A rank being one is definable: an idempotent nonzero rank. -/
-theorem arithDef_isOne (x : α) :
+private theorem arithDef_isOne (x : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => orank (v x) = 1) :=
   ((arithDef_times x x x).and (arithDef_isZero x).not).congr fun _ _ _ _ _ v => by
     constructor
@@ -544,7 +546,7 @@ theorem arithDef_isOne (x : α) :
 
 /-- **Being a position is definable**, by
 `DescriptiveComplexity.isPos_iff_forall_dvd`. -/
-theorem arithDef_isPos (x : α) :
+private theorem arithDef_isPos (x : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => IsPos (v x)) := by
   have hdvd : ArithDef (L := L) (α := α ⊕ Fin 1)
       (fun _ _ _ _ _ u => ∃ w : Fin 1 → _, orank (w 0) * orank (u (Sum.inr 0)) =

@@ -10,6 +10,9 @@ public import DescriptiveComplexity.Problems.CliqueFamily.FromSat
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 import DescriptiveComplexity.Counting.Subtractive
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.CliqueFamily.Counting
+import all DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 
 /-!
 # #Clique is parsimoniously `#P`-complete
@@ -67,28 +70,28 @@ def ForceAt (c x : A) (s : Bool) (y : A) (t b : Bool) : Prop :=
 
 /-- The choices `(c, x, s)` and `(c', x', s')` disagree: some variable is made
 true by the first and false by the second. -/
-def Clash (c x : A) (s : Bool) (c' x' : A) (s' : Bool) : Prop :=
+private def Clash (c x : A) (s : Bool) (c' x' : A) (s' : Bool) : Prop :=
   ∃ y, (∃ t, ForceAt c x s y t true) ∧ ∃ t, ForceAt c' x' s' y t false
 
 /-- The choice `(c, x, s)` is a literal occurrence whose demands are
 consistent. -/
-def Sound (c x : A) (s : Bool) : Prop :=
+private def Sound (c x : A) (s : Bool) : Prop :=
   OccIn c x s ∧ ¬Clash c x s c x s
 
 /-- The vertices that have neighbours: consistent occurrences, and diagonal
 clause vertices. -/
-def Valid : SatCliqueTag → A → A → Prop
+private def Valid : SatCliqueTag → A → A → Prop
   | .pos, c, x => Sound c x true
   | .neg, c, x => Sound c x false
   | .cl, c, x => c = x ∧ IsCl c
 
 /-- Two occurrences are of distinct clauses and agree. -/
-def SepS (s₁ s₂ : Bool) (c₁ x₁ c₂ x₂ : A) : Prop :=
+private def SepS (s₁ s₂ : Bool) (c₁ x₁ c₂ x₂ : A) : Prop :=
   c₁ ≠ c₂ ∧ ¬Clash c₁ x₁ s₁ c₂ x₂ s₂ ∧ ¬Clash c₂ x₂ s₂ c₁ x₁ s₁
 
 /-- What adjacency asks of a pair of vertices beyond their validity: of two
 occurrence vertices, that they be of distinct clauses and agree. -/
-def Sep : SatCliqueTag → A → A → SatCliqueTag → A → A → Prop
+private def Sep : SatCliqueTag → A → A → SatCliqueTag → A → A → Prop
   | .pos, c₁, x₁, .pos, c₂, x₂ => SepS true true c₁ x₁ c₂ x₂
   | .pos, c₁, x₁, .neg, c₂, x₂ => SepS true false c₁ x₁ c₂ x₂
   | .neg, c₁, x₁, .pos, c₂, x₂ => SepS false true c₁ x₁ c₂ x₂
@@ -96,29 +99,29 @@ def Sep : SatCliqueTag → A → A → SatCliqueTag → A → A → Prop
   | _, _, _, _, _, _ => True
 
 /-- The adjacency condition of the interpreted graph. -/
-def AdjCore (t₁ : SatCliqueTag) (c₁ x₁ : A) (t₂ : SatCliqueTag) (c₂ x₂ : A) : Prop :=
+private def AdjCore (t₁ : SatCliqueTag) (c₁ x₁ : A) (t₂ : SatCliqueTag) (c₂ x₂ : A) : Prop :=
   Valid t₁ c₁ x₁ ∧ Valid t₂ c₂ x₂ ∧ Sep t₁ c₁ x₁ t₂ c₂ x₂
 
 /-- The marking condition of the interpreted graph: two vertices per
 clause. -/
-def MarkedCore : SatCliqueTag → A → A → Prop
+private def MarkedCore : SatCliqueTag → A → A → Prop
   | .neg, _, _ => False
   | _, c, x => c = x ∧ IsCl c
 
-theorem valid_ofSign {s : Bool} {c x : A} : Valid (.ofSign s) c x ↔ Sound c x s := by
+private theorem valid_ofSign {s : Bool} {c x : A} : Valid (.ofSign s) c x ↔ Sound c x s := by
   cases s <;> exact Iff.rfl
 
-theorem sep_ofSign {s₁ s₂ : Bool} {c₁ x₁ c₂ x₂ : A} :
+private theorem sep_ofSign {s₁ s₂ : Bool} {c₁ x₁ c₂ x₂ : A} :
     Sep (.ofSign s₁) c₁ x₁ (.ofSign s₂) c₂ x₂ ↔ SepS s₁ s₂ c₁ x₁ c₂ x₂ := by
   cases s₁ <;> cases s₂ <;> exact Iff.rfl
 
-theorem sep_cl_left {c₁ x₁ c₂ x₂ : A} {t : SatCliqueTag} : Sep .cl c₁ x₁ t c₂ x₂ := by
+private theorem sep_cl_left {c₁ x₁ c₂ x₂ : A} {t : SatCliqueTag} : Sep .cl c₁ x₁ t c₂ x₂ := by
   cases t <;> trivial
 
-theorem sep_cl_right {c₁ x₁ c₂ x₂ : A} {t : SatCliqueTag} : Sep t c₁ x₁ .cl c₂ x₂ := by
+private theorem sep_cl_right {c₁ x₁ c₂ x₂ : A} {t : SatCliqueTag} : Sep t c₁ x₁ .cl c₂ x₂ := by
   cases t <;> trivial
 
-theorem Valid.isCl {t : SatCliqueTag} {c x : A} (h : Valid t c x) : IsCl c := by
+private theorem Valid.isCl {t : SatCliqueTag} {c x : A} (h : Valid t c x) : IsCl c := by
   cases t
   · exact OccIn.isCl h.1
   · exact OccIn.isCl h.1
@@ -126,30 +129,30 @@ theorem Valid.isCl {t : SatCliqueTag} {c x : A} (h : Valid t c x) : IsCl c := by
 
 omit [Language.sat.Structure A] in
 /-- The value of a variable, read off the truth of one of its literals. -/
-theorem iff_true_of_litTrue {ν : A → Prop} {y : A} {t b : Bool} {P : Prop}
+private theorem iff_true_of_litTrue {ν : A → Prop} {y : A} {t b : Bool} {P : Prop}
     (h : LitTrue ν y t ↔ P) (hb : b = t ↔ P) : ν y ↔ b = true := by
   cases t <;> cases b <;> simp_all [LitTrue]
 
 omit [Language.sat.Structure A] in
 /-- The truth of a literal, read off the value of its variable. -/
-theorem litTrue_iff_of_true {ν : A → Prop} {y : A} {t b : Bool} {P : Prop}
+private theorem litTrue_iff_of_true {ν : A → Prop} {y : A} {t b : Bool} {P : Prop}
     (h : ν y ↔ b = true) (hb : b = t ↔ P) : LitTrue ν y t ↔ P := by
   cases t <;> cases b <;> simp_all [LitTrue]
 
 /-- Some value is forced. -/
-theorem exists_force (P : Prop) (t : Bool) : ∃ b : Bool, b = t ↔ P := by
+private theorem exists_force (P : Prop) (t : Bool) : ∃ b : Bool, b = t ↔ P := by
   by_cases h : P
   · exact ⟨t, by simp [h]⟩
   · exact ⟨!t, by cases t <;> simp [h]⟩
 
-theorem occIn_satOccurs {c y : A} {t : Bool} (h : OccIn c y t) : SatOccurs A y := by
+private theorem occIn_satOccurs {c y : A} {t : Bool} (h : OccIn c y t) : SatOccurs A y := by
   cases t
   · exact ⟨c, h.1, Or.inr h.2⟩
   · exact ⟨c, h.1, Or.inl h.2⟩
 
 /-- Under an exactly-one assignment, the literals of a clause other than its
 true one are false. -/
-theorem litTrue_iff_chosen {ν : A → Prop} (hν : OneInProper ν) {c x : A} {s : Bool}
+private theorem litTrue_iff_chosen {ν : A → Prop} (hν : OneInProper ν) {c x : A} {s : Bool}
     (hx : OccIn c x s) (hT : LitTrue ν x s) {y : A} {t : Bool} (hy : OccIn c y t) :
     LitTrue ν y t ↔ (y = x ∧ t = s) := by
   obtain ⟨x₀, s₀, -, -, huniq⟩ := hν c (OccIn.isCl hx)
@@ -164,13 +167,13 @@ theorem litTrue_iff_chosen {ν : A → Prop} (hν : OneInProper ν) {c x : A} {s
 
 /-- An exactly-one assignment gives every variable the value its true literals
 force. -/
-theorem forced_of_model {ν : A → Prop} (hν : OneInProper ν) {c x : A} {s : Bool}
+private theorem forced_of_model {ν : A → Prop} (hν : OneInProper ν) {c x : A} {s : Bool}
     (hx : OccIn c x s) (hT : LitTrue ν x s) {y : A} {t b : Bool}
     (hf : ForceAt c x s y t b) : ν y ↔ b = true :=
   iff_true_of_litTrue (litTrue_iff_chosen hν hx hT hf.1) hf.2
 
 /-- The true literals of an exactly-one assignment agree. -/
-theorem not_clash_of_model {ν : A → Prop} (hν : OneInProper ν) {c x c' x' : A}
+private theorem not_clash_of_model {ν : A → Prop} (hν : OneInProper ν) {c x c' x' : A}
     {s s' : Bool} (hx : OccIn c x s) (hT : LitTrue ν x s) (hx' : OccIn c' x' s')
     (hT' : LitTrue ν x' s') : ¬Clash c x s c' x' s' := by
   rintro ⟨y, ⟨t, h₁⟩, t', h₂⟩
@@ -252,11 +255,11 @@ section Realize
 
 variable {α : Type} {v : α → A}
 
-theorem realize_forceAtF {s t b : Bool} {c x y : α} :
+private theorem realize_forceAtF {s t b : Bool} {c x y : α} :
     (forceAtF s t b c x y).Realize v ↔ ForceAt (v c) (v x) s (v y) t b := by
   cases s <;> cases t <;> cases b <;> simp [forceAtF, ForceAt]
 
-theorem realize_clashF {s s' : Bool} {c x c' x' : α} :
+private theorem realize_clashF {s s' : Bool} {c x c' x' : α} :
     (clashF s s' c x c' x').Realize v ↔ Clash (v c) (v x) s (v c') (v x') s' := by
   simp only [clashF, Formula.realize_iExs, Formula.realize_sup, Formula.realize_inf,
     realize_forceAtF, Sum.elim_inl, Sum.elim_inr]
@@ -274,38 +277,38 @@ theorem realize_clashF {s s' : Bool} {c x c' x' : α} :
     · cases t'
       exacts [Or.inl h₂, Or.inr h₂]
 
-theorem realize_soundF {s : Bool} {c x : α} :
+private theorem realize_soundF {s : Bool} {c x : α} :
     (soundF s c x).Realize v ↔ Sound (v c) (v x) s := by
   simp [soundF, Sound, realize_clashF]
 
-theorem realize_validF {t : SatCliqueTag} {c x : α} :
+private theorem realize_validF {t : SatCliqueTag} {c x : α} :
     (validF t c x).Realize v ↔ Valid t (v c) (v x) := by
   cases t <;> simp [validF, Valid, realize_soundF]
 
 end Realize
 
-theorem realize_sepSF {s₁ s₂ : Bool} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_sepSF {s₁ s₂ : Bool} {v : Fin 2 × Fin 2 → A} :
     (sepSF s₁ s₂).Realize v ↔ SepS s₁ s₂ (v (0, 0)) (v (0, 1)) (v (1, 0)) (v (1, 1)) := by
   simp [sepSF, SepS, realize_clashF, and_assoc]
 
-theorem realize_sepF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_sepF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
     (sepF t₁ t₂).Realize v ↔ Sep t₁ (v (0, 0)) (v (0, 1)) t₂ (v (1, 0)) (v (1, 1)) := by
   cases t₁ <;> cases t₂ <;>
     first
       | exact realize_sepSF
       | simp [sepF, Sep]
 
-theorem realize_adjF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_adjF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
     (adjF t₁ t₂).Realize v ↔
       AdjCore t₁ (v (0, 0)) (v (0, 1)) t₂ (v (1, 0)) (v (1, 1)) := by
   simp [adjF, AdjCore, realize_validF, realize_sepF, and_assoc]
 
-theorem realize_markedF {t : SatCliqueTag} {v : Fin 1 × Fin 2 → A} :
+private theorem realize_markedF {t : SatCliqueTag} {v : Fin 1 × Fin 2 → A} :
     (markedF t).Realize v ↔ MarkedCore t (v (0, 0)) (v (0, 1)) := by
   cases t <;> simp [markedF, MarkedCore]
 
 /-- Characterization of the interpreted adjacency relation. -/
-theorem oneInToClique_adj (t₁ t₂ : SatCliqueTag) (w₁ w₂ : Fin 2 → A) :
+private theorem oneInToClique_adj (t₁ t₂ : SatCliqueTag) (w₁ w₂ : Fin 2 → A) :
     RelMap (M := oneInToClique.Map A) mgAdj ![(t₁, w₁), (t₂, w₂)] ↔
       AdjCore t₁ (w₁ 0) (w₁ 1) t₂ (w₂ 0) (w₂ 1) := by
   rw [FOInterpretation.relMap_map]
@@ -314,7 +317,7 @@ theorem oneInToClique_adj (t₁ t₂ : SatCliqueTag) (w₁ w₂ : Fin 2 → A) :
   simp
 
 /-- Characterization of the interpreted mark relation. -/
-theorem oneInToClique_marked (t : SatCliqueTag) (w : Fin 2 → A) :
+private theorem oneInToClique_marked (t : SatCliqueTag) (w : Fin 2 → A) :
     RelMap (M := oneInToClique.Map A) mgMarked ![(t, w)] ↔
       MarkedCore t (w 0) (w 1) := by
   rw [FOInterpretation.relMap_map]
@@ -322,13 +325,13 @@ theorem oneInToClique_marked (t : SatCliqueTag) (w : Fin 2 → A) :
   rw [realize_markedF]
   simp
 
-theorem adj_iff (p q : oneInToClique.Map A) :
+private theorem adj_iff (p q : oneInToClique.Map A) :
     MGAdj p q ↔ AdjCore p.1 (p.2 0) (p.2 1) q.1 (q.2 0) (q.2 1) := by
   obtain ⟨t₁, w₁⟩ := p
   obtain ⟨t₂, w₂⟩ := q
   exact oneInToClique_adj t₁ t₂ w₁ w₂
 
-theorem marked_iff (p : oneInToClique.Map A) :
+private theorem marked_iff (p : oneInToClique.Map A) :
     MGMarked p ↔ MarkedCore p.1 (p.2 0) (p.2 1) := by
   obtain ⟨t, w⟩ := p
   exact oneInToClique_marked t w
@@ -344,24 +347,24 @@ variable {A : Type}
 /-- The vertex of tag `t` at the pair `(c, x)`. -/
 def mkPt (t : SatCliqueTag) (c x : A) : oneInToClique.Map A := (t, ![c, x])
 
-theorem eq_mkPt (p : oneInToClique.Map A) : p = mkPt p.1 (p.2 0) (p.2 1) := by
+private theorem eq_mkPt (p : oneInToClique.Map A) : p = mkPt p.1 (p.2 0) (p.2 1) := by
   obtain ⟨t, w⟩ := p
   refine Prod.ext_iff.mpr ⟨rfl, funext fun j => ?_⟩
   fin_cases j <;> rfl
 
-theorem mkPt_inj {t t' : SatCliqueTag} {c x c' x' : A} (h : mkPt t c x = mkPt t' c' x') :
+private theorem mkPt_inj {t t' : SatCliqueTag} {c x c' x' : A} (h : mkPt t c x = mkPt t' c' x') :
     t = t' ∧ c = c' ∧ x = x' :=
   ⟨congrArg (fun p : oneInToClique.Map A => p.1) h,
     congrArg (fun p : oneInToClique.Map A => p.2 0) h,
     congrArg (fun p : oneInToClique.Map A => p.2 1) h⟩
 
-theorem ofSign_ne_cl (s : Bool) : SatCliqueTag.ofSign s ≠ .cl := by
+private theorem ofSign_ne_cl (s : Bool) : SatCliqueTag.ofSign s ≠ .cl := by
   cases s <;> decide
 
-theorem ofSign_inj {s s' : Bool} (h : SatCliqueTag.ofSign s = .ofSign s') : s = s' := by
+private theorem ofSign_inj {s s' : Bool} (h : SatCliqueTag.ofSign s = .ofSign s') : s = s' := by
   cases s <;> cases s' <;> first | rfl | exact absurd h (by decide)
 
-theorem tag_cases (t : SatCliqueTag) : t = .cl ∨ ∃ s, t = .ofSign s := by
+private theorem tag_cases (t : SatCliqueTag) : t = .cl ∨ ∃ s, t = .ofSign s := by
   cases t
   exacts [Or.inr ⟨true, rfl⟩, Or.inr ⟨false, rfl⟩, Or.inl rfl]
 
@@ -375,13 +378,13 @@ variable {A : Type} [Language.sat.Structure A]
 
 /-- The clique of an assignment: every clause vertex, and the occurrence
 vertices of its true literals. -/
-def cliqueOf (ν : A → Prop) (p : oneInToClique.Map A) : Prop :=
+private def cliqueOf (ν : A → Prop) (p : oneInToClique.Map A) : Prop :=
   (p.1 = .cl ∧ p.2 0 = p.2 1 ∧ IsCl (p.2 0)) ∨
     ∃ s, p.1 = .ofSign s ∧ OccIn (p.2 0) (p.2 1) s ∧ LitTrue ν (p.2 1) s
 
 /-- The assignment of a clique: the variables some occurrence vertex of the
 clique makes true. -/
-def modelOf (S : oneInToClique.Map A → Prop) (y : A) : Prop :=
+private def modelOf (S : oneInToClique.Map A → Prop) (y : A) : Prop :=
   ∃ c x s t, S (mkPt (.ofSign s) c x) ∧ ForceAt c x s y t true
 
 /-- The slots of a clique of the threshold size: two per clause. -/
@@ -389,10 +392,10 @@ abbrev Slot (A : Type) [Language.sat.Structure A] : Type :=
   {c : A // IsCl c} ⊕ {c : A // IsCl c}
 
 /-- The marked vertices, by slot. -/
-def markEnum : Slot A → oneInToClique.Map A :=
+private def markEnum : Slot A → oneInToClique.Map A :=
   Sum.elim (fun c => mkPt .cl c.1 c.1) (fun c => mkPt .pos c.1 c.1)
 
-theorem markEnum_injective : Function.Injective (markEnum (A := A)) := by
+private theorem markEnum_injective : Function.Injective (markEnum (A := A)) := by
   rintro (a | a) (b | b) h <;> obtain ⟨ht, hc, -⟩ := mkPt_inj h
   · exact congrArg Sum.inl (Subtype.ext hc)
   · exact absurd ht (by decide)
@@ -401,12 +404,12 @@ theorem markEnum_injective : Function.Injective (markEnum (A := A)) := by
 
 /-- The vertices of the clique of an exactly-one assignment, by slot: the
 clause vertex, and the occurrence vertex of the true literal. -/
-noncomputable def occEnum {ν : A → Prop} (hν : OneInProper ν) :
+private noncomputable def occEnum {ν : A → Prop} (hν : OneInProper ν) :
     Slot A → oneInToClique.Map A :=
   Sum.elim (fun c => mkPt .cl c.1 c.1)
     (fun c => mkPt (.ofSign (hν c.1 c.2).choose_spec.choose) c.1 (hν c.1 c.2).choose)
 
-theorem occEnum_injective {ν : A → Prop} (hν : OneInProper ν) :
+private theorem occEnum_injective {ν : A → Prop} (hν : OneInProper ν) :
     Function.Injective (occEnum hν) := by
   rintro (a | a) (b | b) h <;> obtain ⟨ht, hc, -⟩ := mkPt_inj h
   · exact congrArg Sum.inl (Subtype.ext hc)
@@ -414,7 +417,7 @@ theorem occEnum_injective {ν : A → Prop} (hν : OneInProper ν) :
   · exact absurd ht (ofSign_ne_cl _)
   · exact congrArg Sum.inr (Subtype.ext hc)
 
-theorem range_occEnum {ν : A → Prop} (hν : OneInProper ν) :
+private theorem range_occEnum {ν : A → Prop} (hν : OneInProper ν) :
     Set.range (occEnum hν) = {p | cliqueOf ν p} := by
   ext p
   simp only [Set.mem_range, Set.mem_ofPred_eq]
@@ -431,7 +434,7 @@ theorem range_occEnum {ν : A → Prop} (hν : OneInProper ν) :
         congr (congrArg (fun t => mkPt (SatCliqueTag.ofSign t) (p.2 0)) h.2.symm) h.1.symm
       exact ⟨.inr ⟨p.2 0, OccIn.isCl ho⟩, he.trans ((eq_mkPt p).trans (by rw [ht])).symm⟩
 
-theorem ncard_cliqueOf {ν : A → Prop} (hν : OneInProper ν) :
+private theorem ncard_cliqueOf {ν : A → Prop} (hν : OneInProper ν) :
     {p | cliqueOf ν p}.ncard = Nat.card (Slot A) := by
   rw [← range_occEnum hν]
   exact Set.ncard_range_of_injective (occEnum_injective hν)
@@ -444,7 +447,7 @@ section Correctness
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem range_markEnum : Set.range (markEnum (A := A)) = {p | MGMarked p} := by
+private theorem range_markEnum : Set.range (markEnum (A := A)) = {p | MGMarked p} := by
   have h : ∀ (t : SatCliqueTag) (c x : A), MarkedCore t c x →
       ∃ i, markEnum i = mkPt t c x := by
     intro t c x h
@@ -466,12 +469,13 @@ theorem range_markEnum : Set.range (markEnum (A := A)) = {p | MGMarked p} := by
     obtain ⟨i, hi⟩ := h p.1 (p.2 0) (p.2 1) hp
     exact ⟨i, hi.trans (eq_mkPt p).symm⟩
 
-theorem ncard_marked : {p : oneInToClique.Map A | MGMarked p}.ncard = Nat.card (Slot A) := by
+private theorem ncard_marked
+    : {p : oneInToClique.Map A | MGMarked p}.ncard = Nat.card (Slot A) := by
   rw [← range_markEnum]
   exact Set.ncard_range_of_injective markEnum_injective
 
 /-- The clique of an exactly-one assignment is one. -/
-theorem adj_cliqueOf {ν : A → Prop} (hν : OneInProper ν) {p q : oneInToClique.Map A}
+private theorem adj_cliqueOf {ν : A → Prop} (hν : OneInProper ν) {p q : oneInToClique.Map A}
     (hp : cliqueOf ν p) (hq : cliqueOf ν q) (hpq : p ≠ q) : MGAdj p q := by
   rw [adj_iff]
   have hvalid : ∀ r : oneInToClique.Map A, cliqueOf ν r → Valid r.1 (r.2 0) (r.2 1) := by
@@ -497,7 +501,7 @@ theorem adj_cliqueOf {ν : A → Prop} (hν : OneInProper ν) {p q : oneInToCliq
       exact (eq_mkPt p).trans (Eq.trans (by rw [ht, ht', hc, hx, hs]) (eq_mkPt q).symm)
 
 /-- The clique of an exactly-one assignment has the threshold size. -/
-theorem cliqueOfSize_cliqueOf [Finite A] {ν : A → Prop} (hν : OneInProper ν) :
+private theorem cliqueOfSize_cliqueOf [Finite A] {ν : A → Prop} (hν : OneInProper ν) :
     CliqueOfSize (oneInToClique.Map A) (cliqueOf ν) :=
   ⟨oneInToClique.map_finite A, fun _ _ hp hq hpq => adj_cliqueOf hν hp hq hpq,
     (ncard_cliqueOf hν).trans ncard_marked.symm⟩
@@ -508,7 +512,7 @@ variable [Finite A] {S : oneInToClique.Map A → Prop}
 
 /-- Every vertex of a clique of the threshold size has a neighbour in it, so
 none is junk. -/
-theorem valid_of_clique (hS : CliqueOfSize (oneInToClique.Map A) S)
+private theorem valid_of_clique (hS : CliqueOfSize (oneInToClique.Map A) S)
     {p : oneInToClique.Map A} (hp : S p) : Valid p.1 (p.2 0) (p.2 1) := by
   obtain ⟨hfin, hadj, hcard⟩ := hS
   have hpos : 0 < {q | S q}.ncard := (Set.ncard_pos (Set.toFinite _)).mpr ⟨p, hp⟩
@@ -519,14 +523,14 @@ theorem valid_of_clique (hS : CliqueOfSize (oneInToClique.Map A) S)
   exact ((adj_iff p q).mp (hadj p q hp hq (Ne.symm hqp))).1
 
 /-- The slot a vertex of a clique fills. -/
-noncomputable def slot (hv : ∀ p : oneInToClique.Map A, S p → Valid p.1 (p.2 0) (p.2 1))
+private noncomputable def slot (hv : ∀ p : oneInToClique.Map A, S p → Valid p.1 (p.2 0) (p.2 1))
     (p : {p // S p}) : Slot A :=
   if p.1.1 = SatCliqueTag.cl then .inl ⟨p.1.2 0, (hv p.1 p.2).isCl⟩
   else .inr ⟨p.1.2 0, (hv p.1 p.2).isCl⟩
 
 omit [Finite A] in
 /-- Two vertices of a clique fill distinct slots. -/
-theorem slot_injective (hadj : ∀ p q : oneInToClique.Map A, S p → S q → p ≠ q → MGAdj p q)
+private theorem slot_injective (hadj : ∀ p q : oneInToClique.Map A, S p → S q → p ≠ q → MGAdj p q)
     (hv : ∀ p : oneInToClique.Map A, S p → Valid p.1 (p.2 0) (p.2 1)) :
     Function.Injective (slot hv) := by
   rintro ⟨p, hp⟩ ⟨q, hq⟩ h
@@ -572,13 +576,13 @@ theorem clique_slots (hS : CliqueOfSize (oneInToClique.Map A) S) (c : A) (hc : I
     have he : p = mkPt (.ofSign s) c (p.2 1) := (eq_mkPt p).trans (by rw [hs, hpc])
     exact ⟨p.2 1, s, Eq.mp (congrArg S he) hp⟩
 
-theorem sound_of_mem (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {c x : A}
+private theorem sound_of_mem (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {c x : A}
     (h : S (mkPt (.ofSign s) c x)) : Sound c x s :=
   valid_ofSign.mp (valid_of_clique hS h)
 
 /-- The assignment of a clique gives every variable the value an occurrence
 vertex of the clique forces. -/
-theorem forced_of_clique (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {c x : A}
+private theorem forced_of_clique (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {c x : A}
     (h : S (mkPt (.ofSign s) c x)) {y : A} {t b : Bool} (hf : ForceAt c x s y t b) :
     modelOf S y ↔ b = true := by
   cases b
@@ -593,7 +597,7 @@ theorem forced_of_clique (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} 
       exact (sep_ofSign.mp hadj.2.2).2.1 ⟨y, ⟨t', hf'⟩, t, hf⟩
   · exact iff_of_true ⟨c, x, s, t, h, hf⟩ rfl
 
-theorem litTrue_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {c x : A}
+private theorem litTrue_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {c x : A}
     (h : S (mkPt (.ofSign s) c x)) {y : A} {t : Bool} (hy : OccIn c y t) :
     LitTrue (modelOf S) y t ↔ (y = x ∧ t = s) := by
   obtain ⟨b, hb⟩ := exists_force (y = x ∧ t = s) t
@@ -601,7 +605,7 @@ theorem litTrue_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) {s : Bool} {
 
 /-- The assignment of a clique of the threshold size is an exactly-one
 model. -/
-theorem oneInModel_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
+private theorem oneInModel_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
     OneInModel A (modelOf S) := by
   refine ⟨fun c hc => ?_, ?_⟩
   · obtain ⟨-, x, s, h⟩ := clique_slots hS c hc
@@ -612,7 +616,7 @@ theorem oneInModel_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
     exact occIn_satOccurs hf.1
 
 /-- A clique of the threshold size is the clique of its assignment. -/
-theorem cliqueOf_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
+private theorem cliqueOf_modelOf (hS : CliqueOfSize (oneInToClique.Map A) S) :
     cliqueOf (modelOf S) = S := by
   have hmod := oneInModel_modelOf hS
   have := hS.1
@@ -636,7 +640,7 @@ end Clique
 
 omit [LinearOrder A] in
 /-- An exactly-one model is the assignment of its clique. -/
-theorem modelOf_cliqueOf {ν : A → Prop} (hν : OneInModel A ν) :
+private theorem modelOf_cliqueOf {ν : A → Prop} (hν : OneInModel A ν) :
     modelOf (cliqueOf ν) = ν := by
   funext y
   refine propext ⟨?_, fun hy => ?_⟩
@@ -661,7 +665,7 @@ variable (A) [Finite A]
 
 /-- **The cliques of the threshold size of the interpreted graph are the
 exactly-one models of the CNF formula**, bijectively. -/
-noncomputable def solEquiv :
+private noncomputable def solEquiv :
     {ν : A → Prop // OneInModel A ν} ≃
       {S : oneInToClique.Map A → Prop // CliqueOfSize (oneInToClique.Map A) S} where
   toFun ν := ⟨cliqueOf ν.1, cliqueOfSize_cliqueOf ν.2.1⟩
@@ -670,7 +674,7 @@ noncomputable def solEquiv :
   right_inv S := Subtype.ext (cliqueOf_modelOf S.2)
 
 /-- **Correctness of the interpretation, for counting.** -/
-theorem sharpClique_map : SharpClique (oneInToClique.Map A) = SharpOneInSAT A := by
+private theorem sharpClique_map : SharpClique (oneInToClique.Map A) = SharpOneInSAT A := by
   rw [sharpClique_apply, sharpOneInSat_apply]
   exact (Nat.card_congr (solEquiv A)).symm
 
@@ -680,7 +684,7 @@ end OneInToClique
 
 open OneInToClique in
 /-- **#1-in-SAT reduces parsimoniously to #Clique.** -/
-noncomputable def sharpOneInSat_ordered_parsimonious_sharpClique :
+private noncomputable def sharpOneInSat_ordered_parsimonious_sharpClique :
     SharpOneInSAT ≤ᵖ[≤] SharpClique where
   Tag := SatCliqueTag
   dim := 2

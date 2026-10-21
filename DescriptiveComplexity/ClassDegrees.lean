@@ -15,6 +15,7 @@ import DescriptiveComplexity.Problems.FinSat.Reduction
 import DescriptiveComplexity.Problems.HornSat.Definability
 import DescriptiveComplexity.Problems.TwoSat.Hardness
 import DescriptiveComplexity.Problems.TwoSat.Membership
+import all DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # The logically defined classes are the degrees of their complete problems
@@ -57,7 +58,7 @@ theorem NP_eq_below_sat : NP = .below SAT :=
 /-- **coNP is the degree of TAUT**.
 Registered in the Lax archive as
 [`Lax604544.ClassesAsDegrees.coNP_eq_below_taut`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.coNP_eq_below_taut). -/
-theorem coNP_eq_below_taut : coNP = .below TAUT :=
+private theorem coNP_eq_below_taut : coNP = .below TAUT :=
   ComplexityClass.eq_below_of_complete TAUT taut_mem_coNP
     (fun Q hQ => taut_hard_of_piSODefinable Q hQ) fun _ => Iff.rfl
 
@@ -71,7 +72,7 @@ theorem PTIME_eq_below_hornSat : PTIME = .below HORNSAT :=
 /-- **NL is the degree of 2SAT**.
 Registered in the Lax archive as
 [`Lax604544.ClassesAsDegrees.NL_eq_below_twoSat`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.NL_eq_below_twoSat). -/
-theorem NL_eq_below_twoSat : NL = .below TwoSAT :=
+private theorem NL_eq_below_twoSat : NL = .below TwoSAT :=
   ComplexityClass.eq_below_of_complete TwoSAT twoSat_mem_NL
     (fun Q hQ => twoSat_hard_of_sigmaSOKromDefinable Q hQ) fun _ => Iff.rfl
 
@@ -79,7 +80,7 @@ theorem NL_eq_below_twoSat : NL = .below TwoSAT :=
 of classes.
 Registered in the Lax archive as
 [`Lax604544.ClassesAsDegrees.RE_eq_below_finsat`](https://laxarchive.org/lax-604544/Lax604544.ClassesAsDegrees.html#s-Lax604544.ClassesAsDegrees.RE_eq_below_finsat). -/
-theorem RE_eq_below_finsat : RE = .below FINSAT :=
+private theorem RE_eq_below_finsat : RE = .below FINSAT :=
   ComplexityClass.eq_below_of_complete FINSAT finsat_mem_RE
     (fun Q hQ => FinSat.finsat_hard_of_sigmaSONewDefinable Q hQ) fun _ => Iff.rfl
 

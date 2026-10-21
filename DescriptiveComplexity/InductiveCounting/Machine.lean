@@ -67,12 +67,13 @@ def RInLe (E : V → V → Prop) : ℕ → V → V → Prop
 
 @[simp] theorem rInLe_zero {a b : V} : RInLe E 0 a b ↔ a = b := Iff.rfl
 
-theorem rInLe_succ {n : ℕ} {a b : V} :
+private theorem rInLe_succ {n : ℕ} {a b : V} :
     RInLe E (n + 1) a b ↔ RInLe E n a b ∨ ∃ c, RInLe E n a c ∧ E c b := Iff.rfl
 
 theorem RInLe.step {n : ℕ} {a b : V} (h : RInLe E n a b) : RInLe E (n + 1) a b := Or.inl h
 
-theorem RInLe.mono {n m : ℕ} {a b : V} (hnm : n ≤ m) (h : RInLe E n a b) : RInLe E m a b := by
+private theorem RInLe.mono
+    {n m : ℕ} {a b : V} (hnm : n ≤ m) (h : RInLe E n a b) : RInLe E m a b := by
   induction m with
   | zero => exact (Nat.le_zero.mp hnm) ▸ h
   | succ m ih =>
@@ -81,7 +82,7 @@ theorem RInLe.mono {n m : ℕ} {a b : V} (hnm : n ≤ m) (h : RInLe E n a b) : R
     · exact (Nat.le_antisymm hnm hge) ▸ h
 
 /-- Prepending an edge to a bounded walk. -/
-theorem RInLe.cons {n : ℕ} {a b c : V} (hab : E a b) (h : RInLe E n b c) :
+private theorem RInLe.cons {n : ℕ} {a b c : V} (hab : E a b) (h : RInLe E n b c) :
     RInLe E (n + 1) a c := by
   induction n generalizing c with
   | zero => exact Or.inr ⟨a, rfl, (rInLe_zero.mp h) ▸ hab⟩
@@ -91,19 +92,19 @@ theorem RInLe.cons {n : ℕ} {a b c : V} (hab : E a b) (h : RInLe E n b c) :
     · exact Or.inr ⟨e, ih he, hec⟩
 
 /-- The set of nodes reachable from a source in at most `d` steps. -/
-def Rset (E : V → V → Prop) (S : V → Prop) : ℕ → Set V
+private def Rset (E : V → V → Prop) (S : V → Prop) : ℕ → Set V
   | 0 => {x | S x}
   | d + 1 => {x | ∃ y ∈ Rset E S d, y = x ∨ E y x}
 
-theorem rset_zero : Rset E S 0 = {x | S x} := rfl
+private theorem rset_zero : Rset E S 0 = {x | S x} := rfl
 
-theorem mem_rset_succ {d : ℕ} {x : V} :
+private theorem mem_rset_succ {d : ℕ} {x : V} :
     x ∈ Rset E S (d + 1) ↔ ∃ y ∈ Rset E S d, y = x ∨ E y x := Iff.rfl
 
-theorem Rset.subset_succ {d : ℕ} : Rset E S d ⊆ Rset E S (d + 1) :=
+private theorem Rset.subset_succ {d : ℕ} : Rset E S d ⊆ Rset E S (d + 1) :=
   fun _ hx => ⟨_, hx, Or.inl rfl⟩
 
-theorem Rset.mono {d e : ℕ} (h : d ≤ e) : Rset E S d ⊆ Rset E S e := by
+private theorem Rset.mono {d e : ℕ} (h : d ≤ e) : Rset E S d ⊆ Rset E S e := by
   induction e with
   | zero => exact (Nat.le_zero.mp h) ▸ subset_rfl
   | succ e ih =>
@@ -113,7 +114,7 @@ theorem Rset.mono {d e : ℕ} (h : d ≤ e) : Rset E S d ⊆ Rset E S e := by
 
 /-- Walking on from a layer: a bounded walk out of `Rset i` lands in a later
 layer. -/
-theorem mem_rset_of_rInLe {i n : ℕ} {y b : V} (hy : y ∈ Rset E S i)
+private theorem mem_rset_of_rInLe {i n : ℕ} {y b : V} (hy : y ∈ Rset E S i)
     (h : RInLe E n y b) : b ∈ Rset E S (i + n) := by
   induction n generalizing b with
   | zero => exact (rInLe_zero.mp h) ▸ hy
@@ -123,7 +124,7 @@ theorem mem_rset_of_rInLe {i n : ℕ} {y b : V} (hy : y ∈ Rset E S i)
     · exact ⟨c, ih hc, Or.inr hcb⟩
 
 /-- Every member of a layer carries a bounded walk from a source. -/
-theorem exists_rInLe_of_mem_rset {d : ℕ} {x : V} (hx : x ∈ Rset E S d) :
+private theorem exists_rInLe_of_mem_rset {d : ℕ} {x : V} (hx : x ∈ Rset E S d) :
     ∃ s, S s ∧ RInLe E d s x := by
   induction d generalizing x with
   | zero => exact ⟨x, hx, rfl⟩
@@ -135,7 +136,7 @@ theorem exists_rInLe_of_mem_rset {d : ℕ} {x : V} (hx : x ∈ Rset E S d) :
     · exact ⟨s, hs, Or.inr ⟨y, hsy, hyx⟩⟩
 
 /-- The layers exhaust the reachable set. -/
-theorem exists_mem_rset_of_reflTransGen {s x : V} (hs : S s)
+private theorem exists_mem_rset_of_reflTransGen {s x : V} (hs : S s)
     (h : Relation.ReflTransGen E s x) : ∃ d, x ∈ Rset E S d := by
   induction h with
   | refl => exact ⟨0, hs⟩
@@ -144,7 +145,7 @@ theorem exists_mem_rset_of_reflTransGen {s x : V} (hs : S s)
     exact ⟨d + 1, ⟨b, hd, Or.inr hbc⟩⟩
 
 /-- Conversely, every member of a layer is reachable from a source. -/
-theorem reflTransGen_of_mem_rset {d : ℕ} {x : V} (hx : x ∈ Rset E S d) :
+private theorem reflTransGen_of_mem_rset {d : ℕ} {x : V} (hx : x ∈ Rset E S d) :
     ∃ s, S s ∧ Relation.ReflTransGen E s x := by
   induction d generalizing x with
   | zero => exact ⟨x, hx, Relation.ReflTransGen.refl⟩
@@ -156,7 +157,7 @@ theorem reflTransGen_of_mem_rset {d : ℕ} {x : V} (hx : x ∈ Rset E S d) :
     · exact ⟨s, hs, hsy.tail hyx⟩
 
 /-- Once a layer repeats, all later layers agree with it. -/
-theorem rset_stabilizes {d : ℕ} (h : Rset E S (d + 1) = Rset E S d) :
+private theorem rset_stabilizes {d : ℕ} (h : Rset E S (d + 1) = Rset E S d) :
     ∀ e, Rset E S (d + e) = Rset E S d := by
   intro e
   induction e with
@@ -168,7 +169,7 @@ theorem rset_stabilizes {d : ℕ} (h : Rset E S (d + 1) = Rset E S d) :
     rw [show d + (e + 1) = d + e + 1 from rfl, this, h]
 
 /-- If no layer contains a target, no target is reachable from a source. -/
-theorem not_reach_target_of_stable {d : ℕ} {T : V → Prop}
+private theorem not_reach_target_of_stable {d : ℕ} {T : V → Prop}
     (hstab : Rset E S (d + 1) = Rset E S d) (hT : ∀ y ∈ Rset E S d, ¬T y) :
     ¬∃ a b, S a ∧ T b ∧ Relation.ReflTransGen E a b := by
   rintro ⟨a, b, ha, hb, hab⟩
@@ -444,7 +445,7 @@ def CfgIsTgt (s : Cfg V) : Prop := s.phase = .accept
 
 /-- The machine accepts: an accepting configuration is reachable from an
 initial one. -/
-def MachineAccepts : Prop :=
+private def MachineAccepts : Prop :=
   ∃ s s' : Cfg V, CfgIsSrc s ∧ CfgIsTgt s' ∧ CfgReach E S T s s'
 
 end Semantics

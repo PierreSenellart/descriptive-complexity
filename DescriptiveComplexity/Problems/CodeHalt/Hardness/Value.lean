@@ -8,6 +8,8 @@ module
 public import Mathlib.Computability.PartrecCode
 import Mathlib.Data.Fintype.Sort
 public import DescriptiveComplexity.Computability.Eval
+import all DescriptiveComplexity.Computability.Eval
+import all DescriptiveComplexity.Computability.FinStruct
 
 /-!
 # The number an instance is written as, and the code that writes it
@@ -75,7 +77,7 @@ def nestLeaf (v : ℕ) (ds : List ℕ) : ℕ := ds.foldl nestGet v
 
 @[simp] theorem nestDrop_zero (v : ℕ) : nestDrop v 0 = v := rfl
 
-theorem nestDrop_succ (a b d : ℕ) : nestDrop (Nat.pair a b) (d + 1) = nestDrop b d := by
+private theorem nestDrop_succ (a b d : ℕ) : nestDrop (Nat.pair a b) (d + 1) = nestDrop b d := by
   rw [nestDrop, Function.iterate_succ_apply, Nat.unpair_pair, nestDrop]
 
 @[simp] theorem nestDrop_zero_left (d : ℕ) : nestDrop 0 d = 0 := by
@@ -91,7 +93,7 @@ theorem nestDrop_succ (a b d : ℕ) : nestDrop (Nat.pair a b) (d + 1) = nestDrop
 @[simp] theorem nestGet_pair_zero (a b : ℕ) : nestGet (Nat.pair a b) 0 = a := by
   rw [nestGet, nestDrop_zero, Nat.unpair_pair]
 
-theorem nestGet_pair_succ (a b d : ℕ) : nestGet (Nat.pair a b) (d + 1) = nestGet b d := by
+private theorem nestGet_pair_succ (a b d : ℕ) : nestGet (Nat.pair a b) (d + 1) = nestGet b d := by
   rw [nestGet, nestDrop_succ, nestGet]
 
 @[simp] theorem nestLeaf_nil (v : ℕ) : nestLeaf v [] = v := rfl
@@ -122,24 +124,24 @@ def codeNestFrom (g : Fin m → Code) (k : ℕ) : Code :=
   if h : k < m then Code.pair (g ⟨k, h⟩) (codeNestFrom g (k + 1)) else Code.zero
   termination_by m - k
 
-theorem natNestFrom_of_lt (g : Fin m → ℕ) {k : ℕ} (h : k < m) :
+private theorem natNestFrom_of_lt (g : Fin m → ℕ) {k : ℕ} (h : k < m) :
     natNestFrom g k = Nat.pair (g ⟨k, h⟩) (natNestFrom g (k + 1)) := by
   rw [natNestFrom, dite_eq_left h]
 
-theorem natNestFrom_of_ge (g : Fin m → ℕ) {k : ℕ} (h : ¬k < m) : natNestFrom g k = 0 := by
+private theorem natNestFrom_of_ge (g : Fin m → ℕ) {k : ℕ} (h : ¬k < m) : natNestFrom g k = 0 := by
   rw [natNestFrom, dite_eq_right h]
 
-theorem codeNestFrom_of_lt (g : Fin m → Code) {k : ℕ} (h : k < m) :
+private theorem codeNestFrom_of_lt (g : Fin m → Code) {k : ℕ} (h : k < m) :
     codeNestFrom g k = Code.pair (g ⟨k, h⟩) (codeNestFrom g (k + 1)) := by
   rw [codeNestFrom, dite_eq_left h]
 
-theorem codeNestFrom_of_ge (g : Fin m → Code) {k : ℕ} (h : ¬k < m) :
+private theorem codeNestFrom_of_ge (g : Fin m → Code) {k : ℕ} (h : ¬k < m) :
     codeNestFrom g k = Code.zero := by
   rw [codeNestFrom, dite_eq_right h]
 
 /-- **Reading an entry of a nest**: `d` links past the start `k` sits the
 entry `k + d`, and `0` past the end. -/
-theorem nestGet_natNestFrom (g : Fin m → ℕ) (d k : ℕ) :
+private theorem nestGet_natNestFrom (g : Fin m → ℕ) (d k : ℕ) :
     nestGet (natNestFrom g k) d = if h : k + d < m then g ⟨k + d, h⟩ else 0 := by
   induction d generalizing k with
   | zero =>
@@ -161,11 +163,11 @@ section Eval
 
 open Nat.Partrec.Code
 
-theorem eval_pair_zero {cf cg : Code} {a b : ℕ} (hf : eval cf 0 = Part.some a)
+private theorem eval_pair_zero {cf cg : Code} {a b : ℕ} (hf : eval cf 0 = Part.some a)
     (hg : eval cg 0 = Part.some b) : eval (Code.pair cf cg) 0 = Part.some (Nat.pair a b) := by
   simp [eval, hf, hg, Seq.seq]
 
-theorem eval_comp_zero {cf cg : Code} {b : ℕ} (hg : eval cg 0 = Part.some b) :
+private theorem eval_comp_zero {cf cg : Code} {b : ℕ} (hg : eval cg 0 = Part.some b) :
     eval (Code.comp cf cg) 0 = eval cf b := by
   simp only [eval, hg]
   exact Part.bind_some _ _
@@ -175,14 +177,14 @@ def numCode : ℕ → Code
   | 0 => Code.zero
   | n + 1 => Code.comp Code.succ (numCode n)
 
-theorem eval_numCode : ∀ n : ℕ, eval (numCode n) 0 = Part.some n
+private theorem eval_numCode : ∀ n : ℕ, eval (numCode n) 0 = Part.some n
   | 0 => rfl
   | n + 1 => by
     rw [numCode, eval_comp_zero (eval_numCode n)]
     rfl
 
 /-- The chain of codes writes the chain of values. -/
-theorem eval_codeNestFrom {m : ℕ} (gc : Fin m → Code) (gv : Fin m → ℕ)
+private theorem eval_codeNestFrom {m : ℕ} (gc : Fin m → Code) (gv : Fin m → ℕ)
     (h : ∀ j, eval (gc j) 0 = Part.some (gv j)) (k : ℕ) :
     eval (codeNestFrom gc k) 0 = Part.some (natNestFrom gv k) := by
   by_cases hk : k < m
@@ -205,7 +207,7 @@ the vocabulary, so that every symbol's arguments fit in a tuple and the tuples
 have at least one coordinate (which the numeral chain walks). -/
 def dimOf (V : FinVocab L) : ℕ := (Finset.univ.sup fun i : Fin V.numSyms => V.arity i) + 1
 
-theorem arity_lt_dimOf (V : FinVocab L) (i : Fin V.numSyms) : V.arity i < dimOf V :=
+private theorem arity_lt_dimOf (V : FinVocab L) (i : Fin V.numSyms) : V.arity i < dimOf V :=
   Nat.lt_succ_of_le (Finset.le_sup (f := fun i : Fin V.numSyms => V.arity i) (Finset.mem_univ i))
 
 theorem arity_le_dimOf (V : FinVocab L) (i : Fin V.numSyms) : V.arity i ≤ dimOf V :=
@@ -370,7 +372,7 @@ omit [L.IsRelational] in
 that tuple.** The induction is on the level: one coordinate is consumed at
 each step, and the tuple built so far is the one the chains have already
 walked. -/
-theorem nestLeaf_levelVal (n : ℕ) (f : Fin n → A) (i : Fin V.numSyms)
+private theorem nestLeaf_levelVal (n : ℕ) (f : Fin n → A) (i : Fin V.numSyms)
     (ds : Fin (dimOf V) → ℕ) (hds : ∀ j, ds j < n) :
     ∀ (m : ℕ), m ≤ dimOf V → ∀ t : Fin (dimOf V) → A,
       (∀ j : Fin (dimOf V), (j : ℕ) < dimOf V - m → t j = f ⟨ds j, hds j⟩) →
@@ -414,7 +416,7 @@ open Classical in
 omit [L.IsRelational] in
 /-- The leaf of the value of a structure is the bit of the tuple the
 coordinates spell out. -/
-theorem leafOf_structVal (n : ℕ) (f : Fin n → A) (t₀ : Fin (dimOf V) → A)
+private theorem leafOf_structVal (n : ℕ) (f : Fin n → A) (t₀ : Fin (dimOf V) → A)
     (i : Fin V.numSyms) (ds : Fin (dimOf V) → ℕ) (hds : ∀ j, ds j < n) :
     leafOf (structVal V n f t₀) (i : ℕ) (List.ofFn ds) =
       if bitOf V i (fun j => f ⟨ds j, hds j⟩) then 1 else 0 := by
@@ -431,7 +433,7 @@ theorem leafOf_structVal (n : ℕ) (f : Fin n → A) (t₀ : Fin (dimOf V) → A
 omit [L.IsRelational] in
 /-- Reading a relation through the number of its symbol: the arity dependency
 of `FirstOrder.Language.FinVocab`, discharged for a `Prop`-valued reading. -/
-theorem relMap_heq {m a : ℕ} (h : m = a) (R : L.Relations m) (R' : L.Relations a)
+private theorem relMap_heq {m a : ℕ} (h : m = a) (R : L.Relations m) (R' : L.Relations a)
     (hR : HEq R R') (y : Fin m → A) (z : Fin a → A) (hy : ∀ j, y j = z (Fin.cast h j)) :
     (RelMap R y : Prop) ↔ RelMap R' z := by
   subst h
@@ -443,7 +445,7 @@ open Classical in
 omit [L.IsRelational] in
 /-- **Reading the decoded structure is reading the structure it was written
 from**, once the two tuples are matched by their numbers. -/
-theorem relMapBool_structVal (n : ℕ) (hn : 0 < n) (f : Fin n → A)
+private theorem relMapBool_structVal (n : ℕ) (hn : 0 < n) (f : Fin n → A)
     (t₀ : Fin (dimOf V) → A) {a : ℕ} (R : L.Relations a)
     (y : Fin a → (structOf V (structVal V n f t₀)).Univ) (z : Fin a → Fin n)
     (hyz : ∀ j, ((y j : Fin _) : ℕ) = ((z j : Fin n) : ℕ)) :
@@ -491,7 +493,7 @@ numbering the value was written with. This is the one mathematical fact the
 reduction rests on: a semi-decision procedure reading concrete instances,
 applied to the value drawn in the instance, answers about the instance
 itself. -/
-noncomputable def structValEquiv (n : ℕ) (hn : 0 < n) (f : Fin n ≃ A)
+private noncomputable def structValEquiv (n : ℕ) (hn : 0 < n) (f : Fin n ≃ A)
     (t₀ : Fin (dimOf V) → A) :
     (structOf V (structVal V n (⇑f) t₀)).Univ ≃[L] A where
   toEquiv :=
@@ -514,13 +516,13 @@ section Primrec
 
 variable {L : Language.{0, 0}} [L.IsRelational] (V : FinVocab L)
 
-theorem primrec_nestGet : Primrec₂ nestGet := by
+private theorem primrec_nestGet : Primrec₂ nestGet := by
   have hdrop : Primrec fun q : ℕ × ℕ => nestDrop q.1 q.2 :=
     (Primrec.nat_iterate Primrec.snd Primrec.fst
       (Primrec.snd.comp (Primrec.unpair.comp Primrec.snd)).to₂).of_eq fun _ => rfl
   exact (Primrec.fst.comp (Primrec.unpair.comp hdrop)).of_eq fun _ => rfl
 
-theorem primrec_nestLeaf : Primrec₂ nestLeaf :=
+private theorem primrec_nestLeaf : Primrec₂ nestLeaf :=
   (Primrec.list_foldl Primrec.snd Primrec.fst
     (primrec_nestGet.comp (Primrec.fst.comp Primrec.snd)
       (Primrec.snd.comp Primrec.snd)).to₂).to₂

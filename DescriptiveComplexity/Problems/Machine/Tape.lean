@@ -181,7 +181,8 @@ once, before any transition exists. -/
 pinned to, so that exactly one tuple carries such a tag. -/
 def IsMinTup (w : Fin 2 → A) : Prop := (∀ a : A, w 0 ≤ a) ∧ ∀ a : A, w 1 ≤ a
 
-theorem isMinTup_unique {w w' : Fin 2 → A} (h : IsMinTup w) (h' : IsMinTup w') : w = w' := by
+private theorem isMinTup_unique
+    {w w' : Fin 2 → A} (h : IsMinTup w) (h' : IsMinTup w') : w = w' := by
   funext i
   fin_cases i
   · exact le_antisymm (h.1 _) (h'.1 _)
@@ -189,14 +190,14 @@ theorem isMinTup_unique {w w' : Fin 2 → A} (h : IsMinTup w) (h' : IsMinTup w')
 
 variable [Finite A] [Nonempty A]
 
-theorem exists_isMinTup : ∃ w : Fin 2 → A, IsMinTup w := by
+private theorem exists_isMinTup : ∃ w : Fin 2 → A, IsMinTup w := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   exact ⟨fun _ => m, hm, hm⟩
 
 /-- The blank symbol: one element, pinned to the tuple of minima. -/
 def SatBlank (p : SatTag × (Fin 2 → A)) : Prop := p.1 = SatTag.sBlank ∧ IsMinTup p.2
 
-theorem exists_satBlank : ∃ p : SatTag × (Fin 2 → A), SatBlank p := by
+private theorem exists_satBlank : ∃ p : SatTag × (Fin 2 → A), SatBlank p := by
   obtain ⟨w, hw⟩ := exists_isMinTup (A := A)
   exact ⟨(SatTag.sBlank, w), rfl, hw⟩
 
@@ -217,7 +218,8 @@ omit [Finite A] [Nonempty A] in
 /-- **The initial tape is functional**: a cell holds at most one symbol. The
 three cases are separated by the tag of the cell, and within each case the
 symbol's tuple is pinned. -/
-theorem satInp_functional {p a b : SatTag × (Fin 2 → A)} (ha : SatInp p a) (hb : SatInp p b) :
+private theorem satInp_functional
+    {p a b : SatTag × (Fin 2 → A)} (ha : SatInp p a) (hb : SatInp p b) :
     a = b := by
   have htup : ∀ u v : Fin 2 → A, u 0 = p.2 0 → (∀ c : A, u 1 ≤ c) →
       v 0 = p.2 0 → (∀ c : A, v 1 ≤ c) → u = v := by
@@ -234,7 +236,7 @@ theorem satInp_functional {p a b : SatTag × (Fin 2 → A)} (ha : SatInp p a) (h
         | (rw [hp] at hq; exact absurd hq (by decide))
 
 /-- There is a position: the start marker. -/
-theorem exists_satPosn : ∃ p : SatTag × (Fin 2 → A), SatPosn p := by
+private theorem exists_satPosn : ∃ p : SatTag × (Fin 2 → A), SatPosn p := by
   obtain ⟨w, hw⟩ := exists_isMinTup (A := A)
   exact ⟨(SatTag.pStart, w), fun a => ⟨hw.1 a, hw.2 a⟩⟩
 
@@ -247,7 +249,7 @@ private theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOr
 omit [Finite A] [Nonempty A] in
 /-- **The interpreted order is linear**, from `DescriptiveComplexity.tagTupleOrder` –
 no tag-pair case analysis. -/
-theorem isLinOrd_tagTupleLe :
+private theorem isLinOrd_tagTupleLe :
     IsLinOrd (tagTupleLe (Tag := SatTag) (d := 2) (A := A)) := by
   have heq : (tagTupleLe (Tag := SatTag) (d := 2) (A := A)) =
       (tagTupleOrder : LinearOrder (SatTag × (Fin 2 → A))).le := by
@@ -276,7 +278,7 @@ theorem sat_budget {n m : ℕ} (hn : 1 ≤ n) (hm : m ≤ n) :
 
 /-- **The tape really has that many positions**: the filler tuples alone inject
 into the positions, which is all the budget argument needs. -/
-theorem card_le_card_posn (A : Type) [LinearOrder A] [Finite A] :
+private theorem card_le_card_posn (A : Type) [LinearOrder A] [Finite A] :
     8 * Nat.card A * Nat.card A ≤ Nat.card {p : SatTag × (Fin 2 → A) // SatPosn p} := by
   have hinj : Function.Injective
       (fun q : Fin 8 × A × A => (⟨(SatTag.pFill q.1, ![q.2.1, q.2.2]), trivial⟩ :

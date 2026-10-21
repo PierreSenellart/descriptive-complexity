@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.LogTime.Fields
 import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Definable
+import all DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The doubling chain: `i ↦ 2 ^ i` is first-order in `≤`, `+` and `×`
@@ -108,21 +112,21 @@ namespace DescriptiveComplexity
 indices of the positions a `2 ^ a` certificate guesses. -/
 def ChainSet (a k : ℕ) : Prop := ∃ t : ℕ, k = a / 2 ^ t
 
-theorem chainSet_self (a : ℕ) : ChainSet a a := ⟨0, by simp⟩
+private theorem chainSet_self (a : ℕ) : ChainSet a a := ⟨0, by simp⟩
 
-theorem chainSet_zero (a : ℕ) : ChainSet a 0 :=
+private theorem chainSet_zero (a : ℕ) : ChainSet a 0 :=
   ⟨a, (Nat.div_eq_of_lt (Nat.lt_two_pow_self)).symm⟩
 
-theorem chainSet_half {a k : ℕ} (h : ChainSet a k) : ChainSet a (k / 2) := by
+private theorem chainSet_half {a k : ℕ} (h : ChainSet a k) : ChainSet a (k / 2) := by
   obtain ⟨t, rfl⟩ := h
   exact ⟨t + 1, by rw [pow_succ, Nat.div_div_eq_div_mul]⟩
 
-theorem chainSet_le {a k : ℕ} (h : ChainSet a k) : k ≤ a := by
+private theorem chainSet_le {a k : ℕ} (h : ChainSet a k) : k ≤ a := by
   obtain ⟨t, rfl⟩ := h
   exact Nat.div_le_self a (2 ^ t)
 
 /-- Every entry but the top is an entry of the chain of the half. -/
-theorem chainSet_half_of_ne {a k : ℕ} (h : ChainSet a k) (hne : k ≠ a) :
+private theorem chainSet_half_of_ne {a k : ℕ} (h : ChainSet a k) (hne : k ≠ a) :
     ChainSet (a / 2) k := by
   obtain ⟨t, ht⟩ := h
   cases t with
@@ -133,7 +137,7 @@ theorem chainSet_half_of_ne {a k : ℕ} (h : ChainSet a k) (hne : k ≠ a) :
     rw [ht, h2, ← Nat.div_div_eq_div_mul]
 
 /-- …and conversely. -/
-theorem chainSet_of_half {a k : ℕ} (h : ChainSet (a / 2) k) : ChainSet a k := by
+private theorem chainSet_of_half {a k : ℕ} (h : ChainSet (a / 2) k) : ChainSet a k := by
   obtain ⟨t, ht⟩ := h
   refine ⟨t + 1, ?_⟩
   have h2 : (2 : ℕ) ^ (t + 1) = 2 * 2 ^ t := by ring
@@ -199,9 +203,9 @@ def chainBelow (a : ℕ) : ℕ :=
   if a = 0 then 0 else 2 ^ (a / 2) + chainBelow (a / 2)
   decreasing_by omega
 
-theorem chainBelow_zero : chainBelow 0 = 0 := by rw [chainBelow]; simp
+private theorem chainBelow_zero : chainBelow 0 = 0 := by rw [chainBelow]; simp
 
-theorem chainBelow_pos {a : ℕ} (ha : 0 < a) :
+private theorem chainBelow_pos {a : ℕ} (ha : 0 < a) :
     chainBelow a = 2 ^ (a / 2) + chainBelow (a / 2) := by
   rw [chainBelow, ite_eq_right (by omega)]
 
@@ -226,7 +230,7 @@ theorem chainBelow_lt (a : ℕ) : chainBelow a < 2 ^ a := by
 /-- **A bit above a place value**: with a low part below `2 ^ m`, the bits of
 `2 ^ m + y` are those of `y` below `m`, a one at `m`, and nothing above. This is
 the only bit-level computation the chain's element needs. -/
-theorem testBit_two_pow_add {m y : ℕ} (hy : y < 2 ^ m) (k : ℕ) :
+private theorem testBit_two_pow_add {m y : ℕ} (hy : y < 2 ^ m) (k : ℕ) :
     (2 ^ m + y).testBit k = if k < m then y.testBit k else decide (k = m) := by
   rcases lt_trichotomy k m with hk | rfl | hk
   · rw [ite_eq_left hk, Nat.testBit_two_pow_add_gt hk]
@@ -281,16 +285,16 @@ def chainVals (a : ℕ) : ℕ :=
   if a = 0 then 0 else a / 2 * 2 ^ (a / 2) + chainVals (a / 2)
   decreasing_by omega
 
-theorem chainVals_zero : chainVals 0 = 0 := by rw [chainVals]; simp
+private theorem chainVals_zero : chainVals 0 = 0 := by rw [chainVals]; simp
 
-theorem chainVals_pos {a : ℕ} (ha : 0 < a) :
+private theorem chainVals_pos {a : ℕ} (ha : 0 < a) :
     chainVals a = a / 2 * 2 ^ (a / 2) + chainVals (a / 2) := by
   rw [chainVals, ite_eq_right (by omega)]
 
 /-- **An entry fits in the field it is given**: `k / 2` is written in the
 `k - k / 2` bits between the positions of index `k / 2` and `k`, which is
 `DescriptiveComplexity.half_add_size_le` read as a bound. -/
-theorem half_lt_two_pow_sub (k : ℕ) : k / 2 < 2 ^ (k - k / 2) :=
+private theorem half_lt_two_pow_sub (k : ℕ) : k / 2 < 2 ^ (k - k / 2) :=
   lt_of_lt_of_le (Nat.lt_size_self _)
     (Nat.pow_le_pow_right (by norm_num) (by have := half_add_size_le k; omega))
 
@@ -315,7 +319,7 @@ theorem chainVals_lt (a : ℕ) : chainVals a < 2 ^ a := by
 
 /-- **The chain, one step below a given entry**: an entry other than the top has
 a next entry, and it is that entry's half. -/
-theorem exists_chainSucc {a k : ℕ} (hk : ChainSet a k) (hne : k ≠ a) :
+private theorem exists_chainSucc {a k : ℕ} (hk : ChainSet a k) (hne : k ≠ a) :
     ∃ l : ℕ, ChainSet a l ∧ 0 < l ∧ l / 2 = k := by
   classical
   have hex : ∃ t : ℕ, a / 2 ^ t = k := by obtain ⟨t, ht⟩ := hk; exact ⟨t, ht.symm⟩
@@ -413,7 +417,7 @@ theorem InChain.isPos {p Y q : A} (h : InChain p Y q) (hp : IsPos p) : IsPos q :
   · exact h
 
 /-- Positions are ordered by their exponents. -/
-theorem posExp_lt_posExp {q q' : A} (hq : IsPos q) (hq' : IsPos q') (h : q < q') :
+private theorem posExp_lt_posExp {q q' : A} (hq : IsPos q) (hq' : IsPos q') (h : q < q') :
     posExp q < posExp q' := by
   have hlt := orank_lt_orank h
   rw [orank_eq_two_pow_posExp hq, orank_eq_two_pow_posExp hq'] at hlt
@@ -421,7 +425,7 @@ theorem posExp_lt_posExp {q q' : A} (hq : IsPos q) (hq' : IsPos q') (h : q < q')
 
 omit [Finite A] in
 /-- An entry has at most one next entry. -/
-theorem consChain_unique {p Y q q₁ q₂ : A} (h₁ : ConsChain p Y q q₁)
+private theorem consChain_unique {p Y q q₁ q₂ : A} (h₁ : ConsChain p Y q q₁)
     (h₂ : ConsChain p Y q q₂) : q₁ = q₂ := by
   rcases lt_trichotomy q₁ q₂ with h | h | h
   · exact absurd ⟨h₁.2.1, h₁.2.2.1, h⟩ (h₂.2.2.2 q₁)
@@ -430,7 +434,7 @@ theorem consChain_unique {p Y q q₁ q₂ : A} (h₁ : ConsChain p Y q q₁)
 
 /-- **An entry carries one exponent**: at the top it is the given `i`, and
 elsewhere the field is a function of its two ends. -/
-theorem valAt_unique {i p Y E q v v' : A} (hp : IsPos p)
+private theorem valAt_unique {i p Y E q v v' : A} (hp : IsPos p)
     (h : ValAt i p Y E q v) (h' : ValAt i p Y E q v') : v = v' := by
   rcases h with ⟨hqp, rfl⟩ | ⟨hne, q₁, hc₁, hf₁⟩
   · rcases h' with ⟨-, rfl⟩ | ⟨hne', -⟩
@@ -448,7 +452,7 @@ theorem valAt_unique {i p Y E q v v' : A} (hp : IsPos p)
 
 /-- **Below the top there is a next entry**: the least entry above the given
 one. -/
-theorem exists_consChain {p Y q : A} (hq : InChain p Y q) (hlt : q < p) :
+private theorem exists_consChain {p Y q : A} (hq : InChain p Y q) (hlt : q < p) :
     ∃ q' : A, ConsChain p Y q q' := by
   have : Nonempty {r : A // InChain p Y r ∧ q < r} := ⟨⟨p, Or.inl rfl, hlt⟩⟩
   obtain ⟨⟨q', hq'chain, hq'lt⟩, hmin⟩ :=
@@ -458,7 +462,7 @@ theorem exists_consChain {p Y q : A} (hq : InChain p Y q) (hlt : q < p) :
 
 /-- **Above the least entry there is a previous one**: the greatest entry below
 the given one. -/
-theorem exists_consChain_lt {p Y q r : A} (hq : InChain p Y q) (hr : InChain p Y r)
+private theorem exists_consChain_lt {p Y q r : A} (hq : InChain p Y q) (hr : InChain p Y r)
     (hlt : r < q) : ∃ r' : A, ConsChain p Y r' q := by
   have : Nonempty {s : A // InChain p Y s ∧ s < q} := ⟨⟨r, hr, hlt⟩⟩
   obtain ⟨⟨r', hr'chain, hr'lt⟩, hmax⟩ :=
@@ -469,7 +473,7 @@ theorem exists_consChain_lt {p Y q r : A} (hq : InChain p Y q) (hr : InChain p Y
 /-- **Every entry carries a value**: the top the given `i`, and any other the
 field below its next entry, which is a rank because a field always is
 (`DescriptiveComplexity.exists_fieldAt`). -/
-theorem exists_valAt {i p Y E q : A} (hp : IsPos p) (hmax : ∀ r : A, InChain p Y r → r ≤ p)
+private theorem exists_valAt {i p Y E q : A} (hp : IsPos p) (hmax : ∀ r : A, InChain p Y r → r ≤ p)
     (hq : InChain p Y q) : ∃ v : A, ValAt i p Y E q v := by
   by_cases hqp : q = p
   · exact ⟨i, Or.inl ⟨hqp, rfl⟩⟩
@@ -488,11 +492,11 @@ open Classical in
 /-- **The exponent a certificate carries at the position of index `k`**: the
 value read at the unique position of that place value, and `0` where there is
 none. `DescriptiveComplexity.valAt_unique` is what makes this a function. -/
-noncomputable def powVal (i p Y E : A) (k : ℕ) : ℕ :=
+private noncomputable def powVal (i p Y E : A) (k : ℕ) : ℕ :=
   if h : ∃ m : ℕ, ∃ q v : A, orank q = 2 ^ k ∧ ValAt i p Y E q v ∧ orank v = m then
     h.choose else 0
 
-theorem powVal_eq {i p Y E q v : A} {k : ℕ} (hp : IsPos p) (hq : orank q = 2 ^ k)
+private theorem powVal_eq {i p Y E q v : A} {k : ℕ} (hp : IsPos p) (hq : orank q = 2 ^ k)
     (hv : ValAt i p Y E q v) : powVal i p Y E k = orank v := by
   have hex : ∃ m : ℕ, ∃ q v : A, orank q = 2 ^ k ∧ ValAt i p Y E q v ∧ orank v = m :=
     ⟨orank v, q, v, hq, hv, rfl⟩
@@ -702,14 +706,14 @@ open Language
 variable {L : Language.{0, 0}} {α : Type}
 
 /-- The chain is first-order: an equality, a position test and a bit. -/
-theorem arithDef_inChain (p Y q : α) :
+private theorem arithDef_inChain (p Y q : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => InChain (v p) (v Y) (v q)) :=
   ((arithDef_eq q p).or ((arithDef_isPos q).and (arithDef_bit q Y))).congr
     fun _ _ _ _ _ _ => Iff.rfl
 
 /-- Consecutiveness is first-order: one universal quantifier says that nothing
 of the chain lies between. -/
-theorem arithDef_consChain (p Y q q' : α) :
+private theorem arithDef_consChain (p Y q q' : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => ConsChain (v p) (v Y) (v q) (v q')) := by
   have hbet : ArithDef (L := L) (α := α ⊕ Fin 1)
       (fun _ _ _ _ _ u => ¬ (InChain (u (Sum.inl p)) (u (Sum.inl Y)) (u (Sum.inr 0)) ∧
@@ -724,7 +728,7 @@ theorem arithDef_consChain (p Y q q' : α) :
 /-- The value at an entry is first-order: the given `i` at the top, and
 otherwise the field below the next entry
 (`DescriptiveComplexity.arithDef_fieldAt`). -/
-theorem arithDef_valAt (i p Y E q m : α) :
+private theorem arithDef_valAt (i p Y E q m : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => ValAt (v i) (v p) (v Y) (v E) (v q) (v m)) := by
   have hfield : ArithDef (L := L) (α := α ⊕ Fin 1)
       (fun _ _ _ _ _ u =>
@@ -739,7 +743,7 @@ theorem arithDef_valAt (i p Y E q m : α) :
 
 /-- **The certificate is first-order**: four conditions, none of them about the
 layout of the fields. -/
-theorem arithDef_powCert (i p Y E : α) :
+private theorem arithDef_powCert (i p Y E : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => PowCert (v i) (v p) (v Y) (v E)) := by
   -- the top is the greatest entry
   have hc2 : ArithDef (L := L) (α := α)

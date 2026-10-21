@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.AltProg
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Machine.AltTape
 
 /-!
 # The transition table of the QBF machine is a table
@@ -72,7 +73,7 @@ theorem aoneI_eq_iff {t t' : AltBase} {i i' : Fin (k + 1)} {a a' : A} :
 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Two elements agree when their tag and both coordinates do. -/
-theorem altV_ext {τ τ' : AltV k A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0)
+private theorem altV_ext {τ τ' : AltV k A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0)
     (h1 : τ.2 1 = τ'.2 1) : τ = τ' := by
   refine Prod.ext ht (funext fun i => ?_)
   fin_cases i
@@ -83,7 +84,7 @@ theorem altV_ext {τ τ' : AltV k A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0)
 
 omit [(Language.qbf k).Structure A] in
 /-- A transition writes exactly one symbol. -/
-theorem altWrite_functional {τ a a' : AltV k A} (h : AltWrite τ a) (h' : AltWrite τ a') :
+private theorem altWrite_functional {τ a a' : AltV k A} (h : AltWrite τ a) (h' : AltWrite τ a') :
     a = a' := by
   unfold AltWrite at h h'
   cases hτ : τ.1.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
@@ -91,7 +92,7 @@ theorem altWrite_functional {τ a a' : AltV k A} (h : AltWrite τ a) (h' : AltWr
 /-- A transition moves to exactly one state. The only case with a choice is the
 check clause, whose two branches are separated by the flag and by
 `DescriptiveComplexity.AltQbf.QbfLit`. -/
-theorem altDst_functional {cnf : Bool} {τ q q' : AltV k A} (h : AltDst cnf τ q)
+private theorem altDst_functional {cnf : Bool} {τ q q' : AltV k A} (h : AltDst cnf τ q)
     (h' : AltDst cnf τ q') : q = q' := by
   unfold AltDst at h h'
   cases hτ : τ.1.1 <;> rw [hτ] at h h' <;> simp only at h h'
@@ -112,7 +113,7 @@ theorem altDst_functional {cnf : Bool} {τ q q' : AltV k A} (h : AltDst cnf τ q
 omit [Finite A] [Nonempty A] in
 /-- **A sweep hands over, or ends**: the two are separated by the sweep
 index. -/
-theorem altTr_next_end_excl {cnf : Bool} {τ τ' : AltV k A} (h : AltTr cnf τ)
+private theorem altTr_next_end_excl {cnf : Bool} {τ τ' : AltV k A} (h : AltTr cnf τ)
     (h' : AltTr cnf τ') (hτ : τ.1.1 = AltBase.tGNext)
     (hτ' : τ'.1.1 = AltBase.tGEndAcc ∨ τ'.1.1 = AltBase.tGEndChk)
     (hi : τ.1.2 = τ'.1.2) : False := by
@@ -123,7 +124,7 @@ theorem altTr_next_end_excl {cnf : Bool} {τ τ' : AltV k A} (h : AltTr cnf τ)
 omit [Finite A] [Nonempty A] in
 /-- **The end of the last sweep is not ambiguous**: an instance either has a
 clause to check or has none. -/
-theorem altTr_end_excl {cnf : Bool} {τ τ' : AltV k A} (h : AltTr cnf τ) (h' : AltTr cnf τ')
+private theorem altTr_end_excl {cnf : Bool} {τ τ' : AltV k A} (h : AltTr cnf τ) (h' : AltTr cnf τ')
     (hτ : τ.1.1 = AltBase.tGEndAcc) (hτ' : τ'.1.1 = AltBase.tGEndChk) : False := by
   unfold AltTr at h h'
   rw [hτ] at h
@@ -134,7 +135,7 @@ omit [Finite A] [Nonempty A] in
 /-- **A turn is not ambiguous**: for a conjunctive matrix the clause just
 checked either has a successor or is the last one, and for a disjunctive one
 the two turns fire at different flags. -/
-theorem altTr_turn_excl {cnf : Bool} {τ τ' : AltV k A} {d d' : Bool} (h : AltTr cnf τ)
+private theorem altTr_turn_excl {cnf : Bool} {τ τ' : AltV k A} {d d' : Bool} (h : AltTr cnf τ)
     (h' : AltTr cnf τ') (hτ : τ.1.1 = AltBase.tTurnNext d) (hτ' : τ'.1.1 = AltBase.tTurnAcc d')
     (hcnf : cnf = true) (hc : τ.2 0 = τ'.2 0) : False := by
   unfold AltTr at h h'
@@ -145,7 +146,7 @@ theorem altTr_turn_excl {cnf : Bool} {τ τ' : AltV k A} {d d' : Bool} (h : AltT
 /-! ### Reading the tag off the state and the symbol -/
 
 /-- Which base tag the state a transition applies in carries. -/
-def stateBase (cnf : Bool) : AltBase → AltBase
+private def stateBase (cnf : Bool) : AltBase → AltBase
   | .tGStart => .qG true
   | .tGKeep _ => .qG true
   | .tGSet => .qG true
@@ -160,7 +161,7 @@ def stateBase (cnf : Bool) : AltBase → AltBase
   | t => t
 
 /-- Which base tag the symbol a transition reads carries. -/
-def readBase : AltBase → AltBase
+private def readBase : AltBase → AltBase
   | .tGStart => .sStart
   | .tGKeep b => .sVal b
   | .tGSet => .sVal false
@@ -175,7 +176,7 @@ def readBase : AltBase → AltBase
   | t => t
 
 /-- The base tags that a transition may carry. -/
-def isTrBase : AltBase → Bool
+private def isTrBase : AltBase → Bool
   | .tGStart => true
   | .tGKeep _ => true
   | .tGSet => true
@@ -191,7 +192,7 @@ def isTrBase : AltBase → Bool
 
 /-- The base tags whose source state is a sweeping state, and so carries the
 transition's own sweep index. -/
-def isSweepBase : AltBase → Bool
+private def isSweepBase : AltBase → Bool
   | .tGStart => true
   | .tGKeep _ => true
   | .tGSet => true
@@ -204,13 +205,13 @@ def isSweepBase : AltBase → Bool
 
 omit [Finite A] [Nonempty A] in
 /-- Only transitions have transition tags. -/
-theorem altTr_isTrBase {cnf : Bool} {τ : AltV k A} (hτ : AltTr cnf τ) : isTrBase τ.1.1 := by
+private theorem altTr_isTrBase {cnf : Bool} {τ : AltV k A} (hτ : AltTr cnf τ) : isTrBase τ.1.1 := by
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> first | exact False.elim hτ | rfl
 
 /-- The state a transition applies in has the base tag its own tag names, and
 its sweep index. -/
-theorem altSrc_base {cnf : Bool} {τ q : AltV k A} (hτ : AltTr cnf τ) (hs : AltSrc cnf τ q) :
+private theorem altSrc_base {cnf : Bool} {τ q : AltV k A} (hτ : AltTr cnf τ) (hs : AltSrc cnf τ q) :
     q.1.1 = stateBase cnf τ.1.1 ∧ (isSweepBase τ.1.1 → q.1.2 = τ.1.2) := by
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> dsimp only [AltTr, AltSrc, stateBase, isSweepBase] at hτ hs ⊢ <;>
@@ -219,7 +220,7 @@ theorem altSrc_base {cnf : Bool} {τ q : AltV k A} (hτ : AltTr cnf τ) (hs : Al
       | (subst hs; exact ⟨rfl, fun h => absurd h (by simp)⟩)
 
 /-- The symbol a transition reads has the base tag its own tag names. -/
-theorem altRead_base {cnf : Bool} {τ a : AltV k A} (hτ : AltTr cnf τ) (hr : AltRead τ a) :
+private theorem altRead_base {cnf : Bool} {τ a : AltV k A} (hτ : AltTr cnf τ) (hr : AltRead τ a) :
     a.1.1 = readBase τ.1.1 := by
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> dsimp only [AltTr, AltRead, readBase] at hτ hr ⊢ <;>
@@ -231,7 +232,7 @@ theorem altRead_base {cnf : Bool} {τ a : AltV k A} (hτ : AltTr cnf τ) (hr : A
 
 /-- **The state and the symbol pin the tag**, up to the three branch points:
 the guessing choice, the end of a sweep and the turn. -/
-theorem base_cases (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTrBase t' →
+private theorem base_cases (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTrBase t' →
     stateBase cnf t = stateBase cnf t' → readBase t = readBase t' →
     t = t' ∨ (t = .tGKeep false ∧ t' = .tGSet) ∨ (t = .tGSet ∧ t' = .tGKeep false) ∨
       (t = .tGNext ∧ (t' = .tGEndAcc ∨ t' = .tGEndChk)) ∨
@@ -243,7 +244,7 @@ theorem base_cases (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTrBase t'
 
 omit [Finite A] [Nonempty A] in
 /-- Away from the sweeps, a transition's sweep index is `0`. -/
-theorem altTr_index_zero {cnf : Bool} {τ : AltV k A} (hτ : AltTr cnf τ)
+private theorem altTr_index_zero {cnf : Bool} {τ : AltV k A} (hτ : AltTr cnf τ)
     (h : ¬isSweepBase τ.1.1) : (τ.1.2 : ℕ) = 0 := by
   obtain ⟨⟨t, i⟩, w⟩ := τ
   cases t <;> dsimp only [AltTr, isSweepBase] at hτ h ⊢ <;>
@@ -254,14 +255,15 @@ theorem altTr_index_zero {cnf : Bool} {τ : AltV k A} (hτ : AltTr cnf τ)
 
 /-- Whether a transition's source is a sweeping state is determined by the base
 tag of that state. -/
-theorem isSweepBase_congr (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTrBase t' →
+private theorem isSweepBase_congr (cnf : Bool) : ∀ t t' : AltBase, isTrBase t → isTrBase t' →
     stateBase cnf t = stateBase cnf t' → isSweepBase t = isSweepBase t' := by
   cases cnf <;> decide
 
 /-- **Equal base tags force equal transitions**: the state and the symbol pin
 one coordinate and the sweep index, and the promises in
 `DescriptiveComplexity.AltQbf.AltTr` pin the other. -/
-theorem altTr_payload {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) (hτ' : AltTr cnf τ')
+private theorem altTr_payload
+    {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) (hτ' : AltTr cnf τ')
     (hs : AltSrc cnf τ q) (hs' : AltSrc cnf τ' q) (hr : AltRead τ a) (hr' : AltRead τ' a)
     (hb : τ.1.1 = τ'.1.1) : τ = τ' := by
   have hmin : ∀ u v : A, (∀ b : A, u ≤ b) → (∀ b : A, v ≤ b) → u = v :=
@@ -294,7 +296,7 @@ theorem altTr_payload {cnf : Bool} {τ τ' q a : AltV k A} (hτ : AltTr cnf τ) 
 omit [(Language.qbf k).Structure A] in
 /-- At a guessing choice, the state and the symbol read are what
 `DescriptiveComplexity.AltQbf.altTr_unique`'s hypothesis excludes. -/
-theorem altSrc_read_guess {cnf : Bool} {τ q a : AltV k A}
+private theorem altSrc_read_guess {cnf : Bool} {τ q a : AltV k A}
     (hb : τ.1.1 = AltBase.tGKeep false ∨ τ.1.1 = AltBase.tGSet) (hs : AltSrc cnf τ q)
     (hr : AltRead τ a) : q = stG τ.1.2 true ∧ a = symV false (τ.2 0) := by
   obtain ⟨⟨t, i⟩, w⟩ := τ
@@ -303,7 +305,8 @@ theorem altSrc_read_guess {cnf : Bool} {τ q a : AltV k A}
 /-- **The two turns never compete**: for a conjunctive matrix the clause just
 settled is either the last one or has a successor, and for a disjunctive one
 they fire at different flags, so their source states differ. -/
-theorem altTr_turn_pair {cnf : Bool} {τ τ' q : AltV k A} (hτ : AltTr cnf τ) (hτ' : AltTr cnf τ')
+private theorem altTr_turn_pair
+    {cnf : Bool} {τ τ' q : AltV k A} (hτ : AltTr cnf τ) (hτ' : AltTr cnf τ')
     (hs : AltSrc cnf τ q) (hs' : AltSrc cnf τ' q) {d : Bool}
     (hb : τ.1.1 = AltBase.tTurnNext d) (hb' : τ'.1.1 = AltBase.tTurnAcc d) : False := by
   have hs2 : q = stChk true d (τ.2 0) := by

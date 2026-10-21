@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawElem
+import all DescriptiveComplexity.Problems.Wide.DrawElem
+import all DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # Tag-branched element loops: the expansion atoms and the domain gates
@@ -138,7 +140,7 @@ variable {emb}
 /-- **A tag-branched machinery leaves only into its own phases or its exit**:
 the witness reads' trips stay inside it, the branch lands in the decoded tag's
 loop, and only the loop's last dispatch leaves. -/
-theorem tagRule_dstPh (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
+private theorem tagRule_dstPh (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
     (∃ p : TagPh m T nrOf,
       (tagRule one wk rg emb rdTrackT MatchT setTagFlag TagsAre rdTrackE MatchE
         setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ).dstPh = emb p) ∨
@@ -168,7 +170,7 @@ theorem tagRule_dstPh (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
 
 /-- **A property of the machinery's phases and its exit holds of every phase it
 can move to.** -/
-theorem tagRule_dstIn {S : P → Prop} (hemb : ∀ p : TagPh m T nrOf, S (emb p))
+private theorem tagRule_dstIn {S : P → Prop} (hemb : ∀ p : TagPh m T nrOf, S (emb p))
     (hexit : S exitPh) (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i) :
     S (tagRule one wk rg emb rdTrackT MatchT setTagFlag TagsAre rdTrackE MatchE
       setFlagE initEl advEl exitSt IsMaxEl exitPh i ρ).dstPh := by
@@ -179,7 +181,7 @@ theorem tagRule_dstIn {S : P → Prop} (hemb : ∀ p : TagPh m T nrOf, S (emb p)
 
 /-- **Every rule of a tag-branched machinery fires from a phase its site
 owns**; the loops' obligation is the element loop's. -/
-theorem tagHosrc :
+private theorem tagHosrc :
     ∀ (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i),
       ∃ p : TagPh m T nrOf,
         (tagRule one wk rg emb rdTrackT MatchT setTagFlag TagsAre rdTrackE

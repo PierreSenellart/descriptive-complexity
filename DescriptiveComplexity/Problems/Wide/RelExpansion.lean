@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Wide.RelExp
+import all DescriptiveComplexity.Padding
 
 /-!
 # The expansion, relativized to the marked part

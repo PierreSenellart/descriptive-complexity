@@ -10,6 +10,11 @@ public import DescriptiveComplexity.Problems.Sat.CountingHardness
 public import DescriptiveComplexity.Counting.Reduction
 import DescriptiveComplexity.Numbers.DigitExtract
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting.Post
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
 
 /-!
 # #DNF: counting the models of a DNF formula
@@ -86,7 +91,7 @@ noncomputable def sharpDnfKernel : satSOLang.Sentence :=
   dnfTermKernel ⊓ satVarKernel
 
 /-- Realization of the term conjunct. -/
-theorem realize_dnfTermKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_dnfTermKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) dnfTermKernel) ↔
@@ -111,7 +116,7 @@ theorem realize_dnfTermKernel {A : Type} [Language.sat.Structure A]
     exact ⟨fun _ => c, hc, fun x => h (x 0)⟩
 
 /-- Realization of the kernel of #DNF: the assignment is a model. -/
-theorem realize_sharpDnfKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_sharpDnfKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpDnfKernel) ↔
@@ -140,7 +145,7 @@ noncomputable def SharpDNF : CountingProblem Language.sat where
     rw [card_dnfModel_eq_witnessCount A, card_dnfModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock sharpDnfKernel e
 
-theorem sharpDnf_apply (A : Type) [Language.sat.Structure A] :
+private theorem sharpDnf_apply (A : Type) [Language.sat.Structure A] :
     SharpDNF A = Nat.card {ν : A → Prop // DnfModel A ν} :=
   rfl
 
@@ -201,7 +206,7 @@ theorem dnfModel_swap_iff (e : A ≃ B)
 /-- **Models and non-models share out the assignments**: a CNF formula with
 `n` variables and its sign swap, read as a DNF formula, have `2 ^ n` models
 between them. -/
-theorem sharpSat_add_sharpDnf [Finite A] (e : A ≃ B)
+private theorem sharpSat_add_sharpDnf [Finite A] (e : A ≃ B)
     (hcl : ∀ c : A, RelMap satIsClause ![c] ↔ RelMap satIsClause ![e c])
     (hpos : ∀ c x : A, RelMap satPosIn ![c, x] ↔ RelMap satNegIn ![e c, e x])
     (hneg : ∀ c x : A, RelMap satNegIn ![c, x] ↔ RelMap satPosIn ![e c, e x]) :
@@ -237,7 +242,7 @@ end DeMorgan
 noncomputable def satOccursAt {α : Type} (x : α) : Language.sat.Formula α :=
   fo%[x] ∃ c, satIsClause(c) ∧ (satPosIn(c, x) ∨ satNegIn(c, x))
 
-theorem realize_satOccursAt {α : Type} (A : Type) [Language.sat.Structure A] (x : α)
+private theorem realize_satOccursAt {α : Type} (A : Type) [Language.sat.Structure A] (x : α)
     (v : α → A) : (satOccursAt x).Realize v ↔ SatOccurs A (v x) := by
   rw [satOccursAt]
   simp only [SatOccurs, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
@@ -252,7 +257,7 @@ theorem realize_satOccursAt {α : Type} (A : Type) [Language.sat.Structure A] (x
 noncomputable def satOccursFormula : (Language.sat.sum Language.order).Formula (Fin 1) :=
   LHom.sumInl.onFormula (satOccursAt (0 : Fin 1))
 
-theorem realize_satOccursFormula (A : Type) [Language.sat.Structure A] [LinearOrder A]
+private theorem realize_satOccursFormula (A : Type) [Language.sat.Structure A] [LinearOrder A]
     (a : A) : satOccursFormula.Realize (fun _ => a) ↔ SatOccurs A a := by
   rw [satOccursFormula, LHom.realize_onFormula, satOccursAt]
   simp only [SatOccurs, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
@@ -265,7 +270,7 @@ theorem realize_satOccursFormula (A : Type) [Language.sat.Structure A] [LinearOr
 
 /-- **#SAT reduces to #DNF with one call**: `#SAT(φ) = 2 ^ n - #DNF(¬φ)`, for
 `n` the number of variables of `φ`. -/
-noncomputable def sharpSat_oneCall_sharpDnf : SharpSAT ≤ᶜ[≤] SharpDNF :=
+private noncomputable def sharpSat_oneCall_sharpDnf : SharpSAT ≤ᶜ[≤] SharpDNF :=
   (SharpDNF.pullbackReduction swapSignInterp).toOneCall.ofPost
     (.sub (.pow2 (.count satOccursFormula)) .oracle) fun A _ _ _ _ => by
       have h := sharpSat_add_sharpDnf (swapSignInterp.mapEquivSelf A).symm

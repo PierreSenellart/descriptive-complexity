@@ -9,6 +9,9 @@ public import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.ClauseDischarge
 public import DescriptiveComplexity.Problems.TwoSat.Defs
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.ClauseDischarge
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderKrom
 
 /-!
 # Hardness of 2SAT: the Krom discharge
@@ -75,13 +78,13 @@ formulas and the correctness proof quantify over. -/
 def slots (c : KromClause (L.sum Language.order) B k) : List (Option (KromLit B k)) :=
   [c.lit₁, c.lit₂]
 
-theorem mem_slots_lit₁ (c : KromClause (L.sum Language.order) B k) : c.lit₁ ∈ slots c := by
+private theorem mem_slots_lit₁ (c : KromClause (L.sum Language.order) B k) : c.lit₁ ∈ slots c := by
   simp [slots]
 
-theorem mem_slots_lit₂ (c : KromClause (L.sum Language.order) B k) : c.lit₂ ∈ slots c := by
+private theorem mem_slots_lit₂ (c : KromClause (L.sum Language.order) B k) : c.lit₂ ∈ slots c := by
   simp [slots]
 
-theorem slots_cases {c : KromClause (L.sum Language.order) B k}
+private theorem slots_cases {c : KromClause (L.sum Language.order) B k}
     {o : Option (KromLit B k)} (h : o ∈ slots c) : o = c.lit₁ ∨ o = c.lit₂ := by
   simpa [slots] using h
 
@@ -108,7 +111,7 @@ noncomputable def litOccF (c : KromClause (L.sum Language.order) B k) (pos : Boo
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_slotOccF {o : Option (KromLit B k)} {pos : Bool} {i : B.ι}
+private theorem realize_slotOccF {o : Option (KromLit B k)} {pos : Bool} {i : B.ι}
     {u x : Fin (clauseDim B k) → γ} :
     (slotOccF (L := L) o pos i u x).Realize v ↔
       ∃ l ∈ o, l.positive = pos ∧ l.atom.idx = i ∧
@@ -139,7 +142,7 @@ theorem realize_slotOccF {o : Option (KromLit B k)} {pos : Bool} {i : B.ι}
       subst hle
       exact hc ⟨hpos, hidx⟩
 
-theorem realize_litOccF {c : KromClause (L.sum Language.order) B k} {pos : Bool} {i : B.ι}
+private theorem realize_litOccF {c : KromClause (L.sum Language.order) B k} {pos : Bool} {i : B.ι}
     {u x : Fin (clauseDim B k) → γ} :
     (litOccF (L := L) c pos i u x).Realize v ↔
       ∃ o ∈ slots c, ∃ l ∈ o, l.positive = pos ∧ l.atom.idx = i ∧
@@ -194,26 +197,26 @@ variable {prog : KromProgram (L.sum Language.order) B k}
 
 /-- **The clause elements**: one per clause of the program and per canonically
 padded tuple satisfying that clause's guard. -/
-theorem krom_isClause_cl (c : Fin prog.length) (w : Fin (clauseDim B k) → A) :
+private theorem krom_isClause_cl (c : Fin prog.length) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (kromInterp prog).Map A) satIsClause ![(clTag c, w)] ↔
       (clauseAt prog c).guard.Realize (fun j => w (Fin.castLE le_clauseDim j)) ∧ Canon k w := by
   rw [FOInterpretation.relMap_map]
   exact Formula.realize_inf.trans (and_congr realize_guardF realize_canonF)
 
 /-- Elements carrying a variable tag are not clauses. -/
-theorem krom_not_isClause_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem krom_not_isClause_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (kromInterp prog).Map A) satIsClause ![(varTag i, w)] :=
   id
 
 /-- Elements carrying the junk tag are not clauses. -/
-theorem krom_not_isClause_junk (w : Fin (clauseDim B k) → A) :
+private theorem krom_not_isClause_junk (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (kromInterp prog).Map A) satIsClause
       ![((Sum.inr () : KromTag prog), w)] :=
   id
 
 /-- **The positive literals**: a slot of the clause carrying a positive
 literal, at the canonically padded tuple of its atom's arguments. -/
-theorem krom_posIn_cl_var (c : Fin prog.length) (i : B.ι)
+private theorem krom_posIn_cl_var (c : Fin prog.length) (i : B.ι)
     (u x : Fin (clauseDim B k) → A) :
     RelMap (M := (kromInterp prog).Map A) satPosIn ![(clTag c, u), (varTag i, x)] ↔
       ∃ o ∈ slots (clauseAt prog c), ∃ l ∈ o,
@@ -223,7 +226,7 @@ theorem krom_posIn_cl_var (c : Fin prog.length) (i : B.ι)
 
 /-- **The negative literals**: a slot of the clause carrying a negated literal,
 at the canonically padded tuple of its atom's arguments. -/
-theorem krom_negIn_cl_var (c : Fin prog.length) (i : B.ι)
+private theorem krom_negIn_cl_var (c : Fin prog.length) (i : B.ι)
     (u x : Fin (clauseDim B k) → A) :
     RelMap (M := (kromInterp prog).Map A) satNegIn ![(clTag c, u), (varTag i, x)] ↔
       ∃ o ∈ slots (clauseAt prog c), ∃ l ∈ o,
@@ -242,7 +245,7 @@ variable (prog : KromProgram (L.sum Language.order) B k)
 
 /-- The propositional variable standing for the atom of a literal, at a clause
 tuple. -/
-noncomputable def slotPt (a₀ : A) (l : KromLit B k) (u : Fin (clauseDim B k) → A) :
+private noncomputable def slotPt (a₀ : A) (l : KromLit B k) (u : Fin (clauseDim B k) → A) :
     (kromInterp prog).Map A :=
   (varTag l.atom.idx, pad a₀ fun j => u (atomIdx l.atom j))
 
@@ -250,7 +253,7 @@ omit [Finite A] [Nonempty A] in
 /-- **Every occurrence of an interpreted clause comes from one of its two
 slots**, at the canonical point of that slot's atom and with that slot's
 sign. -/
-theorem krom_occ_cases {a₀ : A} (ha₀ : IsBot a₀) (c : Fin prog.length)
+private theorem krom_occ_cases {a₀ : A} (ha₀ : IsBot a₀) (c : Fin prog.length)
     (u : Fin (clauseDim B k) → A) (p : (kromInterp prog).Map A) (t : Bool)
     (hocc : OccIn (A := (kromInterp prog).Map A) (clTag c, u) p t) :
     ∃ o ∈ slots (clauseAt prog c), ∃ l ∈ o,

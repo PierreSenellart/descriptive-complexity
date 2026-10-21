@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Counting.Digits.Closure
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Counting.Digits.Closure
+import all DescriptiveComplexity.Counting.Digits.Formulas
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.Counting.Digits.Tower
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Closure under sums over the tuples of the structure
@@ -43,7 +48,7 @@ variables of a formula. -/
 def u2 {a m : ℕ} : Fin (a + m) → Fin a ⊕ Fin m :=
   fun k => Fin.addCases Sum.inl Sum.inr k
 
-theorem elim_comp_u2 {A : Type} {a m : ℕ} (w : Fin a → A) (u : Fin m → A) :
+private theorem elim_comp_u2 {A : Type} {a m : ℕ} (w : Fin a → A) (u : Fin m → A) :
     (fun k => Sum.elim w u (u2 k)) = Fin.append w u := by
   funext k
   refine Fin.addCases (fun k => ?_) (fun k => ?_) k <;> simp [u2]
@@ -66,7 +71,7 @@ noncomputable def lexCovF : ((K.sum Language.order).sum e.B.lang).Formula (Fin m
 
 variable {A : Type} [K.Structure A] [LinearOrder A]
 
-theorem realize_lexBotF (i : Fin m → A) :
+private theorem realize_lexBotF (i : Fin m → A) :
     (@Formula.Realize _ A (ctxStr e A) _ (lexBotF e m) i) ↔
       ∀ c : Lex (Fin m → A), toLex i ≤ c := by
   let := e.B.structure (e.inflLimit A)
@@ -74,7 +79,7 @@ theorem realize_lexBotF (i : Fin m → A) :
     (LHom.sumInl : K.sum Language.order →ᴸ (K.sum Language.order).sum e.B.lang) _).trans
     ((realize_minTupF (L := K) (v := i) id).trans (tup_isBot_iff (t := i)).symm)
 
-theorem realize_lexCovF (i₀ i : Fin m → A) :
+private theorem realize_lexCovF (i₀ i : Fin m → A) :
     (@Formula.Realize _ A (ctxStr e A) _ (lexCovF e m) (Sum.elim i₀ i)) ↔
       toLex i₀ ⋖ toLex i := by
   let := e.B.structure (e.inflLimit A)
@@ -89,7 +94,7 @@ end LexData
 
 /-- The sum of a family up to a tuple, in lexicographic order: a family with
 that tuple as further parameters. -/
-noncomputable def sumFam {a m : ℕ} (F : Fam K (a + m)) : Fam K (a + m) :=
+private noncomputable def sumFam {a m : ℕ} (F : Fam K (a + m)) : Fam K (a + m) :=
   fun A _ _ x => sumUpTo
     (fun u' : Lex (Fin m → A) => F A (Fin.append (fun k => x (Fin.castAdd m k)) (ofLex u')))
     (toLex fun k => x (Fin.natAdd a k))
@@ -118,7 +123,7 @@ noncomputable def sumTheta (jF : e.B.lang.Relations (a + m + ℓ)) :
           (rowAt (Sum.inl ∘ Sum.inl ∘ Sum.inl) (Sum.inl ∘ Sum.inr) Sum.inr)
           (weaken (LHom.sumInl.onFormula (numAt jF u2))))
 
-theorem realize_sumTheta {jF : e.B.lang.Relations (a + m + ℓ)} {F : Fam K (a + m)}
+private theorem realize_sumTheta {jF : e.B.lang.Relations (a + m + ℓ)} {F : Fam K (a + m)}
     (hjF : e.Computes jF (digRel ℓ F)) (A : Type) [K.Structure A] [LinearOrder A] [Finite A]
     [Nonempty A] (ρ : (sweepBlock a m ℓ).Assignment A) (w : Fin a → A) (i : Fin m → A)
     (p : Fin ℓ → A) :

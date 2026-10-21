@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTracks
 public import DescriptiveComplexity.Problems.Wide.Walk
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # A program, written rule by rule
@@ -79,10 +81,10 @@ theorem stVec_inl (f : Q → A) (q : Q) : stVec (W := W) zero f (Sum.inl q) = f 
 @[simp]
 theorem syVec_inr (g : W → A) (s : W) : syVec (Q := Q) zero g (Sum.inr s) = g s := rfl
 
-theorem stVec_injective : Function.Injective (stVec (W := W) (Q := Q) zero) :=
+private theorem stVec_injective : Function.Injective (stVec (W := W) (Q := Q) zero) :=
   fun _f _g h => funext fun q => congrFun h (Sum.inl q)
 
-theorem syVec_injective : Function.Injective (syVec (W := W) (Q := Q) zero) :=
+private theorem syVec_injective : Function.Injective (syVec (W := W) (Q := Q) zero) :=
   fun _f _g h => funext fun s => congrFun h (Sum.inr s)
 
 variable [Fintype Q] [Fintype W]
@@ -95,11 +97,11 @@ noncomputable def stPl (zero : A) (f : Q → A) : Fin (Fintype.card (Q ⊕ W)) �
 noncomputable def syPl (zero : A) (g : W → A) : Fin (Fintype.card (Q ⊕ W)) → A :=
   slotPl (syVec zero g)
 
-theorem stPl_injective : Function.Injective (stPl (W := W) (Q := Q) zero) :=
+private theorem stPl_injective : Function.Injective (stPl (W := W) (Q := Q) zero) :=
   fun f g h => stVec_injective
     (slotPl_injective (show slotPl (stVec zero f) = slotPl (stVec (W := W) zero g) from h))
 
-theorem syPl_injective : Function.Injective (syPl (W := W) (Q := Q) zero) :=
+private theorem syPl_injective : Function.Injective (syPl (W := W) (Q := Q) zero) :=
   fun f g h => syVec_injective
     (slotPl_injective (show slotPl (syVec zero f) = slotPl (syVec (Q := Q) zero g) from h))
 
@@ -237,7 +239,7 @@ theorem fire_left (hR : PR.table.Reads) (r : R) (f : Q → A) (g : W → A)
   · simp only [table, syElt, hf, hs]
 
 /-- **A rule fires, moving right.** -/
-theorem fire_right (hR : PR.table.Reads) (r : R) (f : Q → A) (g : W → A)
+private theorem fire_right (hR : PR.table.Reads) (r : R) (f : Q → A) (g : W → A)
     (hg : (PR.rules r).guard f g) (hd : (PR.rules r).moveRight) :
     ∃ τ : Univ A R P K dd, WMTr τ ∧ WMSrc τ (PR.stElt (PR.rules r).srcPh f) ∧
       WMRead τ (PR.syElt g) ∧
@@ -288,7 +290,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 program that guesses: the two halves of the data are recovered from the
 injections exactly as above, and the phase restriction is carried through
 untouched. -/
-theorem sepOn_of {Ph : P → Prop}
+private theorem sepOn_of {Ph : P → Prop}
     (h : ∀ (r r' : R) (f : Q → A) (g : W → A), Ph (PR.rules r).srcPh →
       (PR.rules r).guard f g → (PR.rules r').guard f g →
       (PR.rules r).srcPh = (PR.rules r').srcPh → r = r') :
@@ -342,7 +344,7 @@ every cell but that element's register. The track enters the tape only through
 `DescriptiveComplexity.bitAtOf`, and `DescriptiveComplexity.bitAtOf_congr` says
 that does not move. Every caller of the register passes is given this and owes
 nothing. -/
-theorem trackTapeAt_coh [DecidableEq W] {I : Type}
+private theorem trackTapeAt_coh [DecidableEq W] {I : Type}
     (cell : I → (Univ A R P K dd → Prop)) (t : W)
     (rest : (Univ A R P K dd → Prop) → W → A) (m m' : I → Prop)
     (u : I) (hag : ∀ v, v ≠ u → (m v ↔ m' v))

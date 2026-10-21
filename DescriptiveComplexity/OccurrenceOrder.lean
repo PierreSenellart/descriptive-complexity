@@ -82,7 +82,7 @@ theorem litTrue_not {ν : A → Prop} {x : A} {s : Bool} :
 
 /-- Bridge from the `Satisfiable` form of clause satisfaction to the
 occurrence form. -/
-theorem satClauses_occ {ν : A → Prop}
+private theorem satClauses_occ {ν : A → Prop}
     (hν : ∀ c : A, RelMap satIsClause ![c] →
       ∃ x : A, (RelMap satPosIn ![c, x] ∧ ν x) ∨ (RelMap satNegIn ![c, x] ∧ ¬ν x)) :
     ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s := by
@@ -155,7 +155,7 @@ theorem Chained.occIn {c x : A} {s : Bool} (h : Chained c x s) : OccIn c x s := 
 
 /-- If `(x, s)` is both the first and last occurrence of `c`, it is the only
 one. -/
-theorem eq_of_minOcc_of_maxOcc {c x z : A} {s u : Bool} (hmin : MinOcc c x s)
+private theorem eq_of_minOcc_of_maxOcc {c x z : A} {s u : Bool} (hmin : MinOcc c x s)
     (hmax : MaxOcc c x s) (hz : OccIn c z u) : z = x ∧ u = s := by
   rcases occLt_trichotomy z u x s with h | h | h
   · exact absurd h (hmin.2 z u hz)
@@ -164,7 +164,7 @@ theorem eq_of_minOcc_of_maxOcc {c x z : A} {s u : Bool} (hmin : MinOcc c x s)
 
 /-- Occurrences up to the immediate predecessor `(y, t)` of `(x, s)` are
 exactly the occurrences strictly before `(x, s)`. -/
-theorem succOcc_occLt_iff {c y x z : A} {t s u : Bool} (hsucc : SuccOcc c y t x s)
+private theorem succOcc_occLt_iff {c y x z : A} {t s u : Bool} (hsucc : SuccOcc c y t x s)
     (hz : OccIn c z u) : occLt z u x s ↔ occLt z u y t ∨ (z = y ∧ u = t) := by
   constructor
   · intro h
@@ -177,7 +177,7 @@ theorem succOcc_occLt_iff {c y x z : A} {t s u : Bool} (hsucc : SuccOcc c y t x 
     · exact hsucc.2.2.1
 
 /-- The successor of a given occurrence is unique. -/
-theorem succOcc_right_unique {c y x₁ x₂ : A} {t s₁ s₂ : Bool}
+private theorem succOcc_right_unique {c y x₁ x₂ : A} {t s₁ s₂ : Bool}
     (h₁ : SuccOcc c y t x₁ s₁) (h₂ : SuccOcc c y t x₂ s₂) : x₁ = x₂ ∧ s₁ = s₂ := by
   rcases occLt_trichotomy x₁ s₁ x₂ s₂ with h | h | h
   · exact absurd ⟨h₁.2.2.1, h⟩ (h₂.2.2.2 x₁ s₁ h₁.2.1)
@@ -194,12 +194,12 @@ def PrefixOrStrict (ν : A → Prop) (c x : A) (s : Bool) : Prop :=
 def PrefixOr (ν : A → Prop) (c x : A) (s : Bool) : Prop :=
   ∃ y t, OccIn c y t ∧ (occLt y t x s ∨ (y = x ∧ t = s)) ∧ LitTrue ν y t
 
-theorem not_prefixOrStrict_min {ν : A → Prop} {c y : A} {t : Bool} (hmin : MinOcc c y t) :
+private theorem not_prefixOrStrict_min {ν : A → Prop} {c y : A} {t : Bool} (hmin : MinOcc c y t) :
     ¬PrefixOrStrict ν c y t := by
   rintro ⟨z, u, hz, hlt, -⟩
   exact hmin.2 z u hz hlt
 
-theorem prefixOr_iff {ν : A → Prop} {c x : A} {s : Bool} (hx : OccIn c x s) :
+private theorem prefixOr_iff {ν : A → Prop} {c x : A} {s : Bool} (hx : OccIn c x s) :
     PrefixOr ν c x s ↔ PrefixOrStrict ν c x s ∨ LitTrue ν x s := by
   constructor
   · rintro ⟨y, t, hy, hlt | ⟨rfl, rfl⟩, hT⟩
@@ -209,7 +209,7 @@ theorem prefixOr_iff {ν : A → Prop} {c x : A} {s : Bool} (hx : OccIn c x s) :
     · exact ⟨y, t, hy, Or.inl hlt, hT⟩
     · exact ⟨x, s, hx, Or.inr ⟨rfl, rfl⟩, hT⟩
 
-theorem prefixOrStrict_succ {ν : A → Prop} {c y x : A} {t s : Bool}
+private theorem prefixOrStrict_succ {ν : A → Prop} {c y x : A} {t s : Bool}
     (hsucc : SuccOcc c y t x s) : PrefixOrStrict ν c x s ↔ PrefixOr ν c y t := by
   constructor
   · rintro ⟨z, u, hz, hlt, hT⟩
@@ -217,13 +217,13 @@ theorem prefixOrStrict_succ {ν : A → Prop} {c y x : A} {t s : Bool}
   · rintro ⟨z, u, hz, h, hT⟩
     exact ⟨z, u, hz, (succOcc_occLt_iff hsucc hz).mpr h, hT⟩
 
-theorem prefixOrStrict_of_min_succ {ν : A → Prop} {c y x : A} {t s : Bool}
+private theorem prefixOrStrict_of_min_succ {ν : A → Prop} {c y x : A} {t s : Bool}
     (hmin : MinOcc c y t) (hsucc : SuccOcc c y t x s) :
     PrefixOrStrict ν c x s ↔ LitTrue ν y t := by
   rw [prefixOrStrict_succ hsucc, prefixOr_iff hmin.occIn]
   exact ⟨fun h => h.resolve_left (not_prefixOrStrict_min hmin), Or.inr⟩
 
-theorem prefixOr_of_max {ν : A → Prop} {c x y : A} {s t : Bool} (hmax : MaxOcc c x s)
+private theorem prefixOr_of_max {ν : A → Prop} {c x y : A} {s t : Bool} (hmax : MaxOcc c x s)
     (hy : OccIn c y t) (hT : LitTrue ν y t) : PrefixOr ν c x s := by
   refine ⟨y, t, hy, ?_, hT⟩
   rcases occLt_trichotomy y t x s with h | h | h
@@ -234,7 +234,7 @@ theorem prefixOr_of_max {ν : A → Prop} {c x y : A} {s t : Bool} (hmax : MaxOc
 variable [Finite A]
 
 /-- A clause with an occurrence has a first occurrence. -/
-theorem exists_minOcc {c : A} (h : ∃ x s, OccIn c x s) : ∃ x s, MinOcc c x s := by
+private theorem exists_minOcc {c : A} (h : ∃ x s, OccIn c x s) : ∃ x s, MinOcc c x s := by
   obtain ⟨x₀, hx₀, hmin⟩ :=
     Set.exists_min_image {x : A | ∃ s, OccIn c x s} id (Set.toFinite _)
       (by obtain ⟨x, s, hxs⟩ := h; exact ⟨x, s, hxs⟩)
@@ -259,7 +259,7 @@ theorem exists_minOcc {c : A} (h : ∃ x s, OccIn c x s) : ∃ x s, MinOcc c x s
       exact h0 (ht ▸ hyt)
 
 /-- A clause with an occurrence has a last occurrence. -/
-theorem exists_maxOcc {c : A} (h : ∃ x s, OccIn c x s) : ∃ x s, MaxOcc c x s := by
+private theorem exists_maxOcc {c : A} (h : ∃ x s, OccIn c x s) : ∃ x s, MaxOcc c x s := by
   obtain ⟨x₀, hx₀, hmax⟩ :=
     Set.exists_max_image {x : A | ∃ s, OccIn c x s} id (Set.toFinite _)
       (by obtain ⟨x, s, hxs⟩ := h; exact ⟨x, s, hxs⟩)
@@ -314,7 +314,7 @@ theorem exists_succOcc {c x : A} {s : Bool} (h : Chained c x s) :
       exact h1 ⟨hz, hlt₂⟩
 
 /-- An occurrence with a later occurrence has an immediate successor. -/
-theorem exists_succOcc_right {c x : A} {s : Bool} (hx : OccIn c x s)
+private theorem exists_succOcc_right {c x : A} {s : Bool} (hx : OccIn c x s)
     (hne : ∃ y t, OccIn c y t ∧ occLt x s y t) : ∃ y t, SuccOcc c x s y t := by
   obtain ⟨y₀, hy₀, hmin⟩ :=
     Set.exists_min_image {y : A | ∃ t, OccIn c y t ∧ occLt x s y t} id (Set.toFinite _)

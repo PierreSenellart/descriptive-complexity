@@ -8,6 +8,8 @@ module
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.QsatRun
 public import DescriptiveComplexity.Problems.Machine.Defs
+import all DescriptiveComplexity.Problems.Machine.QsatProgram
+import all DescriptiveComplexity.Problems.Machine.Tape
 
 /-!
 # The transcription: `QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`
@@ -260,7 +262,7 @@ noncomputable def qOneF (s : QTag) (x : Fin 2 × Fin 2) (t' : QTag) :
 variable {A : Type} [Language.qsat.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable {v : Fin 2 × Fin 2 → A}
 
-theorem realize_qCstF {s : QTag} {q : QV A}
+private theorem realize_qCstF {s : QTag} {q : QV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) :
     (qCstF s q.1).Realize v ↔ q = qCst s := by
   rw [qCstF]
@@ -276,7 +278,7 @@ theorem realize_qCstF {s : QTag} {q : QV A}
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
-theorem realize_qOneF {s : QTag} {x : Fin 2 × Fin 2} {q : QV A}
+private theorem realize_qOneF {s : QTag} {x : Fin 2 × Fin 2} {q : QV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) :
     (qOneF s x q.1).Realize v ↔ q = qOne s (v x) := by
   rw [qOneF]
@@ -494,7 +496,7 @@ theorem relMap_posn (p : QV A) : TMPosn (qsatMapEquiv p) ↔ QPosn p := by
   all_goals exact Iff.rfl
 
 omit [Finite A] [Nonempty A] in
-private theorem realize_minPair {w : Fin 2 → A} :
+theorem realize_minPair {w : Fin 2 → A} :
     ∀ v : Fin 1 × Fin 2 → A, v (0, 0) = w 0 → v (0, 1) = w 1 →
       ((minF (0, 0) ⊓ minF (0, 1) : qsatOrd.Formula (Fin 1 × Fin 2)).Realize v ↔
         IsMinTup w) := by
@@ -617,7 +619,7 @@ theorem qInp_pEnd_iff {w : Fin 2 → A} {a : QV A} :
   · rintro rfl
     exact Or.inr (Or.inr ⟨rfl, rfl, isMinTup_qBot⟩)
 
-theorem relMap_inp (p q : QV A) : TMInp (qsatMapEquiv p) (qsatMapEquiv q) ↔ QInp p q := by
+private theorem relMap_inp (p q : QV A) : TMInp (qsatMapEquiv p) (qsatMapEquiv q) ↔ QInp p q := by
   rw [TMInp, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
   cases t
@@ -628,7 +630,7 @@ theorem relMap_inp (p q : QV A) : TMInp (qsatMapEquiv p) (qsatMapEquiv q) ↔ QI
     refine iff_of_false (by exact fun h => h) ?_
     rintro (⟨h, -⟩ | ⟨h, -⟩ | ⟨h, -⟩) <;> exact QTag.noConfusion h
 
-theorem relMap_tsrc (p q : QV A) : TMSrc (qsatMapEquiv p) (qsatMapEquiv q) ↔ QSrc p q := by
+private theorem relMap_tsrc (p q : QV A) : TMSrc (qsatMapEquiv p) (qsatMapEquiv q) ↔ QSrc p q := by
   rw [TMSrc, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
   cases t
@@ -648,7 +650,8 @@ theorem relMap_tsrc (p q : QV A) : TMSrc (qsatMapEquiv p) (qsatMapEquiv q) ↔ Q
   case tProcAcc => exact realize_qCstF rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tread (p q : QV A) : TMRead (qsatMapEquiv p) (qsatMapEquiv q) ↔ QRead p q := by
+private theorem relMap_tread
+    (p q : QV A) : TMRead (qsatMapEquiv p) (qsatMapEquiv q) ↔ QRead p q := by
   rw [TMRead, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
   cases t
@@ -668,7 +671,7 @@ theorem relMap_tread (p q : QV A) : TMRead (qsatMapEquiv p) (qsatMapEquiv q) ↔
   case tProcAcc => exact realize_qCstF rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_twrite (p q : QV A) :
+private theorem relMap_twrite (p q : QV A) :
     TMWrite (qsatMapEquiv p) (qsatMapEquiv q) ↔ QWrite p q := by
   rw [TMWrite, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -778,7 +781,7 @@ theorem relMap_tr (p : QV A) : TMTr (qsatMapEquiv p) ↔ QTr p := by
   case tProcAcc => exact realize_minPair _ rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tdst (p q : QV A) : TMDst (qsatMapEquiv p) (qsatMapEquiv q) ↔ QDst p q := by
+private theorem relMap_tdst (p q : QV A) : TMDst (qsatMapEquiv p) (qsatMapEquiv q) ↔ QDst p q := by
   rw [TMDst, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
   cases t
@@ -824,7 +827,7 @@ theorem relMap_tdst (p q : QV A) : TMDst (qsatMapEquiv p) (qsatMapEquiv q) ↔ Q
 /-! ### The reduction -/
 
 /-- **The interpreted structure describes the machine of the instance.** -/
-theorem agree_qsatMachine :
+private theorem agree_qsatMachine :
     (tmData (qsatTuringInterp.Map A)).Agree (qsatMapEquiv (A := A)).symm (qsatMachine A) where
   posn := relMap_posn
   le := relMap_le
@@ -840,7 +843,7 @@ theorem agree_qsatMachine :
   inp := relMap_inp
 
 /-- **The image is a yes-instance exactly when the formula is true.** -/
-theorem dtmAcceptSpace_map_iff :
+private theorem dtmAcceptSpace_map_iff :
     DTMAcceptSpace (qsatTuringInterp.Map A) ↔ QsatHolds A :=
   (and_congr (agree_qsatMachine (A := A)).wellFormed
       (and_congr (agree_qsatMachine (A := A)).deterministic
@@ -850,7 +853,8 @@ end Correct
 
 /-- **`QSAT ≤ᶠᵒ[≤] DTMAcceptSpace`**: the deterministic space-bounded machine
 that evaluates a quantified Boolean formula, built inside its instance. -/
-noncomputable def qsat_ordered_fo_reduction_dtmAcceptSpace : QSAT ≤ᶠᵒ[≤] DTMAcceptSpace where
+private noncomputable def qsat_ordered_fo_reduction_dtmAcceptSpace
+    : QSAT ≤ᶠᵒ[≤] DTMAcceptSpace where
   Tag := QTag
   dim := 2
   toInterpretation := qsatTuringInterp

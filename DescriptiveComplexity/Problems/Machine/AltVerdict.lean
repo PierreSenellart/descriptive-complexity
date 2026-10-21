@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltGuess
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltCheck
+import all DescriptiveComplexity.Problems.Machine.AltGuess
+import all DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltTable
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The check phase decides the matrix
@@ -50,14 +56,14 @@ variable {νs : Fin k → A → Prop}
 variable (k) in
 /-- Some literal of the clause `c` is good: satisfied, for a conjunctive
 matrix; violated, for a disjunctive one. -/
-def QChkGood (cnf : Bool) (νs : Fin k → A → Prop) (c : A) : Prop :=
+private def QChkGood (cnf : Bool) (νs : Fin k → A → Prop) (c : A) : Prop :=
   ∃ y : A, QGood k cnf c y (chkVal νs y)
 
 variable (k) in
 /-- **What the check phase has left to prove when it reaches the clause `c`**:
 that every clause from `c` up is satisfied, or that some term from `c` up has
 no violated literal. -/
-def ChkOk (cnf : Bool) (νs : Fin k → A → Prop) (c : A) : Prop :=
+private def ChkOk (cnf : Bool) (νs : Fin k → A → Prop) (c : A) : Prop :=
   match cnf with
   | true => ∀ e : A, QbfCl k e → c ≤ e → QChkGood k cnf νs e
   | false => ∃ e : A, QbfCl k e ∧ c ≤ e ∧ ¬QChkGood k cnf νs e
@@ -65,14 +71,14 @@ def ChkOk (cnf : Bool) (νs : Fin k → A → Prop) (c : A) : Prop :=
 /-! ### Elementary facts about check configurations -/
 
 /-- A checking state is not accepting. -/
-theorem not_acc_stChk {cnf f d : Bool} {c : A} :
+private theorem not_acc_stChk {cnf f d : Bool} {c : A} :
     ¬(altMachine k A cnf).Acc (stChk f d c : AltV k A) := fun h =>
   AltBase.noConfusion (show AltBase.qChk f d = AltBase.qAcc from h)
 
 omit [(Language.qbf k).Structure A] in
 /-- Checking states are told apart by their flag, their direction and their
 clause. -/
-theorem stChk_eq_iff {f d f' d' : Bool} {c c' : A} :
+private theorem stChk_eq_iff {f d f' d' : Bool} {c c' : A} :
     (stChk f d c : AltV k A) = stChk f' d' c' ↔ f = f' ∧ d = d' ∧ c = c' := by
   constructor
   · intro h
@@ -81,15 +87,15 @@ theorem stChk_eq_iff {f d f' d' : Bool} {c c' : A} :
   · rintro ⟨rfl, rfl, rfl⟩
     rfl
 
-theorem inCheck_confChkR (cnf : Bool) (c : A) (p : AltV k A) :
+private theorem inCheck_confChkR (cnf : Bool) (c : A) (p : AltV k A) :
     InCheck (confChkR cnf νs c p) := Or.inl ⟨_, _, _, rfl⟩
 
-theorem inCheck_confChkL (cnf : Bool) (c : A) (p : AltV k A) :
+private theorem inCheck_confChkL (cnf : Bool) (c : A) (p : AltV k A) :
     InCheck (confChkL cnf νs c p) := Or.inl ⟨_, _, _, rfl⟩
 
 /-- **Every step of the check phase is forced**: it is the only one available,
 so acceptance descends along it whatever the polarity of the block. -/
-theorem stepForced_of_inCheck {cnf start : Bool} {c c' : Config (AltV k A)} (hP : InCheck c)
+private theorem stepForced_of_inCheck {cnf start : Bool} {c c' : Config (AltV k A)} (hP : InCheck c)
     (hnacc : ¬(altMachine k A cnf).Acc c.state)
     (hstep : (altMachine k A cnf).Step c c') :
     StepForced (altMachine k A cnf) start c c' :=
@@ -98,7 +104,7 @@ theorem stepForced_of_inCheck {cnf start : Bool} {c c' : Config (AltV k A)} (hP 
 omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- A configuration that accepts and is not accepting outright has an accepting
 successor, whichever player owns it. -/
-theorem exists_step_of_altAcc {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
+private theorem exists_step_of_altAcc {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
     {c : Config (AltV k A)} (hnacc : ¬M.Acc c.state) (hacc : M.AltAcc start n c) :
     ∃ (c' : Config (AltV k A)) (m : ℕ), M.Step c c' ∧ M.AltAcc start m c' := by
   cases n with
@@ -112,7 +118,7 @@ theorem exists_step_of_altAcc {M : ATMData (AltV k A)} {start : Bool} {n : ℕ}
 /-! ### Descending a check sweep -/
 
 /-- **A rightward check sweep reaches the right marker.** -/
-theorem altAcc_chkR_posEnd {cnf start : Bool} {c : A} (hc : QbfCl k c) {n : ℕ}
+private theorem altAcc_chkR_posEnd {cnf start : Bool} {c : A} (hc : QbfCl k c) {n : ℕ}
     (hacc : (altMachine k A cnf).AltAcc start n (confChkR cnf νs c (posCell qbotA))) :
     ∃ m, (altMachine k A cnf).AltAcc start m (confChkR cnf νs c posEnd) := by
   have hcell : ∀ p q : AltV k A, SuccPos tagTupleLe AltPosn p q →
@@ -137,7 +143,7 @@ theorem altAcc_chkR_posEnd {cnf start : Bool} {c : A} (hc : QbfCl k c) {n : ℕ}
   exact ⟨_, hend⟩
 
 /-- **A leftward check sweep reaches the left marker.** -/
-theorem altAcc_chkL_posStart {cnf start : Bool} {c : A} (hc : QbfCl k c) {n : ℕ}
+private theorem altAcc_chkL_posStart {cnf start : Bool} {c : A} (hc : QbfCl k c) {n : ℕ}
     (hacc : (altMachine k A cnf).AltAcc start n (confChkL cnf νs c (posCell qtopA))) :
     ∃ m, (altMachine k A cnf).AltAcc start m (confChkL cnf νs c posStart) := by
   have hcell : ∀ p q : AltV k A, SuccPos tagTupleLe AltPosn p q →
@@ -162,7 +168,7 @@ theorem altAcc_chkL_posStart {cnf start : Bool} {c : A} (hc : QbfCl k c) {n : �
 /-- **The turn at the right marker, read backwards.** Either the clause has a
 good literal and the run moves on to the next one, or the flag settles the run
 and the semantics of the matrix is decided on the spot. -/
-theorem turn_of_step_chkR {cnf : Bool} {c : A} {c' : Config (AltV k A)}
+private theorem turn_of_step_chkR {cnf : Bool} {c : A} {c' : Config (AltV k A)}
     (hstep : (altMachine k A cnf).Step (confChkR cnf νs c posEnd) c') :
     (QChkGood k cnf νs c ∧ ∃ e : A, QbfNextCl k c e ∧ c' = confChkL cnf νs e (posCell qtopA)) ∨
       (chkFlagR cnf νs c posEnd = cnf ∧ (cnf = true → QbfMaxCl k c)) := by
@@ -216,7 +222,7 @@ theorem turn_of_step_chkR {cnf : Bool} {c : A} {c' : Config (AltV k A)}
   all_goals exact absurd hSrc (by simp [acstI, aoneI])
 
 /-- **The turn at the left marker, read backwards.** -/
-theorem turn_of_step_chkL {cnf : Bool} {c : A} {c' : Config (AltV k A)}
+private theorem turn_of_step_chkL {cnf : Bool} {c : A} {c' : Config (AltV k A)}
     (hstep : (altMachine k A cnf).Step (confChkL cnf νs c posStart) c') :
     (QChkGood k cnf νs c ∧ ∃ e : A, QbfNextCl k c e ∧ c' = confChkR cnf νs e (posCell qbotA)) ∨
       (chkFlagL cnf νs c posStart = cnf ∧ (cnf = true → QbfMaxCl k c)) := by
@@ -274,7 +280,8 @@ theorem turn_of_step_chkL {cnf : Bool} {c : A} {c' : Config (AltV k A)}
 omit [Finite A] [Nonempty A] in
 /-- **What the accepting turn says**: the clause settles the run, so it is the
 last one that matters. -/
-theorem chkOk_of_flag {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
+private theorem chkOk_of_flag
+    {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true → QbfMaxCl k c)
     (hgood : QChkGood k cnf νs c ↔ cnf = true) : ChkOk k cnf νs c := by
   cases cnf with
   | true =>
@@ -287,7 +294,7 @@ theorem chkOk_of_flag {cnf : Bool} {c : A} (hc : QbfCl k c) (hmax : cnf = true �
 omit [Finite A] [Nonempty A] in
 /-- **What the turn to the next clause says**: this clause is good, and the run
 goes on to settle the ones above it. -/
-theorem chkOk_of_next {cnf : Bool} {c e : A} (hnext : QbfNextCl k c e)
+private theorem chkOk_of_next {cnf : Bool} {c e : A} (hnext : QbfNextCl k c e)
     (hgood : QChkGood k cnf νs c) (hok : ChkOk k cnf νs e) : ChkOk k cnf νs c := by
   cases cnf with
   | true =>
@@ -302,7 +309,7 @@ theorem chkOk_of_next {cnf : Bool} {c e : A} (hnext : QbfNextCl k c e)
 /-- **The check phase decides the matrix.** Whichever sweep it is on and
 whichever clause it has reached, an accepting run proves that clause and every
 clause above it settled. -/
-theorem chkOk_of_altAcc {cnf start : Bool} :
+private theorem chkOk_of_altAcc {cnf start : Bool} :
     ∀ c : A, QbfCl k c →
       (∀ n : ℕ, (altMachine k A cnf).AltAcc start n (confChkR cnf νs c (posCell qbotA)) →
           ChkOk k cnf νs c) ∧
@@ -352,7 +359,7 @@ theorem chkVal_eq_false {x : A} : chkVal νs x = false ↔ ¬qbfVal νs x := by
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- A conjunctive clause is good exactly when the assignment satisfies one of
 its literals. -/
-theorem qChkGood_true_iff {c : A} :
+private theorem qChkGood_true_iff {c : A} :
     QChkGood k true νs c ↔
       ∃ x : A, (QbfPos k c x ∧ qbfVal νs x) ∨ (QbfNeg k c x ∧ ¬qbfVal νs x) := by
   refine exists_congr fun x => ?_
@@ -362,7 +369,7 @@ theorem qChkGood_true_iff {c : A} :
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- A disjunctive term has no violated literal exactly when the assignment
 satisfies all of them. -/
-theorem not_qChkGood_false_iff {c : A} :
+private theorem not_qChkGood_false_iff {c : A} :
     ¬QChkGood k false νs c ↔
       ∀ x : A, (QbfPos k c x → qbfVal νs x) ∧ (QbfNeg k c x → ¬qbfVal νs x) := by
   simp only [QChkGood, not_exists, QGood, QbfLit, xorB_false, not_or, not_and]
@@ -380,7 +387,7 @@ theorem not_qChkGood_false_iff {c : A} :
 
 omit [Finite A] [Nonempty A] in
 /-- **What the check phase tests is the matrix.** -/
-theorem chkOk_iff_qbfMatrix {cnf : Bool} {c₀ : A} (hmin : QbfMinCl k c₀) :
+private theorem chkOk_iff_qbfMatrix {cnf : Bool} {c₀ : A} (hmin : QbfMinCl k c₀) :
     ChkOk k cnf νs c₀ ↔ QbfMatrix cnf νs := by
   cases cnf with
   | true =>
@@ -408,14 +415,14 @@ noncomputable def chkLen : ℕ :=
   Nat.card A * bitRank tagTupleLe AltPosn (posEnd : AltV k A)
 
 /-- **The check phase proves the matrix.** -/
-theorem qbfMatrix_of_altAcc {cnf start : Bool} {c₀ : A} (hmin : QbfMinCl k c₀) {n : ℕ}
+private theorem qbfMatrix_of_altAcc {cnf start : Bool} {c₀ : A} (hmin : QbfMinCl k c₀) {n : ℕ}
     (hacc : (altMachine k A cnf).AltAcc start n (confChkR cnf νs c₀ (posCell qbotA))) :
     QbfMatrix cnf νs :=
   (chkOk_iff_qbfMatrix hmin).mp ((chkOk_of_altAcc c₀ hmin.1).1 n hacc)
 
 /-- **The matrix makes the check phase accept**, at either polarity of the
 block it sits in, since the phase is deterministic. -/
-theorem altAcc_of_qbfMatrix {cnf start : Bool} {c₀ : A} (hmin : QbfMinCl k c₀)
+private theorem altAcc_of_qbfMatrix {cnf start : Bool} {c₀ : A} (hmin : QbfMinCl k c₀)
     (hmat : QbfMatrix cnf νs) {n : ℕ} (hn : chkLen k A ≤ n) :
     (altMachine k A cnf).AltAcc start n (confChkR cnf νs c₀ (posCell qbotA)) := by
   have hbound : {e : A | QbfCl k e ∧ c₀ ≤ e}.ncard *

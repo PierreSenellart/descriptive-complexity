@@ -390,12 +390,12 @@ variable {A : Type} [Language.jobSeq.Structure A]
 lowest block. -/
 def JWide (b : A → Prop) (u : A × A) : Prop := (∀ y : Fin 1 → A, JSLe u.1 (y 0)) ∧ b u.2
 
-theorem jWide_iff {b : A → Prop} {u : A × A} :
+private theorem jWide_iff {b : A → Prop} {u : A × A} :
     JWide b u ↔ ((∀ y : A, JSLe u.1 y) ∧ b u.2) :=
   and_congr ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩ Iff.rfl
 
 /-- **Read on the wide positions, a number still has its value.** -/
-theorem binNum_jWide [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
+private theorem binNum_jWide [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
     (h₀ : ∀ y : A, JSLe a₀ y) (b : A → Prop) :
     binNum (wideLe JSLe) (WidePosn JSPosn) (JWide b) = binNum JSLe JSPosn b := by
   rw [show binNum (wideLe JSLe) (WidePosn JSPosn) (JWide b) =
@@ -410,7 +410,7 @@ def JBit (s : Bool) (i p : A) : Prop :=
   | false => JSPen i p
 
 /-- The number the walk `s` adds up: the execution time, or the penalty. -/
-noncomputable def JVal (s : Bool) (i : A) : ℕ :=
+private noncomputable def JVal (s : Bool) (i : A) : ℕ :=
   match s with
   | true => JSTimeVal i
   | false => JSPenVal i
@@ -424,18 +424,18 @@ def JDlineW (j : A) : A × A → Prop := JWide (JSDline j)
 /-- The bound, read on the wide positions. -/
 def JBndW : A × A → Prop := JWide (JSBnd (A := A))
 
-theorem binNum_jWt [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
+private theorem binNum_jWt [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
     (h₀ : ∀ y : A, JSLe a₀ y) (s : Bool) (i : A) :
     binNum (wideLe JSLe) (WidePosn JSPosn) (JWt s i) = JVal s i := by
   rw [JWt, binNum_jWide hlin h₀]
   cases s <;> rfl
 
-theorem binNum_jDlineW [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
+private theorem binNum_jDlineW [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
     (h₀ : ∀ y : A, JSLe a₀ y) (j : A) :
     binNum (wideLe JSLe) (WidePosn JSPosn) (JDlineW j) = JSDlineVal j :=
   binNum_jWide hlin h₀ (JSDline j)
 
-theorem binNum_jBndW [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
+private theorem binNum_jBndW [Finite A] (hlin : IsLinOrd (JSLe (A := A))) {a₀ : A}
     (h₀ : ∀ y : A, JSLe a₀ y) :
     binNum (wideLe JSLe) (WidePosn JSPosn) (JBndW (A := A)) = JSBound A :=
   binNum_jWide hlin h₀ JSBnd

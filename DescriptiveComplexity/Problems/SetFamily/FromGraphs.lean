@@ -134,7 +134,7 @@ theorem eq_diagPt_iff (t : Unit) (w : Fin 2 → A) (v : A) :
     fin_cases i <;> simp [diagPt, h0, h1]
 
 /-- Distinct vertices give distinct vertex-sets. -/
-theorem diagPt_injective : Function.Injective (diagPt (A := A)) := by
+private theorem diagPt_injective : Function.Injective (diagPt (A := A)) := by
   intro v v' h
   simpa using ((eq_diagPt_iff () ![v, v] v').mp h).1
 
@@ -157,12 +157,12 @@ theorem ncard_diag_eq (P : A → Prop) (Q : edgeIncidenceInterp.Map A → Prop)
 pairs of its members. Shared by the reductions of Vertex Cover to Set Cover
 and of Independent Set to Set Packing, which both send a set of vertices to
 the family of its vertex-sets. -/
-def vertexFamily (C : A → Prop) : edgeIncidenceInterp.Map A → Prop :=
+private def vertexFamily (C : A → Prop) : edgeIncidenceInterp.Map A → Prop :=
   fun p => ∃ v, C v ∧ p = diagPt v
 
 /-- The family of vertex-sets of a set of vertices encodes the same number as
 the set itself. -/
-theorem ncard_vertexFamily (C : A → Prop) :
+private theorem ncard_vertexFamily (C : A → Prop) :
     {p | vertexFamily C p}.ncard = {v | C v}.ncard :=
   ncard_diag_eq C (vertexFamily C) (fun _ h => ⟨h.choose, h.choose_spec.2⟩)
     fun v => ⟨fun ⟨_, hv', heq⟩ => diagPt_injective heq ▸ hv', fun hv => ⟨v, hv, rfl⟩⟩
@@ -174,13 +174,13 @@ section EdgeIncidenceCorrectness
 variable (A : Type) [Language.markedGraph.Structure A]
 
 /-- The interpreted marked set lives on the diagonal. -/
-theorem marked_diag :
+private theorem marked_diag :
     ∀ p : edgeIncidenceInterp.Map A, SSMarked p → ∃ v, p = diagPt v := by
   rintro ⟨⟨⟩, w⟩ hw
   exact ⟨w 0, (eq_diagPt_iff () w (w 0)).mpr ⟨rfl, ((edgeIncidence_marked w).mp hw).1.symm⟩⟩
 
 /-- The interpreted marked set encodes the same number as the input one. -/
-theorem ncard_marked :
+private theorem ncard_marked :
     {p : edgeIncidenceInterp.Map A | SSMarked p}.ncard = {v : A | MGMarked v}.ncard :=
   ncard_diag_eq (A := A) MGMarked (fun p => SSMarked p) (marked_diag A)
     fun v => (edgeIncidence_marked (A := A) ![v, v]).trans (by simp [MGMarked])
@@ -188,7 +188,7 @@ theorem ncard_marked :
 /-- Correctness of the edge-incidence interpretation: a graph has a vertex
 cover at most as large as its marked set iff the associated set system has a
 cover at most as large as its marked set. -/
-theorem hasSmallVertexCover_iff_setCover_map :
+private theorem hasSmallVertexCover_iff_setCover_map :
     HasSmallVertexCover A ↔ HasSmallSetCover (edgeIncidenceInterp.Map A) := by
   constructor
   · rintro ⟨hfin, C, hcov, hcard⟩
@@ -228,7 +228,7 @@ end EdgeIncidenceCorrectness
 
 /-- **Vertex Cover FO-reduces to Set Cover**: the edges are the ground
 elements, the vertices the sets that cover them. -/
-def vertexCover_fo_reduction_setCover : VertexCover ≤ᶠᵒ SetCover where
+private def vertexCover_fo_reduction_setCover : VertexCover ≤ᶠᵒ SetCover where
   Tag := Unit
   dim := 2
   toInterpretation := edgeIncidenceInterp
@@ -274,7 +274,7 @@ theorem exists_elem_mem_both_iff {u v : A} (huv : u ≠ v) :
 Independent Set: a graph has an independent set at least as large as its
 marked set iff the associated set system has a packing at least as large as
 its marked set. -/
-theorem hasLargeIndependentSet_iff_setPacking_map (A : Type)
+private theorem hasLargeIndependentSet_iff_setPacking_map (A : Type)
     [Language.markedGraph.Structure A] :
     HasLargeIndependentSet A ↔ HasLargeSetPacking (edgeIncidenceInterp.Map A) := by
   constructor
@@ -307,7 +307,7 @@ end Correctness
 
 /-- **Independent Set FO-reduces to Set Packing**: the vertices become the
 sets of edges they are incident to, and independence becomes disjointness. -/
-def indSet_fo_reduction_setPacking : IndependentSet ≤ᶠᵒ SetPacking where
+private def indSet_fo_reduction_setPacking : IndependentSet ≤ᶠᵒ SetPacking where
   Tag := Unit
   dim := 2
   toInterpretation := edgeIncidenceInterp

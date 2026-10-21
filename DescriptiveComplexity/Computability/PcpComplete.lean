@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Machine.HaltHard
 public import DescriptiveComplexity.Problems.Pcp.Hardness
 import DescriptiveComplexity.Problems.Pcp.Membership
 import DescriptiveComplexity.Computability.CodeHalt
+import all DescriptiveComplexity.Problems.Pcp.Hardness
 
 /-!
 # Post's correspondence problem is RE-complete

@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # FO(PFP): first-order logic with a partial fixed point
@@ -149,7 +151,7 @@ theorem realize_pfpValue_iff (d : StepDef L) (A : Type) [L.Structure A] :
       · exact hout
 
 /-- The value of a partial definition is isomorphism-invariant. -/
-theorem pfpHolds_equiv (d : StepDef L) {M N : Type} [L.Structure M] [L.Structure N]
+private theorem pfpHolds_equiv (d : StepDef L) {M N : Type} [L.Structure M] [L.Structure N]
     (e : M ≃[L] N) : d.PFPHolds M ↔ d.PFPHolds N := by
   refine exists_congr fun n => ?_
   rw [d.partStage_map e n]
@@ -182,7 +184,7 @@ def PFPDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
 
 /-- Order-free FO(PFP) definability only depends on the finite instances of a
 problem. -/
-theorem pfpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
+private theorem pfpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     PFPDefinableFree P ↔ PFPDefinableFree Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _
@@ -193,7 +195,7 @@ theorem pfpDefinableFree_congr [L.IsRelational] {P Q : DecisionProblem L}
 problem.
 Registered in the Lax archive as
 [`Lax134656.PartialFixedPointClosure.pfpDefinable_congr_finite`](https://laxarchive.org/lax-134656/Lax134656.PartialFixedPointClosure.html#s-Lax134656.PartialFixedPointClosure.pfpDefinable_congr_finite). -/
-theorem pfpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
+private theorem pfpDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     PFPDefinable P ↔ PFPDefinable Q := by
   constructor <;> rintro ⟨d, hd⟩ <;> refine ⟨d, ?_⟩ <;> intro A _ _ _ _
@@ -301,7 +303,7 @@ variable {L : Language.{0, 0}}
 /-- The inflationary reading of a simultaneous induction, as a partial one:
 disjoin each variable's own atom onto its step formula, so that one partial
 step of the result is one *inflationary* step of the original. -/
-noncomputable def StepDef.inflate (d : StepDef L) : StepDef L where
+private noncomputable def StepDef.inflate (d : StepDef L) : StepDef L where
   B := d.B
   step := fun i =>
     Relations.formula (varInSym L d.B i) (fun j => Term.var j) ⊔ d.step i
@@ -318,14 +320,14 @@ private theorem realize_inflate_step (d : StepDef L) {A : Type} [L.Structure A]
 
 /-- One partial step of the inflated induction is one inflationary step of
 the original. -/
-theorem StepDef.next_inflate (d : StepDef L) {A : Type} [L.Structure A]
+private theorem StepDef.next_inflate (d : StepDef L) {A : Type} [L.Structure A]
     (ρ : d.B.Assignment A) : d.inflate.next ρ = d.inflStep ρ := by
   funext i x
   exact propext (realize_inflate_step d ρ i x)
 
 /-- The partial stages of the inflated induction are the inflationary stages
 of the original. -/
-theorem StepDef.partStage_inflate (d : StepDef L) (A : Type) [L.Structure A] (n : ℕ) :
+private theorem StepDef.partStage_inflate (d : StepDef L) (A : Type) [L.Structure A] (n : ℕ) :
     d.inflate.partStage A n = d.inflStage A n := by
   induction n with
   | zero => rfl
@@ -333,7 +335,7 @@ theorem StepDef.partStage_inflate (d : StepDef L) (A : Type) [L.Structure A] (n 
 
 /-- On a finite structure the inflated induction converges to the
 inflationary limit, so its partial value is the inflationary value. -/
-theorem StepDef.pfpHolds_inflate (d : StepDef L) (A : Type) [L.Structure A]
+private theorem StepDef.pfpHolds_inflate (d : StepDef L) (A : Type) [L.Structure A]
     [Finite A] : d.inflate.PFPHolds A ↔ d.IFPHolds A := by
   constructor
   · rintro ⟨n, hn, hout⟩

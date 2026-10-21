@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Counting.Class
 public import DescriptiveComplexity.Counting.KernelPair
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Class
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # Decision classes defined by counting
@@ -146,14 +149,14 @@ noncomputable def CeqP : ComplexityClass :=
 No complete problem is known for it, and the question does not relativize
 ([Hartmanis, Hemachandra 1988][hartmanis1988complexity]); the class is here
 for its inclusions. -/
-noncomputable def UP : ComplexityClass :=
+private noncomputable def UP : ComplexityClass :=
   countClass (fun c _ => c ≤ 1) fun c _ => c = 1
 
 section Mem
 
 variable {L : Language.{0, 0}} [L.IsRelational] {S R : ℕ → ℕ → Prop}
 
-theorem mem_countClass_iff (P : DecisionProblem L) :
+private theorem mem_countClass_iff (P : DecisionProblem L) :
     P ∈ countClass S R ↔ CountDefinable S R P :=
   Iff.rfl
 
@@ -171,7 +174,7 @@ theorem mem_countClass_of_sharpP {C D : CountingProblem L} (hC : C ∈ SharpP) (
 
 /-- Hardness for the class is the usual notion: every member reduces to the
 problem. -/
-theorem hard_countClass_iff (P : DecisionProblem L) :
+private theorem hard_countClass_iff (P : DecisionProblem L) :
     (countClass S R).Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         CountDefinable S R Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
@@ -184,7 +187,7 @@ end Mem
 section Inclusions
 
 /-- The side condition and the relation may be weakened. -/
-theorem countClass_subset {S R S' R' : ℕ → ℕ → Prop} (hS : ∀ c d, S c d → S' c d)
+private theorem countClass_subset {S R S' R' : ℕ → ℕ → Prop} (hS : ∀ c d, S c d → S' c d)
     (hR : ∀ c d, S c d → (R c d ↔ R' c d)) : countClass S R ⊆ countClass S' R' := by
   rintro L _ P ⟨B, φ, B', φ', hφ⟩
   exact ⟨B, φ, B', φ', fun A _ _ _ _ =>
@@ -193,7 +196,7 @@ theorem countClass_subset {S R S' R' : ℕ → ℕ → Prop} (hS : ∀ c d, S c 
 /-- `UP ⊆ ⊕P`: at most one witness, and one is an odd number of them.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.UP_subset_parityP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.UP_subset_parityP). -/
-theorem UP_subset_parityP : UP ⊆ ParityP :=
+private theorem UP_subset_parityP : UP ⊆ ParityP :=
   countClass_subset (fun _ _ _ => trivial) fun c _ hc => by
     rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hc with rfl | rfl <;> simp
 
@@ -201,7 +204,7 @@ theorem UP_subset_parityP : UP ⊆ ParityP :=
 witness, and the order the kernel reads is re-quantified.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.UP_subset_NP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.UP_subset_NP). -/
-theorem UP_subset_NP : UP ⊆ NP := by
+private theorem UP_subset_NP : UP ⊆ NP := by
   rintro L _ P ⟨B, φ, B', φ', hφ⟩
   refine sigmaSODefinable_of_orderPull (k := 0) [B] rfl φ ?_
   intro A _ _ _
@@ -221,7 +224,7 @@ theorem UP_subset_NP : UP ⊆ NP := by
 `⊥` has, namely none.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.NP_subset_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.NP_subset_PP). -/
-theorem NP_subset_PP : NP ⊆ PP := by
+private theorem NP_subset_PP : NP ⊆ PP := by
   intro L _ P hP
   obtain ⟨C, hC, hCP⟩ := (mem_NP_iff_exists_sharpP_support P).mp hP
   refine mem_countClass_of_sharpP hC (ofKernel_mem_sharpP SOBlock.trivial ⊥) fun A _ _ _ => ?_
@@ -233,14 +236,14 @@ theorem NP_subset_PP : NP ⊆ PP := by
   rw [this]
 
 /-- **Swapping the two counts.** -/
-theorem countClass_swap_subset (S R : ℕ → ℕ → Prop) :
+private theorem countClass_swap_subset (S R : ℕ → ℕ → Prop) :
     countClass S R ⊆ countClass (fun c d => S d c) fun c d => R d c := by
   rintro L _ P ⟨B, φ, B', φ', hφ⟩
   exact ⟨B', φ', B, φ, fun A _ _ _ _ => hφ A⟩
 
 /-- **Adding one to the first count**: the first kernel is paired with the
 kernel `⊤` over the block without variables. -/
-theorem countClass_succ_subset (S R : ℕ → ℕ → Prop) :
+private theorem countClass_succ_subset (S R : ℕ → ℕ → Prop) :
     countClass S R ⊆ countClass (fun c d => ∃ c', c = c' + 1 ∧ S c' d) fun c d =>
       ∃ c', c = c' + 1 ∧ R c' d := by
   rintro L _ P ⟨B, φ, B', φ', hφ⟩
@@ -252,7 +255,7 @@ theorem countClass_succ_subset (S R : ℕ → ℕ → Prop) :
 
 /-- The complement of a problem of the class of `R` is in the class of
 `¬R`. -/
-theorem compl_mem_countClass {L : Language.{0, 0}} [L.IsRelational] {S R : ℕ → ℕ → Prop}
+private theorem compl_mem_countClass {L : Language.{0, 0}} [L.IsRelational] {S R : ℕ → ℕ → Prop}
     {P : DecisionProblem L} (h : P ∈ countClass S R) :
     Pᶜ ∈ countClass S fun c d => ¬R c d := by
   obtain ⟨B, φ, B', φ', hφ⟩ := h
@@ -293,7 +296,7 @@ theorem compl_mem_PP {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem
 /-- `coNP ⊆ PP`.
 Registered in the Lax archive as
 [`Lax175070.CountClassInclusions.coNP_subset_PP`](https://laxarchive.org/lax-175070/Lax175070.CountClassInclusions.html#s-Lax175070.CountClassInclusions.coNP_subset_PP). -/
-theorem coNP_subset_PP : coNP ⊆ PP := by
+private theorem coNP_subset_PP : coNP ⊆ PP := by
   intro L _ P hP
   rw [← DecisionProblem.compl_compl P]
   exact compl_mem_PP (NP_subset_PP ((mem_piP_iff 1 P).mp hP))

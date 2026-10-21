@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.MachinesAltPlay
 import DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.MachinesAltPlay
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The `k`-round game: what a `Σₖ` definition of alternating acceptance guesses
@@ -113,7 +116,7 @@ open Classical in
 noncomputable def nextPos (M : ATMData A) (t : A) : A :=
   if h : ∃ q, SuccPos M.Le M.Posn t q then h.choose else t
 
-theorem succPos_nextPos {t : A} (h : ∃ q, SuccPos M.Le M.Posn t q) :
+private theorem succPos_nextPos {t : A} (h : ∃ q, SuccPos M.Le M.Posn t q) :
     SuccPos M.Le M.Posn t (M.nextPos t) := by
   classical
   rw [nextPos, dite_eq_left h]
@@ -131,7 +134,7 @@ noncomputable def posSeq (M : ATMData A) (t : A) : ℕ → A
 
 /-- **The rank increases by one along `nextPos`**, as long as the highest
 position has not been reached. -/
-theorem succPos_nextPos_of_not_max [Finite A] (hlin : IsLinOrd M.Le) {t : A}
+private theorem succPos_nextPos_of_not_max [Finite A] (hlin : IsLinOrd M.Le) {t : A}
     (ht : M.Posn t) (hmax : ¬MaxPos M.Le M.Posn t) :
     SuccPos M.Le M.Posn t (M.nextPos t) :=
   succPos_nextPos (TMData.exists_succPos' (M := M.toTMData) hlin ht hmax)
@@ -180,7 +183,7 @@ def RoundCond (i : ℕ) (prev w : A → Config A) : Prop :=
 section Blocks
 
 /-- Membership in a block below `i`, once the block is known. -/
-theorem blkLt_iff (hbwf : M.BlocksWellFormed k) {i j : ℕ} {q : A} (hj : M.Blk j q) :
+private theorem blkLt_iff (hbwf : M.BlocksWellFormed k) {i j : ℕ} {q : A} (hj : M.Blk j q) :
     M.BlkLt i q ↔ j < i := by
   constructor
   · rintro ⟨j', hj', h'⟩
@@ -189,7 +192,7 @@ theorem blkLt_iff (hbwf : M.BlocksWellFormed k) {i j : ℕ} {q : A} (hj : M.Blk 
 
 /-- **A walk enters the blocks in order**: the first time whose block is not
 below `i` is in block `i` exactly, since the step into it is legal. -/
-theorem blk_eq_of_entry (hbwf : M.BlocksWellFormed k) {w : A → Config A} {i : ℕ}
+private theorem blk_eq_of_entry (hbwf : M.BlocksWellFormed k) {w : A → Config A} {i : ℕ}
     (hw : M.LegalBelow i w) {p q : A} (hpq : SuccPos M.Le M.Posn p q)
     (hp : M.BlkLt i (w p).state) (hq : ¬M.BlkLt i (w q).state) :
     M.Blk i (w q).state := by
@@ -204,7 +207,7 @@ theorem blk_eq_of_entry (hbwf : M.BlocksWellFormed k) {w : A → Config A} {i : 
   · exact absurd (heq ▸ hp) hq
 
 /-- **The times of the low blocks form a prefix.** -/
-theorem blkLt_of_le [Finite A] (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
+private theorem blkLt_of_le [Finite A] (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
     {w : A → Config A} (hmono : M.BlkMono w) {i : ℕ} {s q : A}
     (hs : M.Posn s) (hq : M.Posn q) (hle : M.Le s q) (h : M.BlkLt i (w q).state) :
     M.BlkLt i (w s).state := by

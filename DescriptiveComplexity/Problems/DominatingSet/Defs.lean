@@ -47,7 +47,7 @@ def DominatesOn (Adjp : A → A → Prop) (Kp : A → Prop) : Prop :=
 
 /-- The domination property, with the threshold certified by an injection into
 the marked set – the shape the second-order definition guesses. -/
-theorem dominatesOn_iff_embedding [Finite A] (Adjp : A → A → Prop) (Kp : A → Prop) :
+private theorem dominatesOn_iff_embedding [Finite A] (Adjp : A → A → Prop) (Kp : A → Prop) :
     DominatesOn Adjp Kp ↔ ∃ D : A → Prop, (∀ v, D v ∨ ∃ u, D u ∧ Adjp u v) ∧
       Nonempty ({v // D v} ↪ {v // Kp v}) :=
   exists_congr fun D =>
@@ -83,7 +83,7 @@ private theorem dom_symm_hBin {MB : B → B → Prop} {MA : A → A → Prop} (u
   simp
 
 /-- `DominatesOn` transports along an equivalence, iff version. -/
-theorem DominatesOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+private theorem DominatesOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     DominatesOn AdjB KB ↔ DominatesOn AdjA KA :=

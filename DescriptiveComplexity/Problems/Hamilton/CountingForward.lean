@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Hamilton.CountingGadget
 public import DescriptiveComplexity.Problems.OneInSat.Defs
+import all DescriptiveComplexity.OccurrenceVar
+import all DescriptiveComplexity.Problems.Hamilton.CountingGadget
 
 /-!
 # The circuit of an exactly-one model

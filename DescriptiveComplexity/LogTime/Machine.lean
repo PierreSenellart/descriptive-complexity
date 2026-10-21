@@ -123,7 +123,7 @@ def Holds (val : V → Prop) : BitExpr V → Prop
   | .or e f => e.Holds val ∨ f.Holds val
 
 /-- The two readings agree. -/
-theorem holds_iff_eval (val : V → Bool) (e : BitExpr V) :
+private theorem holds_iff_eval (val : V → Bool) (e : BitExpr V) :
     e.Holds (fun v => val v = true) ↔ e.eval val = true := by
   induction e with
   | var v => exact Iff.rfl
@@ -143,7 +143,7 @@ def mapVar {W : Type} (f : V → W) : BitExpr V → BitExpr W
   | .or e g => .or (e.mapVar f) (g.mapVar f)
 
 /-- Renaming bit variables is composition on the assignment. -/
-theorem eval_mapVar {W : Type} (f : V → W) (val : W → Bool) (e : BitExpr V) :
+private theorem eval_mapVar {W : Type} (f : V → W) (val : W → Bool) (e : BitExpr V) :
     (e.mapVar f).eval val = e.eval (val ∘ f) := by
   induction e with
   | var v => rfl
@@ -154,7 +154,7 @@ theorem eval_mapVar {W : Type} (f : V → W) (val : W → Bool) (e : BitExpr V) 
   | or e g ihe ihg => rw [mapVar, eval, ihe, ihg, eval]
 
 /-- Holding only depends on the assignment pointwise. -/
-theorem holds_congr {val val' : V → Prop} (h : ∀ v, val v ↔ val' v) (e : BitExpr V) :
+private theorem holds_congr {val val' : V → Prop} (h : ∀ v, val v ↔ val' v) (e : BitExpr V) :
     e.Holds val ↔ e.Holds val' := by
   induction e with
   | var v => exact h v
@@ -210,7 +210,7 @@ def Accepts (S : Sweep ρ) (x : Fin ρ → A) : Prop :=
 
 /-- **Renaming the registers of a sweep**: what lets a sweep built once – the
 comparison, the addition – be run on any registers of a larger machine. -/
-def relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') : Sweep ρ' where
+private def relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') : Sweep ρ' where
   σ := S.σ
   init := S.init
   step := fun j => (S.step j).mapVar (Sum.map id f)
@@ -218,7 +218,7 @@ def relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') : Sweep ρ' wher
 
 omit [Finite A] in
 /-- A renamed sweep runs the original one on the renamed registers. -/
-theorem state_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : Fin ρ' → A) :
+private theorem state_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : Fin ρ' → A) :
     ∀ (i : ℕ) (j : Fin S.σ), (S.relabel f).state x i j = S.state (fun k => x (f k)) i j := by
   intro i
   induction i with
@@ -237,7 +237,7 @@ theorem state_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : F
     exact h1.trans (congrArg (fun v => (S.step j).eval v) h2)
 
 /-- Acceptance of a renamed sweep. -/
-theorem accepts_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : Fin ρ' → A) :
+private theorem accepts_relabel {ρ' : ℕ} (S : Sweep ρ) (f : Fin ρ → Fin ρ') (x : Fin ρ' → A) :
     (S.relabel f).Accepts x ↔ S.Accepts fun k => x (f k) := by
   have h : (S.relabel f).state x (posCount A) = S.state (fun k => x (f k)) (posCount A) :=
     funext fun j => state_relabel S f x _ j
@@ -313,7 +313,7 @@ def prefixHolds {A : Type} : (m : ℕ) → (Fin m → Bool) → ((Fin m → A) �
           else ∀ a, P (Fin.snoc v a))
 
 /-- Prefixes only depend on their body pointwise. -/
-theorem prefixHolds_congr {A : Type} :
+private theorem prefixHolds_congr {A : Type} :
     ∀ (m : ℕ) (pol : Fin m → Bool) {P Q : (Fin m → A) → Prop},
       (∀ v, P v ↔ Q v) → (prefixHolds m pol P ↔ prefixHolds m pol Q) := by
   intro m
@@ -435,7 +435,7 @@ theorem prefixHolds_add {A : Type} (k₁ : ℕ) :
 
 /-- **A block of equal polarity is one quantifier** over the tuple it fills:
 the existential case. -/
-theorem prefixHolds_const_true {A : Type} :
+private theorem prefixHolds_const_true {A : Type} :
     ∀ (m : ℕ) (P : (Fin m → A) → Prop),
       prefixHolds m (fun _ => true) P ↔ ∃ w, P w := by
   intro m
@@ -455,7 +455,7 @@ theorem prefixHolds_const_true {A : Type} :
       exact ⟨Fin.init u, u (Fin.last m), by rwa [Fin.snoc_init_self]⟩
 
 /-- **A block of equal polarity is one quantifier**: the universal case. -/
-theorem prefixHolds_const_false {A : Type} :
+private theorem prefixHolds_const_false {A : Type} :
     ∀ (m : ℕ) (P : (Fin m → A) → Prop),
       prefixHolds m (fun _ => false) P ↔ ∀ w, P w := by
   intro m

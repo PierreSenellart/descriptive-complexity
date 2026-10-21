@@ -12,6 +12,10 @@ public import DescriptiveComplexity.Numbers.Digits
 import DescriptiveComplexity.Padding
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.Digits
+import all DescriptiveComplexity.OccurrenceSlack
+import all DescriptiveComplexity.Problems.NaeSat
 
 /-!
 # Partition is NP-hard
@@ -137,7 +141,8 @@ def subRk : PTag → ℕ
   | _ => 0
 
 /-- The two ranks together determine the tag. -/
-theorem tag_ext {t t' : PTag} (h₁ : tagRk t = tagRk t') (h₂ : subRk t = subRk t') : t = t' := by
+private theorem tag_ext
+    {t t' : PTag} (h₁ : tagRk t = tagRk t') (h₂ : subRk t = subRk t') : t = t' := by
   revert h₁ h₂
   revert t t'
   decide
@@ -214,9 +219,9 @@ variable {A : Type}
 /-- The point of tag `t` over the pair `w`. -/
 def pPt (t : PTag) (w : Fin 2 → A) : pInterp.Map A := (t, w)
 
-theorem pPt_surj (q : pInterp.Map A) : ∃ t w, q = pPt t w := ⟨q.1, q.2, rfl⟩
+private theorem pPt_surj (q : pInterp.Map A) : ∃ t w, q = pPt t w := ⟨q.1, q.2, rfl⟩
 
-theorem pPt_eq_iff {t t' : PTag} {w w' : Fin 2 → A} :
+private theorem pPt_eq_iff {t t' : PTag} {w w' : Fin 2 → A} :
     pPt t w = pPt t' w' ↔ t = t' ∧ w = w' := by
   constructor
   · intro h
@@ -229,7 +234,7 @@ theorem pPt_eq_iff {t t' : PTag} {w w' : Fin 2 → A} :
 theorem pPt_snd (t : PTag) (w : Fin 2 → A) (j : Fin 2) : (pPt t w).2 j = w j := rfl
 
 /-- Two `2`-tuples with the same coordinates are equal. -/
-theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
+private theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
   funext j
   fin_cases j
   · exact h0
@@ -250,21 +255,22 @@ def pPos (f : Fin 3) (b : Bool × A) (y : A) : pInterp.Map A := pPt (.pos b.1 f)
 /-- The lowest position of the block `b`. -/
 def pLow (a₀ : A) (b : Bool × A) : pInterp.Map A := pPos 0 b a₀
 
-theorem pLit_injective (a₀ : A) : Function.Injective fun p : A × Bool => pLit a₀ p.2 p.1 := by
+private theorem pLit_injective
+    (a₀ : A) : Function.Injective fun p : A × Bool => pLit a₀ p.2 p.1 := by
   rintro ⟨x, s⟩ ⟨x', s'⟩ h
   obtain ⟨ht, hw⟩ := pPt_eq_iff.mp h
   refine Prod.ext ?_ ?_
   · simpa using congrArg (fun u : Fin 2 → A => u 0) hw
   · cases s <;> cases s' <;> simp_all
 
-theorem pSlk_injective (c : A) : Function.Injective fun p : A × Bool => pSlk p.2 c p.1 := by
+private theorem pSlk_injective (c : A) : Function.Injective fun p : A × Bool => pSlk p.2 c p.1 := by
   rintro ⟨x, s⟩ ⟨x', s'⟩ h
   obtain ⟨ht, hw⟩ := pPt_eq_iff.mp h
   refine Prod.ext ?_ ?_
   · simpa using congrArg (fun u : Fin 2 → A => u 1) hw
   · cases s <;> cases s' <;> simp_all
 
-theorem pPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
+private theorem pPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
     pPos u.2.1 u.1 u.2.2 := by
   rintro ⟨⟨k, e⟩, f, y⟩ ⟨⟨k', e'⟩, f', y'⟩ h
   obtain ⟨ht, hw⟩ := pPt_eq_iff.mp h
@@ -276,7 +282,7 @@ theorem pPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
   subst h0; subst h1; subst hk₁; subst hk₂
   rfl
 
-theorem pLow_injective (a₀ : A) : Function.Injective (pLow a₀ (A := A)) := by
+private theorem pLow_injective (a₀ : A) : Function.Injective (pLow a₀ (A := A)) := by
   rintro ⟨k, e⟩ ⟨k', e'⟩ h
   obtain ⟨ht, hw⟩ := pPt_eq_iff.mp h
   have h0 : e = e' := by simpa using congrArg (fun u : Fin 2 → A => u 0) hw
@@ -407,7 +413,7 @@ theorem pKey_injective : Function.Injective (pKey (A := A)) := by
 
 /-- The interpreted order is a linear order: the lexicographic order of the
 keys, which are pairwise distinct. -/
-theorem isLinOrd_bwLe : IsLinOrd (BWLe (A := pInterp.Map A)) := by
+private theorem isLinOrd_bwLe : IsLinOrd (BWLe (A := pInterp.Map A)) := by
   refine isLinOrd_of_key (isLinOrd_lexRel isLinOrd_le
     (isLinOrd_lexRel isLinOrd_le (isLinOrd_lexRel isLinOrd_le isLinOrd_le)))
     pKey pKey_injective fun q q' => ?_
@@ -427,10 +433,11 @@ variable {A : Type} [LinearOrder A]
 blocks, each group in the order of the input. -/
 def blkLe : Bool × A → Bool × A → Prop := lexRel (· ≤ ·) (· ≤ ·)
 
-theorem isLinOrd_blkLe : IsLinOrd (blkLe (A := A)) := isLinOrd_lexRel isLinOrd_le isLinOrd_le
+private theorem isLinOrd_blkLe
+    : IsLinOrd (blkLe (A := A)) := isLinOrd_lexRel isLinOrd_le isLinOrd_le
 
 /-- Being strictly below a block. -/
-theorem blkLt_iff {k k' : Bool} {x e : A} :
+private theorem blkLt_iff {k k' : Bool} {x e : A} :
     (blkLe (k, x) (k', e) ∧ (k, x) ≠ (k', e)) ↔
       (k = k' ∧ x < e) ∨ (k = false ∧ k' = true) := by
   cases k <;> cases k' <;> simp [blkLe, lexRel, lt_iff_le_and_ne]
@@ -446,7 +453,7 @@ section Bits
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem bwBit_lit_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
+private theorem bwBit_lit_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
     BWBit (pPt (.lit s) w) (pPt (.pos k f) w') ↔
       f = 0 ∧ IsBot (w 1) ∧ IsBot (w' 1) ∧ (if k then OccIn (w' 0) (w 0) s else w' 0 = w 0) := by
   rw [BWBit, pPt, pPt, FOInterpretation.relMap_map]
@@ -455,7 +462,7 @@ theorem bwBit_lit_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : 
     cases k <;> simp [pInterp, bitF, and_assoc]
   · simp [pInterp, bitF, hf]
 
-theorem bwBit_slk_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
+private theorem bwBit_slk_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
     BWBit (pPt (.slk s) w) (pPt (.pos k f) w') ↔
       f = 0 ∧ k = true ∧ Mid (w 0) (w 1) s ∧ IsBot (w' 1) ∧ w' 0 = w 0 := by
   rw [BWBit, pPt, pPt, FOInterpretation.relMap_map]
@@ -465,7 +472,7 @@ theorem bwBit_slk_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : 
   · simp [pInterp, bitF, hf]
     tauto
 
-theorem bwBit_emp_pos (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
+private theorem bwBit_emp_pos (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
     BWBit (pPt .emp w) (pPt (.pos k f) w') ↔
       f = 0 ∧ k = true ∧ EmptyCl (w 0) ∧ IsBot (w 1) ∧ IsBot (w' 1) ∧ w' 0 = w 0 := by
   rw [BWBit, pPt, pPt, FOInterpretation.relMap_map]
@@ -491,7 +498,7 @@ theorem bwBit_item_right (t : PTag) (w : Fin 2 → A) (s : Bool) (w' : Fin 2 →
       cases t <;> simp [pInterp, bitF]
 
 /-- Only the lowest position of a block ever carries a bit. -/
-theorem eq_pLow_of_bit {a₀ : A} (ha₀ : IsBot a₀) {i q : pInterp.Map A} (h : BWBit i q)
+private theorem eq_pLow_of_bit {a₀ : A} (ha₀ : IsBot a₀) {i q : pInterp.Map A} (h : BWBit i q)
     (hq : BWPosn q) : ∃ b, q = pLow a₀ b := by
   obtain ⟨t, w, rfl⟩ := pPt_surj i
   obtain ⟨t', w', rfl⟩ := pPt_surj q
@@ -528,11 +535,11 @@ section Places
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 omit [Language.sat.Structure A] [LinearOrder A] in
-private theorem key_pos (k : Bool) (f : Fin 3) (w : Fin 2 → A) :
+theorem key_pos (k : Bool) (f : Fin 3) (w : Fin 2 → A) :
     pKey (pPt (.pos k f) w) = (if k then 6 else 5, w 0, (f : ℕ), w 1) := by
   cases k <;> rfl
 
-theorem bwLe_pos_pos (k k' : Bool) (f f' : Fin 3) (w w' : Fin 2 → A) :
+private theorem bwLe_pos_pos (k k' : Bool) (f f' : Fin 3) (w w' : Fin 2 → A) :
     BWLe (pPt (.pos k f) w) (pPt (.pos k' f') w') ↔
       (k = false ∧ k' = true) ∨
         (k = k' ∧ (w 0 < w' 0 ∨
@@ -633,7 +640,7 @@ theorem pbase_pos : 0 < pbase A := by
 open Classical in
 /-- A binary number whose bits sit on the lowest positions of the blocks
 selected by `sub` is the base-`2 ^ (3 |A|)` number with digit `1` there. -/
-theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : pInterp.Map A → Prop}
+private theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : pInterp.Map A → Prop}
     {sub : Bool × A → Prop}
     (hp : ∀ q : pInterp.Map A, (BWPosn q ∧ p q) ↔ ∃ b, sub b ∧ q = pLow a₀ b) :
     binNum (BWLe (A := pInterp.Map A)) BWPosn p =
@@ -650,7 +657,7 @@ theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : pInterp.Map A → P
 open Classical in
 /-- **Every weight is read digit by digit**: the digit of a block is `1` when
 the item carries a bit at its lowest position, and `0` otherwise. -/
-theorem bwWeight_eq {a₀ : A} (ha₀ : IsBot a₀) (i : pInterp.Map A) :
+private theorem bwWeight_eq {a₀ : A} (ha₀ : IsBot a₀) (i : pInterp.Map A) :
     BWWeight i = digitNum (blkLe (A := A)) (fun _ => True) (pbase A)
       (fun b => if BWBit i (pLow a₀ b) then 1 else 0) := by
   classical
@@ -665,7 +672,7 @@ theorem bwWeight_eq {a₀ : A} (ha₀ : IsBot a₀) (i : pInterp.Map A) :
 open Classical in
 /-- **The weight of a set of items**, read digit by digit: the digit of a
 block is the number of selected items carrying a bit there. -/
-theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) :
+private theorem sum_weights_eq {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) :
     (∑ᶠ i ∈ {i | S i}, BWWeight i) =
       digitNum (blkLe (A := A)) (fun _ => True) (pbase A)
         (fun b => ({i : pInterp.Map A | S i ∧ BWBit i (pLow a₀ b)} : Set _).ncard) := by
@@ -690,16 +697,16 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A]
 
 /-- The number of selected items carrying a bit in a block: the digit that
 block contributes to the weight of the selection. -/
-noncomputable def cnt (a₀ : A) (S : pInterp.Map A → Prop) (b : Bool × A) : ℕ :=
+private noncomputable def cnt (a₀ : A) (S : pInterp.Map A → Prop) (b : Bool × A) : ℕ :=
   ({i : pInterp.Map A | S i ∧ BWBit i (pLow a₀ b)} : Set _).ncard
 
-theorem sum_weights_eq_cnt {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) :
+private theorem sum_weights_eq_cnt {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) :
     (∑ᶠ i ∈ {i | S i}, BWWeight i) =
       digitNum (blkLe (A := A)) (fun _ => True) (pbase A) (cnt a₀ S) :=
   sum_weights_eq ha₀ S
 
 /-- A selection and the items it leaves out split every digit. -/
-theorem cnt_add_cnt (a₀ : A) {S : pInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i)
+private theorem cnt_add_cnt (a₀ : A) {S : pInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i)
     (b : Bool × A) :
     cnt a₀ S b + cnt a₀ (fun i => BWItem i ∧ ¬S i) b = cnt a₀ BWItem b := by
   have : Finite (pInterp.Map A) := pInterp.map_finite A
@@ -727,7 +734,7 @@ theorem pLow_eq (a₀ : A) (k : Bool) (e : A) : pLow a₀ (k, e) = pPt (.pos k 0
 omit [Finite A] in
 /-- The items carrying a bit in a variable block are the two literals of that
 variable. -/
-theorem bit_pLow_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) (i : pInterp.Map A) :
+private theorem bit_pLow_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) (i : pInterp.Map A) :
     BWBit i (pLow a₀ (false, x)) ↔ ∃ s, i = pLit a₀ s x := by
   have hbot : ∀ y : A, IsBot y → y = a₀ := fun y hy => le_antisymm (hy a₀) (ha₀ y)
   obtain ⟨t, w, rfl⟩ := pPt_surj i
@@ -771,7 +778,7 @@ theorem bit_pLow_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) (i : pInterp.Map A)
 omit [Finite A] in
 /-- The items carrying a bit in a clause block are the literals occurring in
 the clause, its slack items, and its own item if it is empty. -/
-theorem bit_pLow_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) (i : pInterp.Map A) :
+private theorem bit_pLow_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) (i : pInterp.Map A) :
     BWBit i (pLow a₀ (true, c)) ↔
       (∃ p : A × Bool, OccIn c p.1 p.2 ∧ i = pLit a₀ p.2 p.1) ∨
         (∃ p : A × Bool, Mid c p.1 p.2 ∧ i = pSlk p.2 c p.1) ∨
@@ -861,7 +868,7 @@ theorem pSlk_ne_pEmp (a₀ : A) (s : Bool) (c x c' : A) : pSlk s c x ≠ pEmp a�
 omit [Finite A] in
 /-- The digit of a variable block counts the selected literals of that
 variable. -/
-theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (x : A) :
+private theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (x : A) :
     cnt a₀ S (false, x) = ({s : Bool | S (pLit a₀ s x)} : Set Bool).ncard := by
   have hinj : Set.InjOn (fun s : Bool => pLit a₀ s x) {s | S (pLit a₀ s x)} := by
     intro s _ s' _ h
@@ -882,7 +889,7 @@ theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (x 
 open Classical in
 /-- The digit of a clause block counts the selected literals occurring in the
 clause, its selected slack items, and its own item if it is empty. -/
-theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (c : A) :
+private theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (c : A) :
     cnt a₀ S (true, c) =
       ({p ∈ OccSet c | S (pLit a₀ p.2 p.1)} : Set (A × Bool)).ncard +
         ({p ∈ MidSet c | S (pSlk p.2 c p.1)} : Set (A × Bool)).ncard +
@@ -937,7 +944,7 @@ theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : pInterp.Map A → Prop) (c 
 omit [Finite A] in
 /-- Every variable block totals two: a balanced split takes exactly one of the
 two literals of the variable. -/
-theorem cnt_item_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) : cnt a₀ BWItem (false, x) = 2 := by
+private theorem cnt_item_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) : cnt a₀ BWItem (false, x) = 2 := by
   rw [cnt_var ha₀]
   have hset : {s : Bool | BWItem (pLit a₀ s x)} = Set.univ := by
     ext s
@@ -948,7 +955,7 @@ theorem cnt_item_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) : cnt a₀ BWItem (
 open Classical in
 /-- A clause block totals its occurrences plus its slack occurrences, plus one
 if the clause is empty. -/
-theorem cnt_item_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) :
+private theorem cnt_item_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) :
     cnt a₀ BWItem (true, c) =
       (OccSet c).ncard + (MidSet c).ncard + (if EmptyCl c then 1 else 0) := by
   classical
@@ -981,7 +988,8 @@ theorem ncard_le_two_card (X : Set (A × Bool)) : X.ncard ≤ 2 * Nat.card A := 
   omega
 
 /-- A selection weighs at most as much as all the items, digit by digit. -/
-theorem cnt_le (a₀ : A) {S : pInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i) (b : Bool × A) :
+private theorem cnt_le
+    (a₀ : A) {S : pInterp.Map A → Prop} (hS : ∀ i, S i → BWItem i) (b : Bool × A) :
     cnt a₀ S b ≤ cnt a₀ BWItem b := by
   have : Finite (pInterp.Map A) := pInterp.map_finite A
   exact Set.ncard_le_ncard (fun i hi => ⟨hS i hi.1, hi.2⟩) (Set.toFinite _)
@@ -990,7 +998,7 @@ variable [Nonempty A]
 
 /-- **No carry**: every digit the gadget writes stays below the base, `3 |A|`
 bits being more than the `4 |A| + 1` items a block can hold. -/
-theorem cnt_item_lt_pbase {a₀ : A} (ha₀ : IsBot a₀) (b : Bool × A) :
+private theorem cnt_item_lt_pbase {a₀ : A} (ha₀ : IsBot a₀) (b : Bool × A) :
     cnt a₀ BWItem b < pbase A := by
   classical
   have hn : 1 ≤ Nat.card A := Nat.card_pos
@@ -1016,7 +1024,7 @@ theorem cnt_item_lt_pbase {a₀ : A} (ha₀ : IsBot a₀) (b : Bool × A) :
 
 /-- **The balance condition, digit by digit**: a selection weighs as much as
 the items it leaves out exactly when it takes half of every digit. -/
-theorem sum_eq_iff {a₀ : A} (ha₀ : IsBot a₀) {S : pInterp.Map A → Prop}
+private theorem sum_eq_iff {a₀ : A} (ha₀ : IsBot a₀) {S : pInterp.Map A → Prop}
     (hS : ∀ i, S i → BWItem i) :
     ((∑ᶠ i ∈ {i | S i}, BWWeight i) = ∑ᶠ i ∈ {i | BWItem i ∧ ¬S i}, BWWeight i) ↔
       ∀ b : Bool × A, 2 * cnt a₀ S b = cnt a₀ BWItem b := by
@@ -1105,7 +1113,7 @@ theorem splitSet_pEmp (c : A) : ¬splitSet a₀ ν M (pEmp a₀ c) := by
   · exact absurd hp.symm (pSlk_ne_pEmp a₀ p.2 c' p.1 c)
 
 /-- The true occurrences of a clause under an assignment. -/
-def TrueSet (ν : A → Prop) (c : A) : Set (A × Bool) := {p ∈ OccSet c | LitTrue ν p.1 p.2}
+private def TrueSet (ν : A → Prop) (c : A) : Set (A × Bool) := {p ∈ OccSet c | LitTrue ν p.1 p.2}
 
 end Correctness
 
@@ -1137,7 +1145,7 @@ private theorem ncard_bool_eq_one {P : Bool → Prop} (h : ({s | P s} : Set Bool
 omit [Finite A] [Nonempty A] in
 /-- **A balanced split is an assignment**: the two literals of a variable
 split its block, so exactly one of them is selected. -/
-theorem litTrue_iff_sel {a₀ : A} (ha₀ : IsBot a₀) {S : pInterp.Map A → Prop}
+private theorem litTrue_iff_sel {a₀ : A} (ha₀ : IsBot a₀) {S : pInterp.Map A → Prop}
     (hbal : ∀ b, 2 * cnt a₀ S b = cnt a₀ BWItem b) (x : A) (s : Bool) :
     S (pLit a₀ s x) ↔ LitTrue (fun y => S (pLit a₀ true y)) x s := by
   have h := hbal (false, x)
@@ -1154,7 +1162,7 @@ omit [Nonempty A] in
 occurrence of a clause were selected, the slack of that clause – strictly
 fewer items than it has occurrences – would have to make up for all of them,
 and an empty clause could not be split at all. -/
-theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) {S T : pInterp.Map A → Prop}
+private theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) {S T : pInterp.Map A → Prop}
     (hcompl : ∀ i, BWItem i → (S i ↔ ¬T i))
     (hbal : ∀ b, cnt a₀ S b = cnt a₀ T b) {c : A} (hc : IsCl c) :
     ∃ p : A × Bool, p ∈ OccSet c ∧ S (pLit a₀ p.2 p.1) := by
@@ -1216,7 +1224,8 @@ theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) {S T : pInterp.Map A
 /-- **Correctness of the reduction**: a CNF structure is not-all-equal
 satisfiable iff the interpreted binary-weighted instance splits into two
 halves of equal weight. -/
-theorem naeSatisfiable_iff_hasEqualSplit (A : Type) [Language.sat.Structure A] [LinearOrder A]
+private theorem naeSatisfiable_iff_hasEqualSplit
+    (A : Type) [Language.sat.Structure A] [LinearOrder A]
     [Finite A] [Nonempty A] : NAESatisfiable A ↔ HasEqualSplit (pInterp.Map A) := by
   classical
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
@@ -1343,7 +1352,7 @@ positions per variable and per clause. A variable block totals `2`, so a
 balanced split is an assignment; a clause block of width `w` totals
 `w + (w − 2)`, so a balanced split takes between `1` and `w − 1` true
 literals, which is not-all-equal satisfaction. -/
-noncomputable def naeSat_ordered_fo_reduction_partition : NAESAT ≤ᶠᵒ[≤] Partition where
+private noncomputable def naeSat_ordered_fo_reduction_partition : NAESAT ≤ᶠᵒ[≤] Partition where
   Tag := PTag
   dim := 2
   toInterpretation := pInterp

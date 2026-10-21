@@ -9,6 +9,7 @@ public import DescriptiveComplexity.SecondOrder
 public import DescriptiveComplexity.Padding
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Padding
 
 /-!
 # The Tseitin encoding of a first-order kernel: semantic layer
@@ -102,7 +103,7 @@ def isRootB : ∀ {n : ℕ} (f : L'.BoundedFormula Empty n) {m : ℕ}, NodeAt f 
 /-- A position is the root iff `isRootB` says so; in that case its context
 length is the formula's own index. Stated as an equality of dependent
 pairs. -/
-theorem isRootB_iff :
+private theorem isRootB_iff :
     ∀ {n : ℕ} (f : L'.BoundedFormula Empty n) {m : ℕ} (p : NodeAt f m),
       isRootB f p = true ↔ (⟨m, p⟩ : Σ m', NodeAt f m') = ⟨n, rootAt f⟩
   | _, .falsum, _, p => by obtain ⟨rfl⟩ := p; simp [isRootB, rootAt]
@@ -124,7 +125,7 @@ theorem isRootB_iff :
         exact absurd (eq_of_heq h2) (by rintro ⟨⟩)
 
 /-- Equality of dependent pairs through a fiberwise injective map. -/
-theorem sigma_map_eq_iff {β β' : ℕ → Type} (F : ∀ m, β m → β' m)
+private theorem sigma_map_eq_iff {β β' : ℕ → Type} (F : ∀ m, β m → β' m)
     (hF : ∀ m, Function.Injective (F m)) {m₁ m₂ : ℕ} (a : β m₁) (b : β m₂) :
     (⟨m₁, F m₁ a⟩ : Σ m, β' m) = ⟨m₂, F m₂ b⟩ ↔ (⟨m₁, a⟩ : Σ m, β m) = ⟨m₂, b⟩ := by
   constructor
@@ -169,7 +170,7 @@ theorem nodeAt_le_maxCtx :
       · exact le_maxCtx _
       · exact nodeAt_le_maxCtx f q
 
-def rootSigmaEquiv (n : ℕ) : PUnit.{1} ≃ (Σ m, PLift (n = m)) where
+private def rootSigmaEquiv (n : ℕ) : PUnit.{1} ≃ (Σ m, PLift (n = m)) where
   toFun _ := ⟨n, ⟨rfl⟩⟩
   invFun _ := ⟨⟩
   left_inv _ := rfl
@@ -212,7 +213,7 @@ def termToL {α : Type} : (L.sum B.lang).Term α → L.Term α
       | Sum.inr f => isEmptyElim f
 
 /-- Reembedding `termToL` into the expanded language gives the term back. -/
-theorem sumInl_onTerm_termToL {α : Type} (t : (L.sum B.lang).Term α) :
+private theorem sumInl_onTerm_termToL {α : Type} (t : (L.sum B.lang).Term α) :
     LHom.sumInl.onTerm (termToL t) = t := by
   induction t with
   | var a => rfl
@@ -227,7 +228,7 @@ variable {A : Type}
 
 /-- Realization of `termToL` in the base structure agrees with realization of
 the term in any expansion. -/
-theorem realize_termToL [L.Structure A] [(L.sum B.lang).Structure A]
+private theorem realize_termToL [L.Structure A] [(L.sum B.lang).Structure A]
     [(LHom.sumInl : L →ᴸ L.sum B.lang).IsExpansionOn A] {α : Type}
     (t : (L.sum B.lang).Term α) (v : α → A) :
     (termToL t).realize v = t.realize v := by
@@ -330,7 +331,7 @@ def canonVal (μ : B.Assignment A) :
 
 /-- The canonical valuation at the root is the truth value of the whole
 formula. -/
-theorem canonVal_rootAt (μ : B.Assignment A) {n : ℕ}
+private theorem canonVal_rootAt (μ : B.Assignment A) {n : ℕ}
     (f : (L.sum B.lang).BoundedFormula Empty n) (w : Fin n → A) :
     canonVal μ f n (rootAt f) w ↔ RealizeWith μ f w := by
   cases f <;> exact Iff.rfl
@@ -339,16 +340,16 @@ theorem canonVal_rootAt (μ : B.Assignment A) {n : ℕ}
 
 variable (μ : B.Assignment A)
 
-theorem realizeWith_falsum {n : ℕ} (w : Fin n → A) :
+private theorem realizeWith_falsum {n : ℕ} (w : Fin n → A) :
     ¬RealizeWith μ (.falsum : (L.sum B.lang).BoundedFormula Empty n) w := id
 
-theorem realizeWith_equal {n : ℕ} (t₁ t₂ : (L.sum B.lang).Term (Empty ⊕ Fin n))
+private theorem realizeWith_equal {n : ℕ} (t₁ t₂ : (L.sum B.lang).Term (Empty ⊕ Fin n))
     (w : Fin n → A) : RealizeWith μ (.equal t₁ t₂) w ↔ eqGuard t₁ t₂ w := by
   let := B.structure μ
   change t₁.realize (Sum.elim isEmptyElim w) = t₂.realize (Sum.elim isEmptyElim w) ↔ _
   rw [eqGuard, realize_termToL t₁, realize_termToL t₂]
 
-theorem realizeWith_rel {n l : ℕ} (R : (L.sum B.lang).Relations l)
+private theorem realizeWith_rel {n l : ℕ} (R : (L.sum B.lang).Relations l)
     (ts : Fin l → (L.sum B.lang).Term (Empty ⊕ Fin n)) (w : Fin n → A) :
     RealizeWith μ (.rel R ts) w ↔ atomHolds μ R ts w := by
   let := B.structure μ
@@ -364,12 +365,12 @@ theorem realizeWith_rel {n l : ℕ} (R : (L.sum B.lang).Relations l)
       rw [blockAtom]
       simp only [realize_termToL]
 
-theorem realizeWith_imp {n : ℕ} (f₁ f₂ : (L.sum B.lang).BoundedFormula Empty n)
+private theorem realizeWith_imp {n : ℕ} (f₁ f₂ : (L.sum B.lang).BoundedFormula Empty n)
     (w : Fin n → A) :
     RealizeWith μ (f₁.imp f₂) w ↔ (RealizeWith μ f₁ w → RealizeWith μ f₂ w) :=
   Iff.rfl
 
-theorem realizeWith_all {n : ℕ} (f : (L.sum B.lang).BoundedFormula Empty (n + 1))
+private theorem realizeWith_all {n : ℕ} (f : (L.sum B.lang).BoundedFormula Empty (n + 1))
     (w : Fin n → A) :
     RealizeWith μ f.all w ↔ ∀ a : A, RealizeWith μ f (Fin.snoc w a) :=
   Iff.rfl

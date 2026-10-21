@@ -10,6 +10,13 @@ import DescriptiveComplexity.FixedPointInflationaryLFP
 public import DescriptiveComplexity.FixedPointPartialMachine
 import DescriptiveComplexity.FixedPointStratify
 import DescriptiveComplexity.Invariant.Backward
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.FixedPointOrderTransfer
+import all DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.Invariant.OrderDef
+import all DescriptiveComplexity.Invariant.Simulation
+import all DescriptiveComplexity.Invariant.Stages
+import all DescriptiveComplexity.Invariant.Structure
 
 /-!
 # The Abiteboul–Vianu theorem
@@ -74,7 +81,7 @@ partial fixed-point logics have the same expressive power, then
 relativization is order-free FO(PFP) definable, hence – by the hypothesis –
 order-free FO(IFP) definable, so the problem itself is FO(≤, IFP) definable
 and lands in PTIME. -/
-theorem ptime_eq_pspace_of_ifpDefinableFree_eq_pfpDefinableFree
+private theorem ptime_eq_pspace_of_ifpDefinableFree_eq_pfpDefinableFree
     (h : ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
         IFPDefinableFree P ↔ PFPDefinableFree P) :
     PTIME = PSPACE := by
@@ -106,7 +113,7 @@ by the canonical, itself inflationary-definable order on `≡ᵏ`-classes – th
 hypothesis turns the PSPACE computation into a PTIME one, delivered as an
 ordered inflationary induction, which pulls back along the quotient map and
 is glued to the order's own induction by stratification. -/
-theorem ifpDefinableFree_of_pfpDefinableFree_of_ptime_eq_pspace
+private theorem ifpDefinableFree_of_pfpDefinableFree_of_ptime_eq_pspace
     (hPP : PTIME = PSPACE) {L : Language.{0, 0}} [L.IsRelational]
     {P : DecisionProblem L} (h : PFPDefinableFree P) : IFPDefinableFree P := by
   classical

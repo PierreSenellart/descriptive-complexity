@@ -8,6 +8,9 @@ module
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # TAUT: propositional tautology
@@ -194,7 +197,7 @@ variable (A : Type) [Language.sat.Structure A]
 
 /-- A DNF formula is a tautology iff its sign swap, read as a CNF formula, is
 unsatisfiable. -/
-theorem tautology_iff_not_satisfiable_map :
+private theorem tautology_iff_not_satisfiable_map :
     Tautology A ↔ ¬Satisfiable (swapSignInterp.Map A) := by
   refine tautology_iff_not_satisfiable (swapSignInterp.mapEquivSelf A).symm
     (fun c => (swapSign_isClause (A := A) fun _ => c).symm)
@@ -219,14 +222,14 @@ end Correctness
 
 /-- **TAUT FO-reduces to the complement of SAT**, by swapping the sign of every
 literal. -/
-def taut_fo_reduction_sat_compl : TAUT ≤ᶠᵒ SATᶜ where
+private def taut_fo_reduction_sat_compl : TAUT ≤ᶠᵒ SATᶜ where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
   correct A _ _ _ := tautology_iff_not_satisfiable_map A
 
 /-- **The complement of SAT FO-reduces to TAUT**, by the same swap. -/
-def sat_compl_fo_reduction_taut : SATᶜ ≤ᶠᵒ TAUT where
+private def sat_compl_fo_reduction_taut : SATᶜ ≤ᶠᵒ TAUT where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp
@@ -234,7 +237,7 @@ def sat_compl_fo_reduction_taut : SATᶜ ≤ᶠᵒ TAUT where
 
 /-- **The complement of TAUT FO-reduces to SAT**: a DNF formula fails to be a
 tautology exactly when its sign swap is satisfiable. -/
-def taut_compl_fo_reduction_sat : TAUTᶜ ≤ᶠᵒ SAT where
+private def taut_compl_fo_reduction_sat : TAUTᶜ ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := swapSignInterp

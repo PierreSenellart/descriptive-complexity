@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Defs
 import DescriptiveComplexity.Exponential.Order
+import all DescriptiveComplexity.Exponential.Order
 
 /-!
 # What the promises of a wide machine come to
@@ -108,7 +109,7 @@ theorem wideData_deterministic_iff : (wideData A).Deterministic ↔ WideDet A :=
           | exact congrArg Sum.inr (hwrite τ a a' h1 h2)
 
 /-- Two elements cutting the same initial segment are equal. -/
-theorem eq_of_wmDown (h : IsLinOrd (WMLe (A := A))) {s : A → Prop} {x y : A}
+private theorem eq_of_wmDown (h : IsLinOrd (WMLe (A := A))) {s : A → Prop} {x y : A}
     (hx : WMDown WMLe s x) (hy : WMDown WMLe s y) : x = y := by
   refine h.2.2.1 x y ((hy x).mp ((hx x).mpr (h.1 x))) ((hx y).mp ((hy y).mpr (h.1 y)))
 
@@ -140,7 +141,7 @@ theorem isLinOrd_wmSetLe {α : Type} [Finite α] {Le : α → α → Prop} (h : 
 /-- **The order of a wide machine is linear** as soon as the instance's is: the
 addresses are ordered as binary numbers, the control elements as in the
 instance, and the addresses come first. -/
-theorem isLinOrd_wpLe [Finite A] (h : IsLinOrd (WMLe (A := A))) :
+private theorem isLinOrd_wpLe [Finite A] (h : IsLinOrd (WMLe (A := A))) :
     IsLinOrd (wpLe (A := A)) := by
   have hs := isLinOrd_wmSetLe h
   refine ⟨?_, ?_, ?_, ?_⟩

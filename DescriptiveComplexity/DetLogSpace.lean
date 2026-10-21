@@ -88,7 +88,7 @@ theorem mem_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ LOGSPA
 
 /-- LOGSPACE-hardness is the usual notion: every FO(DTC) definable problem
 reduces to `P`. -/
-theorem hard_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
+private theorem hard_LOGSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
     LOGSPACE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         DTCDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=

@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.SecondOrderNewExpPull
 import DescriptiveComplexity.SecondOrderNewExp
+import all DescriptiveComplexity.SecondOrderNewExp
+import all DescriptiveComplexity.SecondOrderNewExpPull
+import all DescriptiveComplexity.SecondOrderNewMeansB
+import all DescriptiveComplexity.SecondOrderNewOrdered
 
 /-!
 # The guess the forward direction makes
@@ -121,7 +125,7 @@ theorem not_meaningOfB_build (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
 omit [L.IsRelational] in
 /-- A meaning of the built guess relates an invented value to original elements
 and nothing else. -/
-theorem build_shaped (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
+private theorem build_shaped (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
     (w : Fin ((taggedBlock X).arity i) → A ⊕ Fin m)
     (hM : meaningOfB (pullMeanPart (buildAssign σ enum)) i v w) :
     ¬IsOld v ∧ ∀ j, IsOld (w j) := by
@@ -130,7 +134,7 @@ theorem build_shaped (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
 
 omit [L.IsRelational] in
 /-- Some invented value of the built guess means the empty assignment. -/
-theorem build_empty : ∃ v : A ⊕ Fin m, ¬IsOld v ∧
+private theorem build_empty : ∃ v : A ⊕ Fin m, ¬IsOld v ∧
     ∀ (i : (taggedBlock X).ι) (w : Fin ((taggedBlock X).arity i) → A ⊕ Fin m),
       ¬meaningOfB (pullMeanPart (buildAssign σ enum)) i v w := by
   refine ⟨Sum.inr (enum.symm fun _ _ => False), not_isOld_inr _, fun i w hM => ?_⟩
@@ -140,7 +144,7 @@ theorem build_empty : ∃ v : A ⊕ Fin m, ¬IsOld v ∧
 
 omit [L.IsRelational] in
 /-- Invented values of the built guess agreeing on every variable are equal. -/
-theorem build_inj (v u : A ⊕ Fin m) (hv : ¬IsOld v) (hu : ¬IsOld u)
+private theorem build_inj (v u : A ⊕ Fin m) (hv : ¬IsOld v) (hu : ¬IsOld u)
     (hM : ∀ (i : (taggedBlock X).ι) (w : Fin ((taggedBlock X).arity i) → A ⊕ Fin m),
       meaningOfB (pullMeanPart (buildAssign σ enum)) i v w ↔
         meaningOfB (pullMeanPart (buildAssign σ enum)) i u w) :
@@ -161,7 +165,7 @@ open Classical in
 omit [L.IsRelational] in
 /-- Flipping one tuple of one variable of the built guess lands on an invented
 value again, the other variables unchanged. -/
-theorem build_flip (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
+private theorem build_flip (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
     (y : Fin ((taggedBlock X).arity i) → A ⊕ Fin m) (hv : ¬IsOld v)
     (hy : ∀ j, IsOld (y j)) :
     ∃ u : A ⊕ Fin m, ¬IsOld u ∧
@@ -244,7 +248,7 @@ theorem build_le_iff (a b : A) : pullLe (buildAssign (C := C) σ enum) a b ↔ a
   exact (Sum.inl_injective ha) ▸ (Sum.inl_injective hb) ▸ hab
 
 /-- The built guess satisfies the order guard. -/
-theorem build_ordGuard :
+private theorem build_ordGuard :
     letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
     ((A ⊕ Fin m) ⊨ extLinearGuard L (guessBlock X C)) := by
   let := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
@@ -276,7 +280,7 @@ theorem build_ordGuard :
     · exact Or.inr ((build_ord_iff σ enum _ _).mpr ⟨b, a, rfl, rfl, h⟩)
 
 /-- The built guess satisfies the meaning guard. -/
-theorem build_meanGuard [Finite A] :
+private theorem build_meanGuard [Finite A] :
     letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
     ((A ⊕ Fin m) ⊨ pullMeanGuard X C) := by
   let := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
@@ -317,7 +321,7 @@ theorem pullName_build (p : X.Map A) :
 
 omit [L.IsRelational] in
 /-- The certificate the built guess carries is the one it was built from. -/
-theorem pullCert_build :
+private theorem pullCert_build :
     pullCert (buildAssign σ enum)
         (pullName (buildAssign σ enum) (bijective_meanAtB_build σ enum)) = σ := by
   funext j ts
@@ -331,7 +335,7 @@ theorem pullCert_build :
 
 /-- **The built guess satisfies the sentence**: the two guards by construction,
 and the kernel because the certificate it carries is the given one. -/
-theorem pullSentence_forward (φ : (X.E.sum C.lang).Sentence)
+private theorem pullSentence_forward (φ : (X.E.sum C.lang).Sentence)
     (hφ : @Sentence.Realize _ (X.Map A) (C.structure₁ (L := X.E) σ) φ) :
     letI := (pullBlock X C).structure₁ (L := newLang L) (buildAssign σ enum)
     ((A ⊕ Fin m) ⊨ pullSentence X C φ) := by

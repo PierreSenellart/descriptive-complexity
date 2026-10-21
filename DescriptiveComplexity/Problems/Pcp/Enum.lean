@@ -84,12 +84,12 @@ section Sorted
 variable {α : Type} {Lt : α → α → Prop}
 
 /-- An asymmetric relation is irreflexive. -/
-theorem irrefl_of_asymm (has : ∀ a b, Lt a b → Lt b a → False) (a : α) : ¬Lt a a :=
+private theorem irrefl_of_asymm (has : ∀ a b, Lt a b → Lt b a → False) (a : α) : ¬Lt a a :=
   fun h => has a a h h
 
 /-- In a strictly sorted list, one entry precedes another exactly when its
 index is smaller. -/
-theorem lt_getElem_iff (has : ∀ a b, Lt a b → Lt b a → False) {l : List α}
+private theorem lt_getElem_iff (has : ∀ a b, Lt a b → Lt b a → False) {l : List α}
     (hl : l.Pairwise Lt) {i j : ℕ} (hi : i < l.length) (hj : j < l.length) :
     Lt l[i] l[j] ↔ i < j := by
   refine ⟨fun h => ?_, fun h => pairwise_iff_getElem.mp hl i j hi hj h⟩
@@ -120,7 +120,7 @@ theorem forall₂_flatMap :
       (forall₂_flatMap fun c' hc' => h c' (mem_cons_of_mem _ hc'))
 
 /-- A list of witnesses for a list of existentials. -/
-theorem exists_forall₂ {R : α → β → Prop} :
+private theorem exists_forall₂ {R : α → β → Prop} :
     ∀ {l : List α}, (∀ a ∈ l, ∃ b, R a b) → ∃ w : List β, List.Forall₂ R l w
   | [], _ => ⟨[], List.Forall₂.nil⟩
   | a :: l, h => by
@@ -130,7 +130,7 @@ theorem exists_forall₂ {R : α → β → Prop} :
 
 /-- Two lists read off entry by entry along a matching agree, as soon as the
 matched entries carry the same letter. -/
-theorem eq_of_forall₂ {M : α → β → Prop} {δ : Type} {RU : α → δ → Prop} {RV : β → δ → Prop}
+private theorem eq_of_forall₂ {M : α → β → Prop} {δ : Type} {RU : α → δ → Prop} {RV : β → δ → Prop}
     (hcomp : ∀ x y ℓ ℓ', M x y → RU x ℓ → RV y ℓ' → ℓ = ℓ') {L₁ : List α} {L₂ : List β}
     (hM : List.Forall₂ M L₁ L₂) :
     ∀ {U V : List δ}, List.Forall₂ RU L₁ U → List.Forall₂ RV L₂ V → U = V := by
@@ -157,16 +157,16 @@ variable {D α : Type}
 
 /-- The lexicographic order on pairs (block, position inside it), for two
 strict orders. -/
-def LexOf (R : D → D → Prop) (S : α → α → Prop) : D × α → D × α → Prop :=
+private def LexOf (R : D → D → Prop) (S : α → α → Prop) : D × α → D × α → Prop :=
   fun x y => R x.1 y.1 ∨ (x.1 = y.1 ∧ S x.2 y.2)
 
 /-- The strict part of a linear order relation is asymmetric. -/
-theorem asymm_strict {Le : D → D → Prop} (h : IsLinOrd Le) (a b : D)
+private theorem asymm_strict {Le : D → D → Prop} (h : IsLinOrd Le) (a b : D)
     (hab : Le a b ∧ a ≠ b) (hba : Le b a ∧ b ≠ a) : False :=
   hab.2 (h.2.2.1 a b hab.1 hba.1)
 
 /-- The lexicographic order of two asymmetric relations is asymmetric. -/
-theorem asymm_lexOf {R : D → D → Prop} {S : α → α → Prop}
+private theorem asymm_lexOf {R : D → D → Prop} {S : α → α → Prop}
     (hR : ∀ a b, R a b → R b a → False) (hS : ∀ a b, S a b → S b a → False) (x y : D × α)
     (hxy : LexOf R S x y) (hyx : LexOf R S y x) : False := by
   rcases hxy with h | ⟨he, h⟩ <;> rcases hyx with h' | ⟨he', h'⟩
@@ -204,7 +204,7 @@ theorem mem_parseIx {x : D × α} : x ∈ parseIx slots ps ↔ x.1 ∈ slots ∧
 
 /-- The index list of a parse is sorted lexicographically: the blocks come in
 order, and the positions inside a block come in order. -/
-theorem pairwise_parseIx {R : D → D → Prop} {S : α → α → Prop} (hs : slots.Pairwise R)
+private theorem pairwise_parseIx {R : D → D → Prop} {S : α → α → Prop} (hs : slots.Pairwise R)
     (hp : ∀ s, (ps s).Pairwise S) : (parseIx slots ps).Pairwise (LexOf R S) := by
   refine List.pairwise_flatMap.mpr ⟨fun s _ => ?_, hs.imp fun {s t} hst x hx y hy => ?_⟩
   · exact List.pairwise_map.mpr ((hp s).imp fun h => Or.inr ⟨rfl, h⟩)
@@ -214,7 +214,7 @@ theorem pairwise_parseIx {R : D → D → Prop} {S : α → α → Prop} (hs : s
 
 /-- The letters of a parse, read along its index list, are the letters of the
 concatenation. -/
-theorem forall₂_parseIx {T : D → α → β → Prop} {ws : D → List β}
+private theorem forall₂_parseIx {T : D → α → β → Prop} {ws : D → List β}
     (h : ∀ s ∈ slots, List.Forall₂ (T s) (ps s) (ws s)) :
     List.Forall₂ (fun x ℓ => T x.1 x.2 ℓ) (parseIx slots ps) (slots.flatMap ws) :=
   forall₂_flatMap fun s hs => List.forall₂_map_left_iff.mpr (h s hs)
@@ -233,12 +233,12 @@ variable {α β : Type} {R : α → β → Prop} {l₁ : List α} {l₂ : List �
 
 /-- Entries of two lists related by `List.Forall₂` are related index by
 index. -/
-theorem forall₂_getElem (h : List.Forall₂ R l₁ l₂) {i : ℕ} (h₁ : i < l₁.length)
+private theorem forall₂_getElem (h : List.Forall₂ R l₁ l₂) {i : ℕ} (h₁ : i < l₁.length)
     (h₂ : i < l₂.length) : R l₁[i] l₂[i] :=
   (forall₂_iff_get.mp h).2 i h₁ h₂
 
 /-- A `List.Forall₂` is a function on the indices of its left list. -/
-theorem exists_fun_of_forall₂ (h : List.Forall₂ R l₁ l₂) :
+private theorem exists_fun_of_forall₂ (h : List.Forall₂ R l₁ l₂) :
     ∃ g : Fin l₁.length → β,
       (List.finRange l₁.length).map g = l₂ ∧ ∀ i, R (l₁.get i) (g i) := by
   have hlen : l₁.length = l₂.length := h.length_eq
@@ -319,31 +319,31 @@ variable {α β : Type}
 
 /-- **The pairing of two lists index by index**, as a relation: the matching a
 yes-instance hands back once its two parses are known to be the same word. -/
-def IdxMatch (L₁ : List α) (L₂ : List β) (x : α) (y : β) : Prop :=
+private def IdxMatch (L₁ : List α) (L₂ : List β) (x : α) (y : β) : Prop :=
   ∃ i : ℕ, ∃ h₁ : i < L₁.length, ∃ h₂ : i < L₂.length, L₁[i] = x ∧ L₂[i] = y
 
 variable {L₁ : List α} {L₂ : List β}
 
 /-- The index pairing relates members of the two lists. -/
-theorem idxMatch_mem {x : α} {y : β} (h : IdxMatch L₁ L₂ x y) : x ∈ L₁ ∧ y ∈ L₂ := by
+private theorem idxMatch_mem {x : α} {y : β} (h : IdxMatch L₁ L₂ x y) : x ∈ L₁ ∧ y ∈ L₂ := by
   obtain ⟨i, h₁, h₂, rfl, rfl⟩ := h
   exact ⟨List.getElem_mem h₁, List.getElem_mem h₂⟩
 
 /-- The index pairing is defined on every member of the left list. -/
-theorem idxMatch_left (hlen : L₁.length = L₂.length) {x : α} (hx : x ∈ L₁) :
+private theorem idxMatch_left (hlen : L₁.length = L₂.length) {x : α} (hx : x ∈ L₁) :
     ∃ y, IdxMatch L₁ L₂ x y := by
   obtain ⟨i, h₁, rfl⟩ := List.getElem_of_mem hx
   exact ⟨L₂[i]'(hlen ▸ h₁), i, h₁, hlen ▸ h₁, rfl, rfl⟩
 
 /-- The index pairing is defined on every member of the right list. -/
-theorem idxMatch_right (hlen : L₁.length = L₂.length) {y : β} (hy : y ∈ L₂) :
+private theorem idxMatch_right (hlen : L₁.length = L₂.length) {y : β} (hy : y ∈ L₂) :
     ∃ x, IdxMatch L₁ L₂ x y := by
   obtain ⟨i, h₂, rfl⟩ := List.getElem_of_mem hy
   exact ⟨L₁[i]'(hlen ▸ h₂), i, hlen ▸ h₂, h₂, rfl, rfl⟩
 
 /-- The index pairing reflects the orders of two strictly sorted lists: both
 read as the order of the indices. -/
-theorem idxMatch_mono {Lt₁ : α → α → Prop} {Lt₂ : β → β → Prop}
+private theorem idxMatch_mono {Lt₁ : α → α → Prop} {Lt₂ : β → β → Prop}
     (has₁ : ∀ a b, Lt₁ a b → Lt₁ b a → False) (has₂ : ∀ a b, Lt₂ a b → Lt₂ b a → False)
     (hp₁ : L₁.Pairwise Lt₁) (hp₂ : L₂.Pairwise Lt₂) {x y x' y' : _}
     (h : IdxMatch L₁ L₂ x y) (h' : IdxMatch L₁ L₂ x' y') : Lt₁ x x' ↔ Lt₂ y y' := by

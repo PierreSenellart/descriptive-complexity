@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.Steiner.Counting
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
 import DescriptiveComplexity.Counting.Subtractive
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import all DescriptiveComplexity.Problems.Steiner.Counting
+import all DescriptiveComplexity.Problems.Steiner.Reductions
 
 /-!
 # #Steiner Tree is parsimoniously `#P`-complete
@@ -56,7 +59,7 @@ theorem steiner_nonterminal_shape {p q : steinerInterp.Map A}
 
 /-- The non-terminals of a connected set containing the terminals are
 vertices. -/
-theorem steiner_mem_shape {m : A} (hm : ∀ a : A, m ≤ a) {S : steinerInterp.Map A → Prop}
+private theorem steiner_mem_shape {m : A} (hm : ∀ a : A, m ≤ a) {S : steinerInterp.Map A → Prop}
     (hterms : ∀ p, STTerminal p → S p) (hconn : ConnectedOn STAdj S)
     {p : steinerInterp.Map A} (hp : S p) (hnt : ¬STTerminal p) : ∃ v, p = vPt v := by
   have hroot : STTerminal (rPt m (A := A)) := (steiner_terminal_r m).mpr hm
@@ -125,7 +128,7 @@ end Shape
 
 /-- **#Vertex Cover reduces parsimoniously to #Steiner Tree**, by the incidence
 structure of the graph with a root. -/
-noncomputable def sharpVertexCover_ordered_parsimonious_sharpSteinerTree :
+private noncomputable def sharpVertexCover_ordered_parsimonious_sharpSteinerTree :
     SharpVertexCover ≤ᵖ[≤] SharpSteinerTree where
   Tag := SteinerTag
   dim := 2
@@ -133,7 +136,8 @@ noncomputable def sharpVertexCover_ordered_parsimonious_sharpSteinerTree :
   correct A _ _ _ _ := (sharpSteinerTree_map A).symm
 
 /-- #Steiner Tree is parsimoniously `#P`-hard. -/
-theorem sharpSteinerTree_sharpP_parsimoniousHard : SharpP.ParsimoniousHard SharpSteinerTree :=
+theorem sharpSteinerTree_sharpP_parsimoniousHard
+    : SharpP.ParsimoniousHard SharpSteinerTree :=
   SharpP.parsimoniousHard_of_orderedParsimonious
     sharpVertexCover_ordered_parsimonious_sharpSteinerTree
     sharpVertexCover_sharpP_parsimoniousHard

@@ -10,6 +10,10 @@ import DescriptiveComplexity.Problems.Machine.SpaceDet
 import DescriptiveComplexity.Problems.Machine.Space
 import DescriptiveComplexity.Problems.Qsat
 import DescriptiveComplexity.Problems.Qsat.Hardness
+import all DescriptiveComplexity.Composition
+import all DescriptiveComplexity.Problems.Machine.QsatInterp
+import all DescriptiveComplexity.Problems.Machine.SpaceDet
+import all DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
 # The space-bounded machine problems are PSPACE-complete

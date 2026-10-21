@@ -87,12 +87,12 @@ def WMSetLt (Le : α → α → Prop) (s t : α → Prop) : Prop :=
 
 /-- Weak comparison of addresses is agreement or strict comparison, by
 definition. -/
-theorem wmSetLe_iff_wmSetLt (Le : α → α → Prop) (s t : α → Prop) :
+private theorem wmSetLe_iff_wmSetLt (Le : α → α → Prop) (s t : α → Prop) :
     WMSetLe Le s t ↔ ((∀ x, s x ↔ t x) ∨ WMSetLt Le s t) :=
   Iff.rfl
 
 /-- Two elements neither of which is strictly below the other are equal. -/
-theorem eq_of_not_wmLt {Le : α → α → Prop} (h : IsLinOrd Le) {x y : α}
+private theorem eq_of_not_wmLt {Le : α → α → Prop} (h : IsLinOrd Le) {x y : α}
     (h1 : ¬WMLt Le x y) (h2 : ¬WMLt Le y x) : x = y := by
   rcases h.2.2.2 x y with hle | hle
   · exact h.2.2.1 x y hle (by
@@ -121,13 +121,13 @@ def WMIncr (Le : α → α → Prop) (s t : α → Prop) : Prop :=
 
 /-- **The carry position of an increment is unique**: it is the greatest element
 outside the address, and an address has only one such. -/
-theorem wmIncr_carry_unique (h : IsLinOrd Le) {s : α → Prop} {u u' : α}
+private theorem wmIncr_carry_unique (h : IsLinOrd Le) {s : α → Prop} {u u' : α}
     (hu : ¬s u) (hau : ∀ v, WMLt Le u v → s v)
     (hu' : ¬s u') (hau' : ∀ v, WMLt Le u' v → s v) : u = u' :=
   eq_of_not_wmLt h (fun hc => hu' (hau u' hc)) (fun hc => hu (hau' u hc))
 
 /-- **The increment is unique**, so a program stepping by it is deterministic. -/
-theorem wmIncr_functional (h : IsLinOrd Le) {s t t' : α → Prop}
+private theorem wmIncr_functional (h : IsLinOrd Le) {s t t' : α → Prop}
     (hi : WMIncr Le s t) (hi' : WMIncr Le s t') : t = t' := by
   obtain ⟨u, hu, hau, ht⟩ := hi
   obtain ⟨u', hu', hau', ht'⟩ := hi'
@@ -136,7 +136,7 @@ theorem wmIncr_functional (h : IsLinOrd Le) {s t t' : α → Prop}
 
 /-- **The increment is above the address**: they differ at the carry position,
 and agree at every element below it – that is, above it in significance. -/
-theorem wmSetLe_of_wmIncr {s t : α → Prop} (hi : WMIncr Le s t) : WMSetLe Le s t := by
+private theorem wmSetLe_of_wmIncr {s t : α → Prop} (hi : WMIncr Le s t) : WMSetLe Le s t := by
   obtain ⟨u, hu, -, ht⟩ := hi
   refine Or.inr ⟨u, fun y hy => ?_, hu, (ht u).mpr (Or.inl rfl)⟩
   have hyu : y ≠ u := by
@@ -147,7 +147,7 @@ theorem wmSetLe_of_wmIncr {s t : α → Prop} (hi : WMIncr Le s t) : WMSetLe Le 
   exact ⟨fun hc => (hc.resolve_left hyu).1, fun hc => Or.inr ⟨hc, fun hup => hy.2 hup.1⟩⟩
 
 /-- The increment differs from the address, at the carry position. -/
-theorem ne_of_wmIncr {s t : α → Prop} (hi : WMIncr Le s t) : s ≠ t := by
+private theorem ne_of_wmIncr {s t : α → Prop} (hi : WMIncr Le s t) : s ≠ t := by
   obtain ⟨u, hu, -, ht⟩ := hi
   intro hst
   exact hu (hst ▸ (ht u).mpr (Or.inl rfl) : s u)
@@ -184,7 +184,7 @@ theorem exists_wmPred (h : IsLinOrd Le) {s : α → Prop} (hne : ∃ x, s x) :
 
 omit [Finite α] in
 /-- Strict comparison of addresses is weak comparison plus difference. -/
-theorem wmSetLt_iff (s t : α → Prop) : WMSetLt Le s t ↔ (WMSetLe Le s t ∧ s ≠ t) := by
+private theorem wmSetLt_iff (s t : α → Prop) : WMSetLt Le s t ↔ (WMSetLe Le s t ∧ s ≠ t) := by
   constructor
   · rintro ⟨x, hb, hs, ht⟩
     exact ⟨Or.inr ⟨x, hb, hs, ht⟩, fun hc => hs (hc ▸ ht)⟩
@@ -223,7 +223,7 @@ theorem wmSetLe_of_empty (h : IsLinOrd Le) {s : α → Prop} (hs : ∀ x, ¬s x)
 two addresses differ decides the comparison, and if one is contained in the other
 that element is in the larger – so a program that only ever *clears* cells moves
 its address down the tape, and one that only sets them moves it up. -/
-theorem wmSetLe_of_subset (h : IsLinOrd Le) {s t : α → Prop} (hsub : ∀ x, s x → t x) :
+private theorem wmSetLe_of_subset (h : IsLinOrd Le) {s t : α → Prop} (hsub : ∀ x, s x → t x) :
     WMSetLe Le s t := by
   rcases Classical.em (∃ x, ¬(s x ↔ t x)) with hne | hno
   · obtain ⟨x, hx, hmin⟩ := exists_least h hne
@@ -263,7 +263,7 @@ theorem wmLt_wmSetLe_iff (h : IsLinOrd Le) (s t : α → Prop) :
 weakly between them agrees with one of the two. This is the half that makes the
 increment an *immediate* successor, and the only place the linearity of the
 address order is used. -/
-theorem eq_of_between_wmIncr (h : IsLinOrd Le) {s t r : α → Prop} (hi : WMIncr Le s t)
+private theorem eq_of_between_wmIncr (h : IsLinOrd Le) {s t r : α → Prop} (hi : WMIncr Le s t)
     (h1 : WMSetLe Le s r) (h2 : WMSetLe Le r t) : r = s ∨ r = t := by
   have hlin := isLinOrd_wmSetLe h
   obtain ⟨u, hu, habove, ht⟩ := hi
@@ -343,7 +343,7 @@ theorem wmSetLt_iff_of_wmIncr (h : IsLinOrd Le) {t t' : α → Prop} (hi : WMInc
 address strictly below it is at or below the empty one, hence empty. This is
 what puts a program's data – every address it marks anything at – inside a
 stretch that starts one step above the cell its head began on. -/
-theorem wmSetLe_succ_bot_of_nonempty (h : IsLinOrd Le) {s₀ s : α → Prop}
+private theorem wmSetLe_succ_bot_of_nonempty (h : IsLinOrd Le) {s₀ s : α → Prop}
     (hs₀ : WMIncr Le (fun _ => False) s₀) (hne : ∃ x, s x) : WMSetLe Le s₀ s := by
   have hlin := isLinOrd_wmSetLe h
   by_contra hc
@@ -358,7 +358,7 @@ theorem wmSetLe_succ_bot_of_nonempty (h : IsLinOrd Le) {s₀ s : α → Prop}
 /-- **An increment cannot overshoot**: the successor of an address strictly below
 another is still at or below it. A walk that stops at the first address a marker
 sits on reads this at every round. -/
-theorem wmSetLe_of_wmIncr_of_lt (h : IsLinOrd Le) {t t' s : α → Prop} (hi : WMIncr Le t t')
+private theorem wmSetLe_of_wmIncr_of_lt (h : IsLinOrd Le) {t t' s : α → Prop} (hi : WMIncr Le t t')
     (hlt : WMSetLt Le t s) : WMSetLe Le t' s := by
   have hlin := isLinOrd_wmSetLe h
   rcases hlin.2.2.2 t' s with hc | hc
@@ -378,7 +378,7 @@ which is what a program handed its file counts its rounds over. -/
 section Chain
 
 /-- The addresses strictly below a given one, as a measure to induct on. -/
-noncomputable def belowCount (Le : α → α → Prop) (s : α → Prop) : ℕ :=
+private noncomputable def belowCount (Le : α → α → Prop) (s : α → Prop) : ℕ :=
   {t : α → Prop | WMSetLt Le t s}.ncard
 
 private theorem belowCount_lt (h : IsLinOrd Le) {s t : α → Prop} (hi : WMIncr Le s t) :
@@ -493,7 +493,7 @@ variable {A : Type} [Language.wide.Structure A] [Finite A]
 
 omit [Language.wide.Structure A] [Finite A] in
 /-- Only addresses are positions, so both ends of a step are addresses. -/
-theorem wpPosn_iff (p : WPoint A) : wpPosn p ↔ ∃ s, p = Sum.inl s := by
+private theorem wpPosn_iff (p : WPoint A) : wpPosn p ↔ ∃ s, p = Sum.inl s := by
   match p with
   | Sum.inl s => exact iff_of_true trivial ⟨s, rfl⟩
   | Sum.inr x =>

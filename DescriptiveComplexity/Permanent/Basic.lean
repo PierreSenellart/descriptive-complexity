@@ -52,17 +52,17 @@ when the numbers of rows and columns differ. -/
 noncomputable def bperm (M : α → β → R) : R :=
   ∑ e : α ≃ β, ∏ a, M a (e a)
 
-theorem bperm_eq_zero_of_isEmpty [IsEmpty (α ≃ β)] (M : α → β → R) : bperm M = 0 := by
+private theorem bperm_eq_zero_of_isEmpty [IsEmpty (α ≃ β)] (M : α → β → R) : bperm M = 0 := by
   simp [bperm]
 
 /-- The permanent of a matrix without rows nor columns is `1`. -/
-theorem bperm_of_isEmpty [IsEmpty α] [IsEmpty β] (M : α → β → R) : bperm M = 1 := by
+private theorem bperm_of_isEmpty [IsEmpty α] [IsEmpty β] (M : α → β → R) : bperm M = 1 := by
   have : Unique (α ≃ β) := ⟨⟨Equiv.equivOfIsEmpty α β⟩, fun e => Equiv.ext fun a => isEmptyElim a⟩
   rw [bperm, Fintype.sum_unique]
   exact Fintype.prod_empty _
 
 /-- The permanent of a `1 × 1` matrix is its entry. -/
-theorem bperm_of_unique [Unique α] [Unique β] (M : α → β → R) :
+private theorem bperm_of_unique [Unique α] [Unique β] (M : α → β → R) :
     bperm M = M default default := by
   have : Unique (α ≃ β) :=
     ⟨⟨Equiv.ofUnique α β⟩, fun e => Equiv.ext fun a => Subsingleton.elim _ _⟩
@@ -70,7 +70,8 @@ theorem bperm_of_unique [Unique α] [Unique β] (M : α → β → R) :
   exact congrArg (M default) (Subsingleton.elim _ _)
 
 /-- Reindexing rows and columns. -/
-theorem bperm_reindex {α' β' : Type} [Fintype α'] [Fintype β'] [DecidableEq α'] [DecidableEq β']
+private theorem bperm_reindex
+    {α' β' : Type} [Fintype α'] [Fintype β'] [DecidableEq α'] [DecidableEq β']
     (eα : α ≃ α') (eβ : β ≃ β')
     (M : α → β → R) : bperm (fun a' b' => M (eα.symm a') (eβ.symm b')) = bperm M := by
   rw [bperm, bperm]
@@ -79,18 +80,18 @@ theorem bperm_reindex {α' β' : Type} [Fintype α'] [Fintype β'] [DecidableEq 
   simp
 
 /-- The permanent of the transpose. -/
-theorem bperm_flip (M : α → β → R) : bperm (fun b a => M a b) = bperm M := by
+private theorem bperm_flip (M : α → β → R) : bperm (fun b a => M a b) = bperm M := by
   rw [bperm, bperm]
   refine Fintype.sum_equiv ⟨Equiv.symm, Equiv.symm, fun _ => rfl, fun _ => rfl⟩ _ _ fun e => ?_
   exact Fintype.prod_equiv e _ _ fun b => by simp
 
 /-- A matrix with a zero row has permanent `0`. -/
-theorem bperm_eq_zero_of_zero_row (M : α → β → R) (a : α) (h : ∀ b, M a b = 0) :
+private theorem bperm_eq_zero_of_zero_row (M : α → β → R) (a : α) (h : ∀ b, M a b = 0) :
     bperm M = 0 :=
   Finset.sum_eq_zero fun e _ => Finset.prod_eq_zero (Finset.mem_univ a) (h (e a))
 
 /-- A matrix with a zero column has permanent `0`. -/
-theorem bperm_eq_zero_of_zero_col (M : α → β → R) (b : β) (h : ∀ a, M a b = 0) :
+private theorem bperm_eq_zero_of_zero_col (M : α → β → R) (b : β) (h : ∀ a, M a b = 0) :
     bperm M = 0 := by
   rw [← bperm_flip]
   exact bperm_eq_zero_of_zero_row _ b h
@@ -114,21 +115,21 @@ variable {α β : Type} [DecidableEq α] [DecidableEq β]
 
 /-- A bijection from the rows in `I` to the columns in `S` and one between the
 complements, assembled into a bijection between all rows and all columns. -/
-def glue (I : Finset α) (S : Finset β) (e₁ : I ≃ S) (e₂ : {a // a ∉ I} ≃ {b // b ∉ S}) :
+private def glue (I : Finset α) (S : Finset β) (e₁ : I ≃ S) (e₂ : {a // a ∉ I} ≃ {b // b ∉ S}) :
     α ≃ β :=
   (Equiv.sumCompl (· ∈ I)).symm.trans ((e₁.sumCongr e₂).trans (Equiv.sumCompl (· ∈ S)))
 
-theorem glue_apply_of_mem {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
+private theorem glue_apply_of_mem {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
     (e₂ : {a // a ∉ I} ≃ {b // b ∉ S}) {a : α} (ha : a ∈ I) :
     glue I S e₁ e₂ a = e₁ ⟨a, ha⟩ := by
   simp [glue, Equiv.sumCompl_symm_apply_of_pos ha]
 
-theorem glue_apply_of_not_mem {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
+private theorem glue_apply_of_not_mem {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
     (e₂ : {a // a ∉ I} ≃ {b // b ∉ S}) {a : α} (ha : a ∉ I) :
     glue I S e₁ e₂ a = e₂ ⟨a, ha⟩ := by
   simp [glue, Equiv.sumCompl_symm_apply_of_neg ha]
 
-theorem glue_mem_iff {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
+private theorem glue_mem_iff {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
     (e₂ : {a // a ∉ I} ≃ {b // b ∉ S}) (a : α) : a ∈ I ↔ glue I S e₁ e₂ a ∈ S := by
   by_cases ha : a ∈ I
   · rw [glue_apply_of_mem e₁ e₂ ha]
@@ -139,7 +140,7 @@ theorem glue_mem_iff {I : Finset α} {S : Finset β} (e₁ : I ≃ S)
 omit [DecidableEq α] in
 /-- A bijection sends the rows in `I` exactly to the columns in `S` when
 membership is preserved and reflected. -/
-theorem image_eq_iff (I : Finset α) (S : Finset β) (e : α ≃ β) :
+private theorem image_eq_iff (I : Finset α) (S : Finset β) (e : α ≃ β) :
     I.image e = S ↔ ∀ a, a ∈ I ↔ e a ∈ S := by
   constructor
   · intro h a
@@ -230,13 +231,13 @@ section Cast
 variable {α β : Type} [Fintype α] [Fintype β] [DecidableEq α] [DecidableEq β]
 
 /-- The permanent of a natural-number matrix, as an integer. -/
-theorem bperm_natCast (M : α → β → ℕ) :
+private theorem bperm_natCast (M : α → β → ℕ) :
     ((bperm M : ℕ) : ℤ) = bperm fun a b => (M a b : ℤ) := by
   rw [bperm, bperm, Nat.cast_sum]
   exact Finset.sum_congr rfl fun e _ => Nat.cast_prod _ _
 
 /-- **Permanents of matrices congruent entrywise are congruent.** -/
-theorem bperm_modEq (M M' : α → β → ℤ) (m : ℤ) (h : ∀ a b, M a b ≡ M' a b [ZMOD m]) :
+private theorem bperm_modEq (M M' : α → β → ℤ) (m : ℤ) (h : ∀ a b, M a b ≡ M' a b [ZMOD m]) :
     bperm M ≡ bperm M' [ZMOD m] := by
   exact Int.ModEq.sum fun e _ => Int.ModEq.prod fun a _ => h a (e a)
 

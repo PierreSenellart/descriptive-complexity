@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.TwoCnf
 import Mathlib.Basic.Finite.Sigma
+import all DescriptiveComplexity.SecondOrderKrom
+import all DescriptiveComplexity.TwoCnf
 
 /-!
 # The implication graph of a Krom program
@@ -83,7 +85,7 @@ theorem ofAssign_toAssign (ν : KromAtom B A → Prop) : ofAssign (toAssign ν) 
   obtain ⟨i, x⟩ := a
   rfl
 
-theorem eq_of_mem_option {α : Type} {o : Option α} {a b : α} (ha : a ∈ o) (hb : b ∈ o) :
+private theorem eq_of_mem_option {α : Type} {o : Option α} {a b : α} (ha : a ∈ o) (hb : b ∈ o) :
     a = b := by
   have e₁ := Option.mem_def.mp ha
   have e₂ := Option.mem_def.mp hb
@@ -98,7 +100,7 @@ def atomVar (a : SOAtom B k) (v : Fin k → A) : KromAtom B A :=
 def litOf (l : KromLit B k) (v : Fin k → A) : TwoCnf.Lit (KromAtom B A) :=
   (atomVar l.atom v, l.positive)
 
-theorem holds_iff_litTrue (l : KromLit B k) (ν : KromAtom B A → Prop) (v : Fin k → A) :
+private theorem holds_iff_litTrue (l : KromLit B k) (ν : KromAtom B A → Prop) (v : Fin k → A) :
     l.Holds (toAssign ν) v ↔ TwoCnf.LitTrue ν (litOf l v) := by
   cases hpos : l.positive <;> simp [KromLit.Holds, TwoCnf.LitTrue, litOf, atomVar,
     toAssign, SOAtom.Holds, hpos]
@@ -139,7 +141,7 @@ guard, contributes the pair whose first literal is the negation of `p` and
 whose second is `q`. The `DescriptiveComplexity.TwoCnf.Step` on the left is symmetric in
 the two literals of a clause, which is why the *ordered* pairs of
 `DescriptiveComplexity.KromImpl.edgePairs` suffice. -/
-theorem step_iff_edgePairs (prog : KromProgram L B k)
+private theorem step_iff_edgePairs (prog : KromProgram L B k)
     (p q : TwoCnf.Lit (KromAtom B A)) :
     TwoCnf.Step (clauseRel prog) p q ↔
       ∃ c ∈ prog, ∃ v : Fin k → A, c.guard.Realize v ∧
@@ -202,7 +204,7 @@ def GoalFires (prog : KromProgram L B k) (A : Type) [L.Structure A] : Prop :=
 
 /-- An assignment satisfies the program iff it satisfies the 2-CNF and no goal
 clause fires. -/
-theorem holds_iff_satisfies (prog : KromProgram L B k) (ν : KromAtom B A → Prop) :
+private theorem holds_iff_satisfies (prog : KromProgram L B k) (ν : KromAtom B A → Prop) :
     prog.Holds (toAssign ν) ↔ TwoCnf.Satisfies (clauseRel prog) ν ∧ ¬GoalFires prog A := by
   constructor
   · intro h

@@ -95,7 +95,7 @@ namespace ComplexityClass
 
 /-- Two complexity classes with the same members and the same hard problems
 are equal: the remaining fields are proofs. -/
-theorem ext {C₁ C₂ : ComplexityClass}
+private theorem ext {C₁ C₂ : ComplexityClass}
     (hMem : ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
       C₁.Mem P ↔ C₂.Mem P)
     (hHard : ∀ {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L),
@@ -116,7 +116,7 @@ theorem ext {C₁ C₂ : ComplexityClass}
 /-- The empty complexity class: no members, and every problem vacuously hard
 (there is nothing that would have to reduce to it). It stands for a level of a
 hierarchy that has no logical characterization. -/
-def empty : ComplexityClass where
+private def empty : ComplexityClass where
   Mem _ := False
   Hard _ := True
   mem_of_foReduction _ h := h
@@ -141,7 +141,7 @@ def Complete (P : DecisionProblem L) : Prop :=
 
 theorem Complete.mem {P : DecisionProblem L} (h : C.Complete P) : P ∈ C := h.1
 
-theorem Complete.hard {P : DecisionProblem L} (h : C.Complete P) : C.Hard P := h.2
+private theorem Complete.hard {P : DecisionProblem L} (h : C.Complete P) : C.Hard P := h.2
 
 end ComplexityClass
 

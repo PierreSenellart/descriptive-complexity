@@ -8,6 +8,16 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
 public import DescriptiveComplexity.Problems.Wide.DrawBack
 import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawSeekKit
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The stage atom's run
@@ -937,7 +947,7 @@ read under the head, the restore, and the reset–clear–seek home – to the e
 phase, the verdict `setAv b` in the control and the marker, mirror and save
 restored at the home address. Five passes of the file, two resets, two seeks,
 the loops, and the thirteen dispatches between them. -/
-theorem stage_reachesIn :
+private theorem stage_reachesIn :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       (5 * wP + 2 * wR + 2 * wK + wL + 13)
       ⟨Sum.inr (PR.stElt (emb (.savP .up)) f₀), Sum.inl v',
@@ -1007,7 +1017,7 @@ file's rules provide. -/
 
 /-- The phase before the `n`-th copy loop – the first reset's checkpoint
 once the positions are exhausted. -/
-def stagePhaseAt (emb : StagePh k → P) (n : ℕ) : P :=
+private def stagePhaseAt (emb : StagePh k → P) (n : ℕ) : P :=
   if h : n < k then emb (.tupP ⟨n, h⟩ (.chk ⟨0, by omega⟩)) else emb .cR1
 
 section StageChain
@@ -1053,7 +1063,7 @@ include hrules hR hlin hvi hwkOf hwkTrk hLoopIn in
 loop – one cell to the marker's right, as every dispatch leaves it – to the
 first reset's checkpoint, each position's run handed to the next by its own
 walk-back, and one walk-back and one loop paid per position. -/
-theorem stage_loops_reachesIn :
+private theorem stage_loops_reachesIn :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn ((wT + 1) * k)
       ⟨Sum.inr (PR.stElt (stageFirstTup emb) (fAt 0)), Sum.inl v',
         wideTape (PR.trackTapeAt F.cell (trkOf 0) (restOf 0) (mOf 0))
@@ -1184,7 +1194,7 @@ noncomputable def stageEndSt (st : TapeStD dt A R P)
 omit [Finite A] [Finite R] [Finite P] in
 include hord in
 /-- **A leg's after-tape at the elementwise file.** -/
-theorem trackTape_back_gen_diag {stA stB : TapeStD dt A R P} {t : dt.SlotIx}
+private theorem trackTape_back_gen_diag {stA stB : TapeStD dt A R P} {t : dt.SlotIx}
     {m : Univ A R P dt.KIx dt.dd → Prop}
     (hagree : ∀ r s, s ≠ t →
       dt.back RF.cell PR.zero PR.one dt.dd0Le stA r s =

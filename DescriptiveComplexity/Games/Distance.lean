@@ -51,20 +51,20 @@ def truncAt (n : ℕ) (x : ℤ) : ℤ :=
 
 variable {n : ℕ} {x y : ℤ}
 
-theorem two_pow_pos (n : ℕ) : (0 : ℤ) < 2 ^ n := by positivity
+private theorem two_pow_pos (n : ℕ) : (0 : ℤ) < 2 ^ n := by positivity
 
 /-- Truncation is the identity within the bounds. -/
-theorem truncAt_of_abs_le (h₁ : -(2 ^ n) ≤ x) (h₂ : x ≤ 2 ^ n) : truncAt n x = x := by
+private theorem truncAt_of_abs_le (h₁ : -(2 ^ n) ≤ x) (h₂ : x ≤ 2 ^ n) : truncAt n x = x := by
   simp only [truncAt, min_eq_right h₂, max_eq_right h₁]
 
 /-- Truncation is `2 ^ n` above the bound. -/
-theorem truncAt_of_le (h : 2 ^ n ≤ x) : truncAt n x = 2 ^ n := by
+private theorem truncAt_of_le (h : 2 ^ n ≤ x) : truncAt n x = 2 ^ n := by
   have := two_pow_pos n
   simp only [truncAt, min_eq_left h]
   omega
 
 /-- Truncation is `-2 ^ n` below the bound. -/
-theorem truncAt_of_le_neg (h : x ≤ -(2 ^ n)) : truncAt n x = -(2 ^ n) := by
+private theorem truncAt_of_le_neg (h : x ≤ -(2 ^ n)) : truncAt n x = -(2 ^ n) := by
   have := two_pow_pos n
   simp only [truncAt, min_eq_right (by omega : (2 : ℤ) ^ n ≥ x)]
   omega
@@ -105,18 +105,18 @@ theorem truncAt_eq_iff : truncAt n x = truncAt n y ↔
 /-! ### What an equation between truncated distances says -/
 
 /-- Equal truncated distances have the same sign, weakly. -/
-theorem le_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x ≤ 0 ↔ y ≤ 0 := by
+private theorem le_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x ≤ 0 ↔ y ≤ 0 := by
   have hpos := two_pow_pos n
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩ <;> constructor <;> intro <;> omega
 
 /-- Equal truncated distances have the same strict sign. -/
-theorem lt_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x < 0 ↔ y < 0 := by
+private theorem lt_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x < 0 ↔ y < 0 := by
   have hpos := two_pow_pos n
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩ <;> constructor <;> intro <;> omega
 
 /-- Truncation commutes with negation, as an equation between two
 distances. -/
-theorem neg_congr_of_truncAt (h : truncAt n x = truncAt n y) :
+private theorem neg_congr_of_truncAt (h : truncAt n x = truncAt n y) :
     truncAt n (-x) = truncAt n (-y) := by
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩
   · rfl
@@ -124,14 +124,14 @@ theorem neg_congr_of_truncAt (h : truncAt n x = truncAt n y) :
   · exact truncAt_eq_iff.mpr (Or.inr (Or.inl ⟨by omega, by omega⟩))
 
 /-- Equal truncated distances are zero together. -/
-theorem eq_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x = 0 ↔ y = 0 := by
+private theorem eq_zero_congr_of_truncAt (h : truncAt n x = truncAt n y) : x = 0 ↔ y = 0 := by
   have hpos := two_pow_pos n
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩ <;> constructor <;> intro <;> omega
 
 /-- **Truncating further is coarser**: an equation between distances
 truncated at `2 ^ n` survives truncation at any smaller bound. This is how a
 round is spent – the budget halves, and the invariant still holds. -/
-theorem truncAt_eq_of_le {m : ℕ} (hmn : m ≤ n) (h : truncAt n x = truncAt n y) :
+private theorem truncAt_eq_of_le {m : ℕ} (hmn : m ≤ n) (h : truncAt n x = truncAt n y) :
     truncAt m x = truncAt m y := by
   have hmono : (2 : ℤ) ^ m ≤ 2 ^ n := pow_le_pow_right₀ (by norm_num) hmn
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩
@@ -145,7 +145,7 @@ equal up to truncation at `2 ^ (n + 1)` stay equal up to truncation at
 the spoiler in the two easy cases of
 `DescriptiveComplexity.exists_answer` – the shift being the distance from the
 new point to the neighbor the duplicator copies. -/
-theorem truncAt_sub_shift {s : ℤ} (h : truncAt (n + 1) x = truncAt (n + 1) y)
+private theorem truncAt_sub_shift {s : ℤ} (h : truncAt (n + 1) x = truncAt (n + 1) y)
     (hs₁ : -(2 ^ n) ≤ s) (hs₂ : s ≤ 2 ^ n) : truncAt n (x - s) = truncAt n (y - s) := by
   have hpow : (2 : ℤ) ^ (n + 1) = 2 ^ n * 2 := pow_succ 2 n
   rcases truncAt_eq_iff.mp h with rfl | ⟨hx, hy⟩ | ⟨hx, hy⟩

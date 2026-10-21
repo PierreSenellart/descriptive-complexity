@@ -14,6 +14,11 @@ public import DescriptiveComplexity.Problems.Qbf
 public import DescriptiveComplexity.SecondOrderReplicate
 public import DescriptiveComplexity.MachinesAltPlay
 public import DescriptiveComplexity.Problems.Qbf.Hardness
+import all DescriptiveComplexity.Problems.Machine.AltInterp
+import all DescriptiveComplexity.Problems.Machine.AltMembership
+import all DescriptiveComplexity.Problems.Machine.AltOne
+import all DescriptiveComplexity.Problems.Qbf
+import all DescriptiveComplexity.Problems.Qbf.Hardness
 
 /-!
 # Alternating machine acceptance, and the machine bridge for the hierarchy
@@ -110,11 +115,11 @@ theorem atmAccept_one_complete : NP.Complete (ATMAccept 1 true) :=
 
 /-- **Alternating acceptance with an existential first block is in `Σₖ₊₁ᵖ`**,
 the membership half of the bridge. -/
-theorem atmAccept_mem_sigmaP' (k : ℕ) : ATMAccept (k + 1) true ∈ SigmaP (k + 1) :=
+private theorem atmAccept_mem_sigmaP' (k : ℕ) : ATMAccept (k + 1) true ∈ SigmaP (k + 1) :=
   atmAccept_mem_sigmaP k
 
 /-- **Alternating acceptance with a universal first block is in `Πₖ₊₁ᵖ`.** -/
-theorem atmAccept_mem_piP' (k : ℕ) : ATMAccept (k + 1) false ∈ PiP (k + 1) :=
+private theorem atmAccept_mem_piP' (k : ℕ) : ATMAccept (k + 1) false ∈ PiP (k + 1) :=
   atmAccept_mem_piP k
 
 /-! ### The hardness half -/

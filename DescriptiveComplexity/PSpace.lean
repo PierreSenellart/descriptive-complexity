@@ -79,12 +79,13 @@ noncomputable def PSPACE : ComplexityClass :=
     (fun h => sotcDefinable_congr h)
 
 /-- Membership in PSPACE is exactly SO(TC) definability, by definition. -/
-theorem mem_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) : P ∈ PSPACE ↔ SOTCDefinable P :=
+private theorem mem_PSPACE_iff
+    [L.IsRelational] (P : DecisionProblem L) : P ∈ PSPACE ↔ SOTCDefinable P :=
   Iff.rfl
 
 /-- PSPACE-hardness is the usual notion: every SO(TC) definable problem
 reduces to `P`. -/
-theorem hard_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
+private theorem hard_PSPACE_iff [L.IsRelational] (P : DecisionProblem L) :
     PSPACE.Hard P ↔
       ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (Q : DecisionProblem L''),
         SOTCDefinable Q → Nonempty (Q ≤ʳᶠᵒ[≤] P) :=
@@ -125,7 +126,7 @@ def blockOrderLift (L : Language.{0, 0}) (B : SOBlock) :
 variable {A : Type} [L.Structure A] [LinearOrder A] (B : SOBlock) (ρ : B.Assignment A)
 
 /-- Inserting the order symbol does not change how anything is interpreted. -/
-theorem blockOrderLift_isExpansionOn :
+private theorem blockOrderLift_isExpansionOn :
     @LHom.IsExpansionOn _ _ (blockOrderLift L B) A
       (B.structure₁ (L := L) ρ) (B.structure₁ (L := L.sum Language.order) ρ) := by
   let := B.structure₁ (L := L) ρ
@@ -140,7 +141,7 @@ theorem blockOrderLift_isExpansionOn :
 
 /-- The lifted kernel realizes over the ordered expansion exactly as the
 original kernel realizes over the base expansion. -/
-theorem realize_blockOrderLift (φ : (L.sum B.lang).Sentence) :
+private theorem realize_blockOrderLift (φ : (L.sum B.lang).Sentence) :
     @Sentence.Realize _ A (B.structure₁ (L := L.sum Language.order) ρ)
         ((blockOrderLift L B).onSentence φ) ↔
       @Sentence.Realize _ A (B.structure₁ (L := L) ρ) φ :=
@@ -161,7 +162,7 @@ def sigmaOneSpec (B : SOBlock) (φ : (L.sum B.lang).Sentence) : SOTCSpec L where
 
 /-- The one-step walk of a `Σ₁` definition accepts exactly when the kernel is
 satisfiable in the block. -/
-theorem sigmaOneSpec_accepts_iff (φ : (L.sum B.lang).Sentence) :
+private theorem sigmaOneSpec_accepts_iff (φ : (L.sum B.lang).Sentence) :
     (sigmaOneSpec L B φ).Accepts A ↔
       ∃ ρ : B.Assignment A, @Sentence.Realize _ A (B.structure₁ (L := L) ρ) φ := by
   have hstep : ∀ ρ σ : B.Assignment A, ¬(sigmaOneSpec L B φ).Step ρ σ := fun _ _ h => h
@@ -174,7 +175,7 @@ theorem sigmaOneSpec_accepts_iff (φ : (L.sum B.lang).Sentence) :
 
 /-- **Every `Σ₁`-definable problem is SO(TC) definable**: guess the block in
 the state, take no step. -/
-theorem SOTCDefinable.of_sigmaSODefinable [L.IsRelational] {P : DecisionProblem L}
+private theorem SOTCDefinable.of_sigmaSODefinable [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable 1 P) : SOTCDefinable P := by
   obtain ⟨Bs, hlen, φ, hφ⟩ := h
   match Bs, hlen with

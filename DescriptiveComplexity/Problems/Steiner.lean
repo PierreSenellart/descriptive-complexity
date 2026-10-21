@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Steiner.Defs
 import DescriptiveComplexity.Problems.Steiner.Reductions
 import DescriptiveComplexity.Problems.Steiner.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily
+import all DescriptiveComplexity.Problems.CliqueFamily
+import all DescriptiveComplexity.Problems.Steiner.Defs
+import all DescriptiveComplexity.Problems.Steiner.Membership
+import all DescriptiveComplexity.Problems.Steiner.Reductions
 
 /-!
 # Steiner Tree is NP-complete

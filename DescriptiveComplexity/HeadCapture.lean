@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.HeadEval
 public import Mathlib.SetTheory.Cardinal.NatCard
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadProgram
 
 /-!
 # The capture theorem for NL: FO(TC) is what a multi-head automaton recognizes
@@ -120,7 +122,8 @@ section Choice
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {m : ℕ}
 
-theorem runs_chooseP : (chooseP (L := L) (K := K)).Runs A m fun x _ y => HeadAgree m x y := by
+private theorem runs_chooseP
+    : (chooseP (L := L) (K := K)).Runs A m fun x _ y => HeadAgree m x y := by
   have hflat : ∀ t ∈ (chooseP (L := L) (K := K)).tr (chooseP (L := L) (K := K)).entry,
       ∃ b', t.target = Sum.inr b' := by
     intro t ht
@@ -142,7 +145,7 @@ theorem runs_chooseP : (chooseP (L := L) (K := K)).Runs A m fun x _ y => HeadAgr
       exact ⟨⟨⊤, fun _ => .stay, Sum.inr false⟩, by simp, Formula.realize_top.mpr trivial, rfl,
         fun _ => rfl⟩
 
-theorem runs_guessStepP (h : Fin K) (hh : (h : ℕ) < m) :
+private theorem runs_guessStepP (h : Fin K) (hh : (h : ℕ) < m) :
     (guessStepP (L := L) h).Runs A m fun x b y =>
       (b = true ∧ (x h < y h ∧ ∀ e : A, ¬(x h < e ∧ e < y h)) ∧
         ∀ j : Fin K, (j : ℕ) < m → j ≠ h → y j = x j) ∨ (b = false ∧ HeadAgree m x y) := by
@@ -224,7 +227,7 @@ section Guess
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] {m : ℕ}
 
 /-- The relations the fragments of a guess run. -/
-def guessRel (h : Fin K) (m : ℕ) : GuessNode → (Fin K → A) → Bool → (Fin K → A) → Prop
+private def guessRel (h : Fin K) (m : ℕ) : GuessNode → (Fin K → A) → Bool → (Fin K → A) → Prop
   | .reset => fun x b y => b = true ∧
       ∀ j : Fin K, (j : ℕ) < m → (setHead h (.toMin) j).Holds x j (y j)
   | .loop => fun x b y =>
@@ -233,7 +236,7 @@ def guessRel (h : Fin K) (m : ℕ) : GuessNode → (Fin K → A) → Bool → (F
 
 /-- **What a guess runs**: head `h` may end anywhere, every other head staying
 where it was. -/
-theorem runs_guessP (h : Fin K) (hh : (h : ℕ) < m) :
+private theorem runs_guessP (h : Fin K) (hh : (h : ℕ) < m) :
     (guessP (L := L) h).Runs A m fun x b y =>
       b = true ∧ ∀ j : Fin K, (j : ℕ) < m → j ≠ h → y j = x j := by
   have hfam : ∀ c, (guessFam (L := L) h c).Runs A m (guessRel h m c) := by
@@ -361,12 +364,12 @@ end Guess
 
 /-! ### Guessing a block of heads -/
 
-theorem runs_exitP_local {A : Type} [L.Structure A] [LinearOrder A] (b : Bool) (m : ℕ) :
+private theorem runs_exitP_local {A : Type} [L.Structure A] [LinearOrder A] (b : Bool) (m : ℕ) :
     (exitP (L := L) (K := K) b).Runs A m fun x b' y => b' = b ∧ HeadAgree m x y :=
   (runs_exitP b).mono (fun x b' y hxy => ⟨hxy.1, fun j _ => by rw [hxy.2]⟩)
     fun x b' y hxy => ⟨x, hxy.2.symm, hxy.1, rfl⟩
 
-theorem headLocal2_exitP {A : Type} (b : Bool) (m : ℕ) :
+private theorem headLocal2_exitP {A : Type} (b : Bool) (m : ℕ) :
     HeadLocal2 m fun (x : Fin K → A) b' y => b' = b ∧ HeadAgree m x y := by
   intro x x' y y' hx hy b'
   exact and_congr Iff.rfl ⟨fun h => hx.symm.trans (h.trans hy), fun h => hx.trans (h.trans hy.symm)⟩
@@ -382,7 +385,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
 
 /-- **What guessing a block runs**: the heads of the block may end anywhere, and
 no other head moves. -/
-theorem runs_guessManyP (hd : ℕ → Fin K) (m : ℕ) (hhd : ∀ i : ℕ, i < m → (hd i : ℕ) = i)
+private theorem runs_guessManyP (hd : ℕ → Fin K) (m : ℕ) (hhd : ∀ i : ℕ, i < m → (hd i : ℕ) = i)
     (lo : ℕ) : ∀ n : ℕ, lo + n ≤ m →
       (guessManyP (L := L) hd lo n).Runs A m fun x b y => b = true ∧
         ∀ j : Fin K, (j : ℕ) < m → ((j : ℕ) < lo ∨ lo + n ≤ (j : ℕ)) → y j = x j := by
@@ -524,7 +527,7 @@ noncomputable def shd (i : ℕ) : Fin (specHeads spec) :=
   if h : i < specHeads spec then ⟨i, h⟩ else ⟨0, lt_of_le_of_lt (Nat.zero_le _)
     (two_k_lt_specHeads spec)⟩
 
-theorem shd_val {i : ℕ} (h : i < specHeads spec) : (shd spec i : ℕ) = i := by
+private theorem shd_val {i : ℕ} (h : i < specHeads spec) : (shd spec i : ℕ) = i := by
   rw [shd, dite_eq_left h]
 
 @[simp]
@@ -554,19 +557,19 @@ section Fragments
 variable (spec : TCSpec L)
 
 open Classical in
-theorem qdepth_src_le (m : spec.Mode) : qdepth (spec.src m) ≤ specDepth spec := by
+private theorem qdepth_src_le (m : spec.Mode) : qdepth (spec.src m) ≤ specDepth spec := by
   let := Fintype.ofFinite spec.Mode
   exact le_trans (Finset.le_sup (f := fun m => qdepth (spec.src m)) (Finset.mem_univ m))
     (le_trans (le_max_left _ _) (le_max_right _ _))
 
 open Classical in
-theorem qdepth_tgt_le (m : spec.Mode) : qdepth (spec.tgt m) ≤ specDepth spec := by
+private theorem qdepth_tgt_le (m : spec.Mode) : qdepth (spec.tgt m) ≤ specDepth spec := by
   let := Fintype.ofFinite spec.Mode
   exact le_trans (Finset.le_sup (f := fun m => qdepth (spec.tgt m)) (Finset.mem_univ m))
     (le_trans (le_max_right _ _) (le_max_right _ _))
 
 open Classical in
-theorem qdepth_step_le (m m' : spec.Mode) : qdepth (spec.step m m') ≤ specDepth spec := by
+private theorem qdepth_step_le (m m' : spec.Mode) : qdepth (spec.step m m') ≤ specDepth spec := by
   let := Fintype.ofFinite spec.Mode
   exact le_trans (Finset.le_sup (f := fun p : spec.Mode × spec.Mode => qdepth (spec.step p.1 p.2))
     (Finset.mem_univ (m, m'))) (le_max_left _ _)
@@ -580,12 +583,12 @@ noncomputable def hv0 : Fin spec.k ⊕ Fin 0 → Fin (specHeads spec) :=
 noncomputable def hv01 : (Fin spec.k ⊕ Fin spec.k) ⊕ Fin 0 → Fin (specHeads spec) :=
   Sum.elim (Sum.elim (blk0 spec) (blk1 spec)) Fin.elim0
 
-theorem hv0_low : ∀ v, ((hv0 spec v : Fin (specHeads spec)) : ℕ) < 2 * spec.k := by
+private theorem hv0_low : ∀ v, ((hv0 spec v : Fin (specHeads spec)) : ℕ) < 2 * spec.k := by
   rintro (i | i)
   · exact lt_of_lt_of_le i.isLt (by omega)
   · exact i.elim0
 
-theorem hv01_low : ∀ v, ((hv01 spec v : Fin (specHeads spec)) : ℕ) < 2 * spec.k := by
+private theorem hv01_low : ∀ v, ((hv01 spec v : Fin (specHeads spec)) : ℕ) < 2 * spec.k := by
   rintro ((i | i) | i)
   · exact lt_of_lt_of_le i.isLt (by omega)
   · have := i.isLt
@@ -613,10 +616,11 @@ section Eval
 
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
 
-theorem hshd : ∀ i : ℕ, i < specHeads spec → ((shd spec i : Fin (specHeads spec)) : ℕ) = i :=
+private theorem hshd
+    : ∀ i : ℕ, i < specHeads spec → ((shd spec i : Fin (specHeads spec)) : ℕ) = i :=
   fun _ h => shd_val spec h
 
-theorem decides_evalSrcP (m : spec.Mode) :
+private theorem decides_evalSrcP (m : spec.Mode) :
     (evalSrcP spec m).Decides A (2 * spec.k) fun x => spec.IsSrc (curNode spec x m) := by
   refine (decides_evalP (shd spec) (hshd spec) (spec.src m) (2 * spec.k) (hv0 spec)
     (hv0_low spec) ?_).congr fun x => ?_
@@ -626,7 +630,7 @@ theorem decides_evalSrcP (m : spec.Mode) :
   · exact iff_of_eq (congrArg (BoundedFormula.Realize (spec.src m)
       fun i => x (blk0 spec i)) (funext fun i => i.elim0))
 
-theorem decides_evalTgtP (m : spec.Mode) :
+private theorem decides_evalTgtP (m : spec.Mode) :
     (evalTgtP spec m).Decides A (2 * spec.k) fun x => spec.IsTgt (curNode spec x m) := by
   refine (decides_evalP (shd spec) (hshd spec) (spec.tgt m) (2 * spec.k) (hv0 spec)
     (hv0_low spec) ?_).congr fun x => ?_
@@ -636,7 +640,7 @@ theorem decides_evalTgtP (m : spec.Mode) :
   · exact iff_of_eq (congrArg (BoundedFormula.Realize (spec.tgt m)
       fun i => x (blk0 spec i)) (funext fun i => i.elim0))
 
-theorem decides_evalStepP (m m' : spec.Mode) :
+private theorem decides_evalStepP (m m' : spec.Mode) :
     (evalStepP spec m m').Decides A (2 * spec.k) fun x =>
       spec.Step (curNode spec x m) (candNode spec x m') := by
   refine (decides_evalP (shd spec) (hshd spec) (spec.step m m') (2 * spec.k) (hv01 spec)
@@ -704,7 +708,7 @@ noncomputable def ix0 : Fin (modeCard spec + 1) := ⟨0, Nat.succ_pos _⟩
 noncomputable def ixOf (m : spec.Mode) : Fin (modeCard spec + 1) :=
   ⟨modeEquiv spec m, by have := (modeEquiv spec m).isLt; omega⟩
 
-theorem modeAt_ixOf (m : spec.Mode) : modeAt spec (ixOf spec m) = some m := by
+private theorem modeAt_ixOf (m : spec.Mode) : modeAt spec (ixOf spec m) = some m := by
   have h : ((ixOf spec m : Fin (modeCard spec + 1)) : ℕ) < modeCard spec := (modeEquiv spec m).isLt
   rw [modeAt, dite_eq_left h]
   refine congrArg some ?_
@@ -731,7 +735,7 @@ section Runs
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A]
 
 /-- What the fragments of the machine run. -/
-noncomputable def drvRel : DrvNode spec.Mode (modeCard spec) → (Fin (specHeads spec) → A) →
+private noncomputable def drvRel : DrvNode spec.Mode (modeCard spec) → (Fin (specHeads spec) → A) →
     Bool → (Fin (specHeads spec) → A) → Prop
   | .pickSrc _ => fun x _ y => HeadAgree (2 * spec.k) x y
   | .trySrc m => fun x b y => (b = true ↔ spec.IsSrc (curNode spec y m)) ∧
@@ -759,11 +763,11 @@ theorem candNode_congr {x y : Fin (specHeads spec) → A}
   refine congrArg (fun u => (m, u)) (funext fun i => ?_)
   refine h _ ?_ ?_ <;> (simp only [blk1_val]; have := i.isLt; omega)
 
-theorem hshd' : ∀ i : ℕ, i < 2 * spec.k → ((shd spec i : Fin (specHeads spec)) : ℕ) = i :=
+private theorem hshd' : ∀ i : ℕ, i < 2 * spec.k → ((shd spec i : Fin (specHeads spec)) : ℕ) = i :=
   fun _ hi => shd_val spec (lt_trans hi (two_k_lt_specHeads spec))
 
 /-- **The fragments run what they are meant to.** -/
-theorem runs_drvFam (c : DrvNode spec.Mode (modeCard spec)) :
+private theorem runs_drvFam (c : DrvNode spec.Mode (modeCard spec)) :
     (drvFam spec c).Runs A (2 * spec.k) (drvRel spec c) := by
   cases c with
   | pickSrc i => exact runs_chooseP
@@ -827,7 +831,7 @@ theorem runs_drvFam (c : DrvNode spec.Mode (modeCard spec)) :
 
 omit [Finite A] in
 /-- The relations the fragments run see only the two tuples. -/
-theorem headLocal2_drvRel (c : DrvNode spec.Mode (modeCard spec)) :
+private theorem headLocal2_drvRel (c : DrvNode spec.Mode (modeCard spec)) :
     HeadLocal2 (2 * spec.k) (drvRel (A := A) spec c) := by
   cases c with
   | pickSrc i =>
@@ -863,7 +867,7 @@ theorem headLocal2_drvRel (c : DrvNode spec.Mode (modeCard spec)) :
 /-- The invariant the machine carries: at a control node, the tuple on the first
 block of heads is a node of the specification reachable from a source – and, at
 `commit`, the candidate is a step away. -/
-def drvInv (u : DrvNode spec.Mode (modeCard spec) × (Fin (specHeads spec) → A)) : Prop :=
+private def drvInv (u : DrvNode spec.Mode (modeCard spec) × (Fin (specHeads spec) → A)) : Prop :=
   match u.1 with
   | .pickSrc _ => True
   | .trySrc _ => True
@@ -936,7 +940,7 @@ end Arcs
 
 omit [Finite A] in
 /-- **The invariant is carried along the machine's walk.** -/
-theorem drvInv_of_walk (x₀ : Fin (specHeads spec) → A)
+private theorem drvInv_of_walk (x₀ : Fin (specHeads spec) → A)
     {u : DrvNode spec.Mode (modeCard spec) × (Fin (specHeads spec) → A)}
     (h : Relation.ReflTransGen
       (wireStep (drvRel spec) (drvWire (modeAt spec) (nextIx spec) (ix0 spec)))
@@ -1048,7 +1052,7 @@ theorem drvInv_of_walk (x₀ : Fin (specHeads spec) → A)
 
 omit [Finite A] in
 /-- **Soundness**: if the machine accepts, the specification does. -/
-theorem accepts_of_exit (x₀ : Fin (specHeads spec) → A)
+private theorem accepts_of_exit (x₀ : Fin (specHeads spec) → A)
     {u : DrvNode spec.Mode (modeCard spec) × (Fin (specHeads spec) → A)}
     {z : Fin (specHeads spec) → A}
     (hwalk : Relation.ReflTransGen
@@ -1127,7 +1131,7 @@ theorem putBlk1_of_lt (x : Fin (specHeads spec) → A) (u : Fin spec.k → A)
 
 omit [Finite A] in
 /-- The chain of free choices reaches every mode. -/
-theorem walk_pickSrc (x : Fin (specHeads spec) → A) :
+private theorem walk_pickSrc (x : Fin (specHeads spec) → A) :
     ∀ (n : ℕ) (hn : n < modeCard spec + 1), Relation.ReflTransGen
       (wireStep (drvRel spec) (drvWire (modeAt spec) (nextIx spec) (ix0 spec)))
       ((.pickSrc (ix0 spec) : DrvNode spec.Mode (modeCard spec)), x)
@@ -1145,7 +1149,7 @@ theorem walk_pickSrc (x : Fin (specHeads spec) → A) :
 
 omit [Finite A] in
 /-- The same chain, for the candidate mode. -/
-theorem walk_pickCand (x : Fin (specHeads spec) → A) (m : spec.Mode) :
+private theorem walk_pickCand (x : Fin (specHeads spec) → A) (m : spec.Mode) :
     ∀ (n : ℕ) (hn : n < modeCard spec + 1), Relation.ReflTransGen
       (wireStep (drvRel spec) (drvWire (modeAt spec) (nextIx spec) (ix0 spec)))
       ((.pickCand m (ix0 spec) : DrvNode spec.Mode (modeCard spec)), x)
@@ -1164,7 +1168,8 @@ theorem walk_pickCand (x : Fin (specHeads spec) → A) (m : spec.Mode) :
 omit [Finite A] in
 /-- **Completeness**: the machine imitates the specification's walk, node by
 node, unless it has already accepted on the way. -/
-theorem walk_of_reach (x₀ : Fin (specHeads spec) → A) {u₀ : spec.Node A} (hsrc : spec.IsSrc u₀) :
+private theorem walk_of_reach
+    (x₀ : Fin (specHeads spec) → A) {u₀ : spec.Node A} (hsrc : spec.IsSrc u₀) :
     ∀ w : spec.Node A, spec.Reach u₀ w →
       (∃ (u : DrvNode spec.Mode (modeCard spec) × (Fin (specHeads spec) → A))
           (z : Fin (specHeads spec) → A), Relation.ReflTransGen

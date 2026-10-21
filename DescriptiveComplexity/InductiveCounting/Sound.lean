@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.InductiveCounting.Order
+import all DescriptiveComplexity.InductiveCounting.Machine
+import all DescriptiveComplexity.InductiveCounting.Order
 
 /-!
 # Soundness of the inductive-counting machine
@@ -38,11 +40,11 @@ variable {V : Type} [LinearOrder V] [Finite V] (E : V → V → Prop) (S T : V �
 /-! ### Reading a configuration -/
 
 /-- The layer index recorded by the stage register. -/
-noncomputable def stage (s : Cfg V) : ℕ := orank (s.regs Reg.d)
+private noncomputable def stage (s : Cfg V) : ℕ := orank (s.regs Reg.d)
 
 /-- A node `y` witnessing that the outer register's node lies in the next
 layer: it is that node, or has an edge to it. -/
-def Wit (r : WithBot V) (y : V) : Prop := (↑y : WithBot V) = r ∨ EW E ↑y r
+private def Wit (r : WithBot V) (y : V) : Prop := (↑y : WithBot V) = r ∨ EW E ↑y r
 
 variable {E S T}
 
@@ -62,7 +64,7 @@ omit [LinearOrder V] [Finite V] in
 
 omit [LinearOrder V] [Finite V] in
 /-- The next layer is exactly the nodes witnessed by the current one. -/
-theorem mem_rset_succ_iff_wit {d : ℕ} {vv : V} :
+private theorem mem_rset_succ_iff_wit {d : ℕ} {vv : V} :
     vv ∈ Rset E S (d + 1) ↔ ∃ y ∈ Rset E S d, Wit E (↑vv : WithBot V) y := by
   rw [mem_rset_succ]
   refine exists_congr fun y => and_congr_right fun _ => ?_
@@ -78,7 +80,7 @@ scanned by it: the stage count is exact, the outer count is exact for the part
 of the next layer already scanned, and the inner count is at most – and, as
 soon as something was skipped that should not have been, strictly below – the
 number of layer nodes scanned. -/
-def InnerInv (s : Cfg V) (P : Set V) : Prop :=
+private def InnerInv (s : Cfg V) (P : Set V) : Prop :=
   (∃ vv : V, s.regs Reg.v = ↑vv) ∧
     orank (s.regs Reg.c) = (Rset E S (stage s)).ncard ∧
     orank (s.regs Reg.c2) =
@@ -90,7 +92,7 @@ def InnerInv (s : Cfg V) (P : Set V) : Prop :=
         orank (s.regs Reg.cnt) < (Rset E S (stage s) ∩ P).ncard)
 
 /-- The invariant, phase by phase. -/
-def PhaseInv (ph : Phase) (s : Cfg V) : Prop :=
+private def PhaseInv (ph : Phase) (s : Cfg V) : Prop :=
   match ph with
   | .initCount =>
       (∃ vv : V, s.regs Reg.v = ↑vv) ∧
@@ -112,14 +114,14 @@ def PhaseInv (ph : Phase) (s : Cfg V) : Prop :=
   | .accept => ¬∃ a b : V, S a ∧ T b ∧ Relation.ReflTransGen E a b
 
 /-- The invariant of a configuration. -/
-def Inv (s : Cfg V) : Prop := PhaseInv E S T s.phase s
+private def Inv (s : Cfg V) : Prop := PhaseInv E S T s.phase s
 
 /-! ### Two steps of the inner loop -/
 
 variable {E S T}
 
 /-- Scanning one more node without certifying it. -/
-theorem innerInv_skip {s s' : Cfg V} {uu : V} {P : Set V}
+private theorem innerInv_skip {s s' : Cfg V} {uu : V} {P : Set V}
     (hinv : InnerInv E S T s P) (huP : uu ∉ P)
     (hstage : stage s' = stage s)
     (hc : s'.regs Reg.c = s.regs Reg.c) (hc2 : s'.regs Reg.c2 = s.regs Reg.c2)
@@ -148,7 +150,7 @@ theorem innerInv_skip {s s' : Cfg V} {uu : V} {P : Set V}
 
 /-- Scanning one more node and certifying it: the count goes up, and the flag
 goes up exactly when the node witnesses the outer node. -/
-theorem innerInv_certify {s s' : Cfg V} {uu : V} {P : Set V}
+private theorem innerInv_certify {s s' : Cfg V} {uu : V} {P : Set V}
     (hinv : InnerInv E S T s P) (huP : uu ∉ P)
     (huR : uu ∈ Rset E S (stage s)) (huT : ¬T uu)
     (hstage : stage s' = stage s)
@@ -202,7 +204,7 @@ theorem innerInv_certify {s s' : Cfg V} {uu : V} {P : Set V}
 
 omit [Finite V] in
 /-- The inner invariant only reads the registers named here. -/
-theorem innerInv_congr {s s' : Cfg V} {P : Set V} (hinv : InnerInv E S T s P)
+private theorem innerInv_congr {s s' : Cfg V} {P : Set V} (hinv : InnerInv E S T s P)
     (hstage : stage s' = stage s) (hc : s'.regs Reg.c = s.regs Reg.c)
     (hc2 : s'.regs Reg.c2 = s.regs Reg.c2) (hv : s'.regs Reg.v = s.regs Reg.v)
     (hcnt : s'.regs Reg.cnt = s.regs Reg.cnt) (hflag : s'.flag = s.flag) :
@@ -213,7 +215,7 @@ theorem innerInv_congr {s s' : Cfg V} {P : Set V} (hinv : InnerInv E S T s P)
     by rw [hcnt, hstage, hflag, hv]; exact hdef⟩
 
 /-- Counting the sources, one node at a time. -/
-theorem inv_step_initCount {s s' : Cfg V} (hp : s.phase = Phase.initCount)
+private theorem inv_step_initCount {s s' : Cfg V} (hp : s.phase = Phase.initCount)
     (hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, hsat⟩ := hstep
   have hinv' : PhaseInv E S T Phase.initCount s := hp ▸ hinv
@@ -292,7 +294,7 @@ theorem inv_step_initCount {s s' : Cfg V} (hp : s.phase = Phase.initCount)
   · exact absurd hl List.not_mem_nil
 
 /-- The inner loop: skipping a node, certifying a node, or ending the scan. -/
-theorem inv_step_inner {s s' : Cfg V} (hp : s.phase = Phase.inner)
+private theorem inv_step_inner {s s' : Cfg V} (hp : s.phase = Phase.inner)
     (hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, hsat⟩ := hstep
   have hinv' : PhaseInv E S T Phase.inner s := hp ▸ hinv
@@ -349,7 +351,7 @@ theorem inv_step_inner {s s' : Cfg V} (hp : s.phase = Phase.inner)
   · exact absurd hl List.not_mem_nil
 
 /-- The certifying walk: one more edge backwards, or a source is reached. -/
-theorem inv_step_walk {s s' : Cfg V} (hp : s.phase = Phase.walk)
+private theorem inv_step_walk {s s' : Cfg V} (hp : s.phase = Phase.walk)
     (hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, hsat⟩ := hstep
   have hinv' : PhaseInv E S T Phase.walk s := hp ▸ hinv
@@ -407,7 +409,7 @@ theorem inv_step_walk {s s' : Cfg V} (hp : s.phase = Phase.walk)
 
 /-- The end of a stage: either the counts agree, and the reachable set is the
 current layer, or the machine moves on to the next layer. -/
-theorem inv_step_stageEnd {s s' : Cfg V} (hp : s.phase = Phase.stageEnd)
+private theorem inv_step_stageEnd {s s' : Cfg V} (hp : s.phase = Phase.stageEnd)
     (hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, hsat⟩ := hstep
   have hinv' : PhaseInv E S T Phase.stageEnd s := hp ▸ hinv
@@ -457,7 +459,7 @@ omit [Finite V] in
 /-- At the end of the inner scan the count check leaves no room: the certified
 nodes are exactly the layer, so no target lies in it and the flag says exactly
 whether the outer node has entered the next layer. -/
-theorem check_exact {s : Cfg V} (hinv : InnerInv E S T s Set.univ)
+private theorem check_exact {s : Cfg V} (hinv : InnerInv E S T s Set.univ)
     (hcnt : s.regs Reg.cnt = s.regs Reg.c) :
     (∀ y ∈ Rset E S (stage s), ¬T y) ∧
       ∀ vv : V, s.regs Reg.v = ↑vv → (s.flag = true ↔ vv ∈ Rset E S (stage s + 1)) := by
@@ -481,7 +483,7 @@ theorem check_exact {s : Cfg V} (hinv : InnerInv E S T s Set.univ)
     omega
 
 /-- A certified node is counted in, and tested against the outer node. -/
-theorem inv_step_certDone {s s' : Cfg V} (hp : s.phase = Phase.certDone)
+private theorem inv_step_certDone {s s' : Cfg V} (hp : s.phase = Phase.certDone)
     (hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, hsat⟩ := hstep
   have hinv' : PhaseInv E S T Phase.certDone s := hp ▸ hinv
@@ -566,7 +568,7 @@ theorem inv_step_certDone {s s' : Cfg V} (hp : s.phase = Phase.certDone)
 
 /-- The count check: the outer count is updated and the scan restarts, or the
 stage is over. -/
-theorem inv_step_check {s s' : Cfg V} (hp : s.phase = Phase.check)
+private theorem inv_step_check {s s' : Cfg V} (hp : s.phase = Phase.check)
     (hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, hsat⟩ := hstep
   have hinner : InnerInv E S T s Set.univ := by
@@ -664,7 +666,7 @@ theorem inv_step_check {s s' : Cfg V} (hp : s.phase = Phase.check)
 
 omit [Finite V] in
 /-- Nothing leaves the accepting phase. -/
-theorem inv_step_accept {s s' : Cfg V} (hp : s.phase = Phase.accept)
+private theorem inv_step_accept {s s' : Cfg V} (hp : s.phase = Phase.accept)
     (_hinv : Inv E S T s) (hstep : CfgStep E S T s s') : Inv E S T s' := by
   obtain ⟨l, hl, -⟩ := hstep
   rw [hp] at hl
@@ -674,7 +676,7 @@ theorem inv_step_accept {s s' : Cfg V} (hp : s.phase = Phase.accept)
 /-! ### Soundness -/
 
 /-- **The invariant is preserved by every transition.** -/
-theorem inv_step {s s' : Cfg V} (hinv : Inv E S T s) (hstep : CfgStep E S T s s') :
+private theorem inv_step {s s' : Cfg V} (hinv : Inv E S T s) (hstep : CfgStep E S T s s') :
     Inv E S T s' := by
   cases hp : s.phase with
   | initCount => exact inv_step_initCount hp hinv hstep
@@ -687,7 +689,7 @@ theorem inv_step {s s' : Cfg V} (hinv : Inv E S T s) (hstep : CfgStep E S T s s'
 
 omit [Finite V] in
 /-- The invariant holds at every initial configuration. -/
-theorem inv_of_isSrc {s : Cfg V} (h : CfgIsSrc s) : Inv E S T s := by
+private theorem inv_of_isSrc {s : Cfg V} (h : CfgIsSrc s) : Inv E S T s := by
   obtain ⟨hph, -, hc, vv, hvv, hvmin⟩ := h
   change PhaseInv E S T s.phase s
   rw [hph]
@@ -695,7 +697,7 @@ theorem inv_of_isSrc {s : Cfg V} (h : CfgIsSrc s) : Inv E S T s := by
     rw [hc, orank_bot, hvv, predSet_of_isMin hvmin, Set.inter_empty, Set.ncard_empty]⟩
 
 /-- The invariant survives any number of transitions. -/
-theorem inv_reach {s s' : Cfg V} (hinv : Inv E S T s) (h : CfgReach E S T s s') :
+private theorem inv_reach {s s' : Cfg V} (hinv : Inv E S T s) (h : CfgReach E S T s s') :
     Inv E S T s' := by
   induction h with
   | refl => exact hinv
@@ -703,7 +705,7 @@ theorem inv_reach {s s' : Cfg V} (hinv : Inv E S T s) (h : CfgReach E S T s s') 
 
 /-- **Soundness**: if the machine accepts, no target is reachable from a
 source. -/
-theorem not_reach_of_machineAccepts (h : MachineAccepts E S T) :
+private theorem not_reach_of_machineAccepts (h : MachineAccepts E S T) :
     ¬∃ a b : V, S a ∧ T b ∧ Relation.ReflTransGen E a b := by
   obtain ⟨s, s', hsrc, htgt, hreach⟩ := h
   have hinv : Inv E S T s' := inv_reach (inv_of_isSrc hsrc) hreach

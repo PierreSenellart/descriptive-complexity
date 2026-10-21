@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.Quantitative
 import DescriptiveComplexity.SecondOrderPull
+import all DescriptiveComplexity.Counting.Quantitative
 
 /-!
 # Pulling a quantitative term back through an interpretation
@@ -48,13 +49,13 @@ def bigMul : List (QTerm L α) → QTerm L α
   | [] => const 1
   | t :: l => mul t (bigMul l)
 
-theorem eval_bigAdd {A : Type} [L.Structure A] (l : List (QTerm L α)) (v : α → A) :
+private theorem eval_bigAdd {A : Type} [L.Structure A] (l : List (QTerm L α)) (v : α → A) :
     (bigAdd l).eval v = (l.map fun t => t.eval v).sum := by
   induction l with
   | nil => rfl
   | cons t l ih => simp only [bigAdd, eval, ih, List.map_cons, List.sum_cons]
 
-theorem eval_bigMul {A : Type} [L.Structure A] (l : List (QTerm L α)) (v : α → A) :
+private theorem eval_bigMul {A : Type} [L.Structure A] (l : List (QTerm L α)) (v : α → A) :
     (bigMul l).eval v = (l.map fun t => t.eval v).prod := by
   induction l with
   | nil => rfl
@@ -74,7 +75,7 @@ noncomputable def FOInterpretation.pullFormula (I : FOInterpretation L₁ L₂ T
     fun p : (α ⊕ Fin 0) × Fin d =>
       (Sum.elim (fun a => (a, p.2)) (fun z => z.elim0) p.1 : α × Fin d)
 
-theorem FOInterpretation.realize_pullFormula (I : FOInterpretation L₁ L₂ Tag d) {A : Type}
+private theorem FOInterpretation.realize_pullFormula (I : FOInterpretation L₁ L₂ Tag d) {A : Type}
     [L₁.Structure A] {α : Type} (φ : L₂.Formula α) (τ : α → Tag) (w : α × Fin d → A) :
     (I.pullFormula φ τ).Realize w ↔ φ.Realize (M := I.Map A) (I.liftEnv τ w) := by
   rw [FOInterpretation.pullFormula, Formula.realize_relabel, I.realize_pull]

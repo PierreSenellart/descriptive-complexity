@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Qsat.Interp
 public import DescriptiveComplexity.Problems.Qsat.Blocks
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Qsat.Interp
+import all DescriptiveComplexity.Problems.Qsat.Tags
 
 /-!
 # The quantifier prefix of the constructed instance
@@ -50,14 +52,14 @@ def qVar (v : QVarTag) (p q : A) : QM A := (Sum.inl v, ![p, q])
 /-- The element standing for the clause `c` at the coordinates `(p, q)`. -/
 def qCl (c : QClTag) (p q : A) : QM A := (Sum.inr c, ![p, q])
 
-theorem qVar_inj {v v' : QVarTag} {p q p' q' : A} (h : qVar v p q = qVar v' p' q') :
+private theorem qVar_inj {v v' : QVarTag} {p q p' q' : A} (h : qVar v p q = qVar v' p' q') :
     v = v' ∧ p = p' ∧ q = q' := by
   have h1 : (Sum.inl v : QTag) = Sum.inl v' := congrArg Prod.fst h
   have h2 : (![p, q] : Fin 2 → A) = ![p', q'] := congrArg Prod.snd h
   exact ⟨Sum.inl.inj h1, congrFun h2 0, congrFun h2 1⟩
 
 /-- Every element is a variable or a clause at some pair of coordinates. -/
-theorem qm_cases (x : QM A) :
+private theorem qm_cases (x : QM A) :
     (∃ v p q, x = qVar v p q) ∨ (∃ c p q, x = qCl c p q) := by
   obtain ⟨t, w⟩ := x
   have hw : w = ![w 0, w 1] := by
@@ -184,21 +186,21 @@ def QBlk (T : ℕ × A × ℕ) : QM A → Prop := fun x =>
 def QPlayed (T : ℕ × A × ℕ) : QM A → Prop := fun x =>
   ∃ v p q, x = qVar v p q ∧ QVarOn v p q ∧ TripleLt (keyTriple v p q) T
 
-theorem qBlk_qVar {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} (hv : QVarOn v p q)
+private theorem qBlk_qVar {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} (hv : QVarOn v p q)
     (h : keyTriple v p q = T) : QBlk T (qVar v p q) :=
   ⟨v, p, q, rfl, hv, h⟩
 
-theorem qPlayed_qVar {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} (hv : QVarOn v p q)
+private theorem qPlayed_qVar {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} (hv : QVarOn v p q)
     (h : TripleLt (keyTriple v p q) T) : QPlayed T (qVar v p q) :=
   ⟨v, p, q, rfl, hv, h⟩
 
-theorem qBlk_iff {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} :
+private theorem qBlk_iff {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} :
     QBlk T (qVar v p q) ↔ QVarOn v p q ∧ keyTriple v p q = T := by
   refine ⟨fun ⟨v', p', q', he, hv, h⟩ => ?_, fun h => ⟨v, p, q, rfl, h.1, h.2⟩⟩
   obtain ⟨rfl, rfl, rfl⟩ := qVar_inj he
   exact ⟨hv, h⟩
 
-theorem qPlayed_iff {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} :
+private theorem qPlayed_iff {T : ℕ × A × ℕ} {v : QVarTag} {p q : A} :
     QPlayed T (qVar v p q) ↔ QVarOn v p q ∧ TripleLt (keyTriple v p q) T := by
   refine ⟨fun ⟨v', p', q', he, hv, h⟩ => ?_, fun h => ⟨v, p, q, rfl, h.1, h.2⟩⟩
   obtain ⟨rfl, rfl, rfl⟩ := qVar_inj he

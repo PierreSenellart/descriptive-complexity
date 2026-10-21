@@ -84,7 +84,7 @@ expansion. -/
 def count {k : ℕ} (φ : (L.sum Language.order).Formula (Fin k)) : PolyTerm L :=
   card (cardInterp φ)
 
-theorem eval_count (A : Type) [L.Structure A] [LinearOrder A] {k : ℕ}
+private theorem eval_count (A : Type) [L.Structure A] [LinearOrder A] {k : ℕ}
     (φ : (L.sum Language.order).Formula (Fin k)) :
     (count φ).eval A = Nat.card {w : Fin k → A // φ.Realize w} :=
   Nat.card_congr
@@ -95,7 +95,7 @@ theorem eval_count (A : Type) [L.Structure A] [LinearOrder A] {k : ℕ}
 
 /-- The number of elements satisfying a first-order formula over the ordered
 expansion, as a cardinality of a set of elements. -/
-theorem eval_count_one (A : Type) [L.Structure A] [LinearOrder A]
+private theorem eval_count_one (A : Type) [L.Structure A] [LinearOrder A]
     (φ : (L.sum Language.order).Formula (Fin 1)) :
     (count φ).eval A = Nat.card {a : A // φ.Realize fun _ => a} := by
   rw [eval_count]
@@ -109,10 +109,10 @@ theorem eval_count_one (A : Type) [L.Structure A] [LinearOrder A]
       right_inv := fun _ => rfl }
 
 /-- The number of elements of the instance. -/
-def univ : PolyTerm L :=
+private def univ : PolyTerm L :=
   count (⊤ : (L.sum Language.order).Formula (Fin 1))
 
-theorem eval_univ (A : Type) [L.Structure A] [LinearOrder A] :
+private theorem eval_univ (A : Type) [L.Structure A] [LinearOrder A] :
     (univ : PolyTerm L).eval A = Nat.card A := by
   rw [univ, eval_count_one]
   exact Nat.card_congr (Equiv.subtypeUnivEquiv fun _ => Formula.realize_top.mpr trivial)
@@ -133,7 +133,7 @@ noncomputable def pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T
 
 /-- A pulled-back polynomial term has, at the instance, the value of the
 original term at the interpreted structure. -/
-theorem eval_pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T d)
+private theorem eval_pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T d)
     (A : Type) [L₁.Structure A] [LinearOrder A] (p : PolyTerm L₂) :
     (p.pull I).eval A =
       (letI := I.mapRelLinearOrder A; p.eval (I.MapRel A)) := by
@@ -233,7 +233,7 @@ noncomputable def pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T
 
 /-- A pulled-back post-processing term has, at the instance, the value of the
 original term at the interpreted structure. -/
-theorem eval_pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T d)
+private theorem eval_pull (I : RelFOInterpretation (L₁.sum Language.order) L₂ T d)
     (A : Type) [L₁.Structure A] [LinearOrder A] (c : ℕ) (s : PostTerm L₂) :
     (s.pull I).eval A c =
       (letI := I.mapRelLinearOrder A; s.eval (I.MapRel A) c) := by

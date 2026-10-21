@@ -8,6 +8,21 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawIxSeq
 import DescriptiveComplexity.Problems.Wide.DrawIxIGate
 public import DescriptiveComplexity.Problems.Wide.DrawInstRound
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawInstRound
+import all DescriptiveComplexity.Problems.Wide.DrawInstSeq
+import all DescriptiveComplexity.Problems.Wide.DrawIxIGate
+import all DescriptiveComplexity.Problems.Wide.DrawIxMat
+import all DescriptiveComplexity.Problems.Wide.DrawIxSeq
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunSeq
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # One round of a variable's loop at an arbitrary file
@@ -102,7 +117,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
 passes, the witness chain reads the VAL block, the branch dispatches – on
 the decoded tag or the default – the domain loop runs, and the conjoining
 exit lands at the next checkpoint. -/
-theorem ixIGateBlock_reachesIn_pos (hTest : ∀ u, Test u) (f : dt.CtlIx → A) :
+private theorem ixIGateBlock_reachesIn_pos (hTest : ∀ u, Test u) (f : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       ((wideRank (F.cell gtop) + 2 + ((ixRank F.le gtop - ixRank F.le gbot) * wG + 1) +
         wideRank (F.cell gbot)) + (1 + (1 +
@@ -216,7 +231,7 @@ include hrules hR hlin hix htop hbot hv hvi hwkSt
 so the file test fails and the block leaves through the failing exit – for
 an inner gate, the *next* checkpoint – with the fail store applied at the
 marker's symbol. -/
-theorem ixIGateBlock_reachesIn_neg {u : I}
+private theorem ixIGateBlock_reachesIn_neg {u : I}
     (hTest : ¬Test u) (f : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       ((wideRank (F.cell gtop) + 2 + ((ixRank F.le gtop - ixRank F.le gbot) * wG + 1) +
@@ -295,7 +310,7 @@ omit [Finite I] [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A
   [L.IsRelational] [L.Structure A] in
 /-- **A file test depends on the VAL register alone**: everything else it
 reads is the tape's permanent geometry. -/
-theorem ixIGTest_congr (zero one : A)
+private theorem ixIGTest_congr (zero one : A)
     {st st' : TapeSt dt A R P I}
     (hval : st.val = st'.val) (b : Fin dt.ko ⊕ Fin dt.ki) (u : I) :
     dt.ixIGTest F zero one st b u ↔ dt.ixIGTest F zero one st' b u := by
@@ -349,7 +364,7 @@ omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 level's test reads the VAL register (`igTest_congr`), its dispatched tag is
 that register's block value, and its two loops read their background at the
 working cell. -/
-theorem ixIGFs_congr_scratch {v : Univ A R P dt.KIx dt.dd → Prop}
+private theorem ixIGFs_congr_scratch {v : Univ A R P dt.KIx dt.dd → Prop}
     {stV stV' : TapeSt dt A R P I} (h : dt.ScratchEq stV stV')
     (hreg : ¬∃ u : I, v = F.cell u)
     (vi : dt.VarIx) (f₀ : dt.CtlIx → A) (n : ℕ) :
@@ -424,7 +439,7 @@ omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The inner fold's vector survives the inner gates**: no level's
 machinery – witness chain, domain loop, conjoining exit, fail store or
 entry reset – ever writes an accumulator. -/
-theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
     (jj : Fin dt.naDim) (n : ℕ) :
     dt.ixIGFs (elt := elt) F zero one hhas vi stV v f₀ n (dt.accC jj) = f₀ (dt.accC jj) := by
@@ -563,7 +578,7 @@ theorem ixIGFs_apply_accC (vi : dt.VarIx) (stV : TapeSt dt A R P I)
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round flag survives one atom's machinery**: no kind's exit control
 writes the two VAL-round gate flags. -/
-theorem ixKindExitCtl_apply_roundFlag {q : dt.CtlIx}
+private theorem ixKindExitCtl_apply_roundFlag {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (av : Fin dt.natMax) (st : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -769,7 +784,7 @@ theorem ixKindExitCtl_apply_roundFlag {q : dt.CtlIx}
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round flag survives the whole matrix**: what the branch checkpoint
 read, the fold checkpoint still reads. -/
-theorem ixMatFs_apply_roundFlag {q : dt.CtlIx}
+private theorem ixMatFs_apply_roundFlag {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (st : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -816,7 +831,7 @@ include hinj helt in
 /-- **One level's effect on a round flag**: its own polarity flag becomes
 “held at entry ∧ the level's verdict”; the other polarity's rides
 through. -/
-theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
+private theorem ctlBit_flag_ixIGFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
@@ -995,7 +1010,7 @@ include hinj helt in
 a round flag holds exactly when every quantified level of its polarity
 passes its gate – the file test, the one-hot witness at the dispatched
 tag, and the domain condition there. -/
-theorem ctlBit_flag_ixIGFs (hzo : zero ≠ one) {q : dt.CtlIx}
+private theorem ctlBit_flag_ixIGFs (hzo : zero ≠ one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
@@ -1141,7 +1156,7 @@ omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit state differs from its entry in SAV and TARGET
 alone** – the same fact as
 `DescriptiveComplexity.Draw.Data.matSt_fields`, through the branch. -/
-theorem ixRoundEndSt_fields (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixRoundEndSt_fields (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
     (dt.ixRoundEndSt (elt := elt) F zero one hhas vi stV v f₀).wk = stV.wk ∧
       (dt.ixRoundEndSt (elt := elt) F zero one hhas vi stV v f₀).mir = stV.mir ∧
@@ -1174,7 +1189,7 @@ theorem ixRoundEndSt_eq (vi : dt.VarIx) (stV : TapeSt dt A R P I)
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit state differs from its entry state in the two scratch
 registers alone** – `roundEndSt_eq` in the form the congruences take. -/
-theorem ixScratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeSt dt A R P I)
+private theorem ixScratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
     dt.ScratchEq (dt.ixRoundEndSt (elt := elt) F zero one hhas vi stV v f₀) stV := by
   rw [ixRoundEndSt_eq (F := F) (hhas := hhas) (elt := elt) (vi := vi) (stV := stV)
@@ -1280,7 +1295,7 @@ theorem ixRoundCtlT_eq_ixRoundCtl (hzo : zero ≠ one)
 
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The accumulators survive one whole round.** -/
-theorem ixRoundCtl_apply_accC {hzo : zero ≠ one} (vi : dt.VarIx)
+private theorem ixRoundCtl_apply_accC {hzo : zero ≠ one} (vi : dt.VarIx)
     (stV : TapeSt dt A R P I) (v : Univ A R P dt.KIx dt.dd → Prop)
     (sem : (∀ ℓ : Fin (dt.nIn vi), dt.ixIGPassP (elt := elt) F zero one vi stV ℓ) →
       ∀ a : Fin (dt.natOf vi), dt.IxKindSem (elt := elt) zero one vi stV (dt.kindOf vi a))
@@ -1301,7 +1316,7 @@ theorem ixRoundCtl_apply_accC {hzo : zero ≠ one} (vi : dt.VarIx)
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit reads the two flags off the inner gates' thread**:
 the matrix – run or skipped – never writes them. -/
-theorem ixRoundCtl_apply_roundFlag {q : dt.CtlIx}
+private theorem ixRoundCtl_apply_roundFlag {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC) {hzo : zero ≠ one}
     (vi : dt.VarIx) (stV : TapeSt dt A R P I)
     (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -1320,7 +1335,7 @@ theorem ixRoundCtl_apply_roundFlag {q : dt.CtlIx}
 omit [Finite I] [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A passing round's exit is the matrix thread**, at any proof of the
 pass – the branch's own derivation is proof-irrelevant. -/
-theorem ixRoundCtl_of_flags {hzo : zero ≠ one} (vi : dt.VarIx)
+private theorem ixRoundCtl_of_flags {hzo : zero ≠ one} (vi : dt.VarIx)
     (stV : TapeSt dt A R P I) (v : Univ A R P dt.KIx dt.dd → Prop)
     (sem : (∀ ℓ : Fin (dt.nIn vi), dt.ixIGPassP (elt := elt) F zero one vi stV ℓ) →
       ∀ a : Fin (dt.natOf vi), dt.IxKindSem (elt := elt) zero one vi stV (dt.kindOf vi a))
@@ -1387,7 +1402,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt hgap
 `DescriptiveComplexity.Draw.Data.ixIGs_run` with the levels counted – one
 level's width, its dispatch and the step back per level, and one step to
 leave. -/
-theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
+private theorem ixIGs_reachesIn (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       ((dt.ixGateCost A w wP + 2) * dt.nIn vi + 1)
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
@@ -1520,7 +1535,7 @@ the marker, through every level – the file test, and either the dispatch,
 domain loop and conjoining exit, or the continuing fail – to the round's
 branch checkpoint one cell to the marker's right, the two flags spelled by
 the thread. -/
-theorem ixIGs_run (f₀ : dt.CtlIx → A) :
+private theorem ixIGs_run (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell Slot.val
@@ -1612,7 +1627,7 @@ continuing – the branch checkpoint on the two flags, the matrix pass on
 the passing branch, and the walk-back at the fold checkpoint. No semantic
 hypothesis: the levels' outcomes and the branch are decided classically,
 so the round runs at **every** VAL content the loop enumerates. -/
-theorem ixRound_reachesIn (stV : TapeSt dt A R P I)
+private theorem ixRound_reachesIn (stV : TapeSt dt A R P I)
     (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
     (hbotV : stV.bot = fun r => r = (fun _ => False))
     (hsavV : stV.sav = ixMark elt v) (htgtV : stV.tgt = ixMark elt v)
@@ -1822,7 +1837,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP hgap hord htop hbot hwork hv h
 assumed, so it applies at every address of the outer sweep. The tape ends
 in `DescriptiveComplexity.Draw.Data.roundEndSt`, which is the entry state
 unless the round's matrix ran and contained a stage atom. -/
-theorem ixRound_run_thread_reachesIn (stV : TapeSt dt A R P I)
+private theorem ixRound_run_thread_reachesIn (stV : TapeSt dt A R P I)
     (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = ixMark elt v)
     (hbotV : stV.bot = fun r => r = (fun _ => False))
     (sem : (∀ ℓ : Fin (dt.nIn vi),

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.OccurrenceFormulas
 public import Mathlib.Data.Set.Finite.Lemmas
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # The occurrences of a variable, cyclically ordered
@@ -67,13 +68,13 @@ theorem VarNext.occIn_left {x c c' : A} {s t : Bool} (h : VarNext x c s c' t) :
   rcases h with h | ⟨h, -⟩
   exacts [h.1, h.1]
 
-theorem VarNext.occIn_right {x c c' : A} {s t : Bool} (h : VarNext x c s c' t) :
+private theorem VarNext.occIn_right {x c c' : A} {s t : Bool} (h : VarNext x c s c' t) :
     OccIn c' x t := by
   rcases h with h | ⟨-, h⟩
   exacts [h.2.1, h.1]
 
 /-- The first occurrence of a variable is unique. -/
-theorem varMin_unique {x c c' : A} {s t : Bool} (h : VarMin x c s) (h' : VarMin x c' t) :
+private theorem varMin_unique {x c c' : A} {s t : Bool} (h : VarMin x c s) (h' : VarMin x c' t) :
     c = c' ∧ s = t := by
   rcases occLt_trichotomy c s c' t with hlt | ⟨hc, hs⟩ | hlt
   · exact absurd hlt (h'.2 c s h.1)
@@ -81,7 +82,7 @@ theorem varMin_unique {x c c' : A} {s t : Bool} (h : VarMin x c s) (h' : VarMin 
   · exact absurd hlt (h.2 c' t h'.1)
 
 /-- The last occurrence of a variable is unique. -/
-theorem varMax_unique {x c c' : A} {s t : Bool} (h : VarMax x c s) (h' : VarMax x c' t) :
+private theorem varMax_unique {x c c' : A} {s t : Bool} (h : VarMax x c s) (h' : VarMax x c' t) :
     c = c' ∧ s = t := by
   rcases occLt_trichotomy c s c' t with hlt | ⟨hc, hs⟩ | hlt
   · exact absurd hlt (h.2 c' t h'.1)
@@ -89,7 +90,7 @@ theorem varMax_unique {x c c' : A} {s t : Bool} (h : VarMax x c s) (h' : VarMax 
   · exact absurd hlt (h'.2 c s h.1)
 
 /-- The immediate successor is unique. -/
-theorem varStep_right_unique {x c c₁ c₂ : A} {s t₁ t₂ : Bool} (h₁ : VarStep x c s c₁ t₁)
+private theorem varStep_right_unique {x c c₁ c₂ : A} {s t₁ t₂ : Bool} (h₁ : VarStep x c s c₁ t₁)
     (h₂ : VarStep x c s c₂ t₂) : c₁ = c₂ ∧ t₁ = t₂ := by
   rcases occLt_trichotomy c₁ t₁ c₂ t₂ with hlt | ⟨hc, ht⟩ | hlt
   · exact absurd ⟨h₁.2.2.1, hlt⟩ (h₂.2.2.2 c₁ t₁ h₁.2.1)
@@ -97,7 +98,7 @@ theorem varStep_right_unique {x c c₁ c₂ : A} {s t₁ t₂ : Bool} (h₁ : Va
   · exact absurd ⟨h₂.2.2.1, hlt⟩ (h₁.2.2.2 c₂ t₂ h₂.2.1)
 
 /-- The immediate predecessor is unique. -/
-theorem varStep_left_unique {x c₁ c₂ c' : A} {s₁ s₂ t : Bool} (h₁ : VarStep x c₁ s₁ c' t)
+private theorem varStep_left_unique {x c₁ c₂ c' : A} {s₁ s₂ t : Bool} (h₁ : VarStep x c₁ s₁ c' t)
     (h₂ : VarStep x c₂ s₂ c' t) : c₁ = c₂ ∧ s₁ = s₂ := by
   rcases occLt_trichotomy c₁ s₁ c₂ s₂ with hlt | ⟨hc, hs⟩ | hlt
   · exact absurd ⟨hlt, h₂.2.2.1⟩ (h₁.2.2.2 c₂ s₂ h₂.1)
@@ -108,7 +109,7 @@ variable [Finite A]
 
 /-- A nonempty set of occurrences of a variable has an `occLt`-least
 element. -/
-theorem exists_minOccP {x : A} {P : A → Bool → Prop} (h : ∃ c s, OccIn c x s ∧ P c s) :
+private theorem exists_minOccP {x : A} {P : A → Bool → Prop} (h : ∃ c s, OccIn c x s ∧ P c s) :
     ∃ c s, OccIn c x s ∧ P c s ∧ ∀ c' t, OccIn c' x t → P c' t → ¬occLt c' t c s := by
   obtain ⟨c₀, hc₀, hmin⟩ :=
     Set.exists_min_image {c : A | ∃ s, OccIn c x s ∧ P c s} id (Set.toFinite _)
@@ -135,7 +136,7 @@ theorem exists_minOccP {x : A} {P : A → Bool → Prop} (h : ∃ c s, OccIn c x
       exact h0 ⟨hct, hPt⟩
 
 /-- A variable with an occurrence has a first one. -/
-theorem exists_varMin {x : A} (h : ∃ c s, OccIn c x s) : ∃ c s, VarMin x c s := by
+private theorem exists_varMin {x : A} (h : ∃ c s, OccIn c x s) : ∃ c s, VarMin x c s := by
   obtain ⟨c₀, hc₀, hmin⟩ :=
     Set.exists_min_image {c : A | ∃ s, OccIn c x s} id (Set.toFinite _)
       (by obtain ⟨c, s, hcs⟩ := h; exact ⟨c, s, hcs⟩)
@@ -160,7 +161,7 @@ theorem exists_varMin {x : A} (h : ∃ c s, OccIn c x s) : ∃ c s, VarMin x c s
       exact h0 (ht ▸ hct)
 
 /-- A variable with an occurrence has a last one. -/
-theorem exists_varMax {x : A} (h : ∃ c s, OccIn c x s) : ∃ c s, VarMax x c s := by
+private theorem exists_varMax {x : A} (h : ∃ c s, OccIn c x s) : ∃ c s, VarMax x c s := by
   obtain ⟨c₀, hc₀, hmax⟩ :=
     Set.exists_max_image {c : A | ∃ s, OccIn c x s} id (Set.toFinite _)
       (by obtain ⟨c, s, hcs⟩ := h; exact ⟨c, s, hcs⟩)
@@ -185,7 +186,7 @@ theorem exists_varMax {x : A} (h : ∃ c s, OccIn c x s) : ∃ c s, VarMax x c s
       exact h1 (ht ▸ hct)
 
 /-- An occurrence with a later one has an immediate successor. -/
-theorem exists_varStep_right {x c : A} {s : Bool} (hx : OccIn c x s)
+private theorem exists_varStep_right {x c : A} {s : Bool} (hx : OccIn c x s)
     (hne : ∃ c' t, OccIn c' x t ∧ occLt c s c' t) : ∃ c' t, VarStep x c s c' t := by
   obtain ⟨c₀, hc₀, hmin⟩ :=
     Set.exists_min_image {c' : A | ∃ t, OccIn c' x t ∧ occLt c s c' t} id (Set.toFinite _)
@@ -212,7 +213,7 @@ theorem exists_varStep_right {x c : A} {s : Bool} (hx : OccIn c x s)
       exact h0 ⟨hc'', hlt₁⟩
 
 /-- An occurrence with an earlier one has an immediate predecessor. -/
-theorem exists_varStep_left {x c' : A} {t : Bool} (hx : OccIn c' x t)
+private theorem exists_varStep_left {x c' : A} {t : Bool} (hx : OccIn c' x t)
     (hne : ∃ c s, OccIn c x s ∧ occLt c s c' t) : ∃ c s, VarStep x c s c' t := by
   obtain ⟨c₀, hc₀, hmax⟩ :=
     Set.exists_max_image {c : A | ∃ s, OccIn c x s ∧ occLt c s c' t} id (Set.toFinite _)
@@ -240,7 +241,7 @@ theorem exists_varStep_left {x c' : A} {t : Bool} (hx : OccIn c' x t)
 
 /-- **Every occurrence has a cyclic successor**: the next one, or the first
 one when it is the last. -/
-theorem exists_varNext {x c : A} {s : Bool} (hx : OccIn c x s) :
+private theorem exists_varNext {x c : A} {s : Bool} (hx : OccIn c x s) :
     ∃ c' t, VarNext x c s c' t := by
   by_cases hlast : ∃ c' t, OccIn c' x t ∧ occLt c s c' t
   · obtain ⟨c', t, hstep⟩ := exists_varStep_right hx hlast
@@ -249,7 +250,7 @@ theorem exists_varNext {x c : A} {s : Bool} (hx : OccIn c x s) :
     exact ⟨c', t, Or.inr ⟨⟨hx, fun c'' u hc'' hlt => hlast ⟨c'', u, hc'', hlt⟩⟩, hmin⟩⟩
 
 /-- **Every occurrence has a cyclic predecessor**. -/
-theorem exists_varPrev {x c' : A} {t : Bool} (hx : OccIn c' x t) :
+private theorem exists_varPrev {x c' : A} {t : Bool} (hx : OccIn c' x t) :
     ∃ c s, VarNext x c s c' t := by
   by_cases hfirst : ∃ c s, OccIn c x s ∧ occLt c s c' t
   · obtain ⟨c, s, hstep⟩ := exists_varStep_left hx hfirst
@@ -259,7 +260,7 @@ theorem exists_varPrev {x c' : A} {t : Bool} (hx : OccIn c' x t) :
 
 omit [Finite A] in
 /-- The cyclic successor is unique. -/
-theorem varNext_right_unique {x c c₁ c₂ : A} {s t₁ t₂ : Bool} (h₁ : VarNext x c s c₁ t₁)
+private theorem varNext_right_unique {x c c₁ c₂ : A} {s t₁ t₂ : Bool} (h₁ : VarNext x c s c₁ t₁)
     (h₂ : VarNext x c s c₂ t₂) : c₁ = c₂ ∧ t₁ = t₂ := by
   rcases h₁ with h₁ | ⟨hmax₁, hmin₁⟩ <;> rcases h₂ with h₂ | ⟨hmax₂, hmin₂⟩
   · exact varStep_right_unique h₁ h₂
@@ -269,7 +270,7 @@ theorem varNext_right_unique {x c c₁ c₂ : A} {s t₁ t₂ : Bool} (h₁ : Va
 
 omit [Finite A] in
 /-- The cyclic predecessor is unique. -/
-theorem varNext_left_unique {x c₁ c₂ c' : A} {s₁ s₂ t : Bool} (h₁ : VarNext x c₁ s₁ c' t)
+private theorem varNext_left_unique {x c₁ c₂ c' : A} {s₁ s₂ t : Bool} (h₁ : VarNext x c₁ s₁ c' t)
     (h₂ : VarNext x c₂ s₂ c' t) : c₁ = c₂ ∧ s₁ = s₂ := by
   rcases h₁ with h₁ | ⟨hmax₁, hmin₁⟩ <;> rcases h₂ with h₂ | ⟨hmax₂, hmin₂⟩
   · exact varStep_left_unique h₁ h₂

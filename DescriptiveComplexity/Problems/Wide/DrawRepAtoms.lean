@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawAtoms
 import DescriptiveComplexity.Exponential.Block
+import all DescriptiveComplexity.Problems.Wide.DrawAtoms
 
 /-!
 # The atoms of a defining sentence, classified
@@ -81,7 +82,7 @@ def blkAtom? : ∀ {n : ℕ},
   | _, .all _ => none
 
 /-- **Every atom of a matrix classifies.** -/
-theorem isSome_blkAtom?_of_mem_qfAtoms :
+private theorem isSome_blkAtom?_of_mem_qfAtoms :
     ∀ {n : ℕ}
       (ψ φ : ((L.sum Language.order).sum B.lang).BoundedFormula Empty n),
       φ ∈ qfAtoms ψ → (blkAtom? φ).isSome := by
@@ -159,7 +160,7 @@ def BlkAtom.holds (ρ : B.Assignment A) {n : ℕ} (w : Fin n → A) :
 
 /-- **The reading is correct**: a classified atom realizes at a valuation
 of the prefix exactly as its kind says. -/
-theorem realize_blkAtom (ρ : B.Assignment A) {n : ℕ}
+private theorem realize_blkAtom (ρ : B.Assignment A) {n : ℕ}
     {φ : ((L.sum Language.order).sum B.lang).BoundedFormula Empty n}
     {κ : BlkAtom L B n} (h : blkAtom? φ = some κ) (w : Fin n → A) :
     (@BoundedFormula.Realize _ A
@@ -206,7 +207,7 @@ theorem exists_blkA_of_isBlkAtom {n : ℕ}
     · exact ⟨b.1, _, rfl⟩
 
 /-- The converse test: a classified block atom passes the syntactic one. -/
-theorem isBlkAtom_of_blkA {n : ℕ}
+private theorem isBlkAtom_of_blkA {n : ℕ}
     {φ : ((L.sum Language.order).sum B.lang).BoundedFormula Empty n}
     {i : B.ι} {ts : Fin (B.arity i) → Fin n}
     (h : blkAtom? φ = some (.blkA i ts)) : isBlkAtom φ = true := by

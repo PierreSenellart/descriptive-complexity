@@ -6,6 +6,13 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Leaf
+import all DescriptiveComplexity.Problems.Qsat.Leaf
+import all DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Parts
+import all DescriptiveComplexity.Problems.Qsat.Peel
+import all DescriptiveComplexity.Problems.Qsat.Prefix
+import all DescriptiveComplexity.Problems.Qsat.Reach
+import all DescriptiveComplexity.Savitch
 
 /-!
 # One level of the recursion
@@ -88,7 +95,7 @@ omit [Finite A] [Nonempty A] in
     stZ (qOver (QBlk (tB ℓ)) τ ν) ℓ' = stZ τ ℓ' := by
   funext a; exact propext (readout_out τ ν (by simp [tB]))
 
-theorem bitB_over_tB_ne (τ ν : QM A → Prop) {ℓ ℓ' : A} (h : ℓ' ≠ ℓ) :
+private theorem bitB_over_tB_ne (τ ν : QM A → Prop) {ℓ ℓ' : A} (h : ℓ' ≠ ℓ) :
     bitB (qOver (QBlk (tB ℓ)) τ ν) ℓ' ↔ bitB τ ℓ' :=
   readout_out τ ν (by simp [tB, h])
 
@@ -125,7 +132,7 @@ theorem stV_over_tUV_ne (τ ν : QM A → Prop) {ℓ ℓ' : A} (h : ℓ' ≠ ℓ
 def zVal (ℓ : A) (Z : A → Prop) : QM A → Prop := fun y => ∃ a : A, y = qVar .sZ ℓ a ∧ Z a
 
 /-- The assignment of a universal-bit block. -/
-def bVal (ℓ : A) (β : Prop) : QM A → Prop := fun y => y = qVar .sB ℓ (qBot A) ∧ β
+private def bVal (ℓ : A) (β : Prop) : QM A → Prop := fun y => y = qVar .sB ℓ (qBot A) ∧ β
 
 /-- The assignment of a pair block. -/
 def uvVal (ℓ : A) (U V : A → Prop) : QM A → Prop := fun y =>
@@ -137,7 +144,7 @@ theorem stZ_over_zVal (τ : QM A → Prop) {ℓ : A} (hℓ : IsSV ℓ) (Z : A �
   refine (readout_in (v := .sZ) τ _ ⟨hℓ, ha⟩ (by simp [tZ])).trans ?_
   refine ⟨fun ⟨a', he, hz⟩ => (qVar_inj he).2.2 ▸ hz, fun hz => ⟨a, rfl, hz⟩⟩
 
-theorem bitB_over_bVal (τ : QM A → Prop) {ℓ : A} (hℓ : IsSV ℓ) (β : Prop) :
+private theorem bitB_over_bVal (τ : QM A → Prop) {ℓ : A} (hℓ : IsSV ℓ) (β : Prop) :
     bitB (qOver (QBlk (tB ℓ)) τ (bVal ℓ β)) ℓ ↔ β := by
   refine (readout_in (v := .sB) τ _ ⟨hℓ, isBot_qBot A⟩ (by simp [tB])).trans ?_
   exact ⟨fun h => h.2, fun h => ⟨rfl, h⟩⟩
@@ -175,22 +182,22 @@ open Classical in
 noncomputable def inSnd (ℓ : A) (τ : QM A → Prop) : A → Prop :=
   if h : ∃ d : A, IsPredSV d ℓ then stV τ h.choose else stT τ
 
-theorem inFst_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) (τ : QM A → Prop) : inFst ℓ τ = stS τ := by
+private theorem inFst_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) (τ : QM A → Prop) : inFst ℓ τ = stS τ := by
   rw [inFst, dite_eq_right]
   rintro ⟨d, hd⟩
   exact hd.not_isMinSV h
 
-theorem inSnd_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) (τ : QM A → Prop) : inSnd ℓ τ = stT τ := by
+private theorem inSnd_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) (τ : QM A → Prop) : inSnd ℓ τ = stT τ := by
   rw [inSnd, dite_eq_right]
   rintro ⟨d, hd⟩
   exact hd.not_isMinSV h
 
-theorem inFst_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) (τ : QM A → Prop) :
+private theorem inFst_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) (τ : QM A → Prop) :
     inFst ℓ τ = stU τ d := by
   have hex : ∃ d : A, IsPredSV d ℓ := ⟨d, h⟩
   rw [inFst, dite_eq_left hex, isPredSV_unique hex.choose_spec h]
 
-theorem inSnd_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) (τ : QM A → Prop) :
+private theorem inSnd_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) (τ : QM A → Prop) :
     inSnd ℓ τ = stV τ d := by
   have hex : ∃ d : A, IsPredSV d ℓ := ⟨d, h⟩
   rw [inSnd, dite_eq_left hex, isPredSV_unique hex.choose_spec h]
@@ -203,7 +210,7 @@ def LevBelow (ℓ : A) (τ : QM A → Prop) : Prop :=
 def LevUpto (ℓ : A) (τ : QM A → Prop) : Prop :=
   ∀ (b w s : Bool) (ℓ'' x : A), IsSV ℓ'' → ℓ'' ≤ ℓ → IsSV x → LevSat τ b w s ℓ'' x
 
-theorem levUpto_iff {ℓ : A} (hℓ : IsSV ℓ) (τ : QM A → Prop) :
+private theorem levUpto_iff {ℓ : A} (hℓ : IsSV ℓ) (τ : QM A → Prop) :
     LevUpto ℓ τ ↔ LevBelow ℓ τ ∧ ∀ (b w s : Bool) (x : A), IsSV x → LevSat τ b w s ℓ x := by
   constructor
   · exact fun h => ⟨fun b w s ℓ'' x hl hlt hx => h b w s ℓ'' x hl hlt.le hx,
@@ -214,7 +221,7 @@ theorem levUpto_iff {ℓ : A} (hℓ : IsSV ℓ) (τ : QM A → Prop) :
     · exact heq ▸ h2 b w s x hx
 
 /-- The input value a level clause compares its own component to. -/
-theorem levIn_fst_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) (s : Bool) :
+private theorem levIn_fst_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) (s : Bool) :
     ((IsMinSV ℓ ∧ (stS σ x ↔ s = true)) ∨
         (∃ d : A, IsPredSV d ℓ ∧ (stU σ d x ↔ s = true))) ↔ (inFst ℓ σ x ↔ s = true) := by
   by_cases hmin : IsMinSV ℓ
@@ -232,7 +239,7 @@ theorem levIn_fst_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) (
       · rwa [isPredSV_unique hd' hd] at hu
     · exact fun h => Or.inr ⟨d, hd, h⟩
 
-theorem levIn_snd_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) (s : Bool) :
+private theorem levIn_snd_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) (s : Bool) :
     ((IsMinSV ℓ ∧ (stT σ x ↔ s = true)) ∨
         (∃ d : A, IsPredSV d ℓ ∧ (stV σ d x ↔ s = true))) ↔ (inSnd ℓ σ x ↔ s = true) := by
   by_cases hmin : IsMinSV ℓ
@@ -252,7 +259,7 @@ theorem levIn_snd_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) (
 
 /-- **A level clause, spelled out**: the polarity of the universal bit, the
 component of the pair it constrains, and the value that component must copy. -/
-theorem levSat_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (b w s : Bool) (x : A) :
+private theorem levSat_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (b w s : Bool) (x : A) :
     LevSat σ b w s ℓ x ↔
       ((bitB σ ℓ ↔ (!b) = true) ∨
         (((if w then stV σ ℓ x else stU σ ℓ x) ↔ (!s) = true) ∨
@@ -269,41 +276,41 @@ theorem levSat_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (b w s : Boo
     · rw [ite_eq_left (rfl : (true : Bool) = true), ite_eq_left (rfl : (true : Bool) = true)]
       exact levIn_fst_iff hℓ x s
 
-theorem levSat_tff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_tff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ true false false ℓ x ↔ (¬bitB σ ℓ ∨ stU σ ℓ x ∨ ¬inFst ℓ σ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_tft {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_tft {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ true false true ℓ x ↔ (¬bitB σ ℓ ∨ ¬stU σ ℓ x ∨ inFst ℓ σ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_ttf {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_ttf {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ true true false ℓ x ↔ (¬bitB σ ℓ ∨ stV σ ℓ x ∨ ¬stZ σ ℓ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_ttt {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_ttt {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ true true true ℓ x ↔ (¬bitB σ ℓ ∨ ¬stV σ ℓ x ∨ stZ σ ℓ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_fff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_fff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ false false false ℓ x ↔ (bitB σ ℓ ∨ stU σ ℓ x ∨ ¬stZ σ ℓ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_fft {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_fft {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ false false true ℓ x ↔ (bitB σ ℓ ∨ ¬stU σ ℓ x ∨ stZ σ ℓ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_ftf {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_ftf {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ false true false ℓ x ↔ (bitB σ ℓ ∨ stV σ ℓ x ∨ ¬inSnd ℓ σ x) := by
   simp [levSat_iff hℓ]
 
-theorem levSat_ftt {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
+private theorem levSat_ftt {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) (x : A) :
     LevSat σ false true true ℓ x ↔ (bitB σ ℓ ∨ ¬stV σ ℓ x ∨ inSnd ℓ σ x) := by
   simp [levSat_iff hℓ]
 
 /-- **What the eight clauses of a level say**: the pair passed below is the first
 half of the level when its universal bit holds, the second half otherwise. -/
-theorem levSat_all_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) :
+private theorem levSat_all_iff {σ : QM A → Prop} {ℓ : A} (hℓ : IsSV ℓ) :
     (∀ (b w s : Bool) (x : A), IsSV x → LevSat σ b w s ℓ x) ↔
       ((bitB σ ℓ → ∀ x : A, IsSV x →
           ((stU σ ℓ x ↔ inFst ℓ σ x) ∧ (stV σ ℓ x ↔ stZ σ ℓ x))) ∧
@@ -361,7 +368,7 @@ level `ℓ`. -/
 def levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) : QM A → Prop :=
   qOver (QBlk (tUV ℓ)) (qOver (QBlk (tB ℓ)) (qOver (QBlk (tZ ℓ)) τ νZ) νB) νUV
 
-theorem levSat_congr {σ σ' : QM A → Prop} {ℓ'' : A}
+private theorem levSat_congr {σ σ' : QM A → Prop} {ℓ'' : A}
     (hs : stS σ = stS σ') (ht : stT σ = stT σ')
     (hz : stZ σ ℓ'' = stZ σ' ℓ'') (hb : bitB σ ℓ'' ↔ bitB σ' ℓ'')
     (hu : stU σ ℓ'' = stU σ' ℓ'') (hv : stV σ ℓ'' = stV σ' ℓ'')
@@ -398,11 +405,11 @@ theorem stV_levOver_ne (ℓ : A) (τ νZ νB νUV : QM A → Prop) {ℓ'' : A} (
     stV (levOver ℓ τ νZ νB νUV) ℓ'' = stV τ ℓ'' := by
   simp [levOver, stV_over_tUV_ne _ _ h]
 
-theorem bitB_levOver_ne (ℓ : A) (τ νZ νB νUV : QM A → Prop) {ℓ'' : A} (h : ℓ'' ≠ ℓ) :
+private theorem bitB_levOver_ne (ℓ : A) (τ νZ νB νUV : QM A → Prop) {ℓ'' : A} (h : ℓ'' ≠ ℓ) :
     bitB (levOver ℓ τ νZ νB νUV) ℓ'' ↔ bitB τ ℓ'' := by
   simp [levOver, bitB_over_tB_ne _ _ h]
 
-theorem inFst_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
+private theorem inFst_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
     inFst ℓ (levOver ℓ τ νZ νB νUV) = inFst ℓ τ := by
   by_cases hmin : IsMinSV ℓ
   · rw [inFst_of_isMinSV hmin, inFst_of_isMinSV hmin, stS_levOver]
@@ -411,7 +418,7 @@ theorem inFst_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
       rw [inFst_of_isPredSV hd, inFst_of_isPredSV hd, stU_levOver_ne ℓ τ νZ νB νUV hd.2.2.1.ne]
     · rw [inFst, inFst, dite_eq_right hex, dite_eq_right hex, stS_levOver]
 
-theorem inSnd_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
+private theorem inSnd_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
     inSnd ℓ (levOver ℓ τ νZ νB νUV) = inSnd ℓ τ := by
   by_cases hmin : IsMinSV ℓ
   · rw [inSnd_of_isMinSV hmin, inSnd_of_isMinSV hmin, stT_levOver]
@@ -421,7 +428,7 @@ theorem inSnd_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
     · rw [inSnd, inSnd, dite_eq_right hex, dite_eq_right hex, stT_levOver]
 
 /-- **The three blocks of a level leave the levels above it alone.** -/
-theorem levBelow_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
+private theorem levBelow_levOver (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
     LevBelow ℓ (levOver ℓ τ νZ νB νUV) ↔ LevBelow ℓ τ := by
   have key : ∀ (ℓ'' : A), ℓ'' < ℓ → ∀ (b w s : Bool) (x : A),
       LevSat (levOver ℓ τ νZ νB νUV) b w s ℓ'' x ↔ LevSat τ b w s ℓ'' x := by
@@ -440,7 +447,7 @@ theorem levOver_eq (ℓ : A) (τ νZ νB νUV : QM A → Prop) :
     qOver (QBlk (tUV ℓ)) (qOver (QBlk (tB ℓ)) (qOver (QBlk (tZ ℓ)) τ νZ) νB) νUV
       = levOver ℓ τ νZ νB νUV := rfl
 
-theorem bitB_levOver_bVal {ℓ : A} (hℓ : IsSV ℓ) (τ νZ νUV : QM A → Prop) (β : Prop) :
+private theorem bitB_levOver_bVal {ℓ : A} (hℓ : IsSV ℓ) (τ νZ νUV : QM A → Prop) (β : Prop) :
     bitB (levOver ℓ τ νZ (bVal ℓ β) νUV) ℓ ↔ β := by
   rw [levOver, bitB_over_tUV]
   exact bitB_over_bVal _ hℓ β
@@ -526,12 +533,12 @@ theorem game_step {ℓ : A} (hℓ : IsSV ℓ) {k : ℕ} {nxt : ℕ × A × ℕ}
 
 /-! ### Down the levels -/
 
-theorem levPart_iff_levUpto {σ : QM A → Prop} {ℓ : A} (hmax : IsMaxSV ℓ) :
+private theorem levPart_iff_levUpto {σ : QM A → Prop} {ℓ : A} (hmax : IsMaxSV ℓ) :
     LevPart σ ↔ LevUpto ℓ σ :=
   ⟨fun h b w s ℓ'' x hl _ hx => h b w s ℓ'' x hl hx,
     fun h b w s ℓ'' x hl hx => h b w s ℓ'' x hl (hmax.le hl) hx⟩
 
-theorem levBelow_iff_levUpto {σ : QM A → Prop} {ℓ ℓ' : A} (hpred : IsPredSV ℓ ℓ') :
+private theorem levBelow_iff_levUpto {σ : QM A → Prop} {ℓ ℓ' : A} (hpred : IsPredSV ℓ ℓ') :
     LevBelow ℓ' σ ↔ LevUpto ℓ σ := by
   constructor
   · exact fun h b w s ℓ'' x hl hle hx => h b w s ℓ'' x hl (lt_of_le_of_lt hle hpred.2.2.1) hx

@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.TransitiveClosure
 import DescriptiveComplexity.SecondOrderKrom
 public import DescriptiveComplexity.LogSpace
+import all DescriptiveComplexity.LogSpace
 
 /-!
 # From FO(TC) to the Krom fragment, through the complement
@@ -97,7 +98,7 @@ noncomputable def allModes : List spec.Mode :=
   (Finset.univ : Finset spec.Mode).toList
 
 open Classical in
-theorem mem_allModes (m : spec.Mode) : m ∈ allModes spec := by
+private theorem mem_allModes (m : spec.Mode) : m ∈ allModes spec := by
   let : Fintype spec.Mode := Fintype.ofFinite spec.Mode
   exact Finset.mem_toList.mpr (Finset.mem_univ m)
 
@@ -132,21 +133,21 @@ noncomputable def program :
     (allModes spec).flatMap (fun p => (allModes spec).map (stepClause spec p)) ++
     (allModes spec).map (srcClause spec)
 
-theorem tgtClause_mem (m : spec.Mode) : tgtClause spec m ∈ program spec := by
+private theorem tgtClause_mem (m : spec.Mode) : tgtClause spec m ∈ program spec := by
   refine List.mem_append.mpr (Or.inl (List.mem_append.mpr (Or.inl ?_)))
   exact List.mem_map.mpr ⟨m, mem_allModes spec m, rfl⟩
 
-theorem stepClause_mem (p q : spec.Mode) : stepClause spec p q ∈ program spec := by
+private theorem stepClause_mem (p q : spec.Mode) : stepClause spec p q ∈ program spec := by
   refine List.mem_append.mpr (Or.inl (List.mem_append.mpr (Or.inr ?_)))
   exact List.mem_flatMap.mpr ⟨p, mem_allModes spec p,
     List.mem_map.mpr ⟨q, mem_allModes spec q, rfl⟩⟩
 
-theorem srcClause_mem (m : spec.Mode) : srcClause spec m ∈ program spec := by
+private theorem srcClause_mem (m : spec.Mode) : srcClause spec m ∈ program spec := by
   refine List.mem_append.mpr (Or.inr ?_)
   exact List.mem_map.mpr ⟨m, mem_allModes spec m, rfl⟩
 
 /-- The clauses of the program are exactly the three families. -/
-theorem mem_program_iff
+private theorem mem_program_iff
     {c : KromClause (L.sum Language.order) (uBlock spec) (spec.k + spec.k)} :
     c ∈ program spec ↔
       (∃ m, c = tgtClause spec m) ∨ (∃ p q, c = stepClause spec p q) ∨
@@ -202,17 +203,17 @@ theorem uLit_holds_false (ρ : (uBlock spec).Assignment A) (m : spec.Mode)
     (uLit spec m half false).Holds ρ v ↔ ¬URel spec ρ (m, fun j => v (half j)) :=
   Iff.rfl
 
-theorem realize_tgt_relabel (m : spec.Mode) (v : Fin (spec.k + spec.k) → A) :
+private theorem realize_tgt_relabel (m : spec.Mode) (v : Fin (spec.k + spec.k) → A) :
     ((spec.tgt m).relabel (fst spec.k)).Realize v ↔
       spec.IsTgt (m, fun j => v (fst spec.k j)) :=
   Formula.realize_relabel
 
-theorem realize_src_relabel (m : spec.Mode) (v : Fin (spec.k + spec.k) → A) :
+private theorem realize_src_relabel (m : spec.Mode) (v : Fin (spec.k + spec.k) → A) :
     ((spec.src m).relabel (fst spec.k)).Realize v ↔
       spec.IsSrc (m, fun j => v (fst spec.k j)) :=
   Formula.realize_relabel
 
-theorem realize_step_relabel (p q : spec.Mode) (v : Fin (spec.k + spec.k) → A) :
+private theorem realize_step_relabel (p q : spec.Mode) (v : Fin (spec.k + spec.k) → A) :
     ((spec.step p q).relabel (Sum.elim (fst spec.k) (snd spec.k))).Realize v ↔
       spec.Step (p, fun j => v (fst spec.k j)) (q, fun j => v (snd spec.k j)) := by
   rw [Formula.realize_relabel, TCSpec.Step]
@@ -222,7 +223,7 @@ theorem realize_step_relabel (p q : spec.Mode) (v : Fin (spec.k + spec.k) → A)
 /-- What it means for an assignment to satisfy the program: the guessed set
 contains the accepting nodes, is closed under predecessors, and avoids the
 starting nodes. -/
-theorem program_holds_iff (ρ : (uBlock spec).Assignment A) :
+private theorem program_holds_iff (ρ : (uBlock spec).Assignment A) :
     (program spec).Holds ρ ↔
       (∀ a : spec.Node A, spec.IsTgt a → URel spec ρ a) ∧
       (∀ a b : spec.Node A, spec.Step a b → URel spec ρ b → URel spec ρ a) ∧
@@ -299,7 +300,7 @@ theorem uRel_coReachAssign (a : spec.Node A) :
 
 /-- A set containing the accepting nodes and closed under predecessors contains
 every node from which an accepting node is reachable. -/
-theorem uRel_of_reach {ρ : (uBlock spec).Assignment A}
+private theorem uRel_of_reach {ρ : (uBlock spec).Assignment A}
     (h2 : ∀ a b : spec.Node A, spec.Step a b → URel spec ρ b → URel spec ρ a)
     {a b : spec.Node A} (h : spec.Reach a b) : URel spec ρ b → URel spec ρ a := by
   induction h with
@@ -308,7 +309,7 @@ theorem uRel_of_reach {ρ : (uBlock spec).Assignment A}
 
 /-- **Correctness**: the program is satisfiable exactly when the structure is
 *not* accepted. -/
-theorem exists_holds_iff_not_accepts :
+private theorem exists_holds_iff_not_accepts :
     (∃ ρ : (uBlock spec).Assignment A, (program spec).Holds ρ) ↔ ¬spec.Accepts A := by
   constructor
   · rintro ⟨ρ, hρ⟩ ⟨u, v, hu, hv, huv⟩
@@ -343,7 +344,8 @@ theorem SigmaSOKromDefinable.compl_of_tcDefinable {L : Language.{0, 0}}
   exact (not_congr (hspec A)).trans (exists_holds_iff_not_accepts spec).symm
 
 /-- **The complement of an FO(TC) definable problem is in NL.** -/
-theorem mem_NL_compl_of_tcDefinable {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
+theorem mem_NL_compl_of_tcDefinable
+    {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : TCDefinable P) : Pᶜ ∈ NL :=
   (mem_NL_iff Pᶜ).mpr (SigmaSOKromDefinable.compl_of_tcDefinable h)
 

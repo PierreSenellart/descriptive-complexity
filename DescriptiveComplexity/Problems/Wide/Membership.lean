@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.Wide.Expansion
 public import DescriptiveComplexity.Exponential.Classes
 import DescriptiveComplexity.Problems.Machine
 import DescriptiveComplexity.Problems.Machine.Space
+import all DescriptiveComplexity.Exponential.AddrExp
+import all DescriptiveComplexity.Problems.Wide.Expansion
 
 /-!
 # The wide machines are members of the exponential classes
@@ -83,7 +85,7 @@ variable {A : Type} [Language.wide.Structure A] [LinearOrder A]
 /-- Reading a unary symbol of the expanded vocabulary at one point: the address
 expansion's own reading (`DescriptiveComplexity.AddrExp.realize_one`), at this
 expansion. -/
-theorem realize_one (rt : Language.turing.Relations 1) (φ : AddrExp.WTag → wide1.Sentence)
+private theorem realize_one (rt : Language.turing.Relations 1) (φ : AddrExp.WTag → wide1.Sentence)
     (h : ∀ τ : Fin 1 → wideExp.Tag, wideExp.relSentence rt τ = onS1 (φ (τ 0)))
     (x : wideExp.Map A) :
     letI := wideStructure A
@@ -92,7 +94,7 @@ theorem realize_one (rt : Language.turing.Relations 1) (φ : AddrExp.WTag → wi
   AddrExp.realize_one rt φ h x
 
 /-- Reading a binary symbol of the expanded vocabulary at two points. -/
-theorem realize_two (rt : Language.turing.Relations 2)
+private theorem realize_two (rt : Language.turing.Relations 2)
     (φ : AddrExp.WTag → AddrExp.WTag → wide2.Sentence)
     (h : ∀ τ : Fin 2 → wideExp.Tag, wideExp.relSentence rt τ = onS2 (φ (τ 0) (τ 1)))
     (x y : wideExp.Map A) :
@@ -103,7 +105,7 @@ theorem realize_two (rt : Language.turing.Relations 2)
   AddrExp.realize_two rt φ h x y
 
 /-- **The positions of the expanded machine are the addresses.** -/
-theorem relMap_posn (p : WPoint A) :
+private theorem relMap_posn (p : WPoint A) :
     letI := wideStructure A
     (RelMap tmPosn ![wideEmbed p] ↔ (wideData A).Posn p) := by
   let := wideStructure A
@@ -114,7 +116,7 @@ theorem relMap_posn (p : WPoint A) :
 
 /-- **A mark of the expanded machine is the corresponding mark of the
 instance**, carried by the control elements alone. -/
-theorem relMap_mark (rt : Language.turing.Relations 1) (r : Language.wide.Relations 1)
+private theorem relMap_mark (rt : Language.turing.Relations 1) (r : Language.wide.Relations 1)
     (h : ∀ τ : Fin 1 → wideExp.Tag, wideExp.relSentence rt τ = onS1 (markT r (τ 0)))
     (p : WPoint A) :
     letI := wideStructure A
@@ -129,7 +131,7 @@ theorem relMap_mark (rt : Language.turing.Relations 1) (r : Language.wide.Relati
 
 /-- **A binary attribute of the expanded machine is the corresponding attribute
 of the instance**, holding of control elements alone. -/
-theorem relMap_attr (rt : Language.turing.Relations 2) (r : Language.wide.Relations 2)
+private theorem relMap_attr (rt : Language.turing.Relations 2) (r : Language.wide.Relations 2)
     (h : ∀ τ : Fin 2 → wideExp.Tag, wideExp.relSentence rt τ = onS2 (binT r (τ 0) (τ 1)))
     (p q : WPoint A) :
     letI := wideStructure A
@@ -146,7 +148,7 @@ theorem relMap_attr (rt : Language.turing.Relations 2) (r : Language.wide.Relati
 
 /-- **The order of the expanded machine**: addresses in the binary-number order
 the instance's own order induces, then the control elements in that order. -/
-theorem relMap_le (p q : WPoint A) :
+private theorem relMap_le (p q : WPoint A) :
     letI := wideStructure A
     (RelMap tmLe ![wideEmbed p, wideEmbed q] ↔ (wideData A).Le p q) := by
   let := wideStructure A
@@ -161,7 +163,7 @@ theorem relMap_le (p q : WPoint A) :
 
 /-- **The initial tape of the expanded machine**: the address cutting the
 initial segment of an element holds that element's input symbol. -/
-theorem relMap_inp (p q : WPoint A) :
+private theorem relMap_inp (p q : WPoint A) :
     letI := wideStructure A
     (RelMap tmInp ![wideEmbed p, wideEmbed q] ↔ (wideData A).Inp p q) := by
   let := wideStructure A
@@ -212,7 +214,7 @@ open Wide
 
 /-- **The wide machine is the ordinary machine of the expansion**: acceptance of
 the one is acceptance of the other. -/
-theorem wideAccept_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
+private theorem wideAccept_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
     letI := wideStructure A
     (WideAccept A ↔ NTMAccept (wideExp.Map A)) := by
   let := wideStructure A
@@ -220,7 +222,8 @@ theorem wideAccept_iff_expansion (A : Type) [Language.wide.Structure A] [LinearO
   exact and_congr h.wellFormed h.accepts
 
 /-- The space-bounded version of `DescriptiveComplexity.wideAccept_iff_expansion`. -/
-theorem wideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
+private theorem wideAcceptSpace_iff_expansion
+    (A : Type) [Language.wide.Structure A] [LinearOrder A] :
     letI := wideStructure A
     (WideAcceptSpace A ↔ NTMAcceptSpace (wideExp.Map A)) := by
   let := wideStructure A
@@ -229,7 +232,8 @@ theorem wideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [Li
 
 /-- The deterministic space-bounded version of
 `DescriptiveComplexity.wideAccept_iff_expansion`. -/
-theorem dwideAcceptSpace_iff_expansion (A : Type) [Language.wide.Structure A] [LinearOrder A] :
+private theorem dwideAcceptSpace_iff_expansion
+    (A : Type) [Language.wide.Structure A] [LinearOrder A] :
     letI := wideStructure A
     (DWideAcceptSpace A ↔ DTMAcceptSpace (wideExp.Map A)) := by
   let := wideStructure A

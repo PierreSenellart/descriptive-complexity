@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Knapsack.Counting
 public import DescriptiveComplexity.Problems.Knapsack.Hardness
 public import DescriptiveComplexity.Problems.ExactCoverCounting
 import DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.Problems.ExactCoverCounting
+import all DescriptiveComplexity.Problems.Knapsack.Counting
+import all DescriptiveComplexity.Problems.Knapsack.Hardness
+import all DescriptiveComplexity.Problems.SetFamily.Counting
 
 /-!
 # #Knapsack is parsimoniously `#P`-complete
@@ -37,7 +41,7 @@ variable (A : Type) [Language.setSystem.Structure A] [LinearOrder A] [Finite A] 
 
 /-- **The solutions of the interpreted subset-sum instance are the exact covers
 of the set system**, bijectively. -/
-def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
+private def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
     {G : A → Prop // ExactCoverBy (SSElem (A := A)) SSFam SSMem G} ≃
       {S : kInterp.Map A → Prop // KnapsackSol (kInterp.Map A) S} where
   toFun G := ⟨itemsOf a₀ G.1, kInterp.map_finite A, isLinOrd_bwLe,
@@ -58,7 +62,7 @@ def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
       exact ⟨i.2 0, show S (kItem a₀ (i.2 0)) by rw [← hi]; exact h, hi⟩
 
 /-- **Correctness of the interpretation, for counting.** -/
-theorem sharpKnapsack_map : SharpKnapsack (kInterp.Map A) = SharpExactCover A := by
+private theorem sharpKnapsack_map : SharpKnapsack (kInterp.Map A) = SharpExactCover A := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   rw [sharpKnapsack_apply, sharpExactCover_apply]
   exact (Nat.card_congr (solEquiv A ha₀)).symm
@@ -67,7 +71,7 @@ end KnapRed
 
 open KnapRed in
 /-- **#ExactCover reduces parsimoniously to #Knapsack.** -/
-noncomputable def sharpExactCover_ordered_parsimonious_sharpKnapsack :
+private noncomputable def sharpExactCover_ordered_parsimonious_sharpKnapsack :
     SharpExactCover ≤ᵖ[≤] SharpKnapsack where
   Tag := KTag
   dim := 2

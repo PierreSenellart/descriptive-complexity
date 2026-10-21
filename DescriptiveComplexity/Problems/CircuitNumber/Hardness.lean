@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.CircuitNumber.Draw
 public import DescriptiveComplexity.Counting.DigitDefinable
+import all DescriptiveComplexity.Counting.DigitDefinable
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.CircuitNumber.Draw
 
 /-!
 # Every digit-definable function reduces to the number written by a circuit
@@ -50,19 +53,19 @@ section Pad
 
 variable {A : Type} {D m : ℕ}
 
-theorem pad_of_lt (a₀ : A) (w : Fin m → A) {j : Fin D} (hj : (j : ℕ) < m) :
+private theorem pad_of_lt (a₀ : A) (w : Fin m → A) {j : Fin D} (hj : (j : ℕ) < m) :
     pad a₀ w j = w ⟨j, hj⟩ := by
   rw [pad, dite_eq_left hj]
 
-theorem pad_of_le (a₀ : A) (w : Fin m → A) {j : Fin D} (hj : m ≤ (j : ℕ)) :
+private theorem pad_of_le (a₀ : A) (w : Fin m → A) {j : Fin D} (hj : m ≤ (j : ℕ)) :
     pad a₀ w j = a₀ := by
   rw [pad, dite_eq_right (not_lt.mpr hj)]
 
-theorem pad_castLE (a₀ : A) (h : m ≤ D) (w : Fin m → A) (j : Fin m) :
+private theorem pad_castLE (a₀ : A) (h : m ≤ D) (w : Fin m → A) (j : Fin m) :
     pad a₀ w (Fin.castLE h j) = w j :=
   congrFun (pref_pad a₀ h w) j
 
-theorem pad_injective (a₀ : A) (h : m ≤ D) :
+private theorem pad_injective (a₀ : A) (h : m ≤ D) :
     Function.Injective (pad (D := D) a₀ : (Fin m → A) → Fin D → A) := fun x y hxy => by
   rw [← pref_pad a₀ h x, ← pref_pad a₀ h y, hxy]
 
@@ -108,7 +111,7 @@ def Val (p : (drawInterp prog bit).Map A) : Prop :=
         Derives prog ⟨a.idx, fun q => p.2 (atomIdx a q)⟩
 
 /-- An atom read through a canonically padded occurrence. -/
-theorem pref_eq_of_padTup {a : SOAtom B k} {u w : Fin (clauseDim B k) → A}
+private theorem pref_eq_of_padTup {a : SOAtom B k} {u w : Fin (clauseDim B k) → A}
     (h : PadTup (atomIdx a) u w) :
     pref (arity_le_clauseDim (k := k) a.idx) w = fun q => u (atomIdx a q) :=
   funext fun q => h.2 (Fin.castLE (arity_le_clauseDim a.idx) q) q.isLt
@@ -244,7 +247,7 @@ variable {a₀ : A} {ℓ : ℕ}
 omit [L.Structure A] in
 /-- The lexicographic order does not depend on how the coordinates are
 numbered. -/
-theorem tupLeLex_cast {m : ℕ} (h : m = ℓ) (y x : Fin ℓ → A) :
+private theorem tupLeLex_cast {m : ℕ} (h : m = ℓ) (y x : Fin ℓ → A) :
     tupLeLex (fun k : Fin m => y (Fin.cast h k)) (fun k => x (Fin.cast h k)) ↔ tupLeLex y x := by
   subst h
   exact Iff.rfl
@@ -274,7 +277,7 @@ theorem bitPt_injective (a₀ : A) : Function.Injective (bitPt prog bit hℓ a�
   rw [this]
 
 /-- The output gates are the gates of the positions. -/
-theorem out_iff_bitPt (h₀ : IsBot a₀) (p : (drawInterp prog bit).Map A) :
+private theorem out_iff_bitPt (h₀ : IsBot a₀) (p : (drawInterp prog bit).Map A) :
     RelMap (M := (drawInterp prog bit).Map A) ncOut ![p] ↔ ∃ q, p = bitPt prog bit hℓ a₀ q := by
   obtain ⟨t, w⟩ := p
   rcases t with i | ⟨c', j⟩
@@ -293,7 +296,7 @@ theorem out_iff_bitPt (h₀ : IsBot a₀) (p : (drawInterp prog bit).Map A) :
     exact absurd (Prod.mk.inj hq).1 (by simp)
 
 /-- **An output gate holds the digit of its position.** -/
-theorem outBit_bitPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
+private theorem outBit_bitPt (h₀ : IsBot a₀) (q : Fin c ×ₗ Lex (Fin ℓ → A)) :
     OutBit (bitPt prog bit hℓ a₀ q) ↔
       lfpAssign prog (bit (ofLex q).1)
         fun k => ofLex (ofLex q).2 (Fin.cast (hℓ (ofLex q).1) k) := by
@@ -322,7 +325,7 @@ theorem below_bitPt (q' q : Fin c ×ₗ Lex (Fin ℓ → A)) :
 
 include hinj hℓ in
 /-- The outputs of the drawn circuit are linearly ordered. -/
-theorem outOrder_drawInterp (h₀ : IsBot a₀) : OutOrder ((drawInterp prog bit).Map A) :=
+private theorem outOrder_drawInterp (h₀ : IsBot a₀) : OutOrder ((drawInterp prog bit).Map A) :=
   enum_linear (fun x => RelMap (M := (drawInterp prog bit).Map A) ncOut ![x])
     (fun y x => RelMap (M := (drawInterp prog bit).Map A) ncBelow ![y, x])
     (bitPt prog bit hℓ a₀) (out_iff_bitPt hℓ h₀) (below_bitPt hinj hℓ)

@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawScan
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # ADVANCE: moving the working cell one address, mirror in tow
@@ -58,7 +64,7 @@ comes back to the marker. See the module docstring for the itinerary; the
 hypotheses are the rule families of the six phases visited and the slot
 equations of the three backgrounds (marker at `v`, marker nowhere, marker at
 `v'`). -/
-theorem reachesIn_fileAdvance (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileAdvance (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     -- the slots: walked mirror track, register mark, file-top mark, cell marker
     {t rg rl wk : W} (hnerg : t ≠ rg) (hnerl : rl ≠ t) (hnewk : wk ≠ t)

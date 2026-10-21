@@ -10,6 +10,10 @@ public import DescriptiveComplexity.Problems.ReachabilityDet
 import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.WalkBudget
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.DetLogSpace
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.WalkBudget
 
 /-!
 # UNREACHd, and `L = coL`
@@ -70,7 +74,7 @@ variable {A : Type} [Language.stGraph.Structure A]
 
 /-- The forced arcs are functional: that is the whole point of
 `DescriptiveComplexity.DetEdge`. -/
-theorem detEdge_unique {x y z : A} (hy : DetEdge x y) (hz : DetEdge x z) : y = z :=
+private theorem detEdge_unique {x y z : A} (hy : DetEdge x y) (hz : DetEdge x z) : y = z :=
   hz.2 y hy.1
 
 /-- A vertex is *stuck* when no arc out of it is forced: either it has no
@@ -83,12 +87,12 @@ read as an iterated function, `DescriptiveComplexity.stepNext`. Making it total 
 what lets reachability be read as iteration. -/
 noncomputable def detNext (x : A) : A := stepNext DetEdge x
 
-theorem detEdge_detNext {x : A} (h : ¬Stuck x) : DetEdge x (detNext x) :=
+private theorem detEdge_detNext {x : A} (h : ¬Stuck x) : DetEdge x (detNext x) :=
   step_stepNext (not_not.mp h)
 
-theorem detNext_eq_self {x : A} (h : Stuck x) : detNext x = x := stepNext_eq_self h
+private theorem detNext_eq_self {x : A} (h : Stuck x) : detNext x = x := stepNext_eq_self h
 
-theorem detNext_eq {x y : A} (h : DetEdge x y) : detNext x = y :=
+private theorem detNext_eq {x y : A} (h : DetEdge x y) : detNext x = y :=
   stepNext_eq (fun _ _ _ hv hw => detEdge_unique hv hw) h
 
 /-- **Reachability along forced arcs is iteration of the successor map.** -/
@@ -99,7 +103,7 @@ theorem reflTransGen_detEdge_iff_iterate (s t : A) :
 /-- **The step budget**: a vertex reachable along forced arcs is reachable in
 fewer steps than the universe has elements – the machine-free
 `DescriptiveComplexity.exists_iterate_lt_card`, read for the forced arcs. -/
-theorem exists_iterate_detNext_lt_card [Finite A] {s t : A} (h : ∃ n, detNext^[n] s = t) :
+private theorem exists_iterate_detNext_lt_card [Finite A] {s t : A} (h : ∃ n, detNext^[n] s = t) :
     ∃ n, n < Nat.card A ∧ detNext^[n] s = t :=
   exists_iterate_lt_card (R := DetEdge) h
 
@@ -263,14 +267,14 @@ noncomputable abbrev unreachdSpec : TCSpec Language.stGraph where
 def IsMinA (a : A) : Prop := ∀ b : A, a ≤ b
 
 /-- `a` is a greatest element of the order. -/
-def IsMaxA (a : A) : Prop := ∀ b : A, b ≤ a
+private def IsMaxA (a : A) : Prop := ∀ b : A, b ≤ a
 
 /-- `z` covers `w`: the budget goes from `w` to `z` in one step. -/
-def IsSuccA (w z : A) : Prop := w < z ∧ ∀ a : A, ¬(w < a ∧ a < z)
+private def IsSuccA (w z : A) : Prop := w < z ∧ ∀ a : A, ¬(w < a ∧ a < z)
 
 /-- One step of the scanning walk, in Lean: follow the forced arc while there
 is budget, otherwise move to the next candidate, or finish. -/
-def UStep (a b : Bool × (Fin 3 → A)) : Prop :=
+private def UStep (a b : Bool × (Fin 3 → A)) : Prop :=
   a.1 = false ∧ ¬(SGSource (a.2 0) ∧ SGTarget (a.2 1)) ∧
     (match b.1 with
       | true =>
@@ -281,7 +285,7 @@ def UStep (a b : Bool × (Fin 3 → A)) : Prop :=
           ((Stuck (a.2 1) ∨ IsMaxA (a.2 2)) ∧ IsSuccA (a.2 0) (b.2 0) ∧
             b.2 1 = b.2 0 ∧ IsMinA (b.2 2)))
 
-theorem realize_stepFF (x y : Fin 3 → A) :
+private theorem realize_stepFF (x y : Fin 3 → A) :
     stepFF.Realize (Sum.elim x y) ↔
       ¬(SGSource (x 0) ∧ SGTarget (x 1)) ∧
         ((y 0 = x 0 ∧ DetEdge (x 1) (y 1) ∧ IsSuccA (x 2) (y 2)) ∨
@@ -292,7 +296,7 @@ theorem realize_stepFF (x y : Fin 3 → A) :
     realize_minF, Sum.elim_inl, Sum.elim_inr, IsSuccA, IsMinA, IsMaxA]
   tauto
 
-theorem realize_stepFT (x y : Fin 3 → A) :
+private theorem realize_stepFT (x y : Fin 3 → A) :
     stepFT.Realize (Sum.elim x y) ↔
       ¬(SGSource (x 0) ∧ SGTarget (x 1)) ∧ ((Stuck (x 1) ∨ IsMaxA (x 2)) ∧ IsMaxA (x 0) ∧
         IsMinA (y 0) ∧ IsMinA (y 1) ∧ IsMinA (y 2)) := by
@@ -303,7 +307,7 @@ theorem realize_stepFT (x y : Fin 3 → A) :
   tauto
 
 /-- **The walk of the specification is the scanning walk.** -/
-theorem step_unreachdSpec (a b : unreachdSpec.Node A) :
+private theorem step_unreachdSpec (a b : unreachdSpec.Node A) :
     unreachdSpec.Step a b ↔ UStep a b := by
   obtain ⟨m, x⟩ := a
   obtain ⟨n, y⟩ := b
@@ -319,7 +323,7 @@ theorem step_unreachdSpec (a b : unreachdSpec.Node A) :
     | true => exact (realize_stepFT x y).trans ⟨fun h => ⟨rfl, h⟩, fun h => h.2⟩
 
 /-- The starting nodes of the walk. -/
-theorem isSrc_unreachdSpec (a : unreachdSpec.Node A) :
+private theorem isSrc_unreachdSpec (a : unreachdSpec.Node A) :
     unreachdSpec.IsSrc a ↔ a.1 = false ∧ IsMinA (a.2 0) ∧ a.2 1 = a.2 0 ∧ IsMinA (a.2 2) := by
   obtain ⟨m, x⟩ := a
   cases m with
@@ -332,7 +336,8 @@ theorem isSrc_unreachdSpec (a : unreachdSpec.Node A) :
     tauto
 
 /-- The accepting nodes of the walk: those of the finished mode. -/
-theorem isTgt_unreachdSpec (a : unreachdSpec.Node A) : unreachdSpec.IsTgt a ↔ a.1 = true := by
+private theorem isTgt_unreachdSpec
+    (a : unreachdSpec.Node A) : unreachdSpec.IsTgt a ↔ a.1 = true := by
   obtain ⟨m, x⟩ := a
   cases m with
   | true => exact iff_of_true (Formula.realize_top.mpr trivial) rfl
@@ -346,19 +351,20 @@ section OrderFacts
 
 variable {A : Type} [LinearOrder A]
 
-theorem isMinA_unique {a b : A} (ha : IsMinA a) (hb : IsMinA b) : a = b :=
+private theorem isMinA_unique {a b : A} (ha : IsMinA a) (hb : IsMinA b) : a = b :=
   le_antisymm (ha b) (hb a)
 
-theorem isSuccA_unique {c b b' : A} (h : IsSuccA c b) (h' : IsSuccA c b') : b = b' := by
+private theorem isSuccA_unique {c b b' : A} (h : IsSuccA c b) (h' : IsSuccA c b') : b = b' := by
   rcases lt_trichotomy b b' with hlt | heq | hgt
   · exact absurd ⟨h.1, hlt⟩ (h'.2 b)
   · exact heq
   · exact absurd ⟨h'.1, hgt⟩ (h.2 b')
 
-theorem not_isSuccA_of_isMaxA {c b : A} (hc : IsMaxA c) (h : IsSuccA c b) : False :=
+private theorem not_isSuccA_of_isMaxA {c b : A} (hc : IsMaxA c) (h : IsSuccA c b) : False :=
   absurd (hc b) (not_le.mpr h.1)
 
-theorem lt_or_eq_of_lt_isSuccA {w z a : A} (h : IsSuccA w z) (ha : a < z) : a < w ∨ a = w := by
+private theorem lt_or_eq_of_lt_isSuccA
+    {w z a : A} (h : IsSuccA w z) (ha : a < z) : a < w ∨ a = w := by
   rcases lt_trichotomy a w with hlt | heq | hgt
   · exact Or.inl hlt
   · exact Or.inr heq
@@ -366,7 +372,7 @@ theorem lt_or_eq_of_lt_isSuccA {w z a : A} (h : IsSuccA w z) (ha : a < z) : a < 
 
 variable [Finite A]
 
-theorem exists_isSuccA_of_not_isMaxA {c : A} (h : ¬IsMaxA c) : ∃ c', IsSuccA c c' := by
+private theorem exists_isSuccA_of_not_isMaxA {c : A} (h : ¬IsMaxA c) : ∃ c', IsSuccA c c' := by
   classical
   have := Fintype.ofFinite A
   have hne : (Finset.univ.filter fun a : A => c < a).Nonempty := by
@@ -383,10 +389,10 @@ theorem exists_isSuccA_of_not_isMaxA {c : A} (h : ¬IsMaxA c) : ∃ c', IsSuccA 
 omit [Finite A] in
 theorem orank_of_isMinA {a : A} (h : IsMinA a) : orank a = 0 := orank_eq_zero h
 
-theorem orank_of_isSuccA {w z : A} (h : IsSuccA w z) : orank z = orank w + 1 :=
+private theorem orank_of_isSuccA {w z : A} (h : IsSuccA w z) : orank z = orank w + 1 :=
   orank_covBy ⟨h.1, fun a hwa haz => h.2 a ⟨hwa, haz⟩⟩
 
-theorem orank_of_isMaxA {z : A} (h : IsMaxA z) : orank z = Nat.card A - 1 := orank_isTop h
+private theorem orank_of_isMaxA {z : A} (h : IsMaxA z) : orank z = Nat.card A - 1 := orank_isTop h
 
 end OrderFacts
 
@@ -397,7 +403,7 @@ section Functional
 variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A] [Finite A]
 
 omit [Language.stGraph.Structure A] [LinearOrder A] [Finite A] in
-private theorem node_ext {b c : Bool × (Fin 3 → A)} (h0 : b.1 = c.1) (h1 : b.2 0 = c.2 0)
+theorem node_ext {b c : Bool × (Fin 3 → A)} (h0 : b.1 = c.1) (h1 : b.2 0 = c.2 0)
     (h2 : b.2 1 = c.2 1) (h3 : b.2 2 = c.2 2) : b = c := by
   refine Prod.ext_iff.mpr ⟨h0, funext fun i => ?_⟩
   fin_cases i
@@ -414,7 +420,7 @@ private theorem not_walk_of_end {a b : Bool × (Fin 3 → A)}
 
 omit [Finite A] in
 /-- **The scanning walk is deterministic.** -/
-theorem functional_unreachdSpec : unreachdSpec.Functional A := by
+private theorem functional_unreachdSpec : unreachdSpec.Functional A := by
   intro a b c hb hc
   rw [step_unreachdSpec] at hb hc
   obtain ⟨-, -, hb'⟩ := hb
@@ -475,7 +481,7 @@ theorem iterate_of_stuck {x : A} (h : Stuck x) (n : ℕ) : detNext^[n] x = x := 
 /-- **The invariant carried along the scan**: every candidate already passed is
 harmless, and if the current one is not, its target is still ahead of the walk
 and within the remaining budget. -/
-def Inv (a : Bool × (Fin 3 → A)) : Prop :=
+private def Inv (a : Bool × (Fin 3 → A)) : Prop :=
   (∀ s' : A, s' < a.2 0 → ¬Bad s') ∧
     (a.1 = false → Bad (a.2 0) →
       ∃ t : A, ∃ n : ℕ, SGTarget t ∧ n + orank (a.2 2) < Nat.card A ∧
@@ -485,7 +491,7 @@ def Inv (a : Bool × (Fin 3 → A)) : Prop :=
 /-- At the end of an inner loop – the walk stuck, or the budget spent – the
 current candidate is harmless: its target would have to be where the walk
 already stands, and the walk has not stopped there. -/
-theorem not_bad_of_end {a : Bool × (Fin 3 → A)}
+private theorem not_bad_of_end {a : Bool × (Fin 3 → A)}
     (hguard : ¬(SGSource (a.2 0) ∧ SGTarget (a.2 1)))
     (hend : Stuck (a.2 1) ∨ IsMaxA (a.2 2))
     (hinv : Bad (a.2 0) → ∃ t : A, ∃ n : ℕ, SGTarget t ∧
@@ -505,7 +511,7 @@ theorem not_bad_of_end {a : Bool × (Fin 3 → A)}
   exact hguard ⟨hb.1, hta ▸ ht⟩
 
 /-- **The invariant is preserved by every step of the scan.** -/
-theorem inv_step {a b : Bool × (Fin 3 → A)} (h : UStep a b) (hinv : Inv a) : Inv b := by
+private theorem inv_step {a b : Bool × (Fin 3 → A)} (h : UStep a b) (hinv : Inv a) : Inv b := by
   obtain ⟨ha0, hguard, hcases⟩ := h
   obtain ⟨hinv1, hinv2, -⟩ := hinv
   have hinv2' := hinv2 ha0
@@ -553,7 +559,7 @@ theorem inv_step {a b : Bool × (Fin 3 → A)} (h : UStep a b) (hinv : Inv a) : 
         · rw [hb1]
           exact hit
 
-theorem inv_reach {a b : unreachdSpec.Node A} (h : unreachdSpec.Reach a b) (hinv : Inv a) :
+private theorem inv_reach {a b : unreachdSpec.Node A} (h : unreachdSpec.Reach a b) (hinv : Inv a) :
     Inv b := by
   induction h with
   | refl => exact hinv
@@ -562,7 +568,7 @@ theorem inv_reach {a b : unreachdSpec.Node A} (h : unreachdSpec.Reach a b) (hinv
 omit [Nonempty A] in
 /-- The starting node satisfies the invariant: nothing has been scanned, and the
 whole universe is still available as budget. -/
-theorem inv_of_isSrc {a : unreachdSpec.Node A} (h : unreachdSpec.IsSrc a) : Inv a := by
+private theorem inv_of_isSrc {a : unreachdSpec.Node A} (h : unreachdSpec.IsSrc a) : Inv a := by
   rw [isSrc_unreachdSpec] at h
   obtain ⟨h0, hmin0, h1, hmin2⟩ := h
   refine ⟨fun s' hs' => absurd (hmin0 s') (not_le.mpr hs'), ?_,
@@ -578,7 +584,7 @@ theorem inv_of_isSrc {a : unreachdSpec.Node A} (h : unreachdSpec.IsSrc a) : Inv 
     exact hit
 
 /-- **Soundness**: if the scan finishes, there was nothing to find. -/
-theorem not_detReachable_of_accepts (h : unreachdSpec.Accepts A) : ¬DetReachable A := by
+private theorem not_detReachable_of_accepts (h : unreachdSpec.Accepts A) : ¬DetReachable A := by
   obtain ⟨u, v, hu, hv, huv⟩ := h
   have hinvv := inv_reach huv (inv_of_isSrc hu)
   rw [detReachable_iff_exists_bad]
@@ -593,7 +599,7 @@ end for every candidate and finishes. -/
 omit [Nonempty A] in
 /-- The inner loop: from any position of the walk on the candidate `s`, with any
 budget, the node `z` that ends the loop is reached. -/
-theorem reach_of_inner (hnb : ∀ s : A, ¬Bad s) (s : A) (z : Bool × (Fin 3 → A))
+private theorem reach_of_inner (hnb : ∀ s : A, ¬Bad s) (s : A) (z : Bool × (Fin 3 → A))
     (hz : ∀ x c : A, Relation.ReflTransGen DetEdge s x → (Stuck x ∨ IsMaxA c) →
       UStep (false, ![s, x, c]) z) :
     ∀ (m : ℕ) (c x : A), Nat.card A - orank c ≤ m → Relation.ReflTransGen DetEdge s x →
@@ -624,7 +630,7 @@ theorem reach_of_inner (hnb : ∀ s : A, ¬Bad s) (s : A) (z : Bool × (Fin 3 �
 omit [Nonempty A] in
 /-- The outer loop: every candidate is reached, in the order of the
 structure. -/
-theorem reach_candidate (hnb : ∀ s : A, ¬Bad s) {a₀ : A} (h₀ : IsMinA a₀) (s : A) :
+private theorem reach_candidate (hnb : ∀ s : A, ¬Bad s) {a₀ : A} (h₀ : IsMinA a₀) (s : A) :
     unreachdSpec.Reach (false, ![a₀, a₀, a₀]) (false, ![s, s, a₀]) := by
   induction s using order_induction with
   | hmin z hz =>
@@ -639,7 +645,7 @@ theorem reach_candidate (hnb : ∀ s : A, ¬Bad s) {a₀ : A} (h₀ : IsMinA a�
     exact hnb w ⟨h1, x, h2, hx⟩
 
 /-- **Completeness**: if there is nothing to find, the scan finishes. -/
-theorem accepts_of_not_detReachable (h : ¬DetReachable A) : unreachdSpec.Accepts A := by
+private theorem accepts_of_not_detReachable (h : ¬DetReachable A) : unreachdSpec.Accepts A := by
   have hnb : ∀ s : A, ¬Bad s := fun s hs => h (detReachable_iff_exists_bad.mpr ⟨s, hs⟩)
   obtain ⟨a₀, h₀⟩ : ∃ a₀ : A, IsMinA a₀ := Finite.exists_min (id : A → A)
   obtain ⟨aM, hM⟩ : ∃ z : A, IsMaxA z := Finite.exists_max (id : A → A)
@@ -654,7 +660,7 @@ theorem accepts_of_not_detReachable (h : ¬DetReachable A) : unreachdSpec.Accept
   exact hnb aM ⟨h1, x, h2, hx⟩
 
 /-- **The scan decides non-reachability along forced arcs.** -/
-theorem accepts_unreachdSpec_iff : unreachdSpec.Accepts A ↔ ¬DetReachable A :=
+private theorem accepts_unreachdSpec_iff : unreachdSpec.Accepts A ↔ ¬DetReachable A :=
   ⟨not_detReachable_of_accepts, accepts_of_not_detReachable⟩
 
 end Correctness
@@ -677,13 +683,14 @@ theorem unreachd_dtcDefinable : DTCDefinable REACHdᶜ := by
 /-- **FO(DTC) definability is closed under complement.** The complement of `P`
 reduces to the complement of REACHd – a reduction complements along with its two
 problems – and that complement is FO(DTC) definable. -/
-theorem dtcDefinable_compl {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
+private theorem dtcDefinable_compl {L : Language.{0, 0}} [L.IsRelational] {P : DecisionProblem L}
     (h : DTCDefinable P) : DTCDefinable Pᶜ := by
   obtain ⟨f⟩ := reachd_hard_of_dtcDefinable P h
   exact unreachd_dtcDefinable.of_orderedReduction f.compl
 
 /-- Membership in LOGSPACE is closed under complement. -/
-theorem mem_LOGSPACE_compl_iff {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
+private theorem mem_LOGSPACE_compl_iff
+    {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :
     Pᶜ ∈ LOGSPACE ↔ P ∈ LOGSPACE := by
   refine ⟨fun h => ?_, fun h => dtcDefinable_compl h⟩
   have h' := dtcDefinable_compl h

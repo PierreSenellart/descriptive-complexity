@@ -67,7 +67,7 @@ section Basic
 
 variable {A : Type} [Language.sat.Structure A]
 
-theorem wideTwo_iff_not_widthAtMostTwo : WideTwo A ↔ ¬WidthAtMostTwo A := by
+private theorem wideTwo_iff_not_widthAtMostTwo : WideTwo A ↔ ¬WidthAtMostTwo A := by
   constructor
   · rintro ⟨c, x, s, hocc, hdist⟩ h
     obtain ⟨i, j, hij, hx, hs⟩ := h c x s hocc
@@ -131,7 +131,7 @@ private theorem widthAtMostTwo_of_iso (e : A ≃[Language.sat] B) (h : WidthAtMo
   simpa using this
 
 /-- The width-two bound is isomorphism-invariant. -/
-theorem widthAtMostTwo_iso (e : A ≃[Language.sat] B) :
+private theorem widthAtMostTwo_iso (e : A ≃[Language.sat] B) :
     WidthAtMostTwo A ↔ WidthAtMostTwo B :=
   ⟨widthAtMostTwo_of_iso e, widthAtMostTwo_of_iso e.symm⟩
 

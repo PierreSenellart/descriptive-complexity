@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.Difference
+import all DescriptiveComplexity.Hierarchy
 
 /-!
 # SAT-UNSAT, the canonical DP problem
@@ -214,7 +215,7 @@ theorem sideInterp_negIn (w w' : Fin 1 → A) :
   exact Formula.realize_rel₂
 
 /-- The projected instance is satisfiable exactly when that side is. -/
-theorem satisfiable_sideInterp :
+private theorem satisfiable_sideInterp :
     Satisfiable ((sideInterp isCl pos neg).Map A) ↔ SatWith A isCl pos neg := by
   constructor
   · rintro ⟨ν, hν⟩
@@ -302,14 +303,14 @@ def SatSecond : DecisionProblem Language.satPair where
   iso_invariant := fun e => satWith_iso e _ _ _
 
 /-- Projecting the first side is a reduction of `SatFirst` to SAT. -/
-def satFirst_le_sat : SatFirst ≤ᶠᵒ SAT where
+private def satFirst_le_sat : SatFirst ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := sideInterp spIsCl₁ spPos₁ spNeg₁
   correct _ _ _ _ := (satisfiable_sideInterp spIsCl₁ spPos₁ spNeg₁).symm
 
 /-- Projecting the second side is a reduction of `SatSecond` to SAT. -/
-def satSecond_le_sat : SatSecond ≤ᶠᵒ SAT where
+private def satSecond_le_sat : SatSecond ≤ᶠᵒ SAT where
   Tag := Unit
   dim := 1
   toInterpretation := sideInterp spIsCl₂ spPos₂ spNeg₂
@@ -317,16 +318,16 @@ def satSecond_le_sat : SatSecond ≤ᶠᵒ SAT where
 
 /-- **The first side's satisfiability is `Σ₁`-definable**, inherited from SAT
 along the projection. -/
-theorem satFirst_sigmaSODefinable : SigmaSODefinable 1 SatFirst :=
+private theorem satFirst_sigmaSODefinable : SigmaSODefinable 1 SatFirst :=
   sat_sigmaSODefinable.of_foReduction satFirst_le_sat
 
 /-- `UnsatSecond` is the complement of `SatSecond`. -/
-theorem unsatSecond_eq_compl : UnsatSecond = SatSecondᶜ :=
+private theorem unsatSecond_eq_compl : UnsatSecond = SatSecondᶜ :=
   DecisionProblem.ext fun _ _ => Iff.rfl
 
 /-- **The second side's unsatisfiability is `Π₁`-definable**: the complement of
 an NP condition, the reduction complementing along with it. -/
-theorem unsatSecond_piSODefinable : PiSODefinable 1 UnsatSecond := by
+private theorem unsatSecond_piSODefinable : PiSODefinable 1 UnsatSecond := by
   rw [unsatSecond_eq_compl]
   exact PiSODefinable.of_foReduction satSecond_le_sat.compl
     ((compl_mem_coNP_iff SAT).mpr sat_sigmaSODefinable)

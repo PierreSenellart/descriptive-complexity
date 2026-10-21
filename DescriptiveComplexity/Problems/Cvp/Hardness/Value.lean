@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Cvp.Hardness.Wiring
 public import DescriptiveComplexity.Problems.HornSat.Unsat
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Cvp.Hardness.Interp
+import all DescriptiveComplexity.Problems.Cvp.Hardness.Wiring
 
 /-!
 # What the drawn circuit computes
@@ -45,16 +48,16 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonem
 
 /-- The value of a conjunction-chain gate: every negative literal of `c` up to
 `y` is forced within `orank s` rounds. -/
-def BdVal (c y s : A) : Prop := ∀ y' ≤ y, NegIn c y' → ForcedIn (orank s) y'
+private def BdVal (c y s : A) : Prop := ∀ y' ≤ y, NegIn c y' → ForcedIn (orank s) y'
 
 /-- The value of a propagation-chain gate: some clause up to `c` forces `x` in
 one round from the stage `orank s`. -/
-def HdVal (x c s : A) : Prop :=
+private def HdVal (x c s : A) : Prop :=
   ∃ c' ≤ c, IsCl c' ∧ PosIn c' x ∧ ∀ y : A, NegIn c' y → ForcedIn (orank s) y
 
 /-- The value of a top-stage conjunction-chain gate: every negative literal of
 `c` up to `y` is forced at all. -/
-def BdTopVal (c y : A) : Prop := ∀ y' ≤ y, NegIn c y' → Forced y'
+private def BdTopVal (c y : A) : Prop := ∀ y' ≤ y, NegIn c y' → Forced y'
 
 /-- The value of a goal-chain gate: the instance is not Horn, or some clause up
 to `c` is a goal clause whose negative literals are all forced. -/
@@ -67,7 +70,7 @@ def GlVal (c : A) : Prop :=
 omit [Finite A] [Nonempty A] in
 /-- At the top of the clause walk, a propagation gate is one round of unit
 propagation. -/
-theorem hdVal_top {M : A} (hM : ∀ a : A, a ≤ M) (x s : A) :
+private theorem hdVal_top {M : A} (hM : ∀ a : A, a ≤ M) (x s : A) :
     HdVal x M s ↔ ForcedIn (orank s + 1) x := by
   constructor
   · rintro ⟨c, -, hc, hp, hneg⟩
@@ -77,13 +80,13 @@ theorem hdVal_top {M : A} (hM : ∀ a : A, a ≤ M) (x s : A) :
 
 omit [Finite A] [Nonempty A] in
 /-- At the top of the literal walk, a conjunction gate is the body condition. -/
-theorem bdVal_top {M : A} (hM : ∀ a : A, a ≤ M) (c s : A) :
+private theorem bdVal_top {M : A} (hM : ∀ a : A, a ≤ M) (c s : A) :
     BdVal c M s ↔ ∀ y : A, NegIn c y → ForcedIn (orank s) y :=
   ⟨fun h y => h y (hM y), fun h y' _ => h y'⟩
 
 /-- The last stage is the fixed point: `Nat.card A` rounds of propagation force
 everything that is forced at all. -/
-theorem forced_iff_top {M : A} (hM : ∀ a : A, a ≤ M) (x : A) :
+private theorem forced_iff_top {M : A} (hM : ∀ a : A, a ≤ M) (x : A) :
     Forced x ↔ ForcedIn (orank M + 1) x := by
   have hcard : orank M + 1 = Nat.card A := by
     rw [orank_isTop hM]
@@ -102,7 +105,7 @@ variable {m M : A}
 
 omit [Finite A] [Nonempty A] in
 /-- The constant `1` gate derives `1`. -/
-theorem gateVal_tt (hm : ∀ a : A, m ≤ a) : GateVal true (ttPt (A := A) m) :=
+private theorem gateVal_tt (hm : ∀ a : A, m ≤ a) : GateVal true (ttPt (A := A) m) :=
   .constTrue ((isTrue_iff .tt _).mpr ⟨rfl, fun a => hm a, fun a => hm a, fun a => hm a⟩)
 
 omit [Nonempty A] in
@@ -110,7 +113,7 @@ omit [Nonempty A] in
 stage: the conjunction chains of a stage read the propagation gates of the
 stage below, and the propagation chain of a stage reads the conjunction chains
 of its own. -/
-theorem gateVal_stage (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) :
+private theorem gateVal_stage (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) :
     ∀ n : ℕ, ∀ s : A, orank s = n →
       (∀ c y : A, BdVal c y s → GateVal true (bdPt c y s)) ∧
         ∀ x c : A, HdVal x c s → GateVal true (hdPt x c s) := by
@@ -178,7 +181,7 @@ theorem gateVal_stage (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) :
 
 /-- A conjunction gate of the top stage evaluates to `1` when its value
 holds. -/
-theorem gateVal_bdTop (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) (c y : A)
+private theorem gateVal_bdTop (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) (c y : A)
     (hval : BdTopVal c y) : GateVal true (bdTopPt m c y) := by
   have hand : ∀ y : A, RelMap (M := cvpInterp.Map A) circIsAnd ![bdTopPt m c y] :=
     fun _ => (isAnd_iff .bdTop _).mpr (Or.inr ⟨rfl, fun a => hm a⟩)
@@ -204,7 +207,7 @@ theorem gateVal_bdTop (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) (c y :
       (ihy fun y'' hy'' hneg => hval y'' (hy''.trans hlt.le) hneg) hqv
 
 /-- A goal-chain gate evaluates to `1` when its value holds. -/
-theorem gateVal_gl (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) (c : A) (hval : GlVal c) :
+private theorem gateVal_gl (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) (c : A) (hval : GlVal c) :
     GateVal true (glPt m c) := by
   have hor : ∀ c : A, RelMap (M := cvpInterp.Map A) circIsOr ![glPt m c] :=
     fun _ => (isOr_iff .gl _).mpr (Or.inr ⟨rfl, fun a => hm a, fun a => hm a⟩)
@@ -248,7 +251,7 @@ variable {m M : A}
 /-- The intended value of a point, by tag. The constant `1` carries no
 information and the constant `0` is never derived, which is what makes the
 induction go through. -/
-def Val (p : cvpInterp.Map A) : Prop :=
+private def Val (p : cvpInterp.Map A) : Prop :=
   match p.1 with
   | .tt => True
   | .ff => False
@@ -260,7 +263,7 @@ def Val (p : cvpInterp.Map A) : Prop :=
 /-- **Nothing else evaluates to `1`.** By induction on the derivation: every
 rule that can fire at a gate of the drawn circuit fires for the intended
 reason. The false rail carries no information and is not tracked. -/
-theorem val_of_gateVal (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) :
+private theorem val_of_gateVal (hm : ∀ a : A, m ≤ a) (hM : ∀ a : A, a ≤ M) :
     ∀ {b : Bool} {p : cvpInterp.Map A}, GateVal b p → b = true → Val p := by
   intro b p h
   induction h with

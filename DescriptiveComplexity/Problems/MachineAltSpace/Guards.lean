@@ -264,7 +264,7 @@ section PromiseRealize
 
 variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 
-theorem realize_isLinOrdS : (A ⊨ isLinOrdS) ↔ IsLinOrd (ATMLe (k := 2) (A := A)) := by
+private theorem realize_isLinOrdS : (A ⊨ isLinOrdS) ↔ IsLinOrd (ATMLe (k := 2) (A := A)) := by
   rw [isLinOrdS, IsLinOrd, Sentence.Realize]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_sup, realize_leG, realize_eqG, Sum.elim_inr]
@@ -275,7 +275,7 @@ theorem realize_isLinOrdS : (A ⊨ isLinOrdS) ↔ IsLinOrd (ATMLe (k := 2) (A :=
   · exact ⟨fun h a b hab hba => h ![a, b] ⟨hab, hba⟩, fun h w hw => h (w 0) (w 1) hw.1 hw.2⟩
   · exact ⟨fun h a b => h ![a, b], fun h w => h (w 0) (w 1)⟩
 
-theorem realize_wfS : (A ⊨ wfS) ↔ (atmData 2 A).toTMData.WellFormed := by
+private theorem realize_wfS : (A ⊨ wfS) ↔ (atmData 2 A).toTMData.WellFormed := by
   rw [wfS, TMData.WellFormed, Sentence.Realize]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_iExs,
     Formula.realize_imp, realize_inpG, realize_blankG, realize_posnG, realize_eqG,
@@ -289,7 +289,7 @@ theorem realize_wfS : (A ⊨ wfS) ↔ (atmData 2 A).toTMData.WellFormed := by
 /-- The two marks split the states exactly when every state carries one and not
 both: a mark index of `2` or more marks nothing, so the uniqueness clause of
 `DescriptiveComplexity.ATMData.BlocksSplit` only speaks about `0` and `1`. -/
-theorem realize_blocksSplitS : (A ⊨ blocksSplitS) ↔ (atmData 2 A).BlocksSplit := by
+private theorem realize_blocksSplitS : (A ⊨ blocksSplitS) ↔ (atmData 2 A).BlocksSplit := by
   rw [blocksSplitS, Sentence.Realize]
   simp only [Formula.realize_iAlls, Formula.realize_inf, Formula.realize_sup,
     Formula.realize_not, realize_blkG, Sum.elim_inr]

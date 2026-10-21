@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Problems.OneInSat.Defs
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # The three slots of a clause
@@ -79,7 +80,7 @@ def NthOcc : Ix3 → A → A → Bool → Prop
   | .three, c, x, s => ∃ y t z u, MinOcc c z u ∧ SuccOcc c z u y t ∧ SuccOcc c y t x s
 
 /-- The first occurrence of a clause is unique. -/
-theorem minOcc_unique {c x y : A} {s t : Bool} (h₁ : MinOcc c x s) (h₂ : MinOcc c y t) :
+private theorem minOcc_unique {c x y : A} {s t : Bool} (h₁ : MinOcc c x s) (h₂ : MinOcc c y t) :
     x = y ∧ s = t := by
   rcases occLt_trichotomy x s y t with hlt | heq | hlt
   · exact absurd hlt (h₂.2 x s h₁.occIn)
@@ -97,7 +98,7 @@ theorem NthOcc.occIn {i : Ix3} {c x : A} {s : Bool} (h : NthOcc i c x s) : OccIn
     exact hs.2.1
 
 /-- The `i`-th occurrence of a clause is unique. -/
-theorem nthOcc_unique {i : Ix3} {c x y : A} {s t : Bool}
+private theorem nthOcc_unique {i : Ix3} {c x y : A} {s t : Bool}
     (h₁ : NthOcc i c x s) (h₂ : NthOcc i c y t) : x = y ∧ s = t := by
   cases i with
   | one => exact minOcc_unique h₁ h₂

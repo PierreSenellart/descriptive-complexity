@@ -8,6 +8,10 @@ module
 import DescriptiveComplexity.LogTime.BitSum.Sizes
 public import DescriptiveComplexity.LogTime.BitLogic
 import DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Co-location: the one device the Bit Sum Lemma is built out of
@@ -62,7 +66,7 @@ namespace BitSum
 
 /-- **What a window reads**: the bits of `x / 2 ^ a % 2 ^ w` are those of `x`
 from `a` up, and nothing from `w` on. -/
-theorem testBit_window (x a w k : ℕ) :
+private theorem testBit_window (x a w k : ℕ) :
     (x / 2 ^ a % 2 ^ w).testBit k = (decide (k < w) && x.testBit (a + k)) := by
   rw [Nat.testBit_mod_two_pow, ← Nat.shiftRight_eq_div_pow, Nat.testBit_shiftRight]
 
@@ -133,7 +137,7 @@ theorem windowAt_iff {b e x m : A} {w : ℕ} (hw : orank b + w = orank e) :
 
 /-- **A window is always there to be read**: what it reads is at most `x`, hence
 a rank of the universe. -/
-theorem exists_windowAt {b e x : A} {w : ℕ} (hw : orank b + w = orank e) :
+private theorem exists_windowAt {b e x : A} {w : ℕ} (hw : orank b + w = orank e) :
     ∃ m : A, WindowAt b e x m := by
   obtain ⟨m, hm⟩ := exists_orank_eq (A := A) (m := orank x / 2 ^ orank b % 2 ^ w)
     (lt_of_le_of_lt (le_trans (Nat.mod_le _ _) (Nat.div_le_self _ _)) (orank_lt_card x))
@@ -199,7 +203,7 @@ theorem bitIx_iff_of_isBlockSet {g B : A} (hg : 0 < orank g) (h : IsBlockSet g B
 /-- **A boundary set exists**: the multiples of the gap below the top position
 are a bit vector supported below that position, hence a rank
 (`DescriptiveComplexity.exists_orank_testBit'`). -/
-theorem exists_isBlockSet [Nonempty A] {g : A} (hP : 1 < posCount A) :
+private theorem exists_isBlockSet [Nonempty A] {g : A} (hP : 1 < posCount A) :
     ∃ B : A, IsBlockSet g B := by
   classical
   obtain ⟨B, hB, hB'⟩ := exists_orank_testBit' (A := A) fun i => decide (orank g ∣ i)
@@ -253,7 +257,7 @@ variable {L : Language.{0, 0}} {α : Type}
 
 /-- **A window is first-order in the bit logic**: two quantified indices, an
 addition, a comparison and two bit reads. -/
-theorem bitDef_windowAt (b e x m : α) :
+private theorem bitDef_windowAt (b e x m : α) :
     BitDef (L := L) fun _ _ _ _ _ v => WindowAt (v b) (v e) (v x) (v m) := by
   have hin : BitDef (L := L) (α := α ⊕ Fin 2)
       (fun _ _ _ _ _ u =>
@@ -279,7 +283,7 @@ theorem bitDef_windowAt (b e x m : α) :
   · exact Iff.rfl
 
 /-- **A boundary set is first-order in the bit logic.** -/
-theorem bitDef_isBlockSet (g B : α) :
+private theorem bitDef_isBlockSet (g B : α) :
     BitDef (L := L) fun _ _ _ _ _ v => IsBlockSet (v g) (v B) := by
   have hzero : BitDef (L := L) (α := α)
       (fun _ _ _ _ _ v => ∀ z, orank z = 0 → BitIx z (v B)) :=

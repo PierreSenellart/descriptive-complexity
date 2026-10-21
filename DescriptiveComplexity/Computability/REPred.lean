@@ -9,6 +9,9 @@ public import Mathlib.Computability.RE
 public import DescriptiveComplexity.Computability.Eval
 public import DescriptiveComplexity.RecursivelyEnumerable
 public import Mathlib.Data.List.GetD
+import all DescriptiveComplexity.Computability.Eval
+import all DescriptiveComplexity.Computability.FinStruct
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # RE is recursively enumerable
@@ -68,7 +71,7 @@ section Search
 /-- **A predicate found by unbounded search over a coded witness is
 recursively enumerable.** The witness type is any `Primcodable` type; the
 search is Mathlib's `Nat.rfind` over its codes. -/
-theorem rePred_of_exists {α β : Type} [Primcodable α] [Primcodable β] {p : α → Prop}
+private theorem rePred_of_exists {α β : Type} [Primcodable α] [Primcodable β] {p : α → Prop}
     {f : α → β → Bool} (hf : Primrec₂ f) (h : ∀ a, p a ↔ ∃ b, f a b = true) : REPred p := by
   have hg : Computable₂ fun (a : α) (n : ℕ) =>
       ((Encodable.decode (α := β) n).map (f a)).getD false :=
@@ -234,7 +237,7 @@ def tabAssign (B : SOBlock) (s : FinStruct V) (m : ℕ) (tab : List (List Bool))
 
 omit [L.IsRelational] in
 /-- The tuple of values of an original tuple. -/
-theorem ofFn_extEquivFin {n : ℕ} (s : FinStruct V) (m : ℕ) {x : Fin n → s.Univ ⊕ Fin m}
+private theorem ofFn_extEquivFin {n : ℕ} (s : FinStruct V) (m : ℕ) {x : Fin n → s.Univ ⊕ Fin m}
     {y : Fin n → s.Univ} (hy : ∀ j, x j = Sum.inl (y j)) :
     (List.ofFn fun j => ((extEquivFin s m (x j) : Fin (s.univSize + m + 1)) : ℕ)) =
       List.ofFn fun j => ((y j : s.Univ) : ℕ) :=

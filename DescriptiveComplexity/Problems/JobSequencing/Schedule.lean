@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.JobSequencing.Defs
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # What a schedule can achieve
@@ -96,7 +97,7 @@ private theorem finsum_split {S : A → Prop} {Job : A → Prop} (hS : ∀ j, S 
 /-! ### Completion times along a schedule -/
 
 /-- Completion times grow along the schedule. -/
-theorem jsCompletion_mono {sched : A → A → Prop} (hs : IsLinOrd sched) {i j : A}
+private theorem jsCompletion_mono {sched : A → A → Prop} (hs : IsLinOrd sched) {i j : A}
     (hij : sched i j) : JSCompletion sched i ≤ JSCompletion sched j :=
   finsum_mem_mono (fun a ha => ⟨ha.1, hs.2.1 a i j ha.2 hij⟩) JSTimeVal
 
@@ -104,7 +105,7 @@ variable {D : ℕ}
 
 /-- With a common deadline, being on time is inherited backwards along the
 schedule: the on-time jobs form a prefix. -/
-theorem not_jsLate_of_sched {sched : A → A → Prop} (hs : IsLinOrd sched)
+private theorem not_jsLate_of_sched {sched : A → A → Prop} (hs : IsLinOrd sched)
     (hdl : ∀ j : A, JSJob j → JSDlineVal j = D) {i j : A} (hi : JSJob i) (hj : JSJob j)
     (hij : sched i j) (hnl : ¬JSLate sched j) : ¬JSLate sched i := by
   intro hlate

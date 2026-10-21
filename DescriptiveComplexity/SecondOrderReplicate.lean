@@ -104,7 +104,7 @@ def altBlockQuant (A : Type) (B : SOBlock) :
 
 /-- Alternating quantification over the rounds only depends on the quantified
 predicate up to pointwise equivalence. -/
-theorem altBlockQuant_congr {A : Type} {B : SOBlock} :
+private theorem altBlockQuant_congr {A : Type} {B : SOBlock} :
     ∀ (k : ℕ) (P Q : (Fin k → B.Assignment A) → Prop), (∀ ρs, P ρs ↔ Q ρs) →
       ∀ pol : Bool, altBlockQuant A B k P pol ↔ altBlockQuant A B k Q pol := by
   intro k

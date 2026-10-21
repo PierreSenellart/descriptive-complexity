@@ -11,6 +11,7 @@ import DescriptiveComplexity.Problems.TwoSat.Hardness
 import DescriptiveComplexity.Problems.TwoSat.Ptime
 import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.DetLogSpace
+import all DescriptiveComplexity.LogSpace
 
 /-!
 # 2SAT is NL-complete

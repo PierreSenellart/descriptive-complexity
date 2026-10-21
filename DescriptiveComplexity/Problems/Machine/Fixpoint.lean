@@ -12,6 +12,12 @@ import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.FixedPoint
 public import DescriptiveComplexity.FixedPointHorn
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.FixedPoint
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Deterministic machine acceptance is in PTIME
@@ -383,7 +389,7 @@ noncomputable def detS : tmOrd.Sentence :=
 
 variable {A : Type} [Language.turing.Structure A] [LinearOrder A]
 
-theorem realize_wfS : (A ⊨ wfS) ↔ (tmData A).WellFormed := by
+private theorem realize_wfS : (A ⊨ wfS) ↔ (tmData A).WellFormed := by
   rw [wfS]
   simp only [Sentence.Realize, realize_listInf, List.mem_cons, List.not_mem_nil, or_false,
     forall_eq_or_imp, forall_eq]
@@ -424,7 +430,7 @@ theorem realize_wfS : (A ⊨ wfS) ↔ (tmData A).WellFormed := by
       realize_blankG, realize_eqG, Sum.elim_inr]
     exact ⟨fun h a b h1 h2 => h ![a, b] ⟨h1, h2⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
 
-theorem realize_detS : (A ⊨ detS) ↔ (tmData A).Deterministic := by
+private theorem realize_detS : (A ⊨ detS) ↔ (tmData A).Deterministic := by
   rw [detS]
   simp only [Sentence.Realize, realize_listInf, List.mem_cons, List.not_mem_nil, or_false,
     forall_eq_or_imp, forall_eq]
@@ -532,7 +538,7 @@ section CoreRealize
 
 variable {A : Type} [Language.turing.Structure A] [LinearOrder A] {v : Fin 9 → A}
 
-theorem realize_dtCoreG :
+private theorem realize_dtCoreG :
     (dtCoreG.Realize v) ↔
       (SuccPos TMLe TMPosn (v 0) (v 1) ∧ TMTr (v 2) ∧ TMSrc (v 2) (v 3) ∧
         TMRead (v 2) (v 4) ∧ (∃ q : A, TMDst (v 2) q) ∧ ∃ a : A, TMWrite (v 2) a) := by
@@ -549,15 +555,15 @@ end CoreRealize
 /-! ### The output sentence -/
 
 /-- The acceptance atom of the output, over two variables. -/
-def dtAccAt : SOAtom dtBlock 2 := ⟨some true, ![0, 1]⟩
+private def dtAccAt : SOAtom dtBlock 2 := ⟨some true, ![0, 1]⟩
 
 /-- The positive part of the output: some time carries an accepting state in
 the fixed point – the statement no goal clause of a Horn program can make. -/
-noncomputable def dtAccOut : (tmOrd.sum dtBlock.lang).Sentence :=
+private noncomputable def dtAccOut : (tmOrd.sum dtBlock.lang).Sentence :=
   Formula.iExs (Fin 2) (atomF dtAccAt ⊓ guardOutF (accG 1))
 
 /-- The output sentence: the promises, and acceptance at the fixed point. -/
-noncomputable def dtOut : (tmOrd.sum dtBlock.lang).Sentence :=
+private noncomputable def dtOut : (tmOrd.sum dtBlock.lang).Sentence :=
   LHom.sumInl.onSentence wfS ⊓ LHom.sumInl.onSentence detS ⊓ dtAccOut
 
 section OutRealize
@@ -566,12 +572,12 @@ variable {A : Type} [Language.turing.Structure A] [LinearOrder A] (ρ : dtBlock.
 
 omit [Language.turing.Structure A] [LinearOrder A] in
 /-- Reading the acceptance atom off an assignment. -/
-theorem dtAccAt_holds (w : Fin 2 → A) :
+private theorem dtAccAt_holds (w : Fin 2 → A) :
     dtAccAt.Holds ρ w ↔ ρ (some true) ![w 0, w 1] := by
   refine iff_of_eq (congrArg (ρ (some true)) (funext fun l => ?_))
   fin_cases l <;> rfl
 
-theorem realize_dtAccOut :
+private theorem realize_dtAccOut :
     (@Sentence.Realize (tmOrd.sum dtBlock.lang) A
         (@sumStructure _ _ A _ (dtBlock.structure ρ)) dtAccOut) ↔
       ∃ t q : A, ρ (some true) ![t, q] ∧ TMAcc q := by
@@ -585,7 +591,7 @@ theorem realize_dtAccOut :
   · rintro ⟨t, q, h1, h2⟩
     exact ⟨![t, q], (dtAccAt_holds ρ ![t, q]).mpr h1, h2⟩
 
-theorem realize_dtOut :
+private theorem realize_dtOut :
     (@Sentence.Realize (tmOrd.sum dtBlock.lang) A
         (@sumStructure _ _ A _ (dtBlock.structure ρ)) dtOut) ↔
       ((tmData A).WellFormed ∧ (tmData A).Deterministic ∧
@@ -658,7 +664,7 @@ theorem dt_iff {v : Fin 9 → A} {i j l : Fin 9} :
 
 omit [LinearOrder A] [Nonempty A] in
 /-- A position of rank `0` is the lowest. -/
-theorem minPos_of_bitRank_eq_zero (hlin : IsLinOrd (TMLe (A := A))) {p : A} (hp : TMPosn p)
+private theorem minPos_of_bitRank_eq_zero (hlin : IsLinOrd (TMLe (A := A))) {p : A} (hp : TMPosn p)
     (h : bitRank TMLe TMPosn p = 0) : MinPos TMLe TMPosn p := by
   refine ⟨hp, fun q hq => ?_⟩
   by_contra hcon
@@ -672,7 +678,7 @@ theorem minPos_of_bitRank_eq_zero (hlin : IsLinOrd (TMLe (A := A))) {p : A} (hp 
 omit [LinearOrder A] [Nonempty A] in
 /-- Every rank below the position count is realized by a position: this is
 where the run's `ℕ`-indexed clock is matched to the time positions. -/
-theorem exists_pos_bitRank (hlin : IsLinOrd (TMLe (A := A))) :
+private theorem exists_pos_bitRank (hlin : IsLinOrd (TMLe (A := A))) :
     ∀ j : ℕ, j < Nat.card {p : A // TMPosn p} →
       ∃ t : A, TMPosn t ∧ bitRank TMLe TMPosn t = j := by
   intro j
@@ -1029,7 +1035,7 @@ omit [Nonempty A] in
 /-- **The machine accepts exactly when the fixed point contains an accepting
 state**: the two inductions above, glued by the surjectivity of the rank below
 the position count. -/
-theorem accepts_iff_derives (hwf : (tmData A).WellFormed)
+private theorem accepts_iff_derives (hwf : (tmData A).WellFormed)
     (hdet : (tmData A).Deterministic) :
     (tmData A).Accepts ↔ ∃ t q : A, DQ t q ∧ TMAcc q := by
   constructor

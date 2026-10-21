@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawRunVar
 import DescriptiveComplexity.Problems.Wide.Roam
 public import DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Problems.Wide.DrawInner
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # The VAL loop's enumeration
@@ -158,7 +161,7 @@ variable [Finite A] [Finite R] [Finite P]
 
 /-- **The Kin top**: the register content the exhaustion test accepts –
 the set of the inner-block elements. -/
-def kinTop : Univ A R P dt.KIx dt.dd → Prop :=
+private def kinTop : Univ A R P dt.KIx dt.dd → Prop :=
   fun u => ∃ j : Fin dt.ki, tagBlk u.1 = some (Sum.inr j)
 
 variable {dt}

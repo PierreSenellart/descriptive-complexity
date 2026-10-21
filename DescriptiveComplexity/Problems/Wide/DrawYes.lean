@@ -9,6 +9,15 @@ public import DescriptiveComplexity.Problems.Wide.DrawRunSpine
 public import DescriptiveComplexity.Problems.Wide.DrawValEnum
 public import DescriptiveComplexity.FixedPointPartial
 public import DescriptiveComplexity.Problems.Wide.DrawRunOuter
+import all DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Problems.Wide.DrawInstEval
+import all DescriptiveComplexity.Problems.Wide.DrawProg
+import all DescriptiveComplexity.Problems.Wide.DrawRunOuter
+import all DescriptiveComplexity.Problems.Wide.DrawRunSpine
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.DrawVerdict
+import all DescriptiveComplexity.Problems.Wide.Marks
 
 /-!
 # A partial fixed point that holds makes the machine accept
@@ -76,22 +85,22 @@ theorem tgtTopSt_tgt :
 variable {dt}
 
 /-- The startup leaves the marker at the empty address. -/
-theorem startupSt_wk :
+private theorem startupSt_wk :
     (dt.startupSt (A := A) (R' := R') (P' := P')).wk = fun r => r = fun _ => False :=
   rfl
 
 /-- The startup leaves the mirror home. -/
-theorem startupSt_mir :
+private theorem startupSt_mir :
     (dt.startupSt (A := A) (R' := R') (P' := P')).mir = fun _ => False :=
   rfl
 
 /-- The startup leaves the bottom mark at the empty address. -/
-theorem startupSt_bot :
+private theorem startupSt_bot :
     (dt.startupSt (A := A) (R' := R') (P' := P')).bot = fun r => r = fun _ => False :=
   rfl
 
 /-- The startup leaves the end marker at the last logical address. -/
-theorem startupSt_ltp :
+private theorem startupSt_ltp :
     (dt.startupSt (A := A) (R' := R') (P' := P')).ltp =
       fun r => r = logicalTop := by
   rw [show (dt.startupSt (A := A) (R' := R') (P' := P')).ltp =
@@ -110,7 +119,7 @@ variable {α : Type} {Le Le' : α → α → Prop}
 through its extension – the companion of
 `DescriptiveComplexity.Draw.Table.wmSetLe_congr_rel`, and what carries the
 layout's own placement lemmas to the instance's order. -/
-theorem wmSetLt_congr_rel (h : ∀ x y, Le x y ↔ Le' x y) (s u : α → Prop) :
+private theorem wmSetLt_congr_rel (h : ∀ x y, Le x y ↔ Le' x y) (s u : α → Prop) :
     WMSetLt Le s u ↔ WMSetLt Le' s u := by
   refine exists_congr fun x => and_congr_left fun _ => forall_congr' fun y => ?_
   exact imp_congr (and_congr (h y x) (not_congr (h x y))) Iff.rfl

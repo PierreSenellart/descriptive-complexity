@@ -7,6 +7,11 @@ module
 
 import DescriptiveComplexity.Problems.Wide.RegChannelEval
 public import DescriptiveComplexity.Problems.Wide.RegChannelPad
+import all DescriptiveComplexity.Problems.Wide.DrawIxEval
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.RegChannelEval
+import all DescriptiveComplexity.Problems.Wide.RegChannelInit
+import all DescriptiveComplexity.Problems.Wide.RegChannelLaid
 
 /-!
 # The two legs, joined at any program with the clocked rules

@@ -7,6 +7,13 @@ module
 
 public import DescriptiveComplexity.Counting.Digits.ProdSem
 public import DescriptiveComplexity.Counting.Digits.SumSweep
+import all DescriptiveComplexity.Counting.Digits.Closure
+import all DescriptiveComplexity.Counting.Digits.Formulas
+import all DescriptiveComplexity.Counting.Digits.ProdSem
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.Counting.Digits.SumSweep
+import all DescriptiveComplexity.Counting.Digits.Tower
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Closure under products over the tuples of the structure
@@ -63,7 +70,7 @@ noncomputable def prodCovF :
 
 variable {A : Type} [K.Structure A] [LinearOrder A]
 
-theorem realize_prodBotF (i : Fin (m + ℓ) → A) :
+private theorem realize_prodBotF (i : Fin (m + ℓ) → A) :
     (@Formula.Realize _ A (ctxStr e A) _ (prodBotF e m ℓ) i) ↔ ∀ c, prodIx i ≤ c := by
   let := e.B.structure (e.inflLimit A)
   refine (LHom.realize_onFormula
@@ -73,7 +80,7 @@ theorem realize_prodBotF (i : Fin (m + ℓ) → A) :
     ((realize_minTupF (L := K) (v := i) (Fin.castAdd ℓ)).trans (tup_isBot_iff (t := ut i)).symm)
     ((realize_maxTupF (L := K) (v := i) (Fin.natAdd m)).trans (tup_isTop_iff (t := jt i)).symm))
 
-theorem realize_prodCovF [Nonempty A] (i₀ i : Fin (m + ℓ) → A) :
+private theorem realize_prodCovF [Nonempty A] (i₀ i : Fin (m + ℓ) → A) :
     (@Formula.Realize _ A (ctxStr e A) _ (prodCovF e m ℓ) (Sum.elim i₀ i)) ↔
       prodIx i₀ ⋖ prodIx i := by
   let := e.B.structure (e.inflLimit A)
@@ -101,7 +108,7 @@ end Order
 
 /-- The rows of the product sweep, as a family of numbers with the index as
 further parameters. -/
-noncomputable def prodFam {a m : ℕ} (ℓ : ℕ) (I : Fam K a) (F : Fam K (a + m)) :
+private noncomputable def prodFam {a m : ℕ} (ℓ : ℕ) (I : Fam K a) (F : Fam K (a + m)) :
     Fam K (a + (m + ℓ)) :=
   fun A _ _ x => pval (I A fun k => x (Fin.castAdd (m + ℓ) k))
     (fun u' : Lex (Fin m → A) =>
@@ -153,7 +160,7 @@ noncomputable def prodTheta (jI : e.B.lang.Relations (a + ℓ))
           fun k => Sum.inr (Fin.natAdd m k)))) ⊓
       prodTopF jI)
 
-theorem realize_prodTheta {jI : e.B.lang.Relations (a + ℓ)}
+private theorem realize_prodTheta {jI : e.B.lang.Relations (a + ℓ)}
     {jF : e.B.lang.Relations (a + m + ℓ)} {I : Fam K a} {F : Fam K (a + m)}
     (hjI : e.Computes jI (digRel ℓ I)) (hjF : e.Computes jF (digRel ℓ F)) (A : Type)
     [K.Structure A] [LinearOrder A] [Finite A] [Nonempty A]

@@ -10,6 +10,8 @@ public import DescriptiveComplexity.Problems.CodeHalt.Cert
 import DescriptiveComplexity.RecursivelyEnumerable
 public import DescriptiveComplexity.Problems.FinSat
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.CodeHalt.Cert
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # `CODEHALT` is in RE
@@ -125,7 +127,7 @@ noncomputable def certStr (ρ : evBlock.Assignment (A ⊕ Fin m)) :
   @sumStructure (newLang Language.code) evBlock.lang (A ⊕ Fin m)
     (extStructure Language.code A m) (evBlock.structure ρ)
 
-theorem relMap_inl {k : ℕ} (R : Language.code.Relations k) (y : Fin k → A) :
+private theorem relMap_inl {k : ℕ} (R : Language.code.Relations k) (y : Fin k → A) :
     RelMap (L := Language.code) (M := A ⊕ Fin m) R (fun i => Sum.inl (y i)) ↔ RelMap R y := by
   constructor
   · rintro ⟨y', hy', h⟩
@@ -287,37 +289,37 @@ theorem realize_evF (e x v' : γ) (v : γ → A ⊕ Fin m) :
 /-! ### Naming the symbols of the instance -/
 
 /-- Being the root. -/
-noncomputable def crootF (x : γ) : certLang.Formula γ := instF₁ cRoot x
+private noncomputable def crootF (x : γ) : certLang.Formula γ := instF₁ cRoot x
 
 /-- Drawing the constructor `zero`. -/
-noncomputable def czeroF (x : γ) : certLang.Formula γ := instF₁ cZero x
+private noncomputable def czeroF (x : γ) : certLang.Formula γ := instF₁ cZero x
 
 /-- Drawing the constructor `succ`. -/
-noncomputable def csuccF (x : γ) : certLang.Formula γ := instF₁ cSucc x
+private noncomputable def csuccF (x : γ) : certLang.Formula γ := instF₁ cSucc x
 
 /-- Drawing the constructor `left`. -/
-noncomputable def cleftF (x : γ) : certLang.Formula γ := instF₁ cLeft x
+private noncomputable def cleftF (x : γ) : certLang.Formula γ := instF₁ cLeft x
 
 /-- Drawing the constructor `right`. -/
-noncomputable def crightF (x : γ) : certLang.Formula γ := instF₁ cRight x
+private noncomputable def crightF (x : γ) : certLang.Formula γ := instF₁ cRight x
 
 /-- Drawing the constructor `pair`. -/
-noncomputable def cpairF (x : γ) : certLang.Formula γ := instF₁ cPair x
+private noncomputable def cpairF (x : γ) : certLang.Formula γ := instF₁ cPair x
 
 /-- Drawing the constructor `comp`. -/
-noncomputable def ccompF (x : γ) : certLang.Formula γ := instF₁ cComp x
+private noncomputable def ccompF (x : γ) : certLang.Formula γ := instF₁ cComp x
 
 /-- Drawing the constructor `prec`. -/
-noncomputable def cprecF (x : γ) : certLang.Formula γ := instF₁ cPrec x
+private noncomputable def cprecF (x : γ) : certLang.Formula γ := instF₁ cPrec x
 
 /-- Drawing the constructor `rfind'`. -/
-noncomputable def crfindF (x : γ) : certLang.Formula γ := instF₁ cRfind x
+private noncomputable def crfindF (x : γ) : certLang.Formula γ := instF₁ cRfind x
 
 /-- Being the first child. -/
-noncomputable def carg1F (x y : γ) : certLang.Formula γ := instF₂ cArg1 x y
+private noncomputable def carg1F (x y : γ) : certLang.Formula γ := instF₂ cArg1 x y
 
 /-- Being the second child. -/
-noncomputable def carg2F (x y : γ) : certLang.Formula γ := instF₂ cArg2 x y
+private noncomputable def carg2F (x y : γ) : certLang.Formula γ := instF₂ cArg2 x y
 
 /-! ### Guarded quantifiers
 
@@ -466,64 +468,66 @@ The order-theoretic shapes (`IsZ`, `IsS`, strictly below) and the arithmetic
 of a code's number, each a builder used many times below. -/
 
 /-- The numeral `x` is strictly below `y`. -/
-noncomputable def ltF (x y : γ) : certLang.Formula γ := fo%[x, y] leF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
+private noncomputable def ltF (x y : γ) : certLang.Formula γ := fo%[x, y] leF⟨x, y⟩ ∧ ¬ eqF⟨x, y⟩
 
 /-- `x` is the least numeral. -/
-noncomputable def isZF (x : γ) : certLang.Formula γ := allNewF (leF (up x) vr0)
+private noncomputable def isZF (x : γ) : certLang.Formula γ := allNewF (leF (up x) vr0)
 
 /-- `y` is the numeral just above `x`. -/
-noncomputable def isSF (x y : γ) : certLang.Formula γ :=
+private noncomputable def isSF (x y : γ) : certLang.Formula γ :=
   leF x y ⊓ ∼(eqF x y) ⊓
     allNewF (leF (up x) vr0 ⟹ leF vr0 (up y) ⟹ (eqF vr0 (up x) ⊔ eqF vr0 (up y)))
 
 /-- `q` is four times `p`. -/
-noncomputable def quadF (p q : γ) : certLang.Formula γ :=
+private noncomputable def quadF (p q : γ) : certLang.Formula γ :=
   exNewF (addF (up p) (up p) vr0 ⊓ addF vr0 vr0 (up q))
 
 /-- `e` is `q + 4`. -/
-noncomputable def plus4F (q e : γ) : certLang.Formula γ :=
+private noncomputable def plus4F (q e : γ) : certLang.Formula γ :=
   exNewF (exNewF (exNewF (isSF (up (up (up q))) vr2 ⊓ isSF vr2 vr1 ⊓ isSF vr1 vr0 ⊓
     isSF vr0 (up (up (up e))))))
 
 /-- `e` is `q + 5`. -/
-noncomputable def plus5F (q e : γ) : certLang.Formula γ :=
+private noncomputable def plus5F (q e : γ) : certLang.Formula γ :=
   exNewF (plus4F (up q) vr0 ⊓ isSF vr0 (up e))
 
 /-- `e` is `q + 6`. -/
-noncomputable def plus6F (q e : γ) : certLang.Formula γ :=
+private noncomputable def plus6F (q e : γ) : certLang.Formula γ :=
   exNewF (plus5F (up q) vr0 ⊓ isSF vr0 (up e))
 
 /-- `e` is `q + 7`. -/
-noncomputable def plus7F (q e : γ) : certLang.Formula γ :=
+private noncomputable def plus7F (q e : γ) : certLang.Formula γ :=
   exNewF (plus6F (up q) vr0 ⊓ isSF vr0 (up e))
 
 /-- `e` is the numeral `1`. -/
-noncomputable def isOneF (e : γ) : certLang.Formula γ := exNewF (isZF vr0 ⊓ isSF vr0 (up e))
+private noncomputable def isOneF (e : γ) : certLang.Formula γ := exNewF (isZF vr0 ⊓ isSF vr0 (up e))
 
 /-- `e` is the numeral `2`. -/
-noncomputable def isTwoF (e : γ) : certLang.Formula γ := exNewF (isOneF vr0 ⊓ isSF vr0 (up e))
+private noncomputable def isTwoF
+    (e : γ) : certLang.Formula γ := exNewF (isOneF vr0 ⊓ isSF vr0 (up e))
 
 /-- `e` is the numeral `3`. -/
-noncomputable def isThreeF (e : γ) : certLang.Formula γ := exNewF (isTwoF vr0 ⊓ isSF vr0 (up e))
+private noncomputable def isThreeF
+    (e : γ) : certLang.Formula γ := exNewF (isTwoF vr0 ⊓ isSF vr0 (up e))
 
 /-- `e` numbers the code `pair e₁ e₂`. -/
-noncomputable def isPairEF (e e₁ e₂ : γ) : certLang.Formula γ :=
+private noncomputable def isPairEF (e e₁ e₂ : γ) : certLang.Formula γ :=
   exNewF (exNewF (prF (up (up e₁)) (up (up e₂)) vr1 ⊓ quadF vr1 vr0 ⊓ plus4F vr0 (up (up e))))
 
 /-- `e` numbers the code `prec e₁ e₂`. -/
-noncomputable def isPrecEF (e e₁ e₂ : γ) : certLang.Formula γ :=
+private noncomputable def isPrecEF (e e₁ e₂ : γ) : certLang.Formula γ :=
   exNewF (exNewF (prF (up (up e₁)) (up (up e₂)) vr1 ⊓ quadF vr1 vr0 ⊓ plus5F vr0 (up (up e))))
 
 /-- `e` numbers the code `comp e₁ e₂`. -/
-noncomputable def isCompEF (e e₁ e₂ : γ) : certLang.Formula γ :=
+private noncomputable def isCompEF (e e₁ e₂ : γ) : certLang.Formula γ :=
   exNewF (exNewF (prF (up (up e₁)) (up (up e₂)) vr1 ⊓ quadF vr1 vr0 ⊓ plus6F vr0 (up (up e))))
 
 /-- `e` numbers the code `rfind' e₁`. -/
-noncomputable def isRfindEF (e e₁ : γ) : certLang.Formula γ :=
+private noncomputable def isRfindEF (e e₁ : γ) : certLang.Formula γ :=
   exNewF (quadF (up e₁) vr0 ⊓ plus7F vr0 (up e))
 
 /-- `(a, b)` is the pair enumerated just after `(a', b')`. -/
-noncomputable def nextPRF (a' b' a b : γ) : certLang.Formula γ :=
+private noncomputable def nextPRF (a' b' a b : γ) : certLang.Formula γ :=
   fo%[a', b', a, b]
     (((ltF⟨a', b'⟩ ∧ isSF⟨a', a⟩) ∧ ltF⟨a, b'⟩) ∧ eqF⟨b, b'⟩) ∨
       ((isSF⟨a', b'⟩ ∧ eqF⟨a, b'⟩) ∧ isZF⟨b⟩) ∨
@@ -533,40 +537,40 @@ noncomputable def nextPRF (a' b' a b : γ) : certLang.Formula γ :=
 /-! ### The order of the numeral segment -/
 
 /-- The order is reflexive. -/
-noncomputable def leReflS : certLang.Sentence := allNewF (leF vr0 vr0)
+private noncomputable def leReflS : certLang.Sentence := allNewF (leF vr0 vr0)
 
 /-- The order is transitive. -/
-noncomputable def leTransS : certLang.Sentence :=
+private noncomputable def leTransS : certLang.Sentence :=
   allNewF (allNewF (allNewF (leF vr2 vr1 ⟹ leF vr1 vr0 ⟹ leF vr2 vr0)))
 
 /-- The order is antisymmetric. -/
-noncomputable def leAntisymmS : certLang.Sentence :=
+private noncomputable def leAntisymmS : certLang.Sentence :=
   allNewF (allNewF (leF vr1 vr0 ⟹ leF vr0 vr1 ⟹ eqF vr1 vr0))
 
 /-- The order is total. -/
-noncomputable def leTotalS : certLang.Sentence :=
+private noncomputable def leTotalS : certLang.Sentence :=
   allNewF (allNewF (leF vr1 vr0 ⊔ leF vr0 vr1))
 
 /-- The numeral segment is linearly ordered. -/
-noncomputable def linS : certLang.Sentence :=
+private noncomputable def linS : certLang.Sentence :=
   leReflS ⊓ (leTransS ⊓ (leAntisymmS ⊓ leTotalS))
 
 /-! ### The justification rules -/
 
 /-- Every addition fact is justified by the recurrence. -/
-noncomputable def addOkS : certLang.Sentence :=
+private noncomputable def addOkS : certLang.Sentence :=
   allNewF (allNewF (allNewF (addF vr2 vr1 vr0 ⟹
     (isZF vr1 ⊓ eqF vr0 vr2) ⊔
       exNewF (exNewF (isSF vr1 vr3 ⊓ isSF vr0 vr2 ⊓ addF vr4 vr1 vr0)))))
 
 /-- Every pairing fact is justified by the successor rule. -/
-noncomputable def prOkS : certLang.Sentence :=
+private noncomputable def prOkS : certLang.Sentence :=
   allNewF (allNewF (allNewF (prF vr2 vr1 vr0 ⟹
     (isZF vr0 ⊓ isZF vr2 ⊓ isZF vr1) ⊔
       exNewF (exNewF (exNewF (isSF vr2 vr3 ⊓ prF vr1 vr0 vr2 ⊓ nextPRF vr1 vr0 vr5 vr4))))))
 
 /-- Every decoding fact is justified by the node's mark and its children. -/
-noncomputable def decOkS : certLang.Sentence :=
+private noncomputable def decOkS : certLang.Sentence :=
   allOldF (allNewF (decF vr1 vr0 ⟹
     (czeroF vr1 ⊓ isZF vr0) ⊔
       ((csuccF vr1 ⊓ isOneF vr0) ⊔
@@ -582,7 +586,7 @@ noncomputable def decOkS : certLang.Sentence :=
                     isRfindEF vr2 vr0)))))))))))
 
 /-- Every evaluation fact is justified by the rules of its code. -/
-noncomputable def evOkS : certLang.Sentence :=
+private noncomputable def evOkS : certLang.Sentence :=
   allNewF (allNewF (allNewF (evF vr2 vr1 vr0 ⟹
     (isZF vr2 ⊓ isZF vr0) ⊔
       ((isOneF vr2 ⊓ isSF vr1 vr0) ⊔
@@ -606,11 +610,11 @@ noncomputable def evOkS : certLang.Sentence :=
                           ∼(isZF vr0))))))))))))))))))
 
 /-- The root draws a code that returns something on `0`. -/
-noncomputable def rootS : certLang.Sentence :=
+private noncomputable def rootS : certLang.Sentence :=
   exOldF (exNewF (exNewF (exNewF (crootF vr3 ⊓ decF vr3 vr2 ⊓ isZF vr1 ⊓ evF vr2 vr1 vr0))))
 
 /-- **The kernel**: the invented values carry a halting computation. -/
-noncomputable def kernelS : certLang.Sentence :=
+private noncomputable def kernelS : certLang.Sentence :=
   linS ⊓ (addOkS ⊓ (prOkS ⊓ (decOkS ⊓ (evOkS ⊓ rootS))))
 
 /-! ### What the kernel says -/
@@ -683,7 +687,7 @@ private theorem realize_rootS :
 
 end CertRealize
 
-theorem realize_kernelS :
+private theorem realize_kernelS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) kernelS ↔ CertOK (certOf ρ) := by
   simp only [kernelS, Sentence.Realize, Formula.realize_inf]
   constructor

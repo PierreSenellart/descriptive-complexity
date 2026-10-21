@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
 public import DescriptiveComplexity.OccurrenceFormulas
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # SAT reduces to Clique by an ordered FO reduction
@@ -84,13 +85,13 @@ variable {A : Type} [Language.sat.Structure A]
 /-- Two genuine literal occurrences in distinct clauses that are not
 conflicting (the same variable with opposite signs): the adjacency condition
 between occurrence vertices, on the semantic side. -/
-def Compat (s₁ s₂ : Bool) (w₁ w₂ : Fin 2 → A) : Prop :=
+private def Compat (s₁ s₂ : Bool) (w₁ w₂ : Fin 2 → A) : Prop :=
   OccIn (w₁ 0) (w₁ 1) s₁ ∧ OccIn (w₂ 0) (w₂ 1) s₂ ∧ w₁ 0 ≠ w₂ 0 ∧
     (s₁ = s₂ ∨ w₁ 1 ≠ w₂ 1)
 
 /-- The adjacency condition of the interpreted graph: occurrence vertices are
 adjacent iff compatible, clause vertices are isolated. -/
-def AdjCore : SatCliqueTag → (Fin 2 → A) → SatCliqueTag → (Fin 2 → A) → Prop
+private def AdjCore : SatCliqueTag → (Fin 2 → A) → SatCliqueTag → (Fin 2 → A) → Prop
   | .pos, w₁, .pos, w₂ => Compat true true w₁ w₂
   | .pos, w₁, .neg, w₂ => Compat true false w₁ w₂
   | .neg, w₁, .pos, w₂ => Compat false true w₁ w₂
@@ -99,21 +100,21 @@ def AdjCore : SatCliqueTag → (Fin 2 → A) → SatCliqueTag → (Fin 2 → A) 
 
 /-- The marking condition of the interpreted graph: diagonal clause vertices
 – or every vertex, if some clause is empty. -/
-def MarkedCore : SatCliqueTag → (Fin 2 → A) → Prop
+private def MarkedCore : SatCliqueTag → (Fin 2 → A) → Prop
   | .cl, w => (w 0 = w 1 ∧ IsCl (w 0)) ∨ ∃ c : A, EmptyCl c
   | _, _ => ∃ c : A, EmptyCl c
 
 /-- A vertex stands for an actual literal occurrence of the CNF structure. -/
-def Genuine : SatCliqueTag → (Fin 2 → A) → Prop
+private def Genuine : SatCliqueTag → (Fin 2 → A) → Prop
   | .pos, w => OccIn (w 0) (w 1) true
   | .neg, w => OccIn (w 0) (w 1) false
   | .cl, _ => False
 
-theorem adjCore_ofSign {s₁ s₂ : Bool} {w₁ w₂ : Fin 2 → A} :
+private theorem adjCore_ofSign {s₁ s₂ : Bool} {w₁ w₂ : Fin 2 → A} :
     AdjCore (.ofSign s₁) w₁ (.ofSign s₂) w₂ ↔ Compat s₁ s₂ w₁ w₂ := by
   cases s₁ <;> cases s₂ <;> exact Iff.rfl
 
-theorem AdjCore.exists_sign {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
+private theorem AdjCore.exists_sign {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
     (h : AdjCore t₁ w₁ t₂ w₂) :
     ∃ s₁ s₂, t₁ = .ofSign s₁ ∧ t₂ = .ofSign s₂ ∧ Compat s₁ s₂ w₁ w₂ := by
   cases t₁ <;> cases t₂ <;> try exact (h : False).elim
@@ -122,17 +123,17 @@ theorem AdjCore.exists_sign {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
   · exact ⟨false, true, rfl, rfl, h⟩
   · exact ⟨false, false, rfl, rfl, h⟩
 
-theorem AdjCore.genuine_right {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
+private theorem AdjCore.genuine_right {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
     (h : AdjCore t₁ w₁ t₂ w₂) : Genuine t₂ w₂ := by
   obtain ⟨s₁, s₂, rfl, rfl, hc⟩ := h.exists_sign
   cases s₂ <;> exact hc.2.1
 
-theorem AdjCore.ne_clause {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
+private theorem AdjCore.ne_clause {t₁ t₂ : SatCliqueTag} {w₁ w₂ : Fin 2 → A}
     (h : AdjCore t₁ w₁ t₂ w₂) : w₁ 0 ≠ w₂ 0 := by
   obtain ⟨s₁, s₂, rfl, rfl, hc⟩ := h.exists_sign
   exact hc.2.2.1
 
-theorem Genuine.isCl {t : SatCliqueTag} {w : Fin 2 → A} (h : Genuine t w) :
+private theorem Genuine.isCl {t : SatCliqueTag} {w : Fin 2 → A} (h : Genuine t w) :
     IsCl (w 0) := by
   cases t
   · exact OccIn.isCl h
@@ -179,12 +180,12 @@ section Characterization
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem realize_compatF {s₁ s₂ : Bool} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_compatF {s₁ s₂ : Bool} {v : Fin 2 × Fin 2 → A} :
     (compatF s₁ s₂).Realize v ↔
       Compat s₁ s₂ (fun j => v (0, j)) (fun j => v (1, j)) := by
   by_cases h : s₁ = s₂ <;> simp [compatF, Compat, h, and_assoc]
 
-theorem realize_adjF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_adjF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
     (adjF t₁ t₂).Realize v ↔
       AdjCore t₁ (fun j => v (0, j)) t₂ (fun j => v (1, j)) := by
   cases t₁ <;> cases t₂ <;>
@@ -192,12 +193,12 @@ theorem realize_adjF {t₁ t₂ : SatCliqueTag} {v : Fin 2 × Fin 2 → A} :
       | exact realize_compatF
       | simp [adjF, AdjCore]
 
-theorem realize_markedF {t : SatCliqueTag} {v : Fin 1 × Fin 2 → A} :
+private theorem realize_markedF {t : SatCliqueTag} {v : Fin 1 × Fin 2 → A} :
     (markedF t).Realize v ↔ MarkedCore t (fun j => v (0, j)) := by
   cases t <;> simp [markedF, MarkedCore]
 
 /-- Characterization of the interpreted adjacency relation. -/
-theorem satToClique_adj (t₁ t₂ : SatCliqueTag) (w₁ w₂ : Fin 2 → A) :
+private theorem satToClique_adj (t₁ t₂ : SatCliqueTag) (w₁ w₂ : Fin 2 → A) :
     RelMap (M := satToClique.Map A) mgAdj ![(t₁, w₁), (t₂, w₂)] ↔
       AdjCore t₁ w₁ t₂ w₂ := by
   rw [FOInterpretation.relMap_map]
@@ -206,7 +207,7 @@ theorem satToClique_adj (t₁ t₂ : SatCliqueTag) (w₁ w₂ : Fin 2 → A) :
   simp
 
 /-- Characterization of the interpreted mark relation. -/
-theorem satToClique_marked (t : SatCliqueTag) (w : Fin 2 → A) :
+private theorem satToClique_marked (t : SatCliqueTag) (w : Fin 2 → A) :
     RelMap (M := satToClique.Map A) mgMarked ![(t, w)] ↔ MarkedCore t w := by
   rw [FOInterpretation.relMap_map]
   simp only [satToClique]
@@ -229,7 +230,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- When no clause is empty, the marked vertices are exactly the diagonal
 clause vertices, one per clause. -/
-def markedEquivClause (hne : ¬∃ c : A, EmptyCl c) :
+private def markedEquivClause (hne : ¬∃ c : A, EmptyCl c) :
     {v : satToClique.Map A // MGMarked v} ≃ {c : A // IsCl c} where
   toFun v := ⟨v.1.2 0, by
     obtain ⟨⟨t, w⟩, hm⟩ := v
@@ -258,7 +259,7 @@ variable (A) in
 /-- Correctness of the reduction: a finite ordered CNF structure is
 satisfiable iff its interpreted marked graph has a clique at least as large
 as the marked set. -/
-theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
+private theorem satisfiable_iff_hasLargeClique [Finite A] [Nonempty A] :
     Satisfiable A ↔ HasLargeClique (satToClique.Map A) := by
   classical
   have hfin : Finite (satToClique.Map A) := satToClique.map_finite A
@@ -446,7 +447,7 @@ CNF structure to a yes-instance of Clique iff it is satisfiable. (The order
 is never mentioned by the formulas; the ordered packaging only serves to
 restrict correctness to finite structures, as required by the finiteness
 conjunct of `DescriptiveComplexity.Clique`.) -/
-noncomputable def sat_ordered_fo_reduction_clique : SAT ≤ᶠᵒ[≤] Clique where
+private noncomputable def sat_ordered_fo_reduction_clique : SAT ≤ᶠᵒ[≤] Clique where
   Tag := SatCliqueTag
   dim := 2
   toInterpretation := satToClique

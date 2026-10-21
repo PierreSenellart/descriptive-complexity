@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.FixedPointStepRel
 import DescriptiveComplexity.SecondOrderOrdered
+import all DescriptiveComplexity.FixedPointStepRel
+import all DescriptiveComplexity.SecondOrderNewPull
 
 /-!
 # Second-order definability pulls back through a relativized interpretation

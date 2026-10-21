@@ -9,6 +9,11 @@ public import DescriptiveComplexity.KromImplication
 public import DescriptiveComplexity.ClauseDischarge
 public import DescriptiveComplexity.TransitiveClosureKrom
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.ClauseDischarge
+import all DescriptiveComplexity.KromImplication
+import all DescriptiveComplexity.LogSpace
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.TwoCnf
 
 /-!
 # From the Krom fragment to FO(TC), through the complement
@@ -91,7 +96,7 @@ noncomputable def edgeCaseF (c : KromClause (L.sum Language.order) B k)
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_edgeCaseF {c : KromClause (L.sum Language.order) B k} {a₁ a₂ : SOAtom B k}
+private theorem realize_edgeCaseF {c : KromClause (L.sum Language.order) B k} {a₁ a₂ : SOAtom B k}
     {u w : Fin (clauseDim B k) → γ} :
     (edgeCaseF c a₁ a₂ u w).Realize v ↔
       ∃ t : Fin (clauseDim B k) → A,
@@ -129,7 +134,7 @@ theorem litAt_snd (i : B.ι) (s : Bool) (w : Fin (clauseDim B k) → A) :
 
 /-- The literal of a Krom literal, read at the prefix of a clause tuple, is the
 literal its atom denotes at the canonical padding of its arguments. -/
-theorem litAt_pad {a₀ : A} (ha₀ : IsBot a₀) (l : KromLit B k)
+private theorem litAt_pad {a₀ : A} (ha₀ : IsBot a₀) (l : KromLit B k)
     (t : Fin (clauseDim B k) → A) {x : Fin (clauseDim B k) → A}
     (hpad : PadTup (atomIdx l.atom) t x) :
     litAt l.atom.idx l.positive x =
@@ -157,7 +162,7 @@ noncomputable def clauseEdgeF (c : KromClause (L.sum Language.order) B k) (i j :
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_clauseEdgeF {c : KromClause (L.sum Language.order) B k} {i j : B.ι}
+private theorem realize_clauseEdgeF {c : KromClause (L.sum Language.order) B k} {i j : B.ι}
     {s t : Bool} {u w : Fin (clauseDim B k) → γ} :
     (clauseEdgeF c i j s t u w).Realize v ↔
       ∃ pr ∈ KromImpl.edgePairs c,
@@ -196,7 +201,7 @@ section ProgramEdge
 
 /-- Decoding a node tuple from the literal it denotes: under canonicity, the
 tuple *is* the canonical padding of the literal's arguments. -/
-theorem eq_pad_of_litAt_eq {A : Type} [LinearOrder A] {a₀ : A}
+private theorem eq_pad_of_litAt_eq {A : Type} [LinearOrder A] {a₀ : A}
     (ha₀ : IsBot a₀) {i : B.ι} {s : Bool} {x : Fin (clauseDim B k) → A} {l : KromLit B k}
     {vv : Fin k → A} (hcan : Canon (B.arity i) x) (h : litAt i s x = KromImpl.litOf l vv) :
     l.atom.idx = i ∧ l.positive = s ∧ x = pad a₀ fun m => vv (l.atom.args m) := by
@@ -407,7 +412,7 @@ section StepRealize
 variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- Realization of a step between walk modes, spelled out. -/
-theorem realize_stepWalkF {p q : Walk B}
+private theorem realize_stepWalkF {p q : Walk B}
     {x y : Fin (clauseDim B k + clauseDim B k) → A} :
     (stepWalkF prog p q).Realize (Sum.elim x y) ↔
       (q.1 = p.1 ∧
@@ -466,7 +471,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 omit [Finite A] [Nonempty A] in
 /-- Realization of a step of the specification, between walk modes. -/
-theorem step_spec_walk_iff {p q : Walk B}
+private theorem step_spec_walk_iff {p q : Walk B}
     {x y : Fin (clauseDim B k + clauseDim B k) → A} :
     (spec prog).Step (Sum.inl p, x) (Sum.inl q, y) ↔
       (stepWalkF prog p q).Realize (Sum.elim x y) :=
@@ -474,7 +479,7 @@ theorem step_spec_walk_iff {p q : Walk B}
 
 omit [Finite A] [Nonempty A] in
 /-- There is no step into the goal-reporting mode. -/
-theorem not_step_goal_right {p : Mode B} {x y : Fin (clauseDim B k + clauseDim B k) → A} :
+private theorem not_step_goal_right {p : Mode B} {x y : Fin (clauseDim B k + clauseDim B k) → A} :
     ¬(spec prog).Step (p, x) (Sum.inr (), y) := by
   cases p <;> exact id
 
@@ -552,7 +557,7 @@ theorem litAt_pad_self (a₀ : A) (p : TwoCnf.Lit (KromImpl.KromAtom B A)) :
 
 /-- **A carry step lifts to a step of the specification**, at the canonically
 padded nodes. -/
-theorem step_of_carryStep {a₀ : A} (ha₀ : IsBot a₀)
+private theorem step_of_carryStep {a₀ : A} (ha₀ : IsBot a₀)
     {n m : TwoCnf.CarryNode (KromImpl.KromAtom B A)}
     (h : TwoCnf.CarryStep (KromImpl.clauseRel prog) n m) :
     (spec prog).Step (Sum.inl (modeOf n), tupleOf a₀ n) (Sum.inl (modeOf m), tupleOf a₀ m) := by
@@ -598,7 +603,7 @@ theorem step_of_carryStep {a₀ : A} (ha₀ : IsBot a₀)
       rw [tupleOf_sndHalf, tupleOf_fstHalf, hneg, TwoCnf.neg]
 
 /-- **A step of the specification is a carry step** of the decoded nodes. -/
-theorem carryStep_of_step {p q : Walk B} {x y : Fin (clauseDim B k + clauseDim B k) → A}
+private theorem carryStep_of_step {p q : Walk B} {x y : Fin (clauseDim B k + clauseDim B k) → A}
     (h : (spec prog).Step (Sum.inl p, x) (Sum.inl q, y)) :
     TwoCnf.CarryStep (KromImpl.clauseRel prog) (decodeNode p x) (decodeNode q y) := by
   rw [step_spec_walk_iff, realize_stepWalkF] at h
@@ -630,7 +635,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- **A walk of the cycle-witnessing graph lifts to a walk of the
 specification**, at the canonically padded nodes. -/
-theorem reach_of_carryReach {a₀ : A} (ha₀ : IsBot a₀)
+private theorem reach_of_carryReach {a₀ : A} (ha₀ : IsBot a₀)
     {n m : TwoCnf.CarryNode (KromImpl.KromAtom B A)}
     (h : Relation.ReflTransGen (TwoCnf.CarryStep (KromImpl.clauseRel prog)) n m) :
     (spec prog).Reach (Sum.inl (modeOf n), tupleOf a₀ n)
@@ -642,7 +647,7 @@ theorem reach_of_carryReach {a₀ : A} (ha₀ : IsBot a₀)
 /-- **A walk of the specification out of a walk mode is one of the
 cycle-witnessing graph**: the goal-reporting mode is never entered, so every
 node along the way decodes to a carry node. -/
-theorem carryReach_of_reach {p : Walk B} {x : Fin (clauseDim B k + clauseDim B k) → A}
+private theorem carryReach_of_reach {p : Walk B} {x : Fin (clauseDim B k + clauseDim B k) → A}
     {d : (spec prog).Node A} (h : (spec prog).Reach (Sum.inl p, x) d) :
     ∃ (q : Walk B) (y : Fin (clauseDim B k + clauseDim B k) → A), d = (Sum.inl q, y) ∧
       Relation.ReflTransGen (TwoCnf.CarryStep (KromImpl.clauseRel prog))
@@ -668,7 +673,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 omit [Finite A] [Nonempty A] in
 /-- A walk node is a starting node exactly when its current literal is its
 start, its flag is down, and its two halves are the same canonical tuple. -/
-theorem isSrc_inl_iff {i j : B.ι} {s t ph : Bool}
+private theorem isSrc_inl_iff {i j : B.ι} {s t ph : Bool}
     {x : Fin (clauseDim B k + clauseDim B k) → A} :
     (spec prog).IsSrc (Sum.inl ((i, s), (j, t), ph), x) ↔
       (((i, s) : LitMode B) = (j, t) ∧ ph = false) ∧
@@ -696,7 +701,7 @@ theorem isSrc_inl_iff {i j : B.ι} {s t ph : Bool}
 omit [Finite A] [Nonempty A] in
 /-- A walk node is accepting exactly when its current literal is its start
 again, with the flag up. -/
-theorem isTgt_inl_iff {i j : B.ι} {s t ph : Bool}
+private theorem isTgt_inl_iff {i j : B.ι} {s t ph : Bool}
     {x : Fin (clauseDim B k + clauseDim B k) → A} :
     (spec prog).IsTgt (Sum.inl ((i, s), (j, t), ph), x) ↔
       (((i, s) : LitMode B) = (j, t) ∧ ph = true) ∧
@@ -718,13 +723,13 @@ theorem isTgt_inl_iff {i j : B.ι} {s t ph : Bool}
 omit [Finite A] in
 /-- The goal-reporting mode is a starting mode exactly when a goal clause
 fires. -/
-theorem isSrc_inr_iff {x : Fin (clauseDim B k + clauseDim B k) → A} :
+private theorem isSrc_inr_iff {x : Fin (clauseDim B k + clauseDim B k) → A} :
     (spec prog).IsSrc (Sum.inr (), x) ↔ KromImpl.GoalFires prog A :=
   realize_goalF prog
 
 omit [Finite A] in
 /-- The goal-reporting mode is accepting exactly when a goal clause fires. -/
-theorem isTgt_inr_iff {x : Fin (clauseDim B k + clauseDim B k) → A} :
+private theorem isTgt_inr_iff {x : Fin (clauseDim B k + clauseDim B k) → A} :
     (spec prog).IsTgt (Sum.inr (), x) ↔ KromImpl.GoalFires prog A :=
   realize_goalF prog
 

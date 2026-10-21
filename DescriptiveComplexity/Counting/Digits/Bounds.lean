@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.Quantitative
 import DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Padding
 
 /-!
 # The size of the value of a quantitative term
@@ -48,7 +49,7 @@ private theorem exp_mono {n : ℕ} (hn : 2 ≤ n) {a b : ℕ} (h : a ≤ b) :
 
 /-- **The value of a term has polynomially many digits**: it is at most
 `2 ^ (n ^ ℓ)` on the structures with `n ≥ 2` elements. -/
-theorem exists_bound_le {α : Type} (t : QTerm L α) :
+private theorem exists_bound_le {α : Type} (t : QTerm L α) :
     ∃ ℓ : ℕ, ∀ (A : Type) [L.Structure A] [Finite A], 2 ≤ Nat.card A →
       ∀ v : α → A, t.eval v ≤ 2 ^ (Nat.card A ^ ℓ) := by
   induction t with

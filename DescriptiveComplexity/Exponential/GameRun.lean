@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Exponential.AltQuant
+import all DescriptiveComplexity.Exponential.GameCtrl
+import all DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Exponential.GameTape
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # A configuration of the control, and the steps out of it
@@ -154,7 +159,7 @@ theorem CtrlCfg.read (h₀ : IsBot a₀) {p : MachPh V M} {vv : Fin (gameDim B V
   rw [h.2.2.1, h.2.2.2 (leftPt a₀ p.par) (machPosn_leftPt a₀ p.par) (fun _ _ => h₀),
     tapeOfAssign_leftPt]
 
-theorem CtrlCfg.posn {p : MachPh V M} {vv : Fin (gameDim B V) → A}
+private theorem CtrlCfg.posn {p : MachPh V M} {vv : Fin (gameDim B V) → A}
     {c : Config (GamePt B V M A)} (h₀ : IsBot a₀) (h : CtrlCfg a₀ hdim vars ρ σ p vv c) :
     (𝕄).Posn c.head := by
   rw [h.2.2.1]; exact ⟨trivial, fun _ _ => h₀⟩
@@ -162,7 +167,7 @@ theorem CtrlCfg.posn {p : MachPh V M} {vv : Fin (gameDim B V) → A}
 /-- **A phase that declares no coordinate is entered at the constant
 valuation** – which is every phase of the game proper, and the entry of every
 question's prefix. -/
-theorem ctrlCfg_of_arity_zero {p : MachPh V M} (harity : MachPh.arity vars p = 0)
+private theorem ctrlCfg_of_arity_zero {p : MachPh V M} (harity : MachPh.arity vars p = 0)
     {w : Fin (gameDim B V) → A} {c : Config (GamePt B V M A)}
     (h : CtrlCfg a₀ hdim vars ρ σ p (truncTuple a₀ (MachPh.arity vars p) w) c) :
     CtrlCfg a₀ hdim vars ρ σ p (fun _ => a₀) c := by
@@ -236,14 +241,14 @@ theorem ctrlCfg_cases (h₀ : IsBot a₀) {p : MachPh V M} {vv : Fin (gameDim B 
 
 /-- **A state of the control belongs to the universal player exactly when its
 phase does** – read at a configuration rather than at a point. -/
-theorem isUniv_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
+private theorem isUniv_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
     {c : Config (GamePt B V M A)} (h : CtrlCfg a₀ hdim vars ρ σ p vv c) :
     (𝕄).IsUniv true c.state ↔ MachPh.IsUniv pol p = true := by
   rw [h.1]
   exact gameMachine_isUniv hdim _ p vv
 
 /-- **The accepting phase accepts.** -/
-theorem acc_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
+private theorem acc_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
     {c : Config (GamePt B V M A)} (hk : p.kind = .acc)
     (h : CtrlCfg a₀ hdim vars ρ σ p vv c) : (𝕄).Acc c.state :=
   ⟨p, by rw [h.1]; rfl, hk⟩
@@ -321,7 +326,7 @@ theorem qval_update (hV : ∀ q, vars q ≤ V) (q : GameQuestion) {j : ℕ}
 /-- **The prefix hands over to the claim** once every variable has been
 written. The phase still has an owner, but only one successor, so the two
 readings of `DescriptiveComplexity.altWin_of_steps` coincide. -/
-theorem altWin_pre_last (h₀ : IsBot a₀) (hV : ∀ q, vars q ≤ V) {q : GameQuestion}
+private theorem altWin_pre_last (h₀ : IsBot a₀) (hV : ∀ q, vars q ≤ V) {q : GameQuestion}
     {P : (Fin (vars q) → A) → Prop} {r par : Bool} {jj : Fin (V + 1)}
     (hjj : (jj : ℕ) = vars q)
     (hclaim : ∀ (par' : Bool) (vv' : Fin (gameDim B V) → A) (c' : Config (GamePt B V M A)),

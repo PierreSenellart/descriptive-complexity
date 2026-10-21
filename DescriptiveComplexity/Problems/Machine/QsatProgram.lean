@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Machine.QsatTape
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Problems.Machine.Tape
 
 /-!
 # The machine of a quantified Boolean formula
@@ -332,7 +333,7 @@ section Functional
 
 omit [Language.qsat.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Two elements agree when their tag and both coordinates do. -/
-theorem qV_ext {τ τ' : QV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0) (h1 : τ.2 1 = τ'.2 1) :
+private theorem qV_ext {τ τ' : QV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0) (h1 : τ.2 1 = τ'.2 1) :
     τ = τ' := by
   refine Prod.ext ht (funext fun i => ?_)
   fin_cases i
@@ -351,14 +352,14 @@ theorem qOne_eq_qOne_iff {t t' : QTag} {a a' : A} :
 
 omit [Language.qsat.Structure A] in
 /-- A transition writes exactly one symbol. -/
-theorem qWrite_functional {τ a a' : QV A} (h : QWrite τ a) (h' : QWrite τ a') : a = a' := by
+private theorem qWrite_functional {τ a a' : QV A} (h : QWrite τ a) (h' : QWrite τ a') : a = a' := by
   unfold QWrite at h h'
   cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
 
 /-- A transition moves to exactly one state. The only case with a choice is
 the evaluation sweep, whose two branches are separated by the flag and by
 `DescriptiveComplexity.QsatTM.QLit`. -/
-theorem qDst_functional {τ q q' : QV A} (h : QDst τ q) (h' : QDst τ q') : q = q' := by
+private theorem qDst_functional {τ q q' : QV A} (h : QDst τ q) (h' : QDst τ q') : q = q' := by
   unfold QDst at h h'
   cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h'
   case tEval b f fl d =>
@@ -376,7 +377,7 @@ theorem qDst_functional {τ q q' : QV A} (h : QDst τ q) (h' : QDst τ q') : q =
 omit [Finite A] [Nonempty A] in
 /-- **The end of the descent is not ambiguous**: the matrix either has a
 clause or has none. -/
-theorem qTr_descEnd_excl {τ τ' : QV A} (h : QTr τ) (h' : QTr τ')
+private theorem qTr_descEnd_excl {τ τ' : QV A} (h : QTr τ) (h' : QTr τ')
     (hτ : τ.1 = QTag.tDescEndTrue) (hτ' : τ'.1 = QTag.tDescEndEval) : False := by
   unfold QTr at h h'
   rw [hτ] at h
@@ -386,7 +387,7 @@ theorem qTr_descEnd_excl {τ τ' : QV A} (h : QTr τ) (h' : QTr τ')
 omit [Finite A] [Nonempty A] in
 /-- **A turn is not ambiguous**: the clause just evaluated either has a
 successor or is the last one. -/
-theorem qTr_turn_excl {τ τ' : QV A} {d d' : Bool} (h : QTr τ) (h' : QTr τ')
+private theorem qTr_turn_excl {τ τ' : QV A} {d d' : Bool} (h : QTr τ) (h' : QTr τ')
     (hτ : τ.1 = QTag.tTurnNext d) (hτ' : τ'.1 = QTag.tTurnLast d')
     (hc : τ.2 0 = τ'.2 0) : False := by
   unfold QTr at h h'
@@ -397,7 +398,7 @@ theorem qTr_turn_excl {τ τ' : QV A} {d d' : Bool} (h : QTr τ) (h' : QTr τ')
 omit [Finite A] [Nonempty A] in
 /-- **The return step is not ambiguous**: a level either is decided – by the
 quantifier or by its flag – or is not. -/
-theorem qTr_proc_excl {τ τ' : QV A} {v b f v' b' f' : Bool} (h : QTr τ) (h' : QTr τ')
+private theorem qTr_proc_excl {τ τ' : QV A} {v b f v' b' f' : Bool} (h : QTr τ) (h' : QTr τ')
     (hτ : τ.1 = QTag.tProcSkip v b f) (hτ' : τ'.1 = QTag.tProcSwitch v' b' f')
     (hv : v = v') (hx : τ.2 0 = τ'.2 0) (hf : f = f') : False := by
   unfold QTr at h h'
@@ -411,7 +412,7 @@ theorem qTr_proc_excl {τ τ' : QV A} {v b f v' b' f' : Bool} (h : QTr τ) (h' :
 
 /-- The tag of the state a transition applies in, as a function of its own
 tag. Junk tags are sent to themselves; they are never transitions. -/
-def qStateTag : QTag → QTag
+private def qStateTag : QTag → QTag
   | .tDescStart => .qDesc
   | .tDescCell _ _ => .qDesc
   | .tDescEndTrue => .qDesc
@@ -429,7 +430,7 @@ def qStateTag : QTag → QTag
   | t => t
 
 /-- The tag of the symbol a transition reads, as a function of its own tag. -/
-def qReadTag : QTag → QTag
+private def qReadTag : QTag → QTag
   | .tDescStart => .sStart
   | .tDescCell b f => .sVal b f
   | .tDescEndTrue => .sEnd
@@ -447,13 +448,13 @@ def qReadTag : QTag → QTag
   | t => t
 
 /-- **The state pins the transition's tag.** -/
-theorem qSrc_tag {τ q : QV A} (hτ : QTr τ) (hs : QSrc τ q) : q.1 = qStateTag τ.1 := by
+private theorem qSrc_tag {τ q : QV A} (hτ : QTr τ) (hs : QSrc τ q) : q.1 = qStateTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [QTr, QSrc] at hτ hs <;>
     (rw [hs]; rfl)
 
 /-- **The symbol read pins the transition's tag.** -/
-theorem qRead_tag {τ a : QV A} (hτ : QTr τ) (hr : QRead τ a) : a.1 = qReadTag τ.1 := by
+private theorem qRead_tag {τ a : QV A} (hτ : QTr τ) (hr : QRead τ a) : a.1 = qReadTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [QTr, QRead] at hτ hr <;>
     first
@@ -461,7 +462,7 @@ theorem qRead_tag {τ a : QV A} (hτ : QTr τ) (hr : QRead τ a) : a.1 = qReadTa
       | (rename_i d; cases d <;> (rw [hr]; rfl))
 
 /-- Being the tag of a transition. -/
-def qIsTrTag : QTag → Bool
+private def qIsTrTag : QTag → Bool
   | .tDescStart | .tDescCell _ _ | .tDescEndTrue | .tDescEndEval
   | .tEval _ _ _ _ | .tTurnNext _ | .tTurnLast _ | .tTurnFalse _
   | .tToEndCell _ _ _ | .tToEndStart _ | .tToEndTurn _
@@ -469,32 +470,32 @@ def qIsTrTag : QTag → Bool
   | _ => false
 
 /-- The tag ending the descent with no clause to evaluate. -/
-def qIsDescEndTrue : QTag → Bool
+private def qIsDescEndTrue : QTag → Bool
   | .tDescEndTrue => true
   | _ => false
 
 /-- The tag ending the descent with a clause to evaluate. -/
-def qIsDescEndEval : QTag → Bool
+private def qIsDescEndEval : QTag → Bool
   | .tDescEndEval => true
   | _ => false
 
 /-- The tag turning to the next clause. -/
-def qIsTurnNext : QTag → Bool
+private def qIsTurnNext : QTag → Bool
   | .tTurnNext _ => true
   | _ => false
 
 /-- The tag finishing the last clause. -/
-def qIsTurnLast : QTag → Bool
+private def qIsTurnLast : QTag → Bool
   | .tTurnLast _ => true
   | _ => false
 
 /-- The tag passing a decided level on. -/
-def qIsProcSkip : QTag → Bool
+private def qIsProcSkip : QTag → Bool
   | .tProcSkip _ _ _ => true
   | _ => false
 
 /-- The tag switching a level to its second value. -/
-def qIsProcSwitch : QTag → Bool
+private def qIsProcSwitch : QTag → Bool
   | .tProcSwitch _ _ _ => true
   | _ => false
 
@@ -502,76 +503,77 @@ set_option maxRecDepth 20000 in
 /-- **The state and the symbol determine the transition's tag, up to the three
 known branch points**: the end of the descent, a turn, and the return step. A
 finite check over the tags – no case analysis by hand. -/
-theorem qTag_cases : ∀ t t' : QTag, qIsTrTag t → qIsTrTag t' →
+private theorem qTag_cases : ∀ t t' : QTag, qIsTrTag t → qIsTrTag t' →
     qStateTag t = qStateTag t' → qReadTag t = qReadTag t' →
     t = t' ∨ (qIsDescEndTrue t ∧ qIsDescEndEval t') ∨ (qIsDescEndEval t ∧ qIsDescEndTrue t')
       ∨ (qIsTurnNext t ∧ qIsTurnLast t') ∨ (qIsTurnLast t ∧ qIsTurnNext t')
       ∨ (qIsProcSkip t ∧ qIsProcSwitch t') ∨ (qIsProcSwitch t ∧ qIsProcSkip t') := by
   decide
 
-theorem qIsDescEndTrue_iff {t : QTag} : qIsDescEndTrue t ↔ t = .tDescEndTrue := by
+private theorem qIsDescEndTrue_iff {t : QTag} : qIsDescEndTrue t ↔ t = .tDescEndTrue := by
   cases t <;> simp [qIsDescEndTrue]
 
-theorem qIsDescEndEval_iff {t : QTag} : qIsDescEndEval t ↔ t = .tDescEndEval := by
+private theorem qIsDescEndEval_iff {t : QTag} : qIsDescEndEval t ↔ t = .tDescEndEval := by
   cases t <;> simp [qIsDescEndEval]
 
-theorem qIsTurnNext_iff {t : QTag} : qIsTurnNext t ↔ ∃ d, t = .tTurnNext d := by
+private theorem qIsTurnNext_iff {t : QTag} : qIsTurnNext t ↔ ∃ d, t = .tTurnNext d := by
   cases t <;> simp [qIsTurnNext]
 
-theorem qIsTurnLast_iff {t : QTag} : qIsTurnLast t ↔ ∃ d, t = .tTurnLast d := by
+private theorem qIsTurnLast_iff {t : QTag} : qIsTurnLast t ↔ ∃ d, t = .tTurnLast d := by
   cases t <;> simp [qIsTurnLast]
 
-theorem qIsProcSkip_iff {t : QTag} : qIsProcSkip t ↔ ∃ v b f, t = .tProcSkip v b f := by
+private theorem qIsProcSkip_iff {t : QTag} : qIsProcSkip t ↔ ∃ v b f, t = .tProcSkip v b f := by
   cases t <;> simp [qIsProcSkip]
 
-theorem qIsProcSwitch_iff {t : QTag} : qIsProcSwitch t ↔ ∃ v b f, t = .tProcSwitch v b f := by
+private theorem qIsProcSwitch_iff
+    {t : QTag} : qIsProcSwitch t ↔ ∃ v b f, t = .tProcSwitch v b f := by
   cases t <;> simp [qIsProcSwitch]
 
 omit [Finite A] [Nonempty A] in
 /-- Only transitions have transition tags. -/
-theorem qTr_isTrTag {τ : QV A} (hτ : QTr τ) : qIsTrTag τ.1 := by
+private theorem qTr_isTrTag {τ : QV A} (hτ : QTr τ) : qIsTrTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> first | exact False.elim hτ | rfl
 
 omit [Language.qsat.Structure A] in
 /-- Reading off `DescriptiveComplexity.QsatTM.QSrc` at a turn-to-next tag. -/
-theorem qSrc_turnNext {τ q : QV A} {d : Bool} (h : τ.1 = .tTurnNext d) (hs : QSrc τ q) :
+private theorem qSrc_turnNext {τ q : QV A} {d : Bool} (h : τ.1 = .tTurnNext d) (hs : QSrc τ q) :
     q = stEval true d (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
 omit [Language.qsat.Structure A] in
 /-- Reading off `DescriptiveComplexity.QsatTM.QSrc` at a turn-to-last tag. -/
-theorem qSrc_turnLast {τ q : QV A} {d : Bool} (h : τ.1 = .tTurnLast d) (hs : QSrc τ q) :
+private theorem qSrc_turnLast {τ q : QV A} {d : Bool} (h : τ.1 = .tTurnLast d) (hs : QSrc τ q) :
     q = stEval true d (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
 omit [Language.qsat.Structure A] in
 /-- Reading off `DescriptiveComplexity.QsatTM.QSrc` at a skip tag. -/
-theorem qSrc_procSkip {τ q : QV A} {v b f : Bool} (h : τ.1 = .tProcSkip v b f)
+private theorem qSrc_procSkip {τ q : QV A} {v b f : Bool} (h : τ.1 = .tProcSkip v b f)
     (hs : QSrc τ q) : q = stProc v := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
 omit [Language.qsat.Structure A] in
 /-- Reading off `DescriptiveComplexity.QsatTM.QSrc` at a switch tag. -/
-theorem qSrc_procSwitch {τ q : QV A} {v b f : Bool} (h : τ.1 = .tProcSwitch v b f)
+private theorem qSrc_procSwitch {τ q : QV A} {v b f : Bool} (h : τ.1 = .tProcSwitch v b f)
     (hs : QSrc τ q) : q = stProc v := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
 omit [Language.qsat.Structure A] in
 /-- Reading off `DescriptiveComplexity.QsatTM.QRead` at a skip tag. -/
-theorem qRead_procSkip {τ a : QV A} {v b f : Bool} (h : τ.1 = .tProcSkip v b f)
+private theorem qRead_procSkip {τ a : QV A} {v b f : Bool} (h : τ.1 = .tProcSkip v b f)
     (hr : QRead τ a) : a = symV b f (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hr
 
 omit [Language.qsat.Structure A] in
 /-- Reading off `DescriptiveComplexity.QsatTM.QRead` at a switch tag. -/
-theorem qRead_procSwitch {τ a : QV A} {v b f : Bool} (h : τ.1 = .tProcSwitch v b f)
+private theorem qRead_procSwitch {τ a : QV A} {v b f : Bool} (h : τ.1 = .tProcSwitch v b f)
     (hr : QRead τ a) : a = symV b f (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hr
 
 /-- Equal tags force equal payloads: the state and the symbol pin one
 coordinate, the promises in `DescriptiveComplexity.QsatTM.QTr` pin the other. -/
-theorem qTr_payload {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
+private theorem qTr_payload {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
     (hs : QSrc τ q) (hs' : QSrc τ' q) (hr : QRead τ a) (hr' : QRead τ' a)
     (ht : τ.1 = τ'.1) : τ = τ' := by
   have hmin : ∀ u v : A, (∀ b : A, u ≤ b) → (∀ b : A, v ≤ b) → u = v :=
@@ -599,7 +601,7 @@ theorem qTr_payload {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
 state and the symbol read pin the tag (`DescriptiveComplexity.QsatTM.qTag_cases`),
 the tag pins the payload (`DescriptiveComplexity.QsatTM.qTr_payload`), and the three
 branch points are exclusive. -/
-theorem qTr_unique {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
+private theorem qTr_unique {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
     (hs : QSrc τ q) (hs' : QSrc τ' q) (hr : QRead τ a) (hr' : QRead τ' a) : τ = τ' := by
   have hst : qStateTag τ.1 = qStateTag τ'.1 :=
     (qSrc_tag hτ hs).symm.trans (qSrc_tag hτ' hs')
@@ -651,11 +653,11 @@ theorem qTr_unique {τ τ' q a : QV A} (hτ : QTr τ) (hτ' : QTr τ')
 
 omit [Language.qsat.Structure A] [Finite A] [Nonempty A] in
 /-- There is exactly one start state. -/
-theorem qStart_unique {q q' : QV A} (h : QStart q) (h' : QStart q') : q = q' :=
+private theorem qStart_unique {q q' : QV A} (h : QStart q) (h' : QStart q') : q = q' :=
   Prod.ext (h.1.trans h'.1.symm) (isMinTup_unique h.2 h'.2)
 
 /-- **The machine is deterministic.** -/
-theorem qsatMachine_deterministic : (qsatMachine A).Deterministic :=
+private theorem qsatMachine_deterministic : (qsatMachine A).Deterministic :=
   ⟨fun _ _ h h' => qStart_unique h h',
     fun _ _ _ _ h h' hs hs' hr hr' => qTr_unique h h' hs hs' hr hr',
     fun _ _ _ h h' => qDst_functional h h',

@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSeek
 import DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The seek kit: random access
@@ -261,12 +265,12 @@ def rule : SeekRule → Rule A Q W P
 
 /-- **A seek stays inside its own phases**: every rule of the kit lands in one
 of the phases the kit was given. -/
-theorem dstPh_emb (ρ : SeekRule) :
+private theorem dstPh_emb (ρ : SeekRule) :
     ∃ p : SeekPh, (κ.rule (Q := Q) zero one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **In-shape separation.** -/
-theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
+private theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : SeekRule) (f : Q → A) (g : W → A),
       (κ.rule zero one ρ).guard f g → (κ.rule zero one ρ').guard f g →
       (κ.rule zero one ρ).srcPh = (κ.rule zero one ρ').srcPh → ρ = ρ' := by
@@ -287,7 +291,7 @@ theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
 
 /-- **Exit disjointness** at the kit's passing verdict phase, where the
 caller's exit rule reads the sought cell. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : SeekRule) (f : Q → A) (g : W → A), (κ.rule zero one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
       (κ.rule zero one ρ).srcPh = κ.emb .ty → False := by
@@ -366,7 +370,7 @@ include hrules F hR hlin hix hinj hmono hup hnerg hnerl hnewk hnetg htop hbot hT
 /-- **The kit seeks the working cell to the target**: from the loop head with
 the marker and mirror at the empty address, to the passing verdict phase on
 the target's cell. -/
-theorem reachesIn :
+private theorem reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn
       (wideRank T *
           (1 + (wideRank (F.cell gtop) + 3 + (ixRank ile gtop - ixRank ile gbot) * w +
@@ -487,7 +491,7 @@ include hrules F hR hlin hix hinj hmono hup hnerg hnerl hnewk hnetg htop hbot hT
   hbgwk hbgNwk hbgNoth
   hbgrg hbgrl hbgtg in
 /-- **The kit seeks the working cell to the target**, the budget forgotten. -/
-theorem reaches :
+private theorem reaches :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .chk) fc), Sum.inl (fun _ => False),
         wideTape (PR.trackTapeAt F.cell κ.t (bg fun _ => False) fun _ => False)

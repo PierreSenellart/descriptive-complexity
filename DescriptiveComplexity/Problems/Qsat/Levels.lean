@@ -52,11 +52,11 @@ variable (A : Type) [LinearOrder A] [Finite A] [Nonempty A]
 not use. -/
 noncomputable def qBot : A := (Finite.exists_min (id : A → A)).choose
 
-theorem isBot_qBot : IsBot (qBot A) := (Finite.exists_min (id : A → A)).choose_spec
+private theorem isBot_qBot : IsBot (qBot A) := (Finite.exists_min (id : A → A)).choose_spec
 
 variable {A}
 
-theorem eq_qBot {q : A} (h : IsBot q) : q = qBot A :=
+private theorem eq_qBot {q : A} (h : IsBot q) : q = qBot A :=
   le_antisymm (h _) (isBot_qBot A q)
 
 @[simp]
@@ -96,17 +96,18 @@ theorem isPredSV_unique {d d' ℓ : A} (h : IsPredSV d ℓ) (h' : IsPredSV d' �
   · exact heq
   · exact absurd ⟨hlt, h.2.2.1⟩ (h'.2.2.2 d h.1)
 
-theorem exists_isMinSV {x : A} (hx : IsSV x) : ∃ ℓ : A, IsMinSV ℓ := by
+private theorem exists_isMinSV {x : A} (hx : IsSV x) : ∃ ℓ : A, IsMinSV ℓ := by
   have : Nonempty {z : A // IsSV z} := ⟨⟨x, hx⟩⟩
   obtain ⟨m, hm⟩ := Finite.exists_min (fun z : {z : A // IsSV z} => (z : A))
   exact ⟨m, m.2, fun z hz hlt => absurd (hm ⟨z, hz⟩) (not_le.mpr hlt)⟩
 
-theorem exists_isMaxSV {x : A} (hx : IsSV x) : ∃ ℓ : A, IsMaxSV ℓ := by
+private theorem exists_isMaxSV {x : A} (hx : IsSV x) : ∃ ℓ : A, IsMaxSV ℓ := by
   have : Nonempty {z : A // IsSV z} := ⟨⟨x, hx⟩⟩
   obtain ⟨m, hm⟩ := Finite.exists_max (fun z : {z : A // IsSV z} => (z : A))
   exact ⟨m, m.2, fun z hz hlt => absurd (hm ⟨z, hz⟩) (not_le.mpr hlt)⟩
 
-theorem exists_isPredSV {ℓ : A} (hℓ : IsSV ℓ) (hmin : ¬IsMinSV ℓ) : ∃ d : A, IsPredSV d ℓ := by
+private theorem exists_isPredSV
+    {ℓ : A} (hℓ : IsSV ℓ) (hmin : ¬IsMinSV ℓ) : ∃ d : A, IsPredSV d ℓ := by
   obtain ⟨x, hx, hlt⟩ : ∃ x : A, IsSV x ∧ x < ℓ := by
     by_contra hcon
     exact hmin ⟨hℓ, fun z hz hzl => hcon ⟨z, hz, hzl⟩⟩
@@ -132,7 +133,7 @@ theorem svAbove_of_isMaxSV {ℓ : A} (h : IsMaxSV ℓ) : svAbove ℓ = 1 := by
     exact ⟨h.isSV, le_rfl⟩
   rw [svAbove, hset, Set.ncard_singleton]
 
-theorem svAbove_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) : svAbove d = svAbove ℓ + 1 := by
+private theorem svAbove_of_isPredSV {d ℓ : A} (h : IsPredSV d ℓ) : svAbove d = svAbove ℓ + 1 := by
   have hset : {z : A | IsSV z ∧ d ≤ z} = insert d {z : A | IsSV z ∧ ℓ ≤ z} := by
     ext z
     constructor
@@ -156,7 +157,8 @@ theorem svAbove_of_isMinSV {ℓ : A} (h : IsMinSV ℓ) : svAbove ℓ = stateDept
   rw [svAbove, hset, stateDepth, ← Nat.card_coe_set_eq]
   rfl
 
-theorem exists_isSuccSV {ℓ : A} (hℓ : IsSV ℓ) (hmax : ¬IsMaxSV ℓ) : ∃ ℓ' : A, IsPredSV ℓ ℓ' := by
+private theorem exists_isSuccSV
+    {ℓ : A} (hℓ : IsSV ℓ) (hmax : ¬IsMaxSV ℓ) : ∃ ℓ' : A, IsPredSV ℓ ℓ' := by
   obtain ⟨x, hx, hlt⟩ : ∃ x : A, IsSV x ∧ ℓ < x := by
     by_contra hcon
     exact hmax ⟨hℓ, fun z hz hzl => hcon ⟨z, hz, hzl⟩⟩
@@ -165,7 +167,7 @@ theorem exists_isSuccSV {ℓ : A} (hℓ : IsSV ℓ) (hmax : ¬IsMaxSV ℓ) : ∃
   refine ⟨e, hℓ, e.2.1, e.2.2, fun z hz hzz => ?_⟩
   exact absurd (he ⟨z, hz, hzz.1⟩) (not_le.mpr hzz.2)
 
-theorem svAbove_pos {ℓ : A} (hℓ : IsSV ℓ) : 0 < svAbove ℓ := by
+private theorem svAbove_pos {ℓ : A} (hℓ : IsSV ℓ) : 0 < svAbove ℓ := by
   refine Set.ncard_pos (Set.toFinite _) |>.mpr ⟨ℓ, hℓ, le_rfl⟩
 
 end Levels

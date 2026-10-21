@@ -10,6 +10,14 @@ public import DescriptiveComplexity.Exponential.Increment
 public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.HeadAutomaton
 import DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.Exponential.Copies
+import all DescriptiveComplexity.Exponential.Increment
+import all DescriptiveComplexity.Exponential.OrdFormula
+import all DescriptiveComplexity.Exponential.PointGuard
+import all DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.HeadAutomaton
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Simulating a machine that walks an expanded universe
@@ -77,7 +85,7 @@ open Language Structure
 /-- **A merged assignment splits into its rounds**: the assembly map of
 `DescriptiveComplexity.repBlockAssign` is onto, so a guessed state of the walk
 below really is `k` guessed points. -/
-theorem repBlockAssign_surjective (B : SOBlock) (A : Type) :
+private theorem repBlockAssign_surjective (B : SOBlock) (A : Type) :
     ∀ k : ℕ, Function.Surjective (repBlockAssign B A k)
   | 0 => fun μ => ⟨Fin.elim0, funext fun i => Empty.elim i⟩
   | k + 1 => fun μ => by
@@ -120,7 +128,7 @@ def read (σ : H.Assignment A) : X.pointBlock.Assignment A :=
   SOBlock.homAssign s.ix s.arity σ
 
 /-- **Reading a sentence at a slot is reading it at the slot's assignment.** -/
-theorem realize_lhom (σ : H.Assignment A)
+private theorem realize_lhom (σ : H.Assignment A)
     (φ : ((L.sum Language.order).sum X.pointBlock.lang).Sentence) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
         (s.lhom.onSentence φ) ↔
@@ -152,7 +160,7 @@ noncomputable def slotGuardF (s : PtSlot X H) :
 
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
-theorem realize_slotTagF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
+private theorem realize_slotTagF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
     (hs : s.At σ p) (t : X.Tag) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (slotTagF s t) ↔
       t = p.1) := by
@@ -161,7 +169,7 @@ theorem realize_slotTagF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
   rw [hs]
   exact Iff.rfl
 
-theorem realize_slotGuardF (s : PtSlot X H) (σ : H.Assignment A) :
+private theorem realize_slotGuardF (s : PtSlot X H) (σ : H.Assignment A) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (slotGuardF s) ↔
       ∃ p : X.Map A, s.At σ p.1) := by
   refine (s.realize_lhom σ _).trans ?_
@@ -193,7 +201,7 @@ def pairLHom (s₀ s₁ : PtSlot X H) :
 
 /-- **Reading a two-copy sentence at two slots** is reading it at the two
 assignments those slots hold. -/
-theorem realize_pairLHom {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁ : X.Point A}
+private theorem realize_pairLHom {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁ : X.Point A}
     (h₀ : s₀.At σ p₀) (h₁ : s₁.At σ p₁)
     (φ : ((L.sum Language.order).sum (X.B.replicate 2).lang).Sentence) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ)
@@ -305,7 +313,7 @@ theorem realize_eqPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁ 
     exact (realize_slotTagF h₀ t).trans
       ((by rw [h] : (t = p₀.1) ↔ (t = p₁.1)).trans (realize_slotTagF h₁ t).symm)
 
-theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁ : X.Point A}
+private theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁ : X.Point A}
     (h₀ : s₀.At σ p₀) (h₁ : s₁.At σ p₁) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (covPtF s₀ s₁) ↔
       ((X.pointLinearOrder A).lt p₀ p₁ ∧
@@ -359,7 +367,7 @@ theorem realize_covPtF {s₀ s₁ : PtSlot X H} {σ : H.Assignment A} {p₀ p₁
       rw [ite_eq_right (ne_of_lt hlt), ite_eq_left hcov]
       exact htb.mpr ⟨htop, hbot⟩
 
-theorem realize_minPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
+private theorem realize_minPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
     (hs : s.At σ p) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (minPtF s) ↔
       ∀ q : X.Point A, (X.pointLinearOrder A).le p q) := by
@@ -388,7 +396,7 @@ theorem realize_minPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
     rw [ite_eq_left ht]
     exact (realize_slotTagF hs _).mpr rfl
 
-theorem realize_maxPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
+private theorem realize_maxPtF {s : PtSlot X H} {σ : H.Assignment A} {p : X.Point A}
     (hs : s.At σ p) :
     (@Sentence.Realize _ A (H.structure₁ (L := L.sum Language.order) σ) (maxPtF s) ↔
       ∀ q : X.Point A, (X.pointLinearOrder A).le q p) := by
@@ -474,26 +482,26 @@ noncomputable def cfgAssign (s : S) (pts : Fin k → X.Map A) :
 
 omit [L.Structure A] [LinearOrder A] in
 /-- A round of a tagged assignment is read past the tag bits. -/
-theorem cfgSlot_read (s : S) (μ : (repMerged X.pointBlock k).Assignment A) (i : Fin k) :
+private theorem cfgSlot_read (s : S) (μ : (repMerged X.pointBlock k).Assignment A) (i : Fin k) :
     (cfgSlot X k S i).read (SOBlock.tagAssign s μ) =
       SOBlock.homAssign (roundOneIx i X) (roundOneIx_arity i X) μ :=
   rfl
 
 /-- **The `i`-th round of a configuration holds the `i`-th point.** -/
-theorem cfgSlot_at (s : S) (pts : Fin k → X.Map A) (i : Fin k) :
+private theorem cfgSlot_at (s : S) (pts : Fin k → X.Map A) (i : Fin k) :
     (cfgSlot X k S i).At (cfgAssign X k S s pts) (pts i).1 :=
   homAssign_roundOneIx i X (roundAssign pts)
 
 omit [L.Structure A] [LinearOrder A] in
 /-- **A round of one of two copies is that round of that copy.** -/
-theorem stepSlot_at (σs : Fin 2 → (cfgBlock X k S).Assignment A) (c : Fin 2) (i : Fin k)
+private theorem stepSlot_at (σs : Fin 2 → (cfgBlock X k S).Assignment A) (c : Fin 2) (i : Fin k)
     {p : X.Point A} (h : (cfgSlot X k S i).At (σs c) p) :
     (stepSlot X k S c i).At ((cfgBlock X k S).replicateAssign σs) p :=
   h
 
 /-- **Reading a configuration sentence in a copy** is reading it at that
 copy's assignment. -/
-theorem realize_copyLHom (σs : Fin 2 → (cfgBlock X k S).Assignment A) (c : Fin 2)
+private theorem realize_copyLHom (σs : Fin 2 → (cfgBlock X k S).Assignment A) (c : Fin 2)
     (φ : ((L.sum Language.order).sum (cfgBlock X k S).lang).Sentence) :
     (@Sentence.Realize _ A
         (((cfgBlock X k S).replicate 2).structure₁ (L := L.sum Language.order)
@@ -506,14 +514,14 @@ theorem realize_copyLHom (σs : Fin 2 → (cfgBlock X k S).Assignment A) (c : Fi
     (fun y => (c, y)) (fun _ => rfl) ((cfgBlock X k S).replicateAssign σs) φ
   rwa [hass] at h
 
-theorem realize_ctrlF (s s' : S) (pts : Fin k → X.Map A) :
+private theorem realize_ctrlF (s s' : S) (pts : Fin k → X.Map A) :
     (@Sentence.Realize _ A
         ((cfgBlock X k S).structure₁ (L := L.sum Language.order) (cfgAssign X k S s' pts))
         (ctrlF X k S s) ↔ s = s') :=
   SOBlock.realize_tagBitF (L := L.sum Language.order) (cfgAssign X k S s' pts) s
 
 /-- **The guard is exactly “this is a configuration”.** -/
-theorem realize_cfgGuardF (σ : (cfgBlock X k S).Assignment A) :
+private theorem realize_cfgGuardF (σ : (cfgBlock X k S).Assignment A) :
     (@Sentence.Realize _ A
         ((cfgBlock X k S).structure₁ (L := L.sum Language.order) σ) (cfgGuardF X k S) ↔
       ∃ (s : S) (pts : Fin k → X.Map A), σ = cfgAssign X k S s pts) := by
@@ -614,11 +622,11 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 omit [Finite A] [Nonempty A] in
 /-- With a trivial domain, quantifying over the points of the expanded universe
 is quantifying over every tagged assignment. -/
-theorem forall_point_of_total (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem forall_point_of_total (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (P : X.Point A → Prop) : (∀ q : X.Map A, P q.1) ↔ ∀ q : X.Point A, P q :=
   ⟨fun h q => h ⟨q, htot q⟩, fun h q => h q.1⟩
 
-theorem realize_testF (s : M.State) (pts : Fin k → X.Map A)
+private theorem realize_testF (s : M.State) (pts : Fin k → X.Map A)
     {φ : (X.E.sum Language.order).Formula (Fin k)} (hqf : φ.IsQF) :
     letI := X.mapLinearOrder A
     (@Sentence.Realize _ A
@@ -629,7 +637,7 @@ theorem realize_testF (s : M.State) (pts : Fin k → X.Map A)
   refine (realize_withTagLHom (cfgAssign X k M.State s pts) _).trans ?_
   exact realize_translQF pts hqf
 
-theorem realize_readingF (s : M.State) (pts : Fin k → X.Map A) (r : M.TestIx → Bool) :
+private theorem realize_readingF (s : M.State) (pts : Fin k → X.Map A) (r : M.TestIx → Bool) :
     letI := X.mapLinearOrder A
     (@Sentence.Realize _ A
         ((cfgBlock X k M.State).structure₁ (L := L.sum Language.order)
@@ -659,7 +667,7 @@ theorem realize_readingF (s : M.State) (pts : Fin k → X.Map A) (r : M.TestIx �
     obtain ⟨i, -, rfl⟩ := List.mem_map.mp hψ
     exact (key i).mpr rfl
 
-theorem realize_moveF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem realize_moveF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (σs : Fin 2 → (cfgBlock X k M.State).Assignment A) (s₀ s₁ : M.State)
     (x y : Fin k → X.Map A) (h₀ : σs 0 = cfgAssign X k M.State s₀ x)
     (h₁ : σs 1 = cfgAssign X k M.State s₁ y) (mv : HeadMove k) (j : Fin k) :
@@ -703,7 +711,7 @@ theorem realize_moveF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     exact (forall_point_of_total htot fun q =>
       ¬((X.pointLinearOrder A).lt (y j).1 q ∧ (X.pointLinearOrder A).lt q (x i).1)).symm
 
-theorem realize_transF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem realize_transF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (σs : Fin 2 → (cfgBlock X k M.State).Assignment A) (s : M.State) (x : Fin k → X.Map A)
     (h₀ : σs 0 = cfgAssign X k M.State s x) (s₀ : M.State) (r : M.TestIx → Bool)
     (p : M.State × (Fin k → HeadMove k)) :
@@ -750,7 +758,7 @@ theorem realize_transF (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     · obtain ⟨j, -, rfl⟩ := List.mem_map.mp hψ
       exact (realize_moveF M htot σs s p.1 x y h₀ hy (p.2 j) j).mpr (hm j)
 
-theorem step_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem step_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (σ τ : (cfgBlock X k M.State).Assignment A) (s : M.State) (x : Fin k → X.Map A)
     (hσ : σ = cfgAssign X k M.State s x) :
     letI := X.mapLinearOrder A
@@ -792,7 +800,7 @@ theorem step_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     refine ⟨_, List.mem_map.mpr ⟨p, hp, rfl⟩, ?_⟩
     exact (htr s (M.reading x) p).mpr ⟨rfl, rfl, y, by rw [hy, hps], hm⟩
 
-theorem isSrc_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem isSrc_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (σ : (cfgBlock X k M.State).Assignment A) :
     letI := X.mapLinearOrder A
     ((autoSpec M).IsSrc σ ↔ ∃ x : Fin k → X.Map A,
@@ -860,7 +868,7 @@ theorem isTgt_autoSpec (σ : (cfgBlock X k M.State).Assignment A) (s : M.State)
 
 /-- A walk of the simulation that starts at a configuration stays at
 configurations, and is a run of the machine. -/
-theorem reach_autoSpec_of (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem reach_autoSpec_of (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     {σ τ : (cfgBlock X k M.State).Assignment A} (s : M.State) (x : Fin k → X.Map A)
     (hσ : σ = cfgAssign X k M.State s x) :
     letI := X.mapLinearOrder A
@@ -877,7 +885,7 @@ theorem reach_autoSpec_of (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     exact ⟨s'', z, hd, hreach.tail hstep⟩
 
 /-- A run of the machine is a walk of the simulation. -/
-theorem reach_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
+private theorem reach_autoSpec (htot : ∀ p : X.Point A, DomHolds (X := X) p)
     (a b : M.Config (X.Map A)) :
     letI := X.mapLinearOrder A
     (Relation.ReflTransGen M.Step a b →

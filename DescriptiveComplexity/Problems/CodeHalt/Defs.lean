@@ -231,7 +231,7 @@ def DecodesTo (n : A) : Nat.Partrec.Code → Prop
       CPrec n ∧ ∃ a b, CArg1 n a ∧ CArg2 n b ∧ DecodesTo a cf ∧ DecodesTo b cg
   | .rfind' cf => CRfind n ∧ ∃ a, CArg1 n a ∧ DecodesTo a cf
 
-theorem decodesTo_mark : ∀ (c : Nat.Partrec.Code) (n : A), DecodesTo n c → Mark (tagOf c) n
+private theorem decodesTo_mark : ∀ (c : Nat.Partrec.Code) (n : A), DecodesTo n c → Mark (tagOf c) n
   | .zero, _, h => h
   | .succ, _, h => h
   | .left, _, h => h
@@ -253,7 +253,7 @@ structure CodeWF (A : Type) [Language.code.Structure A] : Prop where
   /-- The second child is unique. -/
   arg2_fun : ∀ a b b' : A, CArg2 a b → CArg2 a b' → b = b'
 
-theorem tag_eq_of_decodesTo (h : CodeWF A) {c c' : Nat.Partrec.Code} {n : A}
+private theorem tag_eq_of_decodesTo (h : CodeWF A) {c c' : Nat.Partrec.Code} {n : A}
     (h1 : DecodesTo n c) (h2 : DecodesTo n c') : tagOf c = tagOf c' :=
   h.exclusive n _ _ (decodesTo_mark c n h1) (decodesTo_mark c' n h2)
 

@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Exponential.Class
 public import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.SecondOrderTransitiveClosureFree
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # Exponential expansions that see no order
@@ -117,7 +121,7 @@ variable {X}
 
 /-- Two points of the expanded universe are equal as soon as their tags and
 their assignments are. -/
-theorem map_ext {A : Type} [L.Structure A] {x y : X.Map A}
+private theorem map_ext {A : Type} [L.Structure A] {x y : X.Map A}
     (h₁ : x.1.1 = y.1.1) (h₂ : x.1.2 = y.1.2) : x = y :=
   Subtype.ext (Prod.ext_iff.mpr ⟨h₁, h₂⟩)
 
@@ -153,7 +157,7 @@ instance mapNonempty (A : Type) [L.Structure A] [Finite A] [Nonempty A] :
 
 /-- The same expansion, with the order symbol inserted into every sentence and
 never used. -/
-def toExp : ExpExpansion L where
+private def toExp : ExpExpansion L where
   Tag := X.Tag
   B := X.B
   E := X.E
@@ -167,12 +171,12 @@ def toExp : ExpExpansion L where
 variable {X} {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The two domain conditions agree: the order is inserted and never read. -/
-theorem domHolds_toExp_iff (p : X.Point A) :
+private theorem domHolds_toExp_iff (p : X.Point A) :
     ExpExpansion.DomHolds (X := X.toExp) p ↔ DomHolds p :=
   realize_blockOrderLift X.B p.2 (X.dom p.1)
 
 /-- **The two expanded universes are the same set.** -/
-def toExpEquiv : X.toExp.Map A ≃ X.Map A :=
+private def toExpEquiv : X.toExp.Map A ≃ X.Map A :=
   Equiv.subtypeEquivRight fun p => domHolds_toExp_iff p
 
 variable (X A)
@@ -181,11 +185,11 @@ variable (X A)
 equal to the order-free one by definition, but not syntactically, so instance
 search has to be handed it. -/
 @[instance_reducible]
-def toExpStructure : X.E.Structure (X.toExp.Map A) := X.toExp.mapStructure A
+private def toExpStructure : X.E.Structure (X.toExp.Map A) := X.toExp.mapStructure A
 
 /-- **The two expanded structures are the same structure**: the order-free
 expansion, read as an ordinary one, interprets every symbol as it did. -/
-def toExpLEquiv :
+private def toExpLEquiv :
     letI := toExpStructure X A
     X.toExp.Map A ≃[X.E] X.Map A :=
   letI := toExpStructure X A
@@ -254,7 +258,7 @@ variable {L B k} {A : Type}
 
 /-- **The `n`-copy elimination is an expansion**, when the copy `k` assigns the
 structure's own order to its order variable. -/
-theorem orderElimRepLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
+private theorem orderElimRepLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
     (ρs : Fin n → B.withOrder.Assignment A)
     (hord : ∀ w : Fin 2 → A, ρs k (Sum.inl ()) w ↔ (letI := lo; w 0 ≤ w 1)) :
     @LHom.IsExpansionOn _ _ (orderElimRepLHom L B k) A
@@ -283,7 +287,7 @@ theorem orderElimRepLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder
 expansion and `n` copies of a block says, read through
 `DescriptiveComplexity.orderElimRepLHom` at assignments whose copy `k` holds the
 order, what it said of the underlying assignments. -/
-theorem realize_orderElimRep (instA : L.Structure A) (lo : LinearOrder A)
+private theorem realize_orderElimRep (instA : L.Structure A) (lo : LinearOrder A)
     (ρs : Fin n → B.withOrder.Assignment A)
     (hord : ∀ w : Fin 2 → A, ρs k (Sum.inl ()) w ↔ (letI := lo; w 0 ≤ w 1))
     (φ : ((L.sum Language.order).sum (B.replicate n).lang).Sentence) :
@@ -352,12 +356,12 @@ variable {L₀ B} {A : Type}
 
 /-- Any two assignments of a block replicated *zero* times agree: the index
 type is empty. -/
-theorem replicate_zero_assign_eq (ρ σ : (B.replicate 0).Assignment A) : ρ = σ :=
+private theorem replicate_zero_assign_eq (ρ σ : (B.replicate 0).Assignment A) : ρ = σ :=
   funext fun i => i.1.elim0
 
 /-- **Placing a nullary sentence in one copy is correct**: it says there what
 it said with no copy at all. -/
-theorem realize_rep0LHom [inst : L₀.Structure A] (σ : (B.replicate 1).Assignment A)
+private theorem realize_rep0LHom [inst : L₀.Structure A] (σ : (B.replicate 1).Assignment A)
     (σ₀ : (B.replicate 0).Assignment A) (φ : (L₀.sum (B.replicate 0).lang).Sentence) :
     @Sentence.Realize _ A ((B.replicate 1).structure₁ (L := L₀) σ)
         ((rep0LHom L₀ B).onSentence φ) ↔
@@ -423,7 +427,7 @@ noncomputable def allSameOrdS (n : ℕ) :
 
 variable {L B} {A : Type} [L.Structure A]
 
-theorem realize_allSameOrdS {n : ℕ} (ρs : Fin (n + 1) → B.withOrder.Assignment A) :
+private theorem realize_allSameOrdS {n : ℕ} (ρs : Fin (n + 1) → B.withOrder.Assignment A) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₁ L (B.withOrder.replicate (n + 1)) A ‹_›
           (B.withOrder.replicateAssign ρs)) (allSameOrdS L B n) ↔
@@ -533,7 +537,7 @@ def pointOrd (p : X.orderFree.Map A) : (Fin 2 → A) → Prop :=
   p.1.2 (Sum.inl ())
 
 /-- **The `same` symbol compares the guessed orders.** -/
-theorem relMap_sameSym (xs : Fin 2 → X.orderFree.Map A) :
+private theorem relMap_sameSym (xs : Fin 2 → X.orderFree.Map A) :
     (@RelMap X.orderFree.E (X.orderFree.Map A) (X.orderFree.mapStructure A) 2 X.sameSym xs ↔
       ∀ w : Fin 2 → A, pointOrd (xs 0) w ↔ pointOrd (xs 1) w) := by
   have hrel := ExpExpansionFree.relMap_map (X := X.orderFree) (A := A) X.sameSym xs
@@ -543,7 +547,7 @@ theorem relMap_sameSym (xs : Fin 2 → X.orderFree.Map A) :
 
 /-- The guessed order of a point satisfies the linear-order axioms: its domain
 sentence guards it. -/
-theorem pointOrd_linear (p : X.orderFree.Map A) :
+private theorem pointOrd_linear (p : X.orderFree.Map A) :
     (∀ a : A, pointOrd p ![a, a]) ∧
       ((∀ a b c : A, pointOrd p ![a, b] → pointOrd p ![b, c] → pointOrd p ![a, c]) ∧
         ((∀ a b : A, pointOrd p ![a, b] → pointOrd p ![b, a] → a = b) ∧
@@ -556,11 +560,11 @@ theorem pointOrd_linear (p : X.orderFree.Map A) :
 
 /-- The linear order a point carries. -/
 @[instance_reducible]
-noncomputable def guessedLinearOrder (p : X.orderFree.Map A) : LinearOrder A :=
+private noncomputable def guessedLinearOrder (p : X.orderFree.Map A) : LinearOrder A :=
   let h := pointOrd_linear p
   linearOrderOfGuard (pointOrd p) h.1 h.2.1 h.2.2.1 h.2.2.2
 
-theorem le_guessedLinearOrder (p : X.orderFree.Map A) (w : Fin 2 → A) :
+private theorem le_guessedLinearOrder (p : X.orderFree.Map A) (w : Fin 2 → A) :
     (letI := guessedLinearOrder p; w 0 ≤ w 1) ↔ pointOrd p w := by
   change pointOrd p ![w 0, w 1] ↔ pointOrd p w
   have hvec : (![w 0, w 1] : Fin 2 → A) = w := by
@@ -601,20 +605,20 @@ theorem copyIn_tag (x : X.Map A) : (copyIn x).1.1 = x.1.1 := rfl
 @[simp]
 theorem copyIn_rest (x : X.Map A) : X.B.restPart (copyIn x).1.2 = x.1.2 := rfl
 
-theorem copyIn_injective : Function.Injective (copyIn (X := X) (A := A)) := by
+private theorem copyIn_injective : Function.Injective (copyIn (X := X) (A := A)) := by
   intro x y h
   refine ExpExpansion.map_ext (congrArg (fun p => p.1.1) h) ?_
   exact congrArg (fun p => X.B.restPart p.1.2) h
 
 /-- The guessed order of a placed point is the ambient one. -/
-theorem pointOrd_copyIn (x : X.Map A) (w : Fin 2 → A) :
+private theorem pointOrd_copyIn (x : X.Map A) (w : Fin 2 → A) :
     pointOrd (copyIn x) w ↔ w 0 ≤ w 1 :=
   Iff.rfl
 
 /-- **The relations are unchanged inside a copy**: a relation of the original
 vocabulary, of arity at least one, holds of points of one copy exactly when it
 held of them. -/
-theorem relMap_copyIn {m : ℕ} (r : X.E.Relations (m + 1)) (xs : Fin (m + 1) → X.Map A) :
+private theorem relMap_copyIn {m : ℕ} (r : X.E.Relations (m + 1)) (xs : Fin (m + 1) → X.Map A) :
     (@RelMap (X.orderFree.E) (X.orderFree.Map A) (X.orderFree.mapStructure A) (m + 1)
         (X.origSym r) (fun i => copyIn (xs i)) ↔
       @RelMap X.E (X.Map A) (X.mapStructure A) (m + 1) r xs) := by
@@ -635,7 +639,7 @@ theorem relMap_copyIn {m : ℕ} (r : X.E.Relations (m + 1)) (xs : Fin (m + 1) �
 
 /-- **The unary shift carries the nullary symbols inside a copy**: it holds of
 a placed point exactly when the nullary symbol held. -/
-theorem relMap_nullCopyIn (s : X.E.Relations 0) (xs : Fin 1 → X.Map A)
+private theorem relMap_nullCopyIn (s : X.E.Relations 0) (xs : Fin 1 → X.Map A)
     (ys : Fin 0 → X.Map A) :
     (@RelMap (X.orderFree.E) (X.orderFree.Map A) (X.orderFree.mapStructure A) 1
         (X.nullSym s) (fun i => copyIn (xs i)) ↔
@@ -666,7 +670,7 @@ linear order of the instance. -/
 
 omit [L.Structure A] in
 /-- Rebuilding an assignment from its order variable and the rest. -/
-theorem joinOrder_restPart {ρ : X.B.withOrder.Assignment A}
+private theorem joinOrder_restPart {ρ : X.B.withOrder.Assignment A}
     (hord : ∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ loRel w) :
     X.B.joinOrder (loRel (A := A)) (X.B.restPart ρ) = ρ := by
   funext i
@@ -676,7 +680,7 @@ theorem joinOrder_restPart {ρ : X.B.withOrder.Assignment A}
 
 /-- The domain condition survives reading a point back at the order it
 carries. -/
-theorem domHolds_of_pointOrd {p : X.orderFree.Map A}
+private theorem domHolds_of_pointOrd {p : X.orderFree.Map A}
     (hord : ∀ w : Fin 2 → A, pointOrd p w ↔ loRel w) :
     DomHolds (X := X) (p.1.1, X.B.restPart p.1.2) := by
   let := @SOBlock.structure₁ L X.B.withOrder A ‹L.Structure A› p.1.2

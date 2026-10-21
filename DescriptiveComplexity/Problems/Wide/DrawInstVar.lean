@@ -9,6 +9,20 @@ public import DescriptiveComplexity.Problems.Wide.DrawInstRound
 public import DescriptiveComplexity.Problems.Wide.DrawRunVar
 import DescriptiveComplexity.Problems.Wide.DrawInner
 public import DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Wide.Blocks
+import all DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawInner
+import all DescriptiveComplexity.Problems.Wide.DrawInstRound
+import all DescriptiveComplexity.Problems.Wide.DrawInstSeq
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
+import all DescriptiveComplexity.Problems.Wide.DrawRunVar
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # One variable's machinery, instantiated: the gates' and the matrix's legs
@@ -90,7 +104,7 @@ include hrules hR hlin hord htop hbot hv hvi hwkSt hcompatOf htagOf in
 landing one cell right of the marker, the walk-back, the whole gate
 sequence at a gated address, and the walk-back at the verdict
 checkpoint. -/
-theorem varGates_run (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
+private theorem varGates_run (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.gatesP (.chk 0))) f₀), Sum.inl v',
         wideTape (PR.trackTapeAt RF.cell Slot.val
@@ -198,7 +212,7 @@ include hrules hR hlin hord htop hbot hv hvi hwkSt hcompatOf htagOf in
 /-- **The gates' leg at a junk address**: the walk-back, the passing
 prefix, the failing block, and the walk-back at the verdict checkpoint –
 the fail store applied, the flag clear. -/
-theorem varGatesFail_run (ℓ₀ : Fin (dt.arOf vi))
+private theorem varGatesFail_run (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : Univ A R P dt.KIx dt.dd} (hfail : ¬TestOf ℓ₀ u₀)
     (f₀ : dt.CtlIx → A) :
@@ -283,7 +297,7 @@ include hlin hord htop in
 slot equations `DescriptiveComplexity.Draw.Data.var_run`'s kits read are
 definitional in `DescriptiveComplexity.Draw.Data.back`, given the marker
 and the order facts. -/
-theorem varBg_back (stV : TapeStD dt A R P)
+private theorem varBg_back (stV : TapeStD dt A R P)
     (hwkV : stV.wk = fun r => r = v) :
     dt.VarBg (laidFile RF hord) PR.zero PR.one v gtop
       (dt.back RF.cell PR.zero PR.one dt.dd0Le stV) stV.val := by
@@ -296,7 +310,7 @@ include hrules hR hlin hord htop hbot hv hvi hwkSt hcompatOf htagOf in
 /-- **The whole machinery at a junk address**: entry, the failing gates,
 and the verdict checkpoint's clear flag routing straight to the exit with
 the stage slot erased – the VAL loop never entered. -/
-theorem varMachineFail_run (ℓ₀ : Fin (dt.arOf vi))
+private theorem varMachineFail_run (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : Univ A R P dt.KIx dt.dd} (hfail : ¬TestOf ℓ₀ u₀)
     (f₀ : dt.CtlIx → A)
@@ -375,7 +389,7 @@ dispatched tag or its domain sentence failing. The gates complete with the
 flag clear, and the verdict checkpoint routes straight to the exit with
 the stage slot erased – the VAL loop never entered. The third landing an
 arbitrary address makes, beside the gated and the shape-failing ones. -/
-theorem varMachineUngated_run (hTestOf : ∀ ℓ u, TestOf ℓ u)
+private theorem varMachineUngated_run (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (ℓ₀ : Fin (dt.arOf vi))
     (hbad : ¬((∀ t' : dt.X.Tag,
         wmBlk st.mir
@@ -481,13 +495,13 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- A state written with the register it already holds is itself. -/
-theorem roundSt_val (stV : TapeStD dt A R P) : dt.roundSt stV stV.val = stV :=
+private theorem roundSt_val (stV : TapeStD dt A R P) : dt.roundSt stV stV.val = stV :=
   rfl
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- Two round states' backgrounds agree off the VAL slot. -/
-theorem back_roundSt_off {zero one : A}
+private theorem back_roundSt_off {zero one : A}
     (m₁ m₂ : Univ A R P dt.KIx dt.dd → Prop)
     (r : Univ A R P dt.KIx dt.dd → Prop) (s : dt.SlotIx)
     (hs : s ≠ Slot.val) :
@@ -512,7 +526,7 @@ noncomputable def valCarry (s : Univ A R P dt.KIx dt.dd → Prop) :
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- The carry is unique, so the chosen one is the hypothesis's. -/
-theorem valCarry_eq (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
+private theorem valCarry_eq (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {s : Univ A R P dt.KIx dt.dd → Prop} {u₀ : Univ A R P dt.KIx dt.dd}
     (h1 : ¬s u₀) (h2 : ∀ w, WMLt WMLe u₀ w → s w) :
     dt.valCarry s = u₀ := by
@@ -562,7 +576,7 @@ noncomputable def varFM (fG : dt.CtlIx → A) : ιV → dt.CtlIx → A :=
 /-- **The leaf a round stores**: the two gate flags' combination – `False`
 if an ∃-level's block is not an encoding, the matrix's value only if every
 ∀-level's is. -/
-noncomputable def roundLeaf (q : dt.CtlIx → A) : Prop :=
+private noncomputable def roundLeaf (q : dt.CtlIx → A) : Prop :=
   dt.ctlBit PR.one q dt.existGateC ∧
     (dt.ctlBit PR.one q dt.allGateC → dt.postLeaf PR.one vi q)
 
@@ -603,7 +617,7 @@ the enumeration, the accumulator vector of the control thread reads the
 `accCVal` contributions of the inner quantifier prefix at the register's
 inner blocks – the invariant that turns the machinery's exit verdict into
 the prefix's value. -/
-theorem readAcc_varFM
+private theorem readAcc_varFM
     {a₀ : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
@@ -842,7 +856,7 @@ include hlin hord in
 exhausted register – every inner block full – the exit fold's bit is the
 alternating quantifier prefix over the inner blocks, applied to the
 matrix's value. -/
-theorem accVerdict_varFM
+private theorem accVerdict_varFM
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
       WMIncr WMLe (mV a) (mV a'))
@@ -903,7 +917,7 @@ include hlin in
 semantic pack built by `mkKindSem` from the encoded valuation, the fold's
 leaf after the matrix pass is the quantifier-free matrix's value at that
 valuation – the concrete form of the invariant's `hleaf` hypothesis. -/
-theorem postLeaf_roundFX [LinearOrder (dt.X.Map A)]
+private theorem postLeaf_roundFX [LinearOrder (dt.X.Map A)]
     (σ : dt.d.B.Assignment (dt.X.Map A)) (a : ιV)
     (wa : Fin (dt.nOf vi) → dt.X.Map A)
     (hENCa : ∀ j : Fin (dt.nOf vi),
@@ -1200,7 +1214,7 @@ noncomputable def varFXT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **The registers a round leaves alone ride the whole loop** – by
 construction now, since only the two scratch ones are threaded. -/
-theorem varStT_fields (fG : dt.CtlIx → A) (a : ιV) :
+private theorem varStT_fields (fG : dt.CtlIx → A) (a : ιV) :
     (dt.varStT RF hord vi st v mV semT fG a).wk = st.wk ∧
       (dt.varStT RF hord vi st v mV semT fG a).mir = st.mir ∧
       (dt.varStT RF hord vi st v mV semT fG a).bot = st.bot ∧
@@ -1210,7 +1224,7 @@ theorem varStT_fields (fG : dt.CtlIx → A) (a : ιV) :
 
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- A round leaves the register it was entered with. -/
-theorem varStE_val (fG : dt.CtlIx → A) (a : ιV) :
+private theorem varStE_val (fG : dt.CtlIx → A) (a : ιV) :
     (dt.varStE RF hord vi st v mV semT fG a).val = mV a :=
   (dt.roundEndSt_fields RF vi (dt.varStT RF hord vi st v mV semT fG a) v
     (dt.varFMT RF hord vi st v mV semT fG a)).2.2.2.1
@@ -1219,7 +1233,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **The VAL loop never touches a stage track**: only the two scratch
 registers are threaded, so the `new` tracks the spine writes ride the
 whole loop. -/
-theorem varStE_new (fG : dt.CtlIx → A) (a : ιV) :
+private theorem varStE_new (fG : dt.CtlIx → A) (a : ιV) :
     (dt.varStE RF hord vi st v mV semT fG a).new = st.new := by
   rw [varStE, dt.roundEndSt_eq RF vi (dt.varStT RF hord vi st v mV semT fG a) v
     (dt.varFMT RF hord vi st v mV semT fG a)]
@@ -1228,7 +1242,7 @@ theorem varStE_new (fG : dt.CtlIx → A) (a : ιV) :
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **A round's exit state is the next round's entry state**, once the
 next round's register is written over it. -/
-theorem varRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
+private theorem varRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
     (m : Univ A R P dt.KIx dt.dd → Prop) :
     dt.varRdSt st ((dt.varStE RF hord vi st v mV semT fG a).sav,
         (dt.varStE RF hord vi st v mV semT fG a).tgt) m =
@@ -1239,14 +1253,14 @@ theorem varRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
 
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- The thread starts at the entry state. -/
-theorem varSTT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
+private theorem varSTT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
     (fG : dt.CtlIx → A) :
     dt.varSTT RF hord vi st v mV semT fG a₀ = (st.sav, st.tgt) :=
   congrArg Prod.fst (iterOrd_bot hbotV)
 
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- The thread starts at the entry state. -/
-theorem varStT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
+private theorem varStT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
     (fG : dt.CtlIx → A) :
     dt.varStT RF hord vi st v mV semT fG a₀ = dt.roundSt st (mV a₀) := by
   rw [varStT, dt.varSTT_bot RF hord vi st mV semT hbotV fG]
@@ -1254,7 +1268,7 @@ theorem varStT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
 
 omit [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- The control thread starts at the fold's start. -/
-theorem varFMT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
+private theorem varFMT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
     (fG : dt.CtlIx → A) :
     dt.varFMT RF hord vi st v mV semT fG a₀ =
       (dt.varArgsOf PR.zero PR.one vi).initSt fG
@@ -1265,7 +1279,7 @@ theorem varFMT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
 omit [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The tape's cover equation**: the next round is entered in this
 round's exit state, its own register written over it. -/
-theorem varStT_covers {a a' : ιV} (hlt : a < a')
+private theorem varStT_covers {a a' : ιV} (hlt : a < a')
     (hnb : ∀ b, ¬(a < b ∧ b < a')) (fG : dt.CtlIx → A) :
     dt.varStT RF hord vi st v mV semT fG a' =
       dt.roundSt (dt.varStE RF hord vi st v mV semT fG a) (mV a') := by
@@ -1276,7 +1290,7 @@ theorem varStT_covers {a a' : ιV} (hlt : a < a')
 omit [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The control's cover equation**: the round's exit control, folded and
 stored at the block its increment carried. -/
-theorem varFMT_covers {a a' : ιV} (hlt : a < a')
+private theorem varFMT_covers {a a' : ιV} (hlt : a < a')
     (hnb : ∀ b, ¬(a < b ∧ b < a')) (fG : dt.CtlIx → A) :
     dt.varFMT RF hord vi st v mV semT fG a' =
       (dt.varArgsOf PR.zero PR.one vi).storeCarry
@@ -1317,7 +1331,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite P] [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- **A round's entry state is the round state up to the two scratch
 registers.** -/
-theorem scratchEq_varRdSt (p : Scratch dt A R P)
+private theorem scratchEq_varRdSt (p : Scratch dt A R P)
     (m : Univ A R P dt.KIx dt.dd → Prop) :
     dt.ScratchEq (dt.varRdSt st p m) (dt.roundSt st m) :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
@@ -1345,7 +1359,7 @@ omit [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder ιV] [Finite ιV] in
 /-- **One threaded round is the unthreaded round**: a round's own state is
 the round state up to SAV and TARGET, its matrix threads those two further,
 and the pack rides along – three transports that compose to none. -/
-theorem roundCtlT_semCastT (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
+private theorem roundCtlT_semCastT (hreg : ¬∃ u : Univ A R P dt.KIx dt.dd, v = RF.cell u)
     (p : Scratch dt A R P) (a : ιV) (q : dt.CtlIx → A) :
     dt.roundCtlT RF hord PR.zero_ne_one vi (dt.varRdSt st p (mV a)) v
         (dt.semCastT RF vi st v mV sem₀ p a) q =
@@ -1601,7 +1615,7 @@ only at the one whose SAV and TARGET the advance happens to have left
 behind. The rounds run at the states the thread produces, and the loop
 ends in `DescriptiveComplexity.Draw.Data.varStE` at the top, which
 differs from the entry state in SAV and TARGET alone. -/
-theorem varMachine_run_thread
+private theorem varMachine_run_thread
     (hwitOf : ∀ (ℓ : Fin (dt.arOf vi)) (t' : dt.X.Tag),
       wmBlk st.mir
         (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :

@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.TransitiveClosureReductionDet
 public import DescriptiveComplexity.FixedPointReductionStrict
+import all DescriptiveComplexity.FixedPointReductionStrict
+import all DescriptiveComplexity.Problems.Even
+import all DescriptiveComplexity.TransitiveClosureParam
+import all DescriptiveComplexity.TransitiveClosureReductionDet
 
 /-!
 # FO(TC) reductions are strictly stronger than first-order ones
@@ -68,7 +72,7 @@ variable (A : Type) [Language.empty.Structure A] [LinearOrder A]
 
 /-- Every point of the interpreted universe is marked exactly when the parity
 walk accepts. -/
-theorem relMap_evenMarkTCInterp (xs : Fin 1 → evenMarkTCInterp.Map A) :
+private theorem relMap_evenMarkTCInterp (xs : Fin 1 → evenMarkTCInterp.Map A) :
     RelMap (M := evenMarkTCInterp.Map A) Language.markedSetMark xs ↔ evenSpec.Accepts A := by
   let : ((Language.empty.sum Language.order).sum evenMarkTCInterp.fam.block.lang).Structure A :=
     evenMarkTCInterp.expStructure A
@@ -81,7 +85,7 @@ theorem relMap_evenMarkTCInterp (xs : Fin 1 → evenMarkTCInterp.Map A) :
 
 /-- The interpreted universe is all of the base universe: the domain formula
 is `⊤`. -/
-theorem evenMarkTCInterp_nonempty [Nonempty A] : Nonempty (evenMarkTCInterp.Map A) :=
+private theorem evenMarkTCInterp_nonempty [Nonempty A] : Nonempty (evenMarkTCInterp.Map A) :=
   letI := evenMarkTCInterp.expStructure A
   ⟨⟨((), fun _ => Classical.arbitrary A), Formula.realize_top.mpr trivial⟩⟩
 
@@ -90,7 +94,7 @@ theorem evenMarkTCInterp_nonempty [Nonempty A] : Nonempty (evenMarkTCInterp.Map 
 /-- **EVEN FO(TC)-reduces to NONEMPTYMARK**: one walk along the order decides
 the parity of the universe, and the reduction marks everything or nothing
 accordingly. -/
-theorem even_tcReduction_nonemptyMark : Nonempty (EVEN ≤ᵗᶜ NONEMPTYMARK) := by
+private theorem even_tcReduction_nonemptyMark : Nonempty (EVEN ≤ᵗᶜ NONEMPTYMARK) := by
   refine ⟨{ Tag := Unit
             dim := 1
             toInterpretation := evenMarkTCInterp
@@ -135,7 +139,7 @@ theorem evenSpec_functional : evenSpec.Functional A := by
     key (fun i => a.2 i) (fun i => b.2 i) (fun i => c.2 i) hc₁ hc₂⟩
 
 /-- Determinization does not change what the parity walk reaches. -/
-theorem reach_det_evenSpec_iff (a b : evenSpec.Node A) :
+private theorem reach_det_evenSpec_iff (a b : evenSpec.Node A) :
     evenSpec.det.Reach a b ↔ evenSpec.Reach a b := by
   constructor
   · intro h
@@ -151,7 +155,7 @@ theorem reach_det_evenSpec_iff (a b : evenSpec.Node A) :
 
 /-- The deterministic reading of the parity walk accepts exactly when the walk
 does: determinization changes nothing on a functional walk. -/
-theorem accepts_det_evenSpec_iff : evenSpec.det.Accepts A ↔ evenSpec.Accepts A :=
+private theorem accepts_det_evenSpec_iff : evenSpec.det.Accepts A ↔ evenSpec.Accepts A :=
   ⟨fun ⟨u, v, hu, hv, huv⟩ => ⟨u, v, hu, hv, (reach_det_evenSpec_iff A u v).mp huv⟩,
     fun ⟨u, v, hu, hv, huv⟩ => ⟨u, v, hu, hv, (reach_det_evenSpec_iff A u v).mpr huv⟩⟩
 
@@ -166,19 +170,19 @@ theorem even_dtcDefinable : DTCDefinable EVEN := by
   exact (accepts_evenSpec_iff (A := A)).symm.trans (accepts_det_evenSpec_iff A).symm
 
 /-- The parity walk, as a parameterized walk, is functional too. -/
-theorem evenSpec_toParam_functional : (evenSpec.toParam).Functional A := by
+private theorem evenSpec_toParam_functional : (evenSpec.toParam).Functional A := by
   intro z a b c hb hc
   exact evenSpec_functional A a b c ((evenSpec.stepAt_toParam z a b).mp hb)
     ((evenSpec.stepAt_toParam z a c).mp hc)
 
 /-- The one-element family of the parity walk is functional. -/
-theorem evenSpec_toFamily_functional : (evenSpec.toFamily).Functional A :=
+private theorem evenSpec_toFamily_functional : (evenSpec.toFamily).Functional A :=
   fun _ => evenSpec_toParam_functional A
 
 /-- Every point of the interpreted universe is marked exactly when the
 *determinized* parity walk accepts – which, the walk being functional, is when
 the universe is even. -/
-theorem relMap_evenMarkDetInterp
+private theorem relMap_evenMarkDetInterp
     (xs : Fin 1 → (TCInterpretation.mk evenSpec.toFamily.det evenMarkTCInterp.toRel).Map A) :
     RelMap (M := (TCInterpretation.mk evenSpec.toFamily.det evenMarkTCInterp.toRel).Map A)
       Language.markedSetMark xs ↔ evenSpec.Accepts A := by
@@ -195,7 +199,7 @@ theorem relMap_evenMarkDetInterp
 /-- **EVEN reduces to NONEMPTYMARK by a deterministic logarithmic-space
 reduction**: the walk that decides the parity of the universe follows, from
 each element, its unique successor. -/
-theorem even_dtcReduction_nonemptyMark : Nonempty (EVEN ≤ᵈᵗᶜ NONEMPTYMARK) := by
+private theorem even_dtcReduction_nonemptyMark : Nonempty (EVEN ≤ᵈᵗᶜ NONEMPTYMARK) := by
   refine ⟨{ Tag := Unit
             dim := 1
             fam := evenSpec.toFamily

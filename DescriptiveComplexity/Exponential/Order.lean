@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Exponential.Expansion
 import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The order on an expanded universe
@@ -89,7 +90,7 @@ noncomputable def setLinearOrder [LinearOrder I] [Finite I] : LinearOrder (I →
   LinearOrder.lift' setKey setKey_injective
 
 /-- **What the order says**, unfolded. -/
-theorem setLinearOrder_lt_iff [LinearOrder I] [Finite I] (S T : I → Prop) :
+private theorem setLinearOrder_lt_iff [LinearOrder I] [Finite I] (S T : I → Prop) :
     (setLinearOrder I).lt S T ↔ ∃ i, (∀ j, j < i → (S j ↔ T j)) ∧ ¬S i ∧ T i := by
   classical
   have he : ∀ (U V : I → Prop) (i : I), (decide (U i) = decide (V i)) ↔ (U i ↔ V i) :=
@@ -125,7 +126,7 @@ def atomSet (ρ : B.Assignment A) : B.AtomIx A → Prop :=
   fun p => ρ p.1 fun j => p.2 (Fin.castLE (arity_le_blockArityBound B p.1) j)
 
 /-- A tuple of the arity of `i`, padded out to the block's maximal arity. -/
-noncomputable def padTuple [Nonempty A] (i : B.ι) (x : Fin (B.arity i) → A) :
+private noncomputable def padTuple [Nonempty A] (i : B.ι) (x : Fin (B.arity i) → A) :
     Fin (blockArityBound B) → A :=
   fun k => if h : (k : ℕ) < B.arity i then x ⟨k, h⟩ else Classical.arbitrary A
 
@@ -182,7 +183,7 @@ theorem atomSet_injective [Nonempty A] : Function.Injective (B.atomSet (A := A))
 their padded atoms, stated entirely in terms of
 `DescriptiveComplexity.SOBlock.atomLt` so that no consumer has to resolve an
 order instance on a product. -/
-theorem atomSet_lt_iff [LinearOrder A] [Finite A] (ρ σ : B.Assignment A) :
+private theorem atomSet_lt_iff [LinearOrder A] [Finite A] (ρ σ : B.Assignment A) :
     letI := B.atomIxLinearOrder A
     ((setLinearOrder (B.AtomIx A)).lt (B.atomSet ρ) (B.atomSet σ) ↔
       ∃ p : B.AtomIx A, (∀ q, B.atomLt q p → (B.atomSet ρ q ↔ B.atomSet σ q)) ∧

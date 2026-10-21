@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.MaxCut.Interp
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.MaxCut.Interp
+import all DescriptiveComplexity.Problems.NaeSat
+import all DescriptiveComplexity.Problems.NaeThreeSat
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # NAE-3SAT ordered-FO-reduces to Max Cut
@@ -57,7 +62,7 @@ section Occurrences
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- The last occurrence of a clause is unique. -/
-theorem maxOcc_unique {c x y : A} {s t : Bool} (h₁ : MaxOcc c x s) (h₂ : MaxOcc c y t) :
+private theorem maxOcc_unique {c x y : A} {s t : Bool} (h₁ : MaxOcc c x s) (h₂ : MaxOcc c y t) :
     x = y ∧ s = t := by
   rcases occLt_trichotomy x s y t with hlt | heq | hlt
   · exact absurd hlt (h₁.2 y t h₂.occIn)
@@ -70,7 +75,7 @@ open Classical in
 noncomputable def maxVert (c : A) : mcInterp.Map A :=
   if h : ∃ p : A × Bool, MaxOcc c p.1 p.2 then occPt h.choose.2 c h.choose.1 else penPt c
 
-theorem maxVert_eq {c x : A} {s : Bool} (h : MaxOcc c x s) : maxVert c = occPt s c x := by
+private theorem maxVert_eq {c x : A} {s : Bool} (h : MaxOcc c x s) : maxVert c = occPt s c x := by
   have hex : ∃ p : A × Bool, MaxOcc c p.1 p.2 := ⟨(x, s), h⟩
   rw [maxVert, dite_eq_left hex]
   obtain ⟨hx, hs⟩ := maxOcc_unique hex.choose_spec h
@@ -79,7 +84,7 @@ theorem maxVert_eq {c x : A} {s : Bool} (h : MaxOcc c x s) : maxVert c = occPt s
 omit [LinearOrder A] in
 /-- No clause has four distinct occurrence vertices: the width bound, read on
 the gadget. -/
-theorem no_four_occPt (hwidth : WidthAtMostThree A) {c : A} {v₁ v₂ v₃ v₄ : mcInterp.Map A}
+private theorem no_four_occPt (hwidth : WidthAtMostThree A) {c : A} {v₁ v₂ v₃ v₄ : mcInterp.Map A}
     (h₁ : ∃ x s, OccIn c x s ∧ v₁ = occPt s c x)
     (h₂ : ∃ x s, OccIn c x s ∧ v₂ = occPt s c x)
     (h₃ : ∃ x s, OccIn c x s ∧ v₃ = occPt s c x)
@@ -103,7 +108,7 @@ variable [Finite A]
 
 /-- A clause has at most one occurrence exactly when none of its occurrences
 is a non-first one – the first-order form the marks use. -/
-theorem atMostOne_iff_noChained {c : A} :
+private theorem atMostOne_iff_noChained {c : A} :
     (∀ x s y t, OccIn c x s → OccIn c y t → x = y ∧ s = t) ↔ ∀ x s, ¬Chained c x s := by
   constructor
   · intro h x s hch
@@ -123,7 +128,7 @@ theorem atMostOne_iff_noChained {c : A} :
     · exact absurd hlt (hxmin.2 y t hy)
 
 /-- The vertex of the last occurrence, as an occurrence vertex. -/
-theorem exists_maxVert {c x : A} {s : Bool} (h : OccIn c x s) :
+private theorem exists_maxVert {c x : A} {s : Bool} (h : OccIn c x s) :
     ∃ y t, MaxOcc c y t ∧ maxVert c = occPt t c y := by
   obtain ⟨y, t, hmax⟩ := exists_maxOcc ⟨x, s, h⟩
   exact ⟨y, t, hmax, maxVert_eq hmax⟩
@@ -226,7 +231,7 @@ theorem cutMap_occ_occ (S : mcInterp.Map A → Prop) (s t : Bool) (c d x y : A) 
   simp [cutMap, occPt]
 
 /-- **Every edge of the cut, with its charge in explicit form.** -/
-theorem cut_charge {S : mcInterp.Map A → Prop} {p : mcInterp.Map A × mcInterp.Map A}
+private theorem cut_charge {S : mcInterp.Map A → Prop} {p : mcInterp.Map A × mcInterp.Map A}
     (hp : p ∈ cutSet S) :
     (∃ x : A, cutMap S p = (litPt true x, litPt false x) ∧
         (p = (litPt true x, litPt false x) ∨ p = (litPt false x, litPt true x))) ∨
@@ -254,7 +259,7 @@ theorem cut_charge {S : mcInterp.Map A → Prop} {p : mcInterp.Map A × mcInterp
     rw [hpe, cutMap_occ_occ, hmv]
 
 /-- The charge map sends the cut into the threshold. -/
-theorem cutMap_mapsTo (S : mcInterp.Map A → Prop) :
+private theorem cutMap_mapsTo (S : mcInterp.Map A → Prop) :
     Set.MapsTo (cutMap S) (cutSet S) (markSet (A := A)) := by
   intro p hp
   rcases cut_charge hp with ⟨x, hcp, -⟩ | ⟨s, c, x, hocc, hcp, -⟩ |
@@ -476,7 +481,7 @@ variable (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
 /-- Correctness of the reduction: a CNF structure is a yes-instance of
 NAE-3SAT iff its gadget graph has a cut at least as large as its marked
 relation. -/
-theorem naeThreeSatisfiable_iff_hasLargeCut :
+private theorem naeThreeSatisfiable_iff_hasLargeCut :
     NAEThreeSatisfiable A ↔ HasLargeCut (mcInterp.Map A) := by
   have : Finite (mcInterp.Map A) := mcInterp.map_finite A
   by_cases hw : ThreeSatToSat.Wide A
@@ -594,7 +599,7 @@ end Correctness
 
 /-- **NAE-3SAT ordered-FO-reduces to Max Cut**: the gadget graph, whose cut
 reaches the threshold exactly when the clauses are not-all-equal satisfiable. -/
-noncomputable def nae3Sat_ordered_fo_reduction_maxCut : NAE3SAT ≤ᶠᵒ[≤] MaxCut where
+private noncomputable def nae3Sat_ordered_fo_reduction_maxCut : NAE3SAT ≤ᶠᵒ[≤] MaxCut where
   Tag := MCTag
   dim := 2
   toInterpretation := mcInterp

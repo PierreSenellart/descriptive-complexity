@@ -8,6 +8,11 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawScan
 public import DescriptiveComplexity.Problems.Wide.Mirror
 public import DescriptiveComplexity.Problems.Wide.Test
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRules
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # One-cell writes, and tests the tracks can decide
@@ -119,7 +124,7 @@ theorem step_writeCell (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads
 of the *symbol* – which is what a deterministic rule can branch on – tied to
 the per-cell question by the compatibility hypothesis. The verdict comes back
 in the phase: the passing one exactly when every register passed. -/
-theorem reachesIn_fileTestG (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileTestG (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {Test : I → Prop} {TestG : (W → A) → Prop} {m : I → Prop}
     {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
@@ -211,7 +216,7 @@ exactly what a deterministic rule can do. They are
 
 /-- **Clearing a track**: one pass down the file writing the clear digit at
 every register. -/
-theorem reachesIn_fileClearTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileClearTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
     (hrest : ∀ r : Univ A R P K dd → Prop,
@@ -253,7 +258,7 @@ theorem reachesIn_fileClearTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.t
 /-- **Copying one track into another**: one pass down the file, each register's
 walked digit replaced by its digit on the source slot, which must be a bit
 there. SAV := MIRROR and TARGET := SAV are this pass. -/
-theorem reachesIn_fileCopyTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileCopyTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t rg src : W} (hne : t ≠ rg) (hnesrc : src ≠ t)
     {rest : (Univ A R P K dd → Prop) → W → A}
@@ -312,7 +317,7 @@ what makes the written value independent of the pass's own progress.
 Clearing and copying are special cases; the pattern writes of the program –
 a target register loaded with a pattern of the marks – are the general
 one. -/
-theorem reachesIn_fileMapTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileMapTrack (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t rg : W} (hne : t ≠ rg) {rest : (Univ A R P K dd → Prop) → W → A}
     (hrest : ∀ r : Univ A R P K dd → Prop,

@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Tiling.Defs
 public import DescriptiveComplexity.Problems.Wide.WellFormed
+import all DescriptiveComplexity.Exponential.AddrExp
+import all DescriptiveComplexity.Problems.Tiling.Defs
 
 /-!
 # The wide tiling: a square addressed by the subsets of its instance
@@ -228,7 +230,7 @@ def wideTileData : TileData (WPoint A) where
 /-- **The order of a wide tiling is linear** as soon as the instance's is: the
 addresses are ordered as binary numbers, the tiles as in the instance, and the
 addresses come first. -/
-theorem isLinOrd_wtpLe [Finite A] (h : IsLinOrd (WTLe (A := A))) :
+private theorem isLinOrd_wtpLe [Finite A] (h : IsLinOrd (WTLe (A := A))) :
     IsLinOrd (wtpLe (A := A)) := by
   have hs := isLinOrd_wmSetLe h
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -257,7 +259,7 @@ theorem isLinOrd_wtpLe [Finite A] (h : IsLinOrd (WTLe (A := A))) :
 /-- **The promise of a wide tiling is a promise about its instance**: the grid
 adds nothing to it, the empty address being a position whatever the instance
 says. -/
-theorem wideTileData_wellFormed [Finite A] (h : IsLinOrd (WTLe (A := A))) :
+private theorem wideTileData_wellFormed [Finite A] (h : IsLinOrd (WTLe (A := A))) :
     (wideTileData A).WellFormed :=
   ⟨isLinOrd_wtpLe h, ⟨Sum.inl fun _ => False, fun _ hc => hc.elim⟩⟩
 
@@ -285,39 +287,39 @@ def wtPointEquiv (e : A ≃[Language.wtile] B) : WPoint A ≃ WPoint B where
 
 variable (e : A ≃[Language.wtile] B)
 
-theorem wtLe_map (a a' : A) : WTLe a a' ↔ WTLe (e a) (e a') := relMap_equiv₂ e wtLe a a'
+private theorem wtLe_map (a a' : A) : WTLe a a' ↔ WTLe (e a) (e a') := relMap_equiv₂ e wtLe a a'
 
-theorem wtTile_map (a : A) : WTTile a ↔ WTTile (e a) := relMap_equiv₁ e wtTile a
+private theorem wtTile_map (a : A) : WTTile a ↔ WTTile (e a) := relMap_equiv₁ e wtTile a
 
-theorem wtAcc_map (a : A) : WTAcc a ↔ WTAcc (e a) := relMap_equiv₁ e wtAcc a
+private theorem wtAcc_map (a : A) : WTAcc a ↔ WTAcc (e a) := relMap_equiv₁ e wtAcc a
 
-theorem wtHoriz_map (a a' : A) : WTHoriz a a' ↔ WTHoriz (e a) (e a') :=
+private theorem wtHoriz_map (a a' : A) : WTHoriz a a' ↔ WTHoriz (e a) (e a') :=
   relMap_equiv₂ e wtHoriz a a'
 
-theorem wtVert_map (a a' : A) : WTVert a a' ↔ WTVert (e a) (e a') :=
+private theorem wtVert_map (a a' : A) : WTVert a a' ↔ WTVert (e a) (e a') :=
   relMap_equiv₂ e wtVert a a'
 
-theorem wtFirst_map (a a' : A) : WTFirst a a' ↔ WTFirst (e a) (e a') :=
+private theorem wtFirst_map (a a' : A) : WTFirst a a' ↔ WTFirst (e a) (e a') :=
   relMap_equiv₂ e wtFirst a a'
 
-theorem wtBase_map (a : A) : WTBase a ↔ WTBase (e a) := relMap_equiv₁ e wtBase a
+private theorem wtBase_map (a : A) : WTBase a ↔ WTBase (e a) := relMap_equiv₁ e wtBase a
 
-theorem wtDig_map (a : A) : WTDig a ↔ WTDig (e a) := relMap_equiv₁ e wtDig a
+private theorem wtDig_map (a : A) : WTDig a ↔ WTDig (e a) := relMap_equiv₁ e wtDig a
 
-theorem wtStart_map (a : A) : WTStart a ↔ WTStart (e a) := relMap_equiv₁ e wtStart a
+private theorem wtStart_map (a : A) : WTStart a ↔ WTStart (e a) := relMap_equiv₁ e wtStart a
 
-theorem wtEdgeL_map (a : A) : WTEdgeL a ↔ WTEdgeL (e a) := relMap_equiv₁ e wtEdgeL a
+private theorem wtEdgeL_map (a : A) : WTEdgeL a ↔ WTEdgeL (e a) := relMap_equiv₁ e wtEdgeL a
 
-theorem wtEdgeR_map (a : A) : WTEdgeR a ↔ WTEdgeR (e a) := relMap_equiv₁ e wtEdgeR a
+private theorem wtEdgeR_map (a : A) : WTEdgeR a ↔ WTEdgeR (e a) := relMap_equiv₁ e wtEdgeR a
 
 /-- The elements the bottom row is described at correspond. -/
-theorem wtHasFirst_map (a : A) : WTHasFirst a ↔ WTHasFirst (e a) := by
+private theorem wtHasFirst_map (a : A) : WTHasFirst a ↔ WTHasFirst (e a) := by
   refine ⟨fun ⟨t, ht⟩ => ⟨e t, (wtFirst_map e a t).mp ht⟩, fun ⟨t, ht⟩ => ⟨e.symm t, ?_⟩⟩
   refine (wtFirst_map e a (e.symm t)).mpr ?_
   rwa [e.apply_symm_apply]
 
 /-- And so do the cells of the file. -/
-theorem wtFileSeg_map (s : A → Prop) (x : A) :
+private theorem wtFileSeg_map (s : A → Prop) (x : A) :
     WMFileSeg WTLe WTHasFirst s x ↔
       WMFileSeg WTLe WTHasFirst (fun y => s (e.symm y)) (e x) := by
   refine ⟨fun h y => (h (e.symm y)).trans ?_, fun h y => ?_⟩
@@ -338,7 +340,7 @@ theorem wtFileSeg_map (s : A → Prop) (x : A) :
 
 /-- The positions correspond: an address of digits is a position, a tile is
 not. -/
-theorem wtPosn_map (p : WPoint A) :
+private theorem wtPosn_map (p : WPoint A) :
     (wideTileData A).Posn p ↔ (wideTileData B).Posn (wtPointEquiv e p) := by
   rcases p with s | x
   · refine ⟨fun h y hy => ?_, fun h y hy => ?_⟩
@@ -350,7 +352,7 @@ theorem wtPosn_map (p : WPoint A) :
 
 /-- The orders correspond: the binary-number order on addresses is the
 instance's order read through the isomorphism. -/
-theorem wtLe_point_map (p q : WPoint A) :
+private theorem wtLe_point_map (p q : WPoint A) :
     (wideTileData A).Le p q ↔ (wideTileData B).Le (wtPointEquiv e p) (wtPointEquiv e q) := by
   rcases p with s | x <;> rcases q with t | y
   · exact wmSetLe_congr e.toEquiv (fun a a' => wtLe_map e a a') s t
@@ -359,21 +361,21 @@ theorem wtLe_point_map (p q : WPoint A) :
   · exact wtLe_map e x y
 
 /-- The tiles correspond. -/
-theorem wtTile_point_map (p : WPoint A) :
+private theorem wtTile_point_map (p : WPoint A) :
     (wideTileData A).Tile p ↔ (wideTileData B).Tile (wtPointEquiv e p) := by
   rcases p with s | x
   · exact Iff.rfl
   · exact wtTile_map e x
 
 /-- The accepting tiles correspond. -/
-theorem wtAcc_point_map (p : WPoint A) :
+private theorem wtAcc_point_map (p : WPoint A) :
     (wideTileData A).Acc p ↔ (wideTileData B).Acc (wtPointEquiv e p) := by
   rcases p with s | x
   · exact Iff.rfl
   · exact wtAcc_map e x
 
 /-- Horizontal compatibility corresponds. -/
-theorem wtHoriz_point_map (p q : WPoint A) :
+private theorem wtHoriz_point_map (p q : WPoint A) :
     (wideTileData A).Horiz p q ↔
       (wideTileData B).Horiz (wtPointEquiv e p) (wtPointEquiv e q) := by
   rcases p with s | x <;> rcases q with t | y
@@ -383,7 +385,7 @@ theorem wtHoriz_point_map (p q : WPoint A) :
   · exact wtHoriz_map e x y
 
 /-- Vertical compatibility corresponds. -/
-theorem wtVert_point_map (p q : WPoint A) :
+private theorem wtVert_point_map (p q : WPoint A) :
     (wideTileData A).Vert p q ↔
       (wideTileData B).Vert (wtPointEquiv e p) (wtPointEquiv e q) := by
   rcases p with s | x <;> rcases q with t | y
@@ -394,7 +396,7 @@ theorem wtVert_point_map (p q : WPoint A) :
 
 /-- The bottom row corresponds: the cell of an element goes to the cell of its
 image. -/
-theorem wtFirst_point_map (p q : WPoint A) :
+private theorem wtFirst_point_map (p q : WPoint A) :
     (wideTileData A).First p q ↔
       (wideTileData B).First (wtPointEquiv e p) (wtPointEquiv e q) := by
   rcases p with s | x <;> rcases q with t | y
@@ -409,28 +411,28 @@ theorem wtFirst_point_map (p q : WPoint A) :
   · exact Iff.rfl
 
 /-- The base tiles correspond. -/
-theorem wtBase_point_map (p : WPoint A) :
+private theorem wtBase_point_map (p : WPoint A) :
     (wideTileData A).Base p ↔ (wideTileData B).Base (wtPointEquiv e p) := by
   rcases p with s | x
   · exact Iff.rfl
   · exact wtBase_map e x
 
 /-- The start tiles correspond. -/
-theorem wtStart_point_map (p : WPoint A) :
+private theorem wtStart_point_map (p : WPoint A) :
     (wideTileData A).Start p ↔ (wideTileData B).Start (wtPointEquiv e p) := by
   rcases p with s | x
   · exact Iff.rfl
   · exact wtStart_map e x
 
 /-- The left-edge tiles correspond. -/
-theorem wtEdgeL_point_map (p : WPoint A) :
+private theorem wtEdgeL_point_map (p : WPoint A) :
     (wideTileData A).EdgeL p ↔ (wideTileData B).EdgeL (wtPointEquiv e p) := by
   rcases p with s | x
   · exact Iff.rfl
   · exact wtEdgeL_map e x
 
 /-- And so do the right-edge tiles. -/
-theorem wtEdgeR_point_map (p : WPoint A) :
+private theorem wtEdgeR_point_map (p : WPoint A) :
     (wideTileData A).EdgeR p ↔ (wideTileData B).EdgeR (wtPointEquiv e p) := by
   rcases p with s | x
   · exact Iff.rfl

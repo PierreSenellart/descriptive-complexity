@@ -8,6 +8,13 @@ module
 public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
 import DescriptiveComplexity.Problems.Wide.DrawValEnum
 import Mathlib.Data.Nat.Log
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawInner
+import all DescriptiveComplexity.Problems.Wide.DrawSlots
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.Problems.Wide.RegChannelEval
+import all DescriptiveComplexity.Problems.Wide.RegChannelLaid
 
 /-!
 # The rounds of the evaluation, counted over the handed file
@@ -50,13 +57,13 @@ variable {hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x 
 variable (dt) in
 /-- **The registers the rounds end at**: those standing for an element of an
 inner block. -/
-def RegKin (u : dt.RegIx (A := A) (R' := R') (P' := P')) : Prop :=
+private def RegKin (u : dt.RegIx (A := A) (R' := R') (P' := P')) : Prop :=
   ∃ j : Fin dt.ki, tagBlk (u.1).1 = some (Sum.inr j)
 
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A] [Finite R']
   [Finite P'] [Finite dt.KIx] in
 /-- **A register of an inner block stands for an inner argument element.** -/
-theorem argIn_of_regKin {u : dt.RegIx (A := A) (R' := R') (P' := P')}
+private theorem argIn_of_regKin {u : dt.RegIx (A := A) (R' := R') (P' := P')}
     (hu : dt.RegKin u) : ∃ j : Fin dt.ki, (u.1).1 = argIn dt.ko j := by
   obtain ⟨j, hj⟩ := hu
   exact ⟨j, (tagBlk_eq_some_iff _ _).mp hj⟩
@@ -64,7 +71,7 @@ theorem argIn_of_regKin {u : dt.RegIx (A := A) (R' := R') (P' := P')}
 /-- **The inner registers are upward closed**: the inner blocks are a final
 segment of the tag order (`DescriptiveComplexity.Draw.kinSeg`), so above a
 register of an inner block every register is one. -/
-theorem regKin_up {u v : dt.RegIx (A := A) (R' := R') (P' := P')}
+private theorem regKin_up {u v : dt.RegIx (A := A) (R' := R') (P' := P')}
     (hu : dt.RegKin u)
     (hlt : WMLt (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le u v) :
     dt.RegKin v := by
@@ -81,7 +88,7 @@ registers, in exactly the forms the clocked run demands – the covers are
 increments, the last round passes the exhaustion test everywhere, every earlier
 one fails it somewhere, every round holds inner registers alone, and every
 register it marks is one the addresses use. -/
-theorem exists_regValEnum
+private theorem exists_regValEnum
     (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd,
       (∃ i : dt.KIx, x.1 = Tag.arg i) → WMHasInp x) :
     ∃ (n : ℕ) (mV : Fin (n + 1) → (dt.RegIx (A := A) (R' := R') (P' := P') → Prop)),
@@ -196,7 +203,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)] in
 variable (A R' P') in
 /-- **The universe's size**: a tag and a tuple. -/
-theorem card_univ :
+private theorem card_univ :
     Nat.card (Univ A R' P' dt.KIx dt.dd) =
       Nat.card (Tag R' P' dt.KIx) * Nat.card A ^ dt.dd := by
   classical
@@ -209,7 +216,7 @@ omit [LinearOrder R'] [LinearOrder P'] in
 variable (R' P') in
 /-- **The tags**: one per rule name, one per phase, one per argument block, and
 the alphabet's own. -/
-theorem card_drawTag :
+private theorem card_drawTag :
     Nat.card (Tag R' P' dt.KIx) =
       Nat.card R' + 1 + Nat.card P' + Nat.card dt.KIx := by
   classical
@@ -240,7 +247,7 @@ variable (A R' P') in
 /-- **The channel writes for the argument elements and one more**: so the file
 has at most as many registers as there are argument elements, plus one, and the
 bound the walks are charged against is `2 ^` that. -/
-theorem card_regIx_le
+private theorem card_regIx_le
     (hmk : ∀ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x ↔
       ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)) :
     Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) ≤
@@ -297,7 +304,7 @@ writes for every argument element, and the padded tuples of the encoding's width
 are that many. This is the *lower* bound the clock's exponent is measured
 against – the record's tuple counts are below the register count, so they are
 below the file's own bound. -/
-theorem card_regIx_ge {zero : A}
+private theorem card_regIx_ge {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
       WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd)) :
@@ -341,7 +348,7 @@ This is the *lower* bound the clock's counting hypothesis is met by, and it is
 why a reduction can buy tags by padding its kernel's block
 (`DescriptiveComplexity.SOBlock.pad`): one extra relation variable doubles the
 count. -/
-theorem two_pow_card_le_card_nexRIx [Finite dt.d.B.ι]
+private theorem two_pow_card_le_card_nexRIx [Finite dt.d.B.ι]
     [Finite (dt.NexRIx (G := dt.d.B.ι → Bool))] :
     2 ^ Nat.card dt.d.B.ι ≤ Nat.card (dt.NexRIx (G := dt.d.B.ι → Bool)) := by
   classical
@@ -371,7 +378,7 @@ file's widths give `4 N + 14` (`regWidthBd_le_two_pow`), the padded cells give
 This is where the clock stops depending on the instance: `N` grows with
 `|A| ^ dd`, and so does the drawing, so what a reduction owes is a comparison
 between two *constants*. -/
-theorem evalQ_le_two_pow [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
+private theorem evalQ_le_two_pow [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
     {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
       WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
@@ -436,7 +443,7 @@ theorem evalQ_le_two_pow [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
 omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] in
 variable (A R' P') in
 /-- **And its logarithm**, which is the number the clock actually compares. -/
-theorem log_evalQ_le [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
+private theorem log_evalQ_le [Nonempty dt.KIx] [Nonempty A] (hdd0 : 1 ≤ dt.dd0)
     {zero : A}
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
       WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
@@ -463,7 +470,7 @@ blocks (`KIx`).
 A reduction meets it by padding its kernel's block until the rule names clear
 that number, each extra variable doubling them
 (`two_pow_card_le_card_nexRIx`). -/
-theorem clock_count_of_tags [Nonempty dt.KIx] [Nonempty A]
+private theorem clock_count_of_tags [Nonempty dt.KIx] [Nonempty A]
     [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
     [Finite (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
     [Language.wide.Structure (Univ A R'

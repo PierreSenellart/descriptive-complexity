@@ -137,7 +137,7 @@ def QsatMatrix (τ : A → Prop) : Prop :=
 
 /-- The matrix only depends on the valuation through its values on the
 quantified variables. -/
-theorem qsatMatrix_congr {τ τ' : A → Prop} (h : ∀ y : A, IsQVar y → (τ y ↔ τ' y))
+private theorem qsatMatrix_congr {τ τ' : A → Prop} (h : ∀ y : A, IsQVar y → (τ y ↔ τ' y))
     (hm : QsatMatrix τ) : QsatMatrix τ' := by
   intro c hc
   obtain ⟨x, hx, hlit⟩ := hm c hc
@@ -219,7 +219,7 @@ inductive QsatWins : (A → Prop) → (A → Prop) → Prop
 agreeing on the quantified part `D` win the same positions. This is what makes
 `(D, τ)` a position rather than a full state: the values of `τ` outside `D` are
 about to be overwritten by the quantifiers. -/
-theorem qsatWins_congr {D τ : A → Prop} (h : QsatWins D τ) :
+private theorem qsatWins_congr {D τ : A → Prop} (h : QsatWins D τ) :
     ∀ τ' : A → Prop, (∀ y : A, D y → (τ y ↔ τ' y)) → QsatWins D τ' := by
   classical
   induction h with

@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.SetFamily
 public import DescriptiveComplexity.Problems.OneInSat
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
+import all DescriptiveComplexity.Problems.OneInSat
+import all DescriptiveComplexity.Problems.SetFamily
+import all DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
 # Exact Cover is NP-complete
@@ -77,7 +80,8 @@ noncomputable def occursF {α : Type} (x : α) : Language.sat.Formula α :=
   Formula.iExs Unit (ThreeSatToSat.clF (Sum.inr ()) ⊓
     (ThreeSatToSat.posF (Sum.inr ()) (Sum.inl x) ⊔ ThreeSatToSat.negF (Sum.inr ()) (Sum.inl x)))
 
-theorem realize_occursF {A : Type} [Language.sat.Structure A] {α : Type} {v : α → A} {x : α} :
+private theorem realize_occursF
+    {A : Type} [Language.sat.Structure A] {α : Type} {v : α → A} {x : α} :
     (occursF x).Realize v ↔ SatOccurs A (v x) := by
   simp only [occursF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup,
     ThreeSatToSat.realize_clF, ThreeSatToSat.realize_posF, ThreeSatToSat.realize_negF,
@@ -129,7 +133,7 @@ theorem ecPt_eq_iff {t t' : ECTag} {x x' : A} : ecPt t x = ecPt t' x' ↔ t = t'
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem ecPt_surj (q : ecInterp.Map A) : ∃ t x, q = ecPt t x :=
+private theorem ecPt_surj (q : ecInterp.Map A) : ∃ t x, q = ecPt t x :=
   ⟨q.1, q.2 0, Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg q.2 (Subsingleton.elim i 0)⟩⟩
 
 end Points
@@ -192,7 +196,7 @@ theorem ssFam_cases {q : ecInterp.Map A} (h : SSFam q) :
   | lset s => exact ⟨s, x, (ssFam_lset s x).mp h, rfl⟩
 
 /-- The ground elements are exactly the variables and the clauses. -/
-theorem ssElem_cases {q : ecInterp.Map A} (h : SSElem q) :
+private theorem ssElem_cases {q : ecInterp.Map A} (h : SSElem q) :
     (∃ x, SatOccurs A x ∧ q = ecPt .velt x) ∨ ∃ c, IsCl c ∧ q = ecPt .celt c := by
   obtain ⟨t, x, rfl⟩ := ecPt_surj q
   cases t with
@@ -213,7 +217,7 @@ section Correctness
 variable {A : Type} [Language.sat.Structure A]
 
 /-- A literal occurring in a clause is a literal of a variable. -/
-theorem satOccurs_of_occIn {c x : A} {s : Bool} (h : OccIn c x s) : SatOccurs A x := by
+private theorem satOccurs_of_occIn {c x : A} {s : Bool} (h : OccIn c x s) : SatOccurs A x := by
   cases s
   · exact ⟨c, h.1, Or.inr h.2⟩
   · exact ⟨c, h.1, Or.inl h.2⟩
@@ -308,7 +312,7 @@ theorem oneInProper_assignOf {G : ecInterp.Map A → Prop}
 variable (A) in
 /-- Correctness of the reduction: a CNF structure is exactly-one satisfiable
 iff its literal set system has an exact cover. -/
-theorem oneInSatisfiable_iff_hasExactCover :
+private theorem oneInSatisfiable_iff_hasExactCover :
     OneInSatisfiable A ↔ HasExactCover (ecInterp.Map A) :=
   ⟨fun ⟨ν, hν⟩ => ⟨coverOf ν, exactCoverBy_coverOf hν⟩,
     fun ⟨G, hG⟩ => ⟨assignOf G, oneInProper_assignOf hG⟩⟩
@@ -321,7 +325,7 @@ open ExactCoverRed in
 /-- **1-in-SAT FO-reduces to Exact Cover**: the ground elements are the
 variables and the clauses, and the family has one set per literal. No order,
 no gadget and no counting. -/
-noncomputable def oneInSat_fo_reduction_exactCover : OneInSAT ≤ᶠᵒ ExactCover where
+private noncomputable def oneInSat_fo_reduction_exactCover : OneInSAT ≤ᶠᵒ ExactCover where
   Tag := ECTag
   dim := 1
   toInterpretation := ecInterp

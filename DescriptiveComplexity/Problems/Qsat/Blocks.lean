@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Membership
+import all DescriptiveComplexity.Problems.Qsat.Membership
 
 /-!
 # Playing a whole quantifier block at once
@@ -71,7 +72,8 @@ theorem qSet_ne (τ : A → Prop) {x y : A} (P : Prop) (h : y ≠ x) : qSet τ x
 
 omit [Language.qsat.Structure A] in
 /-- A Boolean update is a propositional one. -/
-theorem qUpd_eq_qSet (τ : A → Prop) (x : A) (b : Bool) : qUpd τ x b = qSet τ x (b = true) := rfl
+private theorem qUpd_eq_qSet
+    (τ : A → Prop) (x : A) (b : Bool) : qUpd τ x b = qSet τ x (b = true) := rfl
 
 omit [Language.qsat.Structure A] in
 theorem qSet_congr (τ : A → Prop) (x : A) {P Q : Prop} (h : P ↔ Q) :
@@ -92,7 +94,7 @@ theorem qSet_self_eq (τ : A → Prop) (x : A) : qSet τ x (τ x) = τ := by
 
 open Classical in
 /-- A proposition as a Boolean. -/
-noncomputable def boolOf (P : Prop) : Bool := if P then true else false
+private noncomputable def boolOf (P : Prop) : Bool := if P then true else false
 
 private theorem boolOf_iff (P : Prop) : (boolOf P = true) ↔ P := by
   classical
@@ -151,7 +153,7 @@ theorem QBlock.mem_of_qLeast {D B : A → Prop} (hB : QBlock D B) {x z : A} (hx 
   exact hx.2.2 z (hB.isVar z hz) (hB.unplayed z hz) (hB.first z x hz hx.1 hx.2.1 hBx)
 
 omit [Finite A] [Language.qsat.Structure A] in
-private theorem qOver_qSet {B : A → Prop} {x : A} (hBx : B x) (τ ν : A → Prop) (P : Prop) :
+theorem qOver_qSet {B : A → Prop} {x : A} (hBx : B x) (τ ν : A → Prop) (P : Prop) :
     qOver (qRem B x) (qSet τ x P) ν = qOver B τ (qSet ν x P) := by
   classical
   funext y
@@ -177,7 +179,7 @@ private theorem qOver_qSet {B : A → Prop} {x : A} (hBx : B x) (τ ν : A → P
       · exact Or.inr ⟨fun hr => hnB hr.2, (qSet_ne τ P hyx).mpr hτ⟩
 
 omit [Finite A] [Language.qsat.Structure A] in
-private theorem qUnion_qAdd_qRem {D B : A → Prop} {x : A} (hBx : B x) :
+theorem qUnion_qAdd_qRem {D B : A → Prop} {x : A} (hBx : B x) :
     qUnion (qAdd D x) (qRem B x) = qUnion D B := by
   classical
   funext y
@@ -194,7 +196,7 @@ private theorem qUnion_qAdd_qRem {D B : A → Prop} {x : A} (hBx : B x) :
       · exact Or.inr ⟨hyx, hB⟩
 
 omit [Finite A] in
-private theorem qBlock_qRem {D B : A → Prop} {x : A} (hB : QBlock D B) :
+theorem qBlock_qRem {D B : A → Prop} {x : A} (hB : QBlock D B) :
     QBlock (qAdd D x) (qRem B x) where
   isVar y hy := hB.isVar y hy.2
   unplayed y hy hd := by
@@ -206,13 +208,13 @@ private theorem qBlock_qRem {D B : A → Prop} {x : A} (hB : QBlock D B) :
     exact hB.first y w hy.2 hw (fun hd => hdw (Or.inr hd)) fun hBw => hrw ⟨hwx, hBw⟩
 
 omit [Finite A] [Language.qsat.Structure A] in
-private theorem qOver_of_empty {B τ ν : A → Prop} (hB : ∀ y : A, ¬B y) :
+theorem qOver_of_empty {B τ ν : A → Prop} (hB : ∀ y : A, ¬B y) :
     qOver B τ ν = τ := by
   funext y
   exact propext ⟨fun h => h.resolve_left (fun hh => hB y hh.1) |>.2, fun h => Or.inr ⟨hB y, h⟩⟩
 
 omit [Finite A] [Language.qsat.Structure A] in
-private theorem qUnion_of_empty {D B : A → Prop} (hB : ∀ y : A, ¬B y) : qUnion D B = D := by
+theorem qUnion_of_empty {D B : A → Prop} (hB : ∀ y : A, ¬B y) : qUnion D B = D := by
   funext y
   exact propext ⟨fun h => h.resolve_right (hB y), Or.inl⟩
 

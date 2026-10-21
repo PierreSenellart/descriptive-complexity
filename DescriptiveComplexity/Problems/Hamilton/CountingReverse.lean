@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Hamilton.CountingForward
 public import DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.OccurrenceVar
+import all DescriptiveComplexity.Problems.Hamilton.CountingGadget
 
 /-!
 # Every circuit of the row graph is the circuit of a model
@@ -72,12 +74,12 @@ def IsPrev (pv : Vtx A) (s : Bool) (x c : A) : Prop :=
 
 /-- The row successor of the padding of an occurrence: the next occurrence, or
 the right end. -/
-def IsNext (nv : Vtx A) (s : Bool) (x c : A) : Prop :=
+private def IsNext (nv : Vtx A) (s : Bool) (x c : A) : Prop :=
   (VarMax x c s ∧ nv = .rgt x) ∨ ∃ c' s', VarStep x c s c' s' ∧ nv = .ain s' x c'
 
 /-! ### The neighbours of a vertex -/
 
-theorem step_pad0_out {x c : A} {s : Bool} (hm : VarMin x c s) {v : Vtx A}
+private theorem step_pad0_out {x c : A} {s : Bool} (hm : VarMin x c s) {v : Vtx A}
     (h : Step (.pad0 x) v) : v = .lft x ∨ v = .ain s x c := by
   cases v with
   | lft y =>
@@ -89,7 +91,7 @@ theorem step_pad0_out {x c : A} {s : Bool} (hm : VarMin x c s) {v : Vtx A}
     exact Or.inr (by rw [← hxy, hc, hs])
   | _ => exact (h : False).elim
 
-theorem step_pad0_in {x c : A} {s : Bool} (hm : VarMin x c s) {v : Vtx A}
+private theorem step_pad0_in {x c : A} {s : Bool} (hm : VarMin x c s) {v : Vtx A}
     (h : Step v (.pad0 x)) : v = .lft x ∨ v = .ain s x c := by
   cases v with
   | lft y =>
@@ -101,7 +103,7 @@ theorem step_pad0_in {x c : A} {s : Bool} (hm : VarMin x c s) {v : Vtx A}
     exact Or.inr (by rw [← hxy, hc, hs])
   | _ => exact (h : False).elim
 
-theorem step_pad_out {nv : Vtx A} {x c : A} {s : Bool} (hn : IsNext nv s x c) {v : Vtx A}
+private theorem step_pad_out {nv : Vtx A} {x c : A} {s : Bool} (hn : IsNext nv s x c) {v : Vtx A}
     (h : Step (.pad s x c) v) : v = .bout s x c ∨ v = nv := by
   cases v with
   | rgt y =>
@@ -120,7 +122,7 @@ theorem step_pad_out {nv : Vtx A} {x c : A} {s : Bool} (hn : IsNext nv s x c) {v
     exact Or.inl (by rw [hs, hxy, hc])
   | _ => exact (h : False).elim
 
-theorem step_pad_in {nv : Vtx A} {x c : A} {s : Bool} (hn : IsNext nv s x c) {v : Vtx A}
+private theorem step_pad_in {nv : Vtx A} {x c : A} {s : Bool} (hn : IsNext nv s x c) {v : Vtx A}
     (h : Step v (.pad s x c)) : v = .bout s x c ∨ v = nv := by
   cases v with
   | rgt y =>
@@ -139,7 +141,7 @@ theorem step_pad_in {nv : Vtx A} {x c : A} {s : Bool} (hn : IsNext nv s x c) {v 
     exact Or.inl (by rw [hs, hxy, hc])
   | _ => exact (h : False).elim
 
-theorem step_ain_out {pv : Vtx A} {x c : A} {s : Bool} (hp : IsPrev pv s x c) {v : Vtx A}
+private theorem step_ain_out {pv : Vtx A} {x c : A} {s : Bool} (hp : IsPrev pv s x c) {v : Vtx A}
     (h : Step (.ain s x c) v) :
     v = pv ∨ (s = true ∧ v = .cls c) ∨ (s = false ∧ v = .bout s x c) := by
   cases v with
@@ -163,7 +165,7 @@ theorem step_ain_out {pv : Vtx A} {x c : A} {s : Bool} (hp : IsPrev pv s x c) {v
     exact Or.inr (Or.inr ⟨hs, by rw [hs, hs₁, hxy, hc]⟩)
   | _ => exact (h : False).elim
 
-theorem step_ain_in {pv : Vtx A} {x c : A} {s : Bool} (hp : IsPrev pv s x c) {v : Vtx A}
+private theorem step_ain_in {pv : Vtx A} {x c : A} {s : Bool} (hp : IsPrev pv s x c) {v : Vtx A}
     (h : Step v (.ain s x c)) :
     v = pv ∨ (s = true ∧ v = .bout s x c) ∨ (s = false ∧ v = .cls c) := by
   cases v with
@@ -187,7 +189,7 @@ theorem step_ain_in {pv : Vtx A} {x c : A} {s : Bool} (hp : IsPrev pv s x c) {v 
     exact Or.inr (Or.inr ⟨hs, by rw [hc]⟩)
   | _ => exact (h : False).elim
 
-theorem step_bout_out {x c : A} {s : Bool} {v : Vtx A} (h : Step (.bout s x c) v) :
+private theorem step_bout_out {x c : A} {s : Bool} {v : Vtx A} (h : Step (.bout s x c) v) :
     v = .pad s x c ∨ (s = true ∧ v = .ain s x c) ∨ (s = false ∧ v = .cls c) := by
   cases v with
   | pad s₁ y c₁ =>
@@ -201,7 +203,7 @@ theorem step_bout_out {x c : A} {s : Bool} {v : Vtx A} (h : Step (.bout s x c) v
     exact Or.inr (Or.inr ⟨hs, by rw [hc]⟩)
   | _ => exact (h : False).elim
 
-theorem step_bout_in {x c : A} {s : Bool} {v : Vtx A} (h : Step v (.bout s x c)) :
+private theorem step_bout_in {x c : A} {s : Bool} {v : Vtx A} (h : Step v (.bout s x c)) :
     v = .pad s x c ∨ (s = true ∧ v = .cls c) ∨ (s = false ∧ v = .ain s x c) := by
   cases v with
   | pad s₁ y c₁ =>
@@ -217,11 +219,11 @@ theorem step_bout_in {x c : A} {s : Bool} {v : Vtx A} (h : Step v (.bout s x c))
 
 variable [Finite A]
 
-theorem exists_isPrev {x c : A} {s : Bool} (ho : OccIn c x s) : ∃ pv, IsPrev pv s x c := by
+private theorem exists_isPrev {x c : A} {s : Bool} (ho : OccIn c x s) : ∃ pv, IsPrev pv s x c := by
   rcases varMin_or_step ho with hm | ⟨c', s', hst⟩
   exacts [⟨_, Or.inl ⟨hm, rfl⟩⟩, ⟨_, Or.inr ⟨c', s', hst, rfl⟩⟩]
 
-theorem exists_isNext {x c : A} {s : Bool} (ho : OccIn c x s) : ∃ nv, IsNext nv s x c := by
+private theorem exists_isNext {x c : A} {s : Bool} (ho : OccIn c x s) : ∃ nv, IsNext nv s x c := by
   rcases varMax_or_step ho with hm | ⟨c', s', hst⟩
   exacts [⟨_, Or.inl ⟨hm, rfl⟩⟩, ⟨_, Or.inr ⟨c', s', hst, rfl⟩⟩]
 
@@ -234,7 +236,7 @@ variable {N : Vtx A → Vtx A → Prop}
 omit [Finite A] in
 /-- With a variable in the formula the graph has more than two vertices, so no
 two of them follow each other both ways. -/
-theorem no2 (hC : Circ N) {x : A} (hx : SatOccurs A x) {u v : Vtx A} (h : N u v)
+private theorem no2 (hC : Circ N) {x : A} (hx : SatOccurs A x) {u v : Vtx A} (h : N u v)
     (h' : N v u) : False := by
   rcases hC.two h h' (.top x) hx with h₁ | h₁ <;> rcases hC.two h h' (.lft x) hx with h₂ | h₂ <;>
     rcases hC.two h h' (.rgt x) hx with h₃ | h₃ <;>
@@ -258,7 +260,7 @@ theorem through (hC : Circ N) (hno2 : ∀ a b, N a b → N b a → False) {p u w
 
 omit [Finite A] in
 /-- The circuit passes through the row predecessor of an occurrence. -/
-theorem prev_adj (hC : Circ N) {pv : Vtx A} {x c : A} {s : Bool} (ho : OccIn c x s)
+private theorem prev_adj (hC : Circ N) {pv : Vtx A} {x c : A} {s : Bool} (ho : OccIn c x s)
     (hp : IsPrev pv s x c) : N pv (.ain s x c) ∨ N (.ain s x c) pv := by
   have hno2 := fun a b => hC.no2 (N := N) (occurs_of_occIn ho) (u := a) (v := b)
   rcases hp with ⟨hm, rfl⟩ | ⟨c', s', hst, rfl⟩
@@ -358,11 +360,11 @@ namespace Circ
 
 variable {N : Vtx A → Vtx A → Prop}
 
-theorem tloc_of_enter (hC : Circ N) {pv : Vtx A} {x c : A} {s : Bool} (ho : OccIn c x s)
+private theorem tloc_of_enter (hC : Circ N) {pv : Vtx A} {x c : A} {s : Bool} (ho : OccIn c x s)
     (hp : IsPrev pv s x c) (h : N pv (.ain s x c)) : TLoc N s x c :=
   ⟨fun _ hp' => isPrev_unique hp hp' ▸ h, hC.pairT ho hp h⟩
 
-theorem floc_of_enter (hC : Circ N) {x c : A} {s : Bool} (ho : OccIn c x s)
+private theorem floc_of_enter (hC : Circ N) {x c : A} {s : Bool} (ho : OccIn c x s)
     (h : N (.pad s x c) (.bout s x c)) : FLoc N s x c := by
   obtain ⟨pv, hp⟩ := exists_isPrev ho
   obtain ⟨h₁, h₂, h₃⟩ := hC.pairF ho hp h
@@ -422,7 +424,7 @@ theorem rowF (hC : Circ N) {x : A} (hx : SatOccurs A x) (hν : ¬N (.top x) (.lf
 
 /-- **Every arc of a circuit is an arc of the circuit of its assignment**: the
 assignment making `x` true when its row is entered from the left. -/
-theorem exists_S (hC : Circ N) {u : Vtx A} (hu : Valid u) :
+private theorem exists_S (hC : Circ N) {u : Vtx A} (hu : Valid u) :
     ∃ v, N u v ∧ S (fun x => N (.top x) (.lft x)) u v := by
   have tl : ∀ {x : A}, N (.top x) (.lft x) → ∀ c s, OccIn c x s → TLoc N s x c :=
     fun {x} h c s ho => (hC.rowT (occurs_of_occIn ho) h).2 c s ho
@@ -569,7 +571,7 @@ end Circ
 /-! ### The correspondence -/
 
 /-- A Hamilton circuit of the row graph, read locally. -/
-theorem circ_of_isCircuit {Nxt : {v : Vtx A // Valid v} → {v : Vtx A // Valid v} → Prop}
+private theorem circ_of_isCircuit {Nxt : {v : Vtx A // Valid v} → {v : Vtx A // Valid v} → Prop}
     (h : IsCircuit (fun u v : {v : Vtx A // Valid v} => Arc u.1 v.1) Nxt) :
     Circ fun u v => ∃ (hu : Valid u) (hv : Valid v), Nxt ⟨u, hu⟩ ⟨v, hv⟩ := by
   obtain ⟨htot, hfun, hsurj, hinj, hR, htwo⟩ := h.local
@@ -592,7 +594,7 @@ variable (A) [Nonempty A]
 
 /-- **The Hamilton circuits of the row graph are the exactly-one models of the
 formula**, bijectively. -/
-noncomputable def modelEquiv :
+private noncomputable def modelEquiv :
     {ν : A → Prop // OneInModel A ν} ≃
       {Nxt : {v : Vtx A // Valid v} → {v : Vtx A // Valid v} → Prop //
         IsCircuit (fun u v : {v : Vtx A // Valid v} => Arc u.1 v.1) Nxt} :=

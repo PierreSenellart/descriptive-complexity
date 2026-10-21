@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.ZeroOneIP.Counting
 public import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 public import DescriptiveComplexity.Problems.Knapsack.CountingHardness
 import DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.Problems.Knapsack.Counting
+import all DescriptiveComplexity.Problems.Knapsack.CountingHardness
+import all DescriptiveComplexity.Problems.ZeroOneIP.Counting
+import all DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 
 /-!
 # #0-1 integer programming is parsimoniously `#P`-complete
@@ -35,7 +39,7 @@ variable (A : Type) [Language.binWeights.Structure A] [LinearOrder A] [Finite A]
 
 /-- **The solutions of the one-equation program are the solutions of the
 subset-sum instance**, bijectively. -/
-def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
+private def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
     {S : A → Prop // KnapsackSol A S} ≃
       {x : ipInterp.Map A → Prop // ZeroOneSol (ipInterp.Map A) x} where
   toFun S := ⟨colsOf S.1, ipInterp.map_finite A, isLinOrd_ipLe S.2.2.1,
@@ -51,7 +55,7 @@ def solEquiv {a₀ : A} (ha₀ : IsBot a₀) :
     rw [← ipPt_surj q]
 
 /-- **Correctness of the interpretation, for counting.** -/
-theorem sharpZeroOneIP_map : SharpZeroOneIP (ipInterp.Map A) = SharpKnapsack A := by
+private theorem sharpZeroOneIP_map : SharpZeroOneIP (ipInterp.Map A) = SharpKnapsack A := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)
   rw [sharpZeroOneIP_apply, sharpKnapsack_apply]
   exact (Nat.card_congr (solEquiv A ha₀)).symm
@@ -60,7 +64,7 @@ end IPRed
 
 open IPRed in
 /-- **#Knapsack reduces parsimoniously to #0-1 integer programming.** -/
-noncomputable def sharpKnapsack_ordered_parsimonious_sharpZeroOneIP :
+private noncomputable def sharpKnapsack_ordered_parsimonious_sharpZeroOneIP :
     SharpKnapsack ≤ᵖ[≤] SharpZeroOneIP where
   Tag := Unit
   dim := 1

@@ -8,6 +8,14 @@ module
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Run
 import DescriptiveComplexity.Problems.Machine.Program
 public import DescriptiveComplexity.Problems.Wide.RegChannel
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.Tiling
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Emit
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Grid
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Run
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # An accepting run tiles the emitted square
@@ -54,7 +62,7 @@ theorem addrOf_tpCol (s : A → Prop) : addrOf (Sum.inl (tpCol s)) = s :=
 
 /-- **The table a run draws**: the row of rank `k` is the configuration at time
 `k`, and its cell at a column is the tile that configuration puts there. -/
-noncomputable def tableTiling (g : ℕ → Config (WPoint A)) (tr : ℕ → WPoint A) (n : ℕ) :
+private noncomputable def tableTiling (g : ℕ → Config (WPoint A)) (tr : ℕ → WPoint A) (n : ℕ) :
     WPoint (TilePt A) → WPoint (TilePt A) → WPoint (TilePt A) :=
   fun col row => Sum.inr (tileAt g tr n (wideRank (addrOf row)) (Sum.inl (addrOf col)))
 
@@ -64,7 +72,8 @@ omit [Finite A] in
 /-- **A head tile carries a transition the machine may fire**, which is all
 `DescriptiveComplexity.TPTile` asks of it; every other kind of tile asks
 nothing. -/
-theorem tpTile_tileAt (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
+private theorem tpTile_tileAt
+    (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     (k : ℕ) (cell : WPoint A) : TPTile (tileAt g tr n k cell) := by
   by_cases hh : (g k).head = cell
   · by_cases hk : k < n
@@ -91,7 +100,7 @@ omit [LinearOrder A] [Finite A] in
 /-- **The accepting configuration's head cell carries an accepting tile**: the
 run has stopped there, so the tile is the halt, and it carries the accepting
 state. -/
-theorem tpAcc_tileAt (hacc : (wideRegData A).Acc (g n).state) :
+private theorem tpAcc_tileAt (hacc : (wideRegData A).Acc (g n).state) :
     TPAcc (tileAt g tr n n ((g n).head)) := by
   rw [tileAt_halt rfl (lt_irrefl n)]
   exact ⟨Or.inr rfl, wpMark_elt hacc⟩
@@ -100,7 +109,7 @@ theorem tpAcc_tileAt (hacc : (wideRegData A).Acc (g n).state) :
 
 omit [LinearOrder A] [Finite A] in
 /-- A cell the head is not on carries no head. -/
-theorem tpNoHead_tileAt {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) :
+private theorem tpNoHead_tileAt {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) :
     TPNoHead (tileAt g tr n k cell) := by
   by_cases hnext : k < n ∧ (g (k + 1)).head = cell
   · rw [tileAt_arr hh hnext.1 hnext.2]
@@ -114,14 +123,14 @@ theorem tpNoHead_tileAt {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) :
 
 omit [Nonempty A] [LinearOrder A] [Finite A] [Language.wide.Structure A] in
 /-- **After the last step the run stands still.** -/
-theorem eq_of_not_lt {k : ℕ} (hfreeze : ∀ i, n ≤ i → g i = g n) (hk : ¬k < n) :
+private theorem eq_of_not_lt {k : ℕ} (hfreeze : ∀ i, n ≤ i → g i = g n) (hk : ¬k < n) :
     g (k + 1) = g k := by
   rw [hfreeze (k + 1) (by omega), hfreeze k (by omega)]
 
 omit [Nonempty A] [LinearOrder A] [Finite A] in
 /-- **A step moves the head**, so the cell it leaves is not the cell it
 enters. -/
-theorem head_ne_next {k : ℕ}
+private theorem head_ne_next {k : ℕ}
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i)) (hk : k < n) :
     (g k).head ≠ (g (k + 1)).head := by
   obtain ⟨-, -, -, -, -, -, hmove⟩ := hstep k hk
@@ -131,7 +140,7 @@ theorem head_ne_next {k : ℕ}
 
 omit [Nonempty A] [LinearOrder A] [Finite A] in
 /-- **A step writes under the head and leaves every other cell alone.** -/
-theorem tape_frame {k : ℕ} {cell : WPoint A}
+private theorem tape_frame {k : ℕ} {cell : WPoint A}
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     (hfreeze : ∀ i, n ≤ i → g i = g n) (hh : (g k).head ≠ cell) :
     (g (k + 1)).tape cell = (g k).tape cell := by
@@ -144,7 +153,7 @@ omit [LinearOrder A] [Finite A] in
 /-- **The row above is the step's**: the head's cell holds what the step wrote,
 the cell the head is entering becomes the head, and every other cell copies
 itself. -/
-theorem tpVert_tileAt
+private theorem tpVert_tileAt
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     (hfreeze : ∀ i, n ≤ i → g i = g n) (k : ℕ) (cell : WPoint A) :
     TPVert (tileAt g tr n k cell) (tileAt g tr n (k + 1) cell) := by
@@ -201,7 +210,7 @@ theorem tpVert_tileAt
 
 omit [LinearOrder A] [Finite A] in
 /-- **A head or a halt tile stands where the head stands.** -/
-theorem head_eq_of_tileAt {k : ℕ} {cell : WPoint A}
+private theorem head_eq_of_tileAt {k : ℕ} {cell : WPoint A}
     (h : (tileAt g tr n k cell).1 = TileTag.head ∨ (tileAt g tr n k cell).1 = TileTag.halt) :
     (g k).head = cell := by
   by_cases hh : (g k).head = cell
@@ -218,7 +227,7 @@ theorem head_eq_of_tileAt {k : ℕ} {cell : WPoint A}
 
 omit [LinearOrder A] [Finite A] in
 /-- **A head tile is the head, with a step left to take.** -/
-theorem head_of_tileAt {k : ℕ} {cell : WPoint A}
+private theorem head_of_tileAt {k : ℕ} {cell : WPoint A}
     (h : (tileAt g tr n k cell).1 = TileTag.head) : (g k).head = cell ∧ k < n := by
   have hh : (g k).head = cell := head_eq_of_tileAt (Or.inl h)
   refine ⟨hh, ?_⟩
@@ -229,7 +238,7 @@ theorem head_of_tileAt {k : ℕ} {cell : WPoint A}
 omit [LinearOrder A] [Finite A] in
 /-- **An arrival is the cell the head is entering**, from the left when the
 transition moves right. -/
-theorem arr_of_tileAt {k : ℕ} {cell : WPoint A} {right : Bool}
+private theorem arr_of_tileAt {k : ℕ} {cell : WPoint A} {right : Bool}
     (h : (tileAt g tr n k cell).1 = if right then TileTag.arrL else TileTag.arrR) :
     (g k).head ≠ cell ∧ k < n ∧ (g (k + 1)).head = cell ∧
       (WMRight (wpElt (tr k)) ↔ right = true) := by
@@ -259,14 +268,14 @@ theorem arr_of_tileAt {k : ℕ} {cell : WPoint A} {right : Bool}
 
 omit [LinearOrder A] [Finite A] in
 /-- The transition a head tile of the table carries is the one the step fires. -/
-theorem tpTr_tileAt_head {k : ℕ} {cell : WPoint A} (hh : (g k).head = cell) (hk : k < n) :
+private theorem tpTr_tileAt_head {k : ℕ} {cell : WPoint A} (hh : (g k).head = cell) (hk : k < n) :
     tpTr (tileAt g tr n k cell) = wpElt (tr k) := by
   rw [tileAt_head hh hk]
   rfl
 
 omit [LinearOrder A] [Finite A] in
 /-- The state an arrival of the table carries is the state the step reaches. -/
-theorem tpState_tileAt_arr {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) (hk : k < n)
+private theorem tpState_tileAt_arr {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) (hk : k < n)
     (hnext : (g (k + 1)).head = cell) :
     tpState (tileAt g tr n k cell) = wpElt (g (k + 1)).state := by
   rw [tileAt_arr hh hk hnext]
@@ -276,7 +285,7 @@ omit [LinearOrder A] [Finite A] in
 open Classical in
 /-- The tag an arrival of the table carries names the side the head comes
 from. -/
-theorem tileAt_arr_tag {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) (hk : k < n)
+private theorem tileAt_arr_tag {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) (hk : k < n)
     (hnext : (g (k + 1)).head = cell) :
     (tileAt g tr n k cell).1 =
       if WMRight (wpElt (tr k)) then TileTag.arrL else TileTag.arrR := by
@@ -284,7 +293,7 @@ theorem tileAt_arr_tag {k : ℕ} {cell : WPoint A} (hh : (g k).head ≠ cell) (h
 
 omit [LinearOrder A] [Finite A] in
 /-- A transition moving right, read at the element it is. -/
-theorem wmRight_iff_right {p : WPoint A} (htr : (wideRegData A).Tr p) :
+private theorem wmRight_iff_right {p : WPoint A} (htr : (wideRegData A).Tr p) :
     (wideRegData A).Right p ↔ WMRight (wpElt p) := by
   rcases p with s | x
   · exact htr.elim
@@ -293,7 +302,7 @@ theorem wmRight_iff_right {p : WPoint A} (htr : (wideRegData A).Tr p) :
 /-- **Neighboring cells of a row agree**: the head is unique, so no two heads
 stand side by side; and the arrival next to it is on the side the transition
 moves, since the head moves to *the* neighbor in that direction. -/
-theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
+private theorem tpHoriz_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     {cL cR : WPoint A}
     (hs : SuccPos (wideRegData A).Le (wideRegData A).Posn cL cR) (k : ℕ) :
@@ -378,7 +387,7 @@ omit [Nonempty A] [Finite A] in
 /-- **The elements the bottom row is described at are the ones carrying
 input**: a digit whose element has an input symbol, since a cell holding that
 symbol and no head is always a tile of the emitted instance. -/
-theorem wtHasFirst_tileStr (p : TilePt A) :
+private theorem wtHasFirst_tileStr (p : TilePt A) :
     letI := tileStr A
     (WTHasFirst p ↔ TPDig p ∧ WMHasInp (p.2 0)) := by
   let := tileStr A
@@ -392,7 +401,7 @@ omit [Nonempty A] [Finite A] in
 /-- **The cells of the emitted file are the machine's register cells**: a
 coordinate is a cell of the digit of `x` exactly when the address it is is the
 machine's cell of `x`. -/
-theorem wmFileSeg_tpCol (s : A → Prop) (x : A) :
+private theorem wmFileSeg_tpCol (s : A → Prop) (x : A) :
     letI := tileStr A
     (WMFileSeg WTLe WTHasFirst (tpCol s) (tpDig x) ↔ WMRegSeg s x) := by
   let := tileStr A
@@ -418,7 +427,7 @@ omit [Nonempty A] [Finite A] in
 /-- **The bottom row of the emitted tiling is the machine's initial tape**: the
 cell of an element may carry a tile holding that element's input symbol, and no
 head. -/
-theorem wtpFirst_tpCol (s : A → Prop) (t : TilePt A) :
+private theorem wtpFirst_tpCol (s : A → Prop) (t : TilePt A) :
     letI := tileStr A
     ((wideTileData (TilePt A)).First (Sum.inl (tpCol s)) (Sum.inr t) ↔
       ∃ x a, WMRegSeg s x ∧ WMInp x a ∧ TPNoHead t ∧ tpSym t = a) := by
@@ -434,7 +443,7 @@ theorem wtpFirst_tpCol (s : A → Prop) (t : TilePt A) :
 
 omit [Nonempty A] [LinearOrder A] [Finite A] in
 /-- The empty address is no register cell, so the machine starts on a blank. -/
-theorem not_wmRegSeg_bot (hlin : IsLinOrd (WMLe (A := A))) {x a : A} (hinp : WMInp x a) :
+private theorem not_wmRegSeg_bot (hlin : IsLinOrd (WMLe (A := A))) {x a : A} (hinp : WMInp x a) :
     ¬WMRegSeg (fun _ : A => False) x :=
   fun h => (h x).mpr ⟨hlin.1 x, a, hinp⟩
 
@@ -442,7 +451,7 @@ theorem not_wmRegSeg_bot (hlin : IsLinOrd (WMLe (A := A))) {x a : A} (hinp : WMI
 carries the machine's start – the head, on the blank cell it begins on – and
 every other column carries the input symbol of its element, or the blank where
 the description names none. -/
-theorem first_tableTiling (hwf : WideWF A)
+private theorem first_tableTiling (hwf : WideWF A)
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     (hinit : (wideRegData A).IsInit (g 0)) {x y : WPoint (TilePt A)}
     (hx : letI := tileStr A; (wideTileData (TilePt A)).Posn x)
@@ -533,7 +542,7 @@ omit [LinearOrder A] in
 /-- **The head never arrives from the left at the first cell**: an arrival from
 the left is a step moving right into that cell, and nothing lies below the least
 position. -/
-theorem tpEdgeL_tileAt (hlin : IsLinOrd (WMLe (A := A)))
+private theorem tpEdgeL_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     {cell : WPoint A} (hmin : MinPos (wideRegData A).Le (wideRegData A).Posn cell) (k : ℕ) :
     TPEdgeL (tileAt g tr n k cell) := by
@@ -552,7 +561,7 @@ omit [LinearOrder A] in
 /-- **And never from the right at the last cell**: an arrival from the right is a
 step moving left into that cell, and nothing lies above the greatest
 position. -/
-theorem tpEdgeR_tileAt (hlin : IsLinOrd (WMLe (A := A)))
+private theorem tpEdgeR_tileAt (hlin : IsLinOrd (WMLe (A := A)))
     (hstep : ∀ i, i < n → StepWith (wideRegData A) (g i) (g (i + 1)) (tr i))
     {cell : WPoint A} (hmax : MaxPos (wideRegData A).Le (wideRegData A).Posn cell) (k : ℕ) :
     TPEdgeR (tileAt g tr n k cell) := by
@@ -573,7 +582,7 @@ theorem tpEdgeR_tileAt (hlin : IsLinOrd (WMLe (A := A)))
 omit [LinearOrder A] [Finite A] in
 /-- The tile the table puts at a coordinate of the emitted square, read at the
 machine's own address and time. -/
-theorem tableTiling_tpCol (s r : A → Prop) :
+private theorem tableTiling_tpCol (s r : A → Prop) :
     tableTiling g tr n (Sum.inl (tpCol s)) (Sum.inl (tpCol r)) =
       Sum.inr (tileAt g tr n (wideRank r) (Sum.inl s)) := by
   rw [tableTiling, addrOf_tpCol, addrOf_tpCol]
@@ -584,7 +593,7 @@ tile carries the transition the step fires; the bottom row is the initial tape;
 neighbors in a row agree because the head is unique; one row becomes the next
 because a step writes under the head and leaves every other cell alone; and the
 accepting configuration's own cell carries an accepting tile. -/
-theorem isTiling_tableTiling (hwf : WideWF A)
+private theorem isTiling_tableTiling (hwf : WideWF A)
     (hinit : (wideRegData A).IsInit (g 0))
     (hlt : n < Nat.card {p : WPoint A // (wideRegData A).Posn p})
     (hfreeze : ∀ i, n ≤ i → g i = g n) (hacc : (wideRegData A).Acc (g n).state)

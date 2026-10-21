@@ -58,7 +58,7 @@ def tpLe (p q : TilePt A) : Prop :=
 omit [Language.wide.Structure A] in
 /-- **The lexicographic order on the emitted universe is linear** – Mathlib's,
 read through `DescriptiveComplexity.tagTupleLe_iff_le`. -/
-theorem isLinOrd_tagTuple :
+private theorem isLinOrd_tagTuple :
     IsLinOrd (tagTupleLe (Tag := TileTag) (d := 3) (A := A)) := by
   have heq : (tagTupleLe (Tag := TileTag) (d := 3) (A := A)) =
       (tagTupleOrder : LinearOrder (TileTag × (Fin 3 → A))).le := by
@@ -73,7 +73,7 @@ theorem isLinOrd_tagTuple :
 
 omit [LinearOrder A] [Language.wide.Structure A] in
 /-- A digit is determined by the element it is the digit of. -/
-theorem eq_of_tpDig {p q : TilePt A} (hp : TPDig p) (hq : TPDig q)
+private theorem eq_of_tpDig {p q : TilePt A} (hp : TPDig p) (hq : TPDig q)
     (h : p.2 0 = q.2 0) : p = q := by
   obtain ⟨hp1, hp2, hp3⟩ := hp
   obtain ⟨hq1, hq2, hq3⟩ := hq
@@ -84,7 +84,7 @@ theorem eq_of_tpDig {p q : TilePt A} (hp : TPDig p) (hq : TPDig q)
 
 /-- **The emitted order is linear**, given that the machine's is: the digits
 carry the machine's order, and everything else the lexicographic one. -/
-theorem isLinOrd_tpLe (h : IsLinOrd (WMLe (A := A))) : IsLinOrd (tpLe (A := A)) := by
+private theorem isLinOrd_tpLe (h : IsLinOrd (WMLe (A := A))) : IsLinOrd (tpLe (A := A)) := by
   obtain ⟨hrefl, htrans, hanti, htot⟩ := h
   obtain ⟨lrefl, ltrans, lanti, ltot⟩ := isLinOrd_tagTuple (A := A)
   refine ⟨fun p => ?_, fun p q r hpq hqr => ?_, fun p q hpq hqp => ?_, fun p q => ?_⟩
@@ -130,7 +130,7 @@ theorem isLinOrd_tpLe (h : IsLinOrd (WMLe (A := A))) : IsLinOrd (tpLe (A := A)) 
         · exact Or.inr (Or.inr (Or.inr ⟨hq, hp, hlex⟩))
 
 /-- Between two digits the emitted order is the machine's. -/
-theorem tpLe_dig (x y : A) : tpLe (tpDig (A := A) x) (tpDig (A := A) y) ↔ WMLe x y :=
+private theorem tpLe_dig (x y : A) : tpLe (tpDig (A := A) x) (tpDig (A := A) y) ↔ WMLe x y :=
   ⟨fun h => by
       rcases h with ⟨-, -, hle⟩ | ⟨hp, -⟩ | ⟨hp, -⟩
       · exact hle

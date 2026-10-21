@@ -9,6 +9,8 @@ import DescriptiveComplexity.Problems.DominatingSet.Defs
 import DescriptiveComplexity.Problems.DominatingSet.Membership
 public import DescriptiveComplexity.Problems.DominatingSet.Reduction
 import DescriptiveComplexity.Problems.SetFamily
+import all DescriptiveComplexity.Problems.DominatingSet.Reduction
+import all DescriptiveComplexity.Problems.SetFamily
 
 /-!
 # Dominating Set is NP-complete

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawGeom
 import DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Encoding the points of an expansion as block values
@@ -81,18 +82,18 @@ variable {ly zero one}
 
 open Classical in
 /-- The code coordinates of an encoded tuple spell the one-hot code. -/
-theorem encTup_cIx (d q : D) (pay : Fin a' → A) :
+private theorem encTup_cIx (d q : D) (pay : Fin a' → A) :
     encTup ly zero one d pay (ly.cIx q) = if q = d then one else zero :=
   ly.cInj.extend_apply _ _ q
 
 /-- The payload coordinates of an encoded tuple spell the payload. -/
-theorem encTup_pIx (d : D) (pay : Fin a' → A) (p : Fin a') :
+private theorem encTup_pIx (d : D) (pay : Fin a' → A) (p : Fin a') :
     encTup ly zero one d pay (ly.pIx p) = pay p := by
   rw [encTup, Function.extend_apply' _ _ _ fun hc => hc.elim fun q hq => ly.disj q p hq]
   exact ly.pInj.extend_apply _ _ p
 
 /-- The remaining coordinates of an encoded tuple hold the designated `zero`. -/
-theorem encTup_of_ne (d : D) (pay : Fin a' → A) {j : Fin dd}
+private theorem encTup_of_ne (d : D) (pay : Fin a' → A) {j : Fin dd}
     (hc : ∀ q : D, ly.cIx q ≠ j) (hp : ∀ p : Fin a', ly.pIx p ≠ j) :
     encTup ly zero one d pay j = zero := by
   rw [encTup, Function.extend_apply' _ _ _ fun hcon => hcon.elim fun q hq => hc q hq]
@@ -110,7 +111,7 @@ theorem encTup_code_inj (hne : zero ≠ one) {d d' : D} {pay pay' : Fin a' → A
 
 /-- **The payload reads back**: two encoded tuples that are equal carry the same
 payload. -/
-theorem encTup_pay_inj {d d' : D} {pay pay' : Fin a' → A}
+private theorem encTup_pay_inj {d d' : D} {pay pay' : Fin a' → A}
     (h : encTup ly zero one d pay = encTup ly zero one d' pay') : pay = pay' :=
   funext fun p => by
     have hp := congrFun h (ly.pIx p)
@@ -173,12 +174,12 @@ theorem not_encPt_zeroTup (hne : zero ≠ one) (p : X.Point A) :
     exact hne hc
 
 /-- The tag witness belongs to the encoding. -/
-theorem encPt_tagTup (p : X.Point A) : encPt ly zero one p (encTagTup ly zero one p.1) :=
+private theorem encPt_tagTup (p : X.Point A) : encPt ly zero one p (encTagTup ly zero one p.1) :=
   Or.inl rfl
 
 /-- **A membership question at a tag witness reads the tag**: the tag witness of
 `t` belongs to the encoding of `p` exactly when `p` carries the tag `t`. -/
-theorem mem_encPt_tag (hne : zero ≠ one) (p : X.Point A) (t : X.Tag) :
+private theorem mem_encPt_tag (hne : zero ≠ one) (p : X.Point A) (t : X.Tag) :
     encPt ly zero one p (encTagTup ly zero one t) ↔ p.1 = t := by
   constructor
   · rintro (h | ⟨i, w, -, h⟩)

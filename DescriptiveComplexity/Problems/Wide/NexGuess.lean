@@ -8,6 +8,13 @@ module
 import DescriptiveComplexity.Problems.Wide.NexOuter
 public import DescriptiveComplexity.Problems.Wide.NexSpec
 import DescriptiveComplexity.Problems.Wide.DrawBuild
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.NexOuter
+import all DescriptiveComplexity.Problems.Wide.NexSpec
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # Guessing the certificate onto the region
@@ -77,7 +84,7 @@ include hrules in
 the rule whose bit vector is the certificate's there fires. It is the guess
 site's *roll-over* arm – at `regionSpec` the pointer never moves, so that arm's
 guard is always true and its destination is the phase it came from. -/
-theorem hasRight_guessRegion
+private theorem hasRight_guessRegion
     {st : TapeSt dt A R' (NexPh (Option dt.KIx) PE) I}
     (σ : dt.d.B.ι → (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → Prop)
     {t : dt.SlotIx} (hne : ∀ i : dt.d.B.ι, (Slot.old i : dt.SlotIx) ≠ t)
@@ -106,7 +113,7 @@ include hrules in
 nondeterministic write per address of the stretch, at the stretch's own length.
 The walk carries no pointer – every step is the same rule at the same phase – so
 it is as long as the region asks and no wider than a bit vector. -/
-theorem reachesIn_guessRegion (hR : PR.table.Reads)
+private theorem reachesIn_guessRegion (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {st : TapeSt dt A R' (NexPh (Option dt.KIx) PE) I}
     (σ : dt.d.B.ι → (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → Prop)
@@ -135,7 +142,7 @@ include hrules in
 the stop – which may fall anywhere, and here falls at the stretch's top – and the
 walk home to the marker. Its cost is the stretch out and back with the one step
 that turns round. -/
-theorem reachesIn_guessRegionPhase (hR : PR.table.Reads)
+private theorem reachesIn_guessRegionPhase (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {st : TapeSt dt A R' (NexPh (Option dt.KIx) PE) I}
     (σ : dt.d.B.ι → (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → Prop)

@@ -10,6 +10,20 @@ public import DescriptiveComplexity.Problems.Wide.RegChannelBack
 public import Mathlib.Data.Nat.Log
 public import DescriptiveComplexity.Problems.Wide.RegChannelEnum
 import DescriptiveComplexity.Problems.Wide.SpineSav
+import all DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.RegChannelAccept
+import all DescriptiveComplexity.Problems.Wide.RegChannelBack
+import all DescriptiveComplexity.Problems.Wide.RegChannelEnum
+import all DescriptiveComplexity.Problems.Wide.RegChannelEval
+import all DescriptiveComplexity.Problems.Wide.RegChannelInit
+import all DescriptiveComplexity.Problems.Wide.RegChannelLaid
+import all DescriptiveComplexity.Problems.Wide.RegChannelPad
+import all DescriptiveComplexity.Problems.Wide.RegChannelYes
+import all DescriptiveComplexity.Problems.Wide.SpineSav
+import all DescriptiveComplexity.Problems.Wide.TrackWrites
 
 /-!
 # The handed program on a no-instance
@@ -66,7 +80,7 @@ true.** The backward direction of the machine's correctness, assembled: the run
 is read back to the configuration where the guess is spent, the evaluation is run
 forward from there, and its verdict – the sentence's value at the stage the
 reading recovered – is false, so the run cannot have accepted. -/
-theorem nexProgHanded_not_wideRegAccept_of_not_out {bot : Option dt.KIx}
+private theorem nexProgHanded_not_wideRegAccept_of_not_out {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)
     (hdd : dt.dd0 < dt.dd)
@@ -184,7 +198,7 @@ does, no run accepts (`nexProgHanded_not_wideRegAccept_of_not_out`). This is the
 nondeterministic counterpart of
 `DescriptiveComplexity.Draw.Data.dwideAcceptSpace_iff_pfpHolds`, and what a
 reduction's correctness is read off. -/
-theorem wideRegAccept_iff_exists_out
+private theorem wideRegAccept_iff_exists_out
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)
@@ -228,7 +242,7 @@ spare.
 That is the shape §2.1's «`|Tag|` is the reduction's to choose» takes here: one
 inequality between the tag count and the evaluation's width exponent, and
 nothing else. -/
-theorem wideRegAccept_iff_exists_out_of_width
+private theorem wideRegAccept_iff_exists_out_of_width
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)
@@ -285,7 +299,7 @@ theorem wideRegAccept_iff_exists_out_of_width
 `wideRegAccept_iff_exists_out_of_width`, so that what a reduction owes the clock
 is one inequality between the drawing's size and the exponent the record's
 dimensions make. -/
-theorem wideRegAccept_iff_exists_out_of_card
+private theorem wideRegAccept_iff_exists_out_of_card
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)
@@ -316,7 +330,7 @@ discharged by `clock_count_of_tags`: what is left is that the emitted program ha
 more rule names than a number built from the kernel alone – its loop budget, its
 dimensions and its argument blocks – which a reduction gets by padding the
 guessed block (`SOBlock.pad`, `two_pow_card_le_card_nexRIx`). -/
-theorem wideRegAccept_iff_exists_out_of_tags
+private theorem wideRegAccept_iff_exists_out_of_tags
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {bot : Option dt.KIx}
     (hE : NexEmitted PR bot)
     (hR : PR.table.Reads)

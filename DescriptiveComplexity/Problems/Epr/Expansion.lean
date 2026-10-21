@@ -10,6 +10,8 @@ public import DescriptiveComplexity.Exponential.Expansion
 public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.Problems.Epr.Small
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Copies
+import all DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # The expansion whose points are the relations on the instance
@@ -96,13 +98,13 @@ def peAssign (R : A → A → Prop) : pairBlock.Assignment A := fun _ v => R (v 
 @[simp]
 theorem peRel_peAssign (R : A → A → Prop) : peRel (peAssign R) = R := rfl
 
-theorem peAssign_peRel (ρ : pairBlock.Assignment A) : peAssign (peRel ρ) = ρ := by
+private theorem peAssign_peRel (ρ : pairBlock.Assignment A) : peAssign (peRel ρ) = ρ := by
   funext i v
   cases i
   refine congrArg (ρ ()) (funext fun j => ?_)
   fin_cases j <;> rfl
 
-theorem peRel_injective : Function.Injective (peRel (A := A)) := by
+private theorem peRel_injective : Function.Injective (peRel (A := A)) := by
   intro ρ σ h
   rw [← peAssign_peRel ρ, ← peAssign_peRel σ, h]
 
@@ -239,9 +241,10 @@ def PEDiag (R : A → A → Prop) : Prop := ∃ x, ∀ y z, R y z ↔ (y = x ∧
 one. -/
 def PEPairRel (R : A → A → Prop) : Prop := ∃ x y, ∀ z w, R z w ↔ (z = x ∧ w = y)
 
-theorem peDiag_diag (x : A) : PEDiag (fun y z : A => y = x ∧ z = x) := ⟨x, fun _ _ => Iff.rfl⟩
+private theorem peDiag_diag
+    (x : A) : PEDiag (fun y z : A => y = x ∧ z = x) := ⟨x, fun _ _ => Iff.rfl⟩
 
-theorem pePairRel_pair (x y : A) : PEPairRel (fun z w : A => z = x ∧ w = y) :=
+private theorem pePairRel_pair (x y : A) : PEPairRel (fun z w : A => z = x ∧ w = y) :=
   ⟨x, y, fun _ _ => Iff.rfl⟩
 
 /-- The domain sentence of the elements: the relation is a diagonal
@@ -508,7 +511,7 @@ noncomputable def eprPtStructure : Language.eprPt.Structure (eprExp.Map A) :=
   eprExp.mapStructure A
 
 /-- Reading a unary symbol of the expanded vocabulary at one point. -/
-theorem realize_one (rt : Language.eprPt.Relations 1) (φ : ETag → peLang1.Sentence)
+private theorem realize_one (rt : Language.eprPt.Relations 1) (φ : ETag → peLang1.Sentence)
     (h : ∀ τ : Fin 1 → ETag, eprExp.relSentence rt τ = onS1 (φ (τ 0)))
     (x : eprExp.Map A) :
     letI := eprPtStructure A
@@ -521,7 +524,7 @@ theorem realize_one (rt : Language.eprPt.Relations 1) (φ : ETag → peLang1.Sen
   exact h1.trans (pairBlock.realize_oneLHom (L := peOrd) _ _)
 
 /-- Reading a binary symbol of the expanded vocabulary at two points. -/
-theorem realize_two (rt : Language.eprPt.Relations 2) (φ : ETag → ETag → peLang2.Sentence)
+private theorem realize_two (rt : Language.eprPt.Relations 2) (φ : ETag → ETag → peLang2.Sentence)
     (h : ∀ τ : Fin 2 → ETag, eprExp.relSentence rt τ = onS2 (φ (τ 0) (τ 1)))
     (x y : eprExp.Map A) :
     letI := eprPtStructure A
@@ -573,7 +576,7 @@ theorem pairPt_tag (x y : A) : (pairPt x y).1.1 = ETag.pair := rfl
 @[simp]
 theorem asgPt_tag (R : A → A → Prop) : (asgPt R).1.1 = ETag.asg := rfl
 
-theorem eltPt_injective : Function.Injective (eltPt (A := A)) := by
+private theorem eltPt_injective : Function.Injective (eltPt (A := A)) := by
   intro x y h
   have h2 : (fun a b : A => a = x ∧ b = x) = (fun a b : A => a = y ∧ b = y) :=
     congrArg (fun p => peRel p.1.2) h
@@ -582,7 +585,7 @@ theorem eltPt_injective : Function.Injective (eltPt (A := A)) := by
 
 /-- **Every point is an element, a pair or an assignment**: what the domain
 sentences say, read back. -/
-theorem cases_point (p : eprExp.Map A) :
+private theorem cases_point (p : eprExp.Map A) :
     (∃ x, p = eltPt x) ∨ (∃ x y, p = pairPt x y) ∨ ∃ R, p = asgPt R := by
   obtain ⟨⟨t, ρ⟩, hdom⟩ := p
   match t with
@@ -691,21 +694,21 @@ theorem peRel_pairPt (x y z w : A) : peRel (pairPt x y).1.2 z w ↔ (z = x ∧ w
 @[simp]
 theorem peRel_asgPt (R : A → A → Prop) (x y : A) : peRel (asgPt R).1.2 x y ↔ R x y := Iff.rfl
 
-theorem realize_isElt (p : eprExp.Map A) :
+private theorem realize_isElt (p : eprExp.Map A) :
     letI := eprPtStructure A
     (RelMap Language.peIsEltSym ![p] ↔ p.1.1 = ETag.elt) := by
   let := eprPtStructure A
   exact (realize_one Language.peIsEltSym (fun t => tagS1 (t = ETag.elt))
     (fun _ => rfl) p).trans (realize_tagS1 _ _)
 
-theorem realize_isPair (p : eprExp.Map A) :
+private theorem realize_isPair (p : eprExp.Map A) :
     letI := eprPtStructure A
     (RelMap Language.peIsPairSym ![p] ↔ p.1.1 = ETag.pair) := by
   let := eprPtStructure A
   exact (realize_one Language.peIsPairSym (fun t => tagS1 (t = ETag.pair))
     (fun _ => rfl) p).trans (realize_tagS1 _ _)
 
-theorem realize_isAsg (p : eprExp.Map A) :
+private theorem realize_isAsg (p : eprExp.Map A) :
     letI := eprPtStructure A
     (RelMap Language.peIsAsgSym ![p] ↔ p.1.1 = ETag.asg) := by
   let := eprPtStructure A
@@ -713,7 +716,7 @@ theorem realize_isAsg (p : eprExp.Map A) :
     (fun _ => rfl) p).trans (realize_tagS1 _ _)
 
 /-- A unary mark of the instance, read at the point of an element. -/
-theorem realize_un (rt : Language.eprPt.Relations 1) (r : Language.epr.Relations 1)
+private theorem realize_un (rt : Language.eprPt.Relations 1) (r : Language.epr.Relations 1)
     (h : ∀ τ : Fin 1 → ETag, eprExp.relSentence rt τ = onS1 (unT r (τ 0))) (x : A) :
     letI := eprPtStructure A
     (RelMap rt ![eltPt x] ↔ RelMap r ![x]) := by
@@ -724,7 +727,7 @@ theorem realize_un (rt : Language.eprPt.Relations 1) (r : Language.epr.Relations
   exact ((peRel_eltPt x y y).mp hy).1 ▸ hr
 
 /-- A binary relation of the instance, read at the points of two elements. -/
-theorem realize_bin (rt : Language.eprPt.Relations 2) (r : Language.epr.Relations 2)
+private theorem realize_bin (rt : Language.eprPt.Relations 2) (r : Language.epr.Relations 2)
     (h : ∀ τ : Fin 2 → ETag, eprExp.relSentence rt τ = onS2 (binT r (τ 0) (τ 1))) (x y : A) :
     letI := eprPtStructure A
     (RelMap rt ![eltPt x, eltPt y] ↔ RelMap r ![x, y]) := by
@@ -736,37 +739,37 @@ theorem realize_bin (rt : Language.eprPt.Relations 2) (r : Language.epr.Relation
   rw [← ((peRel_eltPt x a a).mp ha).1, ← ((peRel_eltPt y b b).mp hb).1]
   exact hr
 
-theorem realize_evarE (x : A) :
+private theorem realize_evarE (x : A) :
     letI := eprPtStructure A
     (RelMap Language.peEVarSym ![eltPt x] ↔ EVarG x) :=
   realize_un Language.peEVarSym Language.eprEVarSym (fun _ => rfl) x
 
-theorem realize_clE (c : A) :
+private theorem realize_clE (c : A) :
     letI := eprPtStructure A
     (RelMap Language.peClSym ![eltPt c] ↔ ClauseG c) :=
   realize_un Language.peClSym Language.eprClSym (fun _ => rfl) c
 
-theorem realize_inClE (c l : A) :
+private theorem realize_inClE (c l : A) :
     letI := eprPtStructure A
     (RelMap Language.peInClSym ![eltPt c, eltPt l] ↔ InClG c l) :=
   realize_bin Language.peInClSym Language.eprInClSym (fun _ => rfl) c l
 
-theorem realize_posLE (l s : A) :
+private theorem realize_posLE (l s : A) :
     letI := eprPtStructure A
     (RelMap Language.pePosSym ![eltPt l, eltPt s] ↔ PosG l s) :=
   realize_bin Language.pePosSym Language.eprPosSym (fun _ => rfl) l s
 
-theorem realize_negLE (l s : A) :
+private theorem realize_negLE (l s : A) :
     letI := eprPtStructure A
     (RelMap Language.peNegSym ![eltPt l, eltPt s] ↔ NegG l s) :=
   realize_bin Language.peNegSym Language.eprNegSym (fun _ => rfl) l s
 
-theorem realize_sigE (s p : A) :
+private theorem realize_sigE (s p : A) :
     letI := eprPtStructure A
     (RelMap Language.peSigSym ![eltPt s, eltPt p] ↔ SigG s p) :=
   realize_bin Language.peSigSym Language.eprSigSym (fun _ => rfl) s p
 
-theorem realize_fstP (x y z : A) :
+private theorem realize_fstP (x y z : A) :
     letI := eprPtStructure A
     (RelMap Language.peFstSym ![pairPt x y, eltPt z] ↔ z = x) := by
   let := eprPtStructure A
@@ -777,7 +780,7 @@ theorem realize_fstP (x y z : A) :
     exact ((peRel_eltPt z a a).mp ha).1.symm
   · exact ⟨hz.symm, hz.symm⟩
 
-theorem realize_sndP (x y z : A) :
+private theorem realize_sndP (x y z : A) :
     letI := eprPtStructure A
     (RelMap Language.peSndSym ![pairPt x y, eltPt z] ↔ z = y) := by
   let := eprPtStructure A
@@ -788,7 +791,7 @@ theorem realize_sndP (x y z : A) :
     exact ((peRel_eltPt z b b).mp hb).1.symm
   · exact ⟨hz.symm, hz.symm⟩
 
-theorem realize_argP (l p x : A) :
+private theorem realize_argP (l p x : A) :
     letI := eprPtStructure A
     (RelMap Language.peArgSym ![pairPt l p, eltPt x] ↔ ArgG l p x) := by
   let := eprPtStructure A

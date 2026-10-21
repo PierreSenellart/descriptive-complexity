@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Data.Set.Card
 public import DescriptiveComplexity.Problems.FinSat.Defs
+import all DescriptiveComplexity.Problems.FinSat.Defs
 
 /-!
 # Satisfaction is the unique fixed point of the truth definition
@@ -49,9 +50,10 @@ variable {A M : Type} [Language.finsat.Structure A]
 /-- The rank of a node: how many nodes precede it in the order of the syntax.
 It bounds the depth of the parse DAG below the node, and so the fuel its
 evaluation needs. -/
-noncomputable def orank (g : A) : ℕ := ({x : A | OrdLt x g} : Set A).ncard
+private noncomputable def orank (g : A) : ℕ := ({x : A | OrdLt x g} : Set A).ncard
 
-theorem orank_lt [Finite A] (hwf : IsWF A) {c g : A} (h : OrdLt c g) : orank c < orank g := by
+private theorem orank_lt
+    [Finite A] (hwf : IsWF A) {c g : A} (h : OrdLt c g) : orank c < orank g := by
   have hsub : ({x : A | OrdLt x c} : Set A) ⊆ ({x : A | OrdLt x g} : Set A) := by
     intro x hx
     refine ⟨hwf.ord_trans _ _ _ hx.1 h.1, ?_⟩
@@ -60,7 +62,7 @@ theorem orank_lt [Finite A] (hwf : IsWF A) {c g : A} (h : OrdLt c g) : orank c <
   exact Set.ncard_lt_ncard ((Set.ssubset_iff_of_subset hsub).mpr
     ⟨c, h, fun hc => hc.2 rfl⟩) (Set.toFinite _)
 
-theorem orank_child_lt [Finite A] (hwf : IsWF A) {g c : A} (h : ChildG g c) :
+private theorem orank_child_lt [Finite A] (hwf : IsWF A) {g c : A} (h : ChildG g c) :
     orank c < orank g :=
   orank_lt hwf (hwf.child_lt g c h)
 
@@ -89,7 +91,7 @@ theorem gstep_mono_child (I : A → (A → M) → Prop)
 
 /-- Rank many unfoldings suffice: whatever the fuel, a node that holds holds
 already with the fuel its rank gives it. -/
-theorem gval_orank [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) :
+private theorem gval_orank [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) :
     ∀ (k : ℕ) (v : A → M) (g : A), gval I k v g → gval I (orank g + 1) v g := by
   intro k
   induction k with
@@ -99,7 +101,8 @@ theorem gval_orank [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) :
     refine gstep_mono_child I v g (fun v' c hc hrec => ?_) hg
     exact gval_of_le I (Nat.succ_le_of_lt (orank_child_lt hwf hc)) v' c (ih v' c hrec)
 
-theorem Gval_iff_orank [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) (v : A → M) (g : A) :
+private theorem Gval_iff_orank
+    [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) (v : A → M) (g : A) :
     Gval I v g ↔ gval I (orank g + 1) v g :=
   ⟨fun ⟨_, hk⟩ => gval_orank hwf I _ v g hk, fun h => ⟨_, h⟩⟩
 
@@ -111,7 +114,7 @@ def IsEval (I : A → (A → M) → Prop) (V : (A → M) → A → Prop) : Prop 
   ∀ (v : A → M) (g : A), V v g ↔ gstep I V v g
 
 /-- **Satisfaction is a fixed point of the truth definition.** -/
-theorem Gval_isEval [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) :
+private theorem Gval_isEval [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) :
     IsEval I (Gval I) := by
   intro v g
   constructor
@@ -126,7 +129,7 @@ theorem Gval_isEval [Finite A] (hwf : IsWF A) (I : A → (A → M) → Prop) :
 
 /-- Every approximant of satisfaction is below any fixed point of the truth
 definition. -/
-theorem gval_of_isEval {I : A → (A → M) → Prop} {V : (A → M) → A → Prop} (hV : IsEval I V) :
+private theorem gval_of_isEval {I : A → (A → M) → Prop} {V : (A → M) → A → Prop} (hV : IsEval I V) :
     ∀ (k : ℕ) (v : A → M) (g : A), gval I k v g → V v g := by
   intro k
   induction k with

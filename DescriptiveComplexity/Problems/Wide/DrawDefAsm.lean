@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefProg
 public import DescriptiveComplexity.Problems.Wide.DrawProg
+import all DescriptiveComplexity.Problems.Wide.DrawDefProg
+import all DescriptiveComplexity.Problems.Wide.DrawDefTower
+import all DescriptiveComplexity.Problems.Wide.DrawDefVar
 
 /-!
 # The whole assembly is definable, given its semantic packs
@@ -129,7 +132,7 @@ theorem uRulesDefinable_varRuleF {v : dt.VarIx}
 
 /-- **The evaluation's machineries are definable**: one copy of the variable
 machinery per spine position, and the output's. -/
-theorem uRulesDefinable_smRule
+private theorem uRulesDefinable_smRule
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v) :
     URulesDefinable (L := L) (Q := Q) (S := dt.SMF) (Sh := dt.SMSh) fun e =>
@@ -143,7 +146,7 @@ theorem uRulesDefinable_smRule
       (exitPh := .acceptP) (h none) s ρ
 
 /-- **The evaluation is definable**: its spine over the machineries. -/
-theorem uRulesDefinable_evalRuleF
+private theorem uRulesDefinable_evalRuleF
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v) :
     URulesDefinable (L := L) (Q := Q) (S := dt.SEF) (Sh := dt.SESh) fun e =>
@@ -153,7 +156,7 @@ theorem uRulesDefinable_evalRuleF
 /-- **The whole program's rule set is definable**: the outer loop around the
 evaluation. This is `DescriptiveComplexity.Draw.Data.progAsm`'s `rule` field,
 so an interpretation may be written down from here. -/
-theorem uRulesDefinable_progAsm
+private theorem uRulesDefinable_progAsm
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v) :
     URulesDefinable (L := L) (Q := Q) (S := dt.SF) (Sh := dt.SFSh) fun e =>

@@ -48,7 +48,7 @@ variable {ι : Type} [Fintype ι] (m : ι → ℕ) {B : ℕ}
 
 /-- The terms of exponent below `p` add up to less than `B ^ p`, when fewer
 than `B` terms share each exponent. -/
-theorem sum_pow_lt (hB : 0 < B)
+private theorem sum_pow_lt (hB : 0 < B)
     (h : ∀ q, (Finset.univ.filter fun i => m i = q).card < B) (p : ℕ) :
     (∑ i, if m i < p then B ^ m i else 0) < B ^ p := by
   induction p with

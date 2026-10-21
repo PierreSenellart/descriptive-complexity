@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Wide.DrawIxVerdict
 public import DescriptiveComplexity.Problems.Wide.DrawIxPack
 public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
 import DescriptiveComplexity.Problems.Wide.DrawIxEval
+import all DescriptiveComplexity.Problems.Wide.DrawIxEval
+import all DescriptiveComplexity.Problems.Wide.DrawIxPack
+import all DescriptiveComplexity.Problems.Wide.DrawIxVerdict
+import all DescriptiveComplexity.Problems.Wide.DrawSpineSem
 
 /-!
 # What the spine does to the tape, at an arbitrary file
@@ -129,7 +133,7 @@ omit [Finite I] in
 include hst in
 /-- **Anything a position's write leaves alone rides the whole spine**: the
 induction along the positions, once, for every field but `val` and `new`. -/
-theorem ixSpineRide {β : Sort _}
+private theorem ixSpineRide {β : Sort _}
     (G : TapeSt dt A R (P) I → β)
     (hF : ∀ st m i b, G (dt.ixPostVarSt v st m i b) = G st)
     (k : Fin (dt.nv + 1)) :
@@ -151,7 +155,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 omit [Finite I] in
 include hst in
 /-- The working address rides the spine. -/
-theorem ixSpine_mir (k : Fin (dt.nv + 1)) : (stOf k).mir = (stOf 0).mir :=
+private theorem ixSpine_mir (k : Fin (dt.nv + 1)) : (stOf k).mir = (stOf 0).mir :=
   dt.ixSpineRide hst (fun st => st.mir) (fun _ _ _ _ => rfl) k
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -164,7 +168,7 @@ omit [Finite I] in
 include hstN in
 /-- **Off the marker, the `new` tracks ride the spine**: a position writes
 its own cell only. -/
-theorem ixSpine_new_off (k : Fin (dt.nv + 1)) (i : dt.d.B.ι)
+private theorem ixSpine_new_off (k : Fin (dt.nv + 1)) (i : dt.d.B.ι)
     {r : Univ A R (P) dt.KIx dt.dd → Prop}
     (hr : r ≠ v) : (stOf k).new i r ↔ (stOf 0).new i r := by
   classical
@@ -193,7 +197,7 @@ include hstN in
 /-- **At the marker, a variable's `new` cell is the verdict of its own
 position**: it is written there, and no later position writes it, the
 enumeration being duplicate-free. -/
-theorem ixNew_last_get (j : Fin dt.nv) :
+private theorem ixNew_last_get (j : Fin dt.nv) :
     (stOf (Fin.last dt.nv)).new (dt.varList.get j) v ↔ bOf j := by
   classical
   have key : ∀ (n : ℕ) (hn : n < dt.nv + 1) (j : Fin dt.nv), (j : ℕ) < n →
@@ -238,7 +242,7 @@ all clear** – the junk legs
 (`DescriptiveComplexity.Draw.Data.ixVarLegFail_reachesIn`,
 `DescriptiveComplexity.Draw.Data.ixVarLegUngated_reachesIn`) store `False`, which
 is what the stage dictionary holds at an address that encodes no tuple. -/
-theorem ixNew_last_of_false (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
+private theorem ixNew_last_of_false (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
     (i : dt.d.B.ι) : ¬(stOf (Fin.last dt.nv)).new i v := by
   obtain ⟨j, hj⟩ := dt.exists_varList_get i
   subst hj
@@ -263,7 +267,7 @@ iteration** – the per-position form: only the position of that variable, its
 pack and its verdict are named, so an address where *other* positions are
 junk is covered too (which is what a sweep needs, the gates being per
 variable). -/
-theorem ixNew_last_next_at
+private theorem ixNew_last_next_at
     (hlin : IsLinOrd (WMLe (A := Univ A R (P)
       dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R (P) dt.KIx dt.dd,
@@ -364,7 +368,7 @@ address's points.** The position of a variable writes its verdict, which
 `DescriptiveComplexity.StepDef.next`; the mirror and the dictionary ride
 the spine, so the semantic hypotheses need only be given at the entry
 state. -/
-theorem ixNew_last_next
+private theorem ixNew_last_next
     (hlin : IsLinOrd (WMLe (A := Univ A R (P)
       dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R (P) dt.KIx dt.dd,
@@ -501,7 +505,7 @@ still the address's – which is what lets the *next* node build its pack –
 and the control. The three have to be produced together: the pack a
 position's leg needs is typed at that position's state, and is available
 only because the mirror rode (`ixSpineSem`). -/
-noncomputable def ixSpineNode :
+private noncomputable def ixSpineNode :
     ℕ → Σ' st : TapeSt dt A R (P) I,
       PProd (st.mir = st₀.mir) (dt.CtlIx → A)
   | 0 => ⟨st₀, rfl, f₀⟩
@@ -518,7 +522,7 @@ noncomputable def ixSpineNode :
     else prev
 
 /-- The tape family of the spine. -/
-noncomputable def ixSpineStOf (k : Fin (dt.nv + 1)) :
+private noncomputable def ixSpineStOf (k : Fin (dt.nv + 1)) :
     TapeSt dt A R (P) I :=
   (dt.ixSpineNode (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf (k : ℕ)).1
 
@@ -529,7 +533,7 @@ noncomputable def ixSpineStOf (k : Fin (dt.nv + 1)) :
 state – SAV and TARGET as its VAL loop left them – instead of the
 normalized one. The mirror still rides, which is what makes the next
 position's pack exist. -/
-noncomputable def ixSpineNodeT :
+private noncomputable def ixSpineNodeT :
     ℕ → Σ' st : TapeSt dt A R (P) I,
       PProd (st.mir = st₀.mir) (dt.CtlIx → A)
   | 0 => ⟨st₀, rfl, f₀⟩
@@ -550,7 +554,7 @@ noncomputable def ixSpineNodeT :
     else prev
 
 /-- The threaded tape family of the spine. -/
-noncomputable def ixSpineStOfT (k : Fin (dt.nv + 1)) :
+private noncomputable def ixSpineStOfT (k : Fin (dt.nv + 1)) :
     TapeSt dt A R (P) I :=
   (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ sem₀ tOf (k : ℕ)).1
 
@@ -558,7 +562,7 @@ omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
 /-- **The mirror rides the threaded family too** – by construction. -/
-theorem ixSpineStOfT_mir (k : Fin (dt.nv + 1)) :
+private theorem ixSpineStOfT_mir (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
   (dt.ixSpineNodeT (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
@@ -623,7 +627,7 @@ omit [Finite R] [Finite (P)] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 omit [Finite I] in
 /-- **The mirror rides the branched family** – by construction. -/
-theorem ixSpineStOfB_mir (k : Fin (dt.nv + 1)) :
+private theorem ixSpineStOfB_mir (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ semB k).mir = st₀.mir :=
   (dt.ixSpineNodeB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB (k : ℕ)).2.1
@@ -632,7 +636,7 @@ omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder (dt.X.Map A)]
   [Finite ιV] in
 /-- **The marker rides the branched family**: no leg writes the working
 register, so the `hwkOf` a spine asks for is the entry state's. -/
-theorem ixSpineStOfB_wk (k : Fin (dt.nv + 1)) :
+private theorem ixSpineStOfB_wk (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ semB k).wk = st₀.wk := by
   have hn : ∀ n : ℕ, (dt.ixSpineNodeB (elt := elt) (v := v) (aT := aT) F hinj hhasP
@@ -654,7 +658,7 @@ omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder (dt.X.Map A)]
   [Finite ιV] in
 /-- **The bottom mark rides the branched family** – the `hbotOf` a spine asks
 for. -/
-theorem ixSpineStOfB_bot (k : Fin (dt.nv + 1)) :
+private theorem ixSpineStOfB_bot (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ semB k).bot = st₀.bot := by
   have hn : ∀ n : ℕ, (dt.ixSpineNodeB (elt := elt) (v := v) (aT := aT) F hinj hhasP
@@ -679,7 +683,7 @@ writes the `old` tracks, so the stage the spine reads at its last checkpoint is
 the stage it was entered with. This is what lets a *guessing* program discharge
 the output's `hdict`: what its guess wrote is what the verdict is read
 against. -/
-theorem ixSpineStOfB_old (k : Fin (dt.nv + 1)) :
+private theorem ixSpineStOfB_old (k : Fin (dt.nv + 1)) :
     (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
       mV st₀ f₀ semB k).old = st₀.old := by
   have hn : ∀ n : ℕ, (dt.ixSpineNodeB (elt := elt) (v := v) (aT := aT) F hinj hhasP
@@ -699,7 +703,7 @@ theorem ixSpineStOfB_old (k : Fin (dt.nv + 1)) :
 
 /-- The packs of the branched family: the parameter's own, at the position's
 state – the gate being what makes them exist. -/
-noncomputable def ixSpineSemOfB (j : Fin dt.nv)
+private noncomputable def ixSpineSemOfB (j : Fin dt.nv)
     (hg : dt.ixGatedAt (PR := PR) (elt := elt) F j
       (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
         mV st₀ f₀ semB j.castSucc))
@@ -725,7 +729,7 @@ omit [Finite R] [Finite (P)] [Finite dt.KIx]
 omit [Finite I] in
 /-- **The branched control's cover equation** –
 `DescriptiveComplexity.Draw.Data.nexIxSpineB_reachesIn`'s `hfs`. -/
-theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
+private theorem ixSpineFsOfB_succ (j : Fin dt.nv) :
     dt.ixSpineFsOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.succ =
       dt.ixLegCtlB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
         (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
@@ -743,7 +747,7 @@ omit [Finite R] [Finite (P)] [Finite dt.KIx]
 omit [Finite I] in
 /-- **The branched tape's cover equation** –
 `DescriptiveComplexity.Draw.Data.nexIxSpineB_reachesIn`'s `hst`. -/
-theorem ixSpineStOfB_succ (j : Fin dt.nv) :
+private theorem ixSpineStOfB_succ (j : Fin dt.nv) :
     dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV st₀ f₀ semB j.succ =
       dt.ixLegStB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP mV j
         (dt.ixSpineStOfB (elt := elt) (v := v) (aT := aT) F hinj hhasP heltP
@@ -774,7 +778,7 @@ one verdict a program can take at the address its head starts on. This is the
 `hacc` a run through the output's machinery
 (`DescriptiveComplexity.Draw.Data.nexIxEvalOutB_reachesIn`) asks for, and the
 reason the accepting bit says anything at all. -/
-theorem ixOutAcc_iff_out
+private theorem ixOutAcc_iff_out
     (hlin : IsLinOrd (WMLe (A := Univ A R (P) dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R (P) dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
@@ -839,7 +843,7 @@ variable (f₀ : dt.CtlIx → A)
 empty address, and at every increment the previous address's evaluation
 exit – its marker moved on and its mirror set to the new address, exactly
 the shape `DescriptiveComplexity.Draw.Data.reaches_sweep` demands. -/
-noncomputable def ixSweepPairG
+private noncomputable def ixSweepPairG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     TapeSt dt A R (P) I × (dt.CtlIx → A) :=
   addrIter (isLinOrd_wmSetLe hlin) (st₀, f₀)
@@ -848,20 +852,20 @@ noncomputable def ixSweepPairG
         fsE u p.1 p.2)) w
 
 /-- The sweep's tape family – `reaches_sweep`'s `SW`. -/
-noncomputable def ixSweepSWG
+private noncomputable def ixSweepSWG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     TapeSt dt A R (P) I :=
   (dt.ixSweepPairG (elt := elt) stE fsE hlin st₀ f₀ w).1
 
 /-- The sweep's control family – `reaches_sweep`'s `FS`. -/
-noncomputable def ixSweepFSG
+private noncomputable def ixSweepFSG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     dt.CtlIx → A :=
   (dt.ixSweepPairG (elt := elt) stE fsE hlin st₀ f₀ w).2
 
 /-- The state the sweep leaves each address in – `reaches_sweep`'s
 `stE`. -/
-noncomputable def ixSweepStEG
+private noncomputable def ixSweepStEG
     (w : Univ A R (P) dt.KIx dt.dd → Prop) :
     TapeSt dt A R (P) I :=
   stE w (dt.ixSweepSWG (elt := elt)
@@ -870,7 +874,7 @@ noncomputable def ixSweepStEG
 omit [Finite I] [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (P)] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
-theorem ixSweepSWG_bot :
+private theorem ixSweepSWG_bot :
     dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ (fun _ => False) = st₀ :=
   congrArg Prod.fst (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
 
@@ -879,7 +883,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [L.IsRelational] [L.Structure A] in
 omit [Finite I] in
 /-- **The tape's cover equation** – `reaches_sweep`'s `hSW`, verbatim. -/
-theorem ixSweepSWG_incr
+private theorem ixSweepSWG_incr
     {w w' : Univ A R (P) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
     dt.ixSweepSWG (elt := elt) stE fsE hlin st₀ f₀ w' =

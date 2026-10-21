@@ -10,6 +10,9 @@ public import DescriptiveComplexity.Problems.SuccinctReach
 public import DescriptiveComplexity.Problems.SuccinctReach.Hardness
 import DescriptiveComplexity.Problems.Qsat.Complement
 import DescriptiveComplexity.Problems.Qsat.Hardness
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Problems.Qsat
+import all DescriptiveComplexity.Problems.Qsat.Hardness
 
 /-!
 # `PSPACE = coPSPACE`
@@ -64,7 +67,7 @@ theorem SOTCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : SOTCDe
     (f.trans succinctReach_ordered_fo_reduction_qsat).compl
 
 /-- Complementation is a bijection of the SO(TC) definable problems. -/
-theorem sotcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
+private theorem sotcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
     SOTCDefinable Pᶜ ↔ SOTCDefinable P := by
   refine ⟨fun h => ?_, SOTCDefinable.compl⟩
   have h2 := h.compl
@@ -84,7 +87,8 @@ theorem PSPACE_eq_coPSPACE : PSPACE = coPSPACE := by
     exact h S hS Q ((sotcDefinable_compl_iff Q).mpr hQ)
 
 /-- Membership in PSPACE is closed under complement. -/
-theorem mem_PSPACE_compl_iff [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ PSPACE ↔ P ∈ PSPACE :=
+private theorem mem_PSPACE_compl_iff
+    [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ PSPACE ↔ P ∈ PSPACE :=
   sotcDefinable_compl_iff P
 
 /-- **QSAT is coPSPACE-complete**, since PSPACE and coPSPACE coincide.

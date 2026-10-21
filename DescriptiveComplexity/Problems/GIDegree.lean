@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.GraphIso.Hardness
 public import DescriptiveComplexity.Problems.DagIso
 import DescriptiveComplexity.Problems.DagIso.FromDigraphIso
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Problems.DagIso.FromDigraphIso
+import all DescriptiveComplexity.Problems.DagIso.ToDigraphIso
+import all DescriptiveComplexity.Problems.GraphIso.Hardness
 
 /-!
 # The GI degree, collected

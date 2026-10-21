@@ -152,7 +152,7 @@ private theorem vec_eta₂ (w : Fin 2 → A) : ![w 0, w 1] = w := by
 /-- A binary relation variable satisfying the guard axioms determines a
 linear order (decidability by choice). -/
 @[instance_reducible]
-noncomputable def linearOrderOfGuard (r : (Fin 2 → A) → Prop)
+private noncomputable def linearOrderOfGuard (r : (Fin 2 → A) → Prop)
     (hrefl : ∀ a : A, r ![a, a])
     (htrans : ∀ a b c : A, r ![a, b] → r ![b, c] → r ![a, c])
     (hantisymm : ∀ a b : A, r ![a, b] → r ![b, a] → a = b)
@@ -185,7 +185,7 @@ def orderElimLHom (L : Language.{0, 0}) (B : SOBlock) :
 order of the structure, the extended structure is an expansion along
 `orderElimLHom` of the ordered structure extended by the underlying
 assignment. -/
-theorem orderElimLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type)
+private theorem orderElimLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type)
     (instA : L.Structure A) (lo : LinearOrder A) (ρ : B.withOrder.Assignment A)
     (hord : ∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ w 0 ≤ w 1) :
     @LHom.IsExpansionOn _ _ (orderElimLHom L B) A

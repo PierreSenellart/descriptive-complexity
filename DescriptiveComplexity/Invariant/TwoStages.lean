@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Invariant.TwoInvariance
 public import DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Invariant.TwoInvariance
+import all DescriptiveComplexity.Invariant.TwoPebble
 
 /-!
 # An induction cannot separate two `k`-pebble equivalent structures
@@ -53,7 +56,7 @@ def AssignInvariant₂ (S : Set (Σ n, L.Relations n)) (M N : Type) [L.Structure
 variable [L.Structure M] [L.Structure N]
 
 /-- The pair of empty assignments is jointly invariant. -/
-theorem botAssign_invariant₂ (B : SOBlock) :
+private theorem botAssign_invariant₂ (B : SOBlock) :
     AssignInvariant₂ S M N k (B.botAssign M) (B.botAssign N) := by
   intro _ _ _ _ _
   exact Iff.rfl
@@ -61,7 +64,7 @@ theorem botAssign_invariant₂ (B : SOBlock) :
 /-- **Expanding both structures by a jointly invariant pair of assignments
 does not change the equivalence** – the two-structure expansion lemma, the one
 that carries invariance from a stage to the next. -/
-theorem equivK₂_structure₁_eq [Finite M] [Finite N] {B : SOBlock} {ρ : B.Assignment M}
+private theorem equivK₂_structure₁_eq [Finite M] [Finite N] {B : SOBlock} {ρ : B.Assignment M}
     {σ : B.Assignment N} (hρσ : AssignInvariant₂ S M N k ρ σ) :
     EquivK₂ (@atomicAgreeOn₂ (L.sum B.lang) (blockRelsExtend S B) M N
         (B.structure₁ (L := L) ρ) (B.structure₁ (L := L) σ) k) =
@@ -81,7 +84,7 @@ variable [L.IsRelational] [Finite M] [Finite N]
 /-- **One application of the step formulas preserves joint invariance**: the
 two-structure `k`-variable invariance lemma, over the structures expanded by
 the (jointly invariant) current stages. -/
-theorem StepDef.next_invariant₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d.UsesRels S)
+private theorem StepDef.next_invariant₂ (d : StepDef L) (hd : d.VarBound k) (hrels : d.UsesRels S)
     {ρ : d.B.Assignment M} {σ : d.B.Assignment N} (hρσ : AssignInvariant₂ S M N k ρ σ) :
     AssignInvariant₂ S M N k (d.next ρ) (d.next σ) := by
   intro i g v w hvw
@@ -109,7 +112,7 @@ theorem StepDef.inflStage_invariant₂ (d : StepDef L) (hd : d.VarBound k)
     exact or_congr (ih i g hvw) (d.next_invariant₂ hd hrels ih i g hvw)
 
 /-- The two limits are jointly invariant. -/
-theorem StepDef.inflLimit_invariant₂ (d : StepDef L) (hd : d.VarBound k)
+private theorem StepDef.inflLimit_invariant₂ (d : StepDef L) (hd : d.VarBound k)
     (hrels : d.UsesRels S) :
     AssignInvariant₂ S M N k (d.inflLimit M) (d.inflLimit N) :=
   fun i g _ _ hvw => exists_congr fun n => d.inflStage_invariant₂ hd hrels n i g hvw

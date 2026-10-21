@@ -45,7 +45,7 @@ variable {n : ℕ} {V : Type} [Finite V] {LeV : V → V → Prop}
 
 /-- On an initial segment of `ℕ` the order the address layer writes is the
 order. -/
-theorem wmLt_fin_iff (σ τ : Fin n) : WMLt (α := Fin n) (· ≤ ·) σ τ ↔ σ < τ :=
+private theorem wmLt_fin_iff (σ τ : Fin n) : WMLt (α := Fin n) (· ≤ ·) σ τ ↔ σ < τ :=
   ⟨fun h => lt_of_le_of_ne h.1 fun hc => h.2 (hc ▸ le_rfl),
     fun h => ⟨le_of_lt h, not_le_of_gt h⟩⟩
 
@@ -66,21 +66,21 @@ variable {s s' : Fin n × V → Prop} {τ : Fin n}
 
 omit [Finite V] in
 /-- The same, at the carry index itself: every strictly earlier block agrees. -/
-theorem blocks_agree_lt (hbefore : ∀ σ, WMLt (α := Fin n) (· ≤ ·) σ τ → ∀ v,
+private theorem blocks_agree_lt (hbefore : ∀ σ, WMLt (α := Fin n) (· ≤ ·) σ τ → ∀ v,
       (wmBlk s' σ v ↔ wmBlk s σ v)) :
     ∀ i : Fin n, (i : ℕ) < (τ : ℕ) → wmBlk s i = wmBlk s' i := fun i hi =>
   funext fun v => propext (hbefore i ((wmLt_fin_iff i τ).mpr (Fin.lt_def.mpr hi)) v).symm
 
 /-- **The blocks after the carry index are maximal before the step**: they are
 full, and a full block is above every block. -/
-theorem blocks_top_after (hV : IsLinOrd LeV)
+private theorem blocks_top_after (hV : IsLinOrd LeV)
     (hfull : ∀ σ, WMLt (α := Fin n) (· ≤ ·) τ σ → ∀ v, wmBlk s σ v) :
     ∀ i : Fin n, (τ : ℕ) < (i : ℕ) → ∀ a : V → Prop, WMSetLe LeV a (wmBlk s i) := fun i hi a =>
   wmSetLe_of_full hV (hfull i ((wmLt_fin_iff τ i).mpr (Fin.lt_def.mpr hi))) a
 
 /-- **At the carry index the new block is the successor of the old one**, which is
 the successor hypothesis the fold asks for. -/
-theorem blocks_succ_at (hV : IsLinOrd LeV) (hincr : WMIncr LeV (wmBlk s τ) (wmBlk s' τ)) :
+private theorem blocks_succ_at (hV : IsLinOrd LeV) (hincr : WMIncr LeV (wmBlk s τ) (wmBlk s' τ)) :
     ∀ a : V → Prop, WMLt (WMSetLe LeV) a (wmBlk s' τ) ↔ WMSetLe LeV a (wmBlk s τ) := fun a =>
   (wmLt_wmSetLe_iff hV a _).trans (wmSetLt_iff_of_wmIncr hV hincr a)
 

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting
 public import DescriptiveComplexity.RelComposition
+import all DescriptiveComplexity.Counting
 
 /-!
 # Relativized parsimonious reductions

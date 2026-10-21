@@ -186,7 +186,8 @@ variable {A : Type}
 /-- The vertex of tag `t` over the element `x`. -/
 def dsPt (t : DSTag) (x : A) : dsInterp.Map A := (t, fun _ => x)
 
-theorem dsPt_eq_iff {t t' : DSTag} {x x' : A} : dsPt t x = dsPt t' x' ↔ t = t' ∧ x = x' := by
+private theorem dsPt_eq_iff
+    {t t' : DSTag} {x x' : A} : dsPt t x = dsPt t' x' ↔ t = t' ∧ x = x' := by
   constructor
   · intro h
     exact ⟨by simpa [dsPt] using congrArg (fun p : dsInterp.Map A => p.1) h,
@@ -194,10 +195,10 @@ theorem dsPt_eq_iff {t t' : DSTag} {x x' : A} : dsPt t x = dsPt t' x' ↔ t = t'
   · rintro ⟨rfl, rfl⟩
     rfl
 
-theorem dsPt_injective (t : DSTag) : Function.Injective (dsPt t (A := A)) :=
+private theorem dsPt_injective (t : DSTag) : Function.Injective (dsPt t (A := A)) :=
   fun _ _ h => (dsPt_eq_iff.mp h).2
 
-theorem dsPt_surj (q : dsInterp.Map A) : ∃ t x, q = dsPt t x :=
+private theorem dsPt_surj (q : dsInterp.Map A) : ∃ t x, q = dsPt t x :=
   ⟨q.1, q.2 0, Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg q.2 (Subsingleton.elim i 0)⟩⟩
 
 end Points
@@ -208,7 +209,7 @@ section Characterizations
 
 variable {A : Type} [Language.setSystem.Structure A]
 
-theorem mgAdj_pt (t₁ t₂ : DSTag) (x y : A) :
+private theorem mgAdj_pt (t₁ t₂ : DSTag) (x y : A) :
     MGAdj (dsPt t₁ x) (dsPt t₂ y) ↔
       ¬(Uncoverable A ∨ NoElem A) ∧
         ((t₁ = .set ∧ t₂ = .set ∧ x ≠ y) ∨
@@ -218,7 +219,7 @@ theorem mgAdj_pt (t₁ t₂ : DSTag) (x y : A) :
   cases t₁ <;> cases t₂ <;>
     simp [dsInterp, adjF, realize_gateF] <;> tauto
 
-theorem mgMarked_pt (t : DSTag) (x : A) :
+private theorem mgMarked_pt (t : DSTag) (x : A) :
     MGMarked (dsPt t x) ↔
       (t = .set ∧ SSMarked x ∧ ¬(Uncoverable A ∨ NoElem A)) ∨ NoElem A := by
   rw [MGMarked, dsPt, FOInterpretation.relMap_map]
@@ -233,7 +234,7 @@ section Correctness
 variable {A : Type} [Language.setSystem.Structure A]
 
 omit [Language.setSystem.Structure A] in
-private theorem ncard_pt_eq (t : DSTag) (P : A → Prop) (Q : dsInterp.Map A → Prop)
+theorem ncard_pt_eq (t : DSTag) (P : A → Prop) (Q : dsInterp.Map A → Prop)
     (hshape : ∀ p, Q p → ∃ v, p = dsPt t v) (hP : ∀ v : A, Q (dsPt t v) ↔ P v) :
     {p | Q p}.ncard = {v | P v}.ncard := by
   have hset : {p | Q p} = dsPt t '' {v | P v} := by
@@ -255,7 +256,7 @@ variable (A)
 
 /-- Correctness of the reduction: a set system has a small cover iff its
 incidence graph has a small dominating set. -/
-theorem hasSmallSetCover_iff_hasSmallDominatingSet :
+private theorem hasSmallSetCover_iff_hasSmallDominatingSet :
     HasSmallSetCover A ↔ HasSmallDominatingSet (dsInterp.Map A) := by
   by_cases hno : NoElem A
   · -- no ground element at all: the empty cover works, and everything is marked
@@ -393,7 +394,7 @@ end Correctness
 /-- **Set Cover FO-reduces to Dominating Set**: elements and sets become
 vertices, the sets form a clique, and each set is joined to its elements – and
 to the junk, which domination cannot ignore. -/
-noncomputable def setCover_fo_reduction_dominatingSet : SetCover ≤ᶠᵒ DominatingSet where
+private noncomputable def setCover_fo_reduction_dominatingSet : SetCover ≤ᶠᵒ DominatingSet where
   Tag := DSTag
   dim := 1
   toInterpretation := dsInterp

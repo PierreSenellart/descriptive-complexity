@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Invariant.Structure
 public import DescriptiveComplexity.OrderedComposition
 import Mathlib.Order.PiLex
 import Mathlib.Tactic.DefEqTransformations
+import all DescriptiveComplexity.FixedPointStep
 
 /-!
 # The canonical order is inflationary-definable
@@ -77,7 +78,7 @@ def toPebble {A : Type} (σ : (ordBlock k).Assignment A) : PebbleRel A k :=
   fun u v => σ () (Fin.addCases u v)
 
 /-- Reading a `k + k`-tuple as two `k`-tuples. -/
-theorem addCases_comp {A γ : Type} (w : γ → A) (f g : Fin k → γ) :
+private theorem addCases_comp {A γ : Type} (w : γ → A) (f g : Fin k → γ) :
     (Fin.addCases (fun i => w (f i)) fun i => w (g i)) =
       fun p : Fin (k + k) => w (Fin.addCases f g p) := by
   funext p
@@ -152,7 +153,7 @@ section RealizeBuilders
 
 variable {A : Type} [L.Structure A] {σ : (ordBlock k).Assignment A}
 
-theorem realize_ordPrecF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
+private theorem realize_ordPrecF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (ordPrecF L k f g) w) ↔
       toPebble σ (fun i => w (f i)) fun i => w (g i) := by
@@ -161,7 +162,7 @@ theorem realize_ordPrecF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
   rw [toPebble, addCases_comp]
   exact Iff.rfl
 
-theorem realize_incompF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
+private theorem realize_incompF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (incompF L k f g) w) ↔
       IncompRel (toPebble σ) (fun i => w (f i)) fun i => w (g i) := by
@@ -170,7 +171,7 @@ theorem realize_incompF {γ : Type} (f g : Fin k → γ) (w : γ → A) :
     realize_ordPrecF, realize_ordPrecF]
   exact Iff.rfl
 
-theorem realize_inMovesF {γ : Type} [DecidableEq γ] (j : Fin k)
+private theorem realize_inMovesF {γ : Type} [DecidableEq γ] (j : Fin k)
     (f x : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (inMovesF L k j f x) w) ↔
@@ -207,7 +208,7 @@ theorem realize_inMovesF {γ : Type} [DecidableEq γ] (j : Fin k)
     rw [h1]
     exact ha
 
-theorem realize_movesDiffF {γ : Type} [DecidableEq γ] (j : Fin k)
+private theorem realize_movesDiffF {γ : Type} [DecidableEq γ] (j : Fin k)
     (f g x : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (movesDiffF L k j f g x) w) ↔
@@ -218,7 +219,7 @@ theorem realize_movesDiffF {γ : Type} [DecidableEq γ] (j : Fin k)
     realize_inMovesF, realize_inMovesF]
   exact Iff.rfl
 
-theorem realize_setLessF {γ : Type} [DecidableEq γ] (j : Fin k)
+private theorem realize_setLessF {γ : Type} [DecidableEq γ] (j : Fin k)
     (f g : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (setLessF L k j f g) w) ↔
@@ -241,7 +242,7 @@ theorem realize_setLessF {γ : Type} [DecidableEq γ] (j : Fin k)
       realize_ordPrecF]
     exact h3 y
 
-theorem realize_movesEqF {γ : Type} [DecidableEq γ] (j : Fin k)
+private theorem realize_movesEqF {γ : Type} [DecidableEq γ] (j : Fin k)
     (f g : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (movesEqF L k j f g) w) ↔
@@ -252,7 +253,7 @@ theorem realize_movesEqF {γ : Type} [DecidableEq γ] (j : Fin k)
   rw [Formula.realize_iff, realize_inMovesF, realize_inMovesF]
   exact Iff.rfl
 
-theorem realize_movesLessF {γ : Type} [DecidableEq γ] (f g : Fin k → γ)
+private theorem realize_movesLessF {γ : Type} [DecidableEq γ] (f g : Fin k → γ)
     (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (movesLessF L k f g) w) ↔
@@ -379,7 +380,7 @@ noncomputable def atomEqF (hS : S.Finite) {γ : Type} (f g : Fin k → γ) :
 
 variable {A : Type} [L.Structure A] {σ : (ordBlock k).Assignment A}
 
-theorem realize_atomBitF {γ : Type} (b : BitIdx L k S) (f : Fin k → γ) (w : γ → A) :
+private theorem realize_atomBitF {γ : Type} (b : BitIdx L k S) (f : Fin k → γ) (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (atomBitF L k S b f) w) ↔
       atomBits L k S (fun i => w (f i)) b = true := by
@@ -399,7 +400,7 @@ theorem realize_atomBitF {γ : Type} (b : BitIdx L k S) (f : Fin k → γ) (w : 
       exact Iff.rfl
     exact h R.1.1 R.1.2 gsel
 
-theorem realize_atomBitEqF {γ : Type} (b : BitIdx L k S) (f g : Fin k → γ)
+private theorem realize_atomBitEqF {γ : Type} (b : BitIdx L k S) (f g : Fin k → γ)
     (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (atomBitEqF L k S b f g) w) ↔
@@ -409,7 +410,7 @@ theorem realize_atomBitEqF {γ : Type} (b : BitIdx L k S) (f g : Fin k → γ)
   rw [atomBitEqF, Formula.realize_iff, realize_atomBitF, realize_atomBitF]
   exact Bool.eq_iff_iff.symm
 
-theorem realize_atomLessF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
+private theorem realize_atomLessF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
     (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (atomLessF L k S hS f g) w) ↔
@@ -441,7 +442,7 @@ theorem realize_atomLessF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
       rw [hfalse] at hx
       exact Bool.false_ne_true hx
 
-theorem realize_atomEqF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
+private theorem realize_atomEqF (hS : S.Finite) {γ : Type} (f g : Fin k → γ)
     (w : γ → A) :
     (@Formula.Realize _ A ((ordBlock k).structure₁ (L := L) σ) _
       (atomEqF L k S hS f g) w) ↔
@@ -547,7 +548,7 @@ theorem inflStage_ordStepDef (hS : S.Finite) (n : ℕ) :
     refine propext (or_congr (iff_of_eq (congrFun (congrFun ih i) w)) hnext)
 
 /-- **The value of the definable refinement is the canonical order.** -/
-theorem toPebble_inflLimit_ordStepDef (hS : S.Finite) :
+private theorem toPebble_inflLimit_ordStepDef (hS : S.Finite) :
     toPebble ((ordStepDef L k S hS).inflLimit A) =
       (letI := bitVecLinearOrder L k S hS;
         OrdK (atomColor L k S (A := A))) := by

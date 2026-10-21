@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Problems.DigraphIso
 public import DescriptiveComplexity.GadgetDouble
 public import DescriptiveComplexity.Degree
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.IsoGadget
 
 /-!
 # Digraph Isomorphism is the generic isomorphism problem of the graph vocabulary
@@ -69,20 +70,20 @@ section Points
 variable {A : Type}
 
 /-- The unique copy of an element, going to the generic vocabulary. -/
-def toPt (v : A) : toTC.Map A := ((), fun _ => v)
+private def toPt (v : A) : toTC.Map A := ((), fun _ => v)
 
 /-- The unique copy of an element, coming back. -/
-def ofPt (v : A) : ofTC.Map A := ((), fun _ => v)
+private def ofPt (v : A) : ofTC.Map A := ((), fun _ => v)
 
 /-- The image universe is a copy of the original. -/
-def toEquivMap : toTC.Map A ≃ A where
+private def toEquivMap : toTC.Map A ≃ A where
   toFun p := p.2 0
   invFun := toPt
   left_inv p := Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg p.2 (Subsingleton.elim 0 i)⟩
   right_inv _ := rfl
 
 /-- The image universe is a copy of the original, coming back. -/
-def ofEquivMap : ofTC.Map A ≃ A where
+private def ofEquivMap : ofTC.Map A ≃ A where
   toFun p := p.2 0
   invFun := ofPt
   left_inv p := Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg p.2 (Subsingleton.elim 0 i)⟩
@@ -96,22 +97,22 @@ section Realize
 
 variable {A : Type} [Language.twoGraphs.Structure A]
 
-theorem toTC_patMark (p : toTC.Map A) :
+private theorem toTC_patMark (p : toTC.Map A) :
     TCPatMark (L₁ := Language.graph) p ↔ TGPatV (p.2 0) := by
   rw [TCPatMark, FOInterpretation.relMap_map]
   simp [toTC, Formula.realize_rel₁, TGPatV]
 
-theorem toTC_hostMark (p : toTC.Map A) :
+private theorem toTC_hostMark (p : toTC.Map A) :
     TCHostMark (L₁ := Language.graph) p ↔ TGHostV (p.2 0) := by
   rw [TCHostMark, FOInterpretation.relMap_map]
   simp [toTC, Formula.realize_rel₁, TGHostV]
 
-theorem toTC_patAdj (p q : toTC.Map A) :
+private theorem toTC_patAdj (p q : toTC.Map A) :
     RelMap (tcPat Language.adj) ![p, q] ↔ TGPatE (p.2 0) (q.2 0) := by
   rw [FOInterpretation.relMap_map]
   simp [toTC, Formula.realize_rel₂, TGPatE]
 
-theorem toTC_hostAdj (p q : toTC.Map A) :
+private theorem toTC_hostAdj (p q : toTC.Map A) :
     RelMap (tcHost Language.adj) ![p, q] ↔ TGHostE (p.2 0) (q.2 0) := by
   rw [FOInterpretation.relMap_map]
   simp [toTC, Formula.realize_rel₂, TGHostE]
@@ -122,22 +123,22 @@ section RealizeBack
 
 variable {A : Type} [(Language.twoCopies Language.graph).Structure A]
 
-theorem ofTC_patV (p : ofTC.Map A) :
+private theorem ofTC_patV (p : ofTC.Map A) :
     TGPatV p ↔ TCPatMark (L₁ := Language.graph) (p.2 0) := by
   rw [TGPatV, FOInterpretation.relMap_map]
   simp [ofTC, Formula.realize_rel₁, TCPatMark]
 
-theorem ofTC_hostV (p : ofTC.Map A) :
+private theorem ofTC_hostV (p : ofTC.Map A) :
     TGHostV p ↔ TCHostMark (L₁ := Language.graph) (p.2 0) := by
   rw [TGHostV, FOInterpretation.relMap_map]
   simp [ofTC, Formula.realize_rel₁, TCHostMark]
 
-theorem ofTC_patE (p q : ofTC.Map A) :
+private theorem ofTC_patE (p q : ofTC.Map A) :
     TGPatE p q ↔ RelMap (tcPat Language.adj) ![p.2 0, q.2 0] := by
   rw [TGPatE, FOInterpretation.relMap_map]
   simp [ofTC, Formula.realize_rel₂]
 
-theorem ofTC_hostE (p q : ofTC.Map A) :
+private theorem ofTC_hostE (p q : ofTC.Map A) :
     TGHostE p q ↔ RelMap (tcHost Language.adj) ![p.2 0, q.2 0] := by
   rw [TGHostE, FOInterpretation.relMap_map]
   simp [ofTC, Formula.realize_rel₂]
@@ -151,13 +152,13 @@ section Generic
 variable {B : Type} [(Language.twoCopies Language.graph).Structure B]
 
 /-- The pattern relation of a `twoCopies graph`-structure. -/
-def TCPatAdj (x y : B) : Prop := RelMap (tcPat Language.adj) ![x, y]
+private def TCPatAdj (x y : B) : Prop := RelMap (tcPat Language.adj) ![x, y]
 
 /-- The host relation of a `twoCopies graph`-structure. -/
-def TCHostAdj (x y : B) : Prop := RelMap (tcHost Language.adj) ![x, y]
+private def TCHostAdj (x y : B) : Prop := RelMap (tcHost Language.adj) ![x, y]
 
 /-- The pattern side's adjacency, read on the ambient structure. -/
-theorem patSide_relMap (a b : {x : B // TCPatMark (L₁ := Language.graph) x}) :
+private theorem patSide_relMap (a b : {x : B // TCPatMark (L₁ := Language.graph) x}) :
     RelMap (L := Language.graph) Language.adj ![a, b] ↔ TCPatAdj a.1 b.1 := by
   change RelMap (tcPat Language.adj)
     (fun i => ((![a, b] : Fin 2 → {x : B // TCPatMark (L₁ := Language.graph) x}) i).1) ↔ _
@@ -166,7 +167,7 @@ theorem patSide_relMap (a b : {x : B // TCPatMark (L₁ := Language.graph) x}) :
   exact Iff.rfl
 
 /-- The host side's adjacency, read on the ambient structure. -/
-theorem hostSide_relMap (a b : {x : B // TCHostMark (L₁ := Language.graph) x}) :
+private theorem hostSide_relMap (a b : {x : B // TCHostMark (L₁ := Language.graph) x}) :
     RelMap (L := Language.graph) Language.adj ![a, b] ↔ TCHostAdj a.1 b.1 := by
   change RelMap (tcHost Language.adj)
     (fun i => ((![a, b] : Fin 2 → {x : B // TCHostMark (L₁ := Language.graph) x}) i).1) ↔ _
@@ -180,7 +181,7 @@ preserving the two relations. Stated through
 `DescriptiveComplexity.relIsoOn_iff_equiv`, whose right-hand side mentions no
 structure, so the two presentations of a side never have to be identified as
 instances. -/
-theorem nonempty_tcSideEquiv_iff_relIsoOn :
+private theorem nonempty_tcSideEquiv_iff_relIsoOn :
     Nonempty (TCSideEquiv (L₁ := Language.graph) B) ↔
       RelIsoOn (TCPatMark (L₁ := Language.graph)) (TCHostMark (L₁ := Language.graph))
         (TCPatAdj (B := B)) TCHostAdj := by

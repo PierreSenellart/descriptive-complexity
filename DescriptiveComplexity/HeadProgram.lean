@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.HeadAutomaton
+import all DescriptiveComplexity.HeadAutomaton
 
 /-!
 # Programs: two-way multi-head automata, written with guarded transitions
@@ -99,13 +100,13 @@ variable {m : ℕ} {A : Type} {x y z : Fin K → A}
 @[refl]
 theorem refl (x : Fin K → A) : HeadAgree m x x := fun _ _ => rfl
 
-theorem symm (h : HeadAgree m x y) : HeadAgree m y x := fun j hj => (h j hj).symm
+private theorem symm (h : HeadAgree m x y) : HeadAgree m y x := fun j hj => (h j hj).symm
 
-theorem trans (h : HeadAgree m x y) (h' : HeadAgree m y z) : HeadAgree m x z :=
+private theorem trans (h : HeadAgree m x y) (h' : HeadAgree m y z) : HeadAgree m x z :=
   fun j hj => (h j hj).trans (h' j hj)
 
 /-- Agreement on more heads is agreement on fewer. -/
-theorem mono {m' : ℕ} (hm : m' ≤ m) (h : HeadAgree m x y) : HeadAgree m' x y :=
+private theorem mono {m' : ℕ} (hm : m' ≤ m) (h : HeadAgree m x y) : HeadAgree m' x y :=
   fun j hj => h j (hj.trans_le hm)
 
 end HeadAgree
@@ -200,20 +201,20 @@ abbrev Reach : F.Conf A → F.Conf A → Prop := Relation.ReflTransGen F.Step
 variable {F}
 
 /-- Nothing happens at an exit: it has no transitions. -/
-theorem not_step_exit {b : Bool} {y : Fin K → A} {d : F.Conf A} :
+private theorem not_step_exit {b : Bool} {y : Fin K → A} {d : F.Conf A} :
     ¬F.Step ((Sum.inr b : F.Site), y) d := by
   rintro ⟨s, hs, -⟩
   simp at hs
 
 /-- A run that has reached an exit stays there. -/
-theorem reach_exit {b : Bool} {y : Fin K → A} {d : F.Conf A}
+private theorem reach_exit {b : Bool} {y : Fin K → A} {d : F.Conf A}
     (h : F.Reach ((Sum.inr b : F.Site), y) d) : d = (Sum.inr b, y) := by
   induction h with
   | refl => rfl
   | @tail c d _ hcd ih => exact absurd (ih ▸ hcd) not_step_exit
 
 /-- The step relation, at a state, spelled out. -/
-theorem step_iff {s : F.St} {x : Fin K → A} {d : F.Conf A} :
+private theorem step_iff {s : F.St} {x : Fin K → A} {d : F.Conf A} :
     F.Step ((Sum.inl s : F.Site), x) d ↔
       ∃ t ∈ F.tr s, t.guard.Realize x ∧ d.1 = t.target ∧ ∀ j, (t.moves j).Holds x j (d.2 j) := by
   constructor
@@ -225,7 +226,7 @@ theorem step_iff {s : F.St} {x : Fin K → A} {d : F.Conf A} :
     exact ⟨s, rfl, t, ht, hg, htar, hmv⟩
 
 /-- Taking a named transition is a step. -/
-theorem step_of_mem {s : F.St} {x : Fin K → A} {t : HeadTrans L K F.St} (ht : t ∈ F.tr s)
+private theorem step_of_mem {s : F.St} {x : Fin K → A} {t : HeadTrans L K F.St} (ht : t ∈ F.tr s)
     (hg : t.guard.Realize x) {d : F.Conf A} (htar : d.1 = t.target)
     (hmv : ∀ j, (t.moves j).Holds x j (d.2 j)) : F.Step ((Sum.inl s : F.Site), x) d :=
   ⟨s, rfl, t, ht, hg, htar, hmv⟩
@@ -274,7 +275,7 @@ theorem Decides.runs {F : HeadProgram L K} {m : ℕ} {P : (Fin K → A) → Prop
 
 omit [LinearOrder A] in
 /-- The relation a decider runs is local when the property is. -/
-theorem headLocal2_decides {m : ℕ} {P : (Fin K → A) → Prop} (hP : HeadLocal m P) :
+private theorem headLocal2_decides {m : ℕ} {P : (Fin K → A) → Prop} (hP : HeadLocal m P) :
     HeadLocal2 m fun x b y => (b = true ↔ P x) ∧ HeadAgree m x y := by
   intro x x' y y' hx hy b
   constructor
@@ -310,7 +311,7 @@ theorem Embeds.step (h : Embeds F P e xt) {c d : F.Conf A} (hcd : F.Step c d) :
   · rw [HeadTrans.retarget_target, htar]
 
 /-- A run of the fragment is a run of the program. -/
-theorem Embeds.reach (h : Embeds F P e xt) {c d : F.Conf A} (hcd : F.Reach c d) :
+private theorem Embeds.reach (h : Embeds F P e xt) {c d : F.Conf A} (hcd : F.Reach c d) :
     P.Reach (esite e xt c.1, c.2) (esite e xt d.1, d.2) := by
   induction hcd with
   | refl => exact Relation.ReflTransGen.refl
@@ -412,7 +413,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] {m : ℕ}
 
 /-- Weakening what a fragment is known to run: any relation implied by `R` and
 whose outcomes `R` already realizes up to the scratch heads. -/
-theorem Runs.mono {F : HeadProgram L K} {R R' : (Fin K → A) → Bool → (Fin K → A) → Prop}
+private theorem Runs.mono {F : HeadProgram L K} {R R' : (Fin K → A) → Bool → (Fin K → A) → Prop}
     (h : F.Runs A m R) (hsound : ∀ x b y, R x b y → R' x b y)
     (hcomplete : ∀ x b y, R' x b y → ∃ y', HeadAgree m y y' ∧ R x b y') : F.Runs A m R' where
   sound hr := hsound _ _ _ (h.sound hr)
@@ -424,7 +425,7 @@ theorem Runs.mono {F : HeadProgram L K} {R R' : (Fin K → A) → Bool → (Fin 
 
 /-- **A flat fragment** – one whose every transition out of the entry goes
 straight to an exit – runs exactly one step. -/
-theorem reach_exit_flat {F : HeadProgram L K}
+private theorem reach_exit_flat {F : HeadProgram L K}
     (hflat : ∀ t ∈ F.tr F.entry, ∃ b, t.target = Sum.inr b) {x : Fin K → A} {b : Bool}
     {y : Fin K → A} :
     F.Reach ((Sum.inl F.entry : F.Site), x) ((Sum.inr b : F.Site), y) ↔
@@ -464,7 +465,7 @@ theorem tr_leafP (φ : (L.sum Language.order).Formula (Fin K)) (hφ : φ.IsQF)
 theorem tr_moveP (mvs : Fin K → HeadMove K) (s : (moveP (L := L) mvs).St) :
     (moveP (L := L) mvs).tr s = [⟨⊤, mvs, Sum.inr true⟩] := rfl
 
-theorem runs_exitP (b : Bool) :
+private theorem runs_exitP (b : Bool) :
     (exitP (L := L) (K := K) b).Runs A m fun x b' y => b' = b ∧ y = x := by
   have hflat : ∀ t ∈ (exitP (L := L) (K := K) b).tr (exitP b).entry,
       ∃ b', t.target = Sum.inr b' := by
@@ -482,7 +483,7 @@ theorem runs_exitP (b : Bool) :
       ⟨⟨⊤, fun _ => .stay, Sum.inr b'⟩, by simp, Formula.realize_top.mpr trivial, rfl,
         fun _ => rfl⟩⟩
 
-theorem decides_leafP (φ : (L.sum Language.order).Formula (Fin K)) (hφ : φ.IsQF) :
+private theorem decides_leafP (φ : (L.sum Language.order).Formula (Fin K)) (hφ : φ.IsQF) :
     (leafP φ hφ).Decides A m fun x => φ.Realize x := by
   have hflat : ∀ t ∈ (leafP (L := L) (K := K) φ hφ).tr (leafP φ hφ).entry,
       ∃ b', t.target = Sum.inr b' := by
@@ -510,7 +511,7 @@ theorem decides_leafP (φ : (L.sum Language.order).Formula (Fin K)) (hφ : φ.Is
       refine ⟨⟨∼φ, fun _ => .stay, Sum.inr false⟩, by simp, ?_, rfl, fun _ => rfl⟩
       exact Formula.realize_not.mpr fun h => by simpa using hb.mpr h
 
-theorem runs_moveP (mvs : Fin K → HeadMove K) :
+private theorem runs_moveP (mvs : Fin K → HeadMove K) :
     (moveP (L := L) mvs).Runs A m fun x b y => b = true ∧ ∀ j, (mvs j).Holds x j (y j) := by
   have hflat : ∀ t ∈ (moveP (L := L) mvs).tr (moveP mvs).entry, ∃ b', t.target = Sum.inr b' := by
     intro t ht
@@ -526,18 +527,18 @@ theorem runs_moveP (mvs : Fin K → HeadMove K) :
     exact ⟨y, HeadAgree.refl y, (reach_exit_flat hflat).mpr
       ⟨⟨⊤, mvs, Sum.inr true⟩, by simp, Formula.realize_top.mpr trivial, rfl, hmv⟩⟩
 
-theorem deterministic_exitP (b : Bool) : (exitP (L := L) (K := K) b).Deterministic A := by
+private theorem deterministic_exitP (b : Bool) : (exitP (L := L) (K := K) b).Deterministic A := by
   intro s x t t' ht ht' _ _
   simp only [tr_exitP, List.mem_singleton] at ht ht'
   exact ht ▸ ht' ▸ ⟨rfl, rfl⟩
 
-theorem deterministic_moveP (mvs : Fin K → HeadMove K) :
+private theorem deterministic_moveP (mvs : Fin K → HeadMove K) :
     (moveP (L := L) mvs).Deterministic A := by
   intro s x t t' ht ht' _ _
   simp only [tr_moveP, List.mem_singleton] at ht ht'
   exact ht ▸ ht' ▸ ⟨rfl, rfl⟩
 
-theorem deterministic_leafP (φ : (L.sum Language.order).Formula (Fin K)) (hφ : φ.IsQF) :
+private theorem deterministic_leafP (φ : (L.sum Language.order).Formula (Fin K)) (hφ : φ.IsQF) :
     (leafP (L := L) φ hφ).Deterministic A := by
   intro s x t t' ht ht' hg hg'
   simp only [tr_leafP, List.mem_cons, List.not_mem_nil, or_false] at ht ht'
@@ -576,7 +577,7 @@ def wireP (c₀ : C) : HeadProgram L K where
     exact (Fam p.1).guard_qf p.2 t₀ ht₀
 
 /-- Each fragment sits in the assembled program at its own control node. -/
-theorem embeds_wireP (c₀ c : C) :
+private theorem embeds_wireP (c₀ c : C) :
     Embeds (Fam c) (wireP Fam w c₀) (fun s => ⟨c, s⟩) (wireTo Fam w c) := fun _ => rfl
 
 variable {A : Type} [L.Structure A] [LinearOrder A]
@@ -679,7 +680,7 @@ theorem runs_wireP {m : ℕ} {R : C → (Fin K → A) → Bool → (Fin K → A)
     exact ⟨y', hy', hreach.trans himg⟩
 
 /-- An assembled program is deterministic as soon as its fragments are. -/
-theorem deterministic_wireP (c₀ : C) (h : ∀ c, (Fam c).Deterministic A) :
+private theorem deterministic_wireP (c₀ : C) (h : ∀ c, (Fam c).Deterministic A) :
     (wireP Fam w c₀).Deterministic A := by
   rintro ⟨c, s⟩ x t t' ht ht' hg hg'
   obtain ⟨t₀, ht₀, rfl⟩ := List.mem_map.mp ht
@@ -738,7 +739,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The step relation of a program, indexed by transitions rather than by
 membership: the form the compiled table has. -/
-theorem step_iff_index {s : F.St} {x : Fin K → A} {d : F.Conf A} :
+private theorem step_iff_index {s : F.St} {x : Fin K → A} {d : F.Conf A} :
     F.Step ((Sum.inl s : F.Site), x) d ↔
       ∃ i : Fin (F.tr s).length, ((F.tr s).get i).guard.Realize x ∧
         d.1 = ((F.tr s).get i).target ∧ ∀ j, (((F.tr s).get i).moves j).Holds x j (d.2 j) := by
@@ -752,7 +753,7 @@ theorem step_iff_index {s : F.St} {x : Fin K → A} {d : F.Conf A} :
 
 /-- The step relation of a compiled automaton, in terms of the enabled
 transitions of the program. -/
-theorem step_compile (pri : Bool) {s : F.St} {x : Fin K → A} {d : F.Conf A} :
+private theorem step_compile (pri : Bool) {s : F.St} {x : Fin K → A} {d : F.Conf A} :
     (F.compile pri).Step ((Sum.inl s : F.Site), x) d ↔
       ∃ i ∈ (if pri then (F.enabled s ((F.compile pri).reading x)).take 1
           else F.enabled s ((F.compile pri).reading x)),
@@ -767,14 +768,14 @@ theorem step_compile (pri : Bool) {s : F.St} {x : Fin K → A} {d : F.Conf A} :
     exact ⟨F.entryOf ⟨s, i⟩, List.mem_map_of_mem hi, htar.symm, hmv⟩
 
 /-- Nothing steps out of an exit of a compiled automaton. -/
-theorem not_step_compile_exit (pri : Bool) {b : Bool} {x : Fin K → A} {d : F.Conf A} :
+private theorem not_step_compile_exit (pri : Bool) {b : Bool} {x : Fin K → A} {d : F.Conf A} :
     ¬(F.compile pri).Step ((Sum.inr b : F.Site), x) d := by
   rintro ⟨p, hp, -⟩
   have hp' : p ∈ ([] : List (F.Site × (Fin K → HeadMove K))) := hp
   cases hp'
 
 /-- An index is enabled exactly when its guard holds. -/
-theorem mem_enabled_iff (pri : Bool) (s : F.St) (x : Fin K → A) (i : Fin (F.tr s).length) :
+private theorem mem_enabled_iff (pri : Bool) (s : F.St) (x : Fin K → A) (i : Fin (F.tr s).length) :
     i ∈ F.enabled s ((F.compile pri).reading x) ↔ ((F.tr s).get i).guard.Realize x := by
   simp only [enabled, List.mem_filter]
   exact ⟨fun h => ((F.compile pri).reading_iff x ⟨s, i⟩).mp (by simpa using h.2),
@@ -782,7 +783,7 @@ theorem mem_enabled_iff (pri : Bool) (s : F.St) (x : Fin K → A) (i : Fin (F.tr
 
 /-- **The compiled automaton runs the program**, in the nondeterministic
 reading. -/
-theorem step_compile_false (c d : F.Conf A) : (F.compile false).Step c d ↔ F.Step c d := by
+private theorem step_compile_false (c d : F.Conf A) : (F.compile false).Step c d ↔ F.Step c d := by
   obtain ⟨site, x⟩ := c
   rcases site with s | b
   · refine Iff.trans (F.step_compile false) (Iff.trans ?_ (Iff.symm F.step_iff_index))
@@ -795,7 +796,7 @@ theorem step_compile_false (c d : F.Conf A) : (F.compile false).Step c d ↔ F.S
   · exact ⟨fun h => absurd h (F.not_step_compile_exit false), fun h => absurd h not_step_exit⟩
 
 /-- The deterministic compilation has at most one transition per reading. -/
-theorem isDeterministic_compile_true : (F.compile true).IsDeterministic := by
+private theorem isDeterministic_compile_true : (F.compile true).IsDeterministic := by
   rintro (s | b) r
   · change ((if true then (F.enabled s r).take 1 else F.enabled s r).map
       fun i => F.entryOf ⟨s, i⟩).length ≤ 1
@@ -805,7 +806,7 @@ theorem isDeterministic_compile_true : (F.compile true).IsDeterministic := by
 
 /-- **A deterministic program runs the same way under the deterministic
 compilation**: taking the first enabled transition is taking the only one. -/
-theorem step_compile_true (hdet : F.Deterministic A) (c d : F.Conf A) :
+private theorem step_compile_true (hdet : F.Deterministic A) (c d : F.Conf A) :
     (F.compile true).Step c d ↔ F.Step c d := by
   obtain ⟨site, x⟩ := c
   rcases site with s | b
@@ -835,7 +836,7 @@ theorem step_compile_true (hdet : F.Deterministic A) (c d : F.Conf A) :
   · exact ⟨fun h => absurd h (F.not_step_compile_exit true), fun h => absurd h not_step_exit⟩
 
 /-- A run of the program is a run of the compiled automaton, and back. -/
-theorem reach_compile (pri : Bool)
+private theorem reach_compile (pri : Bool)
     (hstep : ∀ c d : F.Conf A, (F.compile pri).Step c d ↔ F.Step c d) {c d : F.Conf A} :
     Relation.ReflTransGen (F.compile pri).Step c d ↔ F.Reach c d := by
   constructor
@@ -850,7 +851,7 @@ theorem reach_compile (pri : Bool)
 
 /-- **A compiled program is accepted exactly when its `true` exit is
 reachable** from the entry with every head on the least element. -/
-theorem accepts_compile (pri : Bool)
+private theorem accepts_compile (pri : Bool)
     (hstep : ∀ c d : F.Conf A, (F.compile pri).Step c d ↔ F.Step c d) :
     (F.compile pri).Accepts A ↔ ∃ x y : Fin K → A, (∀ j, ∀ a : A, x j ≤ a) ∧
       F.Reach ((Sum.inl F.entry : F.Site), x) ((Sum.inr true : F.Site), y) := by
@@ -875,14 +876,14 @@ theorem accepts_compile (pri : Bool)
 
 /-- **The nondeterministic compilation accepts exactly what the program
 reaches.** -/
-theorem accepts_compile_false : (F.compile false).Accepts A ↔ ∃ x y : Fin K → A,
+private theorem accepts_compile_false : (F.compile false).Accepts A ↔ ∃ x y : Fin K → A,
     (∀ j, ∀ a : A, x j ≤ a) ∧
       F.Reach ((Sum.inl F.entry : F.Site), x) ((Sum.inr true : F.Site), y) :=
   F.accepts_compile false F.step_compile_false
 
 /-- **The deterministic compilation of a deterministic program accepts exactly
 what the program reaches.** -/
-theorem accepts_compile_true (hdet : F.Deterministic A) :
+private theorem accepts_compile_true (hdet : F.Deterministic A) :
     (F.compile true).Accepts A ↔ ∃ x y : Fin K → A, (∀ j, ∀ a : A, x j ≤ a) ∧
       F.Reach ((Sum.inl F.entry : F.Site), x) ((Sum.inr true : F.Site), y) :=
   F.accepts_compile true (F.step_compile_true hdet)

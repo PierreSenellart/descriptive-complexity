@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # A register file on a stretch of consecutive addresses
@@ -105,7 +111,7 @@ noncomputable def addrSeq (h : IsLinOrd (WMLe (A := A))) : ℕ → (A → Prop)
     else addrSeq h j
 
 /-- Where the sequence advances, it advances by an increment. -/
-theorem wmIncr_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
+private theorem wmIncr_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
     (hex : ∃ x : A, ¬addrSeq h j x) : WMIncr WMLe (addrSeq h j) (addrSeq h (j + 1)) := by
   have : addrSeq h (j + 1) = Classical.choose (exists_wmIncr h hex) := by
     simp only [addrSeq, dite_eq_left hex]
@@ -115,7 +121,7 @@ theorem wmIncr_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
 /-- **The `j`-th address has rank `j`**, as long as there is a `j`-th address at
 all. This is the whole content of the construction: the ranks are the numbers
 `0, 1, 2, …`, so the addresses are the tape read from its bottom end. -/
-theorem wideRank_addrSeq (h : IsLinOrd (WMLe (A := A))) :
+private theorem wideRank_addrSeq (h : IsLinOrd (WMLe (A := A))) :
     ∀ j : ℕ, j < Nat.card {p : WPoint A // (wideData A).Posn p} → wideRank (addrSeq h j) = j := by
   intro j
   induction j with
@@ -232,7 +238,7 @@ theorem wmIncr_ixSegCell (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile)
 /-- **Consecutive registers are consecutive addresses**, wherever the file sits,
 so a move of a walk over it is a single step and a pass over the whole file costs
 one step per index. -/
-theorem ixSegFile_gap (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile) {base : ℕ}
+private theorem ixSegFile_gap (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile) {base : ℕ}
     (hpos : 0 < base)
     (hbase : base + Nat.card I ≤ Nat.card {p : WPoint A // (wideData A).Posn p})
     {u u' : I} (hs : IxSucc ile u u') :
@@ -251,7 +257,7 @@ noncomputable def segCell (h : IsLinOrd (WMLe (A := A))) (base : ℕ) (u : A) : 
   ixSegCell (WMLe (A := A)) h base u
 
 /-- The rank of a register is its element's, shifted by the base. -/
-theorem wideRank_segCell (h : IsLinOrd (WMLe (A := A))) {base : ℕ}
+private theorem wideRank_segCell (h : IsLinOrd (WMLe (A := A))) {base : ℕ}
     (hbase : base + Nat.card A ≤ Nat.card {p : WPoint A // (wideData A).Posn p}) (u : A) :
     wideRank (segCell h base u) = base + wmRank u :=
   wideRank_ixSegCell _ h hbase u
@@ -298,7 +304,7 @@ theorem one_add_card_le :
   omega
 
 /-- The rank of a register is one above the rank of the element naming it. -/
-theorem wideRank_lowCell (h : IsLinOrd (WMLe (A := A))) (u : A) :
+private theorem wideRank_lowCell (h : IsLinOrd (WMLe (A := A))) (u : A) :
     wideRank (lowCell h u) = wmRank u + 1 := by
   rw [lowCell, wideRank_segCell h (one_add_card_le)]
   omega
@@ -335,7 +341,7 @@ theorem wideRank_injective (h : IsLinOrd (WMLe (A := A))) :
 injective into as many numbers as there are elements, so it is onto them; this is
 what says the file has a register for each of the first `n` nonempty
 addresses. -/
-theorem exists_wmRank_eq (h : IsLinOrd (WMLe (A := A))) {k : ℕ} (hk : k < Nat.card A) :
+private theorem exists_wmRank_eq (h : IsLinOrd (WMLe (A := A))) {k : ℕ} (hk : k < Nat.card A) :
     ∃ u : A, wmRank u = k := by
   classical
   have := Fintype.ofFinite A
@@ -357,7 +363,7 @@ theorem exists_wmRank_eq (h : IsLinOrd (WMLe (A := A))) {k : ℕ} (hk : k < Nat.
 injective into as many numbers as there are indices, so it is onto them – the
 index-level sibling of `DescriptiveComplexity.exists_wmRank_eq`, and what says a
 file on a stretch has a register for every address of that stretch. -/
-theorem exists_ixRank_eq {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLinOrd ile)
+private theorem exists_ixRank_eq {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLinOrd ile)
     {k : ℕ} (hk : k < Nat.card I) : ∃ u : I, ixRank ile u = k := by
   classical
   have := Fintype.ofFinite I
@@ -383,7 +389,7 @@ noncomputable def ixSegTop (I : Type) [Finite I] (h : IsLinOrd (WMLe (A := A)))
   addrSeq h (base + Nat.card I)
 
 /-- The rank of that address is the stretch's length above the base. -/
-theorem wideRank_ixSegTop {I : Type} [Finite I] (h : IsLinOrd (WMLe (A := A)))
+private theorem wideRank_ixSegTop {I : Type} [Finite I] (h : IsLinOrd (WMLe (A := A)))
     {base : ℕ}
     (hbase : base + Nat.card I < Nat.card {p : WPoint A // (wideData A).Posn p}) :
     wideRank (ixSegTop I h base) = base + Nat.card I :=
@@ -391,7 +397,7 @@ theorem wideRank_ixSegTop {I : Type} [Finite I] (h : IsLinOrd (WMLe (A := A)))
 
 /-- **Every register is below the stretch's end**, which is the upper bound a
 file-laying sweep is run against. -/
-theorem wmSetLt_ixSegTop {I : Type} [Finite I] (ile : I → I → Prop)
+private theorem wmSetLt_ixSegTop {I : Type} [Finite I] (ile : I → I → Prop)
     (h : IsLinOrd (WMLe (A := A))) {base : ℕ}
     (hbase : base + Nat.card I < Nat.card {p : WPoint A // (wideData A).Posn p})
     (u : I) : WMSetLt WMLe (ixSegCell ile h base u) (ixSegTop I h base) := by
@@ -403,7 +409,7 @@ theorem wmSetLt_ixSegTop {I : Type} [Finite I] (ile : I → I → Prop)
 /-- **The greatest index has the greatest rank**: every index below it, and the
 ranks running over `0 … card − 1`, leave it the last. So a walk that stops at
 the top register has crossed every one of them. -/
-theorem ixRank_of_top {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLinOrd ile)
+private theorem ixRank_of_top {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLinOrd ile)
     {utop : I} (htop : ∀ y : I, ile y utop) : ixRank ile utop + 1 = Nat.card I := by
   have hlt := ixRank_lt_card ile utop
   refine le_antisymm hlt ?_
@@ -416,7 +422,7 @@ theorem ixRank_of_top {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLin
 /-- **The last address the sequence of a stretch reaches is taken**: below the
 tape's top, some cell is outside the address, which is what lets the sequence
 advance. -/
-theorem exists_not_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
+private theorem exists_not_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
     (hj : j + 1 < Nat.card {p : WPoint A // (wideData A).Posn p}) :
     ∃ x : A, ¬addrSeq h j x := by
   classical
@@ -430,7 +436,7 @@ theorem exists_not_addrSeq (h : IsLinOrd (WMLe (A := A))) {j : ℕ}
 
 /-- **The least index has rank zero**: nothing lies below it, so a walk that
 starts at the first register has crossed none. -/
-theorem ixRank_of_bot {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLinOrd ile)
+private theorem ixRank_of_bot {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLinOrd ile)
     {ubot : I} (hbot : ∀ y : I, ile ubot y) : ixRank ile ubot = 0 := by
   have : Nonempty I := ⟨ubot⟩
   have hcard : 0 < Nat.card I := Nat.card_pos
@@ -440,7 +446,7 @@ theorem ixRank_of_bot {I : Type} [Finite I] {ile : I → I → Prop} (hi : IsLin
 
 /-- **The address past a stretch is no register's**, which is what tells the
 sweep's last landing from every cell it wrote. -/
-theorem ixSegTop_ne_ixSegCell {I : Type} [Finite I] (ile : I → I → Prop)
+private theorem ixSegTop_ne_ixSegCell {I : Type} [Finite I] (ile : I → I → Prop)
     (h : IsLinOrd (WMLe (A := A))) {base : ℕ}
     (hbase : base + Nat.card I < Nat.card {p : WPoint A // (wideData A).Posn p})
     (w : I) : ixSegTop I h base ≠ ixSegCell ile h base w := by
@@ -453,7 +459,7 @@ theorem ixSegTop_ne_ixSegCell {I : Type} [Finite I] (ile : I → I → Prop)
 
 /-- **The step off the last register**: the address the sweep moves to when it
 writes the file's last register is the one just past the stretch. -/
-theorem wmIncr_ixSegCell_top {I : Type} [Finite I] (ile : I → I → Prop)
+private theorem wmIncr_ixSegCell_top {I : Type} [Finite I] (ile : I → I → Prop)
     (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile) {base : ℕ}
     (hbase : base + Nat.card I < Nat.card {p : WPoint A // (wideData A).Posn p})
     {utop : I} (htop : ∀ y : I, ile y utop) :
@@ -473,7 +479,7 @@ and the last register sits one short of its end. Every budget of the opening
 phases is one of these two numbers. -/
 
 /-- **A sweep of the stretch costs one step per register.** -/
-theorem wideRank_ixSegTop_sub_bot {I : Type} [Finite I] (ile : I → I → Prop)
+private theorem wideRank_ixSegTop_sub_bot {I : Type} [Finite I] (ile : I → I → Prop)
     (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile) {base : ℕ}
     (hbase : base + Nat.card I < Nat.card {p : WPoint A // (wideData A).Posn p})
     {ubot : I} (hbot : ∀ y : I, ile ubot y) :
@@ -484,7 +490,7 @@ theorem wideRank_ixSegTop_sub_bot {I : Type} [Finite I] (ile : I → I → Prop)
 
 /-- **The last register sits one short of the stretch's end**, so a walk home
 from it costs the stretch and the file's base together, less one. -/
-theorem wideRank_ixSegCell_top {I : Type} [Finite I] (ile : I → I → Prop)
+private theorem wideRank_ixSegCell_top {I : Type} [Finite I] (ile : I → I → Prop)
     (h : IsLinOrd (WMLe (A := A))) (hi : IsLinOrd ile) {base : ℕ}
     (hbase : base + Nat.card I ≤ Nat.card {p : WPoint A // (wideData A).Posn p})
     {utop : I} (htop : ∀ y : I, ile y utop) :

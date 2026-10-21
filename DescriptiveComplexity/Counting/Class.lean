@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Counting.SharpP
 public import DescriptiveComplexity.Counting.Relativized
 public import DescriptiveComplexity.Hierarchy
 import DescriptiveComplexity.FixedPointReductionClosure
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Relativized
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.FixedPointReductionClosure
 
 /-!
 # Counting classes, the class `#P`, and its relation to NP
@@ -182,7 +186,7 @@ noncomputable def SharpP : CountingClass :=
 
 variable {L : Language.{0, 0}} [L.IsRelational]
 
-theorem mem_sharpP_iff (C : CountingProblem L) : C ∈ SharpP ↔ SharpPDefinable C :=
+private theorem mem_sharpP_iff (C : CountingProblem L) : C ∈ SharpP ↔ SharpPDefinable C :=
   Iff.rfl
 
 /-- Parsimonious `#P`-hardness, unfolded: every `#P`-definable counting problem
@@ -195,14 +199,14 @@ theorem parsimoniousHard_sharpP_iff (C : CountingProblem L) :
 
 /-- A problem every `#P`-definable counting problem reduces to by an ordinary
 ordered parsimonious reduction is parsimoniously `#P`-hard. -/
-theorem parsimoniousHard_sharpP_of_ordered {C : CountingProblem L}
+private theorem parsimoniousHard_sharpP_of_ordered {C : CountingProblem L}
     (h : ∀ {L'' : Language.{0, 0}} [L''.IsRelational] (D : CountingProblem L''),
       SharpPDefinable D → Nonempty (D ≤ᵖ[≤] C)) : SharpP.ParsimoniousHard C :=
   fun D hD => (h D hD).map fun g => g.toRel
 
 /-- The witness-counting problem of an existential second-order sentence is in
 `#P`. -/
-theorem ofKernel_mem_sharpP (B : SOBlock) (φ : (L.sum B.lang).Sentence) :
+private theorem ofKernel_mem_sharpP (B : SOBlock) (φ : (L.sum B.lang).Sentence) :
     CountingProblem.ofKernel B φ ∈ SharpP :=
   sharpPDefinable_ofKernel B φ
 
@@ -212,7 +216,7 @@ theorem ofKernel_mem_sharpP (B : SOBlock) (φ : (L.sum B.lang).Sentence) :
 count of witnesses is positive exactly when there is a witness, and the order
 the kernel reads is re-quantified by the order elimination of
 `DescriptiveComplexity.sigmaSODefinable_of_orderPull`. -/
-theorem SharpPDefinable.support_sigmaSODefinable {C : CountingProblem L}
+private theorem SharpPDefinable.support_sigmaSODefinable {C : CountingProblem L}
     (h : SharpPDefinable C) : SigmaSODefinable 1 C.support := by
   obtain ⟨B, φ, hφ⟩ := h
   refine sigmaSODefinable_of_orderPull (k := 0) [B] rfl φ ?_

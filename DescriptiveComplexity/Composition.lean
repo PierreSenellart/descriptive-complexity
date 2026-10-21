@@ -365,7 +365,7 @@ instance : Preorder (DecisionProblem L) where
   le_refl P := ⟨.refl P⟩
   le_trans _ _ _ := fun ⟨g⟩ ⟨f⟩ => ⟨g.trans f⟩
 
-theorem DecisionProblem.le_def {P Q : DecisionProblem L} :
+private theorem DecisionProblem.le_def {P Q : DecisionProblem L} :
     P ≤ Q ↔ Nonempty (P ≤ᶠᵒ Q) :=
   Iff.rfl
 

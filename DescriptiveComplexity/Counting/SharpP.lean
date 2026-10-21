@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Counting
 public import DescriptiveComplexity.SecondOrderOrdered
 public import Mathlib.SetTheory.Cardinal.Finite
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Counting the witnesses of a second-order block: `#P`-definability
@@ -92,7 +93,7 @@ instance SOBlock.finite_assignment (B : SOBlock) (A : Type) [Finite A] :
 
 /-- On a finite structure, the witness count is positive exactly when there is
 a witness. -/
-theorem witnessCount_pos_iff (B : SOBlock) (φ : (L.sum B.lang).Sentence) (A : Type)
+private theorem witnessCount_pos_iff (B : SOBlock) (φ : (L.sum B.lang).Sentence) (A : Type)
     [inst : L.Structure A] [Finite A] :
     0 < witnessCount B φ A ↔ ∃ ρ : B.Assignment A,
       @Sentence.Realize (L.sum B.lang) A (@sumStructure L B.lang A inst (B.structure ρ)) φ := by
@@ -195,7 +196,7 @@ theorem CountingProblem.ofKernel_apply (B : SOBlock) (φ : (L.sum B.lang).Senten
 
 /-- The support of a witness-counting problem is the problem its sentence
 defines. -/
-theorem CountingProblem.ofKernel_support_iff (B : SOBlock) (φ : (L.sum B.lang).Sentence)
+private theorem CountingProblem.ofKernel_support_iff (B : SOBlock) (φ : (L.sum B.lang).Sentence)
     (A : Type) [L.Structure A] [Finite A] :
     (CountingProblem.ofKernel B φ).support A ↔ SORealize L A [B] φ true :=
   witnessCount_pos_iff B φ A
@@ -207,7 +208,7 @@ def orderFreeKernel (B : SOBlock) (φ : (L.sum B.lang).Sentence) :
 
 /-- The witness-counting problem of an order-free kernel is `#P`-definable: its
 kernel simply ignores the order. -/
-theorem sharpPDefinable_ofKernel (B : SOBlock) (φ : (L.sum B.lang).Sentence) :
+private theorem sharpPDefinable_ofKernel (B : SOBlock) (φ : (L.sum B.lang).Sentence) :
     SharpPDefinable (CountingProblem.ofKernel B φ) := by
   refine ⟨B, orderFreeKernel B φ, fun A instA _ _ _ => ?_⟩
   refine Nat.card_congr (Equiv.subtypeEquiv (Equiv.refl _) fun ρ => ?_)

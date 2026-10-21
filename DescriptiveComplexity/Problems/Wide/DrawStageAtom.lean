@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawTuple
 import DescriptiveComplexity.Problems.Wide.DrawSites
 import DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawSeekKit
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.DrawTuple
 
 /-!
 # The stage atom's machinery: a random access
@@ -307,7 +311,7 @@ mirror clears and the two seeks all stay inside the machinery's own phases, and
 only the last seek's verdict leaves. This is what a determinism-after-the-guess
 argument asks of the random access
 (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
-theorem stageRule_dstIn {S : P → Prop} (hemb : ∀ p : StagePh k, S (emb p))
+private theorem stageRule_dstIn {S : P → Prop} (hemb : ∀ p : StagePh k, S (emb p))
     (hexit : S exitPh) (i : StageSite k) (ρ : StageSh k i) :
     S (dt.stageRule zero one emb srcTrack srcBlk dstBlk coord bitFlag setBit
       initLv advLv IsMaxLv oldSlot setAv exitPh i ρ).dstPh := by
@@ -378,7 +382,7 @@ theorem stageRule_dstIn {S : P → Prop} (hemb : ∀ p : StagePh k, S (emb p))
 
 /-- **Every rule of a stage atom's machinery fires from a phase its site
 owns**; the tuple loops' obligation is their own. -/
-theorem stageHosrc :
+private theorem stageHosrc :
     ∀ (i : StageSite k) (ρ : StageSh k i),
       ∃ p : StagePh k,
         (dt.stageRule zero one emb srcTrack srcBlk dstBlk coord bitFlag setBit
@@ -422,7 +426,7 @@ variable (hzo : zero ≠ one) (hemb : Function.Injective emb)
 
 include hzo hemb in
 /-- **A stage atom's machinery separates in-shape.** -/
-theorem stageSep :
+private theorem stageSep :
     ∀ (i : StageSite k) (ρ ρ' : StageSh k i) (f : Q → A) (g : dt.SlotIx → A),
       (dt.stageRule zero one emb srcTrack srcBlk dstBlk coord bitFlag setBit
         initLv advLv IsMaxLv oldSlot setAv exitPh i ρ).guard f g →

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Exponential.Free
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Free
 
 /-!
 # The copies of an order-guessing expansion, and the problem read in one of them
@@ -204,13 +205,13 @@ theorem eq_range_copyIn {S : Set (X.orderFree.Map A)} (hS : IsCls X S)
     exact pointOrd_copyIn x
 
 /-- The placed points, as a part of the order-guessing universe. -/
-def toCls {S : Set (X.orderFree.Map A)} (hS : S = Set.range (copyIn (X := X) (A := A)))
+private def toCls {S : Set (X.orderFree.Map A)} (hS : S = Set.range (copyIn (X := X) (A := A)))
     (x : X.Map A) : X.clsPart S :=
   ⟨copyIn x, hS ▸ Set.mem_range_self x⟩
 
 /-- **A copy is the expanded universe**, over the original vocabulary and at the
 order its points carry. -/
-noncomputable def clsEquiv {S : Set (X.orderFree.Map A)}
+private noncomputable def clsEquiv {S : Set (X.orderFree.Map A)}
     (hS : S = Set.range (copyIn (X := X) (A := A))) [Finite A] [Nonempty A] :
     X.Map A ≃[X.E] X.clsPart S := by
   have hbij : Function.Bijective (toCls hS) := by

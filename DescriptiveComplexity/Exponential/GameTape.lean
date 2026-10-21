@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Padding
 public import DescriptiveComplexity.Numbers.BinRel
 public import DescriptiveComplexity.OrderedComposition
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Padding
 
 /-!
 # The tape of a machine playing a second-order game
@@ -115,7 +116,7 @@ namespace TapeTag
 variable {B : SOBlock}
 
 /-- The tape tags as a sum, for the `Finite` instance. -/
-def equivSum : TapeTag B ≃ Bool ⊕ (Bool × B.ι) ⊕ Unit ⊕ (Bool × Bool × B.ι) ⊕ Bool where
+private def equivSum : TapeTag B ≃ Bool ⊕ (Bool × B.ι) ⊕ Unit ⊕ (Bool × Bool × B.ι) ⊕ Bool where
   toFun
     | .left b => .inl b
     | .cell r i => .inr (.inl (r, i))
@@ -160,7 +161,7 @@ def IsPos : TapeTag B → Prop
   | .mark _ => False
   | _ => True
 
-theorem fam_le_four {t : TapeTag B} (h : IsPos t) : fam t ≤ 4 := by
+private theorem fam_le_four {t : TapeTag B} (h : IsPos t) : fam t ≤ 4 := by
   cases t with
   | left b => cases b <;> simp [fam]
   | cell r i => cases r <;> simp [fam]
@@ -168,7 +169,7 @@ theorem fam_le_four {t : TapeTag B} (h : IsPos t) : fam t ≤ 4 := by
   | val b r i => exact h.elim
   | mark b => exact h.elim
 
-theorem eq_left_false_of_fam_zero {t : TapeTag B} (h : fam t = 0) : t = .left false := by
+private theorem eq_left_false_of_fam_zero {t : TapeTag B} (h : fam t = 0) : t = .left false := by
   cases t with
   | left b => cases b <;> simp_all [fam]
   | cell r i => cases r <;> simp [fam] at h
@@ -176,7 +177,7 @@ theorem eq_left_false_of_fam_zero {t : TapeTag B} (h : fam t = 0) : t = .left fa
   | val b r i => simp [fam] at h
   | mark b => simp [fam] at h
 
-theorem eq_left_true_of_fam_one {t : TapeTag B} (h : fam t = 1) : t = .left true := by
+private theorem eq_left_true_of_fam_one {t : TapeTag B} (h : fam t = 1) : t = .left true := by
   cases t with
   | left b => cases b <;> simp_all [fam]
   | cell r i => cases r <;> simp [fam] at h
@@ -184,7 +185,7 @@ theorem eq_left_true_of_fam_one {t : TapeTag B} (h : fam t = 1) : t = .left true
   | val b r i => simp [fam] at h
   | mark b => simp [fam] at h
 
-theorem eq_right_of_fam_four {t : TapeTag B} (h : fam t = 4) : t = .right := by
+private theorem eq_right_of_fam_four {t : TapeTag B} (h : fam t = 4) : t = .right := by
   cases t with
   | left b => cases b <;> simp [fam] at h
   | cell r i => cases r <;> simp [fam] at h
@@ -224,7 +225,7 @@ def arity (carity : C → ℕ) : MachTag B C → ℕ := Sum.elim TapeTag.arity c
     arity carity (Sum.inl t : MachTag B C) = TapeTag.arity t := rfl
 
 /-- A position's tag is a tape tag. -/
-theorem exists_tapeTag_of_isPos {t : MachTag B C} (h : IsPos t) :
+private theorem exists_tapeTag_of_isPos {t : MachTag B C} (h : IsPos t) :
     ∃ s : TapeTag B, t = Sum.inl s ∧ TapeTag.IsPos s := by
   cases t with
   | inl s => exact ⟨s, rfl, h⟩
@@ -238,7 +239,7 @@ noncomputable def finiteIdx (T : Type) [Finite T] (t : T) : ℕ :=
   letI := Fintype.ofFinite T
   (Fintype.equivFin T t : ℕ)
 
-theorem finiteIdx_injective (T : Type) [Finite T] : Function.Injective (finiteIdx T) := by
+private theorem finiteIdx_injective (T : Type) [Finite T] : Function.Injective (finiteIdx T) := by
   let := Fintype.ofFinite T
   intro a b h
   exact (Fintype.equivFin T).injective (Fin.ext h)
@@ -261,14 +262,14 @@ noncomputable def machTagOrder : LinearOrder (MachTag B C) :=
   LinearOrder.lift' machKey machKey_injective
 
 /-- A lower tag is in a family at most as high. -/
-theorem machTag_fam_le_of_le {t t' : MachTag B C}
+private theorem machTag_fam_le_of_le {t t' : MachTag B C}
     (h : letI := machTagOrder (B := B) (C := C); t ≤ t') : MachTag.fam t ≤ MachTag.fam t' := by
   rcases Prod.Lex.toLex_le_toLex.mp h with hlt | ⟨heq, -⟩
   · omega
   · omega
 
 /-- A tag of a lower family is lower. -/
-theorem machTag_lt_of_fam_lt {t t' : MachTag B C} (h : MachTag.fam t < MachTag.fam t') :
+private theorem machTag_lt_of_fam_lt {t t' : MachTag B C} (h : MachTag.fam t < MachTag.fam t') :
     letI := machTagOrder (B := B) (C := C)
     t < t' :=
   Prod.Lex.toLex_lt_toLex.mpr (Or.inl h)
@@ -327,7 +328,7 @@ theorem machPosn_rightPt : machPosn (rightPt (B := B) (C := C) (dim := dim) a₀
 
 omit [LinearOrder A] in
 /-- The two ends of the tape are different points. -/
-theorem leftPt_ne_rightPt (b : Bool) :
+private theorem leftPt_ne_rightPt (b : Bool) :
     (leftPt (B := B) (C := C) (dim := dim) a₀ b) ≠ rightPt a₀ := by
   intro h
   simpa [leftPt, rightPt] using congrArg Prod.fst h
@@ -335,7 +336,7 @@ theorem leftPt_ne_rightPt (b : Bool) :
 omit [LinearOrder A] in
 /-- A sentinel is not a cell, so a walk reading a mark is not reading an
 atom. -/
-theorem leftPt_ne_cellPt (b r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
+private theorem leftPt_ne_cellPt (b r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
     (leftPt (C := C) (dim := dim) a₀ b) ≠ cellPt a₀ r i ā := by
   intro h
   simpa [leftPt, cellPt] using congrArg Prod.fst h
@@ -348,7 +349,7 @@ theorem rightPt_ne_cellPt (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
 
 omit [LinearOrder A] in
 /-- **A symbol determines its bit**, at a fixed cell. -/
-theorem valPt_inj_bit {b b' r : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
+private theorem valPt_inj_bit {b b' r : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
     (h : valPt (C := C) (dim := dim) a₀ b r i ā = valPt a₀ b' r i ā) : b = b' := by
   have h1 := congrArg Prod.fst h
   simp only [valPt, Sum.inl.injEq] at h1
@@ -357,21 +358,21 @@ theorem valPt_inj_bit {b b' r : Bool} {i : B.ι} {ā : Fin (B.arity i) → A}
 omit [LinearOrder A] in
 /-- The two marks are different symbols, which is how a walk tells the ends of
 the tape apart. -/
-theorem markPt_ne_markPt {b b' : Bool} (h : b ≠ b') :
+private theorem markPt_ne_markPt {b b' : Bool} (h : b ≠ b') :
     markPt (B := B) (C := C) (dim := dim) a₀ b ≠ markPt a₀ b' := by
   intro hc
   exact h (by simpa [markPt] using congrArg Prod.fst hc)
 
 omit [LinearOrder A] in
 /-- A cell's symbol is not a mark. -/
-theorem valPt_ne_markPt {b r : Bool} {i : B.ι} {ā : Fin (B.arity i) → A} {b' : Bool} :
+private theorem valPt_ne_markPt {b r : Bool} {i : B.ι} {ā : Fin (B.arity i) → A} {b' : Bool} :
     valPt (C := C) (dim := dim) a₀ b r i ā ≠ markPt a₀ b' := by
   intro hc
   simpa [valPt, markPt] using congrArg Prod.fst hc
 
 omit [LinearOrder A] in
 /-- **A symbol determines its bit, its region and its relation variable.** -/
-theorem valPt_inj_tag {b b₂ r r₂ : Bool} {i i₂ : B.ι} {ā : Fin (B.arity i) → A}
+private theorem valPt_inj_tag {b b₂ r r₂ : Bool} {i i₂ : B.ι} {ā : Fin (B.arity i) → A}
     {ā₂ : Fin (B.arity i₂) → A}
     (h : valPt (C := C) (dim := dim) a₀ b r i ā = valPt a₀ b₂ r₂ i₂ ā₂) :
     b = b₂ ∧ r = r₂ ∧ i = i₂ := by
@@ -382,7 +383,7 @@ theorem valPt_inj_tag {b b₂ r r₂ : Bool} {i i₂ : B.ι} {ā : Fin (B.arity 
 omit [LinearOrder A] in
 /-- **Two symbols that are the same point sit in the same cell**, so a walk may
 write back to it with a different bit. -/
-theorem valPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) (b₃ : Bool) {b b₂ r r₂ : Bool}
+private theorem valPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) (b₃ : Bool) {b b₂ r r₂ : Bool}
     {i i₂ : B.ι} {ā : Fin (B.arity i) → A} {ā₂ : Fin (B.arity i₂) → A}
     (h : valPt (C := C) (dim := dim) a₀ b r i ā = valPt a₀ b₂ r₂ i₂ ā₂) :
     valPt (C := C) (dim := dim) a₀ b₃ r i ā = valPt a₀ b₃ r₂ i₂ ā₂ := by
@@ -395,7 +396,7 @@ theorem valPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) (b₃ : Bool) {b
 
 omit [LinearOrder A] in
 /-- **A symbol determines its address**, at a fixed relation variable. -/
-theorem args_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ : Bool} {i : B.ι}
+private theorem args_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ : Bool} {i : B.ι}
     {ā ā₂ : Fin (B.arity i) → A}
     (h : valPt (C := C) (dim := dim) a₀ b r i ā = valPt a₀ b₂ r₂ i ā₂) : ā = ā₂ := by
   have hle : B.arity i ≤ dim := (arity_le_blockArityBound B i).trans hdim
@@ -404,7 +405,7 @@ theorem args_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ : 
 
 omit [LinearOrder A] in
 /-- **The cell a symbol sits in**, from the symbol read at it. -/
-theorem cellPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ : Bool}
+private theorem cellPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ : Bool}
     {i i₂ : B.ι} {ā : Fin (B.arity i) → A} {ā₂ : Fin (B.arity i₂) → A}
     (h : valPt (C := C) (dim := dim) a₀ b r i ā = valPt a₀ b₂ r₂ i₂ ā₂) :
     cellPt (C := C) (dim := dim) a₀ r i ā = cellPt a₀ r₂ i₂ ā₂ := by
@@ -416,7 +417,7 @@ theorem cellPt_eq_of_valPt_eq (hdim : blockArityBound B ≤ dim) {b b₂ r r₂ 
   rw [hā]
 
 /-- A cell is in the domain. -/
-theorem machDom_cellPt {carity : C → ℕ} (h₀ : IsBot a₀) (r : Bool) (i : B.ι)
+private theorem machDom_cellPt {carity : C → ℕ} (h₀ : IsBot a₀) (r : Bool) (i : B.ι)
     (ā : Fin (B.arity i) → A) : machDom (dim := dim) carity (cellPt a₀ r i ā) :=
   canon_pad h₀ _ ā
 
@@ -434,12 +435,12 @@ include h₀
 omit [Finite C] in
 /-- A point of the domain whose tag uses no coordinate is the constant tuple:
 the sentinels and the mark carry exactly one point each. -/
-theorem eq_const_of_dom {p : Pt B C dim A} (hp : machDom carity p)
+private theorem eq_const_of_dom {p : Pt B C dim A} (hp : machDom carity p)
     (harity : MachTag.arity carity p.1 = 0) : p.2 = fun _ => a₀ :=
   funext fun j => le_antisymm (hp j (by omega) a₀) (h₀ _)
 
 /-- **The lowest position is the first left sentinel.** -/
-theorem minPos_leftPt :
+private theorem minPos_leftPt :
     letI := machTagOrder (B := B) (C := C)
     MinPos (tagTupleLe (Tag := MachTag B C) (d := dim) (A := A))
       (fun p => machPosn p ∧ machDom carity p) (leftPt a₀ false) := by
@@ -455,7 +456,7 @@ theorem minPos_leftPt :
   · exact Or.inl (machTag_lt_of_fam_lt (t := (leftPt a₀ false : Pt B C dim A).1) (t' := q.1) hf)
 
 /-- **Only the two sentinels sit at or below the second one.** -/
-theorem eq_leftPt_of_le {q : Pt B C dim A} (hq : machPosn q ∧ machDom carity q)
+private theorem eq_leftPt_of_le {q : Pt B C dim A} (hq : machPosn q ∧ machDom carity q)
     (hle : letI := machTagOrder (B := B) (C := C)
       tagTupleLe (Tag := MachTag B C) (d := dim) (A := A) q (leftPt a₀ true)) :
     q = leftPt a₀ false ∨ q = leftPt a₀ true := by
@@ -476,7 +477,7 @@ theorem eq_leftPt_of_le {q : Pt B C dim A} (hq : machPosn q ∧ machDom carity q
 
 omit h₀ in
 /-- Both sentinels sit at or below the second one. -/
-theorem leftPt_le_leftPt_true (b : Bool) :
+private theorem leftPt_le_leftPt_true (b : Bool) :
     letI := machTagOrder (B := B) (C := C)
     tagTupleLe (Tag := MachTag B C) (d := dim) (A := A) (leftPt a₀ b) (leftPt a₀ true) := by
   let := machTagOrder (B := B) (C := C)
@@ -523,20 +524,21 @@ theorem succPos_ne_leftPt {p q : Pt B C dim A} (hfam : 1 < MachTag.fam q.1)
 
 omit [Finite C] [LinearOrder A] h₀ in
 /-- A cell sits above the second sentinel. -/
-theorem one_lt_fam_cellPt (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
+private theorem one_lt_fam_cellPt (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
     1 < MachTag.fam (cellPt (C := C) (dim := dim) a₀ r i ā).1 := by
   cases r <;> simp [cellPt, MachTag.fam, TapeTag.fam]
 
 omit [Finite C] [LinearOrder A] h₀ in
 /-- So does the right sentinel. -/
-theorem one_lt_fam_rightPt : 1 < MachTag.fam (rightPt (B := B) (C := C) (dim := dim) a₀).1 := by
+private theorem one_lt_fam_rightPt
+    : 1 < MachTag.fam (rightPt (B := B) (C := C) (dim := dim) a₀).1 := by
   simp [rightPt, MachTag.fam, TapeTag.fam]
 
 omit [Finite C] in
 /-- **What a position is**: a left sentinel, a cell, or the right sentinel –
 which is where every walk's step analysis begins, the symbol under the head
 following from the case. -/
-theorem posn_cases_tape (hdim : blockArityBound B ≤ dim) {p : Pt B C dim A}
+private theorem posn_cases_tape (hdim : blockArityBound B ≤ dim) {p : Pt B C dim A}
     (hp : machPosn p) (hd : machDom carity p) :
     (∃ b, p = leftPt a₀ b) ∨ (∃ (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A),
       p = cellPt a₀ r i ā) ∨ p = rightPt a₀ := by
@@ -558,7 +560,7 @@ theorem posn_cases_tape (hdim : blockArityBound B ≤ dim) {p : Pt B C dim A}
   | mark b => exact hsp.elim
 
 /-- **The highest position is the right sentinel.** -/
-theorem maxPos_rightPt :
+private theorem maxPos_rightPt :
     letI := machTagOrder (B := B) (C := C)
     MaxPos (tagTupleLe (Tag := MachTag B C) (d := dim) (A := A))
       (fun p => machPosn p ∧ machDom carity p) (rightPt a₀) := by
@@ -603,7 +605,7 @@ open Classical in
 /-- **The symbol a cell carries is the cell's own address**, tagged with the bit
 the assignment gives its atom. This is what lets a walk recognize where it is
 from what it reads. -/
-theorem tapeOfAssign_cellPt (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assignment A)
+private theorem tapeOfAssign_cellPt (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assignment A)
     (r : Bool) (i : B.ι) (ā : Fin (B.arity i) → A) :
     tapeOfAssign (C := C) a₀ hdim ρ σ (cellPt a₀ r i ā) =
       valPt a₀ (decide (cond r σ ρ i ā)) r i ā := by
@@ -612,13 +614,14 @@ theorem tapeOfAssign_cellPt (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assign
   simp only [tapeOfAssign, cellPt, pref_pad a₀ hle ā]
 
 /-- The left sentinels carry the left mark. -/
-theorem tapeOfAssign_leftPt (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assignment A) (b : Bool) :
+private theorem tapeOfAssign_leftPt
+    (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assignment A) (b : Bool) :
     tapeOfAssign (C := C) a₀ hdim ρ σ (leftPt a₀ b) = markPt a₀ false := by
   simp only [tapeOfAssign, leftPt]
 
 /-- The right sentinel carries the right mark, which is what tells a rightward
 walk that it is over. -/
-theorem tapeOfAssign_rightPt (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assignment A) :
+private theorem tapeOfAssign_rightPt (hdim : blockArityBound B ≤ dim) (ρ σ : B.Assignment A) :
     tapeOfAssign (C := C) a₀ hdim ρ σ (rightPt a₀) = markPt a₀ true := by
   simp only [tapeOfAssign, rightPt]
 
@@ -649,12 +652,12 @@ noncomputable def updAssign {B : SOBlock} {A : Type} (α : B.Assignment A) (i : 
     (ā : Fin (B.arity i) → A) (b : Bool) : B.Assignment A :=
   fun i' ā' => if (⟨i', ā'⟩ : Σ j : B.ι, Fin (B.arity j) → A) = ⟨i, ā⟩ then b = true else α i' ā'
 
-theorem updAssign_self {B : SOBlock} {A : Type} (α : B.Assignment A) (i : B.ι)
+private theorem updAssign_self {B : SOBlock} {A : Type} (α : B.Assignment A) (i : B.ι)
     (ā : Fin (B.arity i) → A) (b : Bool) : updAssign α i ā b i ā = (b = true) := by
   classical
   rw [updAssign, ite_eq_left rfl]
 
-theorem updAssign_of_ne {B : SOBlock} {A : Type} (α : B.Assignment A) (i : B.ι)
+private theorem updAssign_of_ne {B : SOBlock} {A : Type} (α : B.Assignment A) (i : B.ι)
     (ā : Fin (B.arity i) → A) (b : Bool) {i' : B.ι} {ā' : Fin (B.arity i') → A}
     (h : (⟨i', ā'⟩ : Σ j : B.ι, Fin (B.arity j) → A) ≠ ⟨i, ā⟩) :
     updAssign α i ā b i' ā' = α i' ā' := by
@@ -717,7 +720,7 @@ machine reads its tape only under its head, and its head is always a position,
 so this is the only sense in which a walk has to control the tape – the
 *non-canonical* tagged tuples, which are not positions, keep whatever they
 started with and are never read. -/
-theorem assignOfTape_congr (h₀ : IsBot a₀) {t u : Pt B C dim A → Pt B C dim A}
+private theorem assignOfTape_congr (h₀ : IsBot a₀) {t u : Pt B C dim A → Pt B C dim A}
     (h : ∀ p, machPosn p → machDom carity p → t p = u p) (r : Bool) :
     assignOfTape a₀ t r = assignOfTape a₀ u r := by
   funext i ā
@@ -754,7 +757,7 @@ def machInp (p x : Pt B C dim A) : Prop := machPosn p ∧ x = gameInitTape a₀ 
 variable {a₀ hdim}
 
 /-- **The input is functional.** -/
-theorem machInp_functional {p x y : Pt B C dim A} (hx : machInp a₀ hdim p x)
+private theorem machInp_functional {p x y : Pt B C dim A} (hx : machInp a₀ hdim p x)
     (hy : machInp a₀ hdim p y) : x = y := hx.2.trans hy.2.symm
 
 variable (a₀ hdim)

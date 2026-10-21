@@ -137,7 +137,7 @@ noncomputable def IsLinOrd.toLinearOrder {A : Type} {Le : A → A → Prop} (h :
   toDecidableLE := Classical.decRel _
 
 /-- The natural order of a linear order, as a relation. -/
-theorem isLinOrd_le {α : Type} [LinearOrder α] : IsLinOrd (· ≤ · : α → α → Prop) :=
+private theorem isLinOrd_le {α : Type} [LinearOrder α] : IsLinOrd (· ≤ · : α → α → Prop) :=
   ⟨fun _ => le_rfl, fun _ _ _ => le_trans, fun _ _ => le_antisymm, le_total⟩
 
 end LinOrd
@@ -185,7 +185,7 @@ variable {B : Type}
 
 /-- The rank of a position transports along an equivalence commuting with the
 two relations. -/
-theorem bitRank_equiv (u : B ≃ A) {LeB : B → B → Prop} {PosnB : B → Prop}
+private theorem bitRank_equiv (u : B ≃ A) {LeB : B → B → Prop} {PosnB : B → Prop}
     {LeA : A → A → Prop} {PosnA : A → Prop}
     (hle : ∀ b b', LeB b b' ↔ LeA (u b) (u b')) (hp : ∀ b, PosnB b ↔ PosnA (u b)) (p : B) :
     bitRank LeB PosnB p = bitRank LeA PosnA (u p) := by
@@ -217,7 +217,7 @@ variable [Fintype A] [DecidableEq A] {Le : A → A → Prop} [DecidableRel Le]
   {Posn : A → Prop} [DecidablePred Posn]
 
 /-- The rank of a position, as the cardinality of a `Finset`. -/
-theorem bitRank_eq_card (p : A) :
+private theorem bitRank_eq_card (p : A) :
     bitRank Le Posn p = (Finset.univ.filter fun q => Posn q ∧ Le q p ∧ q ≠ p).card := by
   rw [bitRank, show {q | Posn q ∧ Le q p ∧ q ≠ p}
     = ↑(Finset.univ.filter fun q => Posn q ∧ Le q p ∧ q ≠ p) by ext q; simp,
@@ -225,7 +225,7 @@ theorem bitRank_eq_card (p : A) :
 
 omit [DecidableEq A] [DecidableRel Le] in
 /-- The decoded number, as a sum over a `Finset`. -/
-theorem binNum_eq_finsetSum (b : A → Prop) [DecidablePred b] :
+private theorem binNum_eq_finsetSum (b : A → Prop) [DecidablePred b] :
     binNum Le Posn b = ∑ p ∈ Finset.univ.filter (fun p => Posn p ∧ b p), 2 ^ bitRank Le Posn p := by
   rw [binNum, show {p | Posn p ∧ b p} = ↑(Finset.univ.filter fun p => Posn p ∧ b p) by
     ext p; simp, finsum_mem_coe_finset]
@@ -241,7 +241,7 @@ section Peel
 variable {A : Type} [Finite A]
 
 /-- Removing the lowest position lowers every other rank by one. -/
-theorem bitRank_erase_min {Le : A → A → Prop} {Posn : A → Prop} {p₀ : A}
+private theorem bitRank_erase_min {Le : A → A → Prop} {Posn : A → Prop} {p₀ : A}
     (h₀ : Posn p₀) (hmin : ∀ q, Posn q → Le p₀ q) {p : A} (hp : Posn p) (hne : p ≠ p₀) :
     bitRank Le Posn p = bitRank Le (fun q => Posn q ∧ q ≠ p₀) p + 1 := by
   have hsplit : {q : A | Posn q ∧ Le q p ∧ q ≠ p} =
@@ -328,7 +328,7 @@ def maj (x y z : Prop) : Prop := (x ∧ y) ∨ (x ∧ z) ∨ (y ∧ z)
 open Classical in
 /-- **The full-adder identity**: the sum bit plus twice the carry is the sum
 of the three input bits. -/
-theorem fullAdder (x y z : Prop) :
+private theorem fullAdder (x y z : Prop) :
     (if Xor x (Xor y z) then 1 else 0) + 2 * (if maj x y z then 1 else 0) =
       (if x then 1 else 0) + ((if y then 1 else 0) + (if z then 1 else 0)) := by
   by_cases hx : x <;> by_cases hy : y <;> by_cases hz : z <;>
@@ -355,7 +355,7 @@ def SuccPos (Le : A → A → Prop) (Posn : A → Prop) (p q : A) : Prop :=
   Posn p ∧ Posn q ∧ Le p q ∧ p ≠ q ∧ ∀ r, Posn r → Le p r → Le r q → r = p ∨ r = q
 
 /-- A nonempty set of positions has a lowest one: minimize the rank. -/
-theorem exists_minPos (hlin : IsLinOrd Le) (hne : ∃ p, Posn p) :
+private theorem exists_minPos (hlin : IsLinOrd Le) (hne : ∃ p, Posn p) :
     ∃ p, MinPos Le Posn p := by
   classical
   obtain ⟨p₀, hp₀, hmin⟩ :=
@@ -375,7 +375,7 @@ theorem exists_minPos (hlin : IsLinOrd Le) (hne : ∃ p, Posn p) :
   exact absurd (hmin q hq) (by omega)
 
 /-- Rank is strictly monotone: a lower position has a smaller rank. -/
-theorem bitRank_lt (hlin : IsLinOrd Le) {p q : A} (hp : Posn p) (hle : Le p q)
+private theorem bitRank_lt (hlin : IsLinOrd Le) {p q : A} (hp : Posn p) (hle : Le p q)
     (hne : p ≠ q) : bitRank Le Posn p < bitRank Le Posn q := by
   have hsub : {r : A | Posn r ∧ Le r p ∧ r ≠ p} ⊆ {r : A | Posn r ∧ Le r q ∧ r ≠ q} := by
     rintro r ⟨hr, hrp, hrne⟩
@@ -387,7 +387,7 @@ theorem bitRank_lt (hlin : IsLinOrd Le) {p q : A} (hp : Posn p) (hle : Le p q)
 
 omit [Finite A] in
 /-- The element immediately below a given one is unique. -/
-theorem succPos_left_unique (hlin : IsLinOrd Le) {p p' q : A}
+private theorem succPos_left_unique (hlin : IsLinOrd Le) {p p' q : A}
     (h : SuccPos Le Posn p q) (h' : SuccPos Le Posn p' q) : p = p' := by
   rcases hlin.2.2.2 p p' with hle | hle
   · rcases h.2.2.2.2 p' h'.1 hle h'.2.2.1 with h1 | h1
@@ -399,12 +399,12 @@ theorem succPos_left_unique (hlin : IsLinOrd Le) {p p' q : A}
 
 omit [Finite A] in
 /-- The reverse of a linear order is a linear order. -/
-theorem IsLinOrd.reverse (hlin : IsLinOrd Le) : IsLinOrd (fun a b => Le b a) :=
+private theorem IsLinOrd.reverse (hlin : IsLinOrd Le) : IsLinOrd (fun a b => Le b a) :=
   ⟨hlin.1, fun a b c hab hbc => hlin.2.1 c b a hbc hab,
     fun a b hab hba => hlin.2.2.1 a b hba hab, fun a b => hlin.2.2.2 b a⟩
 
 /-- A nonempty set of positions has a highest one. -/
-theorem exists_maxPos (hlin : IsLinOrd Le) (hne : ∃ p, Posn p) :
+private theorem exists_maxPos (hlin : IsLinOrd Le) (hne : ∃ p, Posn p) :
     ∃ p, MaxPos Le Posn p := by
   obtain ⟨p, hp, hmax⟩ := exists_minPos hlin.reverse hne
   exact ⟨p, hp, hmax⟩
@@ -696,7 +696,7 @@ theorem exists_ripple (hlin : IsLinOrd Le) :
 open Classical in
 /-- **Every number that fits can be written**: a value below `2` to the number
 of positions is decoded from some set of bits. -/
-theorem exists_binNum (hlin : IsLinOrd Le) :
+private theorem exists_binNum (hlin : IsLinOrd Le) :
     ∀ (n : ℕ) (Posn : A → Prop), ({p : A | Posn p} : Set A).ncard = n →
       ∀ k < 2 ^ n, ∃ b : A → Prop, binNum Le Posn b = k := by
   intro n

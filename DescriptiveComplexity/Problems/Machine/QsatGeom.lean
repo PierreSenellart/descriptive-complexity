@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.QsatProgram
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Machine.QsatProgram
+import all DescriptiveComplexity.Problems.Machine.QsatTape
+import all DescriptiveComplexity.Problems.Machine.Tape
 
 /-!
 # The geometry of the QBF machine's tape
@@ -63,32 +66,32 @@ variable {A : Type} [Language.qsat.Structure A] [LinearOrder A] [Finite A] [None
 /-! ### Walking the quantifier prefix -/
 
 /-- `x` is the variable the prefix binds first. -/
-def QMinVar (x : A) : Prop := IsQVar x ∧ ∀ y : A, IsQVar y → ¬QPrec y x
+private def QMinVar (x : A) : Prop := IsQVar x ∧ ∀ y : A, IsQVar y → ¬QPrec y x
 
 /-- `x` is the variable the prefix binds last. -/
-def QMaxVar (x : A) : Prop := IsQVar x ∧ ∀ y : A, IsQVar y → ¬QPrec x y
+private def QMaxVar (x : A) : Prop := IsQVar x ∧ ∀ y : A, IsQVar y → ¬QPrec x y
 
 /-- `y` is the variable the prefix binds immediately after `x`. -/
-def QNextVar (x y : A) : Prop :=
+private def QNextVar (x y : A) : Prop :=
   IsQVar x ∧ IsQVar y ∧ QPrec x y ∧ ∀ z : A, IsQVar z → QPrec x z → QPrec z y → False
 
 /-! ### The positions -/
 
 omit [Language.qsat.Structure A] in
 /-- A tuple pinned at both coordinates is the tuple of least elements. -/
-theorem eq_qBot_tup {w : Fin 2 → A} (h : IsMinTup w) : w = fun _ => qBot :=
+private theorem eq_qBot_tup {w : Fin 2 → A} (h : IsMinTup w) : w = fun _ => qBot :=
   isMinTup_unique h isMinTup_qBot
 
-theorem qPosn_posStart : QPosn (posStart : QV A) := isMinTup_qBot
+private theorem qPosn_posStart : QPosn (posStart : QV A) := isMinTup_qBot
 
-theorem qPosn_posEnd : QPosn (posEnd : QV A) := isMinTup_qBot
+private theorem qPosn_posEnd : QPosn (posEnd : QV A) := isMinTup_qBot
 
-theorem qPosn_posCell {x : A} (hx : IsQVar x) : QPosn (posCell x : QV A) :=
+private theorem qPosn_posCell {x : A} (hx : IsQVar x) : QPosn (posCell x : QV A) :=
   ⟨hx, fun a => qBot_le a⟩
 
 /-- **The positions of the tape, listed**: the two markers and one cell per
 quantified variable. -/
-theorem qPosn_iff (p : QV A) :
+private theorem qPosn_iff (p : QV A) :
     QPosn p ↔ (p = posStart ∨ (∃ x : A, IsQVar x ∧ p = posCell x) ∨ p = posEnd) := by
   constructor
   · intro h
@@ -109,7 +112,7 @@ theorem qPosn_iff (p : QV A) :
 /-! ### Comparing positions -/
 
 /-- Between two cells the tape order is the prefix order. -/
-theorem qLe_posCell_iff (hwf : QsatWf A) {x y : A} :
+private theorem qLe_posCell_iff (hwf : QsatWf A) {x y : A} :
     QLe (posCell x : QV A) (posCell y) ↔ PLe x y := by
   have hrefl := (isLinOrd_pLe A hwf).1
   constructor
@@ -127,31 +130,31 @@ theorem qLe_posCell_iff (hwf : QsatWf A) {x y : A} :
 
 omit [Finite A] [Nonempty A] in
 /-- A tag strictly lower in the index order is lower on the tape. -/
-theorem qLe_of_tagIdx_lt {p q : QV A} (h : qTagIdx p.1 < qTagIdx q.1) : QLe p q := Or.inl h
+private theorem qLe_of_tagIdx_lt {p q : QV A} (h : qTagIdx p.1 < qTagIdx q.1) : QLe p q := Or.inl h
 
 omit [Finite A] [Nonempty A] in
 /-- The tape order is reflexive on a well-formed instance. -/
-theorem qLe_refl (hwf : QsatWf A) (p : QV A) : QLe p p := (isLinOrd_qLe A hwf).1 p
+private theorem qLe_refl (hwf : QsatWf A) (p : QV A) : QLe p p := (isLinOrd_qLe A hwf).1 p
 
-theorem qLe_start_cell (x : A) : QLe (posStart : QV A) (posCell x) :=
+private theorem qLe_start_cell (x : A) : QLe (posStart : QV A) (posCell x) :=
   qLe_of_tagIdx_lt tag_lt_sc
 
-theorem qLe_start_end : QLe (posStart : QV A) posEnd := qLe_of_tagIdx_lt tag_lt_se
+private theorem qLe_start_end : QLe (posStart : QV A) posEnd := qLe_of_tagIdx_lt tag_lt_se
 
-theorem qLe_cell_end (x : A) : QLe (posCell x : QV A) posEnd :=
+private theorem qLe_cell_end (x : A) : QLe (posCell x : QV A) posEnd :=
   qLe_of_tagIdx_lt tag_lt_ce
 
-theorem not_qLe_cell_start (x : A) : ¬QLe (posCell x : QV A) posStart := by
+private theorem not_qLe_cell_start (x : A) : ¬QLe (posCell x : QV A) posStart := by
   rintro (h | ⟨h, -⟩)
   · exact tag_nlt_cs h
   · exact tag_ne_cs h
 
-theorem not_qLe_end_cell (x : A) : ¬QLe (posEnd : QV A) (posCell x) := by
+private theorem not_qLe_end_cell (x : A) : ¬QLe (posEnd : QV A) (posCell x) := by
   rintro (h | ⟨h, -⟩)
   · exact tag_nlt_ec h
   · exact tag_ne_ec h
 
-theorem not_qLe_end_start : ¬QLe (posEnd : QV A) posStart := by
+private theorem not_qLe_end_start : ¬QLe (posEnd : QV A) posStart := by
   rintro (h | ⟨h, -⟩)
   · exact tag_nlt_es h
   · exact tag_ne_es h
@@ -159,7 +162,7 @@ theorem not_qLe_end_start : ¬QLe (posEnd : QV A) posStart := by
 /-! ### The ends of the tape -/
 
 /-- **The left marker is the lowest position.** -/
-theorem minPos_posStart (hwf : QsatWf A) : MinPos (QLe (A := A)) QPosn posStart := by
+private theorem minPos_posStart (hwf : QsatWf A) : MinPos (QLe (A := A)) QPosn posStart := by
   refine ⟨qPosn_posStart, fun q hq => ?_⟩
   rcases (qPosn_iff q).mp hq with rfl | ⟨x, -, rfl⟩ | rfl
   · exact qLe_refl hwf _
@@ -167,7 +170,7 @@ theorem minPos_posStart (hwf : QsatWf A) : MinPos (QLe (A := A)) QPosn posStart 
   · exact qLe_start_end
 
 /-- **The right marker is the highest position.** -/
-theorem maxPos_posEnd (hwf : QsatWf A) : MaxPos (QLe (A := A)) QPosn posEnd := by
+private theorem maxPos_posEnd (hwf : QsatWf A) : MaxPos (QLe (A := A)) QPosn posEnd := by
   refine ⟨qPosn_posEnd, fun q hq => ?_⟩
   rcases (qPosn_iff q).mp hq with rfl | ⟨x, -, rfl⟩ | rfl
   · exact qLe_start_end

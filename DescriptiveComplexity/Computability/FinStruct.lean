@@ -71,7 +71,7 @@ theorem digitAt_lt {c : ℕ} (hc : 0 < c) (t j : ℕ) : digitAt c t j < c :=
   Nat.mod_lt _ hc
 
 /-- A tuple of digits in base `c` numbers below `c ^ length`. -/
-theorem tupleIdx_lt {c : ℕ} : ∀ {l : List ℕ}, (∀ a ∈ l, a < c) → tupleIdx c l < c ^ l.length
+private theorem tupleIdx_lt {c : ℕ} : ∀ {l : List ℕ}, (∀ a ∈ l, a < c) → tupleIdx c l < c ^ l.length
   | [], _ => by simp
   | a :: l, h => by
     have hac : a < c := h a (by simp)
@@ -84,7 +84,7 @@ theorem tupleIdx_lt {c : ℕ} : ∀ {l : List ℕ}, (∀ a ∈ l, a < c) → tup
     omega
 
 /-- The digits of the number of a tuple are the tuple back. -/
-theorem digitAt_tupleIdx {c : ℕ} :
+private theorem digitAt_tupleIdx {c : ℕ} :
     ∀ {l : List ℕ}, (∀ a ∈ l, a < c) → ∀ {j : ℕ}, j < l.length →
       digitAt c (tupleIdx c l) j = l.getD j 0
   | [], _, _, hj => by simp at hj
@@ -104,14 +104,14 @@ theorem digitAt_tupleIdx {c : ℕ} :
     exact this
 
 /-- Splitting a remainder along a product of moduli. -/
-theorem mod_mul_split (c m v : ℕ) : v % (c * m) = v % c + c * (v / c % m) := by
+private theorem mod_mul_split (c m v : ℕ) : v % (c * m) = v % c + c * (v / c % m) := by
   conv_lhs => rw [← Nat.mod_add_div (v % (c * m)) c]
   rw [Nat.mod_mod_of_dvd _ ⟨m, rfl⟩, Nat.mod_mul_right_div_self]
 
 /-- **The number of the tuple of the digits of `v` is `v`**, up to the number
 of digits taken. The converse roundtrip of
 `FirstOrder.Language.digitAt_tupleIdx`. -/
-theorem tupleIdx_ofFn_digitAt (c : ℕ) : ∀ d v : ℕ,
+private theorem tupleIdx_ofFn_digitAt (c : ℕ) : ∀ d v : ℕ,
     tupleIdx c (List.ofFn fun j : Fin d => digitAt c v (j : ℕ)) = v % c ^ d
   | 0, _ => by simp [Nat.mod_one]
   | d + 1, v => by
@@ -164,19 +164,19 @@ abbrev arity (i : Fin V.numSyms) : ℕ := (V.symOf i).1
 /-- The symbol with a given number. -/
 abbrev sym (i : Fin V.numSyms) : L.Relations (V.arity i) := (V.symOf i).2
 
-theorem arity_index {n : ℕ} (R : L.Relations n) : V.arity (V.index R) = n :=
+private theorem arity_index {n : ℕ} (R : L.Relations n) : V.arity (V.index R) = n :=
   congrArg Sigma.fst (V.symOf_index R)
 
-theorem sym_index {n : ℕ} (R : L.Relations n) : HEq (V.sym (V.index R)) R := by
+private theorem sym_index {n : ℕ} (R : L.Relations n) : HEq (V.sym (V.index R)) R := by
   change HEq (V.symOf (V.index R)).2 R
   rw [show V.symOf (V.index R) = ⟨n, R⟩ from V.symOf_index R]
 
-theorem index_sym (i : Fin V.numSyms) : V.index (V.sym i) = i :=
+private theorem index_sym (i : Fin V.numSyms) : V.index (V.sym i) = i :=
   V.index_symOf i
 
 /-- The arity of a symbol, as read from its number, *is* its arity: the shape
 in which the dependency is discharged in practice. -/
-theorem sym_index_eq {n : ℕ} (R : L.Relations n) (h : V.arity (V.index R) = n) :
+private theorem sym_index_eq {n : ℕ} (R : L.Relations n) (h : V.arity (V.index R) = n) :
     h ▸ V.sym (V.index R) = R :=
   eq_of_heq ((eqRec_heq h (V.sym (V.index R))).trans (V.sym_index R))
 
@@ -212,7 +212,7 @@ abbrev Univ (s : FinStruct V) : Type := Fin s.card
 def relMapBool (s : FinStruct V) {n : ℕ} (R : L.Relations n) (x : Fin n → s.Univ) : Bool :=
   (s.table.getD (V.index R) []).getD (tupleIdx s.card (List.ofFn fun j => (x j : ℕ))) false
 
-theorem relMapBool_eq (s : FinStruct V) {n : ℕ} (R : L.Relations n) (x : Fin n → s.Univ) :
+private theorem relMapBool_eq (s : FinStruct V) {n : ℕ} (R : L.Relations n) (x : Fin n → s.Univ) :
     s.relMapBool R x =
       (s.table.getD (V.index R) []).getD
         (tupleIdx s.card (List.ofFn fun j => (x j : ℕ))) false := rfl
@@ -236,7 +236,8 @@ instance decidableRelMap [L.IsRelational] (s : FinStruct V) {n : ℕ} (R : L.Rel
 applied to the symbol read back from a number, is the reading of the symbol
 itself – the one place the arity dependency of
 `FirstOrder.Language.FinVocab` has to be discharged. -/
-theorem heq_relArgs {α : Type} {m n : ℕ} (h : m = n) (R : L.Relations m) (R' : L.Relations n)
+private theorem heq_relArgs
+    {α : Type} {m n : ℕ} (h : m = n) (R : L.Relations m) (R' : L.Relations n)
     (hR : HEq R R') (g : ∀ {k : ℕ}, L.Relations k → (Fin k → α) → Bool)
     (y : Fin m → α) (x : Fin n → α) (hy : ∀ j : Fin m, y j = x (Fin.cast h j)) :
     g R y = g R' x := by
@@ -258,7 +259,7 @@ def ofTable (V : FinVocab L) (k : ℕ)
     (ofTable V k f).univSize = k := rfl
 
 /-- **The table is read back as it was written.** -/
-theorem relMapBool_ofTable (V : FinVocab L) (k : ℕ)
+private theorem relMapBool_ofTable (V : FinVocab L) (k : ℕ)
     (f : ∀ {n : ℕ}, L.Relations n → (Fin n → Fin (k + 1)) → Bool) {n : ℕ}
     (R : L.Relations n) (x : Fin n → Fin (k + 1)) :
     (ofTable V k f).relMapBool R x = f R x := by
@@ -341,19 +342,19 @@ def equivProd : FinStruct V ≃ ℕ × List (List Bool) where
 instance instPrimcodable : Primcodable (FinStruct V) :=
   Primcodable.ofEquiv _ (equivProd V)
 
-theorem primrec_equivProd : Primrec (equivProd V) :=
+private theorem primrec_equivProd : Primrec (equivProd V) :=
   Primrec.of_equiv
 
-theorem primrec_univSize : Primrec fun s : FinStruct V => s.univSize :=
+private theorem primrec_univSize : Primrec fun s : FinStruct V => s.univSize :=
   (Primrec.fst.comp (primrec_equivProd V)).of_eq fun _ => rfl
 
-theorem primrec_card : Primrec fun s : FinStruct V => s.card :=
+private theorem primrec_card : Primrec fun s : FinStruct V => s.card :=
   Primrec.succ.comp (primrec_univSize V)
 
-theorem primrec_table : Primrec fun s : FinStruct V => s.table :=
+private theorem primrec_table : Primrec fun s : FinStruct V => s.table :=
   (Primrec.snd.comp (primrec_equivProd V)).of_eq fun _ => rfl
 
-theorem primrec_mk :
+private theorem primrec_mk :
     Primrec₂ fun (n : ℕ) (t : List (List Bool)) => (⟨n, t⟩ : FinStruct V) :=
   (Primrec.of_equiv_iff (equivProd V)).mp (Primrec.id.of_eq fun _ => rfl)
 
@@ -382,7 +383,7 @@ def DecisionProblem.toPred (P : DecisionProblem L) (V : FinVocab L) :
 /-- **The concrete instances capture the problem**: a finite nonempty structure
 is a yes-instance exactly when some – equivalently, any – numbering of it is.
 Isomorphism-invariance of a decision problem is what makes this true. -/
-theorem toPred_ofEquiv (P : DecisionProblem L) (V : FinVocab L) {A : Type} [L.Structure A]
+private theorem toPred_ofEquiv (P : DecisionProblem L) (V : FinVocab L) {A : Type} [L.Structure A]
     [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)]
     (k : ℕ) (e : Fin (k + 1) ≃ A) :
     P.toPred V (FinStruct.ofEquiv V k e) ↔ P A :=

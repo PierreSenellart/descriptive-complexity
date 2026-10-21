@@ -13,6 +13,22 @@ public import DescriptiveComplexity.Problems.Wide.NexEval
 import DescriptiveComplexity.Problems.Wide.DrawRegion
 public import DescriptiveComplexity.Problems.Wide.DrawAddr
 import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.BlkFile
+import all DescriptiveComplexity.Problems.Wide.BlkLayout
+import all DescriptiveComplexity.Problems.Wide.Blocks
+import all DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawRules
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.LowFile
+import all DescriptiveComplexity.Problems.Wide.NexBuild
+import all DescriptiveComplexity.Problems.Wide.NexDet
+import all DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.Problems.Wide.NexGuess
+import all DescriptiveComplexity.Problems.Wide.NexOuter
+import all DescriptiveComplexity.Problems.Wide.NexSpec
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The clocked program's whole run, and its clock
@@ -87,7 +103,7 @@ variable {A : Type} {M : TMData A}
 step that leaves it. Nothing here is about the program – the three legs are the
 caller's – and what it records is the arithmetic: an opening of `o`, an
 evaluation of `e`, and one step to accept. -/
-theorem reachesIn_nexTotal {o e : ℕ} {c₀ c₁ c₂ c₃ : Config A}
+private theorem reachesIn_nexTotal {o e : ℕ} {c₀ c₁ c₂ c₃ : Config A}
     (hopen : M.ReachesIn o c₀ c₁) (heval : M.ReachesIn e c₁ c₂)
     (hexit : M.Step c₂ c₃) : M.ReachesIn (o + e + 1) c₀ c₃ :=
   (hopen.trans heval).tail hexit
@@ -106,7 +122,7 @@ variable {PR : Prog A R' P' dt.CtlIx dt.SlotIx dt.KIx dt.dd}
 the background already carries is the same tape as one stated along another such
 track, so a leg walking the mirror composes with a leg walking VAL without
 either being restated. -/
-theorem trackTape_ixBack_congr {F : LaidFile dt A R' P' I}
+private theorem trackTape_ixBack_congr {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} {t t' : dt.SlotIx} {m m' : I → Prop}
     (hm : ∀ r, dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st r t =
       bitVal PR.zero PR.one (bitAtOf F.cell m r))
@@ -121,7 +137,7 @@ theorem trackTape_ixBack_congr {F : LaidFile dt A R' P' I}
 /-- **The mirror and VAL presentations agree**: the opening walks the mirror and
 the evaluation walks VAL, and both marks are the state's own, so the two runs
 compose with no rewriting in between. -/
-theorem trackTape_ixBack_mir_val {F : LaidFile dt A R' P' I}
+private theorem trackTape_ixBack_mir_val {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} :
     PR.trackTapeAt F.cell Slot.mir
         (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) st.mir =
@@ -134,7 +150,7 @@ walks the mirror at the empty mark, the evaluation walks VAL at the state's own,
 and the state whose mirror is empty presents the same tape either way. This is
 the one rewrite between `reachesIn_openingRegion` and
 `DescriptiveComplexity.Draw.Data.nexIxEvalB_reachesIn`. -/
-theorem trackTape_ixBack_mir_empty_val {F : LaidFile dt A R' P' I}
+private theorem trackTape_ixBack_mir_empty_val {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} (hmir : st.mir = fun _ => False) :
     PR.trackTapeAt F.cell Slot.mir
         (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) (fun _ => False) =
@@ -149,7 +165,7 @@ empty mark, the evaluation along VAL at the state's own, and a state whose
 mirror is empty presents both the same way. This is the junction of the two
 legs: with it the whole run is `hopen.trans heval`, and
 `DescriptiveComplexity.Draw.Data.nexProg_wideAccept_of_legs` does the clock. -/
-theorem config_openingEnd_eq_evalStart {F : LaidFile dt A R' P' I}
+private theorem config_openingEnd_eq_evalStart {F : LaidFile dt A R' P' I}
     {st : TapeSt dt A R' P' I} (hmir : st.mir = fun _ => False)
     (p : P') (f : dt.CtlIx → A) (w : Univ A R' P' dt.KIx dt.dd → Prop) :
     (⟨Sum.inr (PR.stElt p f), Sum.inl w,
@@ -183,7 +199,7 @@ is what a run stated along *any* clear track begins from. This is the bridge
 between the initial configuration
 (`DescriptiveComplexity.Draw.Prog.wideAccept_prog` presents it along the
 channel's file) and the opening's own presentation along the mirror. -/
-theorem trackTape_blank_congr {I' : Type}
+private theorem trackTape_blank_congr {I' : Type}
     {cell : I → (Univ A R' P' dt.KIx dt.dd → Prop)}
     {cell' : I' → (Univ A R' P' dt.KIx dt.dd → Prop)}
     {t t' : dt.SlotIx} {rest rest' : (Univ A R' P' dt.KIx dt.dd → Prop) →
@@ -223,7 +239,7 @@ mark, and an empty mark has none. This is the bridge a program *handed* its file
 needs, where `trackTape_blank_congr` is the one a program starting on a blank
 tape needs: there the background is the blank, here it is the channel's own
 marks, and neither is read by the presentation. -/
-theorem trackTape_empty_congr {I' : Type}
+private theorem trackTape_empty_congr {I' : Type}
     {cell : I → (Univ A R' P' dt.KIx dt.dd → Prop)}
     {cell' : I' → (Univ A R' P' dt.KIx dt.dd → Prop)}
     {t : dt.SlotIx} {rest : (Univ A R' P' dt.KIx dt.dd → Prop) → dt.SlotIx → A} :
@@ -270,7 +286,7 @@ variable {evalEntry : PE}
 with the marker planted at the address the head is on. A clocked program starts
 on a blank tape, so this – with `DescriptiveComplexity.Draw.Prog.initBack` for the
 background – is what its opening runs from. -/
-noncomputable def startBack
+private noncomputable def startBack
     (bg : (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → dt.SlotIx → A)
     (one : A) (v : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) :
     (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → dt.SlotIx → A :=
@@ -286,7 +302,7 @@ omit [Fintype dt.CtlIx] [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R']
   [Finite (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)] in
 /-- **Planting the marker changes nothing elsewhere**: the frame condition of the
 opening's first step. -/
-theorem startBack_frame
+private theorem startBack_frame
     {bg : (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     {one : A} {v r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
     (hr : r ≠ v) : dt.startBack bg one v r = bg r := by
@@ -301,7 +317,7 @@ omit [LinearOrder A] [LinearOrder R'] [Nonempty A] [Finite A] [Finite R']
 /-- **Planting the two marks is the write the opening's first step makes**: at
 the address the head is on, the presentation with them is the presentation
 without them, updated at the marker slot and at the bottom mark's. -/
-theorem startBack_wr
+private theorem startBack_wr
     {PR : Prog A R' (NexPh (Option dt.KIx) PE) dt.CtlIx dt.SlotIx dt.KIx dt.dd}
     {I : Type} (cell : I → (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop))
     {bg : (Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop) → dt.SlotIx → A}
@@ -527,7 +543,7 @@ def guessTracks (zero one : A) (σ : dt.d.B.Assignment (dt.X.Map A))
 
 /-- **Outside the swept stretch the guess writes nothing** – the opening's
 `hout`, at tracks that are an assignment's inside it. -/
-theorem not_guessTracks_out
+private theorem not_guessTracks_out
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {zero one : A} {σ : dt.d.B.Assignment (dt.X.Map A)}
     {bot top r : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
@@ -551,7 +567,7 @@ What it asks of the **reduction** is that every fixed-point variable have an
 argument. A nullary one has the empty address for its entry, which is the
 marker's own cell and below every stretch the machine writes; padding its
 relation with a dummy argument costs nothing and is the intended reading. -/
-theorem guessTracks_iff_of_lt
+private theorem guessTracks_iff_of_lt
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {zero one : A} {σ : dt.d.B.Assignment (dt.X.Map A)}
     {s₀ top s : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
@@ -569,7 +585,7 @@ as `guessTracks_iff_of_lt`, at a state whose stage tracks are the guess's. Every
 leg of the spine leaves them alone (`ixSpineStOfB_old`), so this is what the
 evaluation's `hdict` is discharged by, at whatever program and whatever rule
 names the reduction runs – nothing here mentions either. -/
-theorem guessTracks_hdict_of_old {I : Type}
+private theorem guessTracks_hdict_of_old {I : Type}
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {zero one : A} {σ : dt.d.B.Assignment (dt.X.Map A)}
     {s₀ top s : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
@@ -731,7 +747,7 @@ wherever the guess stopped, and step into the evaluation.
 Nothing of the guess is read here – the tracks are whatever the sweep left – so
 the same lemma serves the forward opening's last two steps and the backward
 reading's first. -/
-theorem reachesIn_homeGuessTail (hR : PR.table.Reads)
+private theorem reachesIn_homeGuessTail (hR : PR.table.Reads)
     (h : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     {st : TapeSt dt A R' (NexPh (Option dt.KIx) PE) I}
     {v y v' : Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd → Prop}
@@ -790,7 +806,7 @@ section Clock
 each of `a`, `b` and `o + 1` is at most `2 ^ (k · m)` and `j` outruns `k` by two.
 The opening is left abstract: the file-laying one and the region-guessing one
 differ, and both are bounded by the number of addresses. -/
-theorem nexTotal_lt_two_pow {k j m o e a b : ℕ} (hkj : k + 1 < j) (hm : 0 < m)
+private theorem nexTotal_lt_two_pow {k j m o e a b : ℕ} (hkj : k + 1 < j) (hm : 0 < m)
     (he : e ≤ a * b) (ha : a ≤ 2 ^ (k * m)) (hb : b ≤ 2 ^ (k * m))
     (hopen : o + 1 ≤ 2 ^ (k * m)) :
     o + e + 1 < 2 ^ ((k + j) * m) := by
@@ -816,7 +832,7 @@ are below `2 ^ ((k + 1) · m)` – which is what
 `DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'` asks of it. The region
 bound on a rank is `wideRank_lt_two_pow_supported`; the base is bounded the same
 way, being an address of the region like any other. -/
-theorem openingRegion_le_two_pow {A : Type} [Finite A] [Language.wide.Structure A]
+private theorem openingRegion_le_two_pow {A : Type} [Finite A] [Language.wide.Structure A]
     {R base k m : ℕ} {top bot : A → Prop} (hm : 3 ≤ m)
     (htop : wideRank top + 1 ≤ 2 ^ (k * m))
     (hbase : base + 1 ≤ 2 ^ (k * m))
@@ -840,7 +856,7 @@ theorem openingRegion_le_two_pow {A : Type} [Finite A] [Language.wide.Structure 
 are each shorter than the number of addresses, so the whole of it is
 `2 · R + base + 2 · N + 4` for `N` that number. This is the crude reading, above
 the clock; `openingRegion_le_two_pow` is the one a clocked program can pay. -/
-theorem openingRegion_le {A : Type} [Finite A]
+private theorem openingRegion_le {A : Type} [Finite A]
     [Language.wide.Structure A]
     (R base : ℕ) (top bot : A → Prop) :
     2 * R + base + ((wideRank top - wideRank bot) + wideRank top) + 4 ≤
@@ -899,7 +915,7 @@ head on the empty address, the tape blank because the program declines the
 channel's marks – is what `DescriptiveComplexity.WideAccept` asks for.
 Well-formedness comes free with the table and determinism is not asked for,
 which is exactly what a program that guesses needs. -/
-theorem nexProg_wideAccept (hzo : zero ≠ one)
+private theorem nexProg_wideAccept (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -942,7 +958,7 @@ is what laying the file and guessing over it costs – an evaluation of at most
 `a · b` with both factors below `2 ^ (k · m)`, and `k + 1 < j` with one working
 block; then the whole run is below `2 ^ ((k + j) · m)`, hence below the number
 of addresses (`DescriptiveComplexity.Draw.Data.nexTotal_lt_two_pow'`). -/
-theorem nexProg_wideAccept_of_legs (hzo : zero ≠ one)
+private theorem nexProg_wideAccept_of_legs (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -998,7 +1014,7 @@ configuration *is* the evaluation's first, because the state the opening leaves
 has an empty mirror (`config_openingEnd_eq_evalStart`). The clock is
 `nexTotal_lt_two_pow'`, one step of slack over the run since the evaluation
 already ends in the accepting phase. -/
-theorem nexProg_wideAccept_legs (hzo : zero ≠ one)
+private theorem nexProg_wideAccept_legs (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -1100,7 +1116,7 @@ in the same post-guess phase on the same data are the same rule. Across sites
 that is the owner map (`nexOwner_nexRule`); within a site it is
 `nexSep_postGuess`, and the guess site is where the two are allowed to differ –
 which is why the phase restriction is there. -/
-theorem nexProg_sepOn (hzo : zero ≠ one)
+private theorem nexProg_sepOn (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -1142,7 +1158,7 @@ configuration whose phase is post-guess, every reachable configuration has at
 most one successor. This is what a reduction reads its certificate off an
 *arbitrary* accepting run with – determinism where it is needed and
 nondeterminism where the guess is, which is the whole of the polarity. -/
-theorem nexProg_uniqueFrom (hzo : zero ≠ one)
+private theorem nexProg_uniqueFrom (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -1179,7 +1195,7 @@ omit [LinearOrder (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))]
 /-- **No rule of the clocked program fires from its accepting phase**: the
 accepting phase is owned by the accepting site (`nexOwner`), and that site has
 no rules at all – its shape is `Empty`. -/
-theorem nexProg_srcPh_ne_acceptP (hzo : zero ≠ one)
+private theorem nexProg_srcPh_ne_acceptP (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}
@@ -1212,7 +1228,7 @@ fires from the accepting phase, so the run that reached it is the whole run.
 This is what a backward reading needs of the *verdict*: an accepting run ends
 where the evaluation's own run ends, and the two are the same run by
 `nexProg_uniqueFrom`. -/
-theorem nexProg_stuck_acceptP (hzo : zero ≠ one)
+private theorem nexProg_stuck_acceptP (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {coord : Fin dt.dd → dt.CtlIx}
     {β : SweepSpec A dt.CtlIx dt.SlotIx (Option dt.KIx)}

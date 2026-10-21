@@ -6,6 +6,17 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefGate
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawDefAcc
+import all DescriptiveComplexity.Problems.Wide.DrawDefAsm
+import all DescriptiveComplexity.Problems.Wide.DrawDefCtl
+import all DescriptiveComplexity.Problems.Wide.DrawDefGate
+import all DescriptiveComplexity.Problems.Wide.DrawDefLoop
+import all DescriptiveComplexity.Problems.Wide.DrawDefName
+import all DescriptiveComplexity.Problems.Wide.DrawDefStage
+import all DescriptiveComplexity.Problems.Wide.DrawDefTags
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # An expansion atom's pack
@@ -41,7 +52,7 @@ variable [Fintype dt.SlotIx]
 omit [L.IsRelational] in
 /-- **A witness read's name is definable**: the tag's encoded tuple in the
 block of the level the position reads. -/
-theorem uGDefinable_tagMatch (v : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nOf v))
+private theorem uGDefinable_tagMatch (v : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nOf v))
     (ℓ : Fin k) (t : dt.X.Tag) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f g =>
       dt.tagMatch e.zero e.one v ts ℓ t f g :=
@@ -51,7 +62,7 @@ theorem uGDefinable_tagMatch (v : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nO
 omit [L.IsRelational] in
 /-- **A branch's decoding is definable**: one-hotness of the witness flags, at
 every argument position. -/
-theorem uGDefinable_TagsAre {k : ℕ}
+private theorem uGDefinable_TagsAre {k : ℕ}
     (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim) (τ : Fin k → dt.X.Tag) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.TagsAre e.one hk τ f :=
@@ -62,7 +73,7 @@ theorem uGDefinable_TagsAre {k : ℕ}
 
 /-- **A read leaf's name is definable**: the member tuple of the copy's point,
 its payload the loop element at the levels the leaf's atom reads. -/
-theorem uGDefinable_expMatch (v : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nOf v))
+private theorem uGDefinable_expMatch (v : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nOf v))
     (e' : dt.X.E.Relations k) (τ : Fin k → dt.X.Tag) (r : Fin (dt.relNr e' τ))
     (hn : (dt.relPk e' τ).n ≤ dt.eDim) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f g =>
@@ -75,7 +86,7 @@ theorem uGDefinable_expMatch (v : dt.VarIx) {k : ℕ} (ts : Fin k → Fin (dt.nO
 open Classical in
 /-- **The value of a branch's matrix from the control is definable**, exactly
 as a domain sentence's is. -/
-theorem uGDefinable_expLeafVal {k : ℕ} (e' : dt.X.E.Relations k)
+private theorem uGDefinable_expLeafVal {k : ℕ} (e' : dt.X.E.Relations k)
     (τ : Fin k → dt.X.Tag) (hn : (dt.relPk e' τ).n ≤ dt.eDim)
     (hrd : dt.relNr e' τ ≤ dt.nfDim) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx) fun e f _ =>
@@ -97,14 +108,14 @@ theorem uGDefinable_expLeafVal {k : ℕ} (e' : dt.X.E.Relations k)
 
 omit [L.IsRelational] in
 /-- **A branch's loop, started.** -/
-theorem uStDefinable_expInit {k : ℕ} (e' : dt.X.E.Relations k)
+private theorem uStDefinable_expInit {k : ℕ} (e' : dt.X.E.Relations k)
     (τ : Fin k → dt.X.Tag) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.expInit e.zero e.one e' τ f :=
   uStDefinable_initSac_initLvE (dt.relPk e' τ).pol
 
 /-- **A branch's round, folded and advanced.** -/
-theorem uStDefinable_expAdv {k : ℕ} (e' : dt.X.E.Relations k)
+private theorem uStDefinable_expAdv {k : ℕ} (e' : dt.X.E.Relations k)
     (τ : Fin k → dt.X.Tag) (hn : (dt.relPk e' τ).n ≤ dt.eDim)
     (hrd : dt.relNr e' τ ≤ dt.nfDim) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
@@ -113,7 +124,7 @@ theorem uStDefinable_expAdv {k : ℕ} (e' : dt.X.E.Relations k)
 
 /-- **A branch's last round**: the final leaf filed and the sub-fold's verdict
 into the atom's slot. -/
-theorem uStDefinable_expExit {k : ℕ} (e' : dt.X.E.Relations k)
+private theorem uStDefinable_expExit {k : ℕ} (e' : dt.X.E.Relations k)
     (τ : Fin k → dt.X.Tag) (hn : (dt.relPk e' τ).n ≤ dt.eDim)
     (hrd : dt.relNr e' τ ≤ dt.nfDim) (a : Fin dt.natMax) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
@@ -125,7 +136,7 @@ theorem uStDefinable_expExit {k : ℕ} (e' : dt.X.E.Relations k)
 /-! ### The pack -/
 
 /-- **An expansion atom's pack meets its obligation**, field by field. -/
-theorem uTagArgsDef_expArgs {k : ℕ} (v : dt.VarIx) (ts : Fin k → Fin (dt.nOf v))
+private theorem uTagArgsDef_expArgs {k : ℕ} (v : dt.VarIx) (ts : Fin k → Fin (dt.nOf v))
     (e' : dt.X.E.Relations k) (a : Fin dt.natMax)
     (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hn : ∀ τ : Fin k → dt.X.Tag, (dt.relPk e' τ).n ≤ dt.eDim)
@@ -154,7 +165,7 @@ so its folds are nested single-slot writes over the narrow loop element. -/
 open Classical in
 omit [L.IsRelational] in
 /-- **A narrow loop-element write over a definable base.** -/
-theorem uStDefinable_putLv_comp
+private theorem uStDefinable_putLv_comp
     {w : ∀ e : Env L, (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Fin dt.dd0 → e.α}
     (hw : ∀ j : Fin dt.dd0, USlotDefinable fun e f g => w e f g j)
     {F : ∀ e : Env L, (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → dt.CtlIx → e.α}
@@ -172,7 +183,7 @@ theorem uStDefinable_putLv_comp
 omit [L.IsRelational] in
 /-- **A comparison's bookkeeping, folded**: three scratch flags, each written
 from a question about the round's two reads. -/
-theorem uStDefinable_cmpFold (hnf : 2 ≤ dt.nfDim) :
+private theorem uStDefinable_cmpFold (hnf : 2 ≤ dt.nfDim) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.cmpFold e.zero e.one hnf f :=
   have hrd0 := uGDefinable_ctlBit (L := L) (dt := dt) (dt.cmpRdC hnf 0)
@@ -189,7 +200,7 @@ theorem uStDefinable_cmpFold (hnf : 2 ≤ dt.nfDim) :
 
 omit [L.IsRelational] in
 /-- **A comparison's bookkeeping, started.** -/
-theorem uStDefinable_cmpInit_initLvN :
+private theorem uStDefinable_cmpInit_initLvN :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.cmpInit e.zero e.one (dt.initLvN f) :=
   (((uStDefinable_initLvN (L := L)).update dt.cmpValC
@@ -199,7 +210,7 @@ theorem uStDefinable_cmpInit_initLvN :
 
 omit [L.IsRelational] in
 /-- **A comparison's verdict, read off the folded flags.** -/
-theorem uGDefinable_cmpVerdict_cmpFold (hnf : 2 ≤ dt.nfDim) (isEq : Bool) :
+private theorem uGDefinable_cmpVerdict_cmpFold (hnf : 2 ≤ dt.nfDim) (isEq : Bool) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.cmpVerdict e.one isEq (dt.cmpFold e.zero e.one hnf f) := by
   have hrd0 := uGDefinable_ctlBit (L := L) (dt := dt) (dt.cmpRdC hnf 0)
@@ -220,7 +231,7 @@ theorem uGDefinable_cmpVerdict_cmpFold (hnf : 2 ≤ dt.nfDim) (isEq : Bool) :
 
 omit [L.IsRelational] in
 /-- **A comparison's pack meets its obligation.** -/
-theorem uElemArgsDef_cmpArgs (v : dt.VarIx) (a : Fin dt.natMax)
+private theorem uElemArgsDef_cmpArgs (v : dt.VarIx) (a : Fin dt.natMax)
     (hnf : 2 ≤ dt.nfDim) (isEq : Bool) (j₁ j₂ : Fin (dt.nOf v)) :
     UElemArgsDef (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun e : Env L => dt.cmpArgs e.zero e.one v a hnf isEq j₁ j₂ where
@@ -245,7 +256,7 @@ theorem uElemArgsDef_cmpArgs (v : dt.VarIx) (a : Fin dt.natMax)
 omit [L.IsRelational] in
 /-- **A stage atom's pack meets its obligation**: everything it names is
 static, and the two bits it writes are flags. -/
-theorem uStageArgsDef_stageArgs (v : dt.VarIx) (i : dt.d.B.ι)
+private theorem uStageArgsDef_stageArgs (v : dt.VarIx) (i : dt.d.B.ι)
     (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf v)) (a : Fin dt.natMax) :
     UStageArgsDef (L := L) (Q := dt.CtlIx)
       fun e : Env L => dt.stageArgs e.zero e.one v i ts a where
@@ -267,7 +278,7 @@ theorem uStageArgsDef_stageArgs (v : dt.VarIx) (i : dt.d.B.ι)
 by the tags' encoded tuples, the leaf reads by the members of the gated point,
 and the three folds are the gate's. The one thing that needs an environment is
 the *default* branch of the dispatch, which names a tag. -/
-theorem uTagArgsDef_gateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
+private theorem uTagArgsDef_gateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
     (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hn : ∀ t : dt.X.Tag, (dt.domPk t).n ≤ dt.eDim)
     (hrd : ∀ t : dt.X.Tag, dt.domNr t ≤ dt.nfDim) :
@@ -287,7 +298,7 @@ theorem uTagArgsDef_gateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
 
 /-- **An inner gate block's pack**, the same with the reads on VAL and the
 verdict into the level's flag. -/
-theorem uTagArgsDef_igateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
+private theorem uTagArgsDef_igateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
     (flag : dt.CtlIx) (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hn : ∀ t : dt.X.Tag, (dt.domPk t).n ≤ dt.eDim)
     (hrd : ∀ t : dt.X.Tag, dt.domNr t ≤ dt.nfDim) :
@@ -309,7 +320,7 @@ theorem uTagArgsDef_igateArgs (e₀ : Env L) (b : Fin dt.ko ⊕ Fin dt.ki)
 
 /-- **Every atom kind's pack meets its obligation**, one constructor at a
 time. -/
-theorem uKindArgsDef_kindArgsOf (v : dt.VarIx) (a : Fin dt.natMax) :
+private theorem uKindArgsDef_kindArgsOf (v : dt.VarIx) (a : Fin dt.natMax) :
     ∀ (κ : MatAtom dt.X dt.d.B (dt.nOf v))
       (hk : dt.kindArgs κ * @Fintype.card dt.X.Tag (Fintype.ofFinite _) ≤ dt.ntgDim)
       (hn : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim),
@@ -327,7 +338,7 @@ theorem uKindArgsDef_kindArgsOf (v : dt.VarIx) (a : Fin dt.natMax) :
         (blkAtoms (dt.relPk e' τ').mat).length) (Finset.mem_univ τ)) hrd)
 
 /-- **The pack of the `a`-th atom of a variable's matrix.** -/
-theorem uKindArgsDef_atomArgs (v : dt.VarIx) (a : Fin (dt.natOf v)) :
+private theorem uKindArgsDef_atomArgs (v : dt.VarIx) (a : Fin (dt.natOf v)) :
     UKindArgsDef (L := L) (Q := dt.CtlIx) (dt.kindOf v a)
       fun e : Env L => dt.atomArgs e.zero e.one v a :=
   uKindArgsDef_kindArgsOf v _ (dt.kindOf v a) _ _ _

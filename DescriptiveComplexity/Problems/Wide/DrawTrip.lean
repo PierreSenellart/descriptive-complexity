@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawScan
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # A round trip to the register file
@@ -47,7 +51,7 @@ top, scan up to it, bounce into the pass phase, run the middle – any run from
 the top to just below the file, changing at most the walked track – and scan
 back down to the working-cell marker. The marker sits strictly below the file,
 so the return scan's stop is unique. -/
-theorem reachesIn_fileRoundTrip (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileRoundTrip (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t rl wk : W} (hnerl : rl ≠ t) (hnewk : wk ≠ t)
     {gtop gbot : I} (hbot : ∀ y, ile gbot y)

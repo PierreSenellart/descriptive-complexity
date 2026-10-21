@@ -9,6 +9,7 @@ import DescriptiveComplexity.Iterate
 public import DescriptiveComplexity.FixedPoint
 public import DescriptiveComplexity.SecondOrderTransitiveClosure
 import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Simultaneous first-order inductions: one skeleton for IFP and PFP
@@ -94,7 +95,7 @@ def SOBlock.botAssign (B : SOBlock) (A : Type) : B.Assignment A :=
 
 /-- Transport along an equivalence maps the empty assignment to the empty
 assignment. -/
-theorem SOBlock.mapAssign_botAssign (B : SOBlock) {A A' : Type} (e : A ≃ A') :
+private theorem SOBlock.mapAssign_botAssign (B : SOBlock) {A A' : Type} (e : A ≃ A') :
     B.mapAssign e (B.botAssign A) = B.botAssign A' :=
   rfl
 
@@ -108,7 +109,7 @@ instances; this is `FirstOrder.Language.StrongHomClass.realize_formula` with
 the two structures passed explicitly, exactly as
 `DescriptiveComplexity.realize_sentence_of_equiv` does at the sentence level. -/
 
-theorem realize_formula_of_equiv {L' : Language.{0, 0}} {M N : Type} {α : Type}
+private theorem realize_formula_of_equiv {L' : Language.{0, 0}} {M N : Type} {α : Type}
     {instM : L'.Structure M} {instN : L'.Structure N}
     (e : @Language.Equiv L' M N instM instN) (φ : L'.Formula α) (v : α → M) :
     @Formula.Realize L' N instN α φ (fun a => e (v a)) ↔
@@ -169,22 +170,22 @@ finite structure this is the stage at the atom count
 def inflLimit : d.B.Assignment A :=
   fun i x => ∃ n, d.inflStage A n i x
 
-theorem inflStage_succ (n : ℕ) :
+private theorem inflStage_succ (n : ℕ) :
     d.inflStage A (n + 1) = d.inflStep (d.inflStage A n) :=
   Function.iterate_succ_apply' d.inflStep n (d.B.botAssign A)
 
-theorem partStage_succ (n : ℕ) :
+private theorem partStage_succ (n : ℕ) :
     d.partStage A (n + 1) = d.next (d.partStage A n) :=
   Function.iterate_succ_apply' d.next n (d.B.botAssign A)
 
 /-- The inflationary stages increase. -/
-theorem inflStage_le_succ (n : ℕ) (i : d.B.ι) (x : Fin (d.B.arity i) → A)
+private theorem inflStage_le_succ (n : ℕ) (i : d.B.ι) (x : Fin (d.B.arity i) → A)
     (h : d.inflStage A n i x) : d.inflStage A (n + 1) i x := by
   rw [d.inflStage_succ]
   exact Or.inl h
 
 /-- The inflationary stages increase, monotonically. -/
-theorem inflStage_le_of_le {m n : ℕ} (hmn : m ≤ n) (i : d.B.ι)
+private theorem inflStage_le_of_le {m n : ℕ} (hmn : m ≤ n) (i : d.B.ι)
     (x : Fin (d.B.arity i) → A) (h : d.inflStage A m i x) : d.inflStage A n i x := by
   induction n with
   | zero => rwa [Nat.le_zero.mp hmn] at h
@@ -212,7 +213,7 @@ variable {A : Type} [L.Structure A] [Finite A]
 
 variable (A) in
 /-- The inflationary stages plateau within the atom count. -/
-theorem exists_inflStage_succ_eq :
+private theorem exists_inflStage_succ_eq :
     ∃ N ≤ Nat.card (BAtom d.B A), d.inflStage A (N + 1) = d.inflStage A N := by
   obtain ⟨N, hN, heq⟩ := exists_succ_eq_of_monotone_subset
     (c := fun n => {q : BAtom d.B A | d.inflStage A n q.1 q.2})
@@ -237,7 +238,7 @@ theorem isFixedPt_inflStep_card :
   exact hfix
 
 /-- The inflationary stages are constant from the atom count on. -/
-theorem inflStage_eq_of_card_le {n : ℕ} (hn : Nat.card (BAtom d.B A) ≤ n) :
+private theorem inflStage_eq_of_card_le {n : ℕ} (hn : Nat.card (BAtom d.B A) ≤ n) :
     d.inflStage A n = d.inflStage A (Nat.card (BAtom d.B A)) :=
   iterate_eq_of_isFixedPt (d.isFixedPt_inflStep_card A) hn
 
@@ -281,7 +282,7 @@ variable {M N : Type} [L.Structure M] [L.Structure N] (e : M ≃[L] N)
 /-- One application of the step formulas commutes with transporting the
 assignment along an isomorphism: the step formulas cannot tell isomorphic
 expanded structures apart. -/
-theorem next_map (ρ : d.B.Assignment M) :
+private theorem next_map (ρ : d.B.Assignment M) :
     d.next (d.B.mapAssign e.toEquiv ρ) = d.B.mapAssign e.toEquiv (d.next ρ) := by
   funext i x
   refine propext ?_
@@ -291,7 +292,7 @@ theorem next_map (ρ : d.B.Assignment M) :
   exact funext fun j => (e.toEquiv.apply_symm_apply (x j)).symm
 
 /-- The inflationary step commutes with transport along an isomorphism. -/
-theorem inflStep_map (ρ : d.B.Assignment M) :
+private theorem inflStep_map (ρ : d.B.Assignment M) :
     d.inflStep (d.B.mapAssign e.toEquiv ρ) = d.B.mapAssign e.toEquiv (d.inflStep ρ) := by
   funext i x
   have h := congrFun (congrFun (d.next_map e ρ) i) x
@@ -322,7 +323,7 @@ theorem inflLimit_map : d.inflLimit N = d.B.mapAssign e.toEquiv (d.inflLimit M) 
 
 /-- Being a fixed point of the step is insensitive to transporting the
 assignment along an isomorphism. -/
-theorem isFixedPt_next_map_iff (ρ : d.B.Assignment M) :
+private theorem isFixedPt_next_map_iff (ρ : d.B.Assignment M) :
     IsFixedPt d.next (d.B.mapAssign e.toEquiv ρ) ↔ IsFixedPt d.next ρ := by
   have hinj : Function.Injective (d.B.mapAssign (A := M) (A' := N) e.toEquiv) :=
     (d.B.assignEquiv e.toEquiv).injective
@@ -336,7 +337,7 @@ end StepDef
 /-! ### Pullback through an interpretation -/
 
 /-- Pulling back the empty assignment gives the empty assignment. -/
-theorem SOBlock.pullAssign_botAssign (B : SOBlock) {Tag : Type} [Finite Tag]
+private theorem SOBlock.pullAssign_botAssign (B : SOBlock) {Tag : Type} [Finite Tag]
     {dm : ℕ} {A : Type} :
     B.pullAssign (B.botAssign (Tag × (Fin dm → A))) = (B.pull Tag dm).botAssign A :=
   rfl
@@ -366,7 +367,7 @@ variable {A : Type} [L₁.Structure A]
 /-- **One application of the pulled step formulas is the pullback of one
 application of the original ones**: the single commuting square from which
 every transport of the iterations along a reduction follows. -/
-theorem next_pull (ρ : dd.B.Assignment (I.Map A)) :
+private theorem next_pull (ρ : dd.B.Assignment (I.Map A)) :
     (dd.pull I).next (dd.B.pullAssign ρ) = dd.B.pullAssign (dd.next (A := I.Map A) ρ) := by
   funext p x
   refine propext ?_
@@ -377,7 +378,7 @@ theorem next_pull (ρ : dd.B.Assignment (I.Map A)) :
   exact h1.trans h2.symm
 
 /-- The inflationary step commutes with the pullback. -/
-theorem inflStep_pull (ρ : dd.B.Assignment (I.Map A)) :
+private theorem inflStep_pull (ρ : dd.B.Assignment (I.Map A)) :
     (dd.pull I).inflStep (dd.B.pullAssign ρ) = dd.B.pullAssign (dd.inflStep (A := I.Map A) ρ) := by
   funext p x
   have h := congrFun (congrFun (next_pull I dd ρ) p) x
@@ -406,7 +407,7 @@ theorem partStage_pull (n : ℕ) :
 variable (A) in
 /-- The value of the pulled inflationary iteration is the pullback of the
 original value. -/
-theorem inflLimit_pull :
+private theorem inflLimit_pull :
     (dd.pull I).inflLimit A = dd.B.pullAssign (dd.inflLimit (I.Map A)) := by
   funext p x
   refine propext ?_
@@ -418,7 +419,7 @@ theorem inflLimit_pull :
 back: the pullback of assignments is a bijection
 (`DescriptiveComplexity.SOBlock.mergeAssign_pullAssign`) intertwining the two
 steps. -/
-theorem isFixedPt_next_pull_iff (ρ : dd.B.Assignment (I.Map A)) :
+private theorem isFixedPt_next_pull_iff (ρ : dd.B.Assignment (I.Map A)) :
     IsFixedPt (dd.pull I).next (dd.B.pullAssign ρ) ↔ IsFixedPt dd.next ρ := by
   have hinj : Function.Injective
       (dd.B.pullAssign (Tag := Tag) (d := dm) (A := A)) :=

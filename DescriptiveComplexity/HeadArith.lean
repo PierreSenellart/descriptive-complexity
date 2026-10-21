@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.HeadEval
 import DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Arithmetic with heads: addition of ranks
@@ -174,7 +178,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The relations the fragments of an addition run, at the top protection
 level. -/
-noncomputable def plusFamRel (i j k a b mk : Fin K) :
+private noncomputable def plusFamRel (i j k a b mk : Fin K) :
     PlusNode → (Fin K → A) → Bool → (Fin K → A) → Prop
   | .init => fun x c y => c = true ∧ ∀ h, (plusInitMoves i a b mk h).Holds x h (y h)
   | .test => fun x c y => (c = true ↔ x b = x j) ∧ y = x
@@ -184,7 +188,7 @@ noncomputable def plusFamRel (i j k a b mk : Fin K) :
 
 /-- An equality test between two heads, as a fragment at the top protection
 level: it answers the equality and moves nothing. -/
-theorem runs_eqLeafP (u v : Fin K) :
+private theorem runs_eqLeafP (u v : Fin K) :
     (leafP (L := L) (K := K) (HeadMove.eqVarF L u v)
         ((BoundedFormula.IsAtomic.equal _ _).isQF)).Runs A K
       (fun x c y => (c = true ↔ x u = x v) ∧ y = x) := by
@@ -194,7 +198,7 @@ theorem runs_eqLeafP (u v : Fin K) :
   · exact ⟨y, HeadAgree.refl y, h.1.trans (HeadMove.realize_eqVarF _ _).symm,
       fun p _ => by rw [h.2]⟩
 
-theorem runs_plusFam (i j k a b mk : Fin K) (c : PlusNode) :
+private theorem runs_plusFam (i j k a b mk : Fin K) (c : PlusNode) :
     (plusFam (L := L) i j k a b mk c).Runs A K (plusFamRel i j k a b mk c) := by
   cases c with
   | init => exact runs_moveP _
@@ -216,14 +220,14 @@ first summand plus the counter, the counter has not passed the second summand,
 and the marker is parked at the greatest element. Nothing has to be said about
 the marker having been passed: a rank below the running head's is below the
 maximum. -/
-def PlusBase (i j a b mk : Fin K) (x z : Fin K → A) : Prop :=
+private def PlusBase (i j a b mk : Fin K) (x z : Fin K → A) : Prop :=
   (∀ p : Fin K, p ≠ a → p ≠ b → p ≠ mk → z p = x p) ∧
     orank (x i) + orank (z b) = orank (z a) ∧
       orank (z b) ≤ orank (x j) ∧
         ∀ e : A, e ≤ z mk
 
 /-- The invariant of the control walk of an addition, node by node. -/
-def PlusInv (i j a b mk : Fin K) (x : Fin K → A) : PlusNode → (Fin K → A) → Prop
+private def PlusInv (i j a b mk : Fin K) (x : Fin K → A) : PlusNode → (Fin K → A) → Prop
   | .init => fun z => z = x
   | .test => fun z => PlusBase i j a b mk x z
   | .check => fun z => PlusBase i j a b mk x z ∧ z b = x j
@@ -266,7 +270,7 @@ namespace PlusHeads
 
 /-- `i` and `mk` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem imk (h : PlusHeads i j k a b mk prot) : i ≠ mk := by
+private theorem imk (h : PlusHeads i j k a b mk prot) : i ≠ mk := by
   intro he
   have h1 := h.hi
   have h2 := h.hmk
@@ -275,7 +279,7 @@ theorem imk (h : PlusHeads i j k a b mk prot) : i ≠ mk := by
 
 /-- `j` and `a` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem ja (h : PlusHeads i j k a b mk prot) : j ≠ a := by
+private theorem ja (h : PlusHeads i j k a b mk prot) : j ≠ a := by
   intro he
   have h1 := h.hj
   have h2 := h.ha
@@ -284,7 +288,7 @@ theorem ja (h : PlusHeads i j k a b mk prot) : j ≠ a := by
 
 /-- `j` and `b` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem jb (h : PlusHeads i j k a b mk prot) : j ≠ b := by
+private theorem jb (h : PlusHeads i j k a b mk prot) : j ≠ b := by
   intro he
   have h1 := h.hj
   have h2 := h.hb
@@ -293,7 +297,7 @@ theorem jb (h : PlusHeads i j k a b mk prot) : j ≠ b := by
 
 /-- `j` and `mk` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem jmk (h : PlusHeads i j k a b mk prot) : j ≠ mk := by
+private theorem jmk (h : PlusHeads i j k a b mk prot) : j ≠ mk := by
   intro he
   have h1 := h.hj
   have h2 := h.hmk
@@ -302,7 +306,7 @@ theorem jmk (h : PlusHeads i j k a b mk prot) : j ≠ mk := by
 
 /-- `k` and `a` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem ka (h : PlusHeads i j k a b mk prot) : k ≠ a := by
+private theorem ka (h : PlusHeads i j k a b mk prot) : k ≠ a := by
   intro he
   have h1 := h.hk
   have h2 := h.ha
@@ -311,7 +315,7 @@ theorem ka (h : PlusHeads i j k a b mk prot) : k ≠ a := by
 
 /-- `k` and `b` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem kb (h : PlusHeads i j k a b mk prot) : k ≠ b := by
+private theorem kb (h : PlusHeads i j k a b mk prot) : k ≠ b := by
   intro he
   have h1 := h.hk
   have h2 := h.hb
@@ -320,7 +324,7 @@ theorem kb (h : PlusHeads i j k a b mk prot) : k ≠ b := by
 
 /-- `k` and `mk` are distinct heads, being on opposite sides of the
 protection level. -/
-theorem kmk (h : PlusHeads i j k a b mk prot) : k ≠ mk := by
+private theorem kmk (h : PlusHeads i j k a b mk prot) : k ≠ mk := by
   intro he
   have h1 := h.hk
   have h2 := h.hmk
@@ -328,20 +332,20 @@ theorem kmk (h : PlusHeads i j k a b mk prot) : k ≠ mk := by
   omega
 
 /-- The two arithmetic scratch heads are distinct, by fiat. -/
-theorem ab (h : PlusHeads i j k a b mk prot) : a ≠ b := h.hab
+private theorem ab (h : PlusHeads i j k a b mk prot) : a ≠ b := h.hab
 
 /-- The running head is not the marker, by fiat. -/
-theorem amk (h : PlusHeads i j k a b mk prot) : a ≠ mk := h.hamk
+private theorem amk (h : PlusHeads i j k a b mk prot) : a ≠ mk := h.hamk
 
 /-- The counter is not the marker, by fiat. -/
-theorem bmk (h : PlusHeads i j k a b mk prot) : b ≠ mk := h.hbmk
+private theorem bmk (h : PlusHeads i j k a b mk prot) : b ≠ mk := h.hbmk
 
 end PlusHeads
 
 omit [Finite A] in
 /-- The moves of the initialization, read off: the running head, the counter, the
 marker, and everything else. -/
-theorem holds_plusInitMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk prot)
+private theorem holds_plusInitMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk prot)
     (hmv : ∀ h, (plusInitMoves i a b mk h).Holds x h (y h)) :
     y a = x i ∧ (∀ e : A, y b ≤ e) ∧ (∀ e : A, e ≤ y mk) ∧
       ∀ p : Fin K, p ≠ a → p ≠ b → p ≠ mk → y p = x p := by
@@ -363,7 +367,7 @@ theorem holds_plusInitMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk pro
 
 omit [Finite A] in
 /-- The moves of a step, read off. -/
-theorem holds_plusStepMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk prot)
+private theorem holds_plusStepMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk prot)
     (hmv : ∀ h, (plusStepMoves a b h).Holds x h (y h)) :
     x a ⋖ y a ∧ x b ⋖ y b ∧ ∀ p : Fin K, p ≠ a → p ≠ b → y p = x p := by
   classical
@@ -380,7 +384,7 @@ theorem holds_plusStepMoves {x y : Fin K → A} (hh : PlusHeads i j k a b mk pro
 
 /-- **The invariant holds all along the control walk**: this is the whole
 soundness argument, the exits being read off it. -/
-theorem plusInv_of_walk (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
+private theorem plusInv_of_walk (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
     ∀ u : PlusNode × (Fin K → A),
       Relation.ReflTransGen (wireStep (plusFamRel (A := A) i j k a b mk) plusWire) (.init, x) u →
         PlusInv i j a b mk x u.1 u.2 := by
@@ -489,7 +493,7 @@ variable {i j k a b mk : Fin K} {prot : ℕ}
 not passed the second summand and the running head still fits in the universe.
 No condition on the marker: the walk parks it itself, at the top, so it is
 reached exactly when the sum does not fit. -/
-theorem exists_walk_test (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
+private theorem exists_walk_test (hh : PlusHeads i j k a b mk prot) (x : Fin K → A) :
     ∀ t : ℕ, t ≤ orank (x j) → orank (x i) + t < Nat.card A →
       ∃ z : Fin K → A,
         Relation.ReflTransGen (wireStep (plusFamRel (A := A) i j k a b mk) plusWire)
@@ -729,7 +733,7 @@ omit [Finite A] in
 is, and `DescriptiveComplexity.HeadProgram.wireP` inherits it. This is what makes
 the assembled machine a *deterministic* automaton, hence FO(DTC) rather than
 merely FO(TC). -/
-theorem deterministic_plusP (i j k a b mk : Fin K) :
+private theorem deterministic_plusP (i j k a b mk : Fin K) :
     (plusP (L := L) i j k a b mk).Deterministic A := by
   refine deterministic_wireP _ _ _ ?_
   rintro (_ | _ | _ | _ | _)
@@ -902,7 +906,7 @@ noncomputable def timesFamRel (i j k acc cnt cand tmk : Fin K) (m : ℕ) :
   | .commit => fun x c y => c = true ∧
       ∀ q : Fin K, (q : ℕ) < m → (timesCommitMoves acc cnt cand q).Holds x q (y q)
 
-theorem runs_timesFam (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK : m ≤ K)
+private theorem runs_timesFam (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (hmK : m ≤ K)
     (c : TimesNode) :
     (timesFam (L := L) i j k acc cnt cand tmk a b mk c).Runs A m
       (timesFamRel i j k acc cnt cand tmk m c) := by
@@ -988,7 +992,7 @@ omit [Finite A] in
 /-- **A multiplication is deterministic**: every node of its control graph is –
 the `probe` node because an addition is
 (`DescriptiveComplexity.HeadProgram.deterministic_plusP`). -/
-theorem deterministic_timesP (i j k acc cnt cand tmk a b mk : Fin K) :
+private theorem deterministic_timesP (i j k acc cnt cand tmk a b mk : Fin K) :
     (timesP (L := L) i j k acc cnt cand tmk a b mk).Deterministic A := by
   refine deterministic_wireP _ _ _ ?_
   rintro (_ | _ | _ | _ | _ | _ | _ | _)
@@ -1018,7 +1022,7 @@ def TimesBase (i j acc cnt cand tmk : Fin K) (m : ℕ) (x z : Fin K → A) : Pro
 /-- The invariant of the control walk of a multiplication, node by node. Inside
 the scan it also records how far the candidate has got: below the target while
 the probe keeps failing, at it when the probe succeeds. -/
-def TimesInv (i j acc cnt cand tmk : Fin K) (m : ℕ) (x : Fin K → A) :
+private def TimesInv (i j acc cnt cand tmk : Fin K) (m : ℕ) (x : Fin K → A) :
     TimesNode → (Fin K → A) → Prop
   | .init => fun z => z = x
   | .outer => fun z => TimesBase i j acc cnt cand tmk m x z
@@ -1041,7 +1045,7 @@ variable {i j k acc cnt cand tmk a b mk : Fin K} {p m : ℕ}
 omit [Finite A] [LinearOrder A] in
 /-- The interface heads a multiplication must not disturb are below every working
 head. -/
-theorem timesBase_headAgree (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+private theorem timesBase_headAgree (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
     {x z : Fin K → A}
     (hz : ∀ q : Fin K, (q : ℕ) < m → q ≠ acc → q ≠ cnt → q ≠ cand → q ≠ tmk → z q = x q) :
     HeadAgree p x z := by
@@ -1074,7 +1078,7 @@ theorem TimesBase.congr (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
 
 omit [Finite A] in
 /-- The moves that start a multiplication, read off. -/
-theorem holds_timesInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+private theorem holds_timesInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
     {x y : Fin K → A}
     (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesInitMoves acc cnt tmk q).Holds x q (y q)) :
     (∀ e : A, y acc ≤ e) ∧ (∀ e : A, y cnt ≤ e) ∧ (∀ e : A, e ≤ y tmk) ∧
@@ -1097,7 +1101,7 @@ theorem holds_timesInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
 
 omit [Finite A] in
 /-- The move that starts a scan, read off. -/
-theorem holds_timesScanInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+private theorem holds_timesScanInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
     {x y : Fin K → A}
     (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesScanInitMoves cand q).Holds x q (y q)) :
     (∀ e : A, y cand ≤ e) ∧ ∀ q : Fin K, (q : ℕ) < m → q ≠ cand → y q = x q := by
@@ -1112,7 +1116,7 @@ theorem holds_timesScanInitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk 
 
 omit [Finite A] in
 /-- The move of one scan step, read off. -/
-theorem holds_timesScanStepMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+private theorem holds_timesScanStepMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
     {x y : Fin K → A}
     (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesScanStepMoves cand q).Holds x q (y q)) :
     x cand ⋖ y cand ∧ ∀ q : Fin K, (q : ℕ) < m → q ≠ cand → y q = x q := by
@@ -1127,7 +1131,7 @@ theorem holds_timesScanStepMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk 
 
 omit [Finite A] in
 /-- The moves that close a round, read off. -/
-theorem holds_timesCommitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+private theorem holds_timesCommitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
     {x y : Fin K → A}
     (hmv : ∀ q : Fin K, (q : ℕ) < m → (timesCommitMoves acc cnt cand q).Holds x q (y q)) :
     y acc = x cand ∧ x cnt ⋖ y cnt ∧
@@ -1145,7 +1149,8 @@ theorem holds_timesCommitMoves (hh : TimesHeads i j k acc cnt cand tmk a b mk p 
     exact this
 
 /-- **The invariant holds all along the control walk of a multiplication.** -/
-theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x : Fin K → A) :
+private theorem timesInv_of_walk
+    (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x : Fin K → A) :
     ∀ u : TimesNode × (Fin K → A),
       Relation.ReflTransGen
           (wireStep (timesFamRel (A := A) i j k acc cnt cand tmk m) timesWire) (.init, x) u →
@@ -1380,7 +1385,7 @@ theorem timesInv_of_walk (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x 
 /-- **The scan reaches every candidate up to its target**: from the start of a
 scan, the walk can be continued until the candidate has any prescribed rank at
 most the target's, the probe failing at every earlier one. -/
-theorem exists_walk_probe (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
+private theorem exists_walk_probe (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
     (z₀ : Fin K → A) (hz₀ : orank (z₀ cand) = 0) (hmax : ∀ e : A, e ≤ z₀ tmk) :
     ∀ t : ℕ, t ≤ orank (z₀ acc) + orank (z₀ i) → t < Nat.card A →
       ∃ z : Fin K → A,
@@ -1443,7 +1448,8 @@ theorem exists_walk_probe (hh : TimesHeads i j k acc cnt cand tmk a b mk p m)
 
 /-- **The outer loop reaches every round whose partial product fits**: the state
 after `r` rounds is reachable, the accumulator carrying `orank (x i) * r`. -/
-theorem exists_walk_outer (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x : Fin K → A) :
+private theorem exists_walk_outer
+    (hh : TimesHeads i j k acc cnt cand tmk a b mk p m) (x : Fin K → A) :
     ∀ r : ℕ, r ≤ orank (x j) → orank (x i) * r < Nat.card A →
       ∃ z : Fin K → A,
         Relation.ReflTransGen

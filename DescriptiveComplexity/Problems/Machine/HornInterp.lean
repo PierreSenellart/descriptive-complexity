@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.HornHardness
 public import DescriptiveComplexity.Problems.Machine.Interp
+import all DescriptiveComplexity.Problems.Machine.Hardness
+import all DescriptiveComplexity.Problems.Machine.HornHardness
+import all DescriptiveComplexity.Problems.Machine.HornTape
+import all DescriptiveComplexity.Problems.Machine.Interp
 
 /-!
 # The transcription: `HORNSAT ≤ᶠᵒ[≤] DTMAccept`
@@ -70,7 +74,7 @@ section BuilderRealize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
-theorem realize_succEltF {x y : α} {a b : A} (hx : v x = a) (hy : v y = b) :
+private theorem realize_succEltF {x y : α} {a b : A} (hx : v x = a) (hy : v y = b) :
     (succEltF x y).Realize v ↔ SuccElt a b := by
   rw [succEltF, realize_succF, hx, hy, SuccElt]
   refine and_congr Iff.rfl ⟨fun h z hz => ?_, fun h z hz => ?_⟩
@@ -78,13 +82,13 @@ theorem realize_succEltF {x y : α} {a b : A} (hx : v x = a) (hy : v y = b) :
     exact h z ⟨hz, lt_of_not_ge hcon⟩
   · exact absurd (h z hz.1) (not_le.mpr hz.2)
 
-theorem realize_hornF : (hornF (α := α)).Realize v ↔ AtMostOnePositive A := by
+private theorem realize_hornF : (hornF (α := α)).Realize v ↔ AtMostOnePositive A := by
   simp only [hornF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
     realize_clF, realize_posF, realize_eqF, Sum.elim_inr, AtMostOnePositive]
   exact ⟨fun h c x y hc hx hy => h ![c, x, y] ⟨⟨hc, hx⟩, hy⟩,
     fun h i hi => h (i 0) (i 1) (i 2) hi.1.1 hi.1.2 hi.2⟩
 
-theorem realize_mLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 3 → A}
+private theorem realize_mLitF {b : Bool} {c x : A} {v : Fin 2 × Fin 3 → A}
     (h0 : v (0, 0) = c) (h1 : v (0, 1) = x) :
     (mLitF b).Realize v ↔ MLit c x b := by
   cases b
@@ -129,7 +133,7 @@ noncomputable def verDstF (t' : UPTag) : satOrd.Formula (Fin 2 × Fin 3) :=
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable {v : Fin 2 × Fin 3 → A}
 
-theorem realize_cstHF {s : UPTag} {q : HV A}
+private theorem realize_cstHF {s : UPTag} {q : HV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) (h2 : v (1, 2) = q.2 2) :
     (cstHF s q.1).Realize v ↔ q = cstH s := by
   rw [cstHF]
@@ -146,7 +150,7 @@ theorem realize_cstHF {s : UPTag} {q : HV A}
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
-theorem realize_oneHF {s : UPTag} {x : Fin 2 × Fin 3} {q : HV A}
+private theorem realize_oneHF {s : UPTag} {x : Fin 2 × Fin 3} {q : HV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) (h2 : v (1, 2) = q.2 2) :
     (oneHF s x q.1).Realize v ↔ q = oneH s (v x) := by
   rw [oneHF]
@@ -162,7 +166,7 @@ theorem realize_oneHF {s : UPTag} {x : Fin 2 × Fin 3} {q : HV A}
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
-theorem realize_twoHF {s : UPTag} {x y : Fin 2 × Fin 3} {q : HV A}
+private theorem realize_twoHF {s : UPTag} {x y : Fin 2 × Fin 3} {q : HV A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) (h2 : v (1, 2) = q.2 2) :
     (twoHF s x y q.1).Realize v ↔ q = twoH s (v x) (v y) := by
   rw [twoHF]
@@ -533,7 +537,7 @@ theorem relMap_le (p q : HV A) :
   rw [TMLe, FOInterpretation.relMap_map]
   exact realize_lexLeF
 
-theorem relMap_inp (p q : HV A) :
+private theorem relMap_inp (p q : HV A) :
     TMInp (hornMapEquiv p) (hornMapEquiv q) ↔ HInp p q := by
   rw [TMInp, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -568,7 +572,7 @@ theorem relMap_inp (p q : HV A) :
     refine iff_of_false (by exact fun h => h) ?_
     rintro (⟨h, -⟩ | ⟨h, -⟩ | ⟨h, -⟩) <;> exact UPTag.noConfusion h
 
-theorem relMap_tsrc (p q : HV A) :
+private theorem relMap_tsrc (p q : HV A) :
     TMSrc (hornMapEquiv p) (hornMapEquiv q) ↔ HSrc p q := by
   rw [TMSrc, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -586,7 +590,7 @@ theorem relMap_tsrc (p q : HV A) :
   case tVerAcc d => exact realize_oneHF rfl rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tread (p q : HV A) :
+private theorem relMap_tread (p q : HV A) :
     TMRead (hornMapEquiv p) (hornMapEquiv q) ↔ HRead p q := by
   rw [TMRead, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -604,7 +608,7 @@ theorem relMap_tread (p q : HV A) :
   case tVerAcc d => cases d <;> exact realize_cstHF rfl rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_twrite (p q : HV A) :
+private theorem relMap_twrite (p q : HV A) :
     TMWrite (hornMapEquiv p) (hornMapEquiv q) ↔ HWrite p q := by
   rw [TMWrite, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -656,7 +660,7 @@ theorem relMap_twrite (p q : HV A) :
   case tVerAcc d => cases d <;> exact realize_cstHF rfl rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tdst (p q : HV A) :
+private theorem relMap_tdst (p q : HV A) :
     TMDst (hornMapEquiv p) (hornMapEquiv q) ↔ HDst p q := by
   rw [TMDst, FOInterpretation.relMap_map]
   obtain ⟨t, w⟩ := p
@@ -756,7 +760,7 @@ theorem relMap_tdst (p q : HV A) :
 /-! ### The machines agree, and the reduction -/
 
 /-- **The interpreted structure describes the unit-propagation machine.** -/
-theorem agree_hornMachine :
+private theorem agree_hornMachine :
     TMData.Agree (hornMapEquiv (A := A)) (hornMachine A)
       (tmData (hornTuringInterp.Map A)) where
   posn b := (relMap_posn b).symm
@@ -778,7 +782,7 @@ is a yes-instance of HORN-SAT. Well-formedness and determinism hold
 unconditionally – they were proved for every image, Horn or not – and
 acceptance is `DescriptiveComplexity.hornMachine_accepts_iff`, transported along the
 agreement. -/
-theorem dtmAccept_map_iff_hornSatisfiable :
+private theorem dtmAccept_map_iff_hornSatisfiable :
     DTMAccept (hornTuringInterp.Map A) ↔ HornSatisfiable A := by
   have hag := agree_hornMachine (A := A)
   constructor
@@ -794,7 +798,7 @@ end Characterize
 /-- **HORN-SAT reduces to deterministic machine acceptance**: the ordered
 first-order reduction building the unit-propagation machine inside the
 instance. -/
-noncomputable def hornSat_ordered_fo_reduction_dtmAccept : HORNSAT ≤ᶠᵒ[≤] DTMAccept where
+private noncomputable def hornSat_ordered_fo_reduction_dtmAccept : HORNSAT ≤ᶠᵒ[≤] DTMAccept where
   Tag := UPTag
   dim := 3
   toInterpretation := hornTuringInterp

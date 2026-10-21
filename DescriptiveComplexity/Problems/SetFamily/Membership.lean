@@ -9,6 +9,7 @@ import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.SetFamily.Defs
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
 # The set family is existential second-order definable
@@ -85,20 +86,20 @@ noncomputable def sfDisjClause : setFamilySOLang.Sentence :=
 
 /-- Kernel clause (Set Cover's threshold, an upper bound): the guessed
 injection maps every member of the subfamily to a marked element. -/
-noncomputable def sfGuessToMarkedClause : setFamilySOLang.Sentence :=
+private noncomputable def sfGuessToMarkedClause : setFamilySOLang.Sentence :=
   fo% ∀ s, sfGuessSym(s) → ∃ y, sfInjSym(s, y) ∧ sfMarkedSym(y)
 
 /-- Kernel clause (Set Packing's threshold, a lower bound): the guessed
 injection maps every marked element to a member of the subfamily. -/
-noncomputable def sfMarkedToGuessClause : setFamilySOLang.Sentence :=
+private noncomputable def sfMarkedToGuessClause : setFamilySOLang.Sentence :=
   fo% ∀ y, sfMarkedSym(y) → ∃ s, sfInjSym(y, s) ∧ sfGuessSym(s)
 
 /-- Kernel clause: the guessed injection is injective. -/
-noncomputable def sfInjClause : setFamilySOLang.Sentence :=
+private noncomputable def sfInjClause : setFamilySOLang.Sentence :=
   fo% ∀ x x' y, sfInjSym(x, y) ∧ sfInjSym(x', y) → x ≐ x'
 
 /-- The kernel of the `Σ₁` definition of Set Cover. -/
-noncomputable def setCoverKernel : setFamilySOLang.Sentence :=
+private noncomputable def setCoverKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfCoverClause ⊓ (sfGuessToMarkedClause ⊓ sfInjClause))
 
 /-- The first-order kernel of the `Σ₁` definition of Exact Cover: the same
@@ -145,7 +146,7 @@ noncomputable def sharpSetSplittingKernel : setFamilySOLang.Sentence :=
   setSplittingKernel ⊓ (sfGuessElemClause ⊓ sfNoInjClause)
 
 /-- The kernel of the `Σ₁` definition of Set Packing. -/
-noncomputable def setPackingKernel : setFamilySOLang.Sentence :=
+private noncomputable def setPackingKernel : setFamilySOLang.Sentence :=
   sfFamClause ⊓ (sfDisjClause ⊓ (sfMarkedToGuessClause ⊓ sfInjClause))
 
 /-! ### Realization of the clauses -/
@@ -472,7 +473,7 @@ end SigmaOne
 check first-order that it covers every ground element and that no element is
 covered twice. Since NP is defined as `Σ₁`-definability, this is the
 membership half of the NP-completeness of Exact Cover. -/
-theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
+private theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
   refine ⟨[familyGuessBlock], rfl, exactCoverKernel, ?_⟩
   intro A _ _ _
   constructor
@@ -491,7 +492,7 @@ theorem exactCover_sigmaSODefinable : SigmaSODefinable 1 ExactCover := by
 /-- **Set Splitting is `Σ₁`-definable**: existentially guess one color class
 and check first-order that every set of the family meets it and its
 complement. -/
-theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by
+private theorem setSplitting_sigmaSODefinable : SigmaSODefinable 1 SetSplitting := by
   refine ⟨[familyGuessBlock], rfl, setSplittingKernel, ?_⟩
   intro A _ _ _
   constructor

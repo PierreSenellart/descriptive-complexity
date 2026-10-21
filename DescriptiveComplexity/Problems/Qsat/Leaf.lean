@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Peel
+import all DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Parts
+import all DescriptiveComplexity.Problems.Qsat.Peel
+import all DescriptiveComplexity.Problems.Qsat.Prefix
+import all DescriptiveComplexity.Problems.Qsat.Reach
 
 /-!
 # The innermost block: the base case of the recursion
@@ -85,7 +90,7 @@ theorem bitB_over_tAux (τ ν : QM A → Prop) (ℓ : A) :
     bitB (qOver (QBlk (tAux A)) τ ν) ℓ ↔ bitB τ ℓ :=
   readout_out τ ν (by simp [tAux])
 
-theorem levSat_over_tAux (τ ν : QM A → Prop) (b w s : Bool) (ℓ x : A) :
+private theorem levSat_over_tAux (τ ν : QM A → Prop) (b w s : Bool) (ℓ x : A) :
     LevSat (qOver (QBlk (tAux A)) τ ν) b w s ℓ x ↔ LevSat τ b w s ℓ x := by
   simp only [LevSat, stS_over_tAux, stT_over_tAux, stU_over_tAux, stV_over_tAux,
     stZ_over_tAux, bitB_over_tAux]
@@ -98,7 +103,7 @@ def auxVal (f g h : A → Prop) (e : Prop) : QM A → Prop := fun y =>
     (∃ a : A, y = qVar .aP a (qBot A) ∧ h a) ∨ (y = qVar .sE (qBot A) (qBot A) ∧ e)
 
 omit [Finite A] [Nonempty A] in
-private theorem qVar_ne {v v' : QVarTag} (hv : v ≠ v') (p q p' q' : A) :
+theorem qVar_ne {v v' : QVarTag} (hv : v ≠ v') (p q p' q' : A) :
     qVar v p q ≠ qVar v' p' q' := fun he => hv (qVar_inj he).1
 
 @[simp]

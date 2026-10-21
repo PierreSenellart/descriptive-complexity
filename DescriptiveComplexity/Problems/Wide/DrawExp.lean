@@ -91,7 +91,7 @@ theorem relMap_iff_altQuantFrom_expLeaf {k : ℕ} (e : dt.X.E.Relations k)
 /-- **The loop the machine runs**, over every loop-variable slot: the levels
 past the sentence's own prefix are read by nobody, so playing them changes
 nothing. -/
-theorem relMap_iff_altQuantFrom_expLeaf_pad {k : ℕ} (e : dt.X.E.Relations k)
+private theorem relMap_iff_altQuantFrom_expLeaf_pad {k : ℕ} (e : dt.X.E.Relations k)
     (p : Fin k → dt.X.Map A) {N : ℕ}
     (hn : (dt.relPk e fun ℓ => (p ℓ).1.1).n ≤ N) (t : Fin N → A) :
     RelMap (M := dt.X.Map A) e p ↔
@@ -119,7 +119,7 @@ noncomputable def domLeaf (t : dt.X.Tag) (ρ : dt.X.B.Assignment A)
 /-- **The domain gate's loop computes the domain condition**: a tagged
 assignment is a point of the expanded universe exactly when the prefix of
 its leaf predicate, played from level `0`, holds. -/
-theorem domHolds_iff_altQuantFrom_domLeaf (t : dt.X.Tag)
+private theorem domHolds_iff_altQuantFrom_domLeaf (t : dt.X.Tag)
     (ρ : dt.X.B.Assignment A) (v : Fin (dt.domPk t).n → A) :
     ExpExpansion.DomHolds (X := dt.X) (t, ρ) ↔
       altQuantFrom (dt.domPk t).pol (dt.domLeaf t ρ) 0 v := by
@@ -137,7 +137,7 @@ theorem domHolds_iff_altQuantFrom_domLeaf (t : dt.X.Tag)
 
 /-- The same over every loop-variable slot, which is what the machine's loop
 enumerates. -/
-theorem domHolds_iff_altQuantFrom_domLeaf_pad (t : dt.X.Tag)
+private theorem domHolds_iff_altQuantFrom_domLeaf_pad (t : dt.X.Tag)
     (ρ : dt.X.B.Assignment A) {N : ℕ} (hn : (dt.domPk t).n ≤ N) (u : Fin N → A) :
     ExpExpansion.DomHolds (X := dt.X) (t, ρ) ↔
       altQuantFrom (dt.domPk t).pol

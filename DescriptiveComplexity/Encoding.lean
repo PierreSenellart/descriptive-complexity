@@ -200,7 +200,7 @@ def Faithful (e : Encoding L ι) (Conc : ι → Prop) (P : DecisionProblem L) : 
 /-- Faithfulness transports along (extensional) equality of decision problems,
 so a user may state it against the bundled problem or against the raw
 predicate. -/
-theorem faithful_congr {e : Encoding L ι} {Conc : ι → Prop} {P Q : DecisionProblem L}
+private theorem faithful_congr {e : Encoding L ι} {Conc : ι → Prop} {P Q : DecisionProblem L}
     (hPQ : ∀ (A : Type) [L.Structure A], P A ↔ Q A) :
     e.Faithful Conc P ↔ e.Faithful Conc Q :=
   forall_congr' fun _ => iff_congr Iff.rfl (hPQ _)
@@ -211,7 +211,7 @@ honest encoding (some abstract structures carry facts the concrete type cannot
 represent); the practical route is a computable decoding of the *well-formed*
 structures – `DescriptiveComplexity.Decoding`, in
 `DescriptiveComplexity/Decoding.lean`. -/
-def Covers (e : Encoding L ι) : Prop :=
+private def Covers (e : Encoding L ι) : Prop :=
   ∀ (A : Type) [L.Structure A] [Finite A], ∃ i, Nonempty (A ≃[L] e.Univ i)
 
 end Encoding

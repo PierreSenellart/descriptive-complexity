@@ -100,7 +100,7 @@ variable {A : Type}
 
 /-- `SubgraphIsoOn` as an injective map between the two *subtypes*: the
 guessed map of the definition, restricted to the pattern, and back. -/
-theorem subgraphIsoOn_iff_subtype (PV HV : A → Prop) (PE HE : A → A → Prop) :
+private theorem subgraphIsoOn_iff_subtype (PV HV : A → Prop) (PE HE : A → A → Prop) :
     SubgraphIsoOn PV HV PE HE ↔
       ∃ f : {x // PV x} → {y // HV y}, Function.Injective f ∧
         ∀ x y, PE x.1 y.1 → HE (f x).1 (f y).1 := by
@@ -189,26 +189,26 @@ section Faithful
 variable (i : SubgraphIsoInstance)
 
 /-- On an encoded instance, being a pattern vertex is being a left injection. -/
-theorem sgEnc_patV (x : subgraphIsoEncoding.Univ i) : TGPatV x ↔ x.isLeft = true :=
+private theorem sgEnc_patV (x : subgraphIsoEncoding.Univ i) : TGPatV x ↔ x.isLeft = true :=
   Iff.rfl
 
 /-- On an encoded instance, being a host vertex is being a right injection. -/
-theorem sgEnc_hostV (x : subgraphIsoEncoding.Univ i) : TGHostV x ↔ x.isRight = true :=
+private theorem sgEnc_hostV (x : subgraphIsoEncoding.Univ i) : TGHostV x ↔ x.isRight = true :=
   Iff.rfl
 
 /-- Pattern adjacency on an encoded instance, at two left injections. -/
-theorem sgEnc_patE (a b : Fin i.pat) :
+private theorem sgEnc_patE (a b : Fin i.pat) :
     TGPatE (A := subgraphIsoEncoding.Univ i) (Sum.inl a) (Sum.inl b) ↔ (a, b) ∈ i.patEdges :=
   decide_eq_true_iff
 
 /-- Host adjacency on an encoded instance, at two right injections. -/
-theorem sgEnc_hostE (a b : Fin i.host) :
+private theorem sgEnc_hostE (a b : Fin i.host) :
     TGHostE (A := subgraphIsoEncoding.Univ i) (Sum.inr a) (Sum.inr b) ↔ (a, b) ∈ i.hostEdges :=
   decide_eq_true_iff
 
 /-- The pattern vertices of an encoded instance, enumerated by the left
 injection. -/
-def sgEncPatEquiv : Fin i.pat ≃ {x : subgraphIsoEncoding.Univ i // TGPatV x} where
+private def sgEncPatEquiv : Fin i.pat ≃ {x : subgraphIsoEncoding.Univ i // TGPatV x} where
   toFun a := ⟨Sum.inl a, rfl⟩
   invFun x := x.1.getLeft ((sgEnc_patV i x.1).mp x.2)
   left_inv _ := rfl
@@ -219,7 +219,7 @@ def sgEncPatEquiv : Fin i.pat ≃ {x : subgraphIsoEncoding.Univ i // TGPatV x} w
 
 /-- The host vertices of an encoded instance, enumerated by the right
 injection. -/
-def sgEncHostEquiv : Fin i.host ≃ {y : subgraphIsoEncoding.Univ i // TGHostV y} where
+private def sgEncHostEquiv : Fin i.host ≃ {y : subgraphIsoEncoding.Univ i // TGHostV y} where
   toFun b := ⟨Sum.inr b, rfl⟩
   invFun y := y.1.getRight ((sgEnc_hostV i y.1).mp y.2)
   left_inv _ := rfl
@@ -244,7 +244,7 @@ end Faithful
 
 /-- A concrete instance: the directed triangle as pattern, the complete
 directed graph on four vertices as host. -/
-def sgExample : SubgraphIsoInstance :=
+private def sgExample : SubgraphIsoInstance :=
   ⟨3, 4, {(0, 1), (1, 2), (2, 0)}, Finset.univ.filter fun q => q.1 ≠ q.2⟩
 
 /-- The triangle embeds in the complete graph, by the identity on the first
@@ -288,10 +288,10 @@ def sgPatVs : Finset (Fin S.card) :=
 def sgHostVs : Finset (Fin S.card) :=
   Finset.univ.filter fun x => S.relBool tgHostV ![x]
 
-theorem mem_sgPatVs (x : Fin S.card) : x ∈ sgPatVs S ↔ TGPatV x := by
+private theorem mem_sgPatVs (x : Fin S.card) : x ∈ sgPatVs S ↔ TGPatV x := by
   simp [sgPatVs, TGPatV]
 
-theorem mem_sgHostVs (x : Fin S.card) : x ∈ sgHostVs S ↔ TGHostV x := by
+private theorem mem_sgHostVs (x : Fin S.card) : x ∈ sgHostVs S ↔ TGHostV x := by
   simp [sgHostVs, TGHostV]
 
 /-- The decoder: enumerate the pattern vertices and the host vertices, in
@@ -305,11 +305,11 @@ def sgDecode : Option SubgraphIsoInstance :=
       ![(sgHostVs S).orderEmbOfFin rfl q.1, (sgHostVs S).orderEmbOfFin rfl q.2]⟩
 
 /-- The pattern vertices of a presented structure, enumerated in order. -/
-noncomputable def sgDecPatEquiv : Fin (sgPatVs S).card ≃ {x : Fin S.card // TGPatV x} :=
+private noncomputable def sgDecPatEquiv : Fin (sgPatVs S).card ≃ {x : Fin S.card // TGPatV x} :=
   ((sgPatVs S).orderIsoOfFin rfl).toEquiv.trans (Equiv.subtypeEquivRight (mem_sgPatVs S))
 
 /-- The host vertices of a presented structure, enumerated in order. -/
-noncomputable def sgDecHostEquiv : Fin (sgHostVs S).card ≃ {y : Fin S.card // TGHostV y} :=
+private noncomputable def sgDecHostEquiv : Fin (sgHostVs S).card ≃ {y : Fin S.card // TGHostV y} :=
   ((sgHostVs S).orderIsoOfFin rfl).toEquiv.trans (Equiv.subtypeEquivRight (mem_sgHostVs S))
 
 theorem sgDecode_sound (i : SubgraphIsoInstance) (hi : i ∈ sgDecode S) :
@@ -367,7 +367,7 @@ end
 /-- **Hardness reads back to concrete data**: every nonempty finite
 `twoGraphs`-structure is decided by `SubgraphIso` exactly as some pair of
 concrete graphs is by the textbook predicate. -/
-theorem exists_concreteSubgraphIso_iff (A : Type) [Language.twoGraphs.Structure A]
+private theorem exists_concreteSubgraphIso_iff (A : Type) [Language.twoGraphs.Structure A]
     [Finite A] [Nonempty A] : ∃ i, ConcreteSubgraphIsoHolds i ↔ SubgraphIso A :=
   subgraphIsoDecoding.exists_conc_iff A (by simp)
 

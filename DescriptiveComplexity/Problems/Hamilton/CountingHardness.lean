@@ -11,6 +11,10 @@ import DescriptiveComplexity.Counting.Relativized
 import DescriptiveComplexity.Counting.Subtractive
 public import DescriptiveComplexity.OrderWalk
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Hamilton.Counting
+import all DescriptiveComplexity.Problems.Hamilton.CountingReverse
+import all DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 
 /-!
 # #Directed Hamilton Circuit is parsimoniously `#P`-complete
@@ -189,30 +193,30 @@ section Realize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
-theorem realize_varF {x : α} : (varF x).Realize v ↔ SatOccurs A (v x) := by
+private theorem realize_varF {x : α} : (varF x).Realize v ↔ SatOccurs A (v x) := by
   simp only [varF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup, realize_clF,
     realize_posF, realize_negF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun ⟨i, h⟩ => ⟨i (), h⟩, fun ⟨c, h⟩ => ⟨fun _ => c, h⟩⟩
 
-theorem realize_noClF : (noClF (α := α)).Realize v ↔ ¬∃ c : A, IsCl c := by
+private theorem realize_noClF : (noClF (α := α)).Realize v ↔ ¬∃ c : A, IsCl c := by
   simp only [noClF, Formula.realize_not, Formula.realize_iExs, realize_clF, Sum.elim_inr]
   exact not_congr ⟨fun ⟨i, h⟩ => ⟨i (), h⟩, fun ⟨c, h⟩ => ⟨fun _ => c, h⟩⟩
 
-theorem realize_botF {x : α} : (botF x).Realize v ↔ IsBot (v x) := by
+private theorem realize_botF {x : α} : (botF x).Realize v ↔ IsBot (v x) := by
   simp only [botF, Formula.realize_iAlls, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h z => h fun _ => z, fun h i => h (i ())⟩
 
-theorem realize_vFirstF {x : α} : (vFirstF x).Realize v ↔ VFirst (v x) := by
+private theorem realize_vFirstF {x : α} : (vFirstF x).Realize v ↔ VFirst (v x) := by
   simp only [vFirstF, Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     realize_varF, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact and_congr Iff.rfl ⟨fun h z hz => h (fun _ => z) hz, fun h i hi => h (i ()) hi⟩
 
-theorem realize_vLastF {x : α} : (vLastF x).Realize v ↔ VLast (v x) := by
+private theorem realize_vLastF {x : α} : (vLastF x).Realize v ↔ VLast (v x) := by
   simp only [vLastF, Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     realize_varF, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact and_congr Iff.rfl ⟨fun h z hz => h (fun _ => z) hz, fun h i hi => h (i ()) hi⟩
 
-theorem realize_vStepF {x y : α} : (vStepF x y).Realize v ↔ VStep (v x) (v y) := by
+private theorem realize_vStepF {x y : α} : (vStepF x y).Realize v ↔ VStep (v x) (v y) := by
   simp only [vStepF, Formula.realize_inf, Formula.realize_not, Formula.realize_iExs,
     realize_varF, realize_ltF, Sum.elim_inl, Sum.elim_inr]
   constructor
@@ -221,11 +225,11 @@ theorem realize_vStepF {x y : α} : (vStepF x y).Realize v ↔ VStep (v x) (v y)
   · rintro ⟨h₁, h₂, h₃, h₄⟩
     exact ⟨⟨⟨h₁, h₂⟩, h₃⟩, fun ⟨i, ⟨hz, h₅⟩, h₆⟩ => h₄ (i ()) hz ⟨h₅, h₆⟩⟩
 
-theorem realize_nextVarF {x y : α} : (nextVarF x y).Realize v ↔ NextVar (v x) (v y) := by
+private theorem realize_nextVarF {x y : α} : (nextVarF x y).Realize v ↔ NextVar (v x) (v y) := by
   simp only [nextVarF, Formula.realize_sup, Formula.realize_inf, realize_vStepF,
     realize_vLastF, realize_vFirstF, NextVar]
 
-theorem realize_boolF {b : Bool} : (boolF (α := α) b).Realize v ↔ b = true := by
+private theorem realize_boolF {b : Bool} : (boolF (α := α) b).Realize v ↔ b = true := by
   cases b <;> simp [boolF]
 
 /-- Which pairs of elements are vertices, by tag. -/
@@ -246,7 +250,7 @@ theorem realize_domF {t : HTag} {w : Fin 2 → A} :
     simp only [domF, Dom, Formula.realize_inf, realize_eqF, realize_varF, realize_occF,
       realize_clF, realize_botF, realize_noClF]
 
-theorem realize_stepF {t₁ t₂ : HTag} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_stepF {t₁ t₂ : HTag} {v : Fin 2 × Fin 2 → A} :
     (stepF t₁ t₂).Realize v ↔
       Step (toVtx t₁ (v (0, 0)) (v (0, 1))) (toVtx t₂ (v (1, 0)) (v (1, 1))) := by
   cases t₁ <;> cases t₂ <;>
@@ -265,7 +269,7 @@ theorem valid_toVtx {t : HTag} {x y : A} (h : Dom t x y) : Valid (toVtx t x y) :
   cases t
   exacts [h.2, h.2, h.2, h.2, h, h, h, h.2, h.2]
 
-theorem toVtx_inj {t t' : HTag} {x y x' y' : A} (h : Dom t x y) (h' : Dom t' x' y')
+private theorem toVtx_inj {t t' : HTag} {x y x' y' : A} (h : Dom t x y) (h' : Dom t' x' y')
     (he : toVtx t x y = toVtx t' x' y') : t = t' ∧ x = x' ∧ y = y' := by
   cases t <;> cases t' <;>
     simp only [toVtx, Vtx.top.injEq, Vtx.lft.injEq, Vtx.rgt.injEq, Vtx.pad0.injEq,
@@ -326,7 +330,7 @@ theorem dgArc_iff (p q : hamInterp.MapRel A) : DGArc p q ↔ Arc (vtxOf p).1 (vt
 variable (A) [Finite A] [Nonempty A]
 
 /-- **Correctness of the interpretation, for counting.** -/
-theorem sharpDirHamCircuit_mapRel :
+private theorem sharpDirHamCircuit_mapRel :
     SharpDirHamCircuit (hamInterp.MapRel A) = SharpOneInSAT A := by
   have := hamInterp.mapRel_finite A
   have hW : Finite {v : Vtx A // Valid v} := Finite.of_equiv _ (vtxEquiv A)
@@ -344,7 +348,7 @@ open HamGadget in
 /-- **#1-in-SAT reduces parsimoniously to #Directed Hamilton Circuit**, by a
 relativized interpretation: the tagged pairs that are no vertex of the row
 graph are left out of the universe. -/
-noncomputable def sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit :
+private noncomputable def sharpOneInSat_rel_ordered_parsimonious_sharpDirHamCircuit :
     SharpOneInSAT ≤ʳᵖ[≤] SharpDirHamCircuit where
   Tag := HTag
   dim := 2

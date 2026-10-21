@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.HaltHard.SimRet
+import all DescriptiveComplexity.Problems.Machine.HaltHard.SimNorm
+import all DescriptiveComplexity.Problems.Machine.HaltHard.SimRet
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Zip
 
 /-!
 # The assembled simulation
@@ -95,12 +98,12 @@ theorem stepRet_popTarget {k : PCont c} (hk : k ≠ PCont.halt) (v : List ℕ) :
 /-! ### Termination of the abstract machine, as counted runs -/
 
 /-- Counted runs of the abstract machine `Turing.ToPartrec.step`. -/
-def ASteps : ℕ → Cfg → Cfg → Prop
+private def ASteps : ℕ → Cfg → Cfg → Prop
   | 0, a, b => a = b
   | n + 1, a, b => ∃ d, step a = some d ∧ ASteps n d b
 
 /-- A counted abstract run, extended by one step at its end. -/
-theorem ASteps.trans_step : ∀ {n : ℕ} {a b d : Cfg},
+private theorem ASteps.trans_step : ∀ {n : ℕ} {a b d : Cfg},
     ASteps n a b → step b = some d → ASteps (n + 1) a d := by
   intro n
   induction n with
@@ -110,7 +113,7 @@ theorem ASteps.trans_step : ∀ {n : ℕ} {a b d : Cfg},
     exact ⟨e, hstep, ih hrest hbd⟩
 
 /-- An abstract reachability is a counted run of some length. -/
-theorem asteps_of_reaches {a b : Cfg} (h : StateTransition.Reaches step a b) :
+private theorem asteps_of_reaches {a b : Cfg} (h : StateTransition.Reaches step a b) :
     ∃ n, ASteps n a b := by
   induction h with
   | refl => exact ⟨0, rfl⟩
@@ -120,7 +123,7 @@ theorem asteps_of_reaches {a b : Cfg} (h : StateTransition.Reaches step a b) :
 
 /-- Termination of `Turing.ToPartrec.Cont.eval` yields a counted abstract run
 from the return configuration to a halting configuration. -/
-theorem exists_asteps_halt_of_dom {K : Cont} {v : List ℕ} (h : (K.eval v).Dom) :
+private theorem exists_asteps_halt_of_dom {K : Cont} {v : List ℕ} (h : (K.eval v).Dom) :
     ∃ N w, ASteps N (Cfg.ret K v) (Cfg.halt w) := by
   have hd : (StateTransition.eval step (stepRet K v)).Dom := by
     rw [stepRet_eval]
@@ -138,19 +141,19 @@ theorem exists_asteps_halt_of_dom {K : Cont} {v : List ℕ} (h : (K.eval v).Dom)
 
 /-- Termination of `Turing.ToPartrec.Cont.eval` is termination of the
 sequential run from the return configuration. -/
-theorem contEval_dom_iff_evalStep {K : Cont} {v : List ℕ} :
+private theorem contEval_dom_iff_evalStep {K : Cont} {v : List ℕ} :
     (K.eval v).Dom ↔ (StateTransition.eval step (stepRet K v)).Dom := by
   rw [stepRet_eval]
   exact Iff.rfl
 
 /-- Peeling the one step a return configuration always makes. -/
-theorem evalStep_ret (K : Cont) (v : List ℕ) :
+private theorem evalStep_ret (K : Cont) (v : List ℕ) :
     StateTransition.eval step (Cfg.ret K v) = StateTransition.eval step (stepRet K v) :=
   StateTransition.reaches_eval (Relation.ReflTransGen.single (Option.mem_def.mpr rfl))
 
 /-- **Termination transfers along one pop**: the abstract evaluation of a
 nonempty continuation terminates exactly when that of its pop target does. -/
-theorem dom_popTarget {k : PCont c} (hk : k ≠ PCont.halt) (v : List ℕ) :
+private theorem dom_popTarget {k : PCont c} (hk : k ≠ PCont.halt) (v : List ℕ) :
     ((popTarget k v).1.toCont.eval (popTarget k v).2).Dom ↔ (k.toCont.eval v).Dom := by
   rcases stepRet_popTarget hk v with h | ⟨h, -⟩
   · rw [contEval_dom_iff_evalStep (K := k.toCont), h, evalStep_ret,
@@ -160,7 +163,7 @@ theorem dom_popTarget {k : PCont c} (hk : k ≠ PCont.halt) (v : List ℕ) :
 /-! ### The machine cycle -/
 
 /-- Accepting configurations are terminal. -/
-theorem lstep_acc {x : LCfg c} (hx : x.q = SimQ.acc) : lstep x = none := by
+private theorem lstep_acc {x : LCfg c} (hx : x.q = SimQ.acc) : lstep x = none := by
   obtain ⟨q, L, s, R⟩ := x
   subst hx
   have h : simStep (c := c) .acc s = none := by cases s <;> rfl
@@ -240,7 +243,7 @@ theorem cycle_counted {k : PCont c} (hk : k ≠ PCont.halt) {fr : List (SimSym c
 configuration of `k` and `v` in `N` steps, the simulating machine accepts
 from the resting configuration of any frame region of `k`, by lexicographic
 recursion on `(N, sizeOf k)` – the two silent pops keep `N` and shrink `k`. -/
-theorem reach_acc_of_asteps (N : ℕ) (k : PCont c) (v w : List ℕ)
+private theorem reach_acc_of_asteps (N : ℕ) (k : PCont c) (v w : List ℕ)
     (hN : ASteps N (Cfg.ret k.toCont v) (Cfg.halt w)) (g : ℕ) (fr : List (SimSym c))
     (hfr : FrameSeg k fr) (j t : ℕ) :
     ∃ x, x.q = SimQ.acc ∧ Reach (restCfg g fr v j t) x := by
@@ -281,7 +284,7 @@ resting configuration of `k` and `v` in `N` steps, the abstract evaluation of
 `k` on `v` terminates, by lexicographic recursion on `(N, sizeOf k)` – the
 counted cycle is split off the accepting run by determinism, and a silent
 cycle shrinks `k`. -/
-theorem dom_of_stepsTo_acc (N : ℕ) (k : PCont c) (v : List ℕ) (g : ℕ)
+private theorem dom_of_stepsTo_acc (N : ℕ) (k : PCont c) (v : List ℕ) (g : ℕ)
     (fr : List (SimSym c)) (j t : ℕ) (x : LCfg c) (hfr : FrameSeg k fr)
     (hN : stepsTo N (restCfg g fr v j t) x) (hx : x.q = SimQ.acc) :
     (k.toCont.eval v).Dom := by

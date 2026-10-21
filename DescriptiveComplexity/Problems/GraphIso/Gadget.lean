@@ -9,6 +9,7 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.GadgetDouble
 public import Mathlib.ModelTheory.Graph
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.GadgetDouble
 
 /-!
 # The digraph-to-graph gadget
@@ -163,31 +164,31 @@ def pt (t : GTag) (u v : G) : gadget.Map G := (t, ![u, v])
 def vPt (u : G) : gadget.Map G := pt .vtx u u
 
 /-- The lollipop node attached to a vertex. -/
-def m₁Pt (u : G) : gadget.Map G := pt .m₁ u u
+private def m₁Pt (u : G) : gadget.Map G := pt .m₁ u u
 
 /-- One corner of a lollipop triangle. -/
-def m₂Pt (u : G) : gadget.Map G := pt .m₂ u u
+private def m₂Pt (u : G) : gadget.Map G := pt .m₂ u u
 
 /-- The other corner of a lollipop triangle. -/
-def m₃Pt (u : G) : gadget.Map G := pt .m₃ u u
+private def m₃Pt (u : G) : gadget.Map G := pt .m₃ u u
 
 /-- The subdivision node next to an arc's tail. -/
-def aPt (u v : G) : gadget.Map G := pt .a u v
+private def aPt (u v : G) : gadget.Map G := pt .a u v
 
 /-- The middle subdivision node of an arc. -/
-def bPt (u v : G) : gadget.Map G := pt .b u v
+private def bPt (u v : G) : gadget.Map G := pt .b u v
 
 /-- The subdivision node next to an arc's head. -/
-def cPt (u v : G) : gadget.Map G := pt .c u v
+private def cPt (u v : G) : gadget.Map G := pt .c u v
 
 /-- The pendant marking an arc's tail. -/
-def pPt (u v : G) : gadget.Map G := pt .p u v
+private def pPt (u v : G) : gadget.Map G := pt .p u v
 
 /-- Every point is a named one: one eta lemma for all eight kinds. -/
-theorem pt_eta (q : gadget.Map G) : q = pt q.1 (q.2 0) (q.2 1) :=
+private theorem pt_eta (q : gadget.Map G) : q = pt q.1 (q.2 0) (q.2 1) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> rfl⟩
 
-theorem pt_tag (t : GTag) (u v : G) : (pt t u v).1 = t := rfl
+private theorem pt_tag (t : GTag) (u v : G) : (pt t u v).1 = t := rfl
 
 end Points
 
@@ -330,7 +331,7 @@ theorem edge_p_a (u v u' v' : G) :
 
 /-- The tag pairs the gadget joins: the lollipop's four edges in both
 directions, the arc path's four, and the pendant's one. -/
-def TagAdj : GTag → GTag → Prop
+private def TagAdj : GTag → GTag → Prop
   | .vtx, .m₁ | .m₁, .vtx | .m₁, .m₂ | .m₂, .m₁ | .m₁, .m₃ | .m₃, .m₁
   | .m₂, .m₃ | .m₃, .m₂ | .vtx, .a | .a, .vtx | .a, .b | .b, .a
   | .b, .c | .c, .b | .c, .vtx | .vtx, .c | .a, .p | .p, .a => True
@@ -339,13 +340,13 @@ def TagAdj : GTag → GTag → Prop
 /-- **An edge joins only the tag pairs the construction lists.** The forty-six
 other pairs need no argument: their defining formula is `⊥`, so the hypothesis
 *is* `False`. -/
-theorem edge_tagAdj {p q : gadget.Map G} (h : GEdge p q) : TagAdj p.1 q.1 := by
+private theorem edge_tagAdj {p q : gadget.Map G} (h : GEdge p q) : TagAdj p.1 q.1 := by
   obtain ⟨t, w⟩ := p
   obtain ⟨s, x⟩ := q
   cases t <;> cases s <;> first | exact h.elim | trivial
 
 /-- No clause relates a tag to itself, so the construction has no loops. -/
-theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := by
+private theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := by
   rw [GEdge, FOInterpretation.relMap_map]
   cases t <;> exact fun h => h.elim
 
@@ -353,7 +354,7 @@ theorem edge_irrefl_pt (t : GTag) (u v : G) : ¬GEdge (pt t u v) (pt t u v) := b
 
 /-- **Symmetric**: every clause of `DescriptiveComplexity.GraphGadget.edgeF` is
 stated in both directions, so the constructed relation is undirected. -/
-theorem edge_symm_pt (t s : GTag) (u v u' v' : G) :
+private theorem edge_symm_pt (t s : GTag) (u v u' v' : G) :
     GEdge (pt t u v) (pt s u' v') ↔ GEdge (pt s u' v') (pt t u v) := by
   cases t <;> cases s <;>
     first
@@ -383,7 +384,7 @@ section Neighbors
 
 /-- The neighbors of a vertex node: its lollipop, the tail-side subdivision of
 each arc out of it, and the head-side subdivision of each arc into it. -/
-theorem nbr_of_vPt {u : G} {q : gadget.Map G} (h : GEdge (vPt u) q) :
+private theorem nbr_of_vPt {u : G} {q : gadget.Map G} (h : GEdge (vPt u) q) :
     q = m₁Pt u ∨ (∃ v, GAdj u v ∧ q = aPt u v) ∨ ∃ w, GAdj w u ∧ q = cPt w u := by
   obtain ⟨s, x⟩ := q
   have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
@@ -403,7 +404,7 @@ theorem nbr_of_vPt {u : G} {q : gadget.Map G} (h : GEdge (vPt u) q) :
     exact Or.inr (Or.inr ⟨x 0, by rw [hv] at harc; exact harc, by rw [cPt, ← hv]⟩)
   · exact (edge_tagAdj h).elim
 
-theorem nbr_of_m₁Pt {u : G} {q : gadget.Map G} (h : GEdge (m₁Pt u) q) :
+private theorem nbr_of_m₁Pt {u : G} {q : gadget.Map G} (h : GEdge (m₁Pt u) q) :
     q = vPt u ∨ q = m₂Pt u ∨ q = m₃Pt u := by
   obtain ⟨s, x⟩ := q
   have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
@@ -423,7 +424,7 @@ theorem nbr_of_m₁Pt {u : G} {q : gadget.Map G} (h : GEdge (m₁Pt u) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
+private theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
     q = vPt u ∨ q = bPt u v ∨ q = pPt u v := by
   obtain ⟨s, x⟩ := q
   have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
@@ -443,7 +444,7 @@ theorem nbr_of_aPt {u v : G} {q : gadget.Map G} (h : GEdge (aPt u v) q) :
   · obtain ⟨-, -, h0, h1⟩ := (edge_a_p u v (x 0) (x 1)).mp h'
     exact Or.inr (Or.inr (by rw [pPt, h0, h1]))
 
-theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
+private theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
     q = aPt u v ∨ q = cPt u v := by
   obtain ⟨s, x⟩ := q
   have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
@@ -462,7 +463,7 @@ theorem nbr_of_bPt {u v : G} {q : gadget.Map G} (h : GEdge (bPt u v) q) :
     exact Or.inr (by rw [cPt, h0, h1])
   · exact (edge_tagAdj h).elim
 
-theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
+private theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
     q = bPt u v ∨ q = vPt v := by
   obtain ⟨s, x⟩ := q
   have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
@@ -481,7 +482,7 @@ theorem nbr_of_cPt {u v : G} {q : gadget.Map G} (h : GEdge (cPt u v) q) :
   · exact (edge_tagAdj h).elim
   · exact (edge_tagAdj h).elim
 
-theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
+private theorem nbr_of_pPt {u v : G} {q : gadget.Map G} (h : GEdge (pPt u v) q) :
     q = aPt u v := by
   obtain ⟨s, x⟩ := q
   have hq : ((s, x) : gadget.Map G) = pt s (x 0) (x 1) := pt_eta _
@@ -506,24 +507,24 @@ end Neighbors
 section Levels
 
 /-- Lying on a triangle. -/
-def OnTri (p : gadget.Map G) : Prop := ∃ q r, GEdge p q ∧ GEdge q r ∧ GEdge r p
+private def OnTri (p : gadget.Map G) : Prop := ∃ q r, GEdge p q ∧ GEdge q r ∧ GEdge r p
 
 /-- Being adjacent to a node that lies on a triangle. -/
-def AdjTri (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ OnTri q
+private def AdjTri (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ OnTri q
 
 /-- Having exactly one neighbor. -/
-def Leaf (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ ∀ r, GEdge p r → r = q
+private def Leaf (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ ∀ r, GEdge p r → r = q
 
 /-- Having a neighbor with exactly one neighbor. -/
-def HasLeafNbr (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ Leaf q
+private def HasLeafNbr (p : gadget.Map G) : Prop := ∃ q, GEdge p q ∧ Leaf q
 
 /-- The lollipop triangle is a triangle. -/
-theorem onTri_m₁Pt (u : G) : OnTri (m₁Pt u) :=
+private theorem onTri_m₁Pt (u : G) : OnTri (m₁Pt u) :=
   ⟨m₂Pt u, m₃Pt u, (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩,
     (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
 
 /-- A vertex node lies on no triangle: no two of its neighbors are joined. -/
-theorem not_onTri_vPt (u : G) : ¬OnTri (vPt u) := by
+private theorem not_onTri_vPt (u : G) : ¬OnTri (vPt u) := by
   rintro ⟨q, r, hpq, hqr, hrp⟩
   rcases nbr_of_vPt hpq with rfl | ⟨v, -, rfl⟩ | ⟨w, -, rfl⟩
   · rcases nbr_of_m₁Pt hqr with rfl | rfl | rfl
@@ -539,7 +540,7 @@ theorem not_onTri_vPt (u : G) : ¬OnTri (vPt u) := by
     · exact edge_irrefl_pt _ _ _ hrp
 
 /-- A tail-side subdivision node lies on no triangle. -/
-theorem not_onTri_aPt (u v : G) : ¬OnTri (aPt u v) := by
+private theorem not_onTri_aPt (u v : G) : ¬OnTri (aPt u v) := by
   rintro ⟨q, r, hpq, hqr, hrp⟩
   rcases nbr_of_aPt hpq with rfl | rfl | rfl
   · rcases nbr_of_vPt hqr with rfl | ⟨v', -, rfl⟩ | ⟨w, -, rfl⟩
@@ -553,7 +554,7 @@ theorem not_onTri_aPt (u v : G) : ¬OnTri (aPt u v) := by
     · exact edge_irrefl_pt _ _ _ hrp
 
 /-- A middle subdivision node lies on no triangle. -/
-theorem not_onTri_bPt (u v : G) : ¬OnTri (bPt u v) := by
+private theorem not_onTri_bPt (u v : G) : ¬OnTri (bPt u v) := by
   rintro ⟨q, r, hpq, hqr, hrp⟩
   rcases nbr_of_bPt hpq with rfl | rfl
   · rcases nbr_of_aPt hqr with rfl | rfl | rfl
@@ -565,7 +566,7 @@ theorem not_onTri_bPt (u v : G) : ¬OnTri (bPt u v) := by
     · exact (edge_tagAdj hrp).elim
 
 /-- A head-side subdivision node lies on no triangle. -/
-theorem not_onTri_cPt (u v : G) : ¬OnTri (cPt u v) := by
+private theorem not_onTri_cPt (u v : G) : ¬OnTri (cPt u v) := by
   rintro ⟨q, r, hpq, hqr, hrp⟩
   rcases nbr_of_cPt hpq with rfl | rfl
   · rcases nbr_of_bPt hqr with rfl | rfl
@@ -577,7 +578,7 @@ theorem not_onTri_cPt (u v : G) : ¬OnTri (cPt u v) := by
     · exact (edge_tagAdj hrp).elim
 
 /-- A pendant lies on no triangle. -/
-theorem not_onTri_pPt (u v : G) : ¬OnTri (pPt u v) := by
+private theorem not_onTri_pPt (u v : G) : ¬OnTri (pPt u v) := by
   rintro ⟨q, r, hpq, hqr, hrp⟩
   rcases nbr_of_pPt hpq with rfl
   rcases nbr_of_aPt hqr with rfl | rfl | rfl
@@ -594,7 +595,7 @@ what lets the recovery below case over *all* points rather than only the
 well-formed ones. -/
 
 /-- A `vtx` node off the diagonal is isolated. -/
-theorem isolated_vtx {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+private theorem isolated_vtx {u v : G} (h : ¬u = v) (q : gadget.Map G) :
     ¬GEdge (pt .vtx u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -612,7 +613,7 @@ theorem isolated_vtx {u v : G} (h : ¬u = v) (q : gadget.Map G) :
   · exact (edge_tagAdj he).elim
 
 /-- A `m₁` node off the diagonal is isolated. -/
-theorem isolated_m₁ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+private theorem isolated_m₁ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
     ¬GEdge (pt .m₁ u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -630,7 +631,7 @@ theorem isolated_m₁ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
   · exact (edge_tagAdj he).elim
 
 /-- A `m₂` node off the diagonal is isolated. -/
-theorem isolated_m₂ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+private theorem isolated_m₂ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
     ¬GEdge (pt .m₂ u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -648,7 +649,7 @@ theorem isolated_m₂ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
   · exact (edge_tagAdj he).elim
 
 /-- A `m₃` node off the diagonal is isolated. -/
-theorem isolated_m₃ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
+private theorem isolated_m₃ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
     ¬GEdge (pt .m₃ u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -666,7 +667,7 @@ theorem isolated_m₃ {u v : G} (h : ¬u = v) (q : gadget.Map G) :
   · exact (edge_tagAdj he).elim
 
 /-- An `a` node on a pair that is not an arc is isolated. -/
-theorem isolated_a {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+private theorem isolated_a {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
     ¬GEdge (pt .a u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -684,7 +685,7 @@ theorem isolated_a {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
   · exact h ((edge_a_p u v (x 0) (x 1)).mp he').1
 
 /-- An `b` node on a pair that is not an arc is isolated. -/
-theorem isolated_b {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+private theorem isolated_b {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
     ¬GEdge (pt .b u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -702,7 +703,7 @@ theorem isolated_b {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
   · exact (edge_tagAdj he).elim
 
 /-- An `c` node on a pair that is not an arc is isolated. -/
-theorem isolated_c {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+private theorem isolated_c {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
     ¬GEdge (pt .c u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -720,7 +721,7 @@ theorem isolated_c {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
   · exact (edge_tagAdj he).elim
 
 /-- An `p` node on a pair that is not an arc is isolated. -/
-theorem isolated_p {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
+private theorem isolated_p {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
     ¬GEdge (pt .p u v) q := by
   intro he
   obtain ⟨s, x⟩ := q
@@ -740,11 +741,11 @@ theorem isolated_p {u v : G} (h : ¬GAdj u v) (q : gadget.Map G) :
 /-! ### Adjacency to a triangle: the vertices -/
 
 /-- A vertex node is adjacent to its lollipop. -/
-theorem adjTri_vPt (u : G) : AdjTri (vPt u) :=
+private theorem adjTri_vPt (u : G) : AdjTri (vPt u) :=
   ⟨m₁Pt u, (edge_vtx_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩, onTri_m₁Pt u⟩
 
 /-- No subdivision node is adjacent to a triangle. -/
-theorem not_adjTri_aPt (u v : G) : ¬AdjTri (aPt u v) := by
+private theorem not_adjTri_aPt (u v : G) : ¬AdjTri (aPt u v) := by
   rintro ⟨q, hq, htri⟩
   rcases nbr_of_aPt hq with rfl | rfl | rfl
   · exact not_onTri_vPt u htri
@@ -752,32 +753,32 @@ theorem not_adjTri_aPt (u v : G) : ¬AdjTri (aPt u v) := by
   · exact not_onTri_pPt u v htri
 
 @[inherit_doc not_adjTri_aPt]
-theorem not_adjTri_bPt (u v : G) : ¬AdjTri (bPt u v) := by
+private theorem not_adjTri_bPt (u v : G) : ¬AdjTri (bPt u v) := by
   rintro ⟨q, hq, htri⟩
   rcases nbr_of_bPt hq with rfl | rfl
   · exact not_onTri_aPt u v htri
   · exact not_onTri_cPt u v htri
 
 @[inherit_doc not_adjTri_aPt]
-theorem not_adjTri_cPt (u v : G) : ¬AdjTri (cPt u v) := by
+private theorem not_adjTri_cPt (u v : G) : ¬AdjTri (cPt u v) := by
   rintro ⟨q, hq, htri⟩
   rcases nbr_of_cPt hq with rfl | rfl
   · exact not_onTri_bPt u v htri
   · exact not_onTri_vPt v htri
 
 @[inherit_doc not_adjTri_aPt]
-theorem not_adjTri_pPt (u v : G) : ¬AdjTri (pPt u v) := by
+private theorem not_adjTri_pPt (u v : G) : ¬AdjTri (pPt u v) := by
   rintro ⟨q, hq, htri⟩
   rcases nbr_of_pPt hq with rfl
   exact not_onTri_aPt u v htri
 
 /-- The other two corners of a lollipop lie on its triangle too. -/
-theorem onTri_m₂Pt (u : G) : OnTri (m₂Pt u) :=
+private theorem onTri_m₂Pt (u : G) : OnTri (m₂Pt u) :=
   ⟨m₃Pt u, m₁Pt u, (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩,
     (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
 
 @[inherit_doc onTri_m₂Pt]
-theorem onTri_m₃Pt (u : G) : OnTri (m₃Pt u) :=
+private theorem onTri_m₃Pt (u : G) : OnTri (m₃Pt u) :=
   ⟨m₁Pt u, m₂Pt u, (edge_m₃_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩,
     (edge_m₁_m₂ u u u u).mpr ⟨rfl, rfl, rfl⟩, (edge_m₂_m₃ u u u u).mpr ⟨rfl, rfl, rfl⟩⟩
 
@@ -785,7 +786,7 @@ theorem onTri_m₃Pt (u : G) : OnTri (m₃Pt u) :=
 adjacent to a triangle without lying on one. Junk points fail the test by being
 isolated, lollipop nodes by lying on their triangle, and subdivision nodes and
 pendants by touching no triangle. -/
-theorem vertex_iff (p : gadget.Map G) : (¬OnTri p ∧ AdjTri p) ↔ ∃ u, p = vPt u := by
+private theorem vertex_iff (p : gadget.Map G) : (¬OnTri p ∧ AdjTri p) ↔ ∃ u, p = vPt u := by
   constructor
   · rintro ⟨hnt, q, hq, htri⟩
     obtain ⟨t, x⟩ := p
@@ -828,12 +829,12 @@ theorem vertex_iff (p : gadget.Map G) : (¬OnTri p ∧ AdjTri p) ↔ ∃ u, p = 
 /-! ### Leaves: the pendant marks the tail -/
 
 /-- The pendant of an arc is a leaf. -/
-theorem leaf_pPt {u v : G} (h : GAdj u v) : Leaf (pPt u v) :=
+private theorem leaf_pPt {u v : G} (h : GAdj u v) : Leaf (pPt u v) :=
   ⟨aPt u v, (edge_p_a u v u v).mpr ⟨h, h, rfl, rfl⟩, fun _ hr => nbr_of_pPt hr⟩
 
 /-- A middle subdivision node is not a leaf: it has both an `a` and a `c`
 neighbor, and those have different tags. -/
-theorem not_leaf_bPt {u v : G} (h : GAdj u v) : ¬Leaf (bPt u v) := by
+private theorem not_leaf_bPt {u v : G} (h : GAdj u v) : ¬Leaf (bPt u v) := by
   rintro ⟨q, -, huniq⟩
   have h₁ := huniq (aPt u v) ((edge_b_a u v u v).mpr ⟨h, h, rfl, rfl⟩)
   have h₂ := huniq (cPt u v) ((edge_b_c u v u v).mpr ⟨h, h, rfl, rfl⟩)
@@ -842,7 +843,7 @@ theorem not_leaf_bPt {u v : G} (h : GAdj u v) : ¬Leaf (bPt u v) := by
 
 /-- A vertex node incident to an arc is not a leaf: it has its lollipop and the
 arc's subdivision node. -/
-theorem not_leaf_vPt_of_out {u v : G} (h : GAdj u v) : ¬Leaf (vPt u) := by
+private theorem not_leaf_vPt_of_out {u v : G} (h : GAdj u v) : ¬Leaf (vPt u) := by
   rintro ⟨q, -, huniq⟩
   have h₁ := huniq (m₁Pt u) ((edge_vtx_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩)
   have h₂ := huniq (aPt u v) ((edge_vtx_a u u u v).mpr ⟨rfl, h, rfl⟩)
@@ -850,7 +851,7 @@ theorem not_leaf_vPt_of_out {u v : G} (h : GAdj u v) : ¬Leaf (vPt u) := by
   exact absurd this (by simp [m₁Pt, aPt, pt])
 
 @[inherit_doc not_leaf_vPt_of_out]
-theorem not_leaf_vPt_of_in {w u : G} (h : GAdj w u) : ¬Leaf (vPt u) := by
+private theorem not_leaf_vPt_of_in {w u : G} (h : GAdj w u) : ¬Leaf (vPt u) := by
   rintro ⟨q, -, huniq⟩
   have h₁ := huniq (m₁Pt u) ((edge_vtx_m₁ u u u u).mpr ⟨rfl, rfl, rfl⟩)
   have h₂ := huniq (cPt w u) ((edge_vtx_c u u w u).mpr ⟨rfl, h, rfl⟩)
@@ -860,12 +861,12 @@ theorem not_leaf_vPt_of_in {w u : G} (h : GAdj w u) : ¬Leaf (vPt u) := by
 /-! ### Which nodes have a leaf neighbor: the tail side -/
 
 /-- The tail-side subdivision node has the pendant as a neighbor. -/
-theorem hasLeafNbr_aPt {u v : G} (h : GAdj u v) : HasLeafNbr (aPt u v) :=
+private theorem hasLeafNbr_aPt {u v : G} (h : GAdj u v) : HasLeafNbr (aPt u v) :=
   ⟨pPt u v, (edge_a_p u v u v).mpr ⟨h, h, rfl, rfl⟩, leaf_pPt h⟩
 
 /-- The head-side subdivision node has none: its neighbors are the middle node
 and the head, and the head is incident to this very arc. -/
-theorem not_hasLeafNbr_cPt {u v : G} (h : GAdj u v) : ¬HasLeafNbr (cPt u v) := by
+private theorem not_hasLeafNbr_cPt {u v : G} (h : GAdj u v) : ¬HasLeafNbr (cPt u v) := by
   rintro ⟨q, hq, hleaf⟩
   rcases nbr_of_cPt hq with rfl | rfl
   · exact not_leaf_bPt h hleaf
@@ -880,7 +881,7 @@ back through the vertex node, without `¬Leaf` it goes out to the pendant and
 back, and without `¬HasLeafNbr` it returns along the tail-side node – each of
 which would claim an arc from a vertex to itself. The direction of the arc is
 carried by `HasLeafNbr`: only the tail side has a pendant. -/
-theorem arc_iff (u v : G) :
+private theorem arc_iff (u v : G) :
     GAdj u v ↔ ∃ p q r, GEdge (vPt u) p ∧ ¬OnTri p ∧ ¬AdjTri p ∧ HasLeafNbr p ∧
       GEdge p q ∧ ¬OnTri q ∧ ¬AdjTri q ∧ ¬Leaf q ∧
       GEdge q r ∧ ¬OnTri r ∧ ¬HasLeafNbr r ∧ GEdge r (vPt v) := by
@@ -923,18 +924,18 @@ variable {G H : Type} [Language.graph.Structure G] [Language.graph.Structure H]
 variable (φ : gadget.Map G ≃[Language.graph] gadget.Map H)
 
 /-- An isomorphism preserves and reflects the constructed adjacency. -/
-theorem edge_map (p q : gadget.Map G) : GEdge (φ p) (φ q) ↔ GEdge p q := by
+private theorem edge_map (p q : gadget.Map G) : GEdge (φ p) (φ q) ↔ GEdge p q := by
   have h := φ.map_rel' Language.adj ![p, q]
   rw [show (φ.toFun ∘ ![p, q]) = ![φ p, φ q] by funext i; fin_cases i <;> rfl] at h
   exact h
 
-theorem edge_map_symm (p q : gadget.Map H) : GEdge (φ.symm p) (φ.symm q) ↔ GEdge p q := by
+private theorem edge_map_symm (p q : gadget.Map H) : GEdge (φ.symm p) (φ.symm q) ↔ GEdge p q := by
   have h := edge_map φ (φ.symm p) (φ.symm q)
   rw [φ.apply_symm_apply, φ.apply_symm_apply] at h
   exact h.symm
 
 /-- Lying on a triangle is preserved. -/
-theorem onTri_map (p : gadget.Map G) : OnTri (φ p) ↔ OnTri p := by
+private theorem onTri_map (p : gadget.Map G) : OnTri (φ p) ↔ OnTri p := by
   constructor
   · rintro ⟨q, r, h₁, h₂, h₃⟩
     refine ⟨φ.symm q, φ.symm r, ?_, ?_, ?_⟩
@@ -945,7 +946,7 @@ theorem onTri_map (p : gadget.Map G) : OnTri (φ p) ↔ OnTri p := by
     exact ⟨φ q, φ r, (edge_map φ _ _).mpr h₁, (edge_map φ _ _).mpr h₂, (edge_map φ _ _).mpr h₃⟩
 
 /-- Adjacency to a triangle is preserved. -/
-theorem adjTri_map (p : gadget.Map G) : AdjTri (φ p) ↔ AdjTri p := by
+private theorem adjTri_map (p : gadget.Map G) : AdjTri (φ p) ↔ AdjTri p := by
   constructor
   · rintro ⟨q, h₁, h₂⟩
     refine ⟨φ.symm q, ?_, ?_⟩
@@ -956,7 +957,7 @@ theorem adjTri_map (p : gadget.Map G) : AdjTri (φ p) ↔ AdjTri p := by
 
 /-- Being a leaf is preserved: the uniqueness clause transfers because every
 neighbor of the image is the image of a neighbor. -/
-theorem leaf_map (p : gadget.Map G) : Leaf (φ p) ↔ Leaf p := by
+private theorem leaf_map (p : gadget.Map G) : Leaf (φ p) ↔ Leaf p := by
   constructor
   · rintro ⟨q, h₁, h₂⟩
     refine ⟨φ.symm q, ?_, fun r hr => ?_⟩
@@ -970,7 +971,7 @@ theorem leaf_map (p : gadget.Map G) : Leaf (φ p) ↔ Leaf p := by
     rw [← h₂ (φ.symm r) hr', φ.apply_symm_apply]
 
 /-- Having a leaf neighbor is preserved. -/
-theorem hasLeafNbr_map (p : gadget.Map G) : HasLeafNbr (φ p) ↔ HasLeafNbr p := by
+private theorem hasLeafNbr_map (p : gadget.Map G) : HasLeafNbr (φ p) ↔ HasLeafNbr p := by
   constructor
   · rintro ⟨q, h₁, h₂⟩
     refine ⟨φ.symm q, ?_, ?_⟩
@@ -987,7 +988,7 @@ theorem vPt_injective : Function.Injective (vPt (G := G)) := fun _ _ h =>
 graphs restricts to the vertex nodes, and the arcs are read off it by
 `DescriptiveComplexity.GraphGadget.arc_iff`. Together with functoriality – free
 for an interpretation – this says the construction is faithful. -/
-theorem gadget_isoReflecting : IsoReflecting gadget := by
+private theorem gadget_isoReflecting : IsoReflecting gadget := by
   intro G H _ _ _ _ hiso
   obtain ⟨φ⟩ := hiso
   classical

@@ -87,7 +87,7 @@ noncomputable def FOInterpretation.pullF (I : FOInterpretation L₁ L₂ Tag d)
   (I.pull (φ : L₂.BoundedFormula β 0) (Sum.elim τ finZeroElim)).relabel
     fun p => (Sum.elim id finZeroElim p.1, p.2)
 
-theorem realize_pullF {A : Type} [L₁.Structure A] (I : FOInterpretation L₁ L₂ Tag d)
+private theorem realize_pullF {A : Type} [L₁.Structure A] (I : FOInterpretation L₁ L₂ Tag d)
     (φ : L₂.Formula β) (τ : β → Tag) (v : β × Fin d → A) :
     (I.pullF φ τ).Realize v ↔
       φ.Realize (M := I.Map A) fun b => (τ b, fun j => v (b, j)) := by
@@ -111,7 +111,7 @@ variable {L L' : Language.{0, 0}} {spec₁ : TCSpec L} {spec₂ : TCSpec L'}
 
 namespace TCSpec
 
-theorem reach_map (e : spec₁.Node A ≃ spec₂.Node B)
+private theorem reach_map (e : spec₁.Node A ≃ spec₂.Node B)
     (hstep : ∀ a b, spec₁.Step a b ↔ spec₂.Step (e a) (e b)) {a b : spec₁.Node A}
     (h : spec₁.Reach a b) : spec₂.Reach (e a) (e b) := by
   induction h with
@@ -120,7 +120,7 @@ theorem reach_map (e : spec₁.Node A ≃ spec₂.Node B)
 
 /-- **Acceptance transfers along a bijection of nodes** carrying steps to
 steps and endpoints to endpoints. -/
-theorem accepts_congr (e : spec₁.Node A ≃ spec₂.Node B)
+private theorem accepts_congr (e : spec₁.Node A ≃ spec₂.Node B)
     (hstep : ∀ a b, spec₁.Step a b ↔ spec₂.Step (e a) (e b))
     (hsrc : ∀ a, spec₁.IsSrc a ↔ spec₂.IsSrc (e a))
     (htgt : ∀ a, spec₁.IsTgt a ↔ spec₂.IsTgt (e a)) :
@@ -230,7 +230,7 @@ omit [Finite Tag] in
 /-- Reading a formula of the ordered expansion of the target on the structure
 produced by the order-extended interpretation is reading it on the interpreted
 structure equipped with the lexicographic order. -/
-theorem realize_ordExtend_iff {β : Type} (φ : (L'.sum Language.order).Formula β)
+private theorem realize_ordExtend_iff {β : Type} (φ : (L'.sum Language.order).Formula β)
     (v : β → I.Map A) :
     @Formula.Realize (L'.sum Language.order) (I.ordExtend.Map A)
         (FOInterpretation.mapStructure I.ordExtend A) β φ v ↔
@@ -275,7 +275,7 @@ theorem TCSpec.comap_isSrc_iff (a : (spec.comap I).Node A) :
   exact h1.trans (realize_ordExtend_iff I (spec.src a.1.1) _)
 
 /-- **Accepting nodes correspond.** -/
-theorem TCSpec.comap_isTgt_iff (a : (spec.comap I).Node A) :
+private theorem TCSpec.comap_isTgt_iff (a : (spec.comap I).Node A) :
     letI := I.mapLinearOrder A
     (spec.comap I).IsTgt a ↔ spec.IsTgt (comapNodeEquiv spec I a) := by
   let := I.mapLinearOrder A
@@ -287,7 +287,7 @@ theorem TCSpec.comap_isTgt_iff (a : (spec.comap I).Node A) :
 
 /-- **The pullback is correct**: it accepts the base structure exactly when the
 specification accepts the interpreted one. -/
-theorem TCSpec.comap_accepts_iff :
+private theorem TCSpec.comap_accepts_iff :
     letI := I.mapLinearOrder A
     (spec.comap I).Accepts A ↔ spec.Accepts (I.Map A) := by
   let := I.mapLinearOrder A
@@ -296,7 +296,7 @@ theorem TCSpec.comap_accepts_iff :
 
 /-- **The pullback is correct for the deterministic reading too**, by the same
 node bijection: determinism is a property of the walk. -/
-theorem TCSpec.comap_det_accepts_iff :
+private theorem TCSpec.comap_det_accepts_iff :
     letI := I.mapLinearOrder A
     (spec.comap I).det.Accepts A ↔ spec.det.Accepts (I.Map A) := by
   let := I.mapLinearOrder A

@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Exponential.Pull
 public import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Exponential.Pull
 
 /-!
 # The exponential of a complexity class
@@ -49,7 +51,7 @@ open Language
 equivalence. Needed to compare the hardness halves of two classes built by
 `DescriptiveComplexity.ComplexityClass.ofMem` from equivalent membership
 predicates, as `DescriptiveComplexity.ComplexityClass.exp_compl` does. -/
-theorem cofinalHard_congr_mem
+private theorem cofinalHard_congr_mem
     {Mem Mem' : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop}
     (h : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational] (Q : DecisionProblem L₀), Mem Q ↔ Mem' Q)
     {L : Language.{0, 0}} [L.IsRelational] (P : DecisionProblem L) :

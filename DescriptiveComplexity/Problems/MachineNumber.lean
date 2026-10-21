@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.MachineNumber.Membership
 public import DescriptiveComplexity.Problems.MachineNumber.Hardness
 import DescriptiveComplexity.Problems.HornSat.NumberHardness
 import DescriptiveComplexity.Counting.Digits.NormalForm
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Problems.HornSat.NumberHardness
+import all DescriptiveComplexity.Problems.MachineNumber.Hardness
 
 /-!
 # The number written by a machine is complete for FP

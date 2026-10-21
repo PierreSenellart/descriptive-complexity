@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.MachineAltSpace.Guards
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.MachineAltSpace.Guards
 
 /-!
 # The configuration block, and the four sentences of the machine
@@ -156,12 +157,12 @@ def Tp (ρ : cfgBlock.Assignment A) (p a : A) : Prop := ρ CIx.tp ![p, a]
 
 omit [(Language.turingAlt 2).Structure A] [LinearOrder A] in
 /-- A unary variable is read at its only argument. -/
-theorem apply₁ (f : (Fin 1 → A) → Prop) (v : Fin 1 → A) : f v ↔ f fun _ => v 0 :=
+private theorem apply₁ (f : (Fin 1 → A) → Prop) (v : Fin 1 → A) : f v ↔ f fun _ => v 0 :=
   iff_of_eq (congrArg f (funext fun j => congrArg v (Subsingleton.elim j 0)))
 
 omit [(Language.turingAlt 2).Structure A] [LinearOrder A] in
 /-- A binary variable is read at its two arguments. -/
-theorem apply₂ (f : (Fin 2 → A) → Prop) (v : Fin 2 → A) : f v ↔ f ![v 0, v 1] := by
+private theorem apply₂ (f : (Fin 2 → A) → Prop) (v : Fin 2 → A) : f v ↔ f ![v 0, v 1] := by
   refine iff_of_eq (congrArg f (funext fun j => ?_))
   fin_cases j <;> rfl
 
@@ -349,7 +350,7 @@ section SentenceRealize
 
 variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 
-theorem realize_isCfgS (ρ : cfgBlock.Assignment A) :
+private theorem realize_isCfgS (ρ : cfgBlock.Assignment A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) isCfgS ↔ IsCfg ρ) := by
   let := cfgBlock.structure₁ (L := tmaOrd) ρ
   rw [isCfgS, IsCfg, Sentence.Realize]
@@ -367,7 +368,7 @@ theorem realize_isCfgS (ρ : cfgBlock.Assignment A) :
   · exact ⟨fun h p a a' h1 h2 => h ![p, a, a'] ⟨h1, h2⟩,
       fun h w hw => h (w 0) (w 1) (w 2) hw.1 hw.2⟩
 
-theorem realize_isCfgBS (ρ σ : cfgBlock.Assignment A) :
+private theorem realize_isCfgBS (ρ σ : cfgBlock.Assignment A) :
     (@Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) ρ σ) isCfgBS ↔ IsCfg σ) := by
   let := cfgBlock.structure₂ (L := tmaOrd) ρ σ
   rw [isCfgBS, IsCfg, Sentence.Realize]
@@ -385,7 +386,7 @@ theorem realize_isCfgBS (ρ σ : cfgBlock.Assignment A) :
   · exact ⟨fun h p a a' h1 h2 => h ![p, a, a'] ⟨h1, h2⟩,
       fun h w hw => h (w 0) (w 1) (w 2) hw.1 hw.2⟩
 
-theorem realize_univS (c : Config A) :
+private theorem realize_univS (c : Config A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)) univS ↔
       RelMap (atmBlk (1 : Fin 2)) ![c.state]) := by
   let := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
@@ -394,7 +395,7 @@ theorem realize_univS (c : Config A) :
     realize_blkG, st_cfgOf, Sum.elim_inr]
   exact ⟨fun ⟨w, hw, hb⟩ => hw ▸ hb, fun hb => ⟨fun _ => c.state, rfl, hb⟩⟩
 
-theorem realize_wonS (c : Config A) :
+private theorem realize_wonS (c : Config A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)) wonS ↔
       ATMAcc (k := 2) c.state) := by
   let := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
@@ -439,7 +440,7 @@ section BigRealize
 
 variable {A : Type} [(Language.turingAlt 2).Structure A] [LinearOrder A]
 
-theorem realize_stepS (c c' : Config A) :
+private theorem realize_stepS (c c' : Config A) :
     (@Sentence.Realize cfg2 A (cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')) stepS ↔
       (atmData 2 A).toTMData.Step c c') := by
   let := cfgBlock.structure₂ (L := tmaOrd) (cfgOf c) (cfgOf c')
@@ -465,7 +466,7 @@ theorem realize_stepS (c c' : Config A) :
       htr, rfl, hsrc, rfl, hdst, rfl, rfl, rfl, hread, rfl, hwrite, fun i hi => ?_, hdir⟩
     rw [hframe (i 0) hi]
 
-theorem realize_isInitS (c : Config A) :
+private theorem realize_isInitS (c : Config A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)) isInitS ↔
       (atmData 2 A).toTMData.IsInit c) := by
   let := cfgBlock.structure₁ (L := tmaOrd) (cfgOf c)
@@ -478,7 +479,7 @@ theorem realize_isInitS (c : Config A) :
     (and_congr ⟨fun ⟨w, hw, hs⟩ => hw ▸ hs, fun hs => ⟨fun _ => c.head, rfl, hs⟩⟩ ?_)
   exact ⟨fun h p => h ![p, c.tape p] rfl, fun h w hw => hw ▸ h (w 0)⟩
 
-theorem realize_startS (ρ : cfgBlock.Assignment A) :
+private theorem realize_startS (ρ : cfgBlock.Assignment A) :
     (@Sentence.Realize cfg1 A (cfgBlock.structure₁ (L := tmaOrd) ρ) startS ↔
       ((atmData 2 A).toTMData.WellFormed ∧ (atmData 2 A).BlocksSplit ∧
         ∃ c : Config A, ρ = cfgOf c ∧ (atmData 2 A).toTMData.IsInit c)) := by

@@ -9,6 +9,7 @@ public import DescriptiveComplexity.FixedPointReductionClosure
 public import DescriptiveComplexity.Problems.Even
 public import DescriptiveComplexity.Problems.Parity
 public import DescriptiveComplexity.FixedPointInflationaryLFP
+import all DescriptiveComplexity.Problems.Even
 
 /-!
 # FO(LFP) reductions are strictly stronger than first-order ones
@@ -96,7 +97,7 @@ variable {d : StepDef (Language.empty.sum Language.order)}
 
 /-- Every point of the interpreted universe is marked exactly when the
 induction answers yes. -/
-theorem relMap_evenMarkInterp (A : Type) [Language.empty.Structure A] [LinearOrder A]
+private theorem relMap_evenMarkInterp (A : Type) [Language.empty.Structure A] [LinearOrder A]
     (xs : Fin 1 → (evenMarkInterp d).Map A) :
     RelMap (M := (evenMarkInterp d).Map A) Language.markedSetMark xs ↔ d.IFPHolds A := by
   let := (evenMarkInterp d).expStructure A
@@ -106,7 +107,7 @@ theorem relMap_evenMarkInterp (A : Type) [Language.empty.Structure A] [LinearOrd
 
 /-- Every element of the base universe is a point of the interpreted one: the
 domain formula is `⊤`. -/
-theorem evenMarkInterp_nonempty (A : Type) [Language.empty.Structure A] [LinearOrder A]
+private theorem evenMarkInterp_nonempty (A : Type) [Language.empty.Structure A] [LinearOrder A]
     [Nonempty A] : Nonempty ((evenMarkInterp d).Map A) :=
   letI := (evenMarkInterp d).expStructure A
   ⟨⟨((), fun _ => Classical.arbitrary A), Formula.realize_top.mpr trivial⟩⟩
@@ -114,7 +115,7 @@ theorem evenMarkInterp_nonempty (A : Type) [Language.empty.Structure A] [LinearO
 /-- **EVEN FO(LFP)-reduces to NONEMPTYMARK**: the reduction marks everything
 when the universe is even and nothing when it is odd, the decision being made
 by the induction that puts EVEN in PTIME. -/
-theorem even_lfpReduction_nonemptyMark : Nonempty (EVEN ≤ˡᶠᵖ NONEMPTYMARK) := by
+private theorem even_lfpReduction_nonemptyMark : Nonempty (EVEN ≤ˡᶠᵖ NONEMPTYMARK) := by
   obtain ⟨d, hd⟩ := (ifpDefinable_iff_mem_PTIME EVEN).mpr even_mem_PTIME
   refine ⟨{ Tag := Unit
             dim := 1
@@ -131,7 +132,7 @@ theorem even_lfpReduction_nonemptyMark : Nonempty (EVEN ≤ˡᶠᵖ NONEMPTYMARK
 /-- **EVEN does not first-order reduce to NONEMPTYMARK**: the target is
 first-order definable and EVEN is not, and definability travels backward along
 first-order reductions. -/
-theorem even_not_orderedReduction_nonemptyMark : IsEmpty (EVEN ≤ᶠᵒ[≤] NONEMPTYMARK) :=
+private theorem even_not_orderedReduction_nonemptyMark : IsEmpty (EVEN ≤ᶠᵒ[≤] NONEMPTYMARK) :=
   even_not_le_of_foDefinable nonemptyMark_foDefinable
 
 /-- **FO(LFP) reductions are strictly stronger than first-order ones**, with

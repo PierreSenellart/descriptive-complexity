@@ -7,6 +7,12 @@ module
 
 public import DescriptiveComplexity.HeadLex
 public import DescriptiveComplexity.WalkBudget
+import all DescriptiveComplexity.HeadCapture
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadLex
+import all DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.WalkBudget
 
 /-!
 # The capture theorem for L: the deterministic machine of a specification
@@ -221,7 +227,8 @@ variable {K : ℕ} {α A : Type} [L.Structure A] [LinearOrder A] [Finite A]
 
 /-- The evaluator, with the formula's variables read off any heads below the
 protected level. -/
-theorem decides_evalFormula (sh : ℕ → Fin K) (hsh : ∀ i : ℕ, i < K → ((sh i : Fin K) : ℕ) = i)
+private theorem decides_evalFormula
+    (sh : ℕ → Fin K) (hsh : ∀ i : ℕ, i < K → ((sh i : Fin K) : ℕ) = i)
     (prot : ℕ) (φ : (L.sum Language.order).Formula α) (hv : α → Fin K)
     (hlow : ∀ a, ((hv a : Fin K) : ℕ) < prot) (hK : prot + qdepth φ ≤ K) :
     (evalP sh prot (Sum.elim hv Fin.elim0) φ).Decides A prot
@@ -276,13 +283,15 @@ theorem dblk_val (t : Fin 4) (i : Fin spec.k) :
 @[simp]
 theorem dmk_val : ((dmk spec : Fin (dHeads spec)) : ℕ) = 4 * spec.k := rfl
 
-theorem dshd_val {i : ℕ} (h : i < dHeads spec) : ((dshd spec i : Fin (dHeads spec)) : ℕ) = i := by
+private theorem dshd_val
+    {i : ℕ} (h : i < dHeads spec) : ((dshd spec i : Fin (dHeads spec)) : ℕ) = i := by
   rw [dshd, dite_eq_left h]
 
-theorem dshd_val' : ∀ i : ℕ, i < dHeads spec → ((dshd spec i : Fin (dHeads spec)) : ℕ) = i :=
+private theorem dshd_val'
+    : ∀ i : ℕ, i < dHeads spec → ((dshd spec i : Fin (dHeads spec)) : ℕ) = i :=
   fun _ h => dshd_val spec h
 
-theorem dblk_lt (t : Fin 4) (i : Fin spec.k) :
+private theorem dblk_lt (t : Fin 4) (i : Fin spec.k) :
     ((dblk spec t i : Fin (dHeads spec)) : ℕ) < 4 * spec.k := by
   have h1 := t.isLt
   have h2 := i.isLt
@@ -291,21 +300,21 @@ theorem dblk_lt (t : Fin 4) (i : Fin spec.k) :
     _ = ((t : ℕ) + 1) * spec.k := by ring
     _ ≤ 4 * spec.k := Nat.mul_le_mul_right _ (by omega)
 
-theorem dblk_lt_prot (t : Fin 4) (i : Fin spec.k) :
+private theorem dblk_lt_prot (t : Fin 4) (i : Fin spec.k) :
     ((dblk spec t i : Fin (dHeads spec)) : ℕ) < dprot spec :=
   lt_trans (dblk_lt spec t i) (by rw [dprot]; omega)
 
-theorem dmk_lt_prot : ((dmk spec : Fin (dHeads spec)) : ℕ) < dprot spec := by
+private theorem dmk_lt_prot : ((dmk spec : Fin (dHeads spec)) : ℕ) < dprot spec := by
   rw [dmk_val, dprot]
   omega
 
-theorem dblk_inj (t : Fin 4) : Function.Injective (dblk spec t) := by
+private theorem dblk_inj (t : Fin 4) : Function.Injective (dblk spec t) := by
   intro i j h
   have := congrArg (fun z : Fin (dHeads spec) => (z : ℕ)) h
   rw [dblk_val, dblk_val] at this
   exact Fin.ext (by omega)
 
-theorem dblk_ne_dmk (t : Fin 4) (i : Fin spec.k) : dblk spec t i ≠ dmk spec := by
+private theorem dblk_ne_dmk (t : Fin 4) (i : Fin spec.k) : dblk spec t i ≠ dmk spec := by
   intro h
   have := congrArg (fun z : Fin (dHeads spec) => (z : ℕ)) h
   rw [dblk_val, dmk_val] at this
@@ -370,14 +379,14 @@ section Moves
 
 variable (spec : TCSpec L)
 
-theorem dblk_range (t : Fin 4) (i : Fin spec.k) :
+private theorem dblk_range (t : Fin 4) (i : Fin spec.k) :
     (t : ℕ) * spec.k ≤ ((dblk spec t i : Fin (dHeads spec)) : ℕ) ∧
       ((dblk spec t i : Fin (dHeads spec)) : ℕ) < (t : ℕ) * spec.k + spec.k := by
   rw [dblk_val]
   have := i.isLt
   omega
 
-theorem dblk_notMem_range {t t' : Fin 4} (i : Fin spec.k) (h : t' ≠ t) :
+private theorem dblk_notMem_range {t t' : Fin 4} (i : Fin spec.k) (h : t' ≠ t) :
     ¬((t : ℕ) * spec.k ≤ ((dblk spec t' i : Fin (dHeads spec)) : ℕ) ∧
       ((dblk spec t' i : Fin (dHeads spec)) : ℕ) < (t : ℕ) * spec.k + spec.k) := by
   rw [dblk_val]
@@ -393,7 +402,7 @@ theorem dblk_notMem_range {t t' : Fin 4} (i : Fin spec.k) (h : t' ≠ t) :
         _ ≤ (t' : ℕ) * spec.k := Nat.mul_le_mul_right _ (by omega)
     omega
 
-theorem dmk_notMem_range (t : Fin 4) :
+private theorem dmk_notMem_range (t : Fin 4) :
     ¬((t : ℕ) * spec.k ≤ ((dmk spec : Fin (dHeads spec)) : ℕ) ∧
       ((dmk spec : Fin (dHeads spec)) : ℕ) < (t : ℕ) * spec.k + spec.k) := by
   rw [dmk_val]
@@ -403,7 +412,7 @@ theorem dmk_notMem_range (t : Fin 4) :
       _ ≤ 4 * spec.k := Nat.mul_le_mul_right _ (by omega)
   omega
 
-theorem high_notMem_range (t : Fin 4) {h : Fin (dHeads spec)} (hh : dprot spec ≤ (h : ℕ)) :
+private theorem high_notMem_range (t : Fin 4) {h : Fin (dHeads spec)} (hh : dprot spec ≤ (h : ℕ)) :
     ¬((t : ℕ) * spec.k ≤ (h : ℕ) ∧ (h : ℕ) < (t : ℕ) * spec.k + spec.k) := by
   have ht := t.isLt
   have hle : (t : ℕ) * spec.k + spec.k ≤ 4 * spec.k := by
@@ -431,7 +440,7 @@ noncomputable def dStartMoves : Fin (dHeads spec) → HeadMove (dHeads spec) :=
   fun h => if (h : ℕ) < spec.k then .copy (dshd spec (2 * spec.k + (h : ℕ)))
     else if 3 * spec.k ≤ (h : ℕ) ∧ (h : ℕ) < 4 * spec.k then .toMin else .stay
 
-theorem dshd_dblk (t : Fin 4) (i : Fin spec.k) :
+private theorem dshd_dblk (t : Fin 4) (i : Fin spec.k) :
     dshd spec ((t : ℕ) * spec.k + (i : ℕ)) = dblk spec t i := by
   have hlt : (t : ℕ) * spec.k + (i : ℕ) < dHeads spec := by
     have := dblk_lt spec t i
@@ -1204,7 +1213,7 @@ theorem dmk_ne_blk1 (i : Fin spec.k) : dmk spec ≠ dblk spec 1 i :=
   fun he => dblk_ne_dmk spec 1 i he.symm
 
 /-- Covers are unique in a linear order. -/
-theorem covBy_unique {C : Type} [LinearOrder C] {a b b' : C} (h : a ⋖ b) (h' : a ⋖ b') :
+private theorem covBy_unique {C : Type} [LinearOrder C] {a b b' : C} (h : a ⋖ b) (h' : a ⋖ b') :
     b = b' := by
   rcases lt_trichotomy b b' with hlt | he | hgt
   · exact absurd hlt (h'.2 h.1)
@@ -1358,7 +1367,7 @@ theorem dstep_candMode {ms m cm : spec.Mode} {i : Fin (modeCard spec + 1)}
         DetNode spec.Mode _), y) :=
   ⟨true, ⟨rfl, h1, h2⟩, rfl⟩
 
-theorem ixOf_of_modeAt {i : Fin (modeCard spec + 1)} {m : spec.Mode}
+private theorem ixOf_of_modeAt {i : Fin (modeCard spec + 1)} {m : spec.Mode}
     (h : modeAt spec i = some m) : ixOf spec m = i := by
   rw [modeAt] at h
   by_cases hi : (i : ℕ) < modeCard spec
@@ -1370,7 +1379,7 @@ theorem ixOf_of_modeAt {i : Fin (modeCard spec + 1)} {m : spec.Mode}
   · rw [dite_eq_right hi] at h
     exact absurd h (by simp)
 
-theorem nextIx_val {i : Fin (modeCard spec + 1)} (hi : (i : ℕ) < modeCard spec) :
+private theorem nextIx_val {i : Fin (modeCard spec + 1)} (hi : (i : ℕ) < modeCard spec) :
     ((nextIx spec i : Fin (modeCard spec + 1)) : ℕ) = (i : ℕ) + 1 := by
   rw [nextIx, dite_eq_left hi]
 
@@ -1617,7 +1626,7 @@ noncomputable def dcount (spec : TCSpec L) {B : Type} [LinearOrder B] (cm : spec
 
 omit [L.Structure A] [Finite A] in
 /-- The counter's value determines the mode and the tuple. -/
-theorem dcount_inj {cm cm' : spec.Mode} {t t' : Fin spec.k → A}
+private theorem dcount_inj {cm cm' : spec.Mode} {t t' : Fin spec.k → A}
     (h : dcount spec cm t = dcount spec cm' t') : cm = cm' ∧ t = t' := by
   have h1 : (modeEquiv spec cm, toLex t) = (modeEquiv spec cm', toLex t') := toLex_inj.mp h
   exact ⟨(modeEquiv spec).injective (congrArg Prod.fst h1),
@@ -1625,19 +1634,19 @@ theorem dcount_inj {cm cm' : spec.Mode} {t t' : Fin spec.k → A}
 
 omit [L.Structure A] [Finite A] in
 /-- Stepping the tuple is a cover of the counter. -/
-theorem dcount_covBy_tup [Nonempty A] (cm : spec.Mode) {t t' : Fin spec.k → A}
+private theorem dcount_covBy_tup [Nonempty A] (cm : spec.Mode) {t t' : Fin spec.k → A}
     (h : TupSucc t t') : dcount spec cm t ⋖ dcount spec cm t' :=
   prodLex_covBy_iff.mpr (Or.inl ⟨rfl, tupSucc_iff_covBy.mp h⟩)
 
 /-- The index of a mode the enumeration produces. -/
-theorem modeEquiv_of_modeAt {i : Fin (modeCard spec + 1)} {m : spec.Mode}
+private theorem modeEquiv_of_modeAt {i : Fin (modeCard spec + 1)} {m : spec.Mode}
     (h : modeAt spec i = some m) : ((modeEquiv spec m : Fin (modeCard spec)) : ℕ) = (i : ℕ) :=
   congrArg (fun j : Fin (modeCard spec + 1) => (j : ℕ)) (ixOf_of_modeAt h)
 
 omit [L.Structure A] [Finite A] in
 /-- Running the tuple out and moving to the next mode is a cover of the
 counter. -/
-theorem dcount_covBy_mode [Nonempty A] {cm cm' : spec.Mode} {t t' : Fin spec.k → A}
+private theorem dcount_covBy_mode [Nonempty A] {cm cm' : spec.Mode} {t t' : Fin spec.k → A}
     (hnext : modeAt spec (nextIx spec (ixOf spec cm)) = some cm')
     (htop : ∀ (i : Fin spec.k) (a : A), a ≤ t i)
     (hbot : ∀ (i : Fin spec.k) (a : A), t' i ≤ a) :
@@ -1651,7 +1660,7 @@ theorem dcount_covBy_mode [Nonempty A] {cm cm' : spec.Mode} {t t' : Fin spec.k �
 
 omit [L.Structure A] [Finite A] in
 /-- The counter starts at the bottom of its order. -/
-theorem dcount_isBot {cm : spec.Mode} {t : Fin spec.k → A}
+private theorem dcount_isBot {cm : spec.Mode} {t : Fin spec.k → A}
     (h0 : modeAt spec (ix0 spec) = some cm) (hbot : ∀ (i : Fin spec.k) (a : A), t i ≤ a) :
     ∀ u : DCount spec A, dcount spec cm t ≤ u := by
   refine prodLex_isBot_iff.mpr ⟨fun j => ?_, tup_isBot_iff.mpr hbot⟩
@@ -1661,7 +1670,7 @@ theorem dcount_isBot {cm : spec.Mode} {t : Fin spec.k → A}
 omit [L.Structure A] [Finite A] in
 /-- **The counter is exhausted** when its tuple is the greatest one and its
 mode is the last of the enumeration. -/
-theorem dcount_isTop {cm : spec.Mode} {t : Fin spec.k → A}
+private theorem dcount_isTop {cm : spec.Mode} {t : Fin spec.k → A}
     (htop : ∀ (i : Fin spec.k) (a : A), a ≤ t i)
     (hnone : modeAt spec (nextIx spec (ixOf spec cm)) = none) :
     ∀ u : DCount spec A, u ≤ dcount spec cm t := by
@@ -1716,7 +1725,7 @@ end Counter
 
 omit [L.Structure A] in
 /-- The marker can be parked at the greatest element. -/
-theorem exists_dPark (x : Fin (dHeads spec) → A) :
+private theorem exists_dPark (x : Fin (dHeads spec) → A) :
     ∃ y : Fin (dHeads spec) → A, (∀ a : A, a ≤ y (dmk spec)) ∧
       ∀ (t : Fin 4) (i : Fin spec.k), y (dblk spec t i) = x (dblk spec t i) := by
   classical
@@ -1732,7 +1741,7 @@ theorem exists_dPark (x : Fin (dHeads spec) → A) :
 omit [L.Structure A] in
 /-- A walk can be started: the source is copied onto the current block and the
 counter is set to its least tuple. -/
-theorem exists_dStart (x : Fin (dHeads spec) → A) :
+private theorem exists_dStart (x : Fin (dHeads spec) → A) :
     ∃ y : Fin (dHeads spec) → A, (∀ i, y (dblk spec 0 i) = x (dblk spec 2 i)) ∧
       (∀ (i : Fin spec.k) (a : A), y (dblk spec 3 i) ≤ a) ∧
       (∀ (t : Fin 4) (i : Fin spec.k), t ≠ 0 → t ≠ 3 →
@@ -1852,7 +1861,7 @@ theorem dmk_ne_blk2 (i : Fin spec.k) : dmk spec ≠ dblk spec 2 i :=
 
 /-- **A step of the walk taken with the counter at its greatest tuple**: the
 machine moves to the successor, fails to tick, and lands at `tickReset`. -/
-theorem walkToTickReset (ms m cm : spec.Mode) (x : Fin (dHeads spec) → A)
+private theorem walkToTickReset (ms m cm : spec.Mode) (x : Fin (dHeads spec) → A)
     (hmk : ∀ a : A, a ≤ x (dmk spec)) (hntgt : ¬spec.IsTgt (m, dTup spec 0 x))
     {w' : spec.Node A} (hstep : spec.det.Step (m, dTup spec 0 x) w')
     (htop : ∀ (i : Fin spec.k) (a : A), a ≤ x (dblk spec 3 i)) :
@@ -2017,7 +2026,7 @@ theorem walkOut (ms : spec.Mode) : ∀ (z : DCount spec A) (m cm : spec.Mode)
 /-! ### Completeness: the source enumeration -/
 
 /-- The counter mode the machine starts a walk with. -/
-theorem exists_modeAt_ix0 (m : spec.Mode) : ∃ cm₀, modeAt spec (ix0 spec) = some cm₀ := by
+private theorem exists_modeAt_ix0 (m : spec.Mode) : ∃ cm₀, modeAt spec (ix0 spec) = some cm₀ := by
   have hpos : ((ix0 spec : Fin (modeCard spec + 1)) : ℕ) < modeCard spec :=
     Nat.lt_of_le_of_lt (Nat.zero_le _) (modeEquiv spec m).isLt
   exact ⟨_, by rw [modeAt, dite_eq_left hpos]⟩

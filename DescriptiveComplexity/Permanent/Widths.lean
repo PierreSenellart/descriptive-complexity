@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Permanent.Ladder
 import Mathlib.Data.Int.GCD
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.Positivity
+import all DescriptiveComplexity.Permanent.Basic
 
 /-!
 # From an integer matrix to a 0-1 matrix, modulo `2 ^ L + 1`
@@ -55,7 +56,7 @@ theorem widths_le (M : V → V → ℤ) (hM : ∀ a b, M a b ≤ 3) (a b : V) (�
 omit [Fintype V] [DecidableEq V] in
 /-- The product of the widths along a ladder: `2 ^ L` for an entry `-1`, the
 entry otherwise. -/
-theorem prod_widths (M : V → V → ℤ) (a b : V) :
+private theorem prod_widths (M : V → V → ℤ) (a b : V) :
     ∏ ℓ : Λ, widths M a b ℓ = if M a b = -1 then 2 ^ Fintype.card Λ else (M a b).toNat := by
   unfold widths
   split_ifs with h
@@ -65,7 +66,7 @@ theorem prod_widths (M : V → V → ℤ) (a b : V) :
 omit [Fintype V] [DecidableEq V] in
 /-- The product of the widths is congruent to the entry modulo `2 ^ L + 1`,
 for an entry at least `-1`. -/
-theorem prod_widths_modEq (M : V → V → ℤ) (a b : V) (hM : -1 ≤ M a b) :
+private theorem prod_widths_modEq (M : V → V → ℤ) (a b : V) (hM : -1 ≤ M a b) :
     ((∏ ℓ : Λ, widths M a b ℓ : ℕ) : ℤ) ≡ M a b [ZMOD 2 ^ Fintype.card Λ + 1] := by
   rw [prod_widths]
   split_ifs with h

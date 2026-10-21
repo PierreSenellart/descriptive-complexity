@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefTower
 public import DescriptiveComplexity.Problems.Wide.DrawStageAtom
+import all DescriptiveComplexity.Problems.Wide.DrawDefKit
+import all DescriptiveComplexity.Problems.Wide.DrawDefTower
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The two guards the program's own sites are written from, and the stage atom
@@ -55,7 +58,7 @@ theorem uGDefinable_exitG :
 /-- **A naming guard is definable**, given that each of its coordinates is
 compared definably: the block flag and the padding flag are atoms, and the
 comparison is the caller's. -/
-theorem uGDefinable_nameGF {b : Fin dt.ko ⊕ Fin dt.ki}
+private theorem uGDefinable_nameGF {b : Fin dt.ko ⊕ Fin dt.ki}
     {cf : ∀ e : Env L, (Q → e.α) → Fin dt.dd0 → e.α}
     (hcf : ∀ j : Fin dt.dd0, UGDefinable (Q := Q) (W := dt.SlotIx)
       fun e f g => g (Slot.name j) = cf e f j) :
@@ -66,7 +69,7 @@ theorem uGDefinable_nameGF {b : Fin dt.ko ⊕ Fin dt.ki}
 
 /-- **The naming guard of a coordinate loop is definable**: its coordinates are
 control slots, so each comparison is one atom. -/
-theorem uGDefinable_nameG (b : Fin dt.ko ⊕ Fin dt.ki) (coord : Fin dt.dd0 → Q) :
+private theorem uGDefinable_nameG (b : Fin dt.ko ⊕ Fin dt.ki) (coord : Fin dt.dd0 → Q) :
     UGDefinable (L := L) fun e (f : Q → e.α) g => dt.nameG e.one b coord f g :=
   uGDefinable_nameGF fun j =>
     (uGDefinable_mixEq (L := L) (W := dt.SlotIx) (coord j) (Slot.name j)).congr

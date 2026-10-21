@@ -54,7 +54,7 @@ variable {L : Language.{0, 0}} {A : Type} [L.Structure A]
 
 /-- The vocabulary morphism is an expansion between the two induced
 structures. -/
-theorem homLHom_isExpansionOn (σ : B'.Assignment A) :
+private theorem homLHom_isExpansionOn (σ : B'.Assignment A) :
     @LHom.IsExpansionOn _ _ (homLHom f hf (B := B)) A
       (B.structure (B.homAssign f hf σ)) (B'.structure σ) := by
   let := B.structure (B.homAssign f hf σ)
@@ -65,7 +65,7 @@ theorem homLHom_isExpansionOn (σ : B'.Assignment A) :
 /-- **Transport of a formula along a block morphism**: realization over the
 target block's assignment is realization of the original formula over the
 pulled-back assignment. -/
-theorem realize_homFormula {α : Type} (σ : B'.Assignment A)
+private theorem realize_homFormula {α : Type} (σ : B'.Assignment A)
     (φ : (L.sum B.lang).Formula α) (v : α → A) :
     (@Formula.Realize _ A (B'.structure₁ (L := L) σ) _
       ((LHom.sumMap (LHom.id L) (homLHom f hf (B := B))).onFormula φ) v) ↔

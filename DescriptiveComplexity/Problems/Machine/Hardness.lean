@@ -9,6 +9,11 @@ public import DescriptiveComplexity.Problems.Machine.Tape
 public import DescriptiveComplexity.Problems.Sat
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Tape
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # The machine of a CNF formula
@@ -290,7 +295,7 @@ theorem one_eq_one_iff {t t' : SatTag} {a a' : A} :
 
 omit [Language.sat.Structure A] in
 /-- A transition writes exactly one symbol. -/
-theorem satWrite_functional {τ a a' : SatV A} (h : SatWrite τ a) (h' : SatWrite τ a') :
+private theorem satWrite_functional {τ a a' : SatV A} (h : SatWrite τ a) (h' : SatWrite τ a') :
     a = a' := by
   unfold SatWrite at h h'
   cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h' <;> exact h.trans h'.symm
@@ -298,7 +303,8 @@ theorem satWrite_functional {τ a a' : SatV A} (h : SatWrite τ a) (h' : SatWrit
 /-- A transition moves to exactly one state. The only case with a choice is the
 check clause, whose two branches are separated by the flag and by
 `DescriptiveComplexity.SatLit`. -/
-theorem satDst_functional {τ q q' : SatV A} (h : SatDst τ q) (h' : SatDst τ q') : q = q' := by
+private theorem satDst_functional
+    {τ q q' : SatV A} (h : SatDst τ q) (h' : SatDst τ q') : q = q' := by
   unfold SatDst at h h'
   cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h'
   case tChk v f d =>
@@ -316,7 +322,7 @@ theorem satDst_functional {τ q q' : SatV A} (h : SatDst τ q) (h' : SatDst τ q
 omit [Finite A] [Nonempty A] in
 /-- **The end of the guess phase is not ambiguous**: an instance either has a
 clause to check or has none. -/
-theorem satTr_guessEnd_excl {τ τ' : SatV A} (h : SatTr τ) (h' : SatTr τ')
+private theorem satTr_guessEnd_excl {τ τ' : SatV A} (h : SatTr τ) (h' : SatTr τ')
     (hτ : τ.1 = SatTag.tGuessEndAcc) (hτ' : τ'.1 = SatTag.tGuessEndChk) : False := by
   unfold SatTr at h h'
   rw [hτ] at h
@@ -326,7 +332,7 @@ theorem satTr_guessEnd_excl {τ τ' : SatV A} (h : SatTr τ) (h' : SatTr τ')
 omit [Finite A] [Nonempty A] in
 /-- **A turn is not ambiguous**: the clause just checked either has a successor
 or is the last one. -/
-theorem satTr_turn_excl {τ τ' : SatV A} {d d' : Bool} (h : SatTr τ) (h' : SatTr τ')
+private theorem satTr_turn_excl {τ τ' : SatV A} {d d' : Bool} (h : SatTr τ) (h' : SatTr τ')
     (hτ : τ.1 = SatTag.tTurnNext d) (hτ' : τ'.1 = SatTag.tTurnAcc d')
     (hc : τ.2 0 = τ'.2 0) : False := by
   unfold SatTr at h h'
@@ -336,7 +342,7 @@ theorem satTr_turn_excl {τ τ' : SatV A} {d d' : Bool} (h : SatTr τ) (h' : Sat
 
 /-- The tag of the state a transition applies in, as a function of its own tag.
 Junk tags are sent to themselves; they are never transitions. -/
-def stateTag : SatTag → SatTag
+private def stateTag : SatTag → SatTag
   | .tGuessStart => .qGuess
   | .tGuessVal _ => .qGuess
   | .tGuessEndAcc => .qGuess
@@ -347,7 +353,7 @@ def stateTag : SatTag → SatTag
   | t => t
 
 /-- The tag of the symbol a transition reads, as a function of its own tag. -/
-def readTag : SatTag → SatTag
+private def readTag : SatTag → SatTag
   | .tGuessStart => .sStart
   | .tGuessVal _ => .sU
   | .tGuessEndAcc => .sEnd
@@ -358,14 +364,14 @@ def readTag : SatTag → SatTag
   | t => t
 
 /-- **The state pins the transition's tag.** -/
-theorem satSrc_tag {τ q : SatV A} (hτ : SatTr τ) (hs : SatSrc τ q) :
+private theorem satSrc_tag {τ q : SatV A} (hτ : SatTr τ) (hs : SatSrc τ q) :
     q.1 = stateTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [SatTr, SatSrc] at hτ hs <;>
     (rw [hs]; rfl)
 
 /-- **The symbol read pins the transition's tag.** -/
-theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
+private theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
     a.1 = readTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [SatTr, SatRead] at hτ hr <;>
@@ -374,40 +380,40 @@ theorem satRead_tag {τ a : SatV A} (hτ : SatTr τ) (hr : SatRead τ a) :
       | (rename_i d; cases d <;> (rw [hr]; rfl))
 
 /-- Being the tag of a transition. -/
-def isTrTag : SatTag → Bool
+private def isTrTag : SatTag → Bool
   | .tGuessStart | .tGuessVal _ | .tGuessEndAcc | .tGuessEndChk
   | .tChk _ _ _ | .tTurnNext _ | .tTurnAcc _ => true
   | _ => false
 
 /-- The tag of a guess-phase write. -/
-def isGuessVal : SatTag → Bool
+private def isGuessVal : SatTag → Bool
   | .tGuessVal _ => true
   | _ => false
 
 /-- The tag ending the guess phase with no clause to check. -/
-def isEndAcc : SatTag → Bool
+private def isEndAcc : SatTag → Bool
   | .tGuessEndAcc => true
   | _ => false
 
 /-- The tag ending the guess phase with a clause to check. -/
-def isEndChk : SatTag → Bool
+private def isEndChk : SatTag → Bool
   | .tGuessEndChk => true
   | _ => false
 
 /-- The tag turning to the next clause. -/
-def isTurnNext : SatTag → Bool
+private def isTurnNext : SatTag → Bool
   | .tTurnNext _ => true
   | _ => false
 
 /-- The tag accepting after the last clause. -/
-def isTurnAcc : SatTag → Bool
+private def isTurnAcc : SatTag → Bool
   | .tTurnAcc _ => true
   | _ => false
 
 /-- **The state and the symbol determine the transition's tag, up to the three
 known ambiguities**: the guess itself, the end of the guess phase, and a turn.
 A finite check over the tags – no case analysis by hand. -/
-theorem tag_cases : ∀ t t' : SatTag, isTrTag t → isTrTag t' →
+private theorem tag_cases : ∀ t t' : SatTag, isTrTag t → isTrTag t' →
     stateTag t = stateTag t' → readTag t = readTag t' →
     t = t' ∨ (isGuessVal t ∧ isGuessVal t') ∨
       (isEndAcc t ∧ isEndChk t') ∨ (isEndChk t ∧ isEndAcc t') ∨
@@ -416,7 +422,8 @@ theorem tag_cases : ∀ t t' : SatTag, isTrTag t → isTrTag t' →
 
 omit [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Two elements agree when their tag and both coordinates do. -/
-theorem satV_ext {τ τ' : SatV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0) (h1 : τ.2 1 = τ'.2 1) :
+private theorem satV_ext
+    {τ τ' : SatV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0) (h1 : τ.2 1 = τ'.2 1) :
     τ = τ' := by
   refine Prod.ext ht (funext fun i => ?_)
   fin_cases i
@@ -425,28 +432,28 @@ theorem satV_ext {τ τ' : SatV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0) (
 
 omit [Finite A] [Nonempty A] in
 /-- Only transitions have transition tags. -/
-theorem satTr_isTrTag {τ : SatV A} (hτ : SatTr τ) : isTrTag τ.1 := by
+private theorem satTr_isTrTag {τ : SatV A} (hτ : SatTr τ) : isTrTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> first | exact False.elim hτ | rfl
 
-theorem isGuessVal_iff {t : SatTag} : isGuessVal t ↔ ∃ v, t = .tGuessVal v := by
+private theorem isGuessVal_iff {t : SatTag} : isGuessVal t ↔ ∃ v, t = .tGuessVal v := by
   cases t <;> simp [isGuessVal]
 
-theorem isEndAcc_iff {t : SatTag} : isEndAcc t ↔ t = .tGuessEndAcc := by
+private theorem isEndAcc_iff {t : SatTag} : isEndAcc t ↔ t = .tGuessEndAcc := by
   cases t <;> simp [isEndAcc]
 
-theorem isEndChk_iff {t : SatTag} : isEndChk t ↔ t = .tGuessEndChk := by
+private theorem isEndChk_iff {t : SatTag} : isEndChk t ↔ t = .tGuessEndChk := by
   cases t <;> simp [isEndChk]
 
-theorem isTurnNext_iff {t : SatTag} : isTurnNext t ↔ ∃ d, t = .tTurnNext d := by
+private theorem isTurnNext_iff {t : SatTag} : isTurnNext t ↔ ∃ d, t = .tTurnNext d := by
   cases t <;> simp [isTurnNext]
 
-theorem isTurnAcc_iff {t : SatTag} : isTurnAcc t ↔ ∃ d, t = .tTurnAcc d := by
+private theorem isTurnAcc_iff {t : SatTag} : isTurnAcc t ↔ ∃ d, t = .tTurnAcc d := by
   cases t <;> simp [isTurnAcc]
 
 /-- Equal tags force equal payloads: the state and symbol pin one coordinate,
 the promises in `DescriptiveComplexity.SatTr` pin the other. -/
-theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
+private theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
     (hs : SatSrc τ q) (hs' : SatSrc τ' q) (hr : SatRead τ a) (hr' : SatRead τ' a)
     (ht : τ.1 = τ'.1) : τ = τ' := by
   have hmin : ∀ u v : A, (∀ b : A, u ≤ b) → (∀ b : A, v ≤ b) → u = v :=
@@ -471,25 +478,25 @@ theorem satTr_payload {τ τ' q a : SatV A} (hτ : SatTr τ) (hτ' : SatTr τ')
 
 omit [Language.sat.Structure A] in
 /-- Reading off `DescriptiveComplexity.SatSrc` at a guess-write tag. -/
-theorem satSrc_guessVal {τ q : SatV A} {v : Bool} (h : τ.1 = .tGuessVal v)
+private theorem satSrc_guessVal {τ q : SatV A} {v : Bool} (h : τ.1 = .tGuessVal v)
     (hs : SatSrc τ q) : q = stGuess := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
 omit [Language.sat.Structure A] in
 /-- Reading off `DescriptiveComplexity.SatRead` at a guess-write tag. -/
-theorem satRead_guessVal {τ a : SatV A} {v : Bool} (h : τ.1 = .tGuessVal v)
+private theorem satRead_guessVal {τ a : SatV A} {v : Bool} (h : τ.1 = .tGuessVal v)
     (hr : SatRead τ a) : a = symU (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hr
 
 omit [Language.sat.Structure A] in
 /-- Reading off `DescriptiveComplexity.SatSrc` at a turn-to-next tag. -/
-theorem satSrc_turnNext {τ q : SatV A} {d : Bool} (h : τ.1 = .tTurnNext d)
+private theorem satSrc_turnNext {τ q : SatV A} {d : Bool} (h : τ.1 = .tTurnNext d)
     (hs : SatSrc τ q) : q = stChk true d (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
 omit [Language.sat.Structure A] in
 /-- Reading off `DescriptiveComplexity.SatSrc` at a turn-to-accept tag. -/
-theorem satSrc_turnAcc {τ q : SatV A} {d : Bool} (h : τ.1 = .tTurnAcc d)
+private theorem satSrc_turnAcc {τ q : SatV A} {d : Bool} (h : τ.1 = .tTurnAcc d)
     (hs : SatSrc τ q) : q = stChk true d (τ.2 0) := by
   obtain ⟨t, w⟩ := τ; cases h; exact hs
 
@@ -527,31 +534,31 @@ end Functional
 
 omit [Language.sat.Structure A] in
 /-- The left marker is a position. -/
-theorem satPosn_posStart : SatPosn (posStart : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
+private theorem satPosn_posStart : SatPosn (posStart : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
 
 omit [Language.sat.Structure A] in
 /-- The cell of an element is a position. -/
-theorem satPosn_posCell (x : A) : SatPosn (posCell x : SatV A) := fun a => botA_le a
+private theorem satPosn_posCell (x : A) : SatPosn (posCell x : SatV A) := fun a => botA_le a
 
 omit [Language.sat.Structure A] in
 /-- The right marker is a position. -/
-theorem satPosn_posEnd : SatPosn (posEnd : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
+private theorem satPosn_posEnd : SatPosn (posEnd : SatV A) := fun a => ⟨botA_le a, botA_le a⟩
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- The tape order is reflexive. -/
-theorem tagTupleLe_refl (p : SatV A) : tagTupleLe p p := Or.inr ⟨rfl, Or.inl rfl⟩
+private theorem tagTupleLe_refl (p : SatV A) : tagTupleLe p p := Or.inr ⟨rfl, Or.inl rfl⟩
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- A tag strictly below another puts its tuples below all of theirs. -/
-theorem tagTupleLe_of_tag_lt {p q : SatV A} (h : p.1 < q.1) : tagTupleLe p q := Or.inl h
+private theorem tagTupleLe_of_tag_lt {p q : SatV A} (h : p.1 < q.1) : tagTupleLe p q := Or.inl h
 
 /-- Every tag other than the left marker's is above it. -/
-theorem pStart_lt {t : SatTag} (h : t ≠ SatTag.pStart) : SatTag.pStart < t := by
+private theorem pStart_lt {t : SatTag} (h : t ≠ SatTag.pStart) : SatTag.pStart < t := by
   revert h; revert t; decide
 
 omit [Language.sat.Structure A] in
 /-- There is only one left marker. -/
-theorem eq_posStart_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pStart) :
+private theorem eq_posStart_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pStart) :
     p = posStart := by
   obtain ⟨t, w⟩ := p
   cases h
@@ -562,7 +569,7 @@ theorem eq_posStart_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pSta
 
 omit [Language.sat.Structure A] in
 /-- **The left marker is the lowest position**: the head starts there. -/
-theorem minPos_posStart : MinPos tagTupleLe SatPosn (posStart : SatV A) := by
+private theorem minPos_posStart : MinPos tagTupleLe SatPosn (posStart : SatV A) := by
   refine ⟨satPosn_posStart, fun q hq => ?_⟩
   rcases eq_or_ne q.1 SatTag.pStart with h | h
   · rw [eq_posStart_of_posn hq h]
@@ -571,22 +578,22 @@ theorem minPos_posStart : MinPos tagTupleLe SatPosn (posStart : SatV A) := by
 
 omit [Language.sat.Structure A] in
 /-- The left marker precedes every cell. -/
-theorem posStart_le_posCell (x : A) : tagTupleLe (posStart : SatV A) (posCell x) :=
+private theorem posStart_le_posCell (x : A) : tagTupleLe (posStart : SatV A) (posCell x) :=
   tagTupleLe_of_tag_lt (show SatTag.pStart < SatTag.pCell by decide)
 
 omit [Language.sat.Structure A] in
 /-- Every cell precedes the right marker. -/
-theorem posCell_le_posEnd (x : A) : tagTupleLe (posCell x : SatV A) posEnd :=
+private theorem posCell_le_posEnd (x : A) : tagTupleLe (posCell x : SatV A) posEnd :=
   tagTupleLe_of_tag_lt (show SatTag.pCell < SatTag.pEnd by decide)
 
 omit [Language.sat.Structure A] in
 /-- The left marker precedes the right marker. -/
-theorem posStart_le_posEnd : tagTupleLe (posStart : SatV A) posEnd :=
+private theorem posStart_le_posEnd : tagTupleLe (posStart : SatV A) posEnd :=
   tagTupleLe_of_tag_lt (show SatTag.pStart < SatTag.pEnd by decide)
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- The tape order refines the tag order. -/
-theorem tagTupleLe_tag_le {p q : SatV A} (h : tagTupleLe p q) : p.1 ≤ q.1 := by
+private theorem tagTupleLe_tag_le {p q : SatV A} (h : tagTupleLe p q) : p.1 ≤ q.1 := by
   rcases h with h | ⟨h, -⟩
   · exact le_of_lt h
   · exact le_of_eq h
@@ -595,7 +602,7 @@ omit [Language.sat.Structure A] in
 /-- **Cells are ordered as their elements are.** The tape order between two
 cells is the source order between the elements they belong to – which is what
 makes a sweep over the cells a walk along the instance. -/
-theorem posCell_le_iff {x y : A} : tagTupleLe (posCell x : SatV A) (posCell y) ↔ x ≤ y := by
+private theorem posCell_le_iff {x y : A} : tagTupleLe (posCell x : SatV A) (posCell y) ↔ x ≤ y := by
   constructor
   · rintro (h | ⟨-, h | ⟨j, hlt, hj⟩⟩)
     · exact absurd h (lt_irrefl _)
@@ -610,13 +617,13 @@ theorem posCell_le_iff {x y : A} : tagTupleLe (posCell x : SatV A) (posCell y) �
     · exact Or.inr ⟨0, fun i hi => absurd hi (by omega), by simpa [one] using hlt⟩
 
 /-- Only the two lowest tags are at or below a cell's. -/
-theorem tag_le_pCell {t : SatTag} (h : t ≤ SatTag.pCell) :
+private theorem tag_le_pCell {t : SatTag} (h : t ≤ SatTag.pCell) :
     t = SatTag.pStart ∨ t = SatTag.pCell := by
   revert h; revert t; decide
 
 omit [Language.sat.Structure A] in
 /-- A cell is the cell of the element it carries. -/
-theorem eq_posCell_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pCell) :
+private theorem eq_posCell_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pCell) :
     p = posCell (p.2 0) := by
   obtain ⟨t, w⟩ := p
   cases h
@@ -628,7 +635,7 @@ theorem eq_posCell_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pCell
 omit [Language.sat.Structure A] in
 /-- **The head's first move.** The cell of the least element follows the left
 marker immediately: the guess sweep starts by stepping over `⊢`. -/
-theorem succPos_posStart_posCell :
+private theorem succPos_posStart_posCell :
     SuccPos tagTupleLe SatPosn (posStart : SatV A) (posCell botA) := by
   refine ⟨satPosn_posStart, satPosn_posCell _, posStart_le_posCell _, ?_, ?_⟩
   · intro h
@@ -649,13 +656,13 @@ theorem le_topA (a : A) : a ≤ topA (A := A) := (Finite.exists_max (id : A → 
 
 /-- Only the two highest of the bracketing tags lie between a cell's and the
 right marker's. -/
-theorem tag_between {t : SatTag} (h₁ : SatTag.pCell ≤ t) (h₂ : t ≤ SatTag.pEnd) :
+private theorem tag_between {t : SatTag} (h₁ : SatTag.pCell ≤ t) (h₂ : t ≤ SatTag.pEnd) :
     t = SatTag.pCell ∨ t = SatTag.pEnd := by
   revert h₁ h₂; revert t; decide
 
 omit [Language.sat.Structure A] in
 /-- There is only one right marker. -/
-theorem eq_posEnd_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pEnd) :
+private theorem eq_posEnd_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pEnd) :
     p = posEnd := by
   obtain ⟨t, w⟩ := p
   cases h
@@ -667,7 +674,7 @@ theorem eq_posEnd_of_posn {p : SatV A} (hp : SatPosn p) (h : p.1 = SatTag.pEnd) 
 omit [Language.sat.Structure A] in
 /-- **The head's last move of a sweep.** The right marker follows the cell of
 the greatest element: this is where the guess sweep stops. -/
-theorem succPos_posCell_posEnd :
+private theorem succPos_posCell_posEnd :
     SuccPos tagTupleLe SatPosn (posCell (topA (A := A)) : SatV A) posEnd := by
   refine ⟨satPosn_posCell _, satPosn_posEnd, posCell_le_posEnd _, ?_, ?_⟩
   · intro h
@@ -682,7 +689,7 @@ theorem succPos_posCell_posEnd :
 
 /-- **A transition determines the step**: two steps out of the same
 configuration by the same transition lead to the same configuration. -/
-theorem config_eq_of_tr {c c₁ c₂ : Config (SatV A)} {τ : SatV A} (hdst : SatDst τ c₁.state)
+private theorem config_eq_of_tr {c c₁ c₂ : Config (SatV A)} {τ : SatV A} (hdst : SatDst τ c₁.state)
     (hdst' : SatDst τ c₂.state) (hwrite : SatWrite τ (c₁.tape c.head))
     (hwrite' : SatWrite τ (c₂.tape c.head))
     (hframe : ∀ p, p ≠ c.head → c₁.tape p = c.tape p)
@@ -730,7 +737,7 @@ and an accepting configuration has no successor. -/
 
 omit [Language.sat.Structure A] in
 /-- A transition other than a guess write writes back the symbol it read. -/
-theorem satWrite_eq_read {τ a b : SatV A} (hr : SatRead τ a) (hw : SatWrite τ b)
+private theorem satWrite_eq_read {τ a b : SatV A} (hr : SatRead τ a) (hw : SatWrite τ b)
     (hg : ∀ v, τ.1 ≠ SatTag.tGuessVal v) : b = a := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [SatRead, SatWrite] at hr hw <;>
@@ -739,7 +746,7 @@ theorem satWrite_eq_read {τ a b : SatV A} (hr : SatRead τ a) (hw : SatWrite τ
       | exact absurd rfl (hg _)
 
 /-- **Only a guess write changes the tape.** -/
-theorem step_tape_eq {c d : Config (SatV A)} (h : (satMachine A).Step c d)
+private theorem step_tape_eq {c d : Config (SatV A)} (h : (satMachine A).Step c d)
     (hng : ¬ (c.state = stGuess ∧ ∃ x : A, c.tape c.head = symU x)) : d.tape = c.tape := by
   obtain ⟨τ, hτ, hsrc, hread, -, hwrite, hframe, -⟩ := h
   have hg : ∀ v, τ.1 ≠ SatTag.tGuessVal v := fun v hv =>
@@ -752,7 +759,7 @@ theorem step_tape_eq {c d : Config (SatV A)} (h : (satMachine A).Step c d)
 /-- **The guessing state is not entered again**: a step out of a state that is
 not the guessing one, or out of the guessing state over the right marker,
 leads to a state that is not the guessing one. -/
-theorem step_state_ne_guess {c d : Config (SatV A)} (h : (satMachine A).Step c d)
+private theorem step_state_ne_guess {c d : Config (SatV A)} (h : (satMachine A).Step c d)
     (hs : c.state.1 ≠ SatTag.qGuess ∨ c.tape c.head = symEnd) :
     d.state.1 ≠ SatTag.qGuess := by
   obtain ⟨τ, hτ, hsrc, hread, hdst, -, -, -⟩ := h
@@ -772,7 +779,7 @@ theorem step_state_ne_guess {c d : Config (SatV A)} (h : (satMachine A).Step c d
 
 /-- **Past the guess phase the tape is frozen**: a run from a state that is not
 the guessing one ends on the tape it started with. -/
-theorem stepsIn_tape_eq : ∀ (k : ℕ) (c cfin : Config (SatV A)),
+private theorem stepsIn_tape_eq : ∀ (k : ℕ) (c cfin : Config (SatV A)),
     (satMachine A).StepsIn k c cfin → c.state.1 ≠ SatTag.qGuess → cfin.tape = c.tape := by
   intro k
   induction k with
@@ -787,10 +794,11 @@ theorem stepsIn_tape_eq : ∀ (k : ℕ) (c cfin : Config (SatV A)),
     rw [ih c₁ cfin hrest (step_state_ne_guess hstep (Or.inl hc)), step_tape_eq hstep hng]
 
 /-- No transition applies in the accepting state. -/
-theorem trTag_state_ne_qAcc : ∀ t : SatTag, isTrTag t → stateTag t ≠ SatTag.qAcc := by decide
+private theorem trTag_state_ne_qAcc
+    : ∀ t : SatTag, isTrTag t → stateTag t ≠ SatTag.qAcc := by decide
 
 /-- **An accepting configuration has no successor.** -/
-theorem not_step_of_acc {c d : Config (SatV A)} (hacc : SatAcc c.state) :
+private theorem not_step_of_acc {c d : Config (SatV A)} (hacc : SatAcc c.state) :
     ¬ (satMachine A).Step c d := by
   rintro ⟨τ, hτ, hsrc, -⟩
   have h1 : c.state.1 = stateTag τ.1 := satSrc_tag hτ hsrc
@@ -831,7 +839,7 @@ element reads the same before and after: markers and non-cells do not depend on
 the head at all, junk cells are frozen, and a real cell is below the new head
 exactly when it was below the old one – by the between-condition of
 `DescriptiveComplexity.SuccPos` in one direction and transitivity in the other. -/
-theorem guessTape_frame (ν : A → Bool) {p q r : SatV A}
+private theorem guessTape_frame (ν : A → Bool) {p q r : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hr : r ≠ p) :
     guessTape ν q r = guessTape ν p r := by
   classical
@@ -860,7 +868,7 @@ theorem guessTape_frame (ν : A → Bool) {p q r : SatV A}
 /-- **The guess sweep starts from an initial configuration**: at the left
 marker no cell is below the head, so every cell still reads unassigned – which
 is exactly the input `DescriptiveComplexity.SatInp` describes. -/
-theorem isInit_confGuess (ν : A → Bool) :
+private theorem isInit_confGuess (ν : A → Bool) :
     (satMachine A).IsInit (confGuess ν posStart) := by
   have hne : ∀ q : SatV A, q.1 = SatTag.pCell →
       ¬ ((∀ a : A, q.2 1 ≤ a) ∧ tagTupleLe q (posStart : SatV A) ∧ q ≠ posStart) := by
@@ -880,14 +888,14 @@ theorem isInit_confGuess (ν : A → Bool) :
          rcases hb with ⟨h, -⟩ | ⟨h, -, -, -⟩ | ⟨h, -⟩ <;> rw [hq] at h <;> simp at h)
 
 /-- Only the three bracketing tags are at or below the right marker's. -/
-theorem tag_le_pEnd {t : SatTag} (h : t ≤ SatTag.pEnd) :
+private theorem tag_le_pEnd {t : SatTag} (h : t ≤ SatTag.pEnd) :
     t = SatTag.pStart ∨ t = SatTag.pCell ∨ t = SatTag.pEnd := by
   revert h; revert t; decide
 
 /-- **One step of the guess sweep.** At the left marker the machine steps over
 it; at a cell it writes the guessed value and moves on; past the right marker
 the segment bound leaves nothing to prove. -/
-theorem step_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x) {p q : SatV A}
+private theorem step_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x) {p q : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hb : tagTupleLe q posEnd) :
     (satMachine A).Step (confGuess ν p) (confGuess ν q) := by
   classical
@@ -921,7 +929,7 @@ theorem step_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
 /-- **The whole guess sweep.** From the left marker to the right one, the
 machine writes a truth value in every cell, in as many steps as there are
 positions strictly between the markers – plus the two markers themselves. -/
-theorem steps_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x) :
+private theorem steps_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x) :
     (satMachine A).StepsIn
       (bitRank tagTupleLe SatPosn (posEnd : SatV A) -
         bitRank tagTupleLe SatPosn (posStart : SatV A))
@@ -933,7 +941,7 @@ theorem steps_guess (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x
 /-- **The turn out of the guess phase**, when there is a clause to check: the
 machine reads the right marker, takes the lowest clause with an empty flag, and
 turns round to sweep leftwards. -/
-theorem step_turnChk (ν : A → Bool) {c₀ : A} (hc₀ : SatMinCl c₀) :
+private theorem step_turnChk (ν : A → Bool) {c₀ : A} (hc₀ : SatMinCl c₀) :
     (satMachine A).Step (confGuess ν posEnd)
       { state := stChk false false c₀, head := posCell topA, tape := guessTape ν posEnd } := by
   refine ⟨one .tGuessEndChk c₀, ⟨fun a => botA_le a, hc₀⟩, rfl, ?_, rfl, ?_,
@@ -946,7 +954,7 @@ theorem step_turnChk (ν : A → Bool) {c₀ : A} (hc₀ : SatMinCl c₀) :
 /-- **The turn out of the guess phase**, when the instance has no clause at
 all: the formula is vacuously satisfiable and the machine accepts. Without this
 tag the run would die and the reduction would be wrong on the empty CNF. -/
-theorem step_turnAcc (ν : A → Bool) (hno : ∀ e : A, ¬ SatCl e) :
+private theorem step_turnAcc (ν : A → Bool) (hno : ∀ e : A, ¬ SatCl e) :
     (satMachine A).Step (confGuess ν posEnd)
       { state := stAcc, head := posCell topA, tape := guessTape ν posEnd } := by
   refine ⟨cst .tGuessEndAcc, ⟨isMinTup_bot, hno⟩, rfl, ?_, rfl, ?_,
@@ -965,18 +973,18 @@ noncomputable def doneTape (ν : A → Bool) : SatV A → SatV A := guessTape ν
 open Classical in
 /-- The flag of a leftward check sweep with the head at `p`: some cell already
 visited – that is, strictly above `p` – satisfies the clause `c`. -/
-noncomputable def chkFlagL (ν : A → Bool) (c : A) (p : SatV A) : Bool :=
+private noncomputable def chkFlagL (ν : A → Bool) (c : A) (p : SatV A) : Bool :=
   decide (∃ y : A, tagTupleLe p (posCell y) ∧ p ≠ posCell y ∧ SatLit c y (ν y))
 
 /-- The configuration during a leftward check sweep of the clause `c`. -/
-noncomputable def confChkL (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV A) where
+private noncomputable def confChkL (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV A) where
   state := stChk (chkFlagL ν c p) false c
   head := p
   tape := doneTape ν
 
 /-- **A check sweep starts with an empty flag**: at the highest cell nothing has
 been visited yet. -/
-theorem chkFlagL_top (ν : A → Bool) (c : A) :
+private theorem chkFlagL_top (ν : A → Bool) (c : A) :
     chkFlagL ν c (posCell (topA (A := A))) = false := by
   classical
   simp only [chkFlagL, decide_eq_false_iff_not]
@@ -987,7 +995,7 @@ theorem chkFlagL_top (ν : A → Bool) (c : A) :
 from `q` to the position below it brings `q`'s own cell into view and nothing
 else, because `DescriptiveComplexity.SuccPos` leaves no room between them. This is the
 whole content of a check sweep. -/
-theorem chkFlagL_succ (ν : A → Bool) (c : A) {p q : SatV A}
+private theorem chkFlagL_succ (ν : A → Bool) (c : A) {p q : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hq : q.1 = SatTag.pCell) :
     chkFlagL ν c p = true ↔
       (chkFlagL ν c q = true ∨ SatLit c (q.2 0) (ν (q.2 0))) := by
@@ -1018,7 +1026,7 @@ theorem chkFlagL_succ (ν : A → Bool) (c : A) {p q : SatV A}
 
 omit [Language.sat.Structure A] in
 /-- After the guess sweep every real cell holds its assigned value. -/
-theorem doneTape_cell (ν : A → Bool) {q : SatV A} (hq : q.1 = SatTag.pCell)
+private theorem doneTape_cell (ν : A → Bool) {q : SatV A} (hq : q.1 = SatTag.pCell)
     (hpos : ∀ a : A, q.2 1 ≤ a) : doneTape ν q = symV (ν (q.2 0)) (q.2 0) := by
   classical
   simp only [doneTape, guessTape, hq]
@@ -1033,7 +1041,7 @@ theorem doneTape_cell (ν : A → Bool) {q : SatV A} (hq : q.1 = SatTag.pCell)
 on, folds that literal into the flag, and moves one place left. Which of the
 two `DescriptiveComplexity.SatDst` branches applies is exactly
 `DescriptiveComplexity.chkFlagL_succ`. -/
-theorem step_chkL (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
+private theorem step_chkL (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hq : q.1 = SatTag.pCell) :
     (satMachine A).Step (confChkL ν c q) (confChkL ν c p) := by
   classical
@@ -1060,7 +1068,7 @@ theorem step_chkL (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
 
 /-- **A whole leftward check sweep.** From the highest cell down to the left
 marker, the flag accumulating the literals of `c` satisfied along the way. -/
-theorem steps_chkL (ν : A → Bool) {c : A} (hc : SatCl c) :
+private theorem steps_chkL (ν : A → Bool) {c : A} (hc : SatCl c) :
     (satMachine A).StepsIn
       (bitRank tagTupleLe SatPosn (posCell (topA (A := A))) -
         bitRank tagTupleLe SatPosn (posStart : SatV A))
@@ -1077,18 +1085,18 @@ theorem steps_chkL (ν : A → Bool) {c : A} (hc : SatCl c) :
 open Classical in
 /-- The flag of a *rightward* check sweep with the head at `p`: some cell
 already visited – strictly below `p` – satisfies `c`. -/
-noncomputable def chkFlagR (ν : A → Bool) (c : A) (p : SatV A) : Bool :=
+private noncomputable def chkFlagR (ν : A → Bool) (c : A) (p : SatV A) : Bool :=
   decide (∃ y : A, tagTupleLe (posCell y) p ∧ posCell y ≠ p ∧ SatLit c y (ν y))
 
 /-- The configuration during a rightward check sweep of the clause `c`. -/
-noncomputable def confChkR (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV A) where
+private noncomputable def confChkR (ν : A → Bool) (c : A) (p : SatV A) : Config (SatV A) where
   state := stChk (chkFlagR ν c p) true c
   head := p
   tape := doneTape ν
 
 /-- **A rightward sweep also starts with an empty flag**: nothing lies below
 the lowest cell. -/
-theorem chkFlagR_bot (ν : A → Bool) (c : A) :
+private theorem chkFlagR_bot (ν : A → Bool) (c : A) :
     chkFlagR ν c (posCell (botA (A := A))) = false := by
   classical
   simp only [chkFlagR, decide_eq_false_iff_not]
@@ -1097,12 +1105,12 @@ theorem chkFlagR_bot (ν : A → Bool) (c : A) :
 
 omit [Language.sat.Structure A] in
 /-- The left marker keeps its symbol throughout. -/
-theorem doneTape_start (ν : A → Bool) : doneTape ν (posStart : SatV A) = symStart := rfl
+private theorem doneTape_start (ν : A → Bool) : doneTape ν (posStart : SatV A) = symStart := rfl
 
 /-- **The turn at the left marker**, when another clause follows: the flag is
 set, so the machine takes the next clause, empties the flag and reverses to
 sweep rightwards. -/
-theorem step_turnNextL (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
+private theorem step_turnNextL (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
     (hflag : chkFlagL ν c (posStart : SatV A) = true) :
     (satMachine A).Step (confChkL ν c posStart) (confChkR ν c' (posCell botA)) := by
   refine ⟨(SatTag.tTurnNext false, ![c, c']), hnext, ?_, doneTape_start ν, ?_,
@@ -1114,7 +1122,7 @@ theorem step_turnNextL (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
 
 /-- **Stepping up adds exactly one literal to the flag** – the mirror of
 `DescriptiveComplexity.chkFlagL_succ`. -/
-theorem chkFlagR_succ (ν : A → Bool) (c : A) {p q : SatV A}
+private theorem chkFlagR_succ (ν : A → Bool) (c : A) {p q : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hp : p.1 = SatTag.pCell) :
     chkFlagR ν c q = true ↔ (chkFlagR ν c p = true ∨ SatLit c (p.2 0) (ν (p.2 0))) := by
   classical
@@ -1144,7 +1152,7 @@ theorem chkFlagR_succ (ν : A → Bool) (c : A) {p q : SatV A}
 
 /-- **One step of a rightward check sweep** – the mirror of
 `DescriptiveComplexity.step_chkL`. -/
-theorem step_chkR (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
+private theorem step_chkR (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
     (hsucc : SuccPos tagTupleLe SatPosn p q) (hp : p.1 = SatTag.pCell) :
     (satMachine A).Step (confChkR ν c p) (confChkR ν c q) := by
   classical
@@ -1171,11 +1179,11 @@ theorem step_chkR (ν : A → Bool) {c : A} (hc : SatCl c) {p q : SatV A}
 
 omit [Language.sat.Structure A] in
 /-- The right marker keeps its symbol throughout. -/
-theorem doneTape_end (ν : A → Bool) : doneTape ν (posEnd : SatV A) = symEnd := rfl
+private theorem doneTape_end (ν : A → Bool) : doneTape ν (posEnd : SatV A) = symEnd := rfl
 
 /-- **A whole rightward check sweep** – the mirror of
 `DescriptiveComplexity.steps_chkL`. -/
-theorem steps_chkR (ν : A → Bool) {c : A} (hc : SatCl c) :
+private theorem steps_chkR (ν : A → Bool) {c : A} (hc : SatCl c) :
     (satMachine A).StepsIn
       (bitRank tagTupleLe SatPosn (posEnd : SatV A) -
         bitRank tagTupleLe SatPosn (posCell (botA (A := A))))
@@ -1191,7 +1199,7 @@ theorem steps_chkR (ν : A → Bool) {c : A} (hc : SatCl c) :
 
 /-- **The turn at the right marker**, when another clause follows – the mirror
 of `DescriptiveComplexity.step_turnNextL`. -/
-theorem step_turnNextR (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
+private theorem step_turnNextR (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
     (hflag : chkFlagR ν c (posEnd : SatV A) = true) :
     (satMachine A).Step (confChkR ν c posEnd) (confChkL ν c' (posCell topA)) := by
   refine ⟨(SatTag.tTurnNext true, ![c, c']), hnext, ?_, doneTape_end ν, ?_,
@@ -1203,7 +1211,7 @@ theorem step_turnNextR (ν : A → Bool) {c c' : A} (hnext : SatNextCl c c')
 
 /-- **Accepting at the left marker**: the flag is set and the clause just
 checked was the last one. -/
-theorem step_turnAccL (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
+private theorem step_turnAccL (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
     (hflag : chkFlagL ν c (posStart : SatV A) = true) :
     (satMachine A).Step (confChkL ν c posStart)
       { state := stAcc, head := posCell botA, tape := doneTape ν } := by
@@ -1213,7 +1221,7 @@ theorem step_turnAccL (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
   rw [hflag]
 
 /-- **Accepting at the right marker** – the mirror. -/
-theorem step_turnAccR (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
+private theorem step_turnAccR (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
     (hflag : chkFlagR ν c (posEnd : SatV A) = true) :
     (satMachine A).Step (confChkR ν c posEnd)
       { state := stAcc, head := posCell topA, tape := doneTape ν } := by
@@ -1225,7 +1233,7 @@ theorem step_turnAccR (ν : A → Bool) {c : A} (hmax : SatMaxCl c)
 
 /-- **A completed leftward sweep has seen every cell**: its flag says exactly
 that some element satisfies the clause. -/
-theorem chkFlagL_posStart (ν : A → Bool) (c : A) :
+private theorem chkFlagL_posStart (ν : A → Bool) (c : A) :
     chkFlagL ν c (posStart : SatV A) = true ↔ ∃ y : A, SatLit c y (ν y) := by
   classical
   simp only [chkFlagL, decide_eq_true_eq]
@@ -1240,7 +1248,7 @@ theorem chkFlagL_posStart (ν : A → Bool) (c : A) :
 /-- **A completed rightward sweep has seen every cell** – the same statement,
 which is why the alternating directions never have to be reconciled inside the
 induction over clauses. -/
-theorem chkFlagR_posEnd (ν : A → Bool) (c : A) :
+private theorem chkFlagR_posEnd (ν : A → Bool) (c : A) :
     chkFlagR ν c (posEnd : SatV A) = true ↔ ∃ y : A, SatLit c y (ν y) := by
   classical
   simp only [chkFlagR, decide_eq_true_eq]
@@ -1263,24 +1271,24 @@ and what lets the whole run fit the budget of
 
 omit [Language.sat.Structure A] in
 /-- The left marker has rank `0`: it is the lowest position. -/
-theorem bitRank_posStart : bitRank tagTupleLe SatPosn (posStart : SatV A) = 0 :=
+private theorem bitRank_posStart : bitRank tagTupleLe SatPosn (posStart : SatV A) = 0 :=
   bitRank_eq_zero_of_minPos isLinOrd_tagTupleLe minPos_posStart
 
 omit [Language.sat.Structure A] in
 /-- The right marker sits one step above the last cell. -/
-theorem bitRank_posEnd_eq :
+private theorem bitRank_posEnd_eq :
     bitRank tagTupleLe SatPosn (posEnd : SatV A) =
       bitRank tagTupleLe SatPosn (posCell (topA (A := A))) + 1 :=
   bitRank_succPos isLinOrd_tagTupleLe succPos_posCell_posEnd
 
 omit [Language.sat.Structure A] in
 /-- The first cell has rank `1`: it follows the left marker. -/
-theorem bitRank_posCell_botA :
+private theorem bitRank_posCell_botA :
     bitRank tagTupleLe SatPosn (posCell (botA (A := A)) : SatV A) = 1 := by
   rw [bitRank_succPos isLinOrd_tagTupleLe succPos_posStart_posCell, bitRank_posStart]
 
 /-- Checking `c` leftwards and moving on to the next clause. -/
-theorem steps_clauseL (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
+private theorem steps_clauseL (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
     (hsat : ∃ y : A, SatLit c y (ν y)) :
     ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A),
       (satMachine A).StepsIn k (confChkL ν c (posCell topA)) (confChkR ν c' (posCell botA)) := by
@@ -1291,7 +1299,7 @@ theorem steps_clauseL (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNe
   omega
 
 /-- Checking `c` rightwards and moving on to the next clause. -/
-theorem steps_clauseR (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
+private theorem steps_clauseR (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNextCl c c')
     (hsat : ∃ y : A, SatLit c y (ν y)) :
     ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A),
       (satMachine A).StepsIn k (confChkR ν c (posCell botA)) (confChkL ν c' (posCell topA)) := by
@@ -1302,7 +1310,7 @@ theorem steps_clauseR (ν : A → Bool) {c c' : A} (hc : SatCl c) (hnext : SatNe
   omega
 
 /-- Checking the last clause leftwards, and accepting. -/
-theorem steps_clauseAccL (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
+private theorem steps_clauseAccL (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
     (hsat : ∃ y : A, SatLit c y (ν y)) :
     ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A), ∃ cfin : Config (SatV A),
       (satMachine A).StepsIn k (confChkL ν c (posCell topA)) cfin ∧ SatAcc cfin.state := by
@@ -1313,7 +1321,7 @@ theorem steps_clauseAccL (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMax
   omega
 
 /-- Checking the last clause rightwards, and accepting. -/
-theorem steps_clauseAccR (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
+private theorem steps_clauseAccR (ν : A → Bool) {c : A} (hc : SatCl c) (hmax : SatMaxCl c)
     (hsat : ∃ y : A, SatLit c y (ν y)) :
     ∃ k ≤ bitRank tagTupleLe SatPosn (posEnd : SatV A), ∃ cfin : Config (SatV A),
       (satMachine A).StepsIn k (confChkR ν c (posCell botA)) cfin ∧ SatAcc cfin.state := by
@@ -1329,7 +1337,7 @@ right marker, so a sweep of the tape takes about as many steps as the instance
 has elements – not as many as the tape has positions, which is what makes the
 run fit the budget. Proved by injecting into `Option A` rather than by counting.
 -/
-theorem bitRank_posEnd_le :
+private theorem bitRank_posEnd_le :
     bitRank tagTupleLe SatPosn (posEnd : SatV A) ≤ Nat.card A + 1 := by
   classical
   have hcell : ∀ r : SatV A, SatPosn r → tagTupleLe r posEnd → r ≠ posEnd →
@@ -1358,7 +1366,7 @@ omit [Nonempty A] in
 /-- **Every clause but the last has a next one.** The clause the machine turns
 to is the least one above the current one, which is what
 `DescriptiveComplexity.SatNextCl` asserts. -/
-theorem exists_satNextCl {c : A} (hc : SatCl c) (hnmax : ¬ SatMaxCl c) :
+private theorem exists_satNextCl {c : A} (hc : SatCl c) (hnmax : ¬ SatMaxCl c) :
     ∃ c', SatNextCl c c' := by
   have hne : ∃ e : A, SatCl e ∧ c < e := by
     by_contra hcon
@@ -1372,7 +1380,7 @@ theorem exists_satNextCl {c : A} (hc : SatCl c) (hnmax : ¬ SatMaxCl c) :
 omit [Nonempty A] in
 /-- Passing to the next clause removes exactly one clause from the ones still
 to be checked. -/
-theorem ncard_clauses_next {c c' : A} (hnext : SatNextCl c c') :
+private theorem ncard_clauses_next {c c' : A} (hnext : SatNextCl c c') :
     {e : A | SatCl e ∧ c ≤ e}.ncard = {e : A | SatCl e ∧ c' ≤ e}.ncard + 1 := by
   obtain ⟨hc, hc', hlt, hmin⟩ := hnext
   have hset : {e : A | SatCl e ∧ c ≤ e} = insert c {e : A | SatCl e ∧ c' ≤ e} := by
@@ -1394,7 +1402,8 @@ sweep's worth of steps per clause. Induction along the clauses from `c`
 upwards: if `c` is the last one the machine accepts at the marker it reaches,
 and otherwise it turns to the next clause, reversing direction – which is why
 the statement carries both orientations at once. -/
-theorem accepts_from_chk (ν : A → Bool) (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
+private theorem accepts_from_chk
+    (ν : A → Bool) (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
     ∀ c : A, SatCl c →
       (∃ (n : ℕ) (cfin : Config (SatV A)),
           n ≤ {e : A | SatCl e ∧ c ≤ e}.ncard * bitRank tagTupleLe SatPosn (posEnd : SatV A) ∧
@@ -1431,7 +1440,7 @@ theorem accepts_from_chk (ν : A → Bool) (hsat : ∀ e : A, SatCl e → ∃ y 
 `DescriptiveComplexity.TMData.WellFormed` – the order is linear, there is a position,
 the input is functional and the blank is unique. Every conjunct was proved on
 the tape layer, before any transition existed. -/
-theorem satMachine_wellFormed : (satMachine A).WellFormed :=
+private theorem satMachine_wellFormed : (satMachine A).WellFormed :=
   ⟨isLinOrd_tagTupleLe, exists_satPosn, fun _ _ _ ha hb => satInp_functional ha hb,
     exists_satBlank, fun _ _ ha hb => satBlank_unique ha hb⟩
 
@@ -1444,7 +1453,7 @@ The run is the guess sweep, the turn into the lowest clause, and one sweep per
 clause; its length is at most `(m + 1) · (n + 2)` steps for `n` elements and
 `m` clauses, which `DescriptiveComplexity.sat_budget` puts strictly below the number
 of filler positions alone. -/
-theorem satMachine_run_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
+private theorem satMachine_run_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
     (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
     ∃ (n : ℕ) (cfin : Config (SatV A)), n < Nat.card {p : SatV A // SatPosn p} ∧
       (satMachine A).StepsIn n (confGuess ν posStart) cfin ∧ SatAcc cfin.state ∧
@@ -1511,7 +1520,7 @@ theorem satMachine_run_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true �
       _ ≤ _ := hbudget
 
 /-- **A satisfying assignment makes the machine accept, within the budget.** -/
-theorem satMachine_accepts_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
+private theorem satMachine_accepts_of_sat (ν : A → Bool) (hν : ∀ x : A, ν x = true → SatVar x)
     (hsat : ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y)) :
     (satMachine A).Accepts := by
   obtain ⟨n, cfin, hn, hrun, hacc, -⟩ := satMachine_run_of_sat ν hν hsat
@@ -1532,34 +1541,35 @@ section Reverse
 
 /-- In the guessing state over an unassigned cell, only a guess write can
 fire. -/
-theorem trTag_guess_sU : ∀ t : SatTag, isTrTag t → stateTag t = SatTag.qGuess →
+private theorem trTag_guess_sU : ∀ t : SatTag, isTrTag t → stateTag t = SatTag.qGuess →
     readTag t = SatTag.sU → ∃ v, t = SatTag.tGuessVal v := by decide
 
 /-- In the guessing state over the right marker, only the two turns out of the
 guess phase can fire. -/
-theorem trTag_guess_sEnd : ∀ t : SatTag, isTrTag t → stateTag t = SatTag.qGuess →
+private theorem trTag_guess_sEnd : ∀ t : SatTag, isTrTag t → stateTag t = SatTag.qGuess →
     readTag t = SatTag.sEnd → t = SatTag.tGuessEndAcc ∨ t = SatTag.tGuessEndChk := by decide
 
 /-- In a check state over the left marker, only a leftward turn can fire, and
 only with the flag set. -/
-theorem trTag_chk_sStart : ∀ (t : SatTag) (f d : Bool), isTrTag t →
+private theorem trTag_chk_sStart : ∀ (t : SatTag) (f d : Bool), isTrTag t →
     stateTag t = SatTag.qChk f d → readTag t = SatTag.sStart →
     f = true ∧ d = false ∧ (t = SatTag.tTurnNext false ∨ t = SatTag.tTurnAcc false) := by decide
 
 /-- In a check state over the right marker, only a rightward turn can fire, and
 only with the flag set. -/
-theorem trTag_chk_sEnd : ∀ (t : SatTag) (f d : Bool), isTrTag t →
+private theorem trTag_chk_sEnd : ∀ (t : SatTag) (f d : Bool), isTrTag t →
     stateTag t = SatTag.qChk f d → readTag t = SatTag.sEnd →
     f = true ∧ d = true ∧ (t = SatTag.tTurnNext true ∨ t = SatTag.tTurnAcc true) := by decide
 
 /-- No transition reads the blank symbol: the head never leaves the bracketed
 tape, so a run that somehow stood on a filler could not move. -/
-theorem trTag_read_ne_sBlank : ∀ t : SatTag, isTrTag t → readTag t ≠ SatTag.sBlank := by decide
+private theorem trTag_read_ne_sBlank
+    : ∀ t : SatTag, isTrTag t → readTag t ≠ SatTag.sBlank := by decide
 
 omit [Language.sat.Structure A] in
 /-- Changing the assignment anywhere but strictly below the head leaves the
 guess tape unchanged: only the cells already passed read it. -/
-theorem guessTape_congr {ν ν' : A → Bool} {p : SatV A}
+private theorem guessTape_congr {ν ν' : A → Bool} {p : SatV A}
     (h : ∀ y : A, tagTupleLe (posCell y) p → posCell y ≠ p → ν y = ν' y) (r : SatV A) :
     guessTape ν p r = guessTape ν' p r := by
   classical
@@ -1581,7 +1591,8 @@ theorem guessTape_congr {ν ν' : A → Bool} {p : SatV A}
 position are pinned, and the initial tape is functional, so any initial
 configuration starts a guess run – of every assignment at once, no cell of the
 guess tape at the left marker reading the assignment at all. -/
-theorem isInit_eq_confGuess {c : Config (SatV A)} (h : (satMachine A).IsInit c) (ν : A → Bool) :
+private theorem isInit_eq_confGuess
+    {c : Config (SatV A)} (h : (satMachine A).IsInit c) (ν : A → Bool) :
     c = confGuess ν posStart := by
   obtain ⟨hstart, hmin, htape⟩ := h
   refine Config.ext ?_ ?_ (funext fun p => ?_)
@@ -1603,7 +1614,7 @@ be satisfied. The only live positions are the cells – where the step is pinned
 by determinism and the sweep continues – and the marker the sweep is headed to,
 where the transition that fired says the flag was set, hence the clause
 satisfied, and either names the next clause or certifies this one was last. -/
-theorem sat_of_chk (k : ℕ) :
+private theorem sat_of_chk (k : ℕ) :
     (∀ (ν : A → Bool) (c : A) (p : SatV A) (cfin : Config (SatV A)), SatCl c → SatPosn p →
       (satMachine A).StepsIn k (confChkL ν c p) cfin → SatAcc cfin.state →
       ∀ e : A, SatCl e → c ≤ e → ∃ y : A, SatLit e y (ν y)) ∧
@@ -1757,7 +1768,7 @@ theorem sat_of_chk (k : ℕ) :
 
 /-- **The tape at the end of the guess sweep is final**: a run from the
 configuration that ends the guess sweep never writes again. -/
-theorem stepsIn_posEnd_tape (ν : A → Bool) : ∀ (k : ℕ) (cfin : Config (SatV A)),
+private theorem stepsIn_posEnd_tape (ν : A → Bool) : ∀ (k : ℕ) (cfin : Config (SatV A)),
     (satMachine A).StepsIn k (confGuess ν posEnd) cfin → cfin.tape = doneTape ν := by
   intro k cfin hk
   cases k with
@@ -1780,7 +1791,7 @@ theorem stepsIn_posEnd_tape (ν : A → Bool) : ∀ (k : ℕ) (cfin : Config (Sa
 /-- **A guess step writes a truth value**: out of the guessing state over the
 unassigned cell of `x`, the cell under the old head holds `(x, v)` for some
 `v`. -/
-theorem step_guess_write {c d : Config (SatV A)} (h : (satMachine A).Step c d) {x : A}
+private theorem step_guess_write {c d : Config (SatV A)} (h : (satMachine A).Step c d) {x : A}
     (hst : c.state = stGuess) (hx : c.tape c.head = symU x) :
     ∃ v, d.tape c.head = symV v x := by
   obtain ⟨τ, hτ, hsrc, hread, -, hwrite, -, -⟩ := h
@@ -1799,7 +1810,7 @@ theorem step_guess_write {c d : Config (SatV A)} (h : (satMachine A).Step c d) {
 configuration that leave the same symbol under the old head are the same step.
 Away from the guess this is determinism; at a guess the symbol written is the
 truth value chosen. -/
-theorem step_functional_of_write {c c₁ c₂ : Config (SatV A)}
+private theorem step_functional_of_write {c c₁ c₂ : Config (SatV A)}
     (h₁ : (satMachine A).Step c c₁) (h₂ : (satMachine A).Step c c₂)
     (hw : c₁.tape c.head = c₂.tape c.head) : c₁ = c₂ := by
   by_cases hguess : c.state = stGuess ∧ ∃ x : A, c.tape c.head = symU x
@@ -1989,7 +2000,7 @@ end Reverse
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Satisfiability with a `Bool`-valued assignment, the form the machine
 manipulates. -/
-theorem satisfiable_iff_exists_bool :
+private theorem satisfiable_iff_exists_bool :
     Satisfiable A ↔ ∃ ν : A → Bool, ∀ e : A, SatCl e → ∃ y : A, SatLit e y (ν y) := by
   constructor
   · rintro ⟨ν, hν⟩

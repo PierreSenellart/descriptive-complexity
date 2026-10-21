@@ -11,6 +11,9 @@ import DescriptiveComplexity.Problems.Knapsack.Membership
 public import DescriptiveComplexity.Problems.Knapsack.Hardness
 import DescriptiveComplexity.Problems.ExactCover
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.ExactCover
+import all DescriptiveComplexity.Problems.Knapsack.Hardness
+import all DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
 # Knapsack

@@ -8,6 +8,11 @@ module
 public import DescriptiveComplexity.HeadArith
 public import DescriptiveComplexity.ArithmeticDefinable
 import DescriptiveComplexity.HeadCaptureDet
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.HeadArith
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Evaluating an arithmetic formula with heads, and `AC⁰ ⊆ LOGSPACE`
@@ -126,7 +131,7 @@ variable {acc cnt cand tmk a b mk : Fin K} {S d : ℕ}
 
 /-- The layout gives an addition the head discipline it asks for, at any level
 the evaluator can reach. -/
-theorem plusHeads (hs : ArithScratch acc cnt cand tmk a b mk S) {i j k : Fin K}
+private theorem plusHeads (hs : ArithScratch acc cnt cand tmk a b mk S) {i j k : Fin K}
     (hi : (i : ℕ) < d) (hj : (j : ℕ) < d) (hk : (k : ℕ) < d) (hd : d ≤ S) :
     PlusHeads i j k a b mk d where
   hi := hi
@@ -153,7 +158,7 @@ theorem plusHeads (hs : ArithScratch acc cnt cand tmk a b mk S) {i j k : Fin K}
 
 /-- The layout gives a multiplication the three-level head discipline it asks
 for, the middle level being the top of its four working heads. -/
-theorem timesHeads (hs : ArithScratch acc cnt cand tmk a b mk S) {i j k : Fin K}
+private theorem timesHeads (hs : ArithScratch acc cnt cand tmk a b mk S) {i j k : Fin K}
     (hi : (i : ℕ) < d) (hj : (j : ℕ) < d) (hk : (k : ℕ) < d) (hd : d ≤ S) :
     TimesHeads i j k acc cnt cand tmk a b mk d (S + 4) where
   hi := hi
@@ -269,7 +274,7 @@ omit [Finite A] [L.IsRelational] in
 /-- What an arithmetic formula says of the heads depends only on the heads its
 variables live in – the arithmetic twin of
 `DescriptiveComplexity.HeadProgram.headLocal_realize`. -/
-theorem headLocalA_realize {n d : ℕ} (hv : α ⊕ Fin n → Fin K)
+private theorem headLocalA_realize {n d : ℕ} (hv : α ⊕ Fin n → Fin K)
     (ψ : (L.sum Language.arith).BoundedFormula α n) (hlow : ∀ v, (hv v : ℕ) < d) :
     HeadLocal d fun x : Fin K → A =>
       ψ.Realize (fun v => x (hv (Sum.inl v))) (fun i => x (hv (Sum.inr i))) := by
@@ -284,7 +289,7 @@ theorem headLocalA_realize {n d : ℕ} (hv : α ⊕ Fin n → Fin K)
 
 /-- **An arithmetic atom is decided**: read as a guard where it is an input
 relation or the order, computed by a fragment where it is `plus` or `times`. -/
-theorem decides_arithAtomP (hs : ArithScratch acc cnt cand tmk a b mk S) (hSK : S + 7 ≤ K)
+private theorem decides_arithAtomP (hs : ArithScratch acc cnt cand tmk a b mk S) (hSK : S + 7 ≤ K)
     {n l d : ℕ} (hv : α ⊕ Fin l → Fin K) (hlow : ∀ v, (hv v : ℕ) < d) (hd : d ≤ S)
     (R : (L.sum Language.arith).Relations n)
     (ts : Fin n → (L.sum Language.arith).Term (α ⊕ Fin l)) :
@@ -344,7 +349,7 @@ theorem decides_arithAtomP (hs : ArithScratch acc cnt cand tmk a b mk S) (hSK : 
 
 /-- **The arithmetic evaluator is correct**: it decides the formula, reading its
 variables off the heads they live in, and gives those heads back untouched. -/
-theorem decides_evalArithP (sh : ℕ → Fin K) (hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i)
+private theorem decides_evalArithP (sh : ℕ → Fin K) (hsh : ∀ i : ℕ, i < K → (sh i : ℕ) = i)
     (hs : ArithScratch acc cnt cand tmk a b mk S) (hSK : S + 7 ≤ K) :
     ∀ {n : ℕ} (ψ : (L.sum Language.arith).BoundedFormula α n) (d : ℕ)
       (hv : α ⊕ Fin n → Fin K), (∀ v, (hv v : ℕ) < d) → d + qdepthA ψ ≤ S →
@@ -442,7 +447,7 @@ theorem decides_evalArithP (sh : ℕ → Fin K) (hsh : ∀ i : ℕ, i < K → (s
 omit [Finite A] in
 /-- **The arithmetic evaluator is deterministic**: it sweeps and it computes, it
 does not guess – the two arithmetic fragments being deterministic too. -/
-theorem deterministic_evalArithP (sh : ℕ → Fin K) :
+private theorem deterministic_evalArithP (sh : ℕ → Fin K) :
     ∀ {n : ℕ} (ψ : (L.sum Language.arith).BoundedFormula α n) (d : ℕ)
       (hv : α ⊕ Fin n → Fin K),
       (evalArithP sh acc cnt cand tmk a b mk d hv ψ).Deterministic A := by

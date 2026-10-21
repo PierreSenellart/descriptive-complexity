@@ -50,7 +50,7 @@ open Language Structure
 
 /-- Exponential beats polynomial, in the pointed form the negative example
 needs: some `k` has `c * (2 * k + 4) ^ d < 2 ^ k`. -/
-theorem exists_mul_pow_lt_two_pow (c d : ℕ) :
+private theorem exists_mul_pow_lt_two_pow (c d : ℕ) :
     ∃ k : ℕ, c * (2 * k + 4) ^ d < 2 ^ k := by
   obtain ⟨N, hN⟩ := Filter.eventually_atTop.mp
     ((isLittleO_pow_const_const_pow_of_one_lt (R := ℝ) d

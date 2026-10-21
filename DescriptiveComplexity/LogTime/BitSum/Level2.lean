@@ -7,6 +7,14 @@ module
 
 public import DescriptiveComplexity.LogTime.BitSum.Sum
 public import DescriptiveComplexity.LogTime.BitSum.Sizes
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitSum.Ones
+import all DescriptiveComplexity.LogTime.BitSum.Sizes
+import all DescriptiveComplexity.LogTime.BitSum.Sum
+import all DescriptiveComplexity.LogTime.BitSum.Table
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Level 2: counting a middling word by its sub-blocks
@@ -49,7 +57,8 @@ open Finset
 /-! ### Counting past the end of a word -/
 
 /-- **Counting further than the word is long changes nothing.** -/
-theorem onesBelow_eq_of_ge {x w k : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = false) (hk : w ≤ k) :
+private theorem onesBelow_eq_of_ge
+    {x w k : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = false) (hk : w ≤ k) :
     onesBelow x k = onesBelow x w := by
   rw [onesBelow, onesBelow]
   congr 1
@@ -61,7 +70,7 @@ theorem onesBelow_eq_of_ge {x w k : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = 
   exact absurd hi.2 (by simp)
 
 /-- **A word has no more ones than it is long.** -/
-theorem onesBelow_le_of_bits {x w k : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = false) :
+private theorem onesBelow_le_of_bits {x w k : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = false) :
     onesBelow x k ≤ w := by
   rcases Nat.le_total w k with hk | hk
   · rw [onesBelow_eq_of_ge hx hk]
@@ -102,7 +111,7 @@ theorem popMid_sound {m x y : A} (hx : ∀ i, orank m ≤ i → (orank x).testBi
 `DescriptiveComplexity.LogTime.BitSum.Sizes`, the boundaries at that gap, the
 running sums along them, and the first boundary past the end of the word. All
 three size conditions of the table are discharged here, and nowhere else. -/
-theorem exists_popMid [Nonempty A] {m x : A} (hP : 2 ^ 20 ≤ posCount A)
+private theorem exists_popMid [Nonempty A] {m x : A} (hP : 2 ^ 20 ≤ posCount A)
     (hm : orank m < 2 ^ lvl2Block (posCount A))
     (hroom : orank m + 2 * lvl2Block (posCount A) + 2 < posCount A)
     (hx : ∀ i, orank m ≤ i → (orank x).testBit i = false) :
@@ -177,7 +186,7 @@ variable {L : Language.{0, 0}} {α : Type}
 /-- **Level 2 is a formula**, the level below entering it only through
 `DescriptiveComplexity.BitSum.bitDef_popShort`, passed to
 `DescriptiveComplexity.BitSum.bitDef_sumOk` as the chunk counter. -/
-theorem bitDef_popMid (m x y : α) :
+private theorem bitDef_popMid (m x y : α) :
     BitDef (L := L) fun _ _ _ _ _ v => PopMid (v m) (v x) (v y) := by
   have hbody : BitDef (L := L) (α := α ⊕ Fin 5) (fun A _ _ _ _ u =>
       orank (u (Sum.inr 0)) ≠ 0 ∧ IsLowIx (u (Sum.inr 0)) ∧

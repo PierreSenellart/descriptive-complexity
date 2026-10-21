@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Counting.QSO
 import DescriptiveComplexity.Counting.SharpP
 import Mathlib.SetTheory.Cardinal.Finite
+import all DescriptiveComplexity.Counting.KernelPair
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Witness counts with free variables, and their closure properties
@@ -55,7 +57,7 @@ def WCount (M : Language.{0, 0}) (α : Type) (f : ∀ (A : Type) [M.Structure A]
 namespace WCount
 
 /-- Witness counts only depend on their values on finite structures. -/
-theorem congr {f g : ∀ (A : Type) [M.Structure A], (α → A) → ℕ} (hf : WCount M α f)
+private theorem congr {f g : ∀ (A : Type) [M.Structure A], (α → A) → ℕ} (hf : WCount M α f)
     (h : ∀ (A : Type) [M.Structure A] [Finite A] (v : α → A), f A v = g A v) : WCount M α g := by
   obtain ⟨B, φ, hφ⟩ := hf
   exact ⟨B, φ, fun A _ _ v => (h A v).symm.trans (hφ A v)⟩
@@ -101,7 +103,7 @@ section Lift
 variable {A : Type} [M.Structure A] (B C : SOBlock) (ρ : B.Assignment A) (μ : C.Assignment A)
   (v : α → A)
 
-theorem realize_liftFstF (φ : (M.sum B.lang).Formula α) :
+private theorem realize_liftFstF (φ : (M.sum B.lang).Formula α) :
     (@Formula.Realize _ A (@sumStructure M _ A _ ((SOBlock.cons B C).structure (consAssign ρ μ)))
       _ (liftFstF B C φ) v) ↔
       @Formula.Realize _ A (@sumStructure M _ A _ (B.structure ρ)) _ φ v := by
@@ -111,7 +113,7 @@ theorem realize_liftFstF (φ : (M.sum B.lang).Formula α) :
   have := mergeStep_isExpansionOn M (A := A) inferInstance B C ρ μ
   rw [liftFstF, LHom.realize_onFormula, LHom.realize_onFormula]
 
-theorem realize_liftSndF (φ : (M.sum C.lang).Formula α) :
+private theorem realize_liftSndF (φ : (M.sum C.lang).Formula α) :
     (@Formula.Realize _ A (@sumStructure M _ A _ ((SOBlock.cons B C).structure (consAssign ρ μ)))
       _ (liftSndF B C φ) v) ↔
       @Formula.Realize _ A (@sumStructure M _ A _ (C.structure μ)) _ φ v := by
@@ -123,7 +125,7 @@ theorem realize_liftSndF (φ : (M.sum C.lang).Formula α) :
     ⟨fun f _ => by rcases f with f | f <;> rfl, fun r _ => by rcases r with r | r <;> rfl⟩
   rw [liftSndF, LHom.realize_onFormula, LHom.realize_onFormula]
 
-theorem realize_mergeStep (φ : ((M.sum B.lang).sum C.lang).Formula α) :
+private theorem realize_mergeStep (φ : ((M.sum B.lang).sum C.lang).Formula α) :
     (@Formula.Realize _ A (@sumStructure M _ A _ ((SOBlock.cons B C).structure (consAssign ρ μ)))
       _ ((mergeStep M B C).onFormula φ) v) ↔
       @Formula.Realize _ A (@sumStructure (M.sum B.lang) _ A
@@ -186,7 +188,7 @@ theorem sosum (C : SOBlock) {g : ∀ (A : Type) [(M.sum C.lang).Structure A], (�
 noncomputable def emptyF (B : SOBlock) : (M.sum B.lang).Formula α :=
   (emptyBlockS B : (M.sum B.lang).Sentence).relabel Empty.elim
 
-theorem realize_emptyF {A : Type} [M.Structure A] (B : SOBlock) (ρ : B.Assignment A)
+private theorem realize_emptyF {A : Type} [M.Structure A] (B : SOBlock) (ρ : B.Assignment A)
     (v : α → A) :
     (@Formula.Realize _ A (@sumStructure M _ A _ (B.structure ρ)) _ (emptyF B) v) ↔
       ∀ (i : B.ι) (x : Fin (B.arity i) → A), ¬ρ i x := by
@@ -217,7 +219,8 @@ section Sum
 variable {A : Type} [M.Structure A] (B C : SOBlock) (φ : (M.sum B.lang).Formula α)
   (ψ : (M.sum C.lang).Formula α) (v : α → A)
 
-theorem realize_sumF (ρ : B.Assignment A) (μ : C.Assignment A) (ζ : boolBlock.Assignment A) :
+private theorem realize_sumF
+    (ρ : B.Assignment A) (μ : C.Assignment A) (ζ : boolBlock.Assignment A) :
     (@Formula.Realize _ A (@sumStructure M _ A _
       ((sumBlock B C).structure (consAssign ρ (consAssign μ ζ)))) _ (sumF B C φ ψ) v) ↔
       (boolSel ζ ∧ @Formula.Realize _ A (@sumStructure M _ A _ (B.structure ρ)) _ φ v ∧
@@ -247,24 +250,24 @@ def emptyAssign (C : SOBlock) (A : Type) : C.Assignment A := fun _ _ => False
 /-- The selector, true or false. -/
 def selAssign (b : Prop) (A : Type) : boolBlock.Assignment A := fun _ _ => b
 
-theorem eq_emptyAssign {C : SOBlock} {μ : C.Assignment A} (h : ∀ i x, ¬μ i x) :
+private theorem eq_emptyAssign {C : SOBlock} {μ : C.Assignment A} (h : ∀ i x, ¬μ i x) :
     μ = emptyAssign C A :=
   funext fun i => funext fun x => propext ⟨fun hx => h i x hx, False.elim⟩
 
-theorem eq_selAssign (ζ : boolBlock.Assignment A) : ζ = selAssign (boolSel ζ) A :=
+private theorem eq_selAssign (ζ : boolBlock.Assignment A) : ζ = selAssign (boolSel ζ) A :=
   funext fun i => funext fun x => by
     cases i
     exact propext (boolSel_iff ζ x).symm
 
 /-- The witnesses of a sum, on the three parts of the block. -/
-def sumPred (t : B.Assignment A × C.Assignment A × boolBlock.Assignment A) : Prop :=
+private def sumPred (t : B.Assignment A × C.Assignment A × boolBlock.Assignment A) : Prop :=
   (boolSel t.2.2 ∧ @Formula.Realize _ A (@sumStructure M _ A _ (B.structure t.1)) _ φ v ∧
       ∀ i x, ¬t.2.1 i x) ∨
     (¬boolSel t.2.2 ∧ @Formula.Realize _ A (@sumStructure M _ A _ (C.structure t.2.1)) _ ψ v ∧
       ∀ i x, ¬t.1 i x)
 
 /-- **The witnesses of a sum** are those of one formula or the other. -/
-noncomputable def sumEquiv :
+private noncomputable def sumEquiv :
     {ρ : (sumBlock B C).Assignment A // @Formula.Realize _ A
         (@sumStructure M _ A _ ((sumBlock B C).structure ρ)) _ (sumF B C φ ψ) v} ≃
       FWit M B φ A v ⊕ FWit M C ψ A v := by

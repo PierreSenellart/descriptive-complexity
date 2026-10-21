@@ -138,13 +138,13 @@ def ExactCoverBy (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) :
   (∀ s, G s → Fp s) ∧ (∀ x, Ep x → ∃ s, G s ∧ Mp x s) ∧
     ∀ s s', G s → G s' → s ≠ s' → ∀ x, Ep x → ¬(Mp x s ∧ Mp x s')
 
-theorem exactlyCoversOn_iff_exists (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+private theorem exactlyCoversOn_iff_exists (Ep Fp : A → Prop) (Mp : A → A → Prop) :
     ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, ExactCoverBy Ep Fp Mp G :=
   Iff.rfl
 
 /-- Exactness of a given subfamily in the “exactly one” form: covering plus
 disjointness is one covering set per element. -/
-theorem exactCoverBy_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) :
+private theorem exactCoverBy_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) (G : A → Prop) :
     ExactCoverBy Ep Fp Mp G ↔ (∀ s, G s → Fp s) ∧ ∀ x, Ep x → ∃! s, G s ∧ Mp x s := by
   refine and_congr_right fun _ => ?_
   constructor
@@ -163,7 +163,7 @@ theorem exactCoverBy_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) (G 
 
 /-- Exactness in the “exactly one” form: covering plus disjointness is one
 covering set per element. -/
-theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
+private theorem exactlyCoversOn_iff_unique (Ep Fp : A → Prop) (Mp : A → A → Prop) :
     ExactlyCoversOn Ep Fp Mp ↔ ∃ G : A → Prop, (∀ s, G s → Fp s) ∧
       ∀ x, Ep x → ∃! s, G s ∧ Mp x s :=
   exists_congr fun G => exactCoverBy_iff_unique Ep Fp Mp G
@@ -237,7 +237,7 @@ private theorem symm_hBin {MB : B → B → Prop} {MA : A → A → Prop} (u : B
   simp
 
 /-- `CoversOn` transports along an equivalence, iff version. -/
-theorem CoversOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
+private theorem CoversOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
     {EA FA KA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
@@ -315,7 +315,7 @@ theorem SplitsOn.of_equiv (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → P
     simpa using this
 
 /-- `SplitsOn` transports along an equivalence, iff version. -/
-theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+private theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
     {EA FA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) :
@@ -324,7 +324,7 @@ theorem SplitsOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → 
     SplitsOn.of_equiv u.symm (symm_hUn u hE) (symm_hUn u hF) (symm_hBin u hM)⟩
 
 /-- `ExactlyCoversOn` transports along an equivalence, iff version. -/
-theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
+private theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B → B → Prop}
     {EA FA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) :
@@ -333,7 +333,7 @@ theorem ExactlyCoversOn.equiv_iff (u : B ≃ A) {EB FB : B → Prop} {MB : B →
     ExactlyCoversOn.of_equiv u.symm (symm_hUn u hE) (symm_hUn u hF) (symm_hBin u hM)⟩
 
 /-- `PacksOn` transports along an equivalence, iff version. -/
-theorem PacksOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
+private theorem PacksOn.equiv_iff (u : B ≃ A) {EB FB KB : B → Prop} {MB : B → B → Prop}
     {EA FA KA : A → Prop} {MA : A → A → Prop}
     (hE : ∀ b, EB b ↔ EA (u b)) (hF : ∀ b, FB b ↔ FA (u b))
     (hM : ∀ b b', MB b b' ↔ MA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :

@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Membership
+import all DescriptiveComplexity.Problems.Qsat.Defs
+import all DescriptiveComplexity.Problems.Qsat.Membership
 
 /-!
 # The complement of QSAT is in PSPACE
@@ -68,26 +70,26 @@ section Reading
 
 variable {A : Type} [Language.qsat.Structure A] [LinearOrder A]
 
-theorem qsRealize_sup₁ (ρ : qsBlock.Assignment A) (φ ψ : qsLang₁.Sentence) :
+private theorem qsRealize_sup₁ (ρ : qsBlock.Assignment A) (φ ψ : qsLang₁.Sentence) :
     @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) (φ ⊔ ψ) ↔
       (@Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) φ ∨
         @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) ψ) :=
   letI := qsBlock.structure₁ (L := qsBase) ρ
   Formula.realize_sup
 
-theorem realize_qsFalseS (ρ : qsBlock.Assignment A) :
+private theorem realize_qsFalseS (ρ : qsBlock.Assignment A) :
     @Sentence.Realize _ A (qsBlock.structure₁ (L := qsBase) ρ) qsFalseS ↔
       ((∀ y : A, ¬qsSet ρ y) ∧ (qsUp ρ ∧ ¬qsRes ρ)) := by
   simp only [qsFalseS, qsRealize_inf₁, qsRealize_not₁, realize_emptyS, realize_bitS,
     relMap_qsVar₁, relMap_qsBit₁, Matrix.cons_val_zero, qsSet, qsUp, qsRes]
 
 /-- **The accepting states**: back at the initial position, returning `false`. -/
-theorem qsSpecCo_isTgt_iff (ρ : qsBlock.Assignment A) :
+private theorem qsSpecCo_isTgt_iff (ρ : qsBlock.Assignment A) :
     qsSpecCo.IsTgt ρ ↔ ((∀ y : A, ¬qsSet ρ y) ∧ (qsUp ρ ∧ ¬qsRes ρ)) :=
   realize_qsFalseS ρ
 
 omit [LinearOrder A] in
-private theorem qsatWf_iff_conj :
+theorem qsatWf_iff_conj :
     ((∀ x y : A, QPrec x y → IsQVar x ∧ IsQVar y) ∧ (∀ x : A, ¬QPrec x x) ∧
         (∀ x y z : A, QPrec x y → QPrec y z → QPrec x z) ∧
         (∀ x y : A, IsQVar x → IsQVar y → x ≠ y → QPrec x y ∨ QPrec y x)) ↔ QsatWf A :=
@@ -96,7 +98,7 @@ private theorem qsatWf_iff_conj :
 
 /-- **The starting states**: the initial position of a well-formed instance, or
 – on a malformed one – an accepting state outright. -/
-theorem qsSpecCo_isSrc_iff (ρ : qsBlock.Assignment A) :
+private theorem qsSpecCo_isSrc_iff (ρ : qsBlock.Assignment A) :
     qsSpecCo.IsSrc ρ ↔
       ((QsatWf A ∧ ((∀ y : A, ¬qsSet ρ y) ∧ ¬qsUp ρ)) ∨
         (¬QsatWf A ∧ ((∀ y : A, ¬qsSet ρ y) ∧ (qsUp ρ ∧ ¬qsRes ρ)))) := by
@@ -116,7 +118,7 @@ section Correctness
 variable {A : Type} [Language.qsat.Structure A] [LinearOrder A] [Finite A]
 
 omit [Finite A] in
-private theorem qsCoReach_eq_of_terminal {a b : qsBlock.Assignment A}
+theorem qsCoReach_eq_of_terminal {a b : qsBlock.Assignment A}
     (hna : ∀ c : qsBlock.Assignment A, ¬qsSpec.Step a c) (hab : qsSpec.Reach a b) : a = b := by
   rcases Relation.ReflTransGen.cases_head hab with h | ⟨c, hac, -⟩
   · exact h
@@ -124,7 +126,7 @@ private theorem qsCoReach_eq_of_terminal {a b : qsBlock.Assignment A}
 
 /-- **The complementary specification is correct**: its walk accepts an instance
 exactly when the instance is *not* a yes-instance of QSAT. -/
-theorem not_qsatHolds_iff_accepts : ¬QsatHolds A ↔ qsSpecCo.Accepts A := by
+private theorem not_qsatHolds_iff_accepts : ¬QsatHolds A ↔ qsSpecCo.Accepts A := by
   classical
   constructor
   · intro h

@@ -48,37 +48,37 @@ def tripF {α : Type} (x y z : α) : tdmSOLang.Formula α :=
 
 /-- Kernel conjunct: the guessed triples are available ones, inside the three
 classes. -/
-noncomputable def tdmSubClause : tdmSOLang.Sentence :=
+private noncomputable def tdmSubClause : tdmSOLang.Sentence :=
   fo% ∀ x y z,
     matF⟨x, y, z⟩ → ((tripF⟨x, y, z⟩ ∧ tXElSym(x)) ∧ tYElSym(y)) ∧ tZElSym(z)
 
 /-- Kernel conjunct: every element of the first class is covered. -/
-noncomputable def tdmCovXClause : tdmSOLang.Sentence :=
+private noncomputable def tdmCovXClause : tdmSOLang.Sentence :=
   fo% ∀ x, tXElSym(x) → ∃ y z, matF⟨x, y, z⟩
 
 /-- Kernel conjunct: every element of the second class is covered. -/
-noncomputable def tdmCovYClause : tdmSOLang.Sentence :=
+private noncomputable def tdmCovYClause : tdmSOLang.Sentence :=
   fo% ∀ y, tYElSym(y) → ∃ x z, matF⟨x, y, z⟩
 
 /-- Kernel conjunct: every element of the third class is covered. -/
-noncomputable def tdmCovZClause : tdmSOLang.Sentence :=
+private noncomputable def tdmCovZClause : tdmSOLang.Sentence :=
   fo% ∀ z, tZElSym(z) → ∃ x y, matF⟨x, y, z⟩
 
 /-- Kernel conjunct: two triples sharing their first coordinate coincide. -/
-noncomputable def tdmUniqXClause : tdmSOLang.Sentence :=
+private noncomputable def tdmUniqXClause : tdmSOLang.Sentence :=
   fo% ∀ x y z y' z', matF⟨x, y, z⟩ ∧ matF⟨x, y', z'⟩ → y ≐ y' ∧ z ≐ z'
 
 /-- Kernel conjunct: two triples sharing their second coordinate coincide. -/
-noncomputable def tdmUniqYClause : tdmSOLang.Sentence :=
+private noncomputable def tdmUniqYClause : tdmSOLang.Sentence :=
   fo% ∀ x y z x' z', matF⟨x, y, z⟩ ∧ matF⟨x', y, z'⟩ → x ≐ x' ∧ z ≐ z'
 
 /-- Kernel conjunct: two triples sharing their third coordinate coincide. -/
-noncomputable def tdmUniqZClause : tdmSOLang.Sentence :=
+private noncomputable def tdmUniqZClause : tdmSOLang.Sentence :=
   fo% ∀ x y z x' y', matF⟨x, y, z⟩ ∧ matF⟨x', y', z⟩ → x ≐ x' ∧ y ≐ y'
 
 /-- The first-order kernel of the `Σ₁` definition: the guessed relation is a
 matching. -/
-noncomputable def tdmKernel : tdmSOLang.Sentence :=
+private noncomputable def tdmKernel : tdmSOLang.Sentence :=
   tdmSubClause ⊓ (tdmCovXClause ⊓ (tdmCovYClause ⊓ (tdmCovZClause ⊓
     (tdmUniqXClause ⊓ (tdmUniqYClause ⊓ tdmUniqZClause)))))
 

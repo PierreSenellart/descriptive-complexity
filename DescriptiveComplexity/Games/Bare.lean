@@ -39,7 +39,7 @@ open Language
 /-! ### Fresh elements -/
 
 /-- A tuple shorter than the finite set it lives in misses an element. -/
-theorem exists_notMem_range {N : Type} [Finite N] {j : ℕ} (b : Fin j → N)
+private theorem exists_notMem_range {N : Type} [Finite N] {j : ℕ} (b : Fin j → N)
     (h : j < Nat.card N) : ∃ d : N, ∀ i, b i ≠ d := by
   classical
   let := Fintype.ofFinite N
@@ -58,7 +58,7 @@ theorem exists_notMem_range {N : Type} [Finite N] {j : ℕ} (b : Fin j → N)
 /-- Extending two tuples with the same equality pattern by a matching pair of
 elements – matching in the sense that each coordinate hits the new element on
 the left exactly when it does on the right – preserves the pattern. -/
-theorem snoc_pattern {M N : Type} {j : ℕ} {a : Fin j → M} {b : Fin j → N} {c : M} {d : N}
+private theorem snoc_pattern {M N : Type} {j : ℕ} {a : Fin j → M} {b : Fin j → N} {c : M} {d : N}
     (hpat : ∀ i i', a i = a i' ↔ b i = b i') (hc : ∀ i, a i = c ↔ b i = d) :
     ∀ i i' : Fin (j + 1),
       (Fin.snoc a c : Fin (j + 1) → M) i = (Fin.snoc a c : Fin (j + 1) → M) i' ↔

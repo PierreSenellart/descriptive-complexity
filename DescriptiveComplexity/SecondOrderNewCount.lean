@@ -40,7 +40,7 @@ variable {α ι : Type}
 def flipAt [DecidableEq α] (T : Finset α) (a : α) : Finset α :=
   if a ∈ T then T.erase a else insert a T
 
-theorem flipAt_of_notMem [DecidableEq α] {T : Finset α} {a : α} (ha : a ∉ T) :
+private theorem flipAt_of_notMem [DecidableEq α] {T : Finset α} {a : α} (ha : a ∉ T) :
     flipAt T a = insert a T := by
   rw [flipAt, ite_eq_right ha]
 
@@ -68,11 +68,11 @@ theorem bijective_of_flipClosed [DecidableEq α] (f : ι → Finset α)
 
 open Classical in
 /-- The family a guess names, as finite sets. -/
-noncomputable def toFinsetOf [Fintype α] (f : ι → α → Prop) (i : ι) : Finset α :=
+private noncomputable def toFinsetOf [Fintype α] (f : ι → α → Prop) (i : ι) : Finset α :=
   Finset.univ.filter (f i)
 
 open Classical in
-theorem mem_toFinsetOf [Fintype α] (f : ι → α → Prop) (i : ι) (x : α) :
+private theorem mem_toFinsetOf [Fintype α] (f : ι → α → Prop) (i : ι) (x : α) :
     x ∈ toFinsetOf f i ↔ f i x := by
   simp [toFinsetOf]
 

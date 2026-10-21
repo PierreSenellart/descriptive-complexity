@@ -7,6 +7,16 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRun
 import DescriptiveComplexity.Problems.Wide.DrawInstEval
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawRun
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawSites
+import all DescriptiveComplexity.Problems.Wide.DrawSweepKit
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The outer composition: the sweep's rounds
@@ -54,7 +64,7 @@ omit [Language.wide.Structure
   [Finite A] [Finite (dt.RIx zero one hzo args)] [Finite dt.PF]
   [Finite dt.KIx] in
 /-- The program's rule at an evaluation site is the evaluation's. -/
-theorem prog_rules_eval (e : dt.SEF) (ρ : dt.SESh e) :
+private theorem prog_rules_eval (e : dt.SEF) (ρ : dt.SESh e) :
     (dt.prog zero one hzo args hpl).rules ⟨.eval e, ρ⟩ =
       dt.evalRuleF zero one args e ρ := rfl
 
@@ -66,7 +76,7 @@ omit [Language.wide.Structure
   [Finite dt.KIx] in
 /-- An evaluation rule with a true guard is a `HasRight` witness of the
 program. -/
-theorem prog_hasRight_eval {e : dt.SEF} {ρ : dt.SESh e}
+private theorem prog_hasRight_eval {e : dt.SEF} {ρ : dt.SESh e}
     {f f' : dt.CtlIx → A} {g g' : dt.SlotIx → A} {p p' : dt.PF}
     (hg : (dt.evalRuleF zero one args e ρ).guard f g)
     (hp : (dt.evalRuleF zero one args e ρ).srcPh = p)
@@ -86,7 +96,7 @@ omit [Language.wide.Structure
   [Finite dt.KIx] in
 /-- An evaluation rule with a true guard is a `HasLeft` witness of the
 program. -/
-theorem prog_hasLeft_eval {e : dt.SEF} {ρ : dt.SESh e}
+private theorem prog_hasLeft_eval {e : dt.SEF} {ρ : dt.SESh e}
     {f f' : dt.CtlIx → A} {g g' : dt.SlotIx → A} {p p' : dt.PF}
     (hg : (dt.evalRuleF zero one args e ρ).guard f g)
     (hp : (dt.evalRuleF zero one args e ρ).srcPh = p)
@@ -104,7 +114,7 @@ theorem prog_hasLeft_eval {e : dt.SEF} {ρ : dt.SESh e}
 
 /-- **The walk back into a checkpoint**: an entering dispatch lands one
 cell right of the marker; the checkpoint's stay rule steps back to it. -/
-theorem step_evalChk_back
+private theorem step_evalChk_back
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -173,7 +183,7 @@ private theorem update_wk_offSt
 advance's round theorem consumes: at the last checkpoint below the `ltp`
 cell, erase the marker and enter the advance – stated at the MIRROR-walked
 presentation the advance runs on. -/
-theorem hasRight_evalAdv
+private theorem hasRight_evalAdv
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {gbot : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd}
@@ -227,7 +237,7 @@ theorem hasRight_evalAdv
 
 /-- **The erasing dispatch into the post-sweep reset**: at the last
 checkpoint on the `ltp` cell, erase the marker and enter the reset. -/
-theorem hasRight_evalReset
+private theorem hasRight_evalReset
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
     {gbot : Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd}
@@ -284,7 +294,7 @@ theorem hasRight_evalReset
 /-- **The reset's leg after a completed sweep**, the last checkpoint's
 erasing exit included: from the `ltp` cell to the reset's landing phase at
 the empty address, the bottom marker rewritten. -/
-theorem reaches_reset2
+private theorem reaches_reset2
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -361,7 +371,7 @@ theorem reaches_reset2
 
 /-- **The post-sweep reset's exit**: off the marker, rightwards, into the
 mirror clear. -/
-theorem step_reset2_exit
+private theorem step_reset2_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -397,7 +407,7 @@ theorem step_reset2_exit
 
 /-- **The pre-compare mirror clear's leg**: the trip that empties the
 mirror register, returning to the marker at the empty address. -/
-theorem reaches_clearMir2
+private theorem reaches_clearMir2
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -469,7 +479,7 @@ as a hypothesis – the caller instantiates it by
 boundary dispatch, the advance, and back into the first checkpoint at the
 next address. The marker, the mirror and the head all step on in
 lockstep. -/
-theorem sweepRound
+private theorem sweepRound
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -682,7 +692,7 @@ stretch, which `reaches_compareFrom` exposes). -/
 /-- **The convergence sweep from an arbitrary start**: the generalization
 of `DescriptiveComplexity.Draw.Data.reaches_compare` the folded first
 step needs. -/
-theorem reaches_compareFrom
+private theorem reaches_compareFrom
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -734,7 +744,7 @@ theorem reaches_compareFrom
 /-- **COMPARE's folded first step**: `clearMir2`'s verdict exit tests the
 empty address's cell and lands at its successor, in the sweep's state
 there. -/
-theorem step_clearMir2_exit
+private theorem step_clearMir2_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -827,7 +837,7 @@ cell into its own walk home, whose exit re-enters the evaluation. -/
 
 /-- **The passing verdict**: at the `ltp` cell with every address below
 agreed, step off it into the output's walk home. -/
-theorem step_compare_exit_pos
+private theorem step_compare_exit_pos
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -865,7 +875,7 @@ theorem step_compare_exit_pos
 
 /-- **The failing verdict**: at the `ltp` cell with some address below
 disagreed, step off it into the copy-back's walk home. -/
-theorem step_compare_exit_neg
+private theorem step_compare_exit_neg
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -905,7 +915,7 @@ theorem step_compare_exit_neg
 /-- **COPY's folded first step**: `homeCmp`'s exit rewrites the empty
 address's cell – every `old` track taking its `new` digit – and lands at
 its successor, in the copy-back's frontier presentation there. -/
-theorem step_homeCmp_exit
+private theorem step_homeCmp_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -1024,7 +1034,7 @@ theorem step_homeCmp_exit
 /-- **The copy-back from an arbitrary start**: the generalization of
 `DescriptiveComplexity.Draw.Data.reaches_copy` the folded first step
 needs. -/
-theorem reaches_copyFrom
+private theorem reaches_copyFrom
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -1129,7 +1139,7 @@ theorem reaches_copyFrom
 
 /-- **The copy-back's exit**: at the `ltp` cell, step off it into its walk
 home. -/
-theorem step_copy_exit
+private theorem step_copy_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -1168,7 +1178,7 @@ theorem step_copy_exit
 
 /-- **The copy-back's walk home exits into the next sweep**: off the marker,
 rightwards, into the first checkpoint. -/
-theorem step_homeCopy_exit
+private theorem step_homeCopy_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -1205,7 +1215,7 @@ theorem step_homeCopy_exit
 
 /-- **The output's walk home exits into the out machinery**: off the
 marker, rightwards, into its entry checkpoint. -/
-theorem step_homeOut_exit
+private theorem step_homeOut_exit
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -1254,7 +1264,7 @@ home enters the out machinery. -/
 the `ltp` cell (the evaluation there a hypothesis) to the first checkpoint
 at the empty address, every `old` track below the top rewritten to its
 `new` digit. -/
-theorem stageClose_neg
+private theorem stageClose_neg
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))
@@ -1377,7 +1387,7 @@ theorem stageClose_neg
 /-- **A passed stage closes into the output**: the same ring up to the
 verdict, then the walk home and the dispatch into the out machinery's
 entry checkpoint. -/
-theorem stageClose_pos
+private theorem stageClose_pos
     (hR : (dt.prog zero one hzo args hpl).table.Reads)
     (hlin : IsLinOrd
       (WMLe (A := Univ A (dt.RIx zero one hzo args) dt.PF dt.KIx dt.dd)))

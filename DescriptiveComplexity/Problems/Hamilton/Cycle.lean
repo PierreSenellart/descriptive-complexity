@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Hamilton.Defs
 import Mathlib.Order.Fin.Basic
 import Mathlib.Data.Fintype.Sort
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # A tour is a cyclic enumeration
@@ -40,19 +41,20 @@ variable {A : Type}
 def nextIdx {n : ℕ} (i : Fin n) : Fin n :=
   ⟨((i : ℕ) + 1) % n, Nat.mod_lt _ (Nat.pos_of_ne_zero (by rintro rfl; exact i.elim0))⟩
 
-theorem nextIdx_of_lt {n : ℕ} {i : Fin n} (h : (i : ℕ) + 1 < n) :
+private theorem nextIdx_of_lt {n : ℕ} {i : Fin n} (h : (i : ℕ) + 1 < n) :
     (nextIdx i : ℕ) = (i : ℕ) + 1 := by
   rw [nextIdx]
   exact Nat.mod_eq_of_lt h
 
-theorem nextIdx_of_last {n : ℕ} {i : Fin n} (h : (i : ℕ) + 1 = n) : (nextIdx i : ℕ) = 0 := by
+private theorem nextIdx_of_last
+    {n : ℕ} {i : Fin n} (h : (i : ℕ) + 1 = n) : (nextIdx i : ℕ) = 0 := by
   rw [nextIdx]
   simp [h]
 
 /-- The order of an enumeration – by the position of each element – is a tour
 of any relation the enumeration follows: consecutive positions are consecutive
 in that order, and the last position wraps to the first. -/
-theorem tour_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
+private theorem tour_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
     (h : ∀ i : Fin n, R (f i) (f (nextIdx i))) :
     IsLinOrd (fun x y => f.symm x ≤ f.symm y) ∧
       (∀ x y, SuccOf (fun x y => f.symm x ≤ f.symm y) x y → R x y) ∧
@@ -119,7 +121,7 @@ theorem tourOn_of_enum {R : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
 
 /-- An increasing enumeration of a tour follows the relation: consecutive
 elements are adjacent, and the last one is adjacent to the first. -/
-theorem enum_of_mono {R Le : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
+private theorem enum_of_mono {R Le : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
     (hmono : ∀ j k : Fin n, Le (f j) (f k) ↔ j ≤ k)
     (hsucc : ∀ x y, SuccOf Le x y → R x y)
     (hwrap : ∀ x y, (∀ z, Le x z) → (∀ z, Le z y) → R y x) (i : Fin n) :
@@ -169,7 +171,7 @@ theorem enum_of_mono {R Le : A → A → Prop} {n : ℕ} (f : Fin n ≃ A)
 variable [Finite A]
 
 /-- A linear order of a finite universe has an increasing enumeration. -/
-theorem exists_mono_enum {Le : A → A → Prop} (hlin : IsLinOrd Le) :
+private theorem exists_mono_enum {Le : A → A → Prop} (hlin : IsLinOrd Le) :
     ∃ f : Fin (Nat.card A) ≃ A, ∀ j k : Fin (Nat.card A), Le (f j) (f k) ↔ j ≤ k := by
   classical
   let : LinearOrder A := IsLinOrd.toLinearOrder hlin

@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameSpec
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.GameSpec
+import all DescriptiveComplexity.SecondOrderReplicate
 
 /-!
 # The prefix phases play the alternating prefix
@@ -44,12 +47,12 @@ section Cons
 
 variable {α : Type} {k : ℕ}
 
-theorem cons_of_val_zero (v : α) (τs : Fin k → α) (j : Fin (k + 1)) (h : (j : ℕ) = 0) :
+private theorem cons_of_val_zero (v : α) (τs : Fin k → α) (j : Fin (k + 1)) (h : (j : ℕ) = 0) :
     (Fin.cons v τs : Fin (k + 1) → α) j = v := by
   have hj : j = 0 := Fin.ext (by simp [h])
   rw [hj, Fin.cons_zero]
 
-theorem cons_of_val_succ (v : α) (τs : Fin k → α) (j : Fin (k + 1)) (m : Fin k)
+private theorem cons_of_val_succ (v : α) (τs : Fin k → α) (j : Fin (k + 1)) (m : Fin k)
     (h : (j : ℕ) = (m : ℕ) + 1) : (Fin.cons v τs : Fin (k + 1) → α) j = τs m := by
   have hj : j = m.succ := Fin.ext (by simp [h])
   rw [hj, Fin.cons_succ]
@@ -112,11 +115,11 @@ variable {hn : n = 2 * d + Dm} {D : Sub → T → T → ℕ} {hD : ∀ s tx ty, 
 variable {K : ∀ (_s : Sub) (_tx _ty : T),
   ((L.sum Language.order).sum (repMerged X.pointBlock n).lang).Sentence}
 
-theorem movesFrom_pre_zero (hk : 0 < Dm + 1) (s : Sub) (tx ty : T) (pol : Bool) :
+private theorem movesFrom_pre_zero (hk : 0 < Dm + 1) (s : Sub) (tx ty : T) (pol : Bool) :
     movesFrom hn D hD (.pre s tx ty ⟨0, hk⟩ pol) = [] :=
   rfl
 
-theorem movesFrom_pre_succ (k : ℕ) (hk : k + 1 < Dm + 1) (r : Fin n)
+private theorem movesFrom_pre_succ (k : ℕ) (hk : k + 1 < Dm + 1) (r : Fin n)
     (hr : (r : ℕ) = n - (k + 1)) (s : Sub) (tx ty : T) (pol : Bool) :
     movesFrom hn D hD (.pre s tx ty ⟨k + 1, hk⟩ pol) =
       [⟨.pre s tx ty ⟨k, by omega⟩ (!pol), keepOff n (fun i => decide (i = r)), []⟩] := by

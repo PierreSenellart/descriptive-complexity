@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.SuccinctReach.Defs
 import DescriptiveComplexity.Problems.SuccinctReach.Membership
 import DescriptiveComplexity.Problems.SuccinctReach.Double
 import DescriptiveComplexity.Problems.SuccinctReach.Hardness
+import all DescriptiveComplexity.Complexity
 
 /-!
 # SUCCINCT-REACH: reachability in a propositionally described transition system
@@ -70,7 +71,7 @@ namespace DescriptiveComplexity
 
 /-- **SUCCINCT-REACH is in PSPACE**: the walk on states of the described
 transition system is an SO(TC) walk. -/
-theorem succinctReach_PSPACE_mem : SUCCINCTREACH ∈ PSPACE :=
+private theorem succinctReach_PSPACE_mem : SUCCINCTREACH ∈ PSPACE :=
   succinctReach_mem_PSPACE
 
 /-- **SUCCINCT-REACH is PSPACE-hard.** -/

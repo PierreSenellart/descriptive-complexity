@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Counting.SharpP
 import DescriptiveComplexity.SecondOrderOrdered
 public import DescriptiveComplexity.Numbers.MonotoneBijection
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # Counting the solutions of exactly the threshold size
@@ -66,7 +67,7 @@ def sizedLHom :
 variable {A : Type}
 
 /-- The structure of the sized kernel expands that of the kernel. -/
-theorem sizedLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
+private theorem sizedLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
     (ρ : B.withOrder.Assignment A) :
     @LHom.IsExpansionOn _ _ (sizedLHom L B) A
       (@sumStructure (L.sum Language.order) B.lang A
@@ -144,7 +145,7 @@ noncomputable def monoBijS : ((L.sum Language.order).sum B.withOrder.lang).Sente
             (szLe L B (Sum.inr 0) (Sum.inr 1)).iff (szLe L B (Sum.inr 2) (Sum.inr 3)))))
 
 /-- Realization of the monotone-bijection sentence. -/
-theorem realize_monoBijS (instA : L.Structure A) [LinearOrder A]
+private theorem realize_monoBijS (instA : L.Structure A) [LinearOrder A]
     (ρ : B.withOrder.Assignment A) :
     @Sentence.Realize _ A
         (@sumStructure (L.sum Language.order) B.withOrder.lang A _
@@ -198,7 +199,7 @@ noncomputable def sizedKernel : ((L.sum Language.order).sum B.withOrder.lang).Se
   (sizedLHom L B).onSentence φ₀ ⊓ monoBijS L B mk i₀ h₀
 
 /-- Realization of the sized kernel. -/
-theorem realize_sizedKernel (instA : L.Structure A) [LinearOrder A]
+private theorem realize_sizedKernel (instA : L.Structure A) [LinearOrder A]
     (ρ : B.withOrder.Assignment A) :
     @Sentence.Realize _ A
         (@sumStructure (L.sum Language.order) B.withOrder.lang A _
@@ -266,7 +267,7 @@ theorem sharpPDefinable_of_sized_ordered {L : Language.{0, 0}} [L.IsRelational]
 
 /-- An order-free kernel, lifted to the ordered expansion, holds exactly when
 it did. -/
-theorem realize_orderFreeKernel {L : Language.{0, 0}} (B : SOBlock)
+private theorem realize_orderFreeKernel {L : Language.{0, 0}} (B : SOBlock)
     (φ₀ : (L.sum B.lang).Sentence) {A : Type} [instA : L.Structure A] [LinearOrder A]
     (ρ₀ : B.Assignment A) :
     @Sentence.Realize ((L.sum Language.order).sum B.lang) A
@@ -301,7 +302,7 @@ theorem sharpPDefinable_of_sized {L : Language.{0, 0}} [L.IsRelational]
 /-- A set no larger than a number no larger than the universe extends to a set
 of exactly that size: what makes the support of an exact-size count of
 *upward closed* solutions the “at most” decision problem. -/
-theorem exists_superset_ncard_eq {A : Type} [Finite A] {s : Set A} {k : ℕ}
+private theorem exists_superset_ncard_eq {A : Type} [Finite A] {s : Set A} {k : ℕ}
     (hs : s.ncard ≤ k) (hk : k ≤ Nat.card A) : ∃ t : Set A, s ⊆ t ∧ t.ncard = k := by
   have hcompl := Set.ncard_add_ncard_compl s
   obtain ⟨T, hT, hTcard⟩ := Set.exists_subset_card_eq (s := sᶜ) (n := k - s.ncard) (by omega)

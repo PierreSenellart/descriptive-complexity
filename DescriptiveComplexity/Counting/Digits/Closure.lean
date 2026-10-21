@@ -10,6 +10,10 @@ public import DescriptiveComplexity.Counting.Digits.Tower
 import DescriptiveComplexity.FixedPointStep
 import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.SecondOrderTransitiveClosure
+import all DescriptiveComplexity.Counting.Digits.Formulas
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.Counting.Digits.Tower
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Numbers computed by a tower
@@ -61,7 +65,7 @@ abbrev ctxStr (e : StepDef (K.sum Language.order)) (A : Type) [K.Structure A] [L
   e.B.structure₁ (L := K.sum Language.order) (e.inflLimit A)
 
 /-- Vocabulary maps compose into expansions. -/
-theorem isExpansionOn_comp {L₁ L₂ L₃ : Language.{0, 0}} (φ : L₁ →ᴸ L₂) (ψ : L₂ →ᴸ L₃)
+private theorem isExpansionOn_comp {L₁ L₂ L₃ : Language.{0, 0}} (φ : L₁ →ᴸ L₂) (ψ : L₂ →ᴸ L₃)
     (A : Type) [L₁.Structure A] [L₂.Structure A] [L₃.Structure A] [φ.IsExpansionOn A]
     [ψ.IsExpansionOn A] : (ψ.comp φ).IsExpansionOn A where
   map_onFunction := fun f x =>
@@ -83,7 +87,7 @@ def ctxAt {r : ℕ} (j : e.B.lang.Relations r) (ts : Fin r → γ) :
   Relations.formula (Sum.inr j : ((K.sum Language.order).sum e.B.lang).Relations r)
     fun k => Term.var (ts k)
 
-theorem realize_ctxAt {r : ℕ} {j : e.B.lang.Relations r}
+private theorem realize_ctxAt {r : ℕ} {j : e.B.lang.Relations r}
     {R : ∀ (A : Type) [K.Structure A] [LinearOrder A], (Fin r → A) → Prop}
     (h : e.Computes j R) (A : Type) [K.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
     (ts : Fin r → γ) (v : γ → A) :
@@ -97,7 +101,7 @@ def numAt {a : ℕ} (j : e.B.lang.Relations (a + ℓ)) (ws : Fin a → γ) :
     ((K.sum Language.order).sum e.B.lang).Formula (γ ⊕ Fin ℓ) :=
   ctxAt j (Fin.append (fun i => Sum.inl (ws i)) Sum.inr)
 
-theorem realize_numAt {a : ℕ} {j : e.B.lang.Relations (a + ℓ)} {F : Fam K a}
+private theorem realize_numAt {a : ℕ} {j : e.B.lang.Relations (a + ℓ)} {F : Fam K a}
     (h : e.Computes j (digRel ℓ F)) (A : Type) [K.Structure A] [LinearOrder A] [Finite A]
     [Nonempty A] (ws : Fin a → γ) (g : γ → A) (p : Fin ℓ → A) :
     (@Formula.Realize _ A (ctxStr e A) _ (numAt j ws) (Sum.elim g p)) ↔
@@ -130,7 +134,7 @@ theorem exists_ext_of_formula {r : ℕ} (ψ : ((K.sum Language.order).sum e.B.la
 
 /-- **A family of relations defined by formulas over a tower is computed by
 an extension of it.** -/
-theorem exists_ext_of_family {J : Type} [Finite J] {r : ℕ}
+private theorem exists_ext_of_family {J : Type} [Finite J] {r : ℕ}
     (ψ : J → ((K.sum Language.order).sum e.B.lang).Formula (Fin r))
     (R : J → ∀ (A : Type) [K.Structure A] [LinearOrder A], (Fin r → A) → Prop)
     (h : ∀ (τ : J) (A : Type) [K.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
@@ -145,7 +149,7 @@ theorem exists_ext_of_family {J : Type} [Finite J] {r : ℕ}
 
 /-- **The digits of a number defined by a formula over a tower are computed
 by an extension of it.** -/
-theorem exists_ext_of_num {a ℓ : ℕ}
+private theorem exists_ext_of_num {a ℓ : ℕ}
     (ψ : ((K.sum Language.order).sum e.B.lang).Formula (Fin a ⊕ Fin ℓ)) (F : Fam K a)
     (h : ∀ (A : Type) [K.Structure A] [LinearOrder A] [Finite A] [Nonempty A] (w : Fin a → A)
       (p : Fin ℓ → A),
@@ -204,7 +208,7 @@ theorem Dig.congr {a : ℕ} {F G : Fam K a}
   exact this ▸ hF
 
 /-- A family defined by a formula of the ordered vocabulary alone. -/
-theorem Dig.of_base {a : ℕ} (F : Fam K a)
+private theorem Dig.of_base {a : ℕ} (F : Fam K a)
     (ψ : (K.sum Language.order).Formula (Fin a ⊕ Fin ℓ))
     (h : ∀ (A : Type) [K.Structure A] [LinearOrder A] [Finite A] [Nonempty A] (w : Fin a → A)
       (p : Fin ℓ → A), ψ.Realize (Sum.elim w p) ↔ tupBits (F A w) p) : Dig e₀ ℓ F := by
@@ -216,11 +220,11 @@ theorem Dig.of_base {a : ℕ} (F : Fam K a)
     (h A w p)
 
 /-- The family constantly zero. -/
-theorem Dig.zero (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 0 : Fam K a) :=
+private theorem Dig.zero (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 0 : Fam K a) :=
   Dig.of_base _ ⊥ fun _ _ _ _ _ _ _ => iff_of_false id (bitsOf_zero _)
 
 /-- The family constantly one. -/
-theorem Dig.one (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 1 : Fam K a) :=
+private theorem Dig.one (a : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => 1 : Fam K a) :=
   Dig.of_base _ (minTupF Sum.inr) fun _ _ _ _ _ w p =>
     ((realize_minTupF (L := K) (v := Sum.elim w p) Sum.inr).trans
       (tup_isBot_iff (t := p)).symm).trans (tupBits_one p).symm

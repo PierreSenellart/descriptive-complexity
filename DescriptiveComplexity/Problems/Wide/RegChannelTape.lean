@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.RegChannel
 public import DescriptiveComplexity.Problems.Wide.Tape
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.RegChannel
+import all DescriptiveComplexity.Problems.Wide.WellFormed
 
 /-!
 # Starting a run at the register channel
@@ -43,7 +46,7 @@ theorem wideRegData_step (c c' : Config (WPoint A)) :
     (wideRegData A).Step c c' ↔ (wideData A).Step c c' := Iff.rfl
 
 /-- **And so they take the same runs.** -/
-theorem wideRegData_stepsIn : ∀ (n : ℕ) (c c' : Config (WPoint A)),
+private theorem wideRegData_stepsIn : ∀ (n : ℕ) (c c' : Config (WPoint A)),
     (wideRegData A).StepsIn n c c' ↔ (wideData A).StepsIn n c c'
   | 0, _, _ => Iff.rfl
   | n + 1, c, c' => by
@@ -59,13 +62,13 @@ theorem wideRegData_reachesIn (n : ℕ) (c c' : Config (WPoint A)) :
   exists_congr fun k => and_congr_right fun _ => wideRegData_stepsIn k c c'
 
 /-- **A register cell starts holding its element's symbol.** -/
-theorem initTape_wmRegSeg {x a : A} (hinp : WMInp x a) :
+private theorem initTape_wmRegSeg {x a : A} (hinp : WMInp x a) :
     (wideRegData A).InitTape (Sum.inl (wmRegSeg x)) (Sum.inr a) :=
   Or.inl ⟨x, wmRegSeg_self x, hinp⟩
 
 /-- **Every other address starts blank**: one that is no writing element's
 cell. -/
-theorem initTape_of_not_wmRegSeg {s : A → Prop}
+private theorem initTape_of_not_wmRegSeg {s : A → Prop}
     (hno : ∀ x y : A, WMRegSeg s x → ¬WMInp x y) (a : WPoint A) :
     (wideRegData A).InitTape (Sum.inl s) a ↔ (wideRegData A).Blank a := by
   have hinp : ∀ b : WPoint A, ¬(wideRegData A).Inp (Sum.inl s) b := by
@@ -79,7 +82,7 @@ theorem initTape_of_not_wmRegSeg {s : A → Prop}
 /-- **The initial tape at the register channel**: the symbol of `x` at the cell
 of `x` for every element the channel writes for, the blank at every address that
 is no such element's cell. -/
-theorem initTape_of_marksReg {b : A} (hb : WMBlank b) {sym : A → A}
+private theorem initTape_of_marksReg {b : A} (hb : WMBlank b) {sym : A → A}
     (hinp : ∀ x : A, WMHasInp x → WMInp x (sym x)) {tp : WPoint A → WPoint A}
     (hmark : ∀ x : A, WMHasInp x → tp (Sum.inl (wmRegSeg x)) = Sum.inr (sym x))
     (hrest : ∀ p : WPoint A, (∀ x : A, WMHasInp x → p ≠ Sum.inl (wmRegSeg x)) →
@@ -103,7 +106,7 @@ variable [Finite A]
 instance**: a linear order, a functional input and a unique blank. The channel
 enters only through the functionality of the input, and there two elements with
 the same cell that both carry input are equal. -/
-theorem wideRegData_wellFormed_iff : (wideRegData A).WellFormed ↔ WideWF A := by
+private theorem wideRegData_wellFormed_iff : (wideRegData A).WellFormed ↔ WideWF A := by
   constructor
   · rintro ⟨hlin, -, hinp, ⟨b, hb⟩, huniq⟩
     have h1 : IsLinOrd (WMLe (A := A)) :=
@@ -138,7 +141,7 @@ theorem wideRegData_wellFormed_iff : (wideRegData A).WellFormed ↔ WideWF A := 
 /-- **The initial configuration at the register channel**: a start state, the
 head on the empty address – which is no register's cell, a register's cell
 holding its own element – and the marked tape. -/
-theorem isInit_wideReg_marks (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
+private theorem isInit_wideReg_marks (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
     {sym : A → A} (hinp : ∀ x : A, WMHasInp x → WMInp x (sym x))
     {tp : WPoint A → WPoint A}
     (hmark : ∀ x : A, WMHasInp x → tp (Sum.inl (wmRegSeg x)) = Sum.inr (sym x))
@@ -150,7 +153,7 @@ theorem isInit_wideReg_marks (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlan
 
 /-- **The initial configuration of a program at the register channel**, its tape
 given as a function of the addresses. -/
-theorem isInit_wideRegTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
+private theorem isInit_wideRegTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
     {sym : A → A} (hinp : ∀ x : A, WMHasInp x → WMInp x (sym x)) {f : (A → Prop) → A}
     (hmark : ∀ x : A, WMHasInp x → f (wmRegSeg x) = sym x)
     (hrest : ∀ s : A → Prop, (∀ x : A, WMHasInp x → s ≠ wmRegSeg x) → f s = b)
@@ -167,7 +170,7 @@ theorem isInit_wideRegTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank 
 /-- **A program at the register channel accepts on its clock**: it starts as
 `isInit_wideRegTape` says, runs for fewer steps than there are addresses, and
 ends in an accepting state. -/
-theorem accepts_of_wideRegTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
+private theorem accepts_of_wideRegTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
     {sym : A → A} (hinp : ∀ x : A, WMHasInp x → WMInp x (sym x)) {f : (A → Prop) → A}
     (hmark : ∀ x : A, WMHasInp x → f (wmRegSeg x) = sym x)
     (hrest : ∀ s : A → Prop, (∀ x : A, WMHasInp x → s ≠ wmRegSeg x) → f s = b)
@@ -184,7 +187,7 @@ theorem accepts_of_wideRegTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBl
   exact hacc
 
 /-- **The same, with the budget compared against `2 ^ n`.** -/
-theorem accepts_of_wideRegTape_lt_two_pow (h : IsLinOrd (WMLe (A := A))) {b : A}
+private theorem accepts_of_wideRegTape_lt_two_pow (h : IsLinOrd (WMLe (A := A))) {b : A}
     (hb : WMBlank b) {sym : A → A} (hinp : ∀ x : A, WMHasInp x → WMInp x (sym x))
     {f : (A → Prop) → A} (hmark : ∀ x : A, WMHasInp x → f (wmRegSeg x) = sym x)
     (hrest : ∀ s : A → Prop, (∀ x : A, WMHasInp x → s ≠ wmRegSeg x) → f s = b)

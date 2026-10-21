@@ -10,6 +10,7 @@ import DescriptiveComplexity.Problems.Sat
 import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # NAE-SAT is NP-complete
@@ -89,13 +90,13 @@ theorem NAEProper.not {ν : A → Prop} (h : NAEProper ν) : NAEProper fun x => 
 
 omit [Language.sat.Structure A] in
 /-- Flipping the assignment flips the truth of every literal. -/
-theorem litTrue_compl {ν : A → Prop} {x : A} {s : Bool} :
+private theorem litTrue_compl {ν : A → Prop} {x : A} {s : Bool} :
     LitTrue (fun a => ¬ν a) x s ↔ ¬LitTrue ν x s := by
   cases s <;> simp [LitTrue]
 
 /-- Occurrence form of not-all-equal properness: every clause has a true and a
 false literal occurrence. -/
-theorem naeProper_occ {ν : A → Prop} (h : NAEProper ν) (c : A)
+private theorem naeProper_occ {ν : A → Prop} (h : NAEProper ν) (c : A)
     (hc : RelMap satIsClause ![c]) :
     (∃ x s, OccIn c x s ∧ LitTrue ν x s) ∧ ∃ x s, OccIn c x s ∧ ¬LitTrue ν x s := by
   obtain ⟨⟨x, hx⟩, ⟨y, hy⟩⟩ := h c hc
@@ -108,7 +109,7 @@ theorem naeProper_occ {ν : A → Prop} (h : NAEProper ν) (c : A)
     · exact ⟨y, false, ⟨hc, hn⟩, not_not_intro hT⟩
 
 /-- Not-all-equal properness from the occurrence form. -/
-theorem naeProper_of_occ {ν : A → Prop}
+private theorem naeProper_of_occ {ν : A → Prop}
     (h : ∀ c : A, RelMap satIsClause ![c] →
       (∃ x s, OccIn c x s ∧ LitTrue ν x s) ∧ ∃ x s, OccIn c x s ∧ ¬LitTrue ν x s) :
     NAEProper ν := by
@@ -212,14 +213,14 @@ def oPt (v : A) : naeInterp.Map A := (true, fun _ => v)
 used). -/
 def xPt (v : A) : naeInterp.Map A := (false, fun _ => v)
 
-theorem oPt_eta (w : Fin 1 → A) : ((true, w) : naeInterp.Map A) = oPt (w 0) :=
+private theorem oPt_eta (w : Fin 1 → A) : ((true, w) : naeInterp.Map A) = oPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
-theorem xPt_eta (w : Fin 1 → A) : ((false, w) : naeInterp.Map A) = xPt (w 0) :=
+private theorem xPt_eta (w : Fin 1 → A) : ((false, w) : naeInterp.Map A) = xPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
 /-- Every element of the interpreted universe is a copy of an element. -/
-theorem eq_oPt_or_xPt (p : naeInterp.Map A) : (∃ v, p = oPt v) ∨ ∃ v, p = xPt v := by
+private theorem eq_oPt_or_xPt (p : naeInterp.Map A) : (∃ v, p = oPt v) ∨ ∃ v, p = xPt v := by
   rcases p with ⟨b, w⟩
   cases b
   · exact Or.inr ⟨w 0, xPt_eta w⟩
@@ -289,7 +290,7 @@ variable (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonem
 /-- Correctness of the interpretation: a CNF formula is satisfiable iff the
 formula obtained by adding one fresh variable positively to every clause is
 not-all-equal satisfiable. -/
-theorem satisfiable_iff_naeSatisfiable_map :
+private theorem satisfiable_iff_naeSatisfiable_map :
     Satisfiable A ↔ NAESatisfiable (naeInterp.Map A) := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   constructor
@@ -328,7 +329,7 @@ end Correctness
 
 /-- **SAT ordered-FO-reduces to NAE-SAT**: add one fresh variable, the minimum
 of a spare copy of the universe, positively to every clause. -/
-noncomputable def sat_ordered_fo_reduction_naeSat : SAT ≤ᶠᵒ[≤] NAESAT where
+private noncomputable def sat_ordered_fo_reduction_naeSat : SAT ≤ᶠᵒ[≤] NAESAT where
   Tag := Bool
   dim := 1
   toInterpretation := naeInterp
@@ -348,7 +349,7 @@ noncomputable def naeFalseKernel : satSOLang.Sentence :=
 conjoined with its mirror image. -/
 noncomputable def naeKernel : satSOLang.Sentence := satKernel ⊓ naeFalseKernel
 
-theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) naeFalseKernel) ↔
@@ -378,7 +379,7 @@ theorem realize_naeFalseKernel {A : Type} [Language.sat.Structure A]
     · exact ⟨fun _ => x, Or.inl ⟨hp, hT⟩⟩
     · exact ⟨fun _ => x, Or.inr ⟨hn, hT⟩⟩
 
-theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) naeKernel) ↔
@@ -395,7 +396,7 @@ theorem realize_naeKernel {A : Type} [Language.sat.Structure A]
 /-- **NAE-SAT is `Σ₁`-definable**: guess the assignment, then check
 first-order that every clause has a true literal – SAT's kernel – and a false
 one. -/
-theorem naeSat_sigmaSODefinable : SigmaSODefinable 1 NAESAT := by
+private theorem naeSat_sigmaSODefinable : SigmaSODefinable 1 NAESAT := by
   refine ⟨[satAssignBlock], rfl, naeKernel, ?_⟩
   intro A _ _ _
   constructor

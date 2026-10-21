@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.AltDefs
 public import DescriptiveComplexity.Problems.Machine
+import all DescriptiveComplexity.Problems.Machine.AltDefs
 
 /-!
 # The alternating bridge at one block: `ATMAccept 1 true` is NP-complete
@@ -103,13 +104,13 @@ private theorem rel₂_map (R : (Language.turingAlt 1).Relations 2)
   exact Iff.rfl
 
 /-- **Every element of the image is a state of block `0`.** -/
-theorem blk_map (x : markInterp.Map A) : ATMBlk (k := 1) 0 x := by
+private theorem blk_map (x : markInterp.Map A) : ATMBlk (k := 1) 0 x := by
   refine ⟨by omega, ?_⟩
   refine (FOInterpretation.relMap_map markInterp A (atmBlk (0 : Fin 1)) ![x]).mpr ?_
   simp [markInterp]
 
 /-- **A marked machine is the machine it was built from.** -/
-theorem agree (A : Type) [Language.turing.Structure A] :
+private theorem agree (A : Type) [Language.turing.Structure A] :
     (atmData 1 (markInterp.Map A)).toTMData.Agree (markInterp.mapEquivSelf A) (tmData A) where
   posn := rel₁_map atmPosn tmPosn (fun _ => rfl)
   le := rel₂_map atmLe tmLe (fun _ => rfl)
@@ -148,7 +149,7 @@ end MarkOne
 
 /-- **Machine acceptance reduces to alternating acceptance at one block**: mark
 every element as a state of the single block. -/
-noncomputable def ntmAccept_fo_reduction_atmAccept_one :
+private noncomputable def ntmAccept_fo_reduction_atmAccept_one :
     NTMAccept ≤ᶠᵒ ATMAccept 1 true where
   Tag := Unit
   dim := 1
@@ -236,7 +237,7 @@ theorem acc_map (x : forgetInterp.Map A) :
   exact Iff.rfl
 
 /-- **An instance carrying its promise is copied verbatim.** -/
-theorem agree_of_marked (hm : ∀ q : A, ATMBlk (k := 1) 0 q) :
+private theorem agree_of_marked (hm : ∀ q : A, ATMBlk (k := 1) 0 q) :
     (tmData (forgetInterp.Map A)).Agree (forgetInterp.mapEquivSelf A)
       (atmData 1 A).toTMData where
   posn := rel₁_map tmPosn atmPosn (fun _ => rfl)
@@ -253,7 +254,7 @@ theorem agree_of_marked (hm : ∀ q : A, ATMBlk (k := 1) 0 q) :
   inp := rel₂_map tmInp atmInp (fun _ => rfl)
 
 /-- **An instance failing its promise has no accepting state in the image.** -/
-theorem not_accepts_of_not_marked (hm : ¬∀ q : A, ATMBlk (k := 1) 0 q) :
+private theorem not_accepts_of_not_marked (hm : ¬∀ q : A, ATMBlk (k := 1) 0 q) :
     ¬(tmData (forgetInterp.Map A)).Accepts := by
   rintro ⟨-, c, -, -, -, -, hacc⟩
   exact hm ((acc_map c.state).mp hacc).1
@@ -286,7 +287,7 @@ end ForgetOne
 
 /-- **Alternating acceptance at one block reduces to machine acceptance**:
 forget the mark, keeping the accepting states only when the promise holds. -/
-noncomputable def atmAccept_one_fo_reduction_ntmAccept :
+private noncomputable def atmAccept_one_fo_reduction_ntmAccept :
     ATMAccept 1 true ≤ᶠᵒ NTMAccept where
   Tag := Unit
   dim := 1

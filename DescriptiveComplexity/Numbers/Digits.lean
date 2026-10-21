@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Numbers.BinRel
 public import Mathlib.Tactic.Ring.RingNF
 public import Mathlib.Algebra.BigOperators.Ring.Finset
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Numbers written in base `B` on a relation-ordered index set
@@ -32,7 +33,7 @@ The development mirrors the binary one: a peeling lemma for the lowest block
 namespace DescriptiveComplexity
 
 /-- A sum of `0`s and `1`s counts. -/
-theorem finsum_mem_ite_one {ι : Type} [Finite ι] (S : Set ι) (p : ι → Prop)
+private theorem finsum_mem_ite_one {ι : Type} [Finite ι] (S : Set ι) (p : ι → Prop)
     [DecidablePred p] :
     (∑ᶠ i ∈ S, if p i then 1 else 0) = ({i | i ∈ S ∧ p i} : Set ι).ncard := by
   classical
@@ -153,7 +154,8 @@ open Classical in
 each taken `k` times, is the number whose digits are `k` there and `0`
 elsewhere. A number written by *one bit per block*, at a height inside the
 block that may vary from block to block, is of this shape. -/
-theorem finsum_coeff_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ} (k : A → ℕ)
+private theorem finsum_coeff_eq_digitNum
+    {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ} (k : A → ℕ)
     (h : ∀ e, sub e → Blk e) :
     (∑ᶠ e ∈ {e : A | sub e}, k e * B ^ bitRank Le Blk e) =
       digitNum Le Blk B (fun e => if sub e then k e else 0) := by
@@ -174,7 +176,7 @@ theorem finsum_coeff_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} 
 open Classical in
 /-- **Selecting blocks**: the sum of the place values of the blocks satisfying
 `sub` is the number whose digits are `1` there and `0` elsewhere. -/
-theorem finsum_pow_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ}
+private theorem finsum_pow_eq_digitNum {Le : A → A → Prop} {Blk sub : A → Prop} {B : ℕ}
     (h : ∀ e, sub e → Blk e) :
     (∑ᶠ e ∈ {e : A | sub e}, B ^ bitRank Le Blk e) =
       digitNum Le Blk B (fun e => if sub e then 1 else 0) := by
@@ -196,7 +198,7 @@ open Classical in
 /-- **Digit-wise addition**: a sum of numbers written on the same blocks is
 written by the sums of the digits – before any carrying, which is what the
 bound on the digits then rules out. -/
-theorem digitNum_finsum {ι : Type} [Finite ι] {Le : A → A → Prop} {Blk : A → Prop} {B : ℕ}
+private theorem digitNum_finsum {ι : Type} [Finite ι] {Le : A → A → Prop} {Blk : A → Prop} {B : ℕ}
     (S : Set ι) (c : ι → A → ℕ) :
     (∑ᶠ i ∈ S, digitNum Le Blk B (c i)) = digitNum Le Blk B fun e => ∑ᶠ i ∈ S, c i e := by
   classical

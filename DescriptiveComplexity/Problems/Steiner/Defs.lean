@@ -9,6 +9,7 @@ import DescriptiveComplexity.Vocabulary
 import DescriptiveComplexity.Interpretation
 import DescriptiveComplexity.Numbers.Unary
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+import all DescriptiveComplexity.Numbers.Unary
 
 /-!
 # Steiner Tree: definitions
@@ -89,7 +90,7 @@ restricted to the set. -/
 def Link (Adjp : A → A → Prop) (S : A → Prop) (a b : A) : Prop :=
   S a ∧ S b ∧ (Adjp a b ∨ Adjp b a)
 
-theorem link_symm {Adjp : A → A → Prop} {S : A → Prop} {a b : A} (h : Link Adjp S a b) :
+private theorem link_symm {Adjp : A → A → Prop} {S : A → Prop} {a b : A} (h : Link Adjp S a b) :
     Link Adjp S b a :=
   ⟨h.2.1, h.1, h.2.2.symm⟩
 
@@ -109,7 +110,7 @@ def reachIn (R : A → A → Prop) : ℕ → A → A → Prop
   | n + 1, x, y => reachIn R n x y ∨ ∃ z, reachIn R n x z ∧ R z y
 
 /-- Reachability is reachability in some bounded number of steps. -/
-theorem reflTransGen_iff_exists_reachIn (R : A → A → Prop) (x y : A) :
+private theorem reflTransGen_iff_exists_reachIn (R : A → A → Prop) (x y : A) :
     Relation.ReflTransGen R x y ↔ ∃ n, reachIn R n x y := by
   constructor
   · intro h
@@ -127,7 +128,7 @@ theorem reflTransGen_iff_exists_reachIn (R : A → A → Prop) (x y : A) :
       · exact (ih _ hz).tail hzy
 
 /-- The reflexive-transitive closure of a symmetric relation is symmetric. -/
-theorem reflTransGen_symm {R : A → A → Prop} (hsymm : ∀ a b, R a b → R b a) {x y : A}
+private theorem reflTransGen_symm {R : A → A → Prop} (hsymm : ∀ a b, R a b → R b a) {x y : A}
     (h : Relation.ReflTransGen R x y) : Relation.ReflTransGen R y x := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -139,7 +140,7 @@ open Classical in
 /-- The distance from `r`: the least number of steps in which `x` is
 reachable (and `0` when it is not reachable at all, a value the certificate
 never looks at). -/
-noncomputable def rdist (R : A → A → Prop) (r x : A) : ℕ :=
+private noncomputable def rdist (R : A → A → Prop) (r x : A) : ℕ :=
   if h : ∃ n, reachIn R n r x then Nat.find h else 0
 
 private theorem rdist_step {R : A → A → Prop} {r x : A} (hx : Relation.ReflTransGen R r x)
@@ -273,7 +274,7 @@ tree. -/
 
 /-- **A connected set costs edges**: a set connected through `T` has at most
 one more element than `T` has pairs. -/
-theorem ncard_le_ncard_of_connected {A : Type} [Finite A] {T : A → A → Prop} {S : A → Prop}
+private theorem ncard_le_ncard_of_connected {A : Type} [Finite A] {T : A → A → Prop} {S : A → Prop}
     {r : A}
     (hr : S r) (hconn : ConnectedOn T S) :
     {x | S x ∧ x ≠ r}.ncard ≤ {p : A × A | T p.1 p.2}.ncard := by
@@ -354,7 +355,8 @@ def SteinerEdgeOn (Adjp : A → A → Prop) (Term Kp : A → Prop) : Prop :=
     {p : A × A | T p.1 p.2}.ncard ≤ {x | Kp x}.ncard
 
 /-- The certified form of the edge-weighted problem. -/
-theorem steinerEdgeOn_iff_certificate [Finite A] (Adjp : A → A → Prop) (Term Kp : A → Prop) :
+private theorem steinerEdgeOn_iff_certificate
+    [Finite A] (Adjp : A → A → Prop) (Term Kp : A → Prop) :
     SteinerEdgeOn Adjp Term Kp ↔ ∃ T : A → A → Prop, ∃ S : A → Prop,
       (∀ a b, T a b → Adjp a b) ∧ (∀ x, Term x → S x) ∧
       (∃ Rt : A → Prop, (∀ x, Rt x → S x) ∧ (∀ x y, Rt x → Rt y → x = y) ∧
@@ -388,7 +390,7 @@ theorem SteinerOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B
   exact hcard
 
 /-- `SteinerOn` transports along an equivalence, iff version. -/
-theorem SteinerOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B → Prop}
+private theorem SteinerOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {TermB KB : B → Prop}
     {AdjA : A → A → Prop} {TermA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hterm : ∀ b, TermB b ↔ TermA (u b))
     (hK : ∀ b, KB b ↔ KA (u b)) : SteinerOn AdjB TermB KB ↔ SteinerOn AdjA TermA KA :=
@@ -418,7 +420,7 @@ theorem SteinerEdgeOn.of_equiv {A B : Type} (u : B ≃ A) {AdjB : B → B → Pr
     exact hcard
 
 /-- `SteinerEdgeOn` transports along an equivalence, iff version. -/
-theorem SteinerEdgeOn.equiv_iff {A B : Type} (u : B ≃ A) {AdjB : B → B → Prop}
+private theorem SteinerEdgeOn.equiv_iff {A B : Type} (u : B ≃ A) {AdjB : B → B → Prop}
     {TermB KB : B → Prop}
     {AdjA : A → A → Prop} {TermA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hterm : ∀ b, TermB b ↔ TermA (u b))

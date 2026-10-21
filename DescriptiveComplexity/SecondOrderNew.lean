@@ -199,7 +199,7 @@ private theorem relMap_ext_map [L.IsRelational] [L.Structure A] [L.Structure A']
 /-- Extended structures are functorial in the base structure: an isomorphism
 of instances and a bijection of the invented values induce an isomorphism of
 the extended structures. -/
-def extEquiv [L.IsRelational] [L.Structure A] [L.Structure A']
+private def extEquiv [L.IsRelational] [L.Structure A] [L.Structure A']
     (e : A ≃[L] A') (σ : Fin m ≃ Fin m') : (A ⊕ Fin m) ≃[newLang L] (A' ⊕ Fin m') where
   toEquiv := e.toEquiv.sumCongr σ
   map_fun' f _ := isEmptyElim f
@@ -225,7 +225,7 @@ section Definability
 variable {L : Language.{0, 0}}
 
 /-- Unfolding of alternating satisfaction at a single existential block. -/
-theorem sorealize_singleton (A : Type) [inst : L.Structure A] (B : SOBlock)
+private theorem sorealize_singleton (A : Type) [inst : L.Structure A] (B : SOBlock)
     (φ : (soLang L [B]).Sentence) :
     SORealize L A [B] φ true ↔
       ∃ ρ : B.Assignment A, @Sentence.Realize (L.sum B.lang) A
@@ -274,10 +274,10 @@ def oldF {α : Type} (x : α) : (newLang L).Formula α :=
 
 /-- The sentence “nothing was invented”: every element of the universe is an
 original element. -/
-noncomputable def noNewSentence : (newLang L).Sentence :=
+private noncomputable def noNewSentence : (newLang L).Sentence :=
   (oldF L (Sum.inr 0)).iAlls (Fin 1)
 
-theorem realize_noNewSentence [L.IsRelational] (A : Type) [L.Structure A] (m : ℕ) :
+private theorem realize_noNewSentence [L.IsRelational] (A : Type) [L.Structure A] (m : ℕ) :
     @Sentence.Realize (newLang L) (A ⊕ Fin m) _ (noNewSentence L) ↔
       ∀ x : A ⊕ Fin m, IsOld x := by
   simp only [noNewSentence, oldF, Sentence.Realize, Formula.realize_iAlls]
@@ -319,7 +319,7 @@ variable {L : Language.{0, 0}}
 when nothing was invented and the original sentence holds over the instance
 itself. This is the whole content of inventing nothing, and it is what both
 `DescriptiveComplexity.SigmaSODefinable.toNew` and its bounded twin read. -/
-theorem sorealize_guardNoNew_iff [L.IsRelational] {B : SOBlock}
+private theorem sorealize_guardNoNew_iff [L.IsRelational] {B : SOBlock}
     (φ : (soLang L [B]).Sentence) (A : Type) [instA : L.Structure A] (m : ℕ) :
     SORealize (newLang L) (A ⊕ Fin m) [B]
       ((soLangEmbed [B] (newLang L)).onSentence (noNewSentence L) ⊓

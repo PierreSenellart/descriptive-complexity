@@ -11,6 +11,9 @@ import DescriptiveComplexity.Counting.Subtractive
 import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Counting.Sized
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import all DescriptiveComplexity.Problems.SetFamily.FromGraphs
 
 /-!
 # #Set Cover and #Hitting Set
@@ -132,11 +135,11 @@ section Apply
 
 variable (A : Type) [Language.setSystem.Structure A]
 
-theorem sharpSetCover_apply :
+private theorem sharpSetCover_apply :
     SharpSetCover A = Nat.card {G : A → Prop // SetCoverOfSize A G} :=
   rfl
 
-theorem sharpHittingSet_apply :
+private theorem sharpHittingSet_apply :
     SharpHittingSet A = Nat.card {H : A → Prop // HittingSetOfSize A H} :=
   rfl
 
@@ -152,7 +155,7 @@ theorem sharpSetCover_support_iff [Finite A] :
 size.
 Registered in the Lax archive as
 [`Lax280166.HittingSetComplete.sharpHittingSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.sharpHittingSet_support_iff). -/
-theorem sharpHittingSet_support_iff [Finite A] :
+private theorem sharpHittingSet_support_iff [Finite A] :
     SharpHittingSet.support A ↔ ∃ H : A → Prop, HittingSetOfSize A H := by
   rw [CountingProblem.support_iff, sharpHittingSet_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨H⟩, _⟩ => ⟨H.1, H.2⟩, fun ⟨H, hH⟩ => ⟨⟨⟨H, hH⟩⟩, inferInstance⟩⟩
@@ -169,7 +172,7 @@ theorem setCover_of_sharpSetCover_support [Finite A] (h : SharpSetCover.support 
 /-- The support of #Hitting Set implies Hitting Set.
 Registered in the Lax archive as
 [`Lax280166.HittingSetComplete.hittingSet_of_sharpHittingSet_support`](https://laxarchive.org/lax-280166/Lax280166.HittingSetComplete.html#s-Lax280166.HittingSetComplete.hittingSet_of_sharpHittingSet_support). -/
-theorem hittingSet_of_sharpHittingSet_support [Finite A] (h : SharpHittingSet.support A) :
+private theorem hittingSet_of_sharpHittingSet_support [Finite A] (h : SharpHittingSet.support A) :
     HittingSet A := by
   obtain ⟨H, hfin, helem, hhit, hcard⟩ := (sharpHittingSet_support_iff A).mp h
   exact ⟨hfin, H, helem, hhit, hcard.le⟩
@@ -202,14 +205,14 @@ private theorem transpose_marked_iff :
   exact transpose_marked w
 
 /-- The hitting sets of the transposed system are the covers. -/
-theorem sharpHittingSet_transpose_map :
+private theorem sharpHittingSet_transpose_map :
     SharpHittingSet (transposeInterp.Map A) = SharpSetCover A :=
   Nat.card_congr (coverFamOfSizeEquiv (transposeInterp.mapEquivSelf A)
     (transpose_fam_iff A) (transpose_elem_iff A) (fun b b' => transpose_mem_iff A b' b)
     (transpose_marked_iff A))
 
 /-- The covers of the transposed system are the hitting sets. -/
-theorem sharpSetCover_transpose_map :
+private theorem sharpSetCover_transpose_map :
     SharpSetCover (transposeInterp.Map A) = SharpHittingSet A :=
   Nat.card_congr (coverFamOfSizeEquiv (transposeInterp.mapEquivSelf A)
     (transpose_elem_iff A) (transpose_fam_iff A) (fun b b' => transpose_mem_iff A b b')
@@ -229,12 +232,12 @@ instance : Subsingleton coverSelBlock.ι :=
 
 /-- The order-free kernel of #Set Cover: the guessed subfamily consists of sets
 of the family and covers every ground element. -/
-noncomputable def coverSelKernel : coverSelLang.Sentence :=
+private noncomputable def coverSelKernel : coverSelLang.Sentence :=
   fo% (∀ s, cvSelSym(s) → cvFamSym(s)) ∧
     ∀ x, cvElemSym(x) → ∃ s, cvSelSym(s) ∧ cvMemSym(x, s)
 
 /-- Realization of the order-free kernel of #Set Cover. -/
-theorem realize_coverSelKernel {A : Type} [Language.setSystem.Structure A]
+private theorem realize_coverSelKernel {A : Type} [Language.setSystem.Structure A]
     (ρ : coverSelBlock.Assignment A) :
     (@Sentence.Realize coverSelLang A
         (@sumStructure _ _ A _ (coverSelBlock.structure ρ)) coverSelKernel) ↔
@@ -259,7 +262,7 @@ theorem realize_coverSelKernel {A : Type} [Language.setSystem.Structure A]
     exact ⟨fun _ => s, hs⟩
 
 /-- **#Set Cover is in `#P`.** -/
-theorem sharpSetCover_mem_sharpP : SharpSetCover ∈ SharpP :=
+private theorem sharpSetCover_mem_sharpP : SharpSetCover ∈ SharpP :=
   sharpPDefinable_of_sized_set SharpSetCover coverSelBlock ssMarked .sel rfl coverSelKernel
     (fun A _ G => (∀ s : A, G s → SSFam s) ∧ ∀ x : A, SSElem x → ∃ s : A, G s ∧ SSMem x s)
     (fun _ _ ρ => realize_coverSelKernel ρ)
@@ -274,7 +277,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- The vertex-sets of a vertex cover of the threshold size are a cover of the
 threshold size. -/
-theorem setCoverOfSize_vertexFamily {C : A → Prop} (h : CoverOfSize A C) :
+private theorem setCoverOfSize_vertexFamily {C : A → Prop} (h : CoverOfSize A C) :
     SetCoverOfSize (edgeIncidenceInterp.Map A) (vertexFamily C) := by
   obtain ⟨hfin, hcov, hcard⟩ := h
   have := hfin
@@ -291,7 +294,7 @@ theorem setCoverOfSize_vertexFamily {C : A → Prop} (h : CoverOfSize A C) :
         (edgeIncidence_mem w ![w 1, w 1]).mpr ⟨by simp, Or.inr (by simp)⟩⟩
 
 /-- A cover of the interpreted system consists of vertex-sets. -/
-theorem setCover_diag {G : edgeIncidenceInterp.Map A → Prop}
+private theorem setCover_diag {G : edgeIncidenceInterp.Map A → Prop}
     (h : SetCoverOfSize (edgeIncidenceInterp.Map A) G) :
     ∀ p : edgeIncidenceInterp.Map A, G p → ∃ v, p = diagPt v := by
   rintro ⟨⟨⟩, w⟩ hw
@@ -300,7 +303,7 @@ theorem setCover_diag {G : edgeIncidenceInterp.Map A → Prop}
 
 /-- The vertices of a cover of the threshold size are a vertex cover of the
 threshold size. -/
-theorem coverOfSize_of_setCover {G : edgeIncidenceInterp.Map A → Prop}
+private theorem coverOfSize_of_setCover {G : edgeIncidenceInterp.Map A → Prop}
     (h : SetCoverOfSize (edgeIncidenceInterp.Map A) G) :
     CoverOfSize A fun v => G (diagPt v) := by
   have hdiag := setCover_diag h
@@ -318,7 +321,7 @@ theorem coverOfSize_of_setCover {G : edgeIncidenceInterp.Map A → Prop}
 variable (A) in
 /-- **The covers of the threshold size of the edge-incidence system are the
 vertex covers of the threshold size**, bijectively. -/
-def coverEquiv :
+private def coverEquiv :
     {C : A → Prop // CoverOfSize A C} ≃
       {G : edgeIncidenceInterp.Map A → Prop //
         SetCoverOfSize (edgeIncidenceInterp.Map A) G} where
@@ -340,7 +343,7 @@ end Hardness
 
 /-- **#Vertex Cover reduces parsimoniously to #Set Cover**, by the
 edge-incidence interpretation. -/
-noncomputable def sharpVertexCover_parsimonious_sharpSetCover :
+private noncomputable def sharpVertexCover_parsimonious_sharpSetCover :
     SharpVertexCover ≤ᵖ SharpSetCover where
   Tag := Unit
   dim := 2
@@ -348,7 +351,7 @@ noncomputable def sharpVertexCover_parsimonious_sharpSetCover :
   correct A _ _ _ := Nat.card_congr (coverEquiv A)
 
 /-- **#Set Cover reduces parsimoniously to #Hitting Set**, by transposition. -/
-noncomputable def sharpSetCover_parsimonious_sharpHittingSet :
+private noncomputable def sharpSetCover_parsimonious_sharpHittingSet :
     SharpSetCover ≤ᵖ SharpHittingSet where
   Tag := Unit
   dim := 1
@@ -356,7 +359,7 @@ noncomputable def sharpSetCover_parsimonious_sharpHittingSet :
   correct A _ _ _ := (sharpHittingSet_transpose_map A).symm
 
 /-- **#Hitting Set reduces parsimoniously to #Set Cover**, by transposition. -/
-noncomputable def sharpHittingSet_parsimonious_sharpSetCover :
+private noncomputable def sharpHittingSet_parsimonious_sharpSetCover :
     SharpHittingSet ≤ᵖ SharpSetCover where
   Tag := Unit
   dim := 1
@@ -382,7 +385,7 @@ theorem sharpSetCover_sharpP_complete : SharpP.Complete SharpSetCover :=
   complete_sharpP_of_parsimoniousComplete sharpSetCover_sharpP_parsimoniousComplete
 
 /-- **#Hitting Set is in `#P`.** -/
-theorem sharpHittingSet_mem_sharpP : SharpHittingSet ∈ SharpP :=
+private theorem sharpHittingSet_mem_sharpP : SharpHittingSet ∈ SharpP :=
   SharpP.mem_of_parsimonious sharpHittingSet_parsimonious_sharpSetCover
     sharpSetCover_mem_sharpP
 

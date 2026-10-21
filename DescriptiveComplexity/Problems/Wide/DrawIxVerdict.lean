@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
 import DescriptiveComplexity.Problems.Wide.DrawVerdict
+import all DescriptiveComplexity.Problems.Wide.DrawIxRoundSem
+import all DescriptiveComplexity.Problems.Wide.DrawIxVar
+import all DescriptiveComplexity.Problems.Wide.DrawLeaf
 
 /-!
 # One variable's verdict at an arbitrary file
@@ -64,7 +67,7 @@ variable (mV : ιV → I → Prop)
 
 /-- **The working address's outer blocks**, as the valuation the free levels
 of a pack read: the mirror's block at each outer index. -/
-noncomputable def ixMirBlk : Fin dt.ko → (Fin dt.dd → A) → Prop := fun k =>
+private noncomputable def ixMirBlk : Fin dt.ko → (Fin dt.dd → A) → Prop := fun k =>
   wmBlk (ixAddr elt st.mir)
     (Tag.arg (toLex (Sum.inl k : Fin dt.ko ⊕ Fin dt.ki)) :
       Tag R P dt.KIx)
@@ -76,7 +79,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [LinearOrder (dt.X.Map A)] in
 omit [Finite I] in
 /-- The address's blocks depend on the mirror alone. -/
-theorem ixMirBlk_of_mir {st st' : TapeSt dt A R P I} (h : st.mir = st'.mir) :
+private theorem ixMirBlk_of_mir {st st' : TapeSt dt A R P I} (h : st.mir = st'.mir) :
     dt.ixMirBlk (elt := elt) st = dt.ixMirBlk (elt := elt) st' :=
   funext fun k => congrArg
     (fun s => wmBlk (ixAddr elt s)
@@ -100,7 +103,7 @@ and its pack by `DescriptiveComplexity.Draw.Data.ixPassW`, the stage reads
 by `DescriptiveComplexity.Draw.Data.ixOld_stage_of_dict`, and the two
 leaf readings by `DescriptiveComplexity.Draw.Data.ixLeafP_pass_iff` /
 `DescriptiveComplexity.Draw.Data.ixLeafP_fail_iff`. -/
-theorem ixAccVerdict_leafP
+private theorem ixAccVerdict_leafP
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
@@ -222,7 +225,7 @@ include hinj hhasP heltP hix hblkP hmono hup hpassEnc in
 iteration** at the points the working address's outer blocks encode: the
 prefix of `DescriptiveComplexity.Draw.Data.ixAccVerdict_leafP` read through
 `DescriptiveComplexity.Draw.Data.altQuantFrom_leafP`. -/
-theorem ixAccVerdict_next
+private theorem ixAccVerdict_next
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
@@ -298,7 +301,7 @@ at the stage the tracks hold: the prefix of
 variable is nullary, so the working address's outer blocks encode the empty
 tuple and there is nothing to ask of them – which is why this is the one
 verdict a reduction can take at the *empty* address. -/
-theorem ixAccVerdict_out
+private theorem ixAccVerdict_out
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)

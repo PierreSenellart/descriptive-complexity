@@ -10,6 +10,8 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.ZeroOneIP.Defs
 public import DescriptiveComplexity.Problems.Knapsack.Chain
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Knapsack.Chain
 
 /-!
 # 0-1 integer programming is in NP
@@ -231,13 +233,13 @@ variable {A : Type} [Language.zeroOneIP.Structure A]
 variable (ρ : zeroOneIPGuessBlock.Assignment A)
 
 /-- The columns set to `1`, read off an assignment of the block. -/
-def ZX (j : A) : Prop := ρ .x ![j]
+private def ZX (j : A) : Prop := ρ .x ![j]
 
 /-- The running total of a row, read off an assignment of the block. -/
-def ZPS (r j p : A) : Prop := ρ .pS ![r, j, p]
+private def ZPS (r j p : A) : Prop := ρ .pS ![r, j, p]
 
 /-- The carries of a row, read off an assignment of the block. -/
-def ZCy (r j p : A) : Prop := ρ .cy ![r, j, p]
+private def ZCy (r j p : A) : Prop := ρ .cy ![r, j, p]
 
 private theorem realize_zeroOneIPKernel :
     (@Sentence.Realize zoSOLang A
@@ -405,7 +407,7 @@ variable {A : Type} [Finite A] [Language.zeroOneIP.Structure A]
 
 /-- **A solution has a walk per row**, each ending on that row's right-hand
 side. -/
-theorem exists_chains_of_zeroOneSol (hlin : IsLinOrd (IPLe (A := A))) {S : A → Prop}
+private theorem exists_chains_of_zeroOneSol (hlin : IsLinOrd (IPLe (A := A))) {S : A → Prop}
     (hScol : ∀ j, S j → IPCol j)
     (hsumeq : ∀ r, IPRow r → (∑ᶠ j ∈ {j | S j}, IPCoefVal r j) = IPRhsVal r) :
     ∃ PS Cy : A → A → A → Prop,
@@ -447,7 +449,7 @@ theorem exists_chains_of_zeroOneSol (hlin : IsLinOrd (IPLe (A := A))) {S : A →
     exact this.mp
 
 /-- **Walks ending on the right-hand sides make a solution.** -/
-theorem zeroOneSol_of_chains (hlin : IsLinOrd (IPLe (A := A))) {S : A → Prop}
+private theorem zeroOneSol_of_chains (hlin : IsLinOrd (IPLe (A := A))) {S : A → Prop}
     {PS Cy : A → A → A → Prop} (hx : ∀ j, S j → IPCol j)
     (hchains : ∀ r : A, IPRow r → IsChain IPLe IPCol IPLe IPPosn S (IPCoef r) (PS r) (Cy r))
     (hfin : ∀ r j p : A, IPRow r → MaxPos IPLe IPCol j → IPPosn p → (PS r j p ↔ IPRhs r p))

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.Halt
 public import DescriptiveComplexity.Problems.Machine.HaltCert
+import all DescriptiveComplexity.Problems.Machine.HaltCert
 
 /-!
 # The certificate as relations on invented values
@@ -59,7 +60,7 @@ variable {Le : D → D → Prop} {S : D → Prop}
 
 /-- A linear order on a marked subset is a linear order on the subtype it
 marks. -/
-theorem isLinOrd_subtype (h : IsLinOrdOn Le S) :
+private theorem isLinOrd_subtype (h : IsLinOrdOn Le S) :
     IsLinOrd (fun x y : {d : D // S d} => Le x y) :=
   ⟨fun x => h.1 x x.2, fun x y z => h.2.1 x y z x.2 y.2 z.2,
     fun x y hxy hyx => Subtype.ext (h.2.2.1 x y x.2 y.2 hxy hyx),
@@ -182,17 +183,17 @@ section Sub
 variable [LinearOrder {d : D // S d}]
 
 /-- A least element of the subtype is a lowest marked element. -/
-theorem minPos_of_le (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
+private theorem minPos_of_le (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
     {t : {d : D // S d}} (ht : ∀ t', t ≤ t') : MinPos Le S t.val :=
   ⟨t.2, fun q hq => (hle _ _).mp (ht ⟨q, hq⟩)⟩
 
 /-- A greatest element of the subtype is a highest marked element. -/
-theorem maxPos_of_le (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
+private theorem maxPos_of_le (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
     {t : {d : D // S d}} (ht : ∀ t', t' ≤ t) : MaxPos Le S t.val :=
   ⟨t.2, fun q hq => (hle _ _).mp (ht ⟨q, hq⟩)⟩
 
 /-- Covering in the subtype is the successor relation on the marked set. -/
-theorem succPos_of_covBy (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
+private theorem succPos_of_covBy (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
     {a b : {d : D // S d}} (hab : a ⋖ b) : SuccPos Le S a.val b.val := by
   refine ⟨a.2, b.2, (hle _ _).mp hab.1.le, fun hcon => ?_, fun r hr h1 h2 => ?_⟩
   · exact absurd (Subtype.ext hcon : a = b) (ne_of_lt hab.1)
@@ -202,7 +203,7 @@ theorem succPos_of_covBy (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b
       exact Or.inr (congrArg Subtype.val (le_antisymm ((hle _ _).mpr h2) (not_lt.mp hnb)))
 
 /-- …and conversely. -/
-theorem covBy_of_succPos (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
+private theorem covBy_of_succPos (hle : ∀ a b : {d : D // S d}, a ≤ b ↔ Le a.val b.val)
     {a b : {d : D // S d}} (hs : SuccPos Le S a.val b.val) : a ⋖ b := by
   have hab : a < b :=
     lt_of_le_of_ne ((hle _ _).mpr hs.2.2.1) fun hcon => hs.2.2.2.1 (congrArg Subtype.val hcon)
@@ -215,7 +216,7 @@ end Sub
 
 /-- **The relations are realized by a run**: the two sorts are the subtypes
 they mark, and the four relations become functions by choice. -/
-theorem acceptsU_of_runRel [Finite D] (hb : ∃ b, M.Blank b) {c : RunRel A D}
+private theorem acceptsU_of_runRel [Finite D] (hb : ∃ b, M.Blank b) {c : RunRel A D}
     (h : RunRelOK M c) : M.AcceptsU := by
   classical
   let ordT : LinearOrder {d : D // c.Time d} := (isLinOrd_subtype h.tle_lin).toLinearOrder
@@ -289,7 +290,7 @@ section ToRel
 variable {A : Type} {M : TMData A}
 
 /-- The time index a value of the band denotes, clamped so as to be total. -/
-def tIx (n : ℕ) (d : Fin (2 * n + 1)) : Fin (n + 1) := ⟨min (d : ℕ) n, by omega⟩
+private def tIx (n : ℕ) (d : Fin (2 * n + 1)) : Fin (n + 1) := ⟨min (d : ℕ) n, by omega⟩
 
 private theorem tIx_val {n : ℕ} {d : Fin (2 * n + 1)} (hd : (d : ℕ) < n + 1) :
     (tIx n d : ℕ) = (d : ℕ) := by
@@ -300,7 +301,7 @@ private theorem tIx_eq {n : ℕ} {d : Fin (2 * n + 1)} {i : Fin (n + 1)} (hd : (
     (hi : (d : ℕ) = (i : ℕ)) : tIx n d = i := Fin.ext ((tIx_val hd).trans hi)
 
 /-- A run over the band, read as relations on `Fin (2n + 1)`. -/
-def toRunRel {n : ℕ} (zero : Fin (2 * n + 1))
+private def toRunRel {n : ℕ} (zero : Fin (2 * n + 1))
     (r : RunCert A (Fin (n + 1)) (Fin (2 * n + 1))) : RunRel A (Fin (2 * n + 1)) where
   Time d := (d : ℕ) < n + 1
   TLe d d' := (d : ℕ) ≤ (d' : ℕ)
@@ -452,7 +453,7 @@ private theorem runRelOK_toRunRel {n : ℕ} {zero : Fin (2 * n + 1)}
     exact h.acc (Fin.last n) fun i => Fin.le_last i
 
 /-- **A machine that accepts carries a relational certificate on `Fin m`.** -/
-theorem runRel_of_acceptsU (h : M.AcceptsU) :
+private theorem runRel_of_acceptsU (h : M.AcceptsU) :
     ∃ (m : ℕ) (c : RunRel A (Fin m)), RunRelOK M c := by
   obtain ⟨n, zero, r, hr⟩ := runCert_of_acceptsU h
   exact ⟨2 * n + 1, toRunRel zero r, runRelOK_toRunRel hr⟩
@@ -460,7 +461,7 @@ theorem runRel_of_acceptsU (h : M.AcceptsU) :
 /-- **Acceptance on an unbounded tape is a relational certificate on invented
 values**: the statement the `∃SO[new]` kernel of the membership proof mirrors
 clause by clause. -/
-theorem acceptsU_iff_runRel (hb : ∃ b, M.Blank b) :
+private theorem acceptsU_iff_runRel (hb : ∃ b, M.Blank b) :
     M.AcceptsU ↔ ∃ (m : ℕ) (c : RunRel A (Fin m)), RunRelOK M c :=
   ⟨runRel_of_acceptsU, fun ⟨_, _, hc⟩ => acceptsU_of_runRel hb hc⟩
 

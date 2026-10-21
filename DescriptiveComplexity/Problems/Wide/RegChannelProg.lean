@@ -9,6 +9,11 @@ import DescriptiveComplexity.Problems.Wide.RegChannelLaid
 public import DescriptiveComplexity.Problems.Wide.NexInterp
 public import DescriptiveComplexity.Problems.Wide.RegChannelInit
 import DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.Problems.Wide.NexOuter
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.RegChannelInit
 
 /-!
 # The clocked program of a reduction into the register channel
@@ -65,7 +70,7 @@ layer at the sweep that lays nothing and the region-guessing one, over the
 shared tower's evaluation, with the input written on the argument elements'
 file. Its pointer starts clear – there is no file-laying pointer to set – and
 its channel writes for the argument elements alone. -/
-noncomputable def nexProgHanded (hzo : zero ≠ one)
+private noncomputable def nexProgHanded (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G)
     (args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v)
@@ -91,7 +96,7 @@ variable {dt zero one}
 omit [Finite A] [Finite dt.KIx] [Nonempty A] in
 /-- **The handed program's rules, at a rule name**: what every run lemma's rule
 hypothesis is discharged by. -/
-theorem nexProgHanded_rules (hzo : zero ≠ one)
+private theorem nexProgHanded_rules (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G}
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
@@ -211,7 +216,7 @@ in the same post-guess phase on the same data are the same rule. Across sites
 that is the owner map (`nexOwner_nexRule`); within a site it is
 `nexSep_postGuess`, and the guess site is where the two are allowed to differ –
 which is why the phase restriction is there. -/
-theorem nexProgHanded_sep_rules (hzo : zero ≠ one)
+private theorem nexProgHanded_sep_rules (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G}
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
@@ -257,7 +262,7 @@ omit [Language.wide.Structure (Univ A (dt.NexRIx (G := G))
 /-- **No rule of the handed program fires from its accepting phase**: the
 accepting phase is owned by the accepting site (`nexOwner`), and that site has
 no rules at all – its shape is `Empty`. -/
-theorem nexProgHanded_srcPh_ne_acceptP (hzo : zero ≠ one)
+private theorem nexProgHanded_srcPh_ne_acceptP (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G}
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}

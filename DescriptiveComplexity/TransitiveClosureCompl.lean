@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.TransitiveClosure
 public import DescriptiveComplexity.InductiveCounting.Complete
+import all DescriptiveComplexity.InductiveCounting.Complete
+import all DescriptiveComplexity.InductiveCounting.Machine
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Padding
 
 /-!
 # FO(TC) is closed under complement
@@ -71,7 +75,7 @@ instance instNonemptyPadMode (spec : TCSpec L) : Nonempty (spec.pad).Mode :=
 variable (spec : TCSpec L) {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The nodes of the padded specification that carry a genuine mode. -/
-def padNode (a : spec.Node A) : (spec.pad).Node A := (some a.1, a.2)
+private def padNode (a : spec.Node A) : (spec.pad).Node A := (some a.1, a.2)
 
 private theorem pad_step_iff {a b : spec.Node A} :
     (spec.pad).Step (spec.padNode a) (spec.padNode b) ↔ spec.Step a b := Iff.rfl
@@ -155,10 +159,10 @@ omit [L.Structure A] [LinearOrder A] [LinearOrder spec.Mode] in
 def edge (z z' : NodeOrd spec A) : Prop := spec.Step (toNode z) (toNode z')
 
 /-- The starting nodes of the walk, on ordered nodes. -/
-def src (z : NodeOrd spec A) : Prop := spec.IsSrc (toNode z)
+private def src (z : NodeOrd spec A) : Prop := spec.IsSrc (toNode z)
 
 /-- The accepting nodes of the walk, on ordered nodes. -/
-def tgt (z : NodeOrd spec A) : Prop := spec.IsTgt (toNode z)
+private def tgt (z : NodeOrd spec A) : Prop := spec.IsTgt (toNode z)
 
 omit [LinearOrder spec.Mode] in
 theorem reach_of_edge {z z' : NodeOrd spec A} (h : Relation.ReflTransGen edge z z') :
@@ -177,7 +181,7 @@ theorem edge_of_reach {u v : spec.Node A} (h : spec.Reach u v) :
 omit [LinearOrder spec.Mode] in
 variable (spec A) in
 /-- Acceptance of the specification, read on the ordered nodes. -/
-theorem exists_reach_iff :
+private theorem exists_reach_iff :
     (∃ a b : NodeOrd spec A, src a ∧ tgt b ∧ Relation.ReflTransGen edge a b) ↔
       spec.Accepts A := by
   constructor
@@ -556,7 +560,7 @@ private theorem iff_some {P : Prop} {γ : Type} {v : γ → A} {g : (L.sum Langu
 /-- **The atomic constraints are first-order**: given the modes, an atomic
 constraint holds of the registers exactly when its compiled formula holds of
 the tuples. -/
-theorem holds_iff_compileAtom [Nonempty A] (pm qm : Reg → Option spec.Mode)
+private theorem holds_iff_compileAtom [Nonempty A] (pm qm : Reg → Option spec.Mode)
     (x y : Fin (dim spec) → A) (a : VAtom) :
     VAtom.Holds (edge (spec := spec)) src tgt (regsOf pm x) (regsOf qm y) a ↔
       ∃ f, compileAtom spec pm qm a = some f ∧ f.Realize (Sum.elim x y) := by
@@ -734,7 +738,7 @@ noncomputable def compileDisj (pm qm : Reg → Option spec.Mode) (ls : List (Lis
 variable {spec}
 variable {A : Type} [L.Structure A] [LinearOrder A] [Nonempty A]
 
-theorem sat_iff_compileConj (pm qm : Reg → Option spec.Mode) (x y : Fin (dim spec) → A)
+private theorem sat_iff_compileConj (pm qm : Reg → Option spec.Mode) (x y : Fin (dim spec) → A)
     (l : List VAtom) :
     Sat (edge (spec := spec)) src tgt (regsOf pm x) (regsOf qm y) l ↔
       ∃ f, compileConj spec pm qm l = some f ∧ f.Realize (Sum.elim x y) := by
@@ -747,7 +751,7 @@ theorem sat_iff_compileConj (pm qm : Reg → Option spec.Mode) (x y : Fin (dim s
     cases hA : compileAtom spec pm qm a <;> cases hB : compileConj spec pm qm l <;>
       simp [compileConj, hA, hB, Formula.realize_inf]
 
-theorem exists_sat_iff_compileDisj (pm qm : Reg → Option spec.Mode)
+private theorem exists_sat_iff_compileDisj (pm qm : Reg → Option spec.Mode)
     (x y : Fin (dim spec) → A) (ls : List (List VAtom)) :
     (∃ l ∈ ls, Sat (edge (spec := spec)) src tgt (regsOf pm x) (regsOf qm y) l) ↔
       (compileDisj spec pm qm ls).Realize (Sum.elim x y) := by
@@ -830,17 +834,18 @@ theorem toCfg_ofCfg (s : Cfg (NodeOrd spec A)) : toCfg (ofCfg s) = s := by
     = regs r
   rw [regTup_mkTup, fuse_split]
 
-theorem step_iff (n n' : (complSpec spec).Node A) :
+private theorem step_iff (n n' : (complSpec spec).Node A) :
     (complSpec spec).Step n n' ↔ CfgStep (edge (spec := spec)) src tgt (toCfg n) (toCfg n') :=
   (exists_sat_iff_compileDisj n.1.2.2 n'.1.2.2 n.2 n'.2 _).symm
 
-theorem cfgReach_of_reach {n n' : (complSpec spec).Node A} (h : (complSpec spec).Reach n n') :
+private theorem cfgReach_of_reach
+    {n n' : (complSpec spec).Node A} (h : (complSpec spec).Reach n n') :
     CfgReach (edge (spec := spec)) src tgt (toCfg n) (toCfg n') := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
   | @tail b c _ hbc ih => exact ih.tail ((step_iff b c).mp hbc)
 
-theorem reach_of_cfgReach {n : (complSpec spec).Node A} {s : Cfg (NodeOrd spec A)}
+private theorem reach_of_cfgReach {n : (complSpec spec).Node A} {s : Cfg (NodeOrd spec A)}
     (h : CfgReach (edge (spec := spec)) src tgt (toCfg n) s) :
     ∃ n' : (complSpec spec).Node A, toCfg n' = s ∧ (complSpec spec).Reach n n' := by
   induction h with
@@ -912,7 +917,7 @@ theorem isTgt_iff (n : (complSpec spec).Node A) :
     (complSpec spec).IsTgt n ↔ CfgIsTgt (toCfg n) :=
   realize_tgtFormula n.1 n.2
 
-theorem accepts_iff :
+private theorem accepts_iff :
     (complSpec spec).Accepts A ↔
       MachineAccepts (edge (spec := spec) (A := A)) (src (spec := spec) (A := A))
         (tgt (spec := spec) (A := A)) := by
@@ -927,7 +932,7 @@ theorem accepts_iff :
 
 /-- **The complement specification is correct**: it accepts exactly the
 structures the given specification rejects. -/
-theorem complSpec_accepts_iff [Nonempty spec.Mode] [Finite A] :
+private theorem complSpec_accepts_iff [Nonempty spec.Mode] [Finite A] :
     (complSpec spec).Accepts A ↔ ¬spec.Accepts A := by
   rw [accepts_iff, machineAccepts_iff, exists_reach_iff]
 

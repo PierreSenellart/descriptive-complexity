@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawAdv
 import DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawAdv
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The advance kit: one round of a sweep
@@ -164,7 +169,7 @@ def rule : AdvRule → Rule A Q W P
       moveRight := False }
 
 /-- **In-shape separation.** -/
-theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
+private theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : AdvRule) (f : Q → A) (g : W → A),
       (κ.rule zero one ρ).guard f g → (κ.rule zero one ρ').guard f g →
       (κ.rule zero one ρ).srcPh = (κ.rule zero one ρ').srcPh → ρ = ρ' := by
@@ -180,7 +185,7 @@ theorem sep (hzo : zero ≠ one) (hemb : Function.Injective κ.emb) :
     | (have hbb := hemb hph; cases hbb)
 
 /-- **Exit disjointness** at the kit's landing phase. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : AdvRule) (f : Q → A) (g : W → A), (κ.rule zero one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
       (κ.rule zero one ρ).srcPh = κ.emb .a4 → False := by
@@ -252,7 +257,7 @@ include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hi hv' him hAN hNB hNwk
 marker – whose erasing step is the caller's rule, the one hypothesis beyond
 the slot equations – to the kit's landing phase at the new marker, mirror
 incremented. -/
-theorem reachesIn
+private theorem reachesIn
     (h₀ : PR.HasRight p₀ fc (PR.passTracksAt F.cell κ.t restA m v) (κ.emb .a1) fc
       (PR.passTracksAt F.cell κ.t restN m v)) :
     (wideData (Univ A R P K dd)).ReachesIn
@@ -331,7 +336,7 @@ theorem reachesIn
 include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hi hv' him hAN hNB hNwk hNoth
   hwkB hrgB hrlB in
 /-- **The kit runs one round of a sweep**, the budget forgotten. -/
-theorem reaches
+private theorem reaches
     (h₀ : PR.HasRight p₀ fc (PR.passTracksAt F.cell κ.t restA m v) (κ.emb .a1) fc
       (PR.passTracksAt F.cell κ.t restN m v)) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step

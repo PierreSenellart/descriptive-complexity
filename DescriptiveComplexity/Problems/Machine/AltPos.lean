@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.AltTable
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltProg
+import all DescriptiveComplexity.Problems.Machine.AltTable
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The positions of the QBF machine's tape, concretely
@@ -43,28 +47,29 @@ variable {k : ℕ} {A : Type} [(Language.qbf k).Structure A] [LinearOrder A] [Fi
 
 omit [(Language.qbf k).Structure A] in
 /-- The left marker is a position. -/
-theorem altPosn_posStart : AltPosn (posStart : AltV k A) :=
+private theorem altPosn_posStart : AltPosn (posStart : AltV k A) :=
   ⟨rfl, fun a => ⟨qbotA_le a, qbotA_le a⟩⟩
 
 omit [(Language.qbf k).Structure A] in
 /-- The cell of an element is a position. -/
-theorem altPosn_posCell (x : A) : AltPosn (posCell x : AltV k A) :=
+private theorem altPosn_posCell (x : A) : AltPosn (posCell x : AltV k A) :=
   ⟨rfl, fun a => qbotA_le a⟩
 
 omit [(Language.qbf k).Structure A] in
 /-- The right marker is a position. -/
-theorem altPosn_posEnd : AltPosn (posEnd : AltV k A) :=
+private theorem altPosn_posEnd : AltPosn (posEnd : AltV k A) :=
   ⟨rfl, fun a => ⟨qbotA_le a, qbotA_le a⟩⟩
 
 /-! ### The tape order -/
 
 omit [(Language.qbf k).Structure A] [Finite A] [Nonempty A] in
 /-- The tape order is reflexive. -/
-theorem altTagTupleLe_refl (p : AltV k A) : tagTupleLe p p := Or.inr ⟨rfl, Or.inl rfl⟩
+private theorem altTagTupleLe_refl (p : AltV k A) : tagTupleLe p p := Or.inr ⟨rfl, Or.inl rfl⟩
 
 omit [(Language.qbf k).Structure A] [Finite A] [Nonempty A] in
 /-- A tag strictly below another puts its tuples below all of theirs. -/
-theorem altTagTupleLe_of_tag_lt {p q : AltV k A} (h : p.1 < q.1) : tagTupleLe p q := Or.inl h
+private theorem altTagTupleLe_of_tag_lt
+    {p q : AltV k A} (h : p.1 < q.1) : tagTupleLe p q := Or.inl h
 
 /-- **A lower base tag is a lower tag**, whatever the sweep indices: the order
 on tags is the base tag first. -/
@@ -74,13 +79,13 @@ theorem altTag_lt_of_base_lt {t t' : AltBase} (h : altBaseIdx t < altBaseIdx t')
 
 omit [(Language.qbf k).Structure A] [Finite A] [Nonempty A] in
 /-- The tape order refines the tag order. -/
-theorem altTagTupleLe_tag_le {p q : AltV k A} (h : tagTupleLe p q) : p.1 ≤ q.1 := by
+private theorem altTagTupleLe_tag_le {p q : AltV k A} (h : tagTupleLe p q) : p.1 ≤ q.1 := by
   rcases h with h | ⟨h, -⟩
   · exact le_of_lt h
   · exact le_of_eq h
 
 /-- The tag order refines the base-tag numbering. -/
-theorem altBaseIdx_le_of_tag_le {t t' : AltTag k} (h : t ≤ t') :
+private theorem altBaseIdx_le_of_tag_le {t t' : AltTag k} (h : t ≤ t') :
     altBaseIdx t.1 ≤ altBaseIdx t'.1 := by
   rcases Prod.Lex.le_iff.mp h with h | ⟨h, -⟩
   · exact le_of_lt h
@@ -90,7 +95,7 @@ theorem altBaseIdx_le_of_tag_le {t t' : AltTag k} (h : t ≤ t') :
 
 omit [(Language.qbf k).Structure A] in
 /-- There is only one left marker. -/
-theorem eq_posStart_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.pStart) :
+private theorem eq_posStart_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.pStart) :
     p = posStart := by
   obtain ⟨⟨t, i⟩, w⟩ := p
   simp only at h
@@ -103,7 +108,7 @@ theorem eq_posStart_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase
 
 omit [(Language.qbf k).Structure A] in
 /-- A cell is the cell of the element it carries. -/
-theorem eq_posCell_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.pCell) :
+private theorem eq_posCell_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.pCell) :
     p = posCell (p.2 0) := by
   obtain ⟨⟨t, i⟩, w⟩ := p
   simp only at h
@@ -116,7 +121,7 @@ theorem eq_posCell_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.
 
 omit [(Language.qbf k).Structure A] in
 /-- There is only one right marker. -/
-theorem eq_posEnd_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.pEnd) :
+private theorem eq_posEnd_of_posn {p : AltV k A} (hp : AltPosn p) (h : p.1.1 = AltBase.pEnd) :
     p = posEnd := by
   obtain ⟨⟨t, i⟩, w⟩ := p
   simp only at h
@@ -142,13 +147,13 @@ theorem posStart_le_posEnd : tagTupleLe (posStart : AltV k A) posEnd :=
   altTagTupleLe_of_tag_lt (altTag_lt_of_base_lt (by decide) _ _)
 
 /-- Every base tag other than the left marker's is above it. -/
-theorem pStart_idx_lt {t : AltBase} (h : t ≠ AltBase.pStart) :
+private theorem pStart_idx_lt {t : AltBase} (h : t ≠ AltBase.pStart) :
     altBaseIdx AltBase.pStart < altBaseIdx t := by
   revert h; revert t; decide
 
 omit [(Language.qbf k).Structure A] in
 /-- **The left marker is the lowest position**: the head starts there. -/
-theorem minPos_posStart : MinPos tagTupleLe AltPosn (posStart : AltV k A) := by
+private theorem minPos_posStart : MinPos tagTupleLe AltPosn (posStart : AltV k A) := by
   refine ⟨altPosn_posStart, fun q hq => ?_⟩
   rcases eq_or_ne q.1.1 AltBase.pStart with h | h
   · rw [eq_posStart_of_posn hq h]
@@ -159,7 +164,8 @@ omit [(Language.qbf k).Structure A] in
 /-- **Cells are ordered as their elements are**: the tape order between two
 cells is the source order between the elements they belong to, which is what
 makes a sweep over the cells a walk along the instance. -/
-theorem posCell_le_iff {x y : A} : tagTupleLe (posCell x : AltV k A) (posCell y) ↔ x ≤ y := by
+private theorem posCell_le_iff
+    {x y : A} : tagTupleLe (posCell x : AltV k A) (posCell y) ↔ x ≤ y := by
   constructor
   · rintro (h | ⟨-, h | ⟨j, hlt, hj⟩⟩)
     · exact absurd h (lt_irrefl _)
@@ -176,13 +182,13 @@ theorem posCell_le_iff {x y : A} : tagTupleLe (posCell x : AltV k A) (posCell y)
 /-! ### The head's first and last moves of a sweep -/
 
 /-- Only the two lowest base tags are at or below a cell's. -/
-theorem base_le_pCell {t : AltBase} (h : altBaseIdx t ≤ altBaseIdx AltBase.pCell) :
+private theorem base_le_pCell {t : AltBase} (h : altBaseIdx t ≤ altBaseIdx AltBase.pCell) :
     t = AltBase.pStart ∨ t = AltBase.pCell := by
   revert h; revert t; decide
 
 /-- Only the two highest of the bracketing base tags lie between a cell's and
 the right marker's. -/
-theorem base_between {t : AltBase} (h₁ : altBaseIdx AltBase.pCell ≤ altBaseIdx t)
+private theorem base_between {t : AltBase} (h₁ : altBaseIdx AltBase.pCell ≤ altBaseIdx t)
     (h₂ : altBaseIdx t ≤ altBaseIdx AltBase.pEnd) :
     t = AltBase.pCell ∨ t = AltBase.pEnd := by
   revert h₁ h₂; revert t; decide
@@ -190,7 +196,7 @@ theorem base_between {t : AltBase} (h₁ : altBaseIdx AltBase.pCell ≤ altBaseI
 omit [(Language.qbf k).Structure A] in
 /-- **The head's first move.** The cell of the least element follows the left
 marker immediately: a sweep starts by stepping over `⊢`. -/
-theorem succPos_posStart_posCell :
+private theorem succPos_posStart_posCell :
     SuccPos tagTupleLe AltPosn (posStart : AltV k A) (posCell qbotA) := by
   refine ⟨altPosn_posStart, altPosn_posCell _, posStart_le_posCell _, ?_, ?_⟩
   · intro h
@@ -213,7 +219,7 @@ theorem le_qtopA (a : A) : a ≤ qtopA (A := A) := (Finite.exists_max (id : A �
 omit [(Language.qbf k).Structure A] in
 /-- **The head's last move of a sweep.** The right marker follows the cell of
 the greatest element: this is where a sweep turns round. -/
-theorem succPos_posCell_posEnd :
+private theorem succPos_posCell_posEnd :
     SuccPos tagTupleLe AltPosn (posCell (qtopA (A := A)) : AltV k A) posEnd := by
   refine ⟨altPosn_posCell _, altPosn_posEnd, posCell_le_posEnd _, ?_, ?_⟩
   · intro h
@@ -235,7 +241,7 @@ transition is pinned (`DescriptiveComplexity.AltQbf.altTr_unique`), the successo
 configuration is too: its state by `altDst_functional`, the cell under the head
 by `altWrite_functional`, every other cell by the frame condition, and the head
 itself by uniqueness of the neighbor in the direction the transition names. -/
-theorem step_functional_off_guess {cnf : Bool} {c c₁ c₂ : Config (AltV k A)}
+private theorem step_functional_off_guess {cnf : Bool} {c c₁ c₂ : Config (AltV k A)}
     (hguess : ¬∃ (i : Fin (k + 1)) (x : A), c.state = stG i true ∧ c.tape c.head = symV false x)
     (h₁ : (altMachine k A cnf).Step c c₁) (h₂ : (altMachine k A cnf).Step c c₂) : c₁ = c₂ := by
   obtain ⟨τ, hτ, hsrc, hread, hdst, hwrite, hframe, hmove⟩ := h₁

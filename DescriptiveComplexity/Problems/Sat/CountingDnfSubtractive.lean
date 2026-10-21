@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.Sat.CountingDnf
 public import DescriptiveComplexity.Counting.Subtractive
 public import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingDnf
 
 /-!
 # #DNF is `#P`-complete
@@ -182,40 +186,40 @@ section Instances
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem dnfSub_isClause (b : Bool) (w : Fin 1 → A) :
+private theorem dnfSub_isClause (b : Bool) (w : Fin 1 → A) :
     RelMap (M := dnfSubInterp.Map A) satIsClause ![(b, w)] ↔
       b = false ∧ RelMap satIsClause ![w 0] := by
   rw [FOInterpretation.relMap_map]
   cases b <;> simp [dnfSubInterp, LHom.realize_onFormula, Formula.realize_rel₁]
 
-theorem dnfSub_posIn (b b' : Bool) (w w' : Fin 1 → A) :
+private theorem dnfSub_posIn (b b' : Bool) (w w' : Fin 1 → A) :
     RelMap (M := dnfSubInterp.Map A) satPosIn ![(b, w), (b', w')] ↔
       b = false ∧ b' = false ∧ RelMap satNegIn ![w 0, w' 0] := by
   rw [FOInterpretation.relMap_map]
   cases b <;> cases b' <;>
     simp [dnfSubInterp, LHom.realize_onFormula, Formula.realize_rel₂]
 
-theorem dnfSub_negIn (b b' : Bool) (w w' : Fin 1 → A) :
+private theorem dnfSub_negIn (b b' : Bool) (w w' : Fin 1 → A) :
     RelMap (M := dnfSubInterp.Map A) satNegIn ![(b, w), (b', w')] ↔
       b = false ∧ b' = false ∧ RelMap satPosIn ![w 0, w' 0] := by
   rw [FOInterpretation.relMap_map]
   cases b <;> cases b' <;>
     simp [dnfSubInterp, LHom.realize_onFormula, Formula.realize_rel₂]
 
-theorem dnfMin_isClause (b : Bool) (w : Fin 1 → A) :
+private theorem dnfMin_isClause (b : Bool) (w : Fin 1 → A) :
     RelMap (M := dnfMinInterp.Map A) satIsClause ![(b, w)] ↔
       b = true ∨ SatOccurs A (w 0) := by
   rw [FOInterpretation.relMap_map]
   cases b <;> simp [dnfMinInterp, LHom.realize_onFormula, realize_satOccursAt]
 
-theorem dnfMin_posIn (b b' : Bool) (w w' : Fin 1 → A) :
+private theorem dnfMin_posIn (b b' : Bool) (w w' : Fin 1 → A) :
     RelMap (M := dnfMinInterp.Map A) satPosIn ![(b, w), (b', w')] ↔
       b = false ∧ b' = false ∧ w 0 = w' 0 ∧ SatOccurs A (w 0) := by
   rw [FOInterpretation.relMap_map]
   cases b <;> cases b' <;>
     simp [dnfMinInterp, LHom.realize_onFormula, realize_satOccursAt]
 
-theorem dnfMin_negIn (b b' : Bool) (w w' : Fin 1 → A) :
+private theorem dnfMin_negIn (b b' : Bool) (w w' : Fin 1 → A) :
     RelMap (M := dnfMinInterp.Map A) satNegIn ![(b, w), (b', w')] ↔
       b = true ∧ b' = false ∧ w 0 = w' 0 ∧ SatOccurs A (w 0) := by
   rw [FOInterpretation.relMap_map]
@@ -237,7 +241,7 @@ theorem eq_dnfPt (z : Bool × (Fin 1 → A)) {a : A} (h1 : z.1 = false) (h2 : a 
 
 /-- The models of the subtrahend are the sets of images of variables of the
 formula that are not models of it. -/
-theorem dnfSub_model_iff (μ : dnfSubInterp.Map A → Prop) :
+private theorem dnfSub_model_iff (μ : dnfSubInterp.Map A → Prop) :
     DnfModel (dnfSubInterp.Map A) μ ↔
       (∀ y, μ y → ∃ a, y = dnfPt a ∧ SatOccurs A a) ∧ ¬SatModel A fun a => μ (dnfPt a) := by
   refine dnfModel_embed_swap_iff (B := dnfSubInterp.Map A) (ι := dnfPt) dnfPt_injective
@@ -256,7 +260,7 @@ theorem dnfSub_model_iff (μ : dnfSubInterp.Map A → Prop) :
 
 /-- The minuend is a tautology over the images of the variables of the
 formula: its models are all the sets of such images. -/
-theorem dnfMin_model_iff [Nonempty A] (μ : dnfMinInterp.Map A → Prop) :
+private theorem dnfMin_model_iff [Nonempty A] (μ : dnfMinInterp.Map A → Prop) :
     DnfModel (dnfMinInterp.Map A) μ ↔ ∀ y, μ y → ∃ a, y = dnfPt a ∧ SatOccurs A a := by
   have hocc : ∀ y : dnfMinInterp.Map A,
       SatOccurs (dnfMinInterp.Map A) y ↔ ∃ a, y = dnfPt a ∧ SatOccurs A a := by
@@ -296,7 +300,8 @@ theorem dnfMin_model_iff [Nonempty A] (μ : dnfMinInterp.Map A → Prop) :
 
 /-- A witness of the presentation of #DNF at an interpreted instance is a
 model of that instance. -/
-theorem witAt_sharpDnf (I : FOInterpretation (Language.sat.sum Language.order) Language.sat Bool 1)
+private theorem witAt_sharpDnf
+    (I : FOInterpretation (Language.sat.sum Language.order) Language.sat Bool 1)
     (ρ : satAssignBlock.Assignment (Bool × (Fin 1 → A))) :
     I.WitAt satAssignBlock (orderFreeKernel satAssignBlock sharpDnfKernel) A ρ ↔
       DnfModel (I.Map A) ((satAssignEquiv (I.Map A)).symm ρ) :=
@@ -312,7 +317,7 @@ end Instances
 the models of the negated formula are among those of a tautology over the same
 variables, and the difference of the two counts is the number of models of the
 formula. -/
-noncomputable def sharpSat_strongSubtractive_sharpDnf :
+private noncomputable def sharpSat_strongSubtractive_sharpDnf :
     StrongSubtractiveReduction SharpSAT SharpDNF where
   Tag := Bool
   dim := 1
@@ -346,7 +351,7 @@ noncomputable def sharpSat_strongSubtractive_sharpDnf :
 /-- #SAT reduces to #DNF by a subtractive reduction.
 Registered in the Lax archive as
 [`Lax859101.DnfComplete.sharpSat_subtractive_sharpDnf`](https://laxarchive.org/lax-859101/Lax859101.DnfComplete.html#s-Lax859101.DnfComplete.sharpSat_subtractive_sharpDnf). -/
-theorem sharpSat_subtractive_sharpDnf : SharpSAT ≤ˢ SharpDNF :=
+private theorem sharpSat_subtractive_sharpDnf : SharpSAT ≤ˢ SharpDNF :=
   sharpSat_strongSubtractive_sharpDnf.subtractiveReducible
 
 /-- **#DNF is `#P`-hard**: every problem of `#P` reduces to #SAT

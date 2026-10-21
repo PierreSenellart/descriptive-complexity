@@ -141,7 +141,7 @@ theorem acc_map (x : detInterp.Map A) :
   exact Iff.rfl
 
 /-- **A deterministic instance is copied verbatim.** -/
-theorem agree_of_det (hdet : (tmData A).Deterministic) :
+private theorem agree_of_det (hdet : (tmData A).Deterministic) :
     (tmData (detInterp.Map A)).Agree (detInterp.mapEquivSelf A) (tmData A) where
   posn := posn_map
   le := le_map
@@ -158,7 +158,7 @@ theorem agree_of_det (hdet : (tmData A).Deterministic) :
 
 /-- **A nondeterministic instance has no accepting state in the image**, so its
 image cannot accept. -/
-theorem not_acceptsSpace_of_not_det (hdet : ¬(tmData A).Deterministic) :
+private theorem not_acceptsSpace_of_not_det (hdet : ¬(tmData A).Deterministic) :
     ¬(tmData (detInterp.Map A)).AcceptsSpace := by
   rintro ⟨-, c, -, -, hacc⟩
   exact hdet ((acc_map c.state).mp hacc).1
@@ -183,7 +183,7 @@ problem.** The interpretation is the identity, save that the image only keeps
 its accepting states when the source table is deterministic – a first-order
 condition, so the promise folded into the yes-instances of
 `DescriptiveComplexity.DTMAcceptSpace` is enforced by the reduction itself. -/
-noncomputable def dtmAcceptSpace_fo_reduction_ntmAcceptSpace :
+private noncomputable def dtmAcceptSpace_fo_reduction_ntmAcceptSpace :
     DTMAcceptSpace ≤ᶠᵒ NTMAcceptSpace where
   Tag := Unit
   dim := 1

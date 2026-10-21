@@ -8,6 +8,8 @@ module
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.DigraphIso
 public import DescriptiveComplexity.Degree
+import all DescriptiveComplexity.Degree
+import all DescriptiveComplexity.IsoGadget
 
 /-!
 # Graph Isomorphism: vocabulary, semantics, and membership in the GI degree
@@ -126,7 +128,7 @@ noncomputable def simpleSentence {α : Type} (V : Language.twoGraphs.Relations 1
     (E : Language.twoGraphs.Relations 2) : Language.twoGraphs.Formula α :=
   fo% (∀ x y, (V(x) ∧ V(y)) ∧ E(x, y) → E(y, x)) ∧ ∀ x, V(x) → ¬ E(x, x)
 
-theorem realize_simpleSentence {A : Type} [Language.twoGraphs.Structure A] {α : Type}
+private theorem realize_simpleSentence {A : Type} [Language.twoGraphs.Structure A] {α : Type}
     (v : α → A) (V : Language.twoGraphs.Relations 1) (E : Language.twoGraphs.Relations 2) :
     (simpleSentence V E).Realize v ↔
       SimpleOn (fun a : A => RelMap V ![a]) fun a b : A => RelMap E ![a, b] := by
@@ -141,7 +143,8 @@ theorem realize_simpleSentence {A : Type} [Language.twoGraphs.Structure A] {α :
 noncomputable def wfSentence {α : Type} : Language.twoGraphs.Formula α :=
   simpleSentence tgPatV tgPatE ⊓ simpleSentence tgHostV tgHostE
 
-theorem realize_wfSentence {A : Type} [Language.twoGraphs.Structure A] {α : Type} (v : α → A) :
+private theorem realize_wfSentence
+    {A : Type} [Language.twoGraphs.Structure A] {α : Type} (v : α → A) :
     (wfSentence.Realize v) ↔
       SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)) TGHostE := by
   rw [wfSentence, Formula.realize_inf, realize_simpleSentence, realize_simpleSentence]
@@ -164,13 +167,13 @@ section Points
 variable {A : Type}
 
 /-- The unique copy of a vertex. -/
-def uPt (v : A) : simpleInterp.Map A := ((), fun _ => v)
+private def uPt (v : A) : simpleInterp.Map A := ((), fun _ => v)
 
-theorem uPt_eta (t : Unit) (w : Fin 1 → A) : ((t, w) : simpleInterp.Map A) = uPt (w 0) :=
+private theorem uPt_eta (t : Unit) (w : Fin 1 → A) : ((t, w) : simpleInterp.Map A) = uPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
 /-- The map is a copy of the universe: dimension one, one tag. -/
-def uEquiv : simpleInterp.Map A ≃ A where
+private def uEquiv : simpleInterp.Map A ≃ A where
   toFun p := p.2 0
   invFun := uPt
   left_inv p := (uPt_eta p.1 p.2).symm
@@ -186,25 +189,25 @@ variable (hwf : SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)
 
 include hwf
 
-theorem patV_map (p : simpleInterp.Map A) : TGPatV p ↔ TGPatV (uEquiv p) := by
+private theorem patV_map (p : simpleInterp.Map A) : TGPatV p ↔ TGPatV (uEquiv p) := by
   rw [TGPatV, FOInterpretation.relMap_map]
   simp only [simpleInterp, Formula.realize_inf, Formula.realize_rel₁, Term.realize_var]
   exact ⟨fun h => h.2, fun h => ⟨(realize_wfSentence _).mpr hwf, h⟩⟩
 
-theorem hostV_map (p : simpleInterp.Map A) : TGHostV p ↔ TGHostV (uEquiv p) := by
+private theorem hostV_map (p : simpleInterp.Map A) : TGHostV p ↔ TGHostV (uEquiv p) := by
   rw [TGHostV, FOInterpretation.relMap_map]
   simp only [simpleInterp, Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
     Formula.realize_rel₁, Term.realize_var]
   exact ⟨fun h => h.elim (fun h => h.2) fun h => absurd ((realize_wfSentence _).mpr hwf) h,
     fun h => Or.inl ⟨(realize_wfSentence _).mpr hwf, h⟩⟩
 
-theorem patE_map (p q : simpleInterp.Map A) :
+private theorem patE_map (p q : simpleInterp.Map A) :
     TGPatE p q ↔ TGPatE (uEquiv p) (uEquiv q) := by
   rw [TGPatE, FOInterpretation.relMap_map]
   simp only [simpleInterp, Formula.realize_inf, Formula.realize_rel₂, Term.realize_var]
   exact ⟨fun h => h.2, fun h => ⟨(realize_wfSentence _).mpr hwf, h⟩⟩
 
-theorem hostE_map (p q : simpleInterp.Map A) :
+private theorem hostE_map (p q : simpleInterp.Map A) :
     TGHostE p q ↔ TGHostE (uEquiv p) (uEquiv q) := by
   rw [TGHostE, FOInterpretation.relMap_map]
   simp only [simpleInterp, Formula.realize_inf, Formula.realize_rel₂, Term.realize_var]
@@ -216,14 +219,14 @@ section IllFormed
 
 variable {A : Type} [Language.twoGraphs.Structure A]
 
-theorem not_patV_map_of_not_wf
+private theorem not_patV_map_of_not_wf
     (hwf : ¬(SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)) TGHostE))
     (p : simpleInterp.Map A) : ¬TGPatV p := by
   rw [TGPatV, FOInterpretation.relMap_map]
   simp only [simpleInterp, Formula.realize_inf, Formula.realize_rel₁, Term.realize_var]
   exact fun h => hwf ((realize_wfSentence _).mp h.1)
 
-theorem hostV_map_of_not_wf
+private theorem hostV_map_of_not_wf
     (hwf : ¬(SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)) TGHostE))
     (p : simpleInterp.Map A) : TGHostV p := by
   rw [TGHostV, FOInterpretation.relMap_map]
@@ -237,7 +240,8 @@ section Correctness
 
 /-- Correctness: the image is a yes-instance of Digraph Isomorphism exactly
 when the input is one of Graph Isomorphism. -/
-theorem hasGraphIso_iff_hasDigraphIso_map (A : Type) [Language.twoGraphs.Structure A] [Finite A]
+private theorem hasGraphIso_iff_hasDigraphIso_map
+    (A : Type) [Language.twoGraphs.Structure A] [Finite A]
     [Nonempty A] :
     HasGraphIso A ↔ HasDigraphIso (simpleInterp.Map A) := by
   by_cases hwf : SimpleOn (TGPatV (A := A)) TGPatE ∧ SimpleOn (TGHostV (A := A)) TGHostE
@@ -259,7 +263,7 @@ end GraphIso
 
 /-- **Graph Isomorphism FO-reduces to Digraph Isomorphism**: check simplicity
 first-order, then copy. -/
-noncomputable def graphIso_fo_reduction_digraphIso : GraphIso ≤ᶠᵒ DigraphIso where
+private noncomputable def graphIso_fo_reduction_digraphIso : GraphIso ≤ᶠᵒ DigraphIso where
   Tag := Unit
   dim := 1
   toInterpretation := GraphIso.simpleInterp

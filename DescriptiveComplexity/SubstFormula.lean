@@ -88,11 +88,11 @@ def strucOn [L₁.IsRelational] (e : Pt → M) : L₁.Structure Pt where
 variable {F D}
 
 omit [L₂.Structure M] in
-private theorem elim_map {n : ℕ} (v : β → Pt) (xs : Fin n → Pt) (x : β ⊕ Fin n) :
+theorem elim_map {n : ℕ} (v : β → Pt) (xs : Fin n → Pt) (x : β ⊕ Fin n) :
     Sum.elim (fun b => e (v b)) (fun i => e (xs i)) x = e (Sum.elim v xs x) := by
   cases x <;> rfl
 
-theorem realize_domGuard {n : ℕ} (v : β → M) (xs : Fin (n + 1) → M) :
+private theorem realize_domGuard {n : ℕ} (v : β → M) (xs : Fin (n + 1) → M) :
     (domGuard (β := β) D n).Realize v xs ↔ D.Realize ![xs (Fin.last n)] := by
   rw [domGuard, BoundedFormula.realize_relabel]
   refine iff_of_eq (congrArg₂ _ (funext fun i => ?_) (Subsingleton.elim _ _))
@@ -152,7 +152,7 @@ theorem realize_substTo [L₁.IsRelational] (hinj : Function.Injective e)
 
 /-- The sentence form of
 `DescriptiveComplexity.FormulaSubst.realize_substTo`. -/
-theorem realize_substSentence [L₁.IsRelational] (hinj : Function.Injective e)
+private theorem realize_substSentence [L₁.IsRelational] (hinj : Function.Injective e)
     (hD : ∀ x : M, D.Realize ![x] ↔ ∃ p : Pt, e p = x) (φ : L₁.Sentence) :
     (M ⊨ substSentence F D φ) ↔ @Sentence.Realize _ Pt (F.strucOn e) φ := by
   have h := realize_substTo (F := F) (D := D) (e := e) hinj hD (β := Empty) φ default default

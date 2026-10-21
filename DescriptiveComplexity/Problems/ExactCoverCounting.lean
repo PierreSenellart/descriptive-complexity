@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.ExactCover
 public import DescriptiveComplexity.Problems.SetFamily.Counting
 public import DescriptiveComplexity.Problems.OneInSat.CountingFromSat
 import DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.Problems.ExactCover
+import all DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.Problems.OneInSat.CountingFromSat
+import all DescriptiveComplexity.Problems.SetFamily.Counting
 
 /-!
 # #ExactCover is parsimoniously `#P`-complete
@@ -60,7 +64,7 @@ def modelEquiv (A : Type) [Language.sat.Structure A] :
       exact ⟨s, x, rfl, (exactCoverBy_lit hG hocc s).mp h, hocc⟩
 
 /-- **Correctness of the interpretation, for counting.** -/
-theorem sharpExactCover_map (A : Type) [Language.sat.Structure A] :
+private theorem sharpExactCover_map (A : Type) [Language.sat.Structure A] :
     SharpExactCover (ecInterp.Map A) = SharpOneInSAT A := by
   rw [sharpExactCover_apply, sharpOneInSat_apply]
   exact (Nat.card_congr (modelEquiv A)).symm
@@ -69,7 +73,7 @@ end ExactCoverRed
 
 open ExactCoverRed in
 /-- **#1-in-SAT reduces parsimoniously to #ExactCover**, without an order. -/
-noncomputable def sharpOneInSat_parsimonious_sharpExactCover :
+private noncomputable def sharpOneInSat_parsimonious_sharpExactCover :
     SharpOneInSAT ≤ᵖ SharpExactCover where
   Tag := ECTag
   dim := 1

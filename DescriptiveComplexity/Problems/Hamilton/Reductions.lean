@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Hamilton.Defs
+import all DescriptiveComplexity.Problems.Hamilton.Defs
 
 /-!
 # Hamilton Circuit reduces to Directed Hamilton Circuit
@@ -50,7 +51,7 @@ def sEquiv : A ≃ symInterp.Map A := (symInterp.mapEquivSelf A).symm
 @[simp]
 theorem sEquiv_apply (a : A) : sEquiv a = sPt a := rfl
 
-theorem sPt_surj (q : symInterp.Map A) : q = sPt (q.2 0) :=
+private theorem sPt_surj (q : symInterp.Map A) : q = sPt (q.2 0) :=
   (symInterp.mapEquivSelf A).symm_apply_apply q ▸ rfl
 
 end Points
@@ -66,7 +67,7 @@ theorem sArc_iff (a b : A) : DGArc (sPt a) (sPt b) ↔ DGEdge a b := by
 
 /-- **Correctness**: a graph has a Hamilton circuit exactly when its
 symmetrization has a directed one. -/
-theorem hasHamCircuit_iff (A : Type) [Language.digraph.Structure A] :
+private theorem hasHamCircuit_iff (A : Type) [Language.digraph.Structure A] :
     HasHamCircuit A ↔ HasDirHamCircuit (symInterp.Map A) := by
   constructor
   · rintro ⟨hfin, htour⟩
@@ -84,7 +85,7 @@ end HamRed
 open HamRed in
 /-- **HAMILTON CIRCUIT FO-reduces to DIRECTED HAMILTON CIRCUIT**: replace each
 edge by its two arcs, the universe unchanged. -/
-def hamCircuit_fo_reduction_dirHamCircuit : HamCircuit ≤ᶠᵒ DirHamCircuit where
+private def hamCircuit_fo_reduction_dirHamCircuit : HamCircuit ≤ᶠᵒ DirHamCircuit where
   Tag := Unit
   dim := 1
   toInterpretation := symInterp

@@ -110,7 +110,7 @@ def seqRule : ∀ i : SeqSite n SA, SeqSh n ShA i → Rule A Q W P
 
 /-- **A property of a sequence's phases and its exit holds of every phase it can
 move to**, given it holds of every phase a stage can move to. -/
-theorem seqRule_dstIn {S : P → Prop} (hemb : ∀ p : SeqPh n PA, S (emb p))
+private theorem seqRule_dstIn {S : P → Prop} (hemb : ∀ p : SeqPh n PA, S (emb p))
     (hexit : S exitPh)
     (hA : ∀ (a : Fin n) (s : SA a) (ρ : ShA a s), S (ruleA a s ρ).dstPh)
     (i : SeqSite n SA) (ρ : SeqSh n ShA i) :
@@ -126,7 +126,7 @@ theorem seqRule_dstIn {S : P → Prop} (hemb : ∀ p : SeqPh n PA, S (emb p))
 
 /-- **Every rule of a sequence fires from a phase its site owns**; the
 stages' obligation is the parameter. -/
-theorem seqHosrc (ownA : ∀ a : Fin n, PA a → SA a)
+private theorem seqHosrc (ownA : ∀ a : Fin n, PA a → SA a)
     (hosrcA : ∀ (a : Fin n) (s : SA a) (ρ : ShA a s),
       ∃ p : PA a, (ruleA a s ρ).srcPh = emb (.sub a p) ∧ ownA a p = s) :
     ∀ (i : SeqSite n SA) (ρ : SeqSh n ShA i),
@@ -147,7 +147,7 @@ theorem seqHosrc (ownA : ∀ a : Fin n, PA a → SA a)
 
 /-- **A sequence separates in-shape**: the checkpoints by the gadget's
 guards, the stages by their parameter. -/
-theorem seqSep
+private theorem seqSep
     (hsepA : ∀ (a : Fin n) (s : SA a) (ρ ρ' : ShA a s) (f : Q → A) (g : W → A),
       (ruleA a s ρ).guard f g → (ruleA a s ρ').guard f g →
       (ruleA a s ρ).srcPh = (ruleA a s ρ').srcPh → ρ = ρ') :

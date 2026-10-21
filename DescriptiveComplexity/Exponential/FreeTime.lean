@@ -10,6 +10,9 @@ public import DescriptiveComplexity.Exponential.Classes
 public import DescriptiveComplexity.FixedPointParam
 import DescriptiveComplexity.FixedPointStepRel
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.Free
+import all DescriptiveComplexity.Exponential.FreeCopy
 
 /-!
 # The copy a point names, and EXPTIME without the order
@@ -65,7 +68,7 @@ variable {X}
 
 /-- At a point that carries an order – every point of an order-guessing
 expansion does – the copy it names is its class. -/
-theorem ptClsSet_eq_of_refl {c : N} (h : RelMap X.sameSym ![c, c]) :
+private theorem ptClsSet_eq_of_refl {c : N} (h : RelMap X.sameSym ![c, c]) :
     X.ptClsSet c = {y | RelMap X.sameSym ![c, y]} := by
   ext y
   exact ⟨fun hy => hy.elim id fun hy' => (hy' c h).elim, Or.inl⟩
@@ -150,7 +153,7 @@ theorem markPtSet_nonempty {M : Type} [X.ptLangOf.Structure M] [Nonempty M] :
 /-- **The marked point names the copy the point names**: at the structure whose
 mark is a single point, the part the reduction reads is the copy of that
 point. -/
-theorem markPtSet_markOne {N : Type} [inst : X.orderFree.E.Structure N] (c : N) :
+private theorem markPtSet_markOne {N : Type} [inst : X.orderFree.E.Structure N] (c : N) :
     @markPtSet L X N (markOne X.orderFree.E c) = X.ptClsSet c := by
   have hold : ∀ m : N, (@RelMap X.ptLangOf N (markOne X.orderFree.E c) 1
       (Sum.inr Language.oldSym) ![m] ↔ m = c) := fun _ => Iff.rfl
@@ -255,7 +258,7 @@ noncomputable def ptF {α : Type} (x : α) : (X.ptLangOf.sum Language.order).For
 
 variable {X} {M : Type} [X.ptLangOf.Structure M] [LinearOrder M]
 
-theorem realize_noPtF {α : Type} (v : α → M) :
+private theorem realize_noPtF {α : Type} (v : α → M) :
     (X.noPtF (α := α)).Realize v ↔
       ∀ m w : M, ¬(@RelMap X.ptLangOf M ‹_› 1 (Sum.inr Language.oldSym) ![m] ∧
         @RelMap X.orderFree.E M (X.ptReduct M) 2 X.sameSym ![m, w]) := by
@@ -345,7 +348,7 @@ noncomputable def ptReduction (Q : DecisionProblem X.E) : X.ptProblem Q ≤ʳᶠ
 
 /-- **The inner problem read in the copy of the marked point stays in polynomial
 time.** -/
-theorem mem_PTIME_ptProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PTIME) :
+private theorem mem_PTIME_ptProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PTIME) :
     X.ptProblem Q ∈ PTIME :=
   (ifpDefinable_iff_mem_PTIME _).mp
     (IFPDefinable.of_relOrderedReduction (X.ptReduction Q)
@@ -371,7 +374,7 @@ variable {X} {Q : DecisionProblem X.E} {A : Type} [L.Structure A]
 
 /-- **The copy a point of an order-guessing expansion names is a copy**: the
 points carrying its guessed order. -/
-theorem isCls_ptClsSet (c : X.orderFree.Map A) : IsCls X (X.ptClsSet c) := by
+private theorem isCls_ptClsSet (c : X.orderFree.Map A) : IsCls X (X.ptClsSet c) := by
   have hrefl : RelMap X.sameSym ![c, c] := (relMap_sameSym ![c, c]).mpr fun _ => Iff.rfl
   have heq := ptClsSet_eq_of_refl (X := X) hrefl
   refine ⟨⟨c, heq ▸ hrefl⟩, fun x hx y => ?_⟩
@@ -386,7 +389,7 @@ variable [Finite A] [Nonempty A]
 order of the instance** – the same statement as
 `DescriptiveComplexity.ExpExpansion.someCls_map_iff`, with the copy named by a
 point rather than guessed as a set. -/
-theorem somePtCls_map_iff :
+private theorem somePtCls_map_iff :
     (X.somePtCls Q) (X.orderFree.Map A) ↔
       ∃ lo : LinearOrder A, letI := lo; Q (X.Map A) := by
   constructor
@@ -422,7 +425,7 @@ variable {L : Language.{0, 0}} [L.IsRelational]
 into the block of the expansion, and the inner problem is replaced by “some copy
 answers yes” – the copy being *named by a point*, since a deterministic class
 cannot guess one. -/
-theorem expDefinable_PTIME_iff_free (P : DecisionProblem L) :
+private theorem expDefinable_PTIME_iff_free (P : DecisionProblem L) :
     ExpDefinable PTIME P ↔ ExpDefinableFree PTIME P := by
   constructor
   · rintro ⟨X, Q, hQ, hX⟩
@@ -445,7 +448,7 @@ def SOLFPDefinableFree (P : DecisionProblem L) : Prop :=
   ∃ (X : ExpExpansionFree L) (Q : DecisionProblem X.E), LFPDefinable Q ∧
     ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ Q (X.Map A)
 
-theorem solfpDefinableFree_iff_expDefinableFree (P : DecisionProblem L) :
+private theorem solfpDefinableFree_iff_expDefinableFree (P : DecisionProblem L) :
     SOLFPDefinableFree P ↔ ExpDefinableFree PTIME P :=
   exists_congr fun _X => exists_congr fun Q =>
     and_congr_left' (lfpDefinable_iff_mem_PTIME Q)

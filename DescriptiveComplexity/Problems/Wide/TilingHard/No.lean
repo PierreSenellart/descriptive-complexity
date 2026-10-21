@@ -6,6 +6,14 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Yes
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Emit
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Grid
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Run
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Tiles
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Yes
 
 /-!
 # A tiling of the emitted square is an accepting run
@@ -58,7 +66,7 @@ variable (A) in
 the machine of `DescriptiveComplexity.wideData` with its tape described by the
 given relation, which is the one thing the clocked machine and the
 space-bounded one disagree on. -/
-def wideDataOf (Inp : WPoint A → WPoint A → Prop) : TMData (WPoint A) :=
+private def wideDataOf (Inp : WPoint A → WPoint A → Prop) : TMData (WPoint A) :=
   { wideData A with Inp := Inp }
 
 /-- **A drawing of a run, read at the machine's own coordinates**: the rows
@@ -111,7 +119,7 @@ include hlin
 
 omit [LinearOrder A] in
 /-- **Every column but the last has one to its right.** -/
-theorem exists_wmIncr_of_ne_top {s : A → Prop} (hs : s ≠ fun _ : A => True) :
+private theorem exists_wmIncr_of_ne_top {s : A → Prop} (hs : s ≠ fun _ : A => True) :
     ∃ t, WMIncr WMLe s t := by
   classical
   refine exists_wmIncr hlin ?_
@@ -121,7 +129,7 @@ theorem exists_wmIncr_of_ne_top {s : A → Prop} (hs : s ≠ fun _ : A => True) 
 omit [LinearOrder A] in
 /-- **And every column but the first one to its left**, which is what justifies
 an arrival that is not at the edge. -/
-theorem exists_wmIncr_of_ne_bot {t : A → Prop} (ht : t ≠ fun _ : A => False) :
+private theorem exists_wmIncr_of_ne_bot {t : A → Prop} (ht : t ≠ fun _ : A => False) :
     ∃ s, WMIncr WMLe s t := by
   have h0 : wideRank t ≠ 0 := fun hc =>
     ht (wideRank_injective hlin (hc.trans (wideRank_bot hlin).symm))
@@ -140,7 +148,7 @@ theorem exists_wmIncr_of_ne_bot {t : A → Prop} (ht : t ≠ fun _ : A => False)
 
 omit [LinearOrder A] in
 /-- **A column has one column to its left at most.** -/
-theorem wmIncr_left_unique {s s' t : A → Prop} (h : WMIncr WMLe s t)
+private theorem wmIncr_left_unique {s s' t : A → Prop} (h : WMIncr WMLe s t)
     (h' : WMIncr WMLe s' t) : s = s' := by
   refine wideRank_injective hlin ?_
   have h1 := wideRank_incr hlin h
@@ -157,7 +165,7 @@ variable {A : Type} [LinearOrder A] [Finite A] [Language.wide.Structure A]
 
 omit [LinearOrder A] [Finite A] in
 /-- A cell holds a head or holds none. -/
-theorem isHeadTile_or_noHead {p : TilePt A} (h : TPTile p) : IsHeadTile p ∨ TPNoHead p := by
+private theorem isHeadTile_or_noHead {p : TilePt A} (h : TPTile p) : IsHeadTile p ∨ TPNoHead p := by
   rcases hp : p.1 with _ | _ | _ | _ | _ | _
   · rw [TPTile, hp] at h
     exact h.elim
@@ -169,13 +177,14 @@ theorem isHeadTile_or_noHead {p : TilePt A} (h : TPTile p) : IsHeadTile p ∨ TP
 
 omit [LinearOrder A] [Finite A] [Language.wide.Structure A] in
 /-- And not both. -/
-theorem not_isHeadTile_of_noHead {p : TilePt A} (h : TPNoHead p) : ¬IsHeadTile p := by
+private theorem not_isHeadTile_of_noHead {p : TilePt A} (h : TPNoHead p) : ¬IsHeadTile p := by
   rintro (hc | hc) <;> rcases h with h | h | h <;> rw [h] at hc <;>
     exact TileTag.noConfusion hc
 
 omit [LinearOrder A] [Finite A] in
 /-- **A cell that holds no head keeps its symbol**, whatever stands above it. -/
-theorem tpSym_vert {p q : TilePt A} (h : TPVert p q) (hp : TPNoHead p ∨ p.1 = TileTag.halt) :
+private theorem tpSym_vert
+    {p q : TilePt A} (h : TPVert p q) (hp : TPNoHead p ∨ p.1 = TileTag.halt) :
     tpSym q = tpSym p := by
   rcases hp with (hp | hp | hp) | hp <;> rw [TPVert, hp] at h
   · exact h.2
@@ -186,7 +195,7 @@ theorem tpSym_vert {p q : TilePt A} (h : TPVert p q) (hp : TPNoHead p ∨ p.1 = 
 omit [LinearOrder A] [Finite A] in
 /-- **Nothing but a head or an arrival puts a head above it**: above a symbol
 stands a cell with no head, and above a head the cell the head has left. -/
-theorem tag_of_head_above {p q : TilePt A} (hp : TPTile p) (h : TPVert p q)
+private theorem tag_of_head_above {p q : TilePt A} (hp : TPTile p) (h : TPVert p q)
     (hq : IsHeadTile q) :
     p.1 = TileTag.halt ∨ p.1 = TileTag.arrL ∨ p.1 = TileTag.arrR := by
   rcases hp' : p.1 with _ | _ | _ | _ | _ | _
@@ -215,7 +224,7 @@ include hlin
 /-- **Where a head comes from**: either it stood in the same column and halted,
 or the head of a neighboring column moved into it – and then that head's
 transition names the state it arrives in and the direction it came from. -/
-theorem head_from {k : ℕ} {s : A → Prop} (hk : k + 1 < R.rows)
+private theorem head_from {k : ℕ} {s : A → Prop} (hk : k + 1 < R.rows)
     (h : IsHeadTile (R.tl (k + 1) s)) :
     ((R.tl k s).1 = TileTag.halt ∧ tpState (R.tl (k + 1) s) = tpState (R.tl k s)) ∨
       (∃ e, (R.tl k e).1 = TileTag.head ∧
@@ -248,14 +257,14 @@ theorem head_from {k : ℕ} {s : A → Prop} (hk : k + 1 < R.rows)
 omit hlin in
 /-- **The bottom row holds one head, at the corner**: the corner carries the
 machine's start, and every other column the initial tape, which holds none. -/
-theorem head_zero : IsHeadTile (R.tl 0 (fun _ : A => False)) := by
+private theorem head_zero : IsHeadTile (R.tl 0 (fun _ : A => False)) := by
   rcases R.start.2.1 with ⟨h, -⟩ | h
   · exact Or.inl h
   · exact Or.inr h
 
 omit hlin in
 /-- And it is the only one. -/
-theorem eq_bot_of_head_zero {s : A → Prop} (h : IsHeadTile (R.tl 0 s)) :
+private theorem eq_bot_of_head_zero {s : A → Prop} (h : IsHeadTile (R.tl 0 s)) :
     s = fun _ : A => False := by
   by_contra hs
   exact not_isHeadTile_of_noHead (R.first s hs).1 h
@@ -264,7 +273,7 @@ theorem eq_bot_of_head_zero {s : A → Prop} (h : IsHeadTile (R.tl 0 s)) :
 or one a neighbor sent, and the neighbor that sends one is the head of the row
 below moving that way; so the head of a row is determined by the head of the row
 below and the transition it fires. -/
-theorem head_unique : ∀ {k : ℕ}, k < R.rows → ∀ {s t : A → Prop},
+private theorem head_unique : ∀ {k : ℕ}, k < R.rows → ∀ {s t : A → Prop},
     IsHeadTile (R.tl k s) → IsHeadTile (R.tl k t) → s = t := by
   intro k
   induction k with
@@ -294,7 +303,7 @@ theorem head_unique : ∀ {k : ℕ}, k < R.rows → ∀ {s t : A → Prop},
 
 /-- **A row with a head stands on one below it**: nothing sends a head into a
 row whose own row below has none. -/
-theorem exists_head_below {k : ℕ} (hk : k + 1 < R.rows)
+private theorem exists_head_below {k : ℕ} (hk : k + 1 < R.rows)
     (h : ∃ s, IsHeadTile (R.tl (k + 1) s)) : ∃ e, IsHeadTile (R.tl k e) := by
   obtain ⟨s, hs⟩ := h
   rcases head_from R hlin hk hs with ⟨hhalt, -⟩ | ⟨e, hhead, -, -⟩
@@ -319,7 +328,7 @@ noncomputable def headCol (k : ℕ) : A → Prop :=
 
 omit hlin in
 /-- **A square has a row**: the accepting cell stands in one. -/
-theorem rows_pos : 0 < R.rows := lt_of_le_of_lt (Nat.zero_le _) R.accRow_lt
+private theorem rows_pos : 0 < R.rows := lt_of_le_of_lt (Nat.zero_le _) R.accRow_lt
 
 omit hlin in
 theorem headCol_spec {k : ℕ} (h : ∃ s, IsHeadTile (R.tl k s)) :
@@ -330,13 +339,13 @@ theorem headCol_spec {k : ℕ} (h : ∃ s, IsHeadTile (R.tl k s)) :
 
 include hlin in
 /-- And it is *the* column of the head. -/
-theorem headCol_eq {k : ℕ} (hk : k < R.rows) {s : A → Prop}
+private theorem headCol_eq {k : ℕ} (hk : k < R.rows) {s : A → Prop}
     (hs : IsHeadTile (R.tl k s)) : headCol R k = s :=
   head_unique R hlin hk (headCol_spec R ⟨s, hs⟩) hs
 
 include hlin in
 /-- **Every other column of a row holds no head**, the head being unique. -/
-theorem noHead_of_ne {k : ℕ} (hk : k < R.rows) {d : A → Prop}
+private theorem noHead_of_ne {k : ℕ} (hk : k < R.rows) {d : A → Prop}
     (hd : d ≠ headCol R k) : TPNoHead (R.tl k d) := by
   rcases isHeadTile_or_noHead (R.tile k d) with h | h
   · exact absurd (headCol_eq R hlin hk h).symm hd
@@ -347,7 +356,7 @@ variable (b₀ : A)
 /-- **The configuration a row is**: the head in its column, the state that head
 carries, and the symbols of the row on the tape. The control points hold a
 blank, which is what the machine's initial tape asks of them. -/
-noncomputable def cfgAt (k : ℕ) : Config (WPoint A) where
+private noncomputable def cfgAt (k : ℕ) : Config (WPoint A) where
   state := Sum.inr (tpState (R.tl k (headCol R k)))
   head := Sum.inl (headCol R k)
   tape := fun p =>
@@ -359,7 +368,7 @@ include hlin in
 /-- **The bottom row is an initial configuration**: the head at the corner in a
 start state, the cell of an element carrying its input symbol and every other
 cell a blank. -/
-theorem isInit_cfgAt (hb : WMBlank b₀)
+private theorem isInit_cfgAt (hb : WMBlank b₀)
     (hctrl : ∀ (x : A) b, ¬Inp (Sum.inr x) b)
     (hbot : ∀ b, ¬Inp (Sum.inl fun _ : A => False) b) :
     (wideDataOf A Inp).IsInit (cfgAt R b₀ 0) := by
@@ -384,7 +393,7 @@ theorem isInit_cfgAt (hb : WMBlank b₀)
 include hlin in
 /-- **The row above is the step the head takes**, or the same configuration
 again where the head has halted. -/
-theorem step_or_eq {k : ℕ} (hk : k + 1 < R.rows)
+private theorem step_or_eq {k : ℕ} (hk : k + 1 < R.rows)
     (hup : ∃ s, IsHeadTile (R.tl (k + 1) s)) :
     (wideDataOf A Inp).Step (cfgAt R b₀ k) (cfgAt R b₀ (k + 1)) ∨
       cfgAt R b₀ (k + 1) = cfgAt R b₀ k := by
@@ -465,7 +474,7 @@ include hlin
 /-- **A row with a head stands a bounded number of steps above the bottom
 row**: each row below it is either the step its head takes or the same
 configuration again, where that head has halted. -/
-theorem stepsIn_cfgAt : ∀ {k : ℕ}, k < R.rows → (∃ s, IsHeadTile (R.tl k s)) →
+private theorem stepsIn_cfgAt : ∀ {k : ℕ}, k < R.rows → (∃ s, IsHeadTile (R.tl k s)) →
     ∃ j ≤ k, (wideDataOf A Inp).StepsIn j (cfgAt R b₀ 0) (cfgAt R b₀ k) := by
   intro k
   induction k with
@@ -484,7 +493,7 @@ include R in
 /-- **A drawing is an accepting run of the machine**: the accepting cell holds a
 head, so the row it stands in is a configuration the run reaches, in fewer steps
 than there are addresses. -/
-theorem accepts_of_tileRun (hwf : WideWF A)
+private theorem accepts_of_tileRun (hwf : WideWF A)
     (hctrl : ∀ (x : A) b, ¬Inp (Sum.inr x) b)
     (hbot : ∀ b, ¬Inp (Sum.inl fun _ : A => False) b)
     (hrows : R.rows ≤ Nat.card {p : WPoint A // (wideData A).Posn p}) :
@@ -504,7 +513,7 @@ omit hlin in
 include R in
 /-- **And an accepting run in bounded space**, where the drawing has no clock to
 answer to: the same run, with its length forgotten. -/
-theorem acceptsSpace_of_tileRun (hwf : WideWF A)
+private theorem acceptsSpace_of_tileRun (hwf : WideWF A)
     (hctrl : ∀ (x : A) b, ¬Inp (Sum.inr x) b)
     (hbot : ∀ b, ¬Inp (Sum.inl fun _ : A => False) b) :
     (wideDataOf A Inp).AcceptsSpace := by
@@ -530,7 +539,7 @@ omit [Finite A] in
 /-- **The order a tiling promises is the machine's own**, read at the digits:
 they are one per element, and the emitted order between two of them is the
 instance's. -/
-theorem isLinOrd_of_tileWF
+private theorem isLinOrd_of_tileWF
     (h : letI := tileStr A; IsLinOrd (wideTileData (TilePt A)).Le) :
     IsLinOrd (WMLe (A := A)) := by
   let := tileStr A
@@ -566,7 +575,7 @@ theorem wideRank_rowAt {k : ℕ} (hk : k < Nat.card {p : WPoint A // (wideData A
 
 omit [LinearOrder A] in
 /-- The bottom row is the empty address, where the machine's head starts. -/
-theorem rowAt_zero : rowAt (A := A) 0 = fun _ : A => False := by
+private theorem rowAt_zero : rowAt (A := A) 0 = fun _ : A => False := by
   classical
   have hex : ∃ s : A → Prop, wideRank s = 0 := ⟨fun _ => False, wideRank_bot hlin⟩
   rw [rowAt, dite_eq_left hex]
@@ -574,7 +583,7 @@ theorem rowAt_zero : rowAt (A := A) 0 = fun _ : A => False := by
 
 omit [LinearOrder A] in
 /-- And one row above another is the increment of its address. -/
-theorem wmIncr_rowAt {k : ℕ}
+private theorem wmIncr_rowAt {k : ℕ}
     (hk : k + 1 < Nat.card {p : WPoint A // (wideData A).Posn p}) :
     WMIncr WMLe (rowAt (A := A) k) (rowAt (A := A) (k + 1)) := by
   have hk' : k < Nat.card {p : WPoint A // (wideData A).Posn p} := by omega

@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
 public import DescriptiveComplexity.OccurrenceVar
 import DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrenceVar
 
 /-!
 # The row graph of a CNF formula
@@ -108,11 +110,12 @@ theorem NextVar.occ_left {x y : A} (h : NextVar x y) : SatOccurs A x := by
   rcases h with h | ⟨h, -⟩
   exacts [h.1, h.1]
 
-theorem NextVar.occ_right {x y : A} (h : NextVar x y) : SatOccurs A y := by
+private theorem NextVar.occ_right {x y : A} (h : NextVar x y) : SatOccurs A y := by
   rcases h with h | ⟨-, h⟩
   exacts [h.2.1, h.1]
 
-theorem nextVar_right_unique {x y y' : A} (h : NextVar x y) (h' : NextVar x y') : y = y' := by
+private theorem nextVar_right_unique
+    {x y y' : A} (h : NextVar x y) (h' : NextVar x y') : y = y' := by
   rcases h with h | ⟨hl, hf⟩ <;> rcases h' with h' | ⟨hl', hf'⟩
   · rcases lt_trichotomy y y' with hlt | heq | hlt
     · exact absurd ⟨h.2.2.1, hlt⟩ (h'.2.2.2 y h.2.1)
@@ -122,7 +125,8 @@ theorem nextVar_right_unique {x y y' : A} (h : NextVar x y) (h' : NextVar x y') 
   · exact absurd (hl.2 y' h'.2.1) (not_le.mpr h'.2.2.1)
   · exact le_antisymm (hf.2 y' hf'.1) (hf'.2 y hf.1)
 
-theorem nextVar_left_unique {x x' y : A} (h : NextVar x y) (h' : NextVar x' y) : x = x' := by
+private theorem nextVar_left_unique
+    {x x' y : A} (h : NextVar x y) (h' : NextVar x' y) : x = x' := by
   rcases h with h | ⟨hl, hf⟩ <;> rcases h' with h' | ⟨hl', hf'⟩
   · rcases lt_trichotomy x x' with hlt | heq | hlt
     · exact absurd ⟨hlt, h'.2.2.1⟩ (h.2.2.2 x' h'.1)
@@ -133,20 +137,20 @@ theorem nextVar_left_unique {x x' y : A} (h : NextVar x y) (h' : NextVar x' y) :
   · exact le_antisymm (hl'.2 x hl.1) (hl.2 x' hl'.1)
 
 /-- A wrap-around step is not an increasing one. -/
-theorem NextVar.lt_or_last {x y : A} (h : NextVar x y) : x < y ∨ VLast x :=
+private theorem NextVar.lt_or_last {x y : A} (h : NextVar x y) : x < y ∨ VLast x :=
   h.elim (fun h => Or.inl h.2.2.1) fun h => Or.inr h.1
 
 variable [Finite A]
 
-theorem exists_vFirst (h : ∃ x : A, SatOccurs A x) : ∃ x : A, VFirst x := by
+private theorem exists_vFirst (h : ∃ x : A, SatOccurs A x) : ∃ x : A, VFirst x := by
   obtain ⟨x, hx, hmin⟩ := Set.exists_min_image {x : A | SatOccurs A x} id (Set.toFinite _) h
   exact ⟨x, hx, fun z hz => hmin z hz⟩
 
-theorem exists_vLast (h : ∃ x : A, SatOccurs A x) : ∃ x : A, VLast x := by
+private theorem exists_vLast (h : ∃ x : A, SatOccurs A x) : ∃ x : A, VLast x := by
   obtain ⟨x, hx, hmax⟩ := Set.exists_max_image {x : A | SatOccurs A x} id (Set.toFinite _) h
   exact ⟨x, hx, fun z hz => hmax z hz⟩
 
-theorem exists_nextVar {x : A} (hx : SatOccurs A x) : ∃ y, NextVar x y := by
+private theorem exists_nextVar {x : A} (hx : SatOccurs A x) : ∃ y, NextVar x y := by
   by_cases h : ∃ z, SatOccurs A z ∧ x < z
   · obtain ⟨y, hy, hmin⟩ :=
       Set.exists_min_image {z : A | SatOccurs A z ∧ x < z} id (Set.toFinite _) h
@@ -155,7 +159,7 @@ theorem exists_nextVar {x : A} (hx : SatOccurs A x) : ∃ y, NextVar x y := by
   · obtain ⟨y, hy⟩ := exists_vFirst ⟨x, hx⟩
     exact ⟨y, Or.inr ⟨⟨hx, fun z hz => not_lt.mp fun hlt => h ⟨z, hz, hlt⟩⟩, hy⟩⟩
 
-theorem exists_prevVar {y : A} (hy : SatOccurs A y) : ∃ x, NextVar x y := by
+private theorem exists_prevVar {y : A} (hy : SatOccurs A y) : ∃ x, NextVar x y := by
   by_cases h : ∃ z, SatOccurs A z ∧ z < y
   · obtain ⟨x, hx, hmax⟩ :=
       Set.exists_max_image {z : A | SatOccurs A z ∧ z < y} id (Set.toFinite _) h
@@ -175,22 +179,22 @@ noncomputable def occRank (x c : A) (s : Bool) : ℕ :=
 noncomputable def occTotal (x : A) : ℕ :=
   {p : A × Bool | OccIn p.1 x p.2}.ncard
 
-theorem occRank_lt_of_occLt {x c c' : A} {s s' : Bool} (hc : OccIn c x s)
+private theorem occRank_lt_of_occLt {x c c' : A} {s s' : Bool} (hc : OccIn c x s)
     (h : occLt c s c' s') : occRank x c s < occRank x c' s' := by
   refine Set.ncard_lt_ncard ⟨fun p hp => ⟨hp.1, occLt_trans hp.2 h⟩, fun hsub => ?_⟩
   exact occLt_irrefl c s (hsub (show (c, s) ∈ _ from ⟨hc, h⟩)).2
 
-theorem occRank_lt_of_varStep {x c c' : A} {s s' : Bool} (h : VarStep x c s c' s') :
+private theorem occRank_lt_of_varStep {x c c' : A} {s s' : Bool} (h : VarStep x c s c' s') :
     occRank x c s < occRank x c' s' :=
   occRank_lt_of_occLt h.1 h.2.2.1
 
-theorem occRank_lt_total {x c : A} {s : Bool} (hc : OccIn c x s) :
+private theorem occRank_lt_total {x c : A} {s : Bool} (hc : OccIn c x s) :
     occRank x c s < occTotal x := by
   refine Set.ncard_lt_ncard ⟨fun p hp => hp.1, fun hsub => ?_⟩
   exact occLt_irrefl c s (hsub (show (c, s) ∈ _ from hc)).2
 
 /-- Induction along the occurrences of a variable, upward from the first. -/
-theorem occ_induction_up {x : A} {P : A → Bool → Prop}
+private theorem occ_induction_up {x : A} {P : A → Bool → Prop}
     (hmin : ∀ c s, VarMin x c s → P c s)
     (hstep : ∀ c s c' s', VarStep x c s c' s' → P c s → P c' s') :
     ∀ c s, OccIn c x s → P c s := by
@@ -208,7 +212,7 @@ theorem occ_induction_up {x : A} {P : A → Bool → Prop}
         (ih _ (hr ▸ occRank_lt_of_varStep hst) c' t rfl hst.1)
 
 /-- Induction along the occurrences of a variable, downward from the last. -/
-theorem occ_induction_down {x : A} {P : A → Bool → Prop}
+private theorem occ_induction_down {x : A} {P : A → Bool → Prop}
     (hmax : ∀ c s, VarMax x c s → P c s)
     (hstep : ∀ c s c' s', VarStep x c s c' s' → P c' s' → P c s) :
     ∀ c s, OccIn c x s → P c s := by
@@ -238,7 +242,7 @@ theorem occurs_of_occIn {x c : A} {s : Bool} (h : OccIn c x s) : SatOccurs A x :
   · exact ⟨c, h.1, Or.inl h.2⟩
 
 /-- An occurrence is the last one, or has a next one. -/
-theorem varMax_or_step {x c : A} {s : Bool} (hc : OccIn c x s) :
+private theorem varMax_or_step {x c : A} {s : Bool} (hc : OccIn c x s) :
     VarMax x c s ∨ ∃ c' s', VarStep x c s c' s' := by
   by_cases hm : VarMax x c s
   · exact Or.inl hm
@@ -248,7 +252,7 @@ theorem varMax_or_step {x c : A} {s : Bool} (hc : OccIn c x s) :
     exact Or.inr (exists_varStep_right hc hne)
 
 /-- An occurrence is the first one, or has a previous one. -/
-theorem varMin_or_step {x c : A} {s : Bool} (hc : OccIn c x s) :
+private theorem varMin_or_step {x c : A} {s : Bool} (hc : OccIn c x s) :
     VarMin x c s ∨ ∃ c' s', VarStep x c' s' c s := by
   by_cases hm : VarMin x c s
   · exact Or.inl hm

@@ -10,6 +10,8 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.DominatingSet.Defs
 import DescriptiveComplexity.Counting.Sized
 public import DescriptiveComplexity.Counting.Class
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Sized
 
 /-!
 # #Dominating Set: counting the dominating sets of the threshold size
@@ -87,7 +89,7 @@ noncomputable def SharpDominatingSet : CountingProblem Language.markedGraph wher
     (domOfSizeEquiv e.toEquiv (fun a a' => relMap_equiv₂ e mgAdj a a')
       fun a => relMap_equiv₁ e mgMarked a)
 
-theorem sharpDominatingSet_apply (A : Type) [Language.markedGraph.Structure A] :
+private theorem sharpDominatingSet_apply (A : Type) [Language.markedGraph.Structure A] :
     SharpDominatingSet A = Nat.card {D : A → Prop // DomSetOfSize A D} :=
   rfl
 
@@ -122,11 +124,11 @@ instance : Subsingleton domSelBlock.ι :=
 
 /-- The order-free kernel of #Dominating Set: every vertex is in the guessed
 set or has a neighbor in it. -/
-noncomputable def domSelKernel : domSelLang.Sentence :=
+private noncomputable def domSelKernel : domSelLang.Sentence :=
   fo% ∀ v, dmSelSym(v) ∨ ∃ u, dmSelSym(u) ∧ dmAdjSym(u, v)
 
 /-- Realization of the order-free kernel of #Dominating Set. -/
-theorem realize_domSelKernel {A : Type} [Language.markedGraph.Structure A]
+private theorem realize_domSelKernel {A : Type} [Language.markedGraph.Structure A]
     (ρ : domSelBlock.Assignment A) :
     (@Sentence.Realize domSelLang A
         (@sumStructure _ _ A _ (domSelBlock.structure ρ)) domSelKernel) ↔

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Interpretation
+import all DescriptiveComplexity.Interpretation
 
 /-!
 # FINSAT: finite satisfiability of a first-order sentence
@@ -294,7 +295,7 @@ theorem upd_self {A M : Type} (v : A → M) (x : A) (d : M) : upd v x d x = d :=
   classical
   simp [upd]
 
-theorem upd_of_ne {A M : Type} (v : A → M) {x z : A} (d : M) (h : z ≠ x) :
+private theorem upd_of_ne {A M : Type} (v : A → M) {x z : A} (d : M) (h : z ≠ x) :
     upd v x d z = v z := by
   classical
   simp [upd, h]
@@ -333,7 +334,7 @@ noncomputable def gstep (I : A → (A → M) → Prop) (rec : (A → M) → A �
 /-- The truth definition is monotone in the values of the nodes below: no
 clause of `DescriptiveComplexity.FinSat.gstep` uses `rec` negatively, because
 negation is confined to the leaves. -/
-theorem gstep_mono (I : A → (A → M) → Prop) {rec rec' : (A → M) → A → Prop}
+private theorem gstep_mono (I : A → (A → M) → Prop) {rec rec' : (A → M) → A → Prop}
     (h : ∀ v g, rec v g → rec' v g) (v : A → M) (g : A) :
     gstep I rec v g → gstep I rec' v g := by
   intro hg
@@ -364,14 +365,14 @@ the truth definition, reached because a finite parse DAG has finite depth. -/
 def Gval (I : A → (A → M) → Prop) (v : A → M) (g : A) : Prop :=
   ∃ k, gval I k v g
 
-theorem gval_mono (I : A → (A → M) → Prop) :
+private theorem gval_mono (I : A → (A → M) → Prop) :
     ∀ (k : ℕ) (v : A → M) (g : A), gval I k v g → gval I (k + 1) v g := by
   intro k
   induction k with
   | zero => intro v g h; exact h.elim
   | succ k ih => intro v g h; exact gstep_mono I ih v g h
 
-theorem gval_of_le (I : A → (A → M) → Prop) {k k' : ℕ} (hk : k ≤ k') (v : A → M) (g : A)
+private theorem gval_of_le (I : A → (A → M) → Prop) {k k' : ℕ} (hk : k ≤ k') (v : A → M) (g : A)
     (h : gval I k v g) : gval I k' v g := by
   induction hk with
   | refl => exact h
@@ -409,72 +410,74 @@ section Iso
 variable {A B : Type} [Language.finsat.Structure A] [Language.finsat.Structure B]
 variable (e : A ≃[Language.finsat] B)
 
-theorem ord_equiv (x y : A) : Ord x y ↔ Ord (e x) (e y) := relMap_equiv₂ e _ x y
+private theorem ord_equiv (x y : A) : Ord x y ↔ Ord (e x) (e y) := relMap_equiv₂ e _ x y
 
-theorem ordLt_equiv (x y : A) : OrdLt x y ↔ OrdLt (e x) (e y) :=
+private theorem ordLt_equiv (x y : A) : OrdLt x y ↔ OrdLt (e x) (e y) :=
   and_congr (ord_equiv e x y)
     (not_congr ⟨fun h => h ▸ rfl, fun h => EmbeddingLike.injective e h⟩)
 
-theorem and_equiv (g : A) : AndG g ↔ AndG (e g) := relMap_equiv₁ e _ g
+private theorem and_equiv (g : A) : AndG g ↔ AndG (e g) := relMap_equiv₁ e _ g
 
-theorem or_equiv (g : A) : OrG g ↔ OrG (e g) := relMap_equiv₁ e _ g
+private theorem or_equiv (g : A) : OrG g ↔ OrG (e g) := relMap_equiv₁ e _ g
 
-theorem all_equiv (g : A) : AllG g ↔ AllG (e g) := relMap_equiv₁ e _ g
+private theorem all_equiv (g : A) : AllG g ↔ AllG (e g) := relMap_equiv₁ e _ g
 
-theorem ex_equiv (g : A) : ExG g ↔ ExG (e g) := relMap_equiv₁ e _ g
+private theorem ex_equiv (g : A) : ExG g ↔ ExG (e g) := relMap_equiv₁ e _ g
 
-theorem child_equiv (g c : A) : ChildG g c ↔ ChildG (e g) (e c) := relMap_equiv₂ e _ g c
+private theorem child_equiv (g c : A) : ChildG g c ↔ ChildG (e g) (e c) := relMap_equiv₂ e _ g c
 
-theorem bind_equiv (g x : A) : BindG g x ↔ BindG (e g) (e x) := relMap_equiv₂ e _ g x
+private theorem bind_equiv (g x : A) : BindG g x ↔ BindG (e g) (e x) := relMap_equiv₂ e _ g x
 
-theorem eqG_equiv (g x y : A) : EqG g x y ↔ EqG (e g) (e x) (e y) := relMap_equiv₃ e _ g x y
+private theorem eqG_equiv (g x y : A) : EqG g x y ↔ EqG (e g) (e x) (e y) := relMap_equiv₃ e _ g x y
 
-theorem neqG_equiv (g x y : A) : NeqG g x y ↔ NeqG (e g) (e x) (e y) := relMap_equiv₃ e _ g x y
+private theorem neqG_equiv
+    (g x y : A) : NeqG g x y ↔ NeqG (e g) (e x) (e y) := relMap_equiv₃ e _ g x y
 
-theorem pos_equiv (g s : A) : PosG g s ↔ PosG (e g) (e s) := relMap_equiv₂ e _ g s
+private theorem pos_equiv (g s : A) : PosG g s ↔ PosG (e g) (e s) := relMap_equiv₂ e _ g s
 
-theorem neg_equiv (g s : A) : NegG g s ↔ NegG (e g) (e s) := relMap_equiv₂ e _ g s
+private theorem neg_equiv (g s : A) : NegG g s ↔ NegG (e g) (e s) := relMap_equiv₂ e _ g s
 
-theorem arg_equiv (g p x : A) : ArgG g p x ↔ ArgG (e g) (e p) (e x) := relMap_equiv₃ e _ g p x
+private theorem arg_equiv
+    (g p x : A) : ArgG g p x ↔ ArgG (e g) (e p) (e x) := relMap_equiv₃ e _ g p x
 
-theorem sig_equiv (s p : A) : SigG s p ↔ SigG (e s) (e p) := relMap_equiv₂ e _ s p
+private theorem sig_equiv (s p : A) : SigG s p ↔ SigG (e s) (e p) := relMap_equiv₂ e _ s p
 
-theorem root_equiv (g : A) : RootG g ↔ RootG (e g) := relMap_equiv₁ e _ g
+private theorem root_equiv (g : A) : RootG g ↔ RootG (e g) := relMap_equiv₁ e _ g
 
 /-- The positive-or-negative reading of an atom transports along an
 isomorphism. -/
-theorem posneg_equiv (g s : A) :
+private theorem posneg_equiv (g s : A) :
     (PosG g s ∨ NegG g s) ↔ (PosG (e g) (e s) ∨ NegG (e g) (e s)) :=
   or_congr (pos_equiv e g s) (neg_equiv e g s)
 
 /-! The same transports read backwards, at the inverse isomorphism: the shape
 every field of `DescriptiveComplexity.FinSat.isWF_map` needs. -/
 
-theorem ord_equiv' (x y : B) : Ord x y ↔ Ord (e.symm x) (e.symm y) := by
+private theorem ord_equiv' (x y : B) : Ord x y ↔ Ord (e.symm x) (e.symm y) := by
   have h := (ord_equiv e (e.symm x) (e.symm y)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem ordLt_equiv' (x y : B) : OrdLt x y ↔ OrdLt (e.symm x) (e.symm y) := by
+private theorem ordLt_equiv' (x y : B) : OrdLt x y ↔ OrdLt (e.symm x) (e.symm y) := by
   have h := (ordLt_equiv e (e.symm x) (e.symm y)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem child_equiv' (g c : B) : ChildG g c ↔ ChildG (e.symm g) (e.symm c) := by
+private theorem child_equiv' (g c : B) : ChildG g c ↔ ChildG (e.symm g) (e.symm c) := by
   have h := (child_equiv e (e.symm g) (e.symm c)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem arg_equiv' (g p x : B) : ArgG g p x ↔ ArgG (e.symm g) (e.symm p) (e.symm x) := by
+private theorem arg_equiv' (g p x : B) : ArgG g p x ↔ ArgG (e.symm g) (e.symm p) (e.symm x) := by
   have h := (arg_equiv e (e.symm g) (e.symm p) (e.symm x)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem sig_equiv' (s p : B) : SigG s p ↔ SigG (e.symm s) (e.symm p) := by
+private theorem sig_equiv' (s p : B) : SigG s p ↔ SigG (e.symm s) (e.symm p) := by
   have h := (sig_equiv e (e.symm s) (e.symm p)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem root_equiv' (g : B) : RootG g ↔ RootG (e.symm g) := by
+private theorem root_equiv' (g : B) : RootG g ↔ RootG (e.symm g) := by
   have h := (root_equiv e (e.symm g)).symm
   rwa [e.apply_symm_apply] at h
 
-theorem posneg_equiv' (g s : B) :
+private theorem posneg_equiv' (g s : B) :
     (PosG g s ∨ NegG g s) ↔ (PosG (e.symm g) (e.symm s) ∨ NegG (e.symm g) (e.symm s)) := by
   have h := (posneg_equiv e (e.symm g) (e.symm s)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
@@ -509,7 +512,7 @@ the argument positions through the isomorphism. -/
 def mapI {M : Type} (I : A → (A → M) → Prop) : B → (B → M) → Prop :=
   fun s w => I (e.symm s) fun a => w (e a)
 
-theorem local_map {M : Type} {I : A → (A → M) → Prop} (h : Local I) : Local (mapI e I) := by
+private theorem local_map {M : Type} {I : A → (A → M) → Prop} (h : Local I) : Local (mapI e I) := by
   intro s w w' hw
   refine h (e.symm s) _ _ fun p hp => ?_
   refine hw (e p) ?_
@@ -518,14 +521,14 @@ theorem local_map {M : Type} {I : A → (A → M) → Prop} (h : Local I) : Loca
 
 /-- Reading the transported interpretation at a transported argument is
 reading the original one. -/
-theorem mapI_apply {M : Type} (I : A → (A → M) → Prop) (s : A) (w : A → M) :
+private theorem mapI_apply {M : Type} (I : A → (A → M) → Prop) (s : A) (w : A → M) :
     mapI e I (e s) (fun b => w (e.symm b)) ↔ I s w := by
   have hs : e.symm (e s) = s := e.symm_apply_apply s
   have hfun : (fun a => w (e.symm (e a))) = w := funext fun a => by rw [e.symm_apply_apply]
   change I (e.symm (e s)) (fun a => w (e.symm (e a))) ↔ I s w
   rw [hs, hfun]
 
-theorem upd_map {M : Type} (v : A → M) (x : A) (d : M) :
+private theorem upd_map {M : Type} (v : A → M) (x : A) (d : M) :
     (fun b => upd v x d (e.symm b)) = upd (fun b => v (e.symm b)) (e x) d := by
   classical
   funext b
@@ -538,7 +541,7 @@ theorem upd_map {M : Type} (v : A → M) (x : A) (d : M) :
 
 /-- **Satisfaction transports along an isomorphism**, one clause of the truth
 definition at a time. -/
-theorem gval_map {M : Type} (I : A → (A → M) → Prop) :
+private theorem gval_map {M : Type} (I : A → (A → M) → Prop) :
     ∀ (k : ℕ) (v : A → M) (g : A),
       gval I k v g → gval (mapI e I) k (fun b => v (e.symm b)) (e g) := by
   intro k

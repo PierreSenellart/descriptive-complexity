@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Computability.Vocab
+import all DescriptiveComplexity.Computability.FinStruct
 
 /-!
 # Evaluating a formula on a concrete structure is primitive recursive
@@ -61,35 +62,35 @@ def andAll (l : List Bool) : Bool := l.foldr (· && ·) true
 
 @[simp] theorem andAll_cons (b : Bool) (l : List Bool) : andAll (b :: l) = (b && andAll l) := rfl
 
-theorem andAll_eq_true {l : List Bool} : andAll l = true ↔ ∀ b ∈ l, b = true := by
+private theorem andAll_eq_true {l : List Bool} : andAll l = true ↔ ∀ b ∈ l, b = true := by
   induction l with
   | nil => simp
   | cons b l ih => simp [ih]
 
-theorem primrec_andAll : Primrec andAll :=
+private theorem primrec_andAll : Primrec andAll :=
   (Primrec.list_foldr Primrec.id (Primrec.const true)
     (Primrec.and.comp (Primrec.fst.comp Primrec.snd)
       (Primrec.snd.comp Primrec.snd)).to₂).of_eq fun _ => rfl
 
-theorem tupleIdx_eq_foldr (c : ℕ) (l : List ℕ) :
+private theorem tupleIdx_eq_foldr (c : ℕ) (l : List ℕ) :
     tupleIdx c l = l.foldr (fun a r => a + c * r) 0 := by
   induction l with
   | nil => rfl
   | cons a l ih => simp [tupleIdx_cons, ih]
 
-theorem primrec_tupleIdx : Primrec₂ tupleIdx :=
+private theorem primrec_tupleIdx : Primrec₂ tupleIdx :=
   (Primrec.list_foldr Primrec.snd (Primrec.const 0)
       (Primrec.nat_add.comp (Primrec.fst.comp Primrec.snd)
         (Primrec.nat_mul.comp (Primrec.fst.comp Primrec.fst)
           (Primrec.snd.comp Primrec.snd))).to₂).of_eq
     fun p => (tupleIdx_eq_foldr p.1 p.2).symm
 
-theorem primrec_pow_const (j : ℕ) : Primrec fun c : ℕ => c ^ j := by
+private theorem primrec_pow_const (j : ℕ) : Primrec fun c : ℕ => c ^ j := by
   induction j with
   | zero => simpa using Primrec.const 1
   | succ j ih => simpa [pow_succ] using Primrec.nat_mul.comp ih Primrec.id
 
-theorem primrec_digitAt (j : ℕ) : Primrec₂ fun c t : ℕ => digitAt c t j :=
+private theorem primrec_digitAt (j : ℕ) : Primrec₂ fun c t : ℕ => digitAt c t j :=
   Primrec.nat_mod.comp
     (Primrec.nat_div.comp Primrec.snd ((primrec_pow_const j).comp Primrec.fst)) Primrec.fst
 
@@ -123,7 +124,7 @@ theorem primrec_valNat (V : FinVocab L) (k : ℕ) :
 omit [L.IsRelational] in
 /-- Appending a value to a valuation is `Fin.snoc` on the elements it
 denotes. -/
-theorem valOf_append {l : ℕ} (s : FinStruct V) (xs : List ℕ) (hlen : xs.length = l)
+private theorem valOf_append {l : ℕ} (s : FinStruct V) (xs : List ℕ) (hlen : xs.length = l)
     (y : s.Univ) :
     (fun i : Fin (l + 1) => valOf s (xs ++ [(y : ℕ)]) i) =
       Fin.snoc (fun i : Fin l => valOf s xs i) y := by
@@ -157,7 +158,7 @@ def termIdx {l : ℕ} : L.Term (Empty ⊕ Fin l) → ℕ
   | .var (Sum.inr i) => (i : ℕ)
   | .func f _ => isEmptyElim f
 
-theorem realize_term {l : ℕ} (s : FinStruct V) (xs : List ℕ) (t : L.Term (Empty ⊕ Fin l)) :
+private theorem realize_term {l : ℕ} (s : FinStruct V) (xs : List ℕ) (t : L.Term (Empty ⊕ Fin l)) :
     t.realize (Sum.elim Empty.elim fun i : Fin l => valOf s xs i) = valOf s xs (termIdx t) := by
   match t with
   | .var (Sum.inl e) => exact e.elim
@@ -241,12 +242,12 @@ theorem primrec_evalBF (V : FinVocab L) : ∀ {l : ℕ} (φ : L.BoundedFormula E
 A sentence is the case `l = 0` of the evaluator, with the empty valuation. -/
 
 /-- Deciding a fixed sentence on a concrete structure is primitive recursive. -/
-theorem primrec_evalSentence (V : FinVocab L) (φ : L.Sentence) :
+private theorem primrec_evalSentence (V : FinVocab L) (φ : L.Sentence) :
     Primrec fun s : FinStruct V => evalBF V φ s [] :=
   (primrec_evalBF V φ).comp (Primrec.id.pair (Primrec.const []))
 
 /-- The evaluator decides a sentence. -/
-theorem evalSentence_iff (V : FinVocab L) (φ : L.Sentence) (s : FinStruct V) :
+private theorem evalSentence_iff (V : FinVocab L) (φ : L.Sentence) (s : FinStruct V) :
     evalBF V φ s [] = true ↔ φ.Realize s.Univ := by
   refine Iff.trans (evalBF_iff V φ s [] rfl) (iff_of_eq ?_)
   refine congrArg₂ (fun (v : Empty → s.Univ) (xs : Fin 0 → s.Univ) =>

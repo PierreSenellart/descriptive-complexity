@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Exponential.Simulate
 import DescriptiveComplexity.Exponential.Trivialize
 public import DescriptiveComplexity.Exponential.Reach
 import DescriptiveComplexity.HeadCapture
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Exponential.Class
 
 /-!
 # The operator pinned: `PSPACE = NL.exp`
@@ -89,12 +91,12 @@ theorem PSPACE_eq_NL_exp : PSPACE = NL.exp := by
 
 /-- **`LOGSPACE.exp ⊆ PSPACE`**, by monotonicity. The reverse inclusion is not
 claimed; see the module docstring. -/
-theorem LOGSPACE_exp_subset_PSPACE : LOGSPACE.exp ⊆ PSPACE :=
+private theorem LOGSPACE_exp_subset_PSPACE : LOGSPACE.exp ⊆ PSPACE :=
   fun _ _ _ h => NL_exp_subset_PSPACE (ComplexityClass.exp_mono LOGSPACE_subset_NL h)
 
 /-- **`NL.exp ⊆ EXPTIME` sharpened**: read through the gate, the inclusion
 `DescriptiveComplexity.NL_exp_subset_EXPTIME` is just `PSPACE ⊆ EXPTIME`. -/
-theorem NL_exp_eq_PSPACE : NL.exp = PSPACE :=
+private theorem NL_exp_eq_PSPACE : NL.exp = PSPACE :=
   PSPACE_eq_NL_exp.symm
 
 end DescriptiveComplexity

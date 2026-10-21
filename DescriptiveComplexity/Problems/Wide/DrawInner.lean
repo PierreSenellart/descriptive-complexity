@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Wide.Bridge
 import DescriptiveComplexity.OrderWalk
 import Mathlib.Tactic.Monotonicity.Basic
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The fold on a final segment of the blocks
@@ -113,7 +114,7 @@ theorem foldFrom_carry_of_ix (hV : IsLinOrd LeV) (hseg : IxSeg LeT ι) {c : Fin 
 
 /-- **Below the carry index the accumulators reset to the new leaf**: the image
 blocks there have been emptied. -/
-theorem foldFrom_below_of_ix (hV : IsLinOrd LeV) (hseg : IxSeg LeT ι) {c : Fin q}
+private theorem foldFrom_below_of_ix (hV : IsLinOrd LeV) (hseg : IxSeg LeT ι) {c : Fin q}
     (hafter : ∀ σ : T, WMLt LeT (ι c) σ → ∀ v : V, ¬wmBlk s' σ v) {j : ℕ}
     (hj : (c : ℕ) < j) : foldFrom pol P (WMSetLe LeV) j (ixBlk ι s') ↔ P (ixBlk ι s') :=
   foldFrom_below (c := (c : ℕ))
@@ -123,7 +124,7 @@ theorem foldFrom_below_of_ix (hV : IsLinOrd LeV) (hseg : IxSeg LeT ι) {c : Fin 
 omit [Finite V] in
 /-- **Above the carry index only the deeper accumulator changes**: the image
 blocks up to the level are untouched by the increment. -/
-theorem foldFrom_above_of_ix (hseg : IxSeg LeT ι) {c : Fin q}
+private theorem foldFrom_above_of_ix (hseg : IxSeg LeT ι) {c : Fin q}
     (hbefore : ∀ σ : T, WMLt LeT σ (ι c) → ∀ v : V, (wmBlk s' σ v ↔ wmBlk s σ v))
     {j : ℕ} (hjq : j < q) (hj : j < (c : ℕ)) :
     (foldFrom pol P (WMSetLe LeV) j (ixBlk ι s') ↔
@@ -150,7 +151,7 @@ theorem foldFrom_bot_of_ix (hV : IsLinOrd LeV)
 
 /-- **Full image blocks finish the sweep at the whole prefix**: every leaf has
 been seen. -/
-theorem foldFrom_top_of_ix (hV : IsLinOrd LeV)
+private theorem foldFrom_top_of_ix (hV : IsLinOrd LeV)
     (hfull : ∀ (j : Fin q) (v : V), wmBlk s (ι j) v) {j : ℕ} :
     foldFrom pol P (WMSetLe LeV) j (ixBlk ι s) ↔ altQuantFrom pol P j (ixBlk ι s) :=
   foldFrom_top (j₀ := 0) (isLinOrd_wmSetLe hV)
@@ -174,7 +175,7 @@ variable {A : Type} [LinearOrder A] {e : ℕ} {pol : ℕ → Bool} {P : (Fin e �
 
 /-- The strict form of the order relation the fold reads is the strict
 order. -/
-theorem wmLt_le_iff {a b : A} : WMLt (· ≤ ·) a b ↔ a < b :=
+private theorem wmLt_le_iff {a b : A} : WMLt (· ≤ ·) a b ↔ a < b :=
   ⟨fun h => lt_of_le_not_ge h.1 h.2, fun h => ⟨le_of_lt h, not_le_of_gt h⟩⟩
 
 variable {v v' : Fin e → A} {c : Fin e}

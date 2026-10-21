@@ -113,7 +113,7 @@ theorem nodeSize_rootAt :
   | _, .all _ => rfl
 
 /-- Every position of a formula carries a subformula no larger than it. -/
-theorem nodeSize_le :
+private theorem nodeSize_le :
     ∀ {n : ℕ} (f : L'.BoundedFormula Empty n) {m : ℕ} (p : Tseitin.NodeAt f m),
       nodeSize f p ≤ fmlSize f
   | _, .falsum, _, _ => le_rfl
@@ -142,7 +142,7 @@ theorem nodeSize_imp_left {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) {m :
   rw [h1, h2]
   omega
 
-theorem nodeSize_imp_right {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) {m : ℕ}
+private theorem nodeSize_imp_right {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) {m : ℕ}
     (q : Tseitin.NodeAt f₂ m) :
     nodeSize (f₁.imp f₂) (Sum.inr (Sum.inr q)) < nodeSize (f₁.imp f₂) (Sum.inl ⟨rfl⟩) := by
   have h1 : nodeSize (f₁.imp f₂) (Sum.inr (Sum.inr q)) = nodeSize f₂ q := rfl
@@ -151,7 +151,7 @@ theorem nodeSize_imp_right {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) {m 
   rw [h1, h2]
   omega
 
-theorem nodeSize_all_body {n : ℕ} (f : L'.BoundedFormula Empty (n + 1)) {m : ℕ}
+private theorem nodeSize_all_body {n : ℕ} (f : L'.BoundedFormula Empty (n + 1)) {m : ℕ}
     (q : Tseitin.NodeAt f m) :
     nodeSize f.all (Sum.inr q) < nodeSize f.all (Sum.inl ⟨rfl⟩) := by
   have h1 : nodeSize f.all (Sum.inr q) = nodeSize f q := rfl
@@ -214,7 +214,7 @@ variable {P ι : Type} {c d : ℕ}
 
 /-- The tags, mapped injectively into a sum of finite types: how they are seen
 to be finitely many. -/
-def toSum : Tag P ι c d →
+private def toSum : Tag P ι c d →
     Unit ⊕ Unit ⊕ Unit ⊕ Unit ⊕ Fin c ⊕ ι ⊕ Fin d ⊕
       (P × Bool) ⊕ (P × Bool) ⊕ (P × Bool × Fin d)
   | .body => .inl ()
@@ -228,7 +228,8 @@ def toSum : Tag P ι c d →
   | .atup p pol => .inr (.inr (.inr (.inr (.inr (.inr (.inr (.inr (.inl (p, pol)))))))))
   | .alit p pol j => .inr (.inr (.inr (.inr (.inr (.inr (.inr (.inr (.inr (p, pol, j)))))))))
 
-theorem toSum_injective : Function.Injective (toSum (P := P) (ι := ι) (c := c) (d := d)) := by
+private theorem toSum_injective
+    : Function.Injective (toSum (P := P) (ι := ι) (c := c) (d := d)) := by
   intro a b h
   cases a <;> cases b <;> simp_all [toSum]
 
@@ -275,7 +276,7 @@ noncomputable def enum :
 noncomputable def tagKey (sz : P → ℕ) (S : ℕ) (t : Tag P ι c d) : ℕ ×ₗ ℕ :=
   toLex (tagRank sz S t, (enum t : ℕ))
 
-theorem tagKey_injective (sz : P → ℕ) (S : ℕ) :
+private theorem tagKey_injective (sz : P → ℕ) (S : ℕ) :
     Function.Injective (tagKey (P := P) (ι := ι) (c := c) (d := d) sz S) := by
   intro a b h
   have h2 : ((enum a : ℕ)) = ((enum b : ℕ)) := congrArg (fun x => (ofLex x).2) h
@@ -283,7 +284,7 @@ theorem tagKey_injective (sz : P → ℕ) (S : ℕ) :
 
 /-- A tag of a lower layer comes strictly earlier: this is what makes the parse
 DAG of the image descend along the order. -/
-theorem tagKey_lt_of_rank_lt {sz : P → ℕ} {S : ℕ} {t t' : Tag P ι c d}
+private theorem tagKey_lt_of_rank_lt {sz : P → ℕ} {S : ℕ} {t t' : Tag P ι c d}
     (h : tagRank sz S t < tagRank sz S t') : tagKey sz S t < tagKey sz S t' :=
   Prod.Lex.left _ _ h
 

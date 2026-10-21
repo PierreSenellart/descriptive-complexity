@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Problems.Wide.DrawSpec
 public import DescriptiveComplexity.Problems.Wide.DrawData
+import all DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Padding a prefix normal form

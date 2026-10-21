@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Invariant.Stages
 public import DescriptiveComplexity.Invariant.OrderedPebble
+import all DescriptiveComplexity.Invariant.OrderedPebble
 
 /-!
 # The invariant structure `Iᵏ A`
@@ -96,11 +97,11 @@ variable {S : Set (Σ n, L.Relations n)} {k : ℕ} {A : Type} [L.Structure A]
 def mk (S : Set (Σ n, L.Relations n)) (u : Fin k → A) : InvMap S k A :=
   Quotient.mk (invSetoid S k A) u
 
-theorem mk_eq_mk {u v : Fin k → A} :
+private theorem mk_eq_mk {u v : Fin k → A} :
     mk S u = mk S v ↔ EquivK (atomicAgreeOn S A k) u v :=
   Quotient.eq
 
-theorem exists_rep (c : InvMap S k A) : ∃ u : Fin k → A, mk S u = c :=
+private theorem exists_rep (c : InvMap S k A) : ∃ u : Fin k → A, mk S u = c :=
   Quotient.exists_rep c
 
 instance [Finite A] : Finite (InvMap S k A) :=
@@ -114,7 +115,7 @@ section Rels
 variable [Finite A]
 
 omit [Finite A] in
-private theorem equivK_equivalence' :
+theorem equivK_equivalence' :
     Equivalence (EquivK (atomicAgreeOn S A k)) :=
   equivK_atomicAgreeOn_equivalence
 
@@ -176,14 +177,14 @@ instance structure' : (invLang L k).Structure (InvMap S k A) where
 
 /-! #### Reading the relations at representatives -/
 
-theorem relMap_eqBit (i j : Fin k) (x : Fin 1 → InvMap S k A) (u : Fin k → A)
+private theorem relMap_eqBit (i j : Fin k) (x : Fin 1 → InvMap S k A) (u : Fin k → A)
     (hu : x 0 = mk S u) :
     RelMap (L := invLang L k) (.eqBit i j) x ↔ u i = u j := by
   change eqBitRel i j (x 0) ↔ _
   rw [hu]
   exact Iff.rfl
 
-theorem relMap_relBit (R : Σ n, L.Relations n) (g : Fin R.1 → Fin k)
+private theorem relMap_relBit (R : Σ n, L.Relations n) (g : Fin R.1 → Fin k)
     (x : Fin 1 → InvMap S k A) (u : Fin k → A) (hu : x 0 = mk S u) :
     RelMap (L := invLang L k) (.relBit R g) x ↔
       (R ∈ S ∧ RelMap R.2 fun p => u (g p)) := by
@@ -191,7 +192,7 @@ theorem relMap_relBit (R : Σ n, L.Relations n) (g : Fin R.1 → Fin k)
   rw [hu]
   exact Iff.rfl
 
-theorem relMap_sub (j : Fin k) (x : Fin 2 → InvMap S k A) (u v : Fin k → A)
+private theorem relMap_sub (j : Fin k) (x : Fin 2 → InvMap S k A) (u v : Fin k → A)
     (hu : x 0 = mk S u) (hv : x 1 = mk S v) :
     RelMap (L := invLang L k) (.sub j) x ↔
       ∃ a, EquivK (atomicAgreeOn S A k) (Function.update u j a) v := by
@@ -199,7 +200,7 @@ theorem relMap_sub (j : Fin k) (x : Fin 2 → InvMap S k A) (u v : Fin k → A)
   rw [hu, hv]
   exact Iff.rfl
 
-theorem relMap_rearr (σ : Fin k → Fin k) (x : Fin 2 → InvMap S k A)
+private theorem relMap_rearr (σ : Fin k → Fin k) (x : Fin 2 → InvMap S k A)
     (u v : Fin k → A) (hu : x 0 = mk S u) (hv : x 1 = mk S v) :
     RelMap (L := invLang L k) (.rearr σ) x ↔
       EquivK (atomicAgreeOn S A k) (fun p => u (σ p)) v := by
@@ -222,7 +223,7 @@ variable {β : Type*} [LinearOrder β] {c₀ : (Fin k → A) → β}
 canonical order on tuples (`DescriptiveComplexity.OrdK`), a linear order on
 the `≡ᵏ`-classes (decidability by choice). -/
 @[instance_reducible]
-noncomputable def invLinearOrder [Finite A]
+private noncomputable def invLinearOrder [Finite A]
     (hc : colorAgree c₀ = atomicAgreeOn S A k) : LinearOrder (InvMap S k A) := by
   have hE : ∀ {u v : Fin k → A}, EquivK (atomicAgreeOn S A k) u v ↔
       EquivK (colorAgree c₀) u v := by
@@ -293,7 +294,7 @@ noncomputable def invLinearOrder [Finite A]
 
 /-- The order on classes, read at representatives: strictly below in the
 canonical order, or equivalent. -/
-theorem invLinearOrder_le_iff [Finite A]
+private theorem invLinearOrder_le_iff [Finite A]
     (hc : colorAgree c₀ = atomicAgreeOn S A k) (u v : Fin k → A) :
     (letI := invLinearOrder (S := S) hc;
       InvMap.mk S u ≤ InvMap.mk (A := A) S v) ↔

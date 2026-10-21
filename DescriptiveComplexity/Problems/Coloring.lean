@@ -10,6 +10,9 @@ import DescriptiveComplexity.Problems.Coloring.Reductions
 import DescriptiveComplexity.Problems.Coloring.Membership
 import DescriptiveComplexity.Problems.ThreeColorability
 import DescriptiveComplexity.Composition
+import all DescriptiveComplexity.Problems.Coloring.Defs
+import all DescriptiveComplexity.Problems.Coloring.Membership
+import all DescriptiveComplexity.Problems.Coloring.Reductions
 
 /-!
 # The coloring family is NP-complete

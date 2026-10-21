@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Invariant.TwoPebble
+import all DescriptiveComplexity.Invariant.EquivK
+import all DescriptiveComplexity.Invariant.TwoPebble
 
 /-!
 # The `k`-variable invariance lemma, across two structures
@@ -164,7 +166,7 @@ theorem realize_equivK₂ {α : Type} [Fintype α] :
 /-- **The formula form**: a formula whose free variables read the tuples
 through a selection of coordinates, with room left for its quantifier depth,
 cannot separate an equivalent pair. -/
-theorem realize_formula_equivK₂ {α : Type} [Fintype α] (φ : L.Formula α) (g : α → Fin k)
+private theorem realize_formula_equivK₂ {α : Type} [Fintype α] (φ : L.Formula α) (g : α → Fin k)
     (hroom : (Finset.image g Finset.univ).card + qdepth φ ≤ k)
     (hS : RelsIn S φ) {v : Fin k → M} {w : Fin k → N}
     (hvw : EquivK₂ (atomicAgreeOn₂ S M N k) v w) :
@@ -183,7 +185,7 @@ theorem realize_formula_equivK₂ {α : Type} [Fintype α] (φ : L.Formula α) (
 /-- **The sentence form**: two structures carrying a `k`-pebble equivalent
 pair of `k`-tuples satisfy the same sentences of quantifier depth at most
 `k`. -/
-theorem realize_sentence_equivK₂ (φ : L.Sentence) (hdepth : qdepth φ ≤ k)
+private theorem realize_sentence_equivK₂ (φ : L.Sentence) (hdepth : qdepth φ ≤ k)
     (hS : RelsIn S φ) {v : Fin k → M} {w : Fin k → N}
     (hvw : EquivK₂ (atomicAgreeOn₂ S M N k) v w) : M ⊨ φ ↔ N ⊨ φ := by
   have h := realize_equivK₂ (α := Empty) (k := k) φ Empty.elim Fin.elim0

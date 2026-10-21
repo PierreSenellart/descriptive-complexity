@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.Padding
 
 /-!
 # A guessed block that is a point of the expanded universe
@@ -53,7 +55,7 @@ def withTagLHom (B : SOBlock) (T : Type) [Finite T] :
 
 /-- **Reading a block sentence in the extension is reading it at the dropped
 assignment**: the tag bits are invisible to it. -/
-theorem realize_withTagLHom {B : SOBlock} {T : Type} [Finite T] {A : Type}
+private theorem realize_withTagLHom {B : SOBlock} {T : Type} [Finite T] {A : Type}
     [L.Structure A] [LinearOrder A] (σ : (B.withTag T).Assignment A)
     (φ : ((L.sum Language.order).sum B.lang).Sentence) :
     (@Sentence.Realize _ A
@@ -77,7 +79,7 @@ noncomputable def pointGuardF :
 variable {X} {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- **The guard is exactly “this is a point”.** -/
-theorem realize_pointGuardF (σ : (X.B.withTag X.Tag).Assignment A) :
+private theorem realize_pointGuardF (σ : (X.B.withTag X.Tag).Assignment A) :
     (@Sentence.Realize _ A
         ((X.B.withTag X.Tag).structure₁ (L := L.sum Language.order) σ) X.pointGuardF ↔
       ∃ (t : X.Tag) (ρ : X.B.Assignment A),

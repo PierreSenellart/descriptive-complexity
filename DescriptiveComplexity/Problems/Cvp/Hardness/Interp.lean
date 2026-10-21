@@ -215,14 +215,14 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : 
 open SatOcc
 
 /-- A goal clause is a clause with no positive literal. -/
-theorem realize_noPosClF (c : α) :
+private theorem realize_noPosClF (c : α) :
     (noPosClF c).Realize v ↔ IsCl (v c) ∧ ∀ x : A, ¬PosIn (v c) x := by
   simp only [noPosClF, Formula.realize_inf, realize_clF, Formula.realize_not,
     Formula.realize_iExs, realize_posF, Sum.elim_inl, Sum.elim_inr, not_exists]
   exact and_congr Iff.rfl ⟨fun h x hx => h (fun _ => x) hx, fun h i => h (i ())⟩
 
 /-- The Horn condition says what it should. -/
-theorem realize_hornCondF : (hornCondF (α := α)).Realize v ↔ AtMostOnePositive A := by
+private theorem realize_hornCondF : (hornCondF (α := α)).Realize v ↔ AtMostOnePositive A := by
   simp only [hornCondF, Formula.realize_iAlls, Formula.realize_imp, Formula.realize_inf,
     realize_clF, realize_posF, realize_eqF, Sum.elim_inr, AtMostOnePositive, IsCl, PosIn]
   exact ⟨fun h c x y hc hx hy => h ![c, x, y] ⟨⟨hc, hx⟩, hy⟩,

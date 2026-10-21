@@ -81,7 +81,7 @@ open Classical in
 omit [L.IsRelational] in
 /-- **The weight of a valuation of all the facts**: the product of the weights
 of the facts if it is a possible world, and `0` otherwise. -/
-theorem prod_fullWeight [Finite A] [Fintype (Fact L A)] (ρ : (worldBlock L).Assignment A) :
+private theorem prod_fullWeight [Finite A] [Fintype (Fact L A)] (ρ : (worldBlock L).Assignment A) :
     (∏ q : Fact L A, if ρ q.1 q.2 then fullPresWeight q else fullAbsWeight q) =
       if IsWeightedWorld ρ then ∏ᶠ q : Fact L A, factWeight ρ q else 0 := by
   by_cases hw : IsWeightedWorld ρ

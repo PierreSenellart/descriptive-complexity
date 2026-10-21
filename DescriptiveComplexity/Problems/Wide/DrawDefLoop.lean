@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefAsm
 public import DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.EqPattern
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The loop variables are definable: the one write that is not a copy
@@ -51,14 +54,14 @@ variable {A : Type} [LinearOrder A] [Finite A] {D : ℕ} {zero one : A}
 
 omit [Finite A] in
 /-- **Being exhausted is holding the greatest element everywhere.** -/
-theorem isMaxTup_iff_eq_top (ht : IsTop one) (t : Fin D → A) :
+private theorem isMaxTup_iff_eq_top (ht : IsTop one) (t : Fin D → A) :
     IsMaxTup t ↔ ∀ p : Fin D, t p = one :=
   forall_congr' fun _ =>
     ⟨fun h => le_antisymm (ht _) (h one), fun h a => h ▸ ht a⟩
 
 omit [Finite A] in
 /-- **An exhausted tuple stands still.** -/
-theorem tupNext_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupNext t = t := by
+private theorem tupNext_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupNext t = t := by
   classical
   rw [tupNext, dite_eq_right]
   rintro ⟨w, p, hp⟩
@@ -82,20 +85,20 @@ private theorem isTop_iff' (ht : IsTop one) (a : A) : IsTop a ↔ a = one :=
   ⟨fun h => le_antisymm (ht a) (h one), fun h => h ▸ ht⟩
 
 /-- **A tuple below the top steps at its carry coordinate.** -/
-theorem tupSuccAt_of_carry {t : Fin D → A} {p : Fin D} (hp : ¬IsTop (t p))
+private theorem tupSuccAt_of_carry {t : Fin D → A} {p : Fin D} (hp : ¬IsTop (t p))
     (hab : ∀ j : Fin D, p < j → IsTop (t j)) : TupSuccAt p t (tupNext t) := by
   have hnm : ¬IsMaxTup t := fun hc => hp fun a => hc p a
   obtain ⟨p', hh0⟩ : ∃ p' : Fin D, TupSuccAt p' t (tupNext t) := tupSucc_tupNext hnm
   exact carry_unique hp hab hh0 ▸ hh0
 
 /-- **And the coordinate it carries is that one.** -/
-theorem tupCarry_of_carry {t : Fin D → A} {p : Fin D} (hp : ¬IsTop (t p))
+private theorem tupCarry_of_carry {t : Fin D → A} {p : Fin D} (hp : ¬IsTop (t p))
     (hab : ∀ j : Fin D, p < j → IsTop (t j)) : tupCarry t = (p : ℕ) :=
   tupCarry_eq (tupSuccAt_of_carry hp hab)
 
 omit [Finite A] in
 /-- **An exhausted tuple carries past its last coordinate.** -/
-theorem tupCarry_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupCarry t = D := by
+private theorem tupCarry_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupCarry t = D := by
   classical
   rw [tupCarry, dite_eq_right]
   rintro ⟨p, hp⟩
@@ -103,7 +106,7 @@ theorem tupCarry_of_isMaxTup {t : Fin D → A} (h : IsMaxTup t) : tupCarry t = D
 
 omit [Finite A] in
 /-- **The carry never passes the last coordinate.** -/
-theorem tupCarry_le {t : Fin D → A} : tupCarry t ≤ D := by
+private theorem tupCarry_le {t : Fin D → A} : tupCarry t ≤ D := by
   classical
   rw [tupCarry]
   by_cases h : ∃ p : Fin D, TupSuccAt p t (tupNext t)
@@ -130,7 +133,7 @@ theorem tupNext_apply_of_carry (hb : IsBot zero)
 
 omit [Finite A] in
 /-- **A tuple that is not exhausted has a carry coordinate.** -/
-theorem exists_carry (ht : IsTop one) {t : Fin D → A} (h : ¬IsMaxTup t) :
+private theorem exists_carry (ht : IsTop one) {t : Fin D → A} (h : ¬IsMaxTup t) :
     ∃ p : Fin D, t p ≠ one ∧ ∀ j : Fin D, p < j → t j = one := by
   classical
   have hne : (Finset.univ.filter fun p : Fin D => t p ≠ one).Nonempty := by
@@ -146,7 +149,7 @@ theorem exists_carry (ht : IsTop one) {t : Fin D → A} (h : ¬IsMaxTup t) :
       j (Finset.mem_filter.mpr ⟨Finset.mem_univ j, hc⟩)) (not_le.mpr hj)
 
 /-- **What the carry coordinate is**: the greatest coordinate below the top. -/
-theorem tupCarry_eq_iff (ht : IsTop one) {t : Fin D → A} (p : Fin D) :
+private theorem tupCarry_eq_iff (ht : IsTop one) {t : Fin D → A} (p : Fin D) :
     tupCarry t = (p : ℕ) ↔ (t p ≠ one ∧ ∀ j : Fin D, p < j → t j = one) := by
   constructor
   · intro hc
@@ -165,7 +168,7 @@ theorem tupCarry_eq_iff (ht : IsTop one) {t : Fin D → A} (p : Fin D) :
       fun j hj => (isTop_iff' ht _).mpr (hab j hj)
 
 /-- **And when there is none**: the tuple is exhausted. -/
-theorem tupCarry_eq_card_iff (ht : IsTop one) {t : Fin D → A} :
+private theorem tupCarry_eq_card_iff (ht : IsTop one) {t : Fin D → A} :
     tupCarry t = D ↔ ∀ p : Fin D, t p = one := by
   constructor
   · intro hc
@@ -183,7 +186,7 @@ theorem tupCarry_eq_card_iff (ht : IsTop one) {t : Fin D → A} :
     exact tupCarry_of_isMaxTup ((isMaxTup_iff_eq_top ht t).mpr hall)
 
 /-- **The least tuple is the constant designated element.** -/
-theorem botTup_eq [Nonempty A] (hb : IsBot zero) (p : Fin D) :
+private theorem botTup_eq [Nonempty A] (hb : IsBot zero) (p : Fin D) :
     (botTup : Fin D → A) p = zero :=
   le_antisymm (botTup_le p zero) (hb _)
 
@@ -197,7 +200,7 @@ variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 
 /-- **A loop element's coordinate is definable after the advance**: the carry
 is a question about the pattern, and the value at it is the next element. -/
-theorem uSlotDefinable_tupNext_lvE (j : Fin dt.eDim) :
+private theorem uSlotDefinable_tupNext_lvE (j : Fin dt.eDim) :
     USlotDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun _ f _ => tupNext (dt.readLvE f) j := by
   refine uSlotDefinable_cases
@@ -230,7 +233,7 @@ theorem uSlotDefinable_tupNext_lvE (j : Fin dt.eDim) :
     rfl
 
 /-- **The wide loop, advanced, is definable.** -/
-theorem uStDefinable_advLvE :
+private theorem uStDefinable_advLvE :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.advLvE f := by
   classical
@@ -243,7 +246,7 @@ theorem uStDefinable_advLvE :
     exact putLvE_of_not_lv fun j hc => hq ⟨j, hc⟩
 
 /-- **The wide loop, started, is definable.** -/
-theorem uStDefinable_initLvE :
+private theorem uStDefinable_initLvE :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.initLvE f := by
   classical
@@ -258,7 +261,7 @@ theorem uStDefinable_initLvE :
     exact putLvE_of_not_lv fun j hc => hq ⟨j, hc⟩
 
 /-- **The wide loop's exhaustion test is definable.** -/
-theorem uGDefinable_isMaxLvE :
+private theorem uGDefinable_isMaxLvE :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.IsMaxLvE f :=
   (uGDefinable_forall fun j : Fin dt.eDim =>
@@ -267,7 +270,7 @@ theorem uGDefinable_isMaxLvE :
 
 /-- **Which coordinate carries is a definable question**: it is decided by
 which coordinates are maximal, and that is what a slot atom says. -/
-theorem uGDefinable_tupCarry_eq (c₀ : ℕ) :
+private theorem uGDefinable_tupCarry_eq (c₀ : ℕ) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       tupCarry (dt.readLvE f) = c₀ := by
   by_cases hlt : c₀ < dt.eDim
@@ -292,7 +295,7 @@ theorem uGDefinable_tupCarry_eq (c₀ : ℕ) :
 /-! ### The narrow width -/
 
 /-- **A narrow loop element's coordinate is definable after the advance.** -/
-theorem uSlotDefinable_tupNext_lvC (j : Fin dt.dd0) :
+private theorem uSlotDefinable_tupNext_lvC (j : Fin dt.dd0) :
     USlotDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun _ f _ => tupNext (dt.readLv f) j := by
   refine uSlotDefinable_cases
@@ -325,7 +328,7 @@ theorem uSlotDefinable_tupNext_lvC (j : Fin dt.dd0) :
     rfl
 
 /-- **The narrow loop, advanced, is definable.** -/
-theorem uStDefinable_advLvN :
+private theorem uStDefinable_advLvN :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.advLvN f := by
   classical
@@ -338,7 +341,7 @@ theorem uStDefinable_advLvN :
     exact putLv_of_not_lv fun j hc => hq ⟨j, hc⟩
 
 /-- **The narrow loop, started, is definable.** -/
-theorem uStDefinable_initLvN :
+private theorem uStDefinable_initLvN :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.initLvN f := by
   classical
@@ -353,7 +356,7 @@ theorem uStDefinable_initLvN :
     exact putLv_of_not_lv fun j hc => hq ⟨j, hc⟩
 
 /-- **The narrow loop's exhaustion test is definable.** -/
-theorem uGDefinable_isMaxLvN :
+private theorem uGDefinable_isMaxLvN :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.IsMaxLvN f :=
   (uGDefinable_forall fun j : Fin dt.dd0 =>

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Savitch
 public import DescriptiveComplexity.Problems.SuccinctReach.Defs
+import all DescriptiveComplexity.Savitch
 
 /-!
 # SUCCINCT-REACH as a Savitch recursion
@@ -47,7 +48,7 @@ abbrev StateVar : Type := {x : A // RelMap tsStateVar ![x]}
 with the same class are interchangeable everywhere in the semantics. -/
 def stCls (S : A → Prop) : StateVar A → Prop := fun x => S x.1
 
-theorem stCls_eq_iff {S S' : A → Prop} :
+private theorem stCls_eq_iff {S S' : A → Prop} :
     stCls S = stCls S' ↔ ∀ x : A, RelMap tsStateVar ![x] → (S x ↔ S' x) := by
   refine ⟨fun h x hx => iff_of_eq (congrFun h ⟨x, hx⟩), fun h => ?_⟩
   funext x
@@ -60,27 +61,28 @@ noncomputable def stateDepth : ℕ := Nat.card (StateVar A)
 
 /-! ### The semantics only sees a state through its class -/
 
-theorem readsCur_congr {ν S S' : A → Prop} (h : stCls S = stCls S') (hr : ReadsCur A ν S) :
+private theorem readsCur_congr {ν S S' : A → Prop} (h : stCls S = stCls S') (hr : ReadsCur A ν S) :
     ReadsCur A ν S' :=
   fun x hx => (hr x hx).trans (stCls_eq_iff.mp h x hx)
 
-theorem writesNext_congr {ν S S' : A → Prop} (h : stCls S = stCls S') (hw : WritesNext A ν S) :
+private theorem writesNext_congr
+    {ν S S' : A → Prop} (h : stCls S = stCls S') (hw : WritesNext A ν S) :
     WritesNext A ν S' :=
   fun x y hx hxy => (hw x y hx hxy).trans (stCls_eq_iff.mp h x hx)
 
-theorem isStart_congr {S S' : A → Prop} (h : stCls S = stCls S') (hs : IsStart A S) :
+private theorem isStart_congr {S S' : A → Prop} (h : stCls S = stCls S') (hs : IsStart A S) :
     IsStart A S' :=
   let ⟨ν, hcl, hr⟩ := hs
   ⟨ν, hcl, readsCur_congr h hr⟩
 
-theorem isGoal_congr {S S' : A → Prop} (h : stCls S = stCls S') (hs : IsGoal A S) :
+private theorem isGoal_congr {S S' : A → Prop} (h : stCls S = stCls S') (hs : IsGoal A S) :
     IsGoal A S' :=
   let ⟨ν, hcl, hr⟩ := hs
   ⟨ν, hcl, readsCur_congr h hr⟩
 
 /-- **The transition relation lives on the classes**: it only depends on its two
 endpoints through their restrictions to the state variables. -/
-theorem savInv_stepRel : SavInv (stCls (A := A)) (StepRel A) := by
+private theorem savInv_stepRel : SavInv (stCls (A := A)) (StepRel A) := by
   rintro X X' Y Y' hX hY ⟨ν, hcl, hr, hw⟩
   exact ⟨ν, hcl, readsCur_congr hX hr, writesNext_congr hY hw⟩
 

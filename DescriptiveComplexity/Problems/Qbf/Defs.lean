@@ -244,12 +244,12 @@ theorem dnfSat_iff_not_cnfSatWith_true (νs : Fin k → A → Prop) :
       · exact absurd (fun hn' => absurd hn' hn) h2
 
 /-- Optional negation, indexed by a Boolean. -/
-def xorP (b : Bool) (P : Prop) : Prop :=
+private def xorP (b : Bool) (P : Prop) : Prop :=
   match b with
   | true => ¬P
   | false => P
 
-theorem xorP_congr (b : Bool) {P Q : Prop} (h : P ↔ Q) : xorP b P ↔ xorP b Q := by
+private theorem xorP_congr (b : Bool) {P Q : Prop} (h : P ↔ Q) : xorP b P ↔ xorP b Q := by
   cases b
   · exact h
   · exact not_congr h
@@ -258,7 +258,7 @@ theorem xorP_congr (b : Bool) {P Q : Prop} (h : P ↔ Q) : xorP b P ↔ xorP b Q
 given parity is the conjunctive one with the corresponding sign swap, negated
 exactly when the swap happens. This is what lets the hardness proof treat both
 parities at once. -/
-theorem qbfMatrix_eq_xorP (sw : Bool) (νs : Fin k → A → Prop) :
+private theorem qbfMatrix_eq_xorP (sw : Bool) (νs : Fin k → A → Prop) :
     QbfMatrix (!sw) νs ↔ xorP sw (CnfSatWith sw νs) := by
   cases sw
   · exact Iff.rfl

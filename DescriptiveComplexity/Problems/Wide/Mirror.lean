@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Walk
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Tape
+import all DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # Incrementing the mirror
@@ -75,7 +79,7 @@ variable {A : Type} [Language.wide.Structure A] {I : Type} {ile : I → I → Pr
 
 /-- The mirror as it stands when the walk has come down to `u`: incremented
 strictly above `u`, untouched at `u` and below. -/
-def midMirror (ile : I → I → Prop) (s t : I → Prop) (u v : I) : Prop :=
+private def midMirror (ile : I → I → Prop) (s t : I → Prop) (u v : I) : Prop :=
   (WMLt ile u v ∧ t v) ∨ (¬WMLt ile u v ∧ s v)
 
 variable {s t : I → Prop}
@@ -146,7 +150,7 @@ and on whether the digit at `w` is. Everything after this is bookkeeping, and
 none of it is a case split. -/
 
 /-- The mirror after the register of `w` has been processed. -/
-def procMirror (ile : I → I → Prop) (s t : I → Prop) (w : I) : I → Prop :=
+private def procMirror (ile : I → I → Prop) (s t : I → Prop) (w : I) : I → Prop :=
   fun v => (v = w ∧ t v) ∨ (v ≠ w ∧ midMirror ile s t w v)
 
 variable {qc : A} {qd : I → A}

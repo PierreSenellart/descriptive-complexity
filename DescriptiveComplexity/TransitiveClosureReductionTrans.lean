@@ -11,6 +11,16 @@ import DescriptiveComplexity.TransitiveClosureDecideReach
 import DescriptiveComplexity.TransitiveClosureDecideReachDet
 import DescriptiveComplexity.TransitiveClosureFlatten
 public import DescriptiveComplexity.TransitiveClosureSentenceDecide
+import all DescriptiveComplexity.FixedPointReductionComposition
+import all DescriptiveComplexity.TransitiveClosureDecideReach
+import all DescriptiveComplexity.TransitiveClosureDecideReachDet
+import all DescriptiveComplexity.TransitiveClosureFlatten
+import all DescriptiveComplexity.TransitiveClosureParam
+import all DescriptiveComplexity.TransitiveClosureParamPull
+import all DescriptiveComplexity.TransitiveClosureReduction
+import all DescriptiveComplexity.TransitiveClosureReductionClosure
+import all DescriptiveComplexity.TransitiveClosureReductionComposition
+import all DescriptiveComplexity.TransitiveClosureSentenceDecide
 
 /-!
 # Transitivity of FO(TC) and FO(DTC) reductions
@@ -137,7 +147,7 @@ theorem TCInterpretation.pulledStepDecider_decides (A : Type) [L₁.Structure A]
       (@Formula.Realize _ A (I.expStructure A) _ ((I.pulled s τp).step m n) v) :=
   (Classical.choose_spec (I.exists_pulledStepDecider Dq hD s τp m n)).1 A v
 
-theorem TCInterpretation.pulledStepDecider_functional (A : Type) [L₁.Structure A]
+private theorem TCInterpretation.pulledStepDecider_functional (A : Type) [L₁.Structure A]
     [LinearOrder A] (h : ∀ q, (Dq q).Functional A) (m n : (I.pulled s τp).Mode) :
     (I.pulledStepDecider Dq hD s τp m n).Functional A :=
   (Classical.choose_spec (I.exists_pulledStepDecider Dq hD s τp m n)).2 A h
@@ -151,13 +161,13 @@ noncomputable abbrev TCInterpretation.flatWalk : ParamTCSpec (L₁.sum Language.
 
 variable {A : Type} [L₁.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
-theorem TCInterpretation.pulledStepDecider_decidesSteps (z : Fin (I.pulled s τp).par → A) :
+private theorem TCInterpretation.pulledStepDecider_decidesSteps (z : Fin (I.pulled s τp).par → A) :
     (I.pulled s τp).DecidesSteps (I.pulledStepDecider Dq hD s τp) z :=
   fun p _ _ => I.pulledStepDecider_decides Dq hD s τp A p.1 p.2 _
 
 /-- The coordinates of a node's tuple, as a tuple of the flat walk, at a
 bottom element `a₀`. -/
-noncomputable def TCInterpretation.flatCoords (a₀ : A) (a : (I.pulled s τp).Node A) :
+private noncomputable def TCInterpretation.flatCoords (a₀ : A) (a : (I.pulled s τp).Node A) :
     Fin (I.flatWalk Dq hD s τp det).k → A :=
   ((I.pulled s τp).flatEnc (I.pulledStepDecider Dq hD s τp) det a₀ a).2 ∘
     ((I.pulled s τp).flat (I.pulledStepDecider Dq hD s τp) det).coordEquiv.symm
@@ -165,7 +175,7 @@ noncomputable def TCInterpretation.flatCoords (a₀ : A) (a : (I.pulled s τp).N
 /-- **Reachability in the flat walk is reachability in the outer walk**, at
 the encodings of in-domain nodes – for the guessing flat walk, or for the
 searching one when the outer walk is functional. -/
-theorem TCInterpretation.flatWalk_reachAt_iff {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
+private theorem TCInterpretation.flatWalk_reachAt_iff {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
     (hdet : det = true → ∀ (z : Fin s.par → I.ordInterp.MapRel A)
       (a b c : s.Node (I.ordInterp.MapRel A)), s.StepAt z a b → s.StepAt z a c → b = c)
     (z : Fin (I.pulled s τp).par → A) (hz : ParamTCSpec.ParInDom I.ordInterp τp z)

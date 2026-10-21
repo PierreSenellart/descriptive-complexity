@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltProg
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # The intended run: the guessing sweeps
@@ -52,7 +55,7 @@ variable {νs : Fin k → A → Prop} {x : A}
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Reading `DescriptiveComplexity.AltQbf.valAfter` back. -/
-theorem valAfter_eq_true {i : ℕ} :
+private theorem valAfter_eq_true {i : ℕ} :
     valAfter νs i x = true ↔ ∃ j : Fin k, (j : ℕ) < i ∧ QbfBlk j x ∧ νs j x := by
   classical
   simp only [valAfter, decide_eq_true_eq]
@@ -75,7 +78,7 @@ theorem valAfter_top : valAfter νs k x = true ↔ qbfVal νs x := by
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- A sweep leaves a cell alone when its block does not set it. -/
-theorem valAfter_succ_of_keep {i : ℕ}
+private theorem valAfter_succ_of_keep {i : ℕ}
     (h : ¬∃ j : Fin k, (j : ℕ) = i ∧ QbfBlk j x ∧ νs j x) :
     valAfter νs (i + 1) x = valAfter νs i x := by
   rcases Bool.eq_false_or_eq_true (valAfter νs i x) with hv | hv
@@ -92,7 +95,7 @@ theorem valAfter_succ_of_keep {i : ℕ}
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- A sweep sets a cell when its block marks the variable and assigns it
 `true`. -/
-theorem valAfter_succ_of_set {i : ℕ}
+private theorem valAfter_succ_of_set {i : ℕ}
     (h : ∃ j : Fin k, (j : ℕ) = i ∧ QbfBlk j x ∧ νs j x) :
     valAfter νs (i + 1) x = true := by
   obtain ⟨j, hj, hb, hν⟩ := h
@@ -106,7 +109,7 @@ replacement invisible to the sweeps below it and exactly visible to its own. -/
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Only the blocks below `m` matter to what a cell holds after `m` sweeps. -/
-theorem valAfter_congr {ρ σ : Fin k → A → Prop} {m : ℕ}
+private theorem valAfter_congr {ρ σ : Fin k → A → Prop} {m : ℕ}
     (h : ∀ j : Fin k, (j : ℕ) < m → (ρ j x ↔ σ j x)) : valAfter ρ m x = valAfter σ m x := by
   refine Bool.eq_iff_iff.mpr ⟨fun hh => ?_, fun hh => ?_⟩
   · obtain ⟨j, hj, hb, hν⟩ := valAfter_eq_true.mp hh
@@ -117,7 +120,7 @@ theorem valAfter_congr {ρ σ : Fin k → A → Prop} {m : ℕ}
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- **Replacing block `i`'s assignment does not change what the sweeps below it
 wrote.** -/
-theorem valAfter_update_le {i : Fin k} {ν' : A → Prop} {m : ℕ} (hm : m ≤ (i : ℕ)) :
+private theorem valAfter_update_le {i : Fin k} {ν' : A → Prop} {m : ℕ} (hm : m ≤ (i : ℕ)) :
     valAfter (Function.update νs i ν') m x = valAfter νs m x := by
   classical
   refine valAfter_congr fun j hj => ?_
@@ -181,7 +184,7 @@ noncomputable def sweepTape (νs : Fin k → A → Prop) (i : ℕ) (p q : AltV k
   | _ => symBlank
 
 /-- At the left marker nothing has been written yet. -/
-theorem sweepTape_posStart (νs : Fin k → A → Prop) (i : ℕ) :
+private theorem sweepTape_posStart (νs : Fin k → A → Prop) (i : ℕ) :
     sweepTape νs i (posStart : AltV k A) = tapeAfter νs i := by
   classical
   funext q
@@ -194,7 +197,7 @@ theorem sweepTape_posStart (νs : Fin k → A → Prop) (i : ℕ) :
   exact absurd h (show ¬(altBaseIdx AltBase.pCell ≤ altBaseIdx AltBase.pStart) by decide)
 
 /-- At the right marker the sweep is over. -/
-theorem sweepTape_posEnd (νs : Fin k → A → Prop) (i : ℕ) :
+private theorem sweepTape_posEnd (νs : Fin k → A → Prop) (i : ℕ) :
     sweepTape νs i (posEnd : AltV k A) = tapeAfter νs (i + 1) := by
   classical
   funext q
@@ -209,7 +212,7 @@ theorem sweepTape_posEnd (νs : Fin k → A → Prop) (i : ℕ) :
 other element reads the same before and after: markers and non-cells do not
 depend on the head at all, junk cells are frozen, and a real cell is below the
 new head exactly when it was below the old one. -/
-theorem sweepTape_frame (νs : Fin k → A → Prop) (i : ℕ) {p q r : AltV k A}
+private theorem sweepTape_frame (νs : Fin k → A → Prop) (i : ℕ) {p q r : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hr : r ≠ p) :
     sweepTape νs i q r = sweepTape νs i p r := by
   classical
@@ -245,7 +248,7 @@ noncomputable def confSweep (i : Fin (k + 1)) (p : AltV k A) : Config (AltV k A)
 
 /-- At the first cell nothing has been written yet either: no cell is strictly
 below the cell of the least element. -/
-theorem sweepTape_posCell_bot (i : ℕ) :
+private theorem sweepTape_posCell_bot (i : ℕ) :
     sweepTape νs i (posCell (qbotA (A := A)) : AltV k A) = tapeAfter νs i := by
   classical
   funext q
@@ -263,12 +266,12 @@ theorem sweepTape_posCell_bot (i : ℕ) :
   · rw [ite_eq_right hcell, ite_eq_right hcell]
 
 /-- **A sweep starts from the tape the sweeps below it left.** -/
-theorem tape_confSweep_bot (i : Fin (k + 1)) :
+private theorem tape_confSweep_bot (i : Fin (k + 1)) :
     (confSweep νs i (posCell qbotA)).tape = tapeAfter νs (i : ℕ) :=
   sweepTape_posCell_bot νs _
 
 /-- **The run starts at the first sweep.** -/
-theorem isInit_confSweep (cnf : Bool) :
+private theorem isInit_confSweep (cnf : Bool) :
     (altMachine k A cnf).IsInit (confSweep νs 0 posStart) := by
   classical
   refine ⟨⟨rfl, isMinTup2_qbot⟩, minPos_posStart, fun q => ?_⟩
@@ -290,7 +293,8 @@ theorem isInit_confSweep (cnf : Bool) :
 variable {νs}
 
 /-- The value under the head is the old one. -/
-theorem sweepTape_at_head {i : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
+private theorem sweepTape_at_head
+    {i : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
     sweepTape νs i p p = symV (valAfter νs i (p.2 0)) (p.2 0) := by
   classical
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -301,7 +305,8 @@ theorem sweepTape_at_head {i : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 
     ite_eq_right (fun hc => hc.2 rfl)]
 
 /-- The value written under the head is the new one. -/
-theorem sweepTape_written {i : ℕ} {p q : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell)
+private theorem sweepTape_written
+    {i : ℕ} {p q : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell)
     (hsucc : SuccPos tagTupleLe AltPosn p q) :
     sweepTape νs i q p = symV (valAfter νs (i + 1) (p.2 0)) (p.2 0) := by
   classical
@@ -315,7 +320,7 @@ theorem sweepTape_written {i : ℕ} {p q : AltV k A} (hp : AltPosn p) (hb : p.1.
 /-- **One step of a rightward pass.** At a cell the machine writes the value
 its block gives the variable – keeping the old one, or setting it – and moves
 on; at the left marker it steps over it. -/
-theorem step_sweep {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) {p q : AltV k A}
+private theorem step_sweep {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) {p q : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hb : tagTupleLe q posEnd)
     (hstart : p.1.1 = AltBase.pStart → (i : ℕ) = 0) :
     (altMachine k A cnf).Step (confSweep νs i p) (confSweep νs i q) := by
@@ -386,7 +391,7 @@ theorem step_sweep {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) {p q : Al
 
 /-- **The whole rightward pass**: from the first cell to the right marker, the
 sweep of index `i` writes its block's value in every cell. -/
-theorem steps_sweepR {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
+private theorem steps_sweepR {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
     (altMachine k A cnf).StepsIn
       (bitRank tagTupleLe AltPosn (posEnd : AltV k A) -
         bitRank tagTupleLe AltPosn (posCell qbotA : AltV k A))
@@ -401,7 +406,7 @@ theorem steps_sweepR {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
 
 /-- **The first sweep steps over the left marker.** Later sweeps do not: they
 enter at the first cell, the handover at `⊢` having already moved the head. -/
-theorem step_sweepStart {cnf : Bool} (hk : 0 < k) :
+private theorem step_sweepStart {cnf : Bool} (hk : 0 < k) :
     (altMachine k A cnf).Step (confSweep νs 0 posStart) (confSweep νs 0 (posCell qbotA)) :=
   step_sweep (by simpa using hk) succPos_posStart_posCell (posCell_le_posEnd _) fun _ => rfl
 
@@ -420,7 +425,8 @@ noncomputable def confBack (i : Fin (k + 1)) (p : AltV k A) : Config (AltV k A) 
 variable {νs}
 
 /-- The tape reads a real cell as the value its variable has accumulated. -/
-theorem tapeAfter_at_cell {m : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
+private theorem tapeAfter_at_cell
+    {m : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 = AltBase.pCell) :
     tapeAfter νs m p = symV (valAfter νs m (p.2 0)) (p.2 0) := by
   classical
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -429,13 +435,13 @@ theorem tapeAfter_at_cell {m : ℕ} {p : AltV k A} (hp : AltPosn p) (hb : p.1.1 
   simp only [tapeAfter]
   rw [ite_eq_left (show IsCellTup (((AltBase.pCell, j), w) : AltV k A) from hp)]
 
-theorem tapeAfter_posCell (i : ℕ) (x : A) :
+private theorem tapeAfter_posCell (i : ℕ) (x : A) :
     tapeAfter νs i (posCell x : AltV k A) = symV (valAfter νs i x) x :=
   tapeAfter_at_cell (altPosn_posCell x) rfl
 
 /-- **The turn at the right marker**: the sweep has written every cell and
 turns round. -/
-theorem step_turnBack {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
+private theorem step_turnBack {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
     (altMachine k A cnf).Step (confSweep νs i posEnd) (confBack νs i (posCell qtopA)) := by
   refine ⟨acstI .tGTurn i, ⟨isMinTup2_qbot, hi⟩, rfl, ?_, rfl, ?_, ?_,
     Or.inr ⟨id, succPos_posCell_posEnd⟩⟩
@@ -450,7 +456,7 @@ theorem step_turnBack {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
 
 /-- **One step of the leftward pass**: the head steps back over a cell,
 changing nothing. -/
-theorem step_back {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) {p q : AltV k A}
+private theorem step_back {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) {p q : AltV k A}
     (hsucc : SuccPos tagTupleLe AltPosn p q) (hlb : tagTupleLe posStart p)
     (hub : tagTupleLe q (posCell qtopA)) :
     (altMachine k A cnf).Step (confBack νs i q) (confBack νs i p) := by
@@ -474,7 +480,7 @@ theorem step_back {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) {p q : Alt
   · exact tapeAfter_at_cell hsucc.2.1 hq
 
 /-- **The whole leftward pass**: from the last cell back to the left marker. -/
-theorem steps_back {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
+private theorem steps_back {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
     (altMachine k A cnf).StepsIn
       (bitRank tagTupleLe AltPosn (posCell qtopA : AltV k A) -
         bitRank tagTupleLe AltPosn (posStart : AltV k A))
@@ -485,7 +491,7 @@ theorem steps_back {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) < k) :
 
 /-- **The handover to the next sweep**: at the left marker the machine steps
 right into the first cell and the next block takes over. -/
-theorem step_next {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) + 1 < k) :
+private theorem step_next {cnf : Bool} {i : Fin (k + 1)} (hi : (i : ℕ) + 1 < k) :
     (altMachine k A cnf).Step (confBack νs i posStart) (confSweep νs (i + 1) (posCell qbotA)) := by
   have hval : ((i + 1 : Fin (k + 1)) : ℕ) = (i : ℕ) + 1 := by
     refine Fin.val_add_one_of_lt (Fin.lt_last_iff_ne_last.mpr fun hcon => ?_)
@@ -518,7 +524,8 @@ theorem step_toChk {cnf : Bool} {i : Fin (k + 1)} (hlast : (i : ℕ) + 1 = k) {c
 
 /-- **The handover to acceptance**: an instance with no clause at all is
 vacuously satisfied by a conjunctive matrix, and the machine accepts. -/
-theorem step_toAcc {cnf : Bool} {i : Fin (k + 1)} (hlast : (i : ℕ) + 1 = k) (hcnf : cnf = true)
+private theorem step_toAcc
+    {cnf : Bool} {i : Fin (k + 1)} (hlast : (i : ℕ) + 1 = k) (hcnf : cnf = true)
     (hno : ∀ e : A, ¬QbfCl k e) :
     (altMachine k A cnf).Step (confBack νs i posStart)
       { state := stAcc, head := posCell qbotA, tape := tapeAfter νs k } := by
@@ -536,7 +543,7 @@ omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Two runs compose. (`DescriptiveComplexity.TMData.stepsIn_split` is the
 converse; this direction is not in `DescriptiveComplexity.Machines` and could
 be hoisted there.) -/
-theorem stepsIn_add {M : TMData (AltV k A)} :
+private theorem stepsIn_add {M : TMData (AltV k A)} :
     ∀ {m n : ℕ} {c d e : Config (AltV k A)}, M.StepsIn m c d → M.StepsIn n d e →
       M.StepsIn (m + n) c e := by
   intro m

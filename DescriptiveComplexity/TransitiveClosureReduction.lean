@@ -239,7 +239,7 @@ variable [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L} {Q : Decisio
 
 /-- **A relativized ordered FO reduction is an FO(TC) reduction**, consulting
 no walk. -/
-def RelOrderedFOReduction.toTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
+private def RelOrderedFOReduction.toTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -250,11 +250,11 @@ def RelOrderedFOReduction.toTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
       (f.correct A).trans (Q.iso_invariant (f.toRelInterpretation.toTCLEquiv A)).symm }
 
 /-- **An ordered FO reduction is an FO(TC) reduction.** -/
-def OrderedFOReduction.toTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
+private def OrderedFOReduction.toTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵗᶜ Q :=
   f.toRel.toTC
 
 /-- **An FO reduction is an FO(TC) reduction.** -/
-noncomputable def FOReduction.toTC (f : P ≤ᶠᵒ Q) : P ≤ᵗᶜ Q :=
+private noncomputable def FOReduction.toTC (f : P ≤ᶠᵒ Q) : P ≤ᵗᶜ Q :=
   f.toOrdered.toRel.toTC
 
 end Embed
@@ -266,15 +266,15 @@ section Closure
 variable [L.IsRelational] [L'.IsRelational] {P : DecisionProblem L} {Q : DecisionProblem L'}
 
 /-- **PTIME is closed under FO(TC) reductions.** -/
-theorem mem_PTIME_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
+private theorem mem_PTIME_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
   mem_PTIME_of_lfpReduction f.toLFP h
 
 /-- **NP is closed under FO(TC) reductions.** -/
-theorem mem_NP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ NP) : P ∈ NP :=
+private theorem mem_NP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ NP) : P ∈ NP :=
   mem_NP_of_lfpReduction f.toLFP h
 
 /-- **coNP is closed under FO(TC) reductions.** -/
-theorem mem_coNP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ coNP) : P ∈ coNP :=
+private theorem mem_coNP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ coNP) : P ∈ coNP :=
   mem_coNP_of_lfpReduction f.toLFP h
 
 end Closure

@@ -15,6 +15,7 @@ public import DescriptiveComplexity.Problems.Knapsack.Defs
 meta import DescriptiveComplexity.Problems.Knapsack.Defs
 import Mathlib.Algebra.Order.BigOperators.Group.List
 meta import Mathlib.Algebra.Order.BigOperators.Group.List
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # The binary encoding of subset-sum instances, and what it decodes to
@@ -153,7 +154,7 @@ theorem pt_cases (q : binarySubsetSumEncoding.Univ i) :
 
 theorem itemPt_injective : Function.Injective (itemPt i) := fun _ _ h => Sum.inl_injective h
 
-theorem posnPt_injective : Function.Injective (posnPt i) := fun _ _ h => Sum.inr_injective h
+private theorem posnPt_injective : Function.Injective (posnPt i) := fun _ _ h => Sum.inr_injective h
 
 @[simp] theorem itemPt_inj {j j' : Fin i.1.length} : itemPt i j = itemPt i j' ↔ j = j' :=
   ⟨fun h => itemPt_injective h, fun h => h ▸ rfl⟩
@@ -245,7 +246,7 @@ they came from.
 /-- The bit positions of an encoded instance are enumerated, in increasing
 order, by `posnPt`: the hypothesis of the generic decoding lemmas of
 `DescriptiveComplexity.Numbers.BinEnum`. -/
-theorem binEnum :
+private theorem binEnum :
     BinEnum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn (posnPt i) where
   injective := posnPt_injective
   posn_iff q := by
@@ -263,14 +264,14 @@ theorem bitRank_posnPt (p : Fin (ssSize i + 1)) :
 open Classical in
 /-- On an encoded instance, `binNum` is the plain sum of place values over the
 bit positions. -/
-theorem binNum_eq_sum (b : binarySubsetSumEncoding.Univ i → Prop) :
+private theorem binNum_eq_sum (b : binarySubsetSumEncoding.Univ i → Prop) :
     binNum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn b
       = ∑ p : Fin (ssSize i + 1), if b (posnPt i p) then 2 ^ (p : ℕ) else 0 :=
   binEnum.binNum_eq_sum b
 
 /-- **The decoding.** A set of bit positions carrying the binary digits of a
 number that fits in the position block decodes to that number. -/
-theorem binNum_eq (w : ℕ) (hw : w < 2 ^ (ssSize i + 1))
+private theorem binNum_eq (w : ℕ) (hw : w < 2 ^ (ssSize i + 1))
     (b : binarySubsetSumEncoding.Univ i → Prop)
     (hb : ∀ p : Fin (ssSize i + 1), b (posnPt i p) ↔ w.testBit (p : ℕ)) :
     binNum (BWLe (A := binarySubsetSumEncoding.Univ i)) BWPosn b = w :=
@@ -280,7 +281,7 @@ theorem binNum_eq (w : ℕ) (hw : w < 2 ^ (ssSize i + 1))
 
 /-- Every weight fits in the position block: its bit length is part of the
 declared size. -/
-theorem get_lt (j : Fin i.1.length) : i.1.get j < 2 ^ (ssSize i + 1) := by
+private theorem get_lt (j : Fin i.1.length) : i.1.get j < 2 ^ (ssSize i + 1) := by
   refine Nat.size_le.mp (le_trans ?_ (Nat.le_succ _))
   have hmem : Nat.size (i.1.get j) ∈ i.1.map Nat.size :=
     List.mem_map_of_mem (List.get_mem _ _)
@@ -289,7 +290,7 @@ theorem get_lt (j : Fin i.1.length) : i.1.get j < 2 ^ (ssSize i + 1) := by
   omega
 
 /-- The target fits in the position block, for the same reason. -/
-theorem target_lt : i.2 < 2 ^ (ssSize i + 1) := by
+private theorem target_lt : i.2 < 2 ^ (ssSize i + 1) := by
   refine Nat.size_le.mp (le_trans ?_ (Nat.le_succ _))
   simp only [ssSize]
   omega
@@ -475,7 +476,7 @@ def rankB (p : Fin S.card) : ℕ := (Finset.univ.filter fun q => BWPosn q ∧ BW
 def numB (b : Fin S.card → Prop) [DecidablePred b] : ℕ :=
   ∑ p ∈ Finset.univ.filter (fun p => BWPosn p ∧ b p), 2 ^ rankB S p
 
-theorem numB_eq (b : Fin S.card → Prop) [DecidablePred b] :
+private theorem numB_eq (b : Fin S.card → Prop) [DecidablePred b] :
     numB S b = binNum (BWLe (A := Fin S.card)) BWPosn b := by
   rw [numB, binNum_eq_finsetSum]
   exact Finset.sum_congr rfl fun p _ => by rw [rankB, bitRank_eq_card]
@@ -510,7 +511,7 @@ def bwDecode (S : FinPresentation Language.binWeights) : Option SubsetSumInstanc
 
 /-- Reindexing a decoded weight list: the concrete question about `l.map g` is
 the same question about `g` along `l`. -/
-theorem concreteSubsetSum_map {α : Type} (l : List α) (g : α → ℕ) (t : ℕ) :
+private theorem concreteSubsetSum_map {α : Type} (l : List α) (g : α → ℕ) (t : ℕ) :
     ConcreteSubsetSum (l.map g, t) ↔ ∃ J : Finset (Fin l.length), ∑ j ∈ J, g (l.get j) = t := by
   have h : (l.map g).length = l.length := l.length_map g
   have key : ∀ J : Finset (Fin (l.map g).length),
@@ -529,7 +530,7 @@ theorem concreteSubsetSum_map {α : Type} (l : List α) (g : α → ℕ) (t : �
 /-- The empty list with a positive target is a concrete no-instance – what the
 decoder returns on a structure that is a no-instance for lack of a linear
 order. -/
-theorem not_concreteSubsetSum_empty : ¬ ConcreteSubsetSum ([], 1) := by
+private theorem not_concreteSubsetSum_empty : ¬ ConcreteSubsetSum ([], 1) := by
   rintro ⟨J, hJ⟩
   rw [Finset.eq_empty_of_forall_notMem fun j (_ : j ∈ J) => j.elim0] at hJ
   simp at hJ

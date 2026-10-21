@@ -10,6 +10,7 @@ import Mathlib.Order.Prod.Lex.Basic
 public import Mathlib.Data.Set.Card
 public import DescriptiveComplexity.Padding
 import Mathlib.Data.Finset.Max
+import all DescriptiveComplexity.Padding
 
 /-!
 # Walking a finite linear order, first-order
@@ -127,7 +128,7 @@ variable {A : Type} [LinearOrder A] [Finite A]
 
 /-- In a finite linear order, an element that is not a minimum has an
 immediate predecessor. -/
-theorem exists_succ_of_not_min {z : A} (hz : ¬∀ a : A, z ≤ a) :
+private theorem exists_succ_of_not_min {z : A} (hz : ¬∀ a : A, z ≤ a) :
     ∃ w : A, w < z ∧ ∀ a : A, ¬(w < a ∧ a < z) := by
   classical
   have := Fintype.ofFinite A
@@ -154,7 +155,7 @@ theorem order_induction {P : A → Prop} (hmin : ∀ z : A, (∀ a : A, z ≤ a)
 
 /-- In a finite linear order, an element that is not a maximum has an
 immediate successor. -/
-theorem exists_gt_of_not_max {z : A} (hz : ¬∀ a : A, a ≤ z) :
+private theorem exists_gt_of_not_max {z : A} (hz : ¬∀ a : A, a ≤ z) :
     ∃ w : A, z < w ∧ ∀ a : A, ¬(z < a ∧ a < w) := by
   classical
   have := Fintype.ofFinite A
@@ -254,7 +255,7 @@ theorem realize_maxTupF (sel : Fin D → γ) :
     obtain ⟨p, -, rfl⟩ := List.mem_map.mp hφ
     exact (realize_maxF _).mpr (h p)
 
-theorem realize_succTupF (sel sel' : Fin D → γ) :
+private theorem realize_succTupF (sel sel' : Fin D → γ) :
     (succTupF (L := L) sel sel').Realize v ↔ TupSucc (v ∘ sel) (v ∘ sel') := by
   rw [succTupF, realize_listSup]
   constructor
@@ -298,12 +299,12 @@ instance {α : Type*} [Nonempty α] : Nonempty (Lex α) := Nonempty.map toLex �
 
 variable {D : ℕ} {A : Type} [LinearOrder A]
 
-theorem lex_lt_iff {t t' : Fin D → A} :
+private theorem lex_lt_iff {t t' : Fin D → A} :
     toLex t < toLex t' ↔ ∃ p, (∀ j, j < p → t j = t' j) ∧ t p < t' p :=
   Iff.rfl
 
 /-- A tuple is a lexicographic bottom iff each coordinate is minimal. -/
-theorem tup_isBot_iff {t : Fin D → A} :
+private theorem tup_isBot_iff {t : Fin D → A} :
     (∀ u : Lex (Fin D → A), toLex t ≤ u) ↔ ∀ (p : Fin D) (a : A), t p ≤ a := by
   classical
   constructor
@@ -332,7 +333,7 @@ theorem tup_isBot_iff {t : Fin D → A} :
     exact absurd hql (not_lt.mpr (h q _))
 
 /-- A tuple is a lexicographic top iff each coordinate is maximal. -/
-theorem tup_isTop_iff {t : Fin D → A} :
+private theorem tup_isTop_iff {t : Fin D → A} :
     (∀ u : Lex (Fin D → A), u ≤ toLex t) ↔ ∀ (p : Fin D) (a : A), a ≤ t p := by
   classical
   constructor
@@ -429,11 +430,11 @@ theorem prodLex_le_iff {a a' : J} {b b' : B} :
     toLex (a, b) ≤ toLex (a', b') ↔ a < a' ∨ a = a' ∧ b ≤ b' :=
   Prod.Lex.toLex_le_toLex
 
-theorem prodLex_lt_iff {a a' : J} {b b' : B} :
+private theorem prodLex_lt_iff {a a' : J} {b b' : B} :
     toLex (a, b) < toLex (a', b') ↔ a < a' ∨ a = a' ∧ b < b' :=
   Prod.Lex.toLex_lt_toLex
 
-theorem prodLex_isBot_iff {a : J} {b : B} :
+private theorem prodLex_isBot_iff {a : J} {b : B} :
     (∀ u : J ×ₗ B, toLex (a, b) ≤ u) ↔ (∀ x : J, a ≤ x) ∧ ∀ y : B, b ≤ y := by
   constructor
   · intro h
@@ -451,7 +452,7 @@ theorem prodLex_isBot_iff {a : J} {b : B} :
       · exact prodLex_le_iff.mpr (Or.inl hl)
     exact this
 
-theorem prodLex_isTop_iff {a : J} {b : B} :
+private theorem prodLex_isTop_iff {a : J} {b : B} :
     (∀ u : J ×ₗ B, u ≤ toLex (a, b)) ↔ (∀ x : J, x ≤ a) ∧ ∀ y : B, y ≤ b := by
   constructor
   · intro h
@@ -612,7 +613,7 @@ section CovByCases
 variable {α : Type*} [LinearOrder α]
 
 /-- Whatever is below a cover is below its base, or is the cover itself. -/
-theorem covBy_le_cases {a b c : α} (h : a ⋖ b) (hc : c ≤ b) : c ≤ a ∨ c = b := by
+private theorem covBy_le_cases {a b c : α} (h : a ⋖ b) (hc : c ≤ b) : c ≤ a ∨ c = b := by
   rcases lt_or_eq_of_le hc with hlt | he
   · exact Or.inl ((covBy_iff_lt_iff_le_left.mp h).mp hlt)
   · exact Or.inr he
@@ -654,32 +655,32 @@ theorem orank_covBy {w z : A} (h : w ⋖ z) : orank z = orank w + 1 := by
   rw [hset, Set.ncard_insert_of_notMem (by simp)]
 
 /-- Rank is monotone. -/
-theorem orank_le_orank {x y : A} (h : x ≤ y) : orank x ≤ orank y :=
+private theorem orank_le_orank {x y : A} (h : x ≤ y) : orank x ≤ orank y :=
   Set.ncard_le_ncard (fun _ hz => lt_of_lt_of_le hz h) (Set.toFinite _)
 
 /-- Rank is strictly monotone. -/
-theorem orank_lt_orank {x y : A} (h : x < y) : orank x < orank y :=
+private theorem orank_lt_orank {x y : A} (h : x < y) : orank x < orank y :=
   Set.ncard_lt_ncard ⟨fun _ hz => lt_trans hz h, fun hsup => lt_irrefl x (hsup h)⟩
     (Set.toFinite _)
 
 /-- **Rank reflects the order**: it is an order isomorphism onto an initial
 segment of `ℕ`, which is what lets a walk along the order be replayed as
 arithmetic. -/
-theorem orank_le_iff {x y : A} : orank x ≤ orank y ↔ x ≤ y := by
+private theorem orank_le_iff {x y : A} : orank x ≤ orank y ↔ x ≤ y := by
   refine ⟨fun h => ?_, orank_le_orank⟩
   by_contra hxy
   exact absurd (orank_lt_orank (lt_of_not_ge hxy)) (by omega)
 
 /-- Rank tells elements apart. -/
-theorem orank_inj_iff {x y : A} : orank x = orank y ↔ x = y :=
+private theorem orank_inj_iff {x y : A} : orank x = orank y ↔ x = y :=
   ⟨fun h => le_antisymm (orank_le_iff.mp h.le) (orank_le_iff.mp h.ge), fun h => h ▸ rfl⟩
 
 /-- The rank determines the element. -/
-theorem orank_inj {x y : A} (h : orank x = orank y) : x = y :=
+private theorem orank_inj {x y : A} (h : orank x = orank y) : x = y :=
   orank_inj_iff.mp h
 
 /-- Rank is below the cardinality. -/
-theorem orank_lt_card (x : A) : orank x < Nat.card A := by
+private theorem orank_lt_card (x : A) : orank x < Nat.card A := by
   have hsub : {y : A | y < x} ⊆ {x}ᶜ := fun _ hy => ne_of_lt hy
   have hle : orank x ≤ Nat.card A - 1 := by
     rw [orank]
@@ -690,7 +691,7 @@ theorem orank_lt_card (x : A) : orank x < Nat.card A := by
 
 /-- **Every position below the cardinality is a rank**: the ranks exhaust the
 initial segment, by injectivity between two finite types of the same size. -/
-theorem exists_orank_eq {m : ℕ} (h : m < Nat.card A) : ∃ x : A, orank x = m := by
+private theorem exists_orank_eq {m : ℕ} (h : m < Nat.card A) : ∃ x : A, orank x = m := by
   classical
   let := Fintype.ofFinite A
   have hcard : Fintype.card A = Fintype.card (Fin (Nat.card A)) := by

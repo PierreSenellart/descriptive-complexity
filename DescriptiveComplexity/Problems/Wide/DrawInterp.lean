@@ -9,6 +9,12 @@ public import DescriptiveComplexity.Problems.Wide.DrawDefExp
 import DescriptiveComplexity.Problems.Wide.DrawShape
 import DescriptiveComplexity.Problems.Wide.DrawTable
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.EqPattern
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
 
 /-!
 # Writing the emitted machine down
@@ -109,14 +115,14 @@ noncomputable def payAt (i i' : Fin n)
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : Fin n × Fin dd → A}
 
-theorem realize_guardAt {i : Fin n}
+private theorem realize_guardAt {i : Fin n}
     {φ : (L.sum Language.order).Formula (Fin (Fintype.card (Q ⊕ W)))} :
     (guardAt (L := L) hc i φ).Realize v ↔
       φ.Realize (unpad hc fun j => v (i, j)) := by
   rw [guardAt, Formula.realize_relabel]
   exact Iff.rfl
 
-theorem realize_payAt {i i' : Fin n}
+private theorem realize_payAt {i i' : Fin n}
     {χ : (L.sum Language.order).Formula
       (Fin (Fintype.card (Q ⊕ W)) ⊕ Fin (Fintype.card (Q ⊕ W)))} :
     (payAt (L := L) hc i i' χ).Realize v ↔
@@ -176,7 +182,7 @@ noncomputable def attrF (p : Prop)
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {zero : A}
 
-theorem realize_padGuardF (h₀ : IsBot zero) {p : Prop}
+private theorem realize_padGuardF (h₀ : IsBot zero) {p : Prop}
     {φ : (L.sum Language.order).Formula (Fin (Fintype.card (Q ⊕ W)))}
     {v : Fin 1 × Fin dd → A} :
     (padGuardF (L := L) hc p φ).Realize v ↔
@@ -187,7 +193,7 @@ theorem realize_padGuardF (h₀ : IsBot zero) {p : Prop}
     realize_canonF_isPad h₀]
   exact and_assoc
 
-theorem realize_attrF (h₀ : IsBot zero) {p : Prop}
+private theorem realize_attrF (h₀ : IsBot zero) {p : Prop}
     {χ : (L.sum Language.order).Formula
       (Fin (Fintype.card (Q ⊕ W)) ⊕ Fin (Fintype.card (Q ⊕ W)))}
     {F : (Fin (Fintype.card (Q ⊕ W)) → A) → Fin (Fintype.card (Q ⊕ W)) → A}
@@ -217,7 +223,7 @@ noncomputable def constF (p : Prop) : (L.sum Language.order).Formula (Fin 1 × F
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {zero : A}
 
-theorem realize_constF (h₀ : IsBot zero) {p : Prop} {v : Fin 1 × Fin dd → A} :
+private theorem realize_constF (h₀ : IsBot zero) {p : Prop} {v : Fin 1 × Fin dd → A} :
     (constF (L := L) p).Realize v ↔
       (p ∧ (fun j => v (0, j)) = fun _ => zero) := by
   rw [constF]
@@ -245,7 +251,7 @@ section Extremes
 variable {Tag : Type} [LinearOrder Tag] {d : ℕ} {A : Type} [LinearOrder A]
 
 /-- **A tuple below every other is the all-clear one.** -/
-theorem tupLeLex_all_iff (u : Fin d → A) :
+private theorem tupLeLex_all_iff (u : Fin d → A) :
     (∀ v : Fin d → A, tupLeLex u v) ↔ ∀ j, IsBot (u j) := by
   classical
   constructor
@@ -295,7 +301,7 @@ theorem isLeast_tagTupleLe_iff (x : Tag × (Fin d → A)) :
     · exact Or.inr ⟨h, (tupLeLex_all_iff x.2).mpr hbot y.2⟩
 
 /-- **A tuple above every other is the all-set one.** -/
-theorem tupLeLex_all_iff' (u : Fin d → A) :
+private theorem tupLeLex_all_iff' (u : Fin d → A) :
     (∀ v : Fin d → A, tupLeLex v u) ↔ ∀ j, IsTop (u j) := by
   classical
   constructor
@@ -327,7 +333,7 @@ theorem tupLeLex_all_iff' (u : Fin d → A) :
 
 /-- **A tagged tuple above every other**: the greatest tag and the all-set
 tuple. -/
-theorem isGreatest_tagTupleLe_iff (x : Tag × (Fin d → A)) :
+private theorem isGreatest_tagTupleLe_iff (x : Tag × (Fin d → A)) :
     (∀ y : Tag × (Fin d → A), tagTupleLe y x) ↔
       ((∀ t : Tag, t ≤ x.1) ∧ ∀ j, IsTop (x.2 j)) := by
   constructor
@@ -426,23 +432,23 @@ noncomputable def readFOf :
 
 /-! ### What they say -/
 
-theorem srcPhOf_spec (r : (RTagOf S Sh)) (e : Env L) :
+private theorem srcPhOf_spec (r : (RTagOf S Sh)) (e : Env L) :
     (rules e r.1 r.2).srcPh = dt.srcPhOf hdef r := (hdef r.1 r.2).srcPh.choose_spec e
 
-theorem dstPhOf_spec (r : (RTagOf S Sh)) (e : Env L) :
+private theorem dstPhOf_spec (r : (RTagOf S Sh)) (e : Env L) :
     (rules e r.1 r.2).dstPh = dt.dstPhOf hdef r := (hdef r.1 r.2).dstPh.choose_spec e
 
-theorem rightOf_spec (r : (RTagOf S Sh)) (e : Env L) :
+private theorem rightOf_spec (r : (RTagOf S Sh)) (e : Env L) :
     ((rules e r.1 r.2).moveRight ↔ dt.rightOf hdef r = true) :=
   (hdef r.1 r.2).right.choose_spec e
 
-theorem guardFOf_spec (r : (RTagOf S Sh)) (e : Env L)
+private theorem guardFOf_spec (r : (RTagOf S Sh)) (e : Env L)
     (w : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → e.α) :
     (rules e r.1 r.2).guard (fun q => unslot w (Sum.inl q))
         (fun s => unslot w (Sum.inr s)) ↔ (dt.guardFOf hdef r).Realize w :=
   (hdef r.1 r.2).guard.choose_spec e w
 
-theorem dstFOf_spec (r : (RTagOf S Sh)) (e : Env L)
+private theorem dstFOf_spec (r : (RTagOf S Sh)) (e : Env L)
     (w y : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → e.α) :
     (y = stPl (W := dt.SlotIx) e.zero
         ((rules e r.1 r.2).dstSt (fun q => unslot w (Sum.inl q))
@@ -450,7 +456,7 @@ theorem dstFOf_spec (r : (RTagOf S Sh)) (e : Env L)
       (dt.dstFOf hdef r).Realize (Sum.elim w y) :=
   (uPayloadDefinable_stPl (hdef r.1 r.2).dst).choose_spec e w y
 
-theorem wrFOf_spec (r : (RTagOf S Sh)) (e : Env L)
+private theorem wrFOf_spec (r : (RTagOf S Sh)) (e : Env L)
     (w y : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → e.α) :
     (y = syPl (Q := dt.CtlIx) e.zero
         ((rules e r.1 r.2).wr (fun q => unslot w (Sum.inl q))
@@ -458,14 +464,14 @@ theorem wrFOf_spec (r : (RTagOf S Sh)) (e : Env L)
       (dt.wrFOf hdef r).Realize (Sum.elim w y) :=
   (uPayloadDefinable_syPl (hdef r.1 r.2).wr).choose_spec e w y
 
-theorem srcFOf_spec (e : Env L)
+private theorem srcFOf_spec (e : Env L)
     (w y : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → e.α) :
     (y = stPl (W := dt.SlotIx) e.zero fun q => unslot w (Sum.inl q)) ↔
       (dt.srcFOf (L := L)).Realize (Sum.elim w y) :=
   (uPayloadDefinable_stPl (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
     (F := fun _ f _ => f) uStDefinable_id).choose_spec e w y
 
-theorem readFOf_spec (e : Env L)
+private theorem readFOf_spec (e : Env L)
     (w y : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → e.α) :
     (y = syPl (Q := dt.CtlIx) e.zero fun s => unslot w (Sum.inr s)) ↔
       (dt.readFOf (L := L)).Realize (Sum.elim w y) :=
@@ -533,7 +539,7 @@ noncomputable def writeF (t t' : (dt.ITagOf S Sh P)) :
 
 variable (e : Env L)
 
-theorem realize_trF_ctrl (r : (RTagOf S Sh)) {v : Fin 1 × Fin dt.dd → e.α} :
+private theorem realize_trF_ctrl (r : (RTagOf S Sh)) {v : Fin 1 × Fin dt.dd → e.α} :
     (dt.trF hpl hdef (.ctrl r)).Realize v ↔
       (IsPad (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) e.zero (fun j => v (0, j)) ∧
         (rules e r.1 r.2).guard
@@ -543,12 +549,12 @@ theorem realize_trF_ctrl (r : (RTagOf S Sh)) {v : Fin 1 × Fin dt.dd → e.α} :
   exact ⟨fun h => ⟨h.2.1, (dt.guardFOf_spec hdef r e _).mpr h.2.2⟩,
     fun h => ⟨trivial, h.1, (dt.guardFOf_spec hdef r e _).mp h.2⟩⟩
 
-theorem realize_rightF_ctrl (r : (RTagOf S Sh)) {v : Fin 1 × Fin dt.dd → e.α} :
+private theorem realize_rightF_ctrl (r : (RTagOf S Sh)) {v : Fin 1 × Fin dt.dd → e.α} :
     (dt.rightF hdef (.ctrl r)).Realize v ↔ (rules e r.1 r.2).moveRight := by
   rw [rightF, realize_sideF]
   exact (dt.rightOf_spec hdef r e).symm
 
-theorem realize_srcF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
+private theorem realize_srcF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
     {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.srcF hpl hdef (.ctrl r) t').Realize v ↔
       ((t', fun j => v (1, j)) : (dt.ITagOf S Sh P) × (Fin dt.dd → e.α)) =
@@ -558,7 +564,7 @@ theorem realize_srcF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
   rw [srcF, realize_attrF hpl e.hbot (dt.srcFOf_spec e)]
   exact ⟨fun h => Prod.ext h.1 h.2, fun h => ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩⟩
 
-theorem realize_readF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
+private theorem realize_readF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
     {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.readF hpl (.ctrl r) t').Realize v ↔
       ((t', fun j => v (1, j)) : (dt.ITagOf S Sh P) × (Fin dt.dd → e.α)) =
@@ -567,7 +573,7 @@ theorem realize_readF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
   rw [readF, realize_attrF hpl e.hbot (dt.readFOf_spec e)]
   exact ⟨fun h => Prod.ext h.1 h.2, fun h => ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩⟩
 
-theorem realize_dstF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
+private theorem realize_dstF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
     {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.dstF hpl hdef (.ctrl r) t').Realize v ↔
       ((t', fun j => v (1, j)) : (dt.ITagOf S Sh P) × (Fin dt.dd → e.α)) =
@@ -579,7 +585,7 @@ theorem realize_dstF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
   rw [dstF, realize_attrF hpl e.hbot (dt.dstFOf_spec hdef r e)]
   exact ⟨fun h => Prod.ext h.1 h.2, fun h => ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩⟩
 
-theorem realize_writeF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
+private theorem realize_writeF_ctrl (r : (RTagOf S Sh)) (t' : (dt.ITagOf S Sh P))
     {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.writeF hpl hdef (.ctrl r) t').Realize v ↔
       ((t', fun j => v (1, j)) : (dt.ITagOf S Sh P) × (Fin dt.dd → e.α)) =
@@ -614,7 +620,7 @@ noncomputable def topTupF {D : ℕ} (u : Fin D → γ) :
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A} {zero one : A}
 
-theorem realize_bitAtF (h₀ : IsBot zero) (h₁ : IsTop one) {y : γ}
+private theorem realize_bitAtF (h₀ : IsBot zero) (h₁ : IsTop one) {y : γ}
     {φ : (L.sum Language.order).Formula γ} :
     (bitAtF (L := L) y φ).Realize v ↔ v y = bitVal zero one (φ.Realize v) := by
   rw [bitAtF]
@@ -658,7 +664,7 @@ noncomputable def accFOf (p : P) :
     (L.sum Language.order).Formula (Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx))) :=
   (hacc p).choose
 
-theorem accFOf_spec (p : P) (e : Env L)
+private theorem accFOf_spec (p : P) (e : Env L)
     (w : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) → e.α) :
     accept e p (fun q => unslot w (Sum.inl q)) ↔ (dt.accFOf hacc p).Realize w :=
   (hacc p).choose_spec e w
@@ -680,7 +686,7 @@ noncomputable def blankF (t : (dt.ITagOf S Sh P)) :
 
 variable (e : Env L)
 
-theorem realize_accF_phase (p : P) {v : Fin 1 × Fin dt.dd → e.α} :
+private theorem realize_accF_phase (p : P) {v : Fin 1 × Fin dt.dd → e.α} :
     (dt.accF (S := S) (Sh := Sh) hpl hacc (.phase p)).Realize v ↔
       (IsPad (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)) e.zero (fun j => v (0, j)) ∧
         accept e p fun q =>
@@ -829,7 +835,7 @@ theorem realize_markSlotF (t : (dt.ITagOf S Sh P)) (y : Fin 2 × Fin dt.dd) (s :
   | .old i => exact realize_botF.trans (e.isBot_iff _)
   | .new i => exact realize_botF.trans (e.isBot_iff _)
 
-theorem realize_markCoordF (t : (dt.ITagOf S Sh P))
+private theorem realize_markCoordF (t : (dt.ITagOf S Sh P))
     (k : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)))
     {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.markCoordF hpl t k).Realize v ↔
@@ -852,7 +858,7 @@ theorem realize_markCoordF (t : (dt.ITagOf S Sh P))
     rw [hsy, hk]
     exact Iff.rfl
 
-theorem realize_markF (t : (dt.ITagOf S Sh P)) {v : Fin 2 × Fin dt.dd → e.α} :
+private theorem realize_markF (t : (dt.ITagOf S Sh P)) {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.markF hpl t).Realize v ↔
       unpad hpl (fun j => v (1, j)) =
         syPl (Q := dt.CtlIx) e.zero
@@ -982,7 +988,7 @@ theorem realize_markSlotRegF (t : (dt.ITagOf S Sh P)) (y : Fin 2 × Fin dt.dd)
   | .old i => exact dt.realize_markSlotF e t y (.old i)
   | .new i => exact dt.realize_markSlotF e t y (.new i)
 
-theorem realize_markCoordRegF (t : (dt.ITagOf S Sh P))
+private theorem realize_markCoordRegF (t : (dt.ITagOf S Sh P))
     (k : Fin (Fintype.card (dt.CtlIx ⊕ dt.SlotIx)))
     {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.markCoordRegF hpl t k).Realize v ↔
@@ -1005,7 +1011,7 @@ theorem realize_markCoordRegF (t : (dt.ITagOf S Sh P))
     rw [hsy, hk]
     exact Iff.rfl
 
-theorem realize_markRegF (t : (dt.ITagOf S Sh P)) {v : Fin 2 × Fin dt.dd → e.α} :
+private theorem realize_markRegF (t : (dt.ITagOf S Sh P)) {v : Fin 2 × Fin dt.dd → e.α} :
     (dt.markRegF hpl t).Realize v ↔
       unpad hpl (fun j => v (1, j)) =
         syPl (Q := dt.CtlIx) e.zero
@@ -1046,7 +1052,7 @@ theorem pad_const {c : ℕ} :
 
 omit [LinearOrder (RTagOf S Sh)] [LinearOrder P] in
 /-- The pointer the machine starts with is clear at every slot. -/
-theorem stPl_const :
+private theorem stPl_const :
     stPl (W := dt.SlotIx) e.zero (fun _ : dt.CtlIx => e.zero) = fun _ => e.zero := by
   funext k
   change Sum.elim (fun _ => e.zero) (fun _ => e.zero)
@@ -1227,7 +1233,7 @@ variable (hws : ws = dt.wideStr hpl hdef hacc p₀ mk e)
 
 include hws in
 /-- The valuation a unary relation's argument supplies. -/
-theorem relMap_one {R : Language.wide.Relations 1}
+private theorem relMap_one {R : Language.wide.Relations 1}
     {φ : (dt.ITagOf S Sh P) → (L.sum Language.order).Formula (Fin 1 × Fin dt.dd)}
     (hR : (dt.drawInterp hpl hdef hacc p₀ mk).relFormula R = fun t => φ (t 0))
     (x : Univ e.α (RTagOf S Sh) P dt.KIx dt.dd) :
@@ -1240,7 +1246,7 @@ theorem relMap_one {R : Language.wide.Relations 1}
 
 include hws in
 /-- The valuation a binary relation's arguments supply. -/
-theorem relMap_two {R : Language.wide.Relations 2}
+private theorem relMap_two {R : Language.wide.Relations 2}
     {φ : (dt.ITagOf S Sh P) → (dt.ITagOf S Sh P) →
       (L.sum Language.order).Formula (Fin 2 × Fin dt.dd)}
     (hR : (dt.drawInterp hpl hdef hacc p₀ mk).relFormula R = fun t => φ (t 0) (t 1))

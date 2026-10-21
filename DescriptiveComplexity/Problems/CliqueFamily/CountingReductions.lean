@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
 public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
 import DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingHardness
 
 /-!
 # #Independent Set and #Vertex Cover
@@ -64,7 +66,7 @@ def CoverOfSizeOn (Adjp : A → A → Prop) (Kp : A → Prop) (C : A → Prop) :
 
 /-- A clique at least as large as the marked set contains one of exactly that
 size. -/
-theorem exists_cliqueOfSizeOn_iff (Adjp : A → A → Prop) (Kp : A → Prop) :
+private theorem exists_cliqueOfSizeOn_iff (Adjp : A → A → Prop) (Kp : A → Prop) :
     (∃ S, CliqueOfSizeOn Adjp Kp S) ↔ CliqueOn Adjp Kp := by
   constructor
   · rintro ⟨S, hS, hcard⟩
@@ -163,18 +165,18 @@ section Apply
 
 variable (A : Type) [Language.markedGraph.Structure A]
 
-theorem sharpIndependentSet_apply :
+private theorem sharpIndependentSet_apply :
     SharpIndependentSet A = Nat.card {S : A → Prop // IndepOfSize A S} :=
   rfl
 
-theorem sharpVertexCover_apply :
+private theorem sharpVertexCover_apply :
     SharpVertexCover A = Nat.card {C : A → Prop // CoverOfSize A C} :=
   rfl
 
 /-- **The support of #Independent Set is Independent Set.**
 Registered in the Lax archive as
 [`Lax280166.IndependentSetComplete.sharpIndependentSet_support_iff`](https://laxarchive.org/lax-280166/Lax280166.IndependentSetComplete.html#s-Lax280166.IndependentSetComplete.sharpIndependentSet_support_iff). -/
-theorem sharpIndependentSet_support_iff [Finite A] :
+private theorem sharpIndependentSet_support_iff [Finite A] :
     SharpIndependentSet.support A ↔ IndependentSet A := by
   rw [CountingProblem.support_iff, sharpIndependentSet_apply, Nat.card_pos_iff]
   constructor
@@ -229,7 +231,7 @@ private theorem complMark_marked_iff :
   exact complMark_marked w
 
 /-- The cliques of the complement graph are the independent sets. -/
-theorem sharpClique_complEdge_map :
+private theorem sharpClique_complEdge_map :
     SharpClique (complEdgeInterp.Map A) = SharpIndependentSet A :=
   Nat.card_congr (cliqueOfSizeEquiv (complEdgeInterp.mapEquivSelf A)
     (fun b b' hne => (complEdge_adj_iff A b b').trans
@@ -237,7 +239,7 @@ theorem sharpClique_complEdge_map :
     (complEdge_marked_iff A))
 
 /-- The independent sets of the complement graph are the cliques. -/
-theorem sharpIndependentSet_complEdge_map :
+private theorem sharpIndependentSet_complEdge_map :
     SharpIndependentSet (complEdgeInterp.Map A) = SharpClique A :=
   Nat.card_congr (cliqueOfSizeEquiv (complEdgeInterp.mapEquivSelf A)
     (fun b b' hne => (not_congr ((complEdge_adj_iff A b b').trans
@@ -247,7 +249,7 @@ theorem sharpIndependentSet_complEdge_map :
 /-- The independent sets of the threshold size, the marked set being
 complemented, are the complements of the vertex covers of the threshold
 size. -/
-theorem sharpIndependentSet_complMark_map :
+private theorem sharpIndependentSet_complMark_map :
     SharpIndependentSet (complMarkInterp.Map A) = SharpVertexCover A :=
   (Nat.card_congr (cliqueOfSizeEquiv (complMarkInterp.mapEquivSelf A)
     (fun b b' _ => not_congr (complMark_adj_iff A b b')) (complMark_marked_iff A))).trans
@@ -255,7 +257,7 @@ theorem sharpIndependentSet_complMark_map :
 
 /-- The vertex covers of the threshold size, the marked set being complemented,
 are the complements of the independent sets of the threshold size. -/
-theorem sharpVertexCover_complMark_map :
+private theorem sharpVertexCover_complMark_map :
     SharpVertexCover (complMarkInterp.Map A) = SharpIndependentSet A :=
   (Nat.card_congr (coverComplEquiv _ _)).trans
     (Nat.card_congr (cliqueOfSizeEquiv (complMarkInterp.mapEquivSelf A)
@@ -268,7 +270,7 @@ end Apply
 
 /-- **#Independent Set reduces parsimoniously to #Clique**, by complementing
 the edges. -/
-noncomputable def sharpIndependentSet_parsimonious_sharpClique :
+private noncomputable def sharpIndependentSet_parsimonious_sharpClique :
     SharpIndependentSet ≤ᵖ SharpClique where
   Tag := Unit
   dim := 1
@@ -277,7 +279,7 @@ noncomputable def sharpIndependentSet_parsimonious_sharpClique :
 
 /-- **#Clique reduces parsimoniously to #Independent Set**, by complementing
 the edges. -/
-noncomputable def sharpClique_parsimonious_sharpIndependentSet :
+private noncomputable def sharpClique_parsimonious_sharpIndependentSet :
     SharpClique ≤ᵖ SharpIndependentSet where
   Tag := Unit
   dim := 1
@@ -286,7 +288,7 @@ noncomputable def sharpClique_parsimonious_sharpIndependentSet :
 
 /-- **#Vertex Cover reduces parsimoniously to #Independent Set**, by
 complementing the marked set. -/
-noncomputable def sharpVertexCover_parsimonious_sharpIndependentSet :
+private noncomputable def sharpVertexCover_parsimonious_sharpIndependentSet :
     SharpVertexCover ≤ᵖ SharpIndependentSet where
   Tag := Unit
   dim := 1
@@ -295,7 +297,7 @@ noncomputable def sharpVertexCover_parsimonious_sharpIndependentSet :
 
 /-- **#Independent Set reduces parsimoniously to #Vertex Cover**, by
 complementing the marked set. -/
-noncomputable def sharpIndependentSet_parsimonious_sharpVertexCover :
+private noncomputable def sharpIndependentSet_parsimonious_sharpVertexCover :
     SharpIndependentSet ≤ᵖ SharpVertexCover where
   Tag := Unit
   dim := 1
@@ -303,7 +305,7 @@ noncomputable def sharpIndependentSet_parsimonious_sharpVertexCover :
   correct A _ _ _ := (sharpVertexCover_complMark_map A).symm
 
 /-- **#Independent Set is in `#P`.** -/
-theorem sharpIndependentSet_mem_sharpP : SharpIndependentSet ∈ SharpP :=
+private theorem sharpIndependentSet_mem_sharpP : SharpIndependentSet ∈ SharpP :=
   SharpP.mem_of_parsimonious sharpIndependentSet_parsimonious_sharpClique
     sharpClique_mem_sharpP
 
@@ -327,7 +329,7 @@ theorem sharpIndependentSet_sharpP_complete : SharpP.Complete SharpIndependentSe
   complete_sharpP_of_parsimoniousComplete sharpIndependentSet_sharpP_parsimoniousComplete
 
 /-- **#Vertex Cover is in `#P`.** -/
-theorem sharpVertexCover_mem_sharpP : SharpVertexCover ∈ SharpP :=
+private theorem sharpVertexCover_mem_sharpP : SharpVertexCover ∈ SharpP :=
   SharpP.mem_of_parsimonious sharpVertexCover_parsimonious_sharpIndependentSet
     sharpIndependentSet_mem_sharpP
 

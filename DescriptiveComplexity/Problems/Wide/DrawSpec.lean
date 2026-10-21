@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawRel
 public import DescriptiveComplexity.Problems.Wide.DrawEnc
 import DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # What one step of the iteration is, on the machine's side of the encoding

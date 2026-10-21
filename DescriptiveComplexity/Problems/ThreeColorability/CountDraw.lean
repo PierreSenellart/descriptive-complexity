@@ -13,6 +13,13 @@ import DescriptiveComplexity.OccurrencePrefix
 public import DescriptiveComplexity.Counting.Reduction
 public import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting.Post
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.OccurrencePrefix
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
+import all DescriptiveComplexity.Problems.ThreeColorability.CountGadget
+import all DescriptiveComplexity.Problems.ThreeColorability.Counting
 
 /-!
 # #3-Colorability is one-call `#P`-complete
@@ -63,7 +70,7 @@ def CTag.code : CTag → Pal ⊕ Bool ⊕ (Bool × Bool) ⊕ Unit ⊕ (Bool × F
   | .spoil => Sum.inr (Sum.inr (Sum.inr (Sum.inl ())))
   | .tri s j r => Sum.inr (Sum.inr (Sum.inr (Sum.inr (s, j, r))))
 
-theorem CTag.code_injective : Function.Injective CTag.code := by
+private theorem CTag.code_injective : Function.Injective CTag.code := by
   intro t t' h
   cases t <;> cases t' <;> simp_all [CTag.code]
 
@@ -76,7 +83,7 @@ section Points
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- The pair `(c, x)` is a point of tag `t`. -/
-def CDom : CTag → A → A → Prop
+private def CDom : CTag → A → A → Prop
   | .pal _, c, x => (∀ y, c ≤ y) ∧ x = c
   | .lit _, c, x => x = c ∧ SatOccurs A c
   | .gate s _, c, x => Chained c x s
@@ -84,7 +91,7 @@ def CDom : CTag → A → A → Prop
   | .tri s _ _, c, x => Chained c x s
 
 /-- The vertex of the gadget graph a point denotes. -/
-def vOf : (t : CTag) → (c x : A) → CDom t c x → V A
+private def vOf : (t : CTag) → (c x : A) → CDom t c x → V A
   | .pal p, _, _, _ => Sum.inl (Sum.inl p)
   | .lit s, c, _, h => Sum.inl (bvV (Sum.inl ⟨c, h.2⟩, s))
   | .gate s b, c, x, h => Sum.inl (bvV (Sum.inr ⟨(c, x, s), h⟩, b))
@@ -92,14 +99,14 @@ def vOf : (t : CTag) → (c x : A) → CDom t c x → V A
   | .tri s j r, c, x, h => Sum.inr (⟨(c, x, s), h⟩, j, r)
 
 /-- The tag of a vertex. -/
-def vTag : V A → CTag
+private def vTag : V A → CTag
   | Sum.inl (Sum.inl p) => .pal p
   | Sum.inl (Sum.inr (Sum.inl (Sum.inl _, s))) => .lit s
   | Sum.inl (Sum.inr (Sum.inl (Sum.inr g, b))) => .gate g.1.2.2 b
   | Sum.inl (Sum.inr (Sum.inr _)) => .spoil
   | Sum.inr (g, j, r) => .tri g.1.2.2 j r
 
-theorem vTag_vOf (t : CTag) (c x : A) (h : CDom t c x) : vTag (vOf t c x h) = t := by
+private theorem vTag_vOf (t : CTag) (c x : A) (h : CDom t c x) : vTag (vOf t c x h) = t := by
   cases t <;> rfl
 
 variable [Fintype A] [Nonempty A]
@@ -111,14 +118,14 @@ omit [Language.sat.Structure A] in
 theorem least_le (a : A) : least ≤ a := Finset.min'_le _ _ (Finset.mem_univ a)
 
 /-- The pair a vertex is drawn as. -/
-noncomputable def vPair : V A → A × A
+private noncomputable def vPair : V A → A × A
   | Sum.inl (Sum.inl _) => (least, least)
   | Sum.inl (Sum.inr (Sum.inl (Sum.inl x, _))) => (x.1, x.1)
   | Sum.inl (Sum.inr (Sum.inl (Sum.inr g, _))) => (g.1.1, g.1.2.1)
   | Sum.inl (Sum.inr (Sum.inr c)) => (c.1, c.1)
   | Sum.inr (g, _, _) => (g.1.1, g.1.2.1)
 
-theorem cDom_vTag (n : V A) : CDom (vTag n) (vPair n).1 (vPair n).2 := by
+private theorem cDom_vTag (n : V A) : CDom (vTag n) (vPair n).1 (vPair n).2 := by
   rcases n with (p | (⟨x | g, s⟩ | c)) | ⟨g, j, r⟩
   · exact ⟨least_le, rfl⟩
   · exact ⟨rfl, x.2⟩
@@ -126,10 +133,10 @@ theorem cDom_vTag (n : V A) : CDom (vTag n) (vPair n).1 (vPair n).2 := by
   · exact ⟨rfl, c.2⟩
   · exact g.2
 
-theorem vOf_vTag (n : V A) : vOf (vTag n) (vPair n).1 (vPair n).2 (cDom_vTag n) = n := by
+private theorem vOf_vTag (n : V A) : vOf (vTag n) (vPair n).1 (vPair n).2 (cDom_vTag n) = n := by
   rcases n with (p | (⟨x | g, s⟩ | c)) | ⟨g, j, r⟩ <;> rfl
 
-theorem vPair_vOf (t : CTag) (c x : A) (h : CDom t c x) : vPair (vOf t c x h) = (c, x) := by
+private theorem vPair_vOf (t : CTag) (c x : A) (h : CDom t c x) : vPair (vOf t c x h) = (c, x) := by
   cases t with
   | pal p =>
     have hc : least = c := le_antisymm (least_le c) (h.1 _)
@@ -215,16 +222,17 @@ section Realize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
-theorem realize_occursF {x : α} : (occursF x).Realize v ↔ SatOccurs A (v x) := by
+private theorem realize_occursF {x : α} : (occursF x).Realize v ↔ SatOccurs A (v x) := by
   simp only [occursF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup, realize_clF,
     realize_posF, realize_negF, Sum.elim_inl, Sum.elim_inr, SatOccurs, IsCl, PosIn, NegIn]
   exact ⟨fun ⟨c, h⟩ => ⟨c 0, h⟩, fun ⟨c, h⟩ => ⟨fun _ => c, h⟩⟩
 
-theorem realize_isMinF {c : α} : (isMinF c).Realize v ↔ ∀ y, v c ≤ y := by
+private theorem realize_isMinF {c : α} : (isMinF c).Realize v ↔ ∀ y, v c ≤ y := by
   simp only [isMinF, Formula.realize_iAlls, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩
 
-theorem realize_domF (t : CTag) (w : Fin 2 → A) : (domF t).Realize w ↔ CDom t (w 0) (w 1) := by
+private theorem realize_domF
+    (t : CTag) (w : Fin 2 → A) : (domF t).Realize w ↔ CDom t (w 0) (w 1) := by
   cases t <;>
     simp [domF, CDom, realize_isMinF, realize_eqF, realize_occursF, realize_chainedF,
       realize_emptyClF, Chained]
@@ -233,7 +241,7 @@ variable [Finite A]
 
 /-- The negated predecessor of a gate is a literal exactly when the
 predecessor is the first occurrence. -/
-theorem negPred_eq_lit (g : Gate A) {y : A} (hy : SatOccurs A y) (u : Bool) :
+private theorem negPred_eq_lit (g : Gate A) {y : A} (hy : SatOccurs A y) (u : Bool) :
     negPred g = bvV (Sum.inl ⟨y, hy⟩, u) ↔
       SuccOcc g.1.1 y (!u) g.1.2.1 g.1.2.2 ∧ MinOcc g.1.1 y (!u) := by
   have hs := pred_spec g
@@ -257,7 +265,7 @@ theorem negPred_eq_lit (g : Gate A) {y : A} (hy : SatOccurs A y) (u : Bool) :
 
 /-- The negated predecessor of a gate is the negated output of another gate
 exactly when the predecessor is that gate's occurrence. -/
-theorem negPred_eq_gate (g : Gate A) {c y : A} {t : Bool} (h : Chained c y t) (b : Bool) :
+private theorem negPred_eq_gate (g : Gate A) {c y : A} {t : Bool} (h : Chained c y t) (b : Bool) :
     negPred g = bvV (Sum.inr ⟨(c, y, t), h⟩, b) ↔
       b = false ∧ c = g.1.1 ∧ SuccOcc g.1.1 y t g.1.2.1 g.1.2.2 := by
   have hs := pred_spec g
@@ -307,17 +315,17 @@ theorem prefixBv_eq_gate {c x : A} {s : Bool} (h : OccIn c x s) {c' x' : A} {s' 
     constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨h1, h2.symm⟩
 
 /-- The core vertex of a kind of attachment. -/
-noncomputable def kindV (g : Gate A) : OKind → Core A
+private noncomputable def kindV (g : Gate A) : OKind → Core A
   | .z => zV g
   | .negP => negPred g
   | .negL => negLit g
   | .palF => palV .F
 
-theorem outer_kind (g : Gate A) (j r : Fin 3) : outer g j r = kindV g (outerKind j r) := by
+private theorem outer_kind (g : Gate A) (j r : Fin 3) : outer g j r = kindV g (outerKind j r) := by
   fin_cases j <;> fin_cases r <;> rfl
 
 /-- **The attachment formulas define the attachments of the triangles.** -/
-theorem realize_outerF (s : Bool) {v : Fin 2 × Fin 2 → A} (k : OKind) (t' : CTag)
+private theorem realize_outerF (s : Bool) {v : Fin 2 × Fin 2 → A} (k : OKind) (t' : CTag)
     (h : Chained (v (0, 0)) (v (0, 1)) s) (h' : CDom t' (v (1, 0)) (v (1, 1))) :
     (outerF s k t').Realize v ↔
       vOf t' _ _ h' = Sum.inl (kindV ⟨(v (0, 0), v (0, 1), s), h⟩ k) := by
@@ -370,7 +378,8 @@ theorem realize_outerF (s : Bool) {v : Fin 2 × Fin 2 → A} (k : OKind) (t' : C
   · simp [outerF, vOf]
 
 /-- **The edge formulas define the edges of the gadget graph.** -/
-theorem realize_dirF (t t' : CTag) {v : Fin 2 × Fin 2 → A} (h : CDom t (v (0, 0)) (v (0, 1)))
+private theorem realize_dirF
+    (t t' : CTag) {v : Fin 2 × Fin 2 → A} (h : CDom t (v (0, 0)) (v (0, 1)))
     (h' : CDom t' (v (1, 0)) (v (1, 1))) :
     (dirF t t').Realize v ↔ E (vOf t _ _ h) (vOf t' _ _ h') := by
   rcases t with p | s | ⟨s, b⟩ | _ | ⟨s, j, r⟩ <;>
@@ -467,7 +476,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Fintype A] [None
 
 /-- **The universe of the drawing is the set of vertices of the gadget
 graph.** -/
-noncomputable def drawEquiv : drawInterp.MapRel A ≃ V A where
+private noncomputable def drawEquiv : drawInterp.MapRel A ≃ V A where
   toFun p := vOf p.1.1 (p.1.2 0) (p.1.2 1) ((realize_domF _ _).mp p.2)
   invFun n := ⟨(vTag n, ![(vPair n).1, (vPair n).2]), (realize_domF _ _).mpr (cDom_vTag n)⟩
   left_inv := by
@@ -482,7 +491,7 @@ noncomputable def drawEquiv : drawInterp.MapRel A ≃ V A where
 
 /-- **The edges of the drawing are those of the gadget graph**, in either
 direction. -/
-theorem adj_drawEquiv_symm (u w : V A) :
+private theorem adj_drawEquiv_symm (u w : V A) :
     RelMap adj ![drawEquiv.symm u, drawEquiv.symm w] ↔ E u w ∨ E w u := by
   rw [RelFOInterpretation.relMap_mapRel]
   change (dirF (vTag u) (vTag w) ⊔ (dirF (vTag w) (vTag u)).relabel swapPt).Realize _ ↔ _
@@ -503,7 +512,7 @@ theorem adj_drawEquiv_symm (u w : V A) :
 omit [Fintype A] in
 /-- **The number of proper 3-colorings of the drawing** is that of the gadget
 graph. -/
-theorem sharpThreeCol_draw [Finite A] :
+private theorem sharpThreeCol_draw [Finite A] :
     SharpThreeCol (drawInterp.MapRel A) = Nat.card {χ : V A → Fin 3 // Proper χ} := by
   have := Fintype.ofFinite A
   rw [sharpThreeCol_apply]
@@ -550,7 +559,7 @@ def gateEquiv (A : Type) [Language.sat.Structure A] [LinearOrder A] :
     rintro ⟨⟨c, x, s⟩, h⟩
     cases s <;> rfl
 
-theorem eval_gateCount (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
+private theorem eval_gateCount (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
     gateCount.eval A = Nat.card (Gate A) := by
   rw [gateCount, PolyTerm.eval, PolyTerm.eval_count, PolyTerm.eval_count,
     Nat.card_congr (gateSignEquiv A false), Nat.card_congr (gateSignEquiv A true),
@@ -562,7 +571,7 @@ open SatToColCount in
 /-- **#SAT reduces to #3-Colorability with one call**: the count of the
 drawing is divided by `6 · 8 ^ g`, `g` the number of non-first
 occurrences. -/
-noncomputable def sharpSat_oneCall_sharpThreeCol : SharpSAT ≤ᶜ[≤] SharpThreeCol where
+private noncomputable def sharpSat_oneCall_sharpThreeCol : SharpSAT ≤ᶜ[≤] SharpThreeCol where
   Tag := CTag
   dim := 2
   toRelInterpretation := drawInterp

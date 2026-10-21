@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Qsat.Blocks
 import DescriptiveComplexity.Problems.Qsat.Complement
 import DescriptiveComplexity.Problems.Qsat.Hardness
+import all DescriptiveComplexity.Problems.Qsat.Membership
 
 /-!
 # QSAT: quantified Boolean formulas with an unbounded prefix
@@ -92,7 +93,7 @@ namespace DescriptiveComplexity
 
 /-- **QSAT is in PSPACE**: the depth-first evaluation of the game tree is an
 SO(TC) walk. -/
-theorem qsat_PSPACE_mem : QSAT ∈ PSPACE :=
+private theorem qsat_PSPACE_mem : QSAT ∈ PSPACE :=
   qsat_mem_PSPACE
 
 /-- **QSAT is PSPACE-complete** ([Stockmeyer–Meyer 1973][stockmeyer1973word]):

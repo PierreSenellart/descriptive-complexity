@@ -10,6 +10,14 @@ public import DescriptiveComplexity.Problems.Wide.DrawDefLoop
 import DescriptiveComplexity.Problems.Wide.DrawCtl
 import DescriptiveComplexity.Problems.Wide.DrawOrd
 public import DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.BlkFile
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawDefKit
+import all DescriptiveComplexity.Problems.Wide.DrawDefLoop
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
+import all DescriptiveComplexity.Problems.Wide.DrawOrd
+import all DescriptiveComplexity.Problems.Wide.Key
 
 /-!
 # The clocked program's rules are definable
@@ -55,7 +63,7 @@ variable {dd : ℕ}
 /-- **Within a block the advance is the tuple's own successor**: the layout
 order is block-major and the tuples are ordered lexicographically, so below the
 last tuple the next register is the same block at the next tuple. -/
-theorem blkNext_snd_of_ne_tupTop [Nonempty A] {u : Wide.BlkIx K A dd}
+private theorem blkNext_snd_of_ne_tupTop [Nonempty A] {u : Wide.BlkIx K A dd}
     (hu : u.2 ≠ tupTop A dd) :
     (blkNext A K dd u).2 = tupNext u.2 := by
   classical
@@ -91,7 +99,7 @@ theorem blkNext_snd_of_ne_tupTop [Nonempty A] {u : Wide.BlkIx K A dd}
 variable (K) in
 /-- **The greatest block**: the last of the layout's blocks, which is a fact
 about the block order alone and not about the instance. -/
-noncomputable def blkTopB [Nonempty K] : Option K :=
+private noncomputable def blkTopB [Nonempty K] : Option K :=
   (exists_greatest (Le := Wide.blkTagLe K) (Wide.isLinOrd_blkTagLe K)
     (P := fun _ => True) ⟨none, trivial⟩).choose
 
@@ -99,7 +107,7 @@ noncomputable def blkTopB [Nonempty K] : Option K :=
 block-major, so the greatest index sits in the greatest block whatever the
 instance. This is what makes the sweep's stop test a question the formula can be
 built from – it compares the phase's block with a constant. -/
-theorem fst_blkTop [Nonempty A] [Nonempty K] :
+private theorem fst_blkTop [Nonempty A] [Nonempty K] :
     (blkTop A K dd).1 = blkTopB K := by
   have hgeB : ∀ b : Option K, Wide.blkTagLe K b (blkTopB K) :=
     fun b => (exists_greatest (Le := Wide.blkTagLe K) (Wide.isLinOrd_blkTagLe K)
@@ -115,7 +123,7 @@ theorem fst_blkTop [Nonempty A] [Nonempty K] :
 order is block-major and lexicographic within a block, so the least index of a
 block carries the least tuple. This is what the sweep's exit writes into the
 pointer when it resets to the file's first register. -/
-theorem snd_blkBot_apply [Nonempty A] [Nonempty K] {zero : A}
+private theorem snd_blkBot_apply [Nonempty A] [Nonempty K] {zero : A}
     (hbot : ∀ a : A, zero ≤ a) (j : Fin dd) :
     (blkBot A K dd).2 j = zero := by
   rcases blkLe_blkBot A K dd ((blkBot A K dd).1, fun _ => zero) with ⟨-, hne⟩ | ⟨-, ht⟩
@@ -127,7 +135,7 @@ theorem snd_blkBot_apply [Nonempty A] [Nonempty K] {zero : A}
 omit [Finite A] in
 /-- **The least tuple is below every tuple**: at the first differing coordinate
 the least element is smaller, which is what the lexicographic order asks. -/
-theorem tupLeLex_const_bot [Nonempty A] {zero : A} (hbot : ∀ a : A, zero ≤ a)
+private theorem tupLeLex_const_bot [Nonempty A] {zero : A} (hbot : ∀ a : A, zero ≤ a)
     (t : Fin dd → A) : tupLeLex (fun _ : Fin dd => zero) t := by
   classical
   by_cases hEq : (fun _ : Fin dd => zero) = t
@@ -152,7 +160,7 @@ omit [Finite K] in
 /-- **Above the last tuple of a block lies another block**: nothing in the block
 is above its last tuple, so a strictly greater index has a strictly greater
 block. -/
-theorem blkTag_lt_of_gt_tupTop [Nonempty A] {b : Option K} {v : Wide.BlkIx K A dd}
+private theorem blkTag_lt_of_gt_tupTop [Nonempty A] {b : Option K} {v : Wide.BlkIx K A dd}
     (h : WMLt (Wide.blkLe K A dd) (b, tupTop A dd) v) :
     Wide.blkTagLe K b v.1 ∧ b ≠ v.1 := by
   rcases h.1 with ⟨hb, hne⟩ | ⟨hb, ht⟩
@@ -166,7 +174,7 @@ theorem blkTag_lt_of_gt_tupTop [Nonempty A] {b : Option K} {v : Wide.BlkIx K A d
 variable (K) in
 /-- **The next block, as a fact about the block order**: the least block above
 this one, or this one if there is none. -/
-noncomputable def blkNextTag [Nonempty K] (b : Option K) : Option K :=
+private noncomputable def blkNextTag [Nonempty K] (b : Option K) : Option K :=
   open Classical in
   if h : ∃ c : Option K, WMLt (Wide.blkTagLe K) b c then
     (exists_ixSucc (Wide.blkTagLe K) (Wide.isLinOrd_blkTagLe K) h).choose
@@ -175,7 +183,7 @@ noncomputable def blkNextTag [Nonempty K] (b : Option K) : Option K :=
 /-- **The sweep's next block is that one**, so it is chosen when the formula is
 built and not at the instance – which is what a destination phase being a
 constant asks for. -/
-theorem blkNextB_eq [Nonempty A] [Nonempty K] (b : Option K) :
+private theorem blkNextB_eq [Nonempty A] [Nonempty K] (b : Option K) :
     blkNextB A K dd b = blkNextTag K b := by
   classical
   have hlin := Wide.isLinOrd_blkLe K A dd
@@ -223,7 +231,7 @@ theorem blkNextB_eq [Nonempty A] [Nonempty K] (b : Option K) :
 /-- **A roll-over resets the tuple**: at the last tuple of a block that is not
 the last, the next register is the first of the next block, so the pointer's
 coordinates all become the least element. -/
-theorem blkNext_snd_of_tupTop [Nonempty A] [Nonempty K] {b : Option K}
+private theorem blkNext_snd_of_tupTop [Nonempty A] [Nonempty K] {b : Option K}
     (hne : (b, tupTop A dd) ≠ blkTop A K dd) {zero : A} (hbot : ∀ a : A, zero ≤ a)
     (j : Fin dd) : (blkNext A K dd (b, tupTop A dd)).2 j = zero := by
   classical
@@ -249,7 +257,7 @@ theorem blkNext_snd_of_tupTop [Nonempty A] [Nonempty K] {b : Option K}
 /-- **The first register's block is the blockless one**: the layout puts the
 registers that stand for no block first, so the least index's block is
 `none`. -/
-theorem fst_blkBot [Nonempty A] [Nonempty K] : (blkBot A K dd).1 = none := by
+private theorem fst_blkBot [Nonempty A] [Nonempty K] : (blkBot A K dd).1 = none := by
   rcases blkLe_blkBot A K dd (none, fun _ => Classical.arbitrary A) with ⟨hb, -⟩ | ⟨hb, -⟩
   · revert hb
     match (blkBot A K dd).1 with
@@ -259,7 +267,7 @@ theorem fst_blkBot [Nonempty A] [Nonempty K] : (blkBot A K dd).1 = none := by
 
 /-- **The greatest tuple is the greatest element everywhere**: what the sweep's
 roll-over test asks about the pointer, coordinate by coordinate. -/
-theorem tupTop_apply [Nonempty A] {one : A} (htop : ∀ a : A, a ≤ one)
+private theorem tupTop_apply [Nonempty A] {one : A} (htop : ∀ a : A, a ≤ one)
     (j : Fin dd) : tupTop A dd j = one := by
   have h1 : ∀ u : Lex (Fin dd → A), u ≤ toLex (fun _ : Fin dd => one) :=
     tup_isTop_iff.mpr fun _ a => htop a
@@ -271,7 +279,7 @@ theorem tupTop_apply [Nonempty A] {one : A} (htop : ∀ a : A, a ≤ one)
 
 /-- **A tuple is the greatest exactly when every coordinate is**, which is the
 form the roll-over test takes as a formula. -/
-theorem eq_tupTop_iff [Nonempty A] {one : A} (htop : ∀ a : A, a ≤ one)
+private theorem eq_tupTop_iff [Nonempty A] {one : A} (htop : ∀ a : A, a ≤ one)
     (t : Fin dd → A) : t = tupTop A dd ↔ ∀ j : Fin dd, t j = one := by
   constructor
   · intro h j
@@ -296,7 +304,7 @@ position, with two rules each – the walk back to the marker, and the dispatch,
 which goes into the position's machinery below the last checkpoint and out of
 the evaluation at it. There is no third rule, the clocked evaluation running
 once and leaving into whatever phase its caller names. -/
-theorem uRulesDefinable_nexEvalRule {PM SM B : Type} {nv : ℕ} {ShM : SM → Type}
+private theorem uRulesDefinable_nexEvalRule {PM SM B : Type} {nv : ℕ} {ShM : SM → Type}
     {ruleM : ∀ (e : Env L) (s : SM), ShM s →
       Rule e.α Q dt.SlotIx (NexPh B (EvalPh nv PM))}
     {subEntry : Fin nv → PM} {exitPh : NexPh B (EvalPh nv PM)}
@@ -326,7 +334,7 @@ omit [DecidableEq dt.SlotIx] in
 /-- **The clocked evaluation's machineries are definable**: the same tower the
 space-bounded program runs, one copy per spine position and the output's, at the
 clocked program's own phases. -/
-theorem uRulesDefinable_nexSmRule {B : Type}
+private theorem uRulesDefinable_nexSmRule {B : Type}
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v) :
     URulesDefinable (L := L) (Q := Q) (S := dt.SMF) (Sh := dt.SMSh) fun e =>
@@ -344,7 +352,7 @@ theorem uRulesDefinable_nexSmRule {B : Type}
 omit [DecidableEq dt.SlotIx] in
 /-- **The clocked evaluation is definable**: its spine over those
 machineries. -/
-theorem uRulesDefinable_nexEvalRuleF {B : Type}
+private theorem uRulesDefinable_nexEvalRuleF {B : Type}
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v) :
     URulesDefinable (L := L) (Q := Q) (S := dt.SEF) (Sh := dt.NexSESh) fun e =>
@@ -365,7 +373,7 @@ variable {A : Type} [LinearOrder A] [Finite A] [Nonempty A]
 omit [DecidableEq dt.SlotIx] in
 /-- **The roll-over test is definable**: the pointer holds the last tuple
 exactly when every coordinate slot holds the greatest element. -/
-theorem uGDefinable_ptrTup_eq_tupTop (coord : Fin dt.dd → dt.CtlIx) :
+private theorem uGDefinable_ptrTup_eq_tupTop (coord : Fin dt.dd → dt.CtlIx) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun e f _ => dt.ptrTup coord f = tupTop e.α dt.dd :=
   (uGDefinable_forall (R := fun j : Fin dt.dd => fun e f
@@ -377,7 +385,7 @@ omit [DecidableEq dt.SlotIx] in
 /-- **The stop test is definable**: the pointer is at the last register exactly
 when its block is the last one – a comparison the formula is built with – and
 every coordinate slot holds the greatest element. -/
-theorem uGDefinable_done [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx)
+private theorem uGDefinable_done [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx)
     (b : Option dt.KIx) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun e f _ => ((b, dt.ptrTup coord f) = blkTop e.α dt.KIx dt.dd) :=
@@ -399,7 +407,7 @@ omit [DecidableEq dt.SlotIx] in
 /-- **The reset to the file's first register is definable**: the coordinate
 slots take the least element and every other slot keeps what it held. Which
 slots are coordinates is decided when the formula is built. -/
-theorem uStDefinable_st0 [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx) :
+private theorem uStDefinable_st0 [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx) :
     UStDefinable (L := L) (W := dt.SlotIx)
       fun e (f : dt.CtlIx → e.α) (_ : dt.SlotIx → e.α) =>
         dt.ctlOf coord f (blkBot e.α dt.KIx dt.dd).2 := by
@@ -419,7 +427,7 @@ omit [DecidableEq dt.SlotIx] in
 /-- **The first-register test is definable**: the pointer is at the file's first
 register exactly when its block is the blockless one – decided when the formula
 is built – and every coordinate slot holds the least element. -/
-theorem uGDefinable_atBot [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx)
+private theorem uGDefinable_atBot [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx)
     (b : Option dt.KIx) :
     UGDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun e f _ => ((b, dt.ptrTup coord f) = blkBot e.α dt.KIx dt.dd) :=
@@ -447,7 +455,7 @@ its two ends, the block one-hot, the name slots the pointer holds, the padding
 test, and the blank in every track the file does not carry. Every one of them is
 a slot of the control or a designated element, which is what makes the sweep a
 *definable* write. -/
-theorem uTrDefinable_buildWr [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx)
+private theorem uTrDefinable_buildWr [Nonempty dt.KIx] (coord : Fin dt.dd → dt.CtlIx)
     (b : Option dt.KIx) :
     UTrDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun e f _ => dt.buildWr e.zero e.one coord b f := by
@@ -485,7 +493,7 @@ coordinate rolls over is a question about *which coordinates are maximal*, and
 the value at it is the order's own successor. This is
 `DescriptiveComplexity.Draw.Data.uSlotDefinable_tupNext_lvC` at the sweep's
 own coordinates. -/
-theorem uSlotDefinable_tupNext_coord (coord : Fin dt.dd → dt.CtlIx) (j : Fin dt.dd) :
+private theorem uSlotDefinable_tupNext_coord (coord : Fin dt.dd → dt.CtlIx) (j : Fin dt.dd) :
     USlotDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun _ f _ => tupNext (dt.ptrTup coord f) j := by
   refine uSlotDefinable_cases
@@ -522,7 +530,7 @@ omit [DecidableEq dt.SlotIx] in
 the next register's own tuple – the lexicographic successor within a block, the
 least element at a roll-over – and every other slot keeps what it held. This is
 the one write of the whole program that is not a copy. -/
-theorem uStDefinable_ptrNext [Nonempty dt.KIx] {coord : Fin dt.dd → dt.CtlIx}
+private theorem uStDefinable_ptrNext [Nonempty dt.KIx] {coord : Fin dt.dd → dt.CtlIx}
     (hcoord : Function.Injective coord) (b : Option dt.KIx) :
     UStDefinable (L := L) (W := dt.SlotIx)
       fun e (f : dt.CtlIx → e.α) (_ : dt.SlotIx → e.α) => dt.ptrNext coord b f := by
@@ -638,7 +646,7 @@ pointer is the next register's tuple, its exit resets to the file's first
 register, and its two tests ask whether the pointer is at the last tuple and at
 the last register. The next block is a function of the phase, so it is chosen
 when the formula is built. -/
-theorem uSweepSpecDef_buildSpec [Nonempty dt.KIx] {coord : Fin dt.dd → dt.CtlIx}
+private theorem uSweepSpecDef_buildSpec [Nonempty dt.KIx] {coord : Fin dt.dd → dt.CtlIx}
     (hcoord : Function.Injective coord) :
     USweepSpecDef (L := L) (Q := dt.CtlIx) (dt := dt)
       fun e => dt.buildSpec e.zero e.one coord where
@@ -655,7 +663,7 @@ omit [DecidableEq dt.SlotIx] in
 a constant, and its two tests are `True` – which is what makes the phase a single
 step. This is the specification a program that is *handed* its file puts where a
 file-laying one puts `uSweepSpecDef_buildSpec`. -/
-theorem uSweepSpecDef_nullSpec {B : Type} :
+private theorem uSweepSpecDef_nullSpec {B : Type} :
     USweepSpecDef (L := L) (Q := dt.CtlIx) (dt := dt)
       fun e => dt.nullSpec (A := e.α) B where
   wr _ := uTrDefinable_id
@@ -671,7 +679,7 @@ omit [DecidableEq dt.SlotIx] in
 guessed bit – a designated element, chosen when the formula is built, since the
 value guessed is the rule's own shape – and every other slot keeps what it
 held. -/
-theorem uTrDefinable_guessWr (x : dt.d.B.ι → Bool) :
+private theorem uTrDefinable_guessWr (x : dt.d.B.ι → Bool) :
     UTrDefinable (L := L) (Q := dt.CtlIx) (W := dt.SlotIx)
       fun e _ g => dt.guessWr e.zero e.one x g := by
   intro sl
@@ -699,7 +707,7 @@ omit [DecidableEq dt.SlotIx] in
 pointer, so every field but the write is the identity or a constant. Its stop is
 not a test at all – the sweep stops nondeterministically, which is why `Roll` is
 always true and `Done` never. -/
-theorem uGuessSpecDef_regionSpec :
+private theorem uGuessSpecDef_regionSpec :
     UGuessSpecDef (L := L) (Q := dt.CtlIx) (dt := dt)
       fun e => dt.regionSpec e.zero e.one where
   wr _ x := uTrDefinable_guessWr x
@@ -714,7 +722,7 @@ plants the two marks, the approach walk and its stop, the file-laying sweep at
 its specification, the walk home and its turn, the guessing sweep at its own
 specification and its stop, the second walk home, and the evaluation's rules as
 the parameter. -/
-theorem uRulesDefinable_nexRule {PE SE B G : Type} {ShE : SE → Type}
+private theorem uRulesDefinable_nexRule {PE SE B G : Type} {ShE : SE → Type}
     {β : ∀ e : Env L, SweepSpec e.α Q dt.SlotIx B}
     {γ : ∀ e : Env L, GuessSpec e.α Q dt.SlotIx B G}
     {ruleE : ∀ (e : Env L) (s : SE), ShE s → Rule e.α Q dt.SlotIx (NexPh B PE)}
@@ -796,7 +804,7 @@ theorem uRulesDefinable_nexRule {PE SE B G : Type} {ShE : SE → Type}
 /-- **The clocked program's whole rule set is definable**: the outer layer
 around the evaluation, at any two sweep specifications that are themselves
 definable. -/
-theorem uRulesDefinable_nexProgRule {B G : Type}
+private theorem uRulesDefinable_nexProgRule {B G : Type}
     {β : ∀ e : Env L, SweepSpec e.α Q dt.SlotIx B}
     {γ : ∀ e : Env L, GuessSpec e.α Q dt.SlotIx B G}
     {args : ∀ (e : Env L) (v : dt.VarIx), dt.VarArgs (A := e.α) (Q := Q) v}

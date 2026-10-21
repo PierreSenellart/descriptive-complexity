@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Complexity
 public import DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Tiling a square: the local problem behind the machines
@@ -218,7 +219,7 @@ variable (hposn : ∀ a, T.Posn a ↔ S.Posn (u a)) (hle : ∀ a a', T.Le a a' �
 include hposn hle
 
 /-- The least position of the image is the image of the least position. -/
-theorem minPos_map (a : A) :
+private theorem minPos_map (a : A) :
     MinPos T.Le T.Posn a ↔ MinPos S.Le S.Posn (u a) := by
   refine and_congr (hposn a) ⟨fun h q hq => ?_, fun h q hq => ?_⟩
   · obtain ⟨b, rfl⟩ : ∃ b, q = u b := ⟨u.symm q, (u.apply_symm_apply q).symm⟩
@@ -226,7 +227,7 @@ theorem minPos_map (a : A) :
   · exact (hle a q).mpr (h (u q) ((hposn q).mp hq))
 
 /-- The greatest position of the image is the image of the greatest one. -/
-theorem maxPos_map (a : A) :
+private theorem maxPos_map (a : A) :
     MaxPos T.Le T.Posn a ↔ MaxPos S.Le S.Posn (u a) := by
   refine and_congr (hposn a) ⟨fun h q hq => ?_, fun h q hq => ?_⟩
   · obtain ⟨b, rfl⟩ : ∃ b, q = u b := ⟨u.symm q, (u.apply_symm_apply q).symm⟩
@@ -234,7 +235,7 @@ theorem maxPos_map (a : A) :
   · exact (hle q a).mpr (h (u q) ((hposn q).mp hq))
 
 /-- And the successor of the image is the image of the successor. -/
-theorem succPos_map (a a' : A) :
+private theorem succPos_map (a a' : A) :
     SuccPos T.Le T.Posn a a' ↔ SuccPos S.Le S.Posn (u a) (u a') := by
   refine and_congr (hposn a) (and_congr (hposn a') (and_congr (hle a a')
     (and_congr ⟨fun h hc => h (u.injective hc), fun h hc => h (congrArg u hc)⟩ ?_)))
@@ -258,7 +259,7 @@ variable (hedgeL : ∀ a, T.EdgeL a ↔ S.EdgeL (u a)) (hedgeR : ∀ a, T.EdgeR 
 include htile hacc hhoriz hvert hfirst hbase hstart hedgeL hedgeR
 
 /-- **A bijection matching the two systems carries a tiling across.** -/
-theorem isTiling_map {τ : A → A → A} (h : T.IsTiling τ) :
+private theorem isTiling_map {τ : A → A → A} (h : T.IsTiling τ) :
     S.IsTiling fun x y => u (τ (u.symm x) (u.symm y)) := by
   obtain ⟨htiles, hfst, hel, her, hhor, hver, x, y, hx, hy, hax⟩ := h
   refine ⟨fun p q hp hq => ?_, fun p q hp hq => ?_, fun p q hq hp => ?_,
@@ -305,13 +306,13 @@ theorem isTiling_map {τ : A → A → A} (h : T.IsTiling τ) :
     exact (hacc _).mp hax
 
 /-- **And with it, tileability.** -/
-theorem tileable_map (h : T.Tileable) : S.Tileable :=
+private theorem tileable_map (h : T.Tileable) : S.Tileable :=
   ⟨_, isTiling_map T u S hposn hle htile hacc hhoriz hvert hfirst hbase hstart
     hedgeL hedgeR h.choose_spec⟩
 
 omit htile hacc hhoriz hvert hfirst hbase hstart hedgeL hedgeR in
 /-- **And well-formedness**: the order is linear and there is a position. -/
-theorem wellFormed_map (h : T.WellFormed) : S.WellFormed :=
+private theorem wellFormed_map (h : T.WellFormed) : S.WellFormed :=
   ⟨IsLinOrd.of_equiv u hle h.1, ⟨u h.2.choose, (hposn _).mp h.2.choose_spec⟩⟩
 
 end Transport
@@ -383,35 +384,35 @@ section Transport
 
 variable (e : A ≃[Language.tiling] B)
 
-theorem tlPosn_map (a : A) : TLPosn a ↔ TLPosn (e a) := relMap_equiv₁ e tlPosn a
+private theorem tlPosn_map (a : A) : TLPosn a ↔ TLPosn (e a) := relMap_equiv₁ e tlPosn a
 
-theorem tlTile_map (a : A) : TLTile a ↔ TLTile (e a) := relMap_equiv₁ e tlTile a
+private theorem tlTile_map (a : A) : TLTile a ↔ TLTile (e a) := relMap_equiv₁ e tlTile a
 
-theorem tlAcc_map (a : A) : TLAcc a ↔ TLAcc (e a) := relMap_equiv₁ e tlAcc a
+private theorem tlAcc_map (a : A) : TLAcc a ↔ TLAcc (e a) := relMap_equiv₁ e tlAcc a
 
-theorem tlLe_map (a a' : A) : TLLe a a' ↔ TLLe (e a) (e a') := relMap_equiv₂ e tlLe a a'
+private theorem tlLe_map (a a' : A) : TLLe a a' ↔ TLLe (e a) (e a') := relMap_equiv₂ e tlLe a a'
 
-theorem tlHoriz_map (a a' : A) : TLHoriz a a' ↔ TLHoriz (e a) (e a') :=
+private theorem tlHoriz_map (a a' : A) : TLHoriz a a' ↔ TLHoriz (e a) (e a') :=
   relMap_equiv₂ e tlHoriz a a'
 
-theorem tlVert_map (a a' : A) : TLVert a a' ↔ TLVert (e a) (e a') :=
+private theorem tlVert_map (a a' : A) : TLVert a a' ↔ TLVert (e a) (e a') :=
   relMap_equiv₂ e tlVert a a'
 
-theorem tlFirst_map (a a' : A) : TLFirst a a' ↔ TLFirst (e a) (e a') :=
+private theorem tlFirst_map (a a' : A) : TLFirst a a' ↔ TLFirst (e a) (e a') :=
   relMap_equiv₂ e tlFirst a a'
 
-theorem tlBase_map (a : A) : TLBase a ↔ TLBase (e a) := relMap_equiv₁ e tlBase a
+private theorem tlBase_map (a : A) : TLBase a ↔ TLBase (e a) := relMap_equiv₁ e tlBase a
 
-theorem tlStart_map (a : A) : TLStart a ↔ TLStart (e a) := relMap_equiv₁ e tlStart a
+private theorem tlStart_map (a : A) : TLStart a ↔ TLStart (e a) := relMap_equiv₁ e tlStart a
 
-theorem tlEdgeL_map (a : A) : TLEdgeL a ↔ TLEdgeL (e a) := relMap_equiv₁ e tlEdgeL a
+private theorem tlEdgeL_map (a : A) : TLEdgeL a ↔ TLEdgeL (e a) := relMap_equiv₁ e tlEdgeL a
 
-theorem tlEdgeR_map (a : A) : TLEdgeR a ↔ TLEdgeR (e a) := relMap_equiv₁ e tlEdgeR a
+private theorem tlEdgeR_map (a : A) : TLEdgeR a ↔ TLEdgeR (e a) := relMap_equiv₁ e tlEdgeR a
 
 /-- **An isomorphism carries a tiling across**: the tiling of the image is the
 tiling of the source read through the isomorphism, and every condition is a
 condition on relations the isomorphism preserves. -/
-theorem isTiling_map {τ : A → A → A} (h : (tileData A).IsTiling τ) :
+private theorem isTiling_map {τ : A → A → A} (h : (tileData A).IsTiling τ) :
     (tileData B).IsTiling fun u v => e (τ (e.symm u) (e.symm v)) :=
   TileData.isTiling_map _ e.toEquiv _ (tlPosn_map e) (tlLe_map e) (tlTile_map e)
     (tlAcc_map e) (tlHoriz_map e) (tlVert_map e) (tlFirst_map e) (tlBase_map e)
@@ -419,7 +420,7 @@ theorem isTiling_map {τ : A → A → A} (h : (tileData A).IsTiling τ) :
 
 /-- **And it carries well-formedness across**: the order and the positions are
 relations of the vocabulary. -/
-theorem wellFormed_map (e : A ≃[Language.tiling] B) (h : (tileData A).WellFormed) :
+private theorem wellFormed_map (e : A ≃[Language.tiling] B) (h : (tileData A).WellFormed) :
     (tileData B).WellFormed :=
   TileData.wellFormed_map _ e.toEquiv _ (tlPosn_map e) (tlLe_map e) h
 

@@ -9,6 +9,8 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.FinSat.Invented
 public import DescriptiveComplexity.RecursivelyEnumerable
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.FinSat.Invented
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # FINSAT is in RE
@@ -131,7 +133,7 @@ A relation of the instance holds on the extended universe only of original
 elements, and there of what it holds of in the instance – so at original
 arguments the kernel reads the instance itself. -/
 
-theorem relMap_inl {k : ℕ} (R : Language.finsat.Relations k) (y : Fin k → A) :
+private theorem relMap_inl {k : ℕ} (R : Language.finsat.Relations k) (y : Fin k → A) :
     RelMap (L := Language.finsat) (M := A ⊕ Fin m) R (fun i => Sum.inl (y i)) ↔ RelMap R y := by
   constructor
   · rintro ⟨y', hy', h⟩
@@ -179,20 +181,20 @@ omit [Language.finsat.Structure A]
 variable (ρ : certBlock.Assignment (A ⊕ Fin m))
 
 /-- The elements of the model an assignment carries. -/
-def certElt (d : Fin m) : Prop := ρ CertIx.elt ![Sum.inr d]
+private def certElt (d : Fin m) : Prop := ρ CertIx.elt ![Sum.inr d]
 
 /-- The environments an assignment carries. -/
-def certEnv (e : Fin m) : Prop := ρ CertIx.env ![Sum.inr e]
+private def certEnv (e : Fin m) : Prop := ρ CertIx.env ![Sum.inr e]
 
 /-- The graph of an environment, read off an assignment. -/
-def certVal (e : Fin m) (x : A) (d : Fin m) : Prop :=
+private def certVal (e : Fin m) (x : A) (d : Fin m) : Prop :=
   ρ CertIx.val ![Sum.inr e, Sum.inl x, Sum.inr d]
 
 /-- The truth values of the nodes an assignment carries. -/
-def certG (g : A) (e : Fin m) : Prop := ρ CertIx.gv ![Sum.inl g, Sum.inr e]
+private def certG (g : A) (e : Fin m) : Prop := ρ CertIx.gv ![Sum.inl g, Sum.inr e]
 
 /-- The truth values of the atoms an assignment carries. -/
-def certH (g : A) (e : Fin m) : Prop := ρ CertIx.hv ![Sum.inl g, Sum.inr e]
+private def certH (g : A) (e : Fin m) : Prop := ρ CertIx.hv ![Sum.inl g, Sum.inr e]
 
 end Carried
 
@@ -562,50 +564,50 @@ no-instances: each condition of `DescriptiveComplexity.FinSat.IsWF` is one
 conjunct, every quantifier ranging over the original elements. -/
 
 /-- The order of the syntax is reflexive. -/
-noncomputable def ordReflS : certLang.Sentence := allOldF (leF vr0 vr0)
+private noncomputable def ordReflS : certLang.Sentence := allOldF (leF vr0 vr0)
 
 /-- The order of the syntax is transitive. -/
-noncomputable def ordTransS : certLang.Sentence :=
+private noncomputable def ordTransS : certLang.Sentence :=
   allOldF (allOldF (allOldF (leF vr2 vr1 ⊓ leF vr1 vr0 ⟹ leF vr2 vr0)))
 
 /-- The order of the syntax is antisymmetric. -/
-noncomputable def ordAntisymmS : certLang.Sentence :=
+private noncomputable def ordAntisymmS : certLang.Sentence :=
   allOldF (allOldF (leF vr1 vr0 ⊓ leF vr0 vr1 ⟹ eqF vr1 vr0))
 
 /-- The order of the syntax is total. -/
-noncomputable def ordTotalS : certLang.Sentence :=
+private noncomputable def ordTotalS : certLang.Sentence :=
   allOldF (allOldF (leF vr1 vr0 ⊔ leF vr0 vr1))
 
 /-- Children come strictly earlier in the order of the syntax. -/
-noncomputable def childLtS : certLang.Sentence :=
+private noncomputable def childLtS : certLang.Sentence :=
   allOldF (allOldF (childF vr1 vr0 ⟹ leF vr0 vr1 ⊓ ∼(eqF vr0 vr1)))
 
 /-- An atom has at most one argument at each position. -/
-noncomputable def argFunS : certLang.Sentence :=
+private noncomputable def argFunS : certLang.Sentence :=
   allOldF (allOldF (allOldF (allOldF (argF vr3 vr2 vr1 ⊓ argF vr3 vr2 vr0 ⟹ eqF vr1 vr0))))
 
 /-- An atom has at most one relation symbol. -/
-noncomputable def atomSymS : certLang.Sentence :=
+private noncomputable def atomSymS : certLang.Sentence :=
   allOldF (allOldF (allOldF ((posLF vr2 vr1 ⊔ negLF vr2 vr1) ⊓
     (posLF vr2 vr0 ⊔ negLF vr2 vr0) ⟹ eqF vr1 vr0)))
 
 /-- An atom only has arguments at the positions of its symbol's signature. -/
-noncomputable def argSigS : certLang.Sentence :=
+private noncomputable def argSigS : certLang.Sentence :=
   allOldF (allOldF (allOldF (allOldF ((posLF vr3 vr2 ⊔ negLF vr3 vr2) ⊓ argF vr3 vr1 vr0 ⟹
     sigF vr2 vr1))))
 
 /-- An atom has an argument at every position of its symbol's signature. -/
-noncomputable def argTotS : certLang.Sentence :=
+private noncomputable def argTotS : certLang.Sentence :=
   allOldF (allOldF (allOldF ((posLF vr2 vr1 ⊔ negLF vr2 vr1) ⊓ sigF vr1 vr0 ⟹
     exOldF (argF vr3 vr1 vr0))))
 
 /-- **The instance is well-formed**: the nine conditions of
 `DescriptiveComplexity.FinSat.IsWF`, conjoined. -/
-noncomputable def wfS : certLang.Sentence :=
+private noncomputable def wfS : certLang.Sentence :=
   ordReflS ⊓ (ordTransS ⊓ (ordAntisymmS ⊓ (ordTotalS ⊓ (childLtS ⊓
     (argFunS ⊓ (atomSymS ⊓ (argSigS ⊓ argTotS)))))))
 
-theorem realize_wfS :
+private theorem realize_wfS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) wfS ↔ IsWF A := by
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [wfS, ordReflS, ordTransS, ordAntisymmS, ordTotalS, childLtS, argFunS, atomSymS,
@@ -631,13 +633,13 @@ values and everything read off the encoding over the original elements. -/
 (`DescriptiveComplexity.FinSat.UpdAt`). Its inner quantifiers carry guards
 like every other, and here it matters: this clause occurs in a *hypothesis*
 position inside the universal-quantifier disjunct below. -/
-noncomputable def updF (e e' x d : γ) : certLang.Formula γ :=
+private noncomputable def updF (e e' x d : γ) : certLang.Formula γ :=
   valF e' x d ⊓ allOldF (∼(eqF vr0 (up x)) ⟹
     allNewF (valF (up (up e')) vr1 vr0 ⇔ valF (up (up e)) vr1 vr0))
 
 /-- The value of the node `g` under the environment `e`, one disjunct per kind
 of node. -/
-noncomputable def stepBodyF (g e : γ) : certLang.Formula γ :=
+private noncomputable def stepBodyF (g e : γ) : certLang.Formula γ :=
   (andNF g ⊓ allOldF (childF (up g) vr0 ⟹ gF vr0 (up e))) ⊔
   ((orNF g ⊓ exOldF (childF (up g) vr0 ⊓ gF vr0 (up e))) ⊔
     ((allNF g ⊓ allOldF (bindF (up g) vr0 ⟹
@@ -658,7 +660,7 @@ noncomputable def stepBodyF (g e : γ) : certLang.Formula γ :=
 
 /-- The disjunction is the truth definition read on the certificate the
 assignment carries. -/
-theorem realize_stepBodyF (g e : γ) (v : γ → A ⊕ Fin m) (a : A) (i : Fin m)
+private theorem realize_stepBodyF (g e : γ) (v : γ → A ⊕ Fin m) (a : A) (i : Fin m)
     (hg : v g = Sum.inl a) (he : v e = Sum.inr i) :
     @Formula.Realize certLang _ (certStr ρ) γ (stepBodyF g e) v ↔
       CertStep (certElt ρ) (certEnv ρ) (certVal ρ) (certG ρ) (certH ρ) a i := by
@@ -677,39 +679,39 @@ theorem realize_stepBodyF (g e : γ) (v : γ → A ⊕ Fin m) (a : A) (i : Fin m
 One conjunct per field of `DescriptiveComplexity.FinSat.CertOK`. -/
 
 /-- The model is nonempty. -/
-noncomputable def eltNeS : certLang.Sentence := exNewF (eltF vr0)
+private noncomputable def eltNeS : certLang.Sentence := exNewF (eltF vr0)
 
 /-- There is at least one environment. -/
-noncomputable def envNeS : certLang.Sentence := exNewF (envF vr0)
+private noncomputable def envNeS : certLang.Sentence := exNewF (envF vr0)
 
 /-- An environment gives every variable a value in the model. -/
-noncomputable def valTotalS : certLang.Sentence :=
+private noncomputable def valTotalS : certLang.Sentence :=
   allNewF (envF vr0 ⟹ allOldF (exNewF (eltF vr0 ⊓ valF vr2 vr1 vr0)))
 
 /-- An environment gives every variable at most one value. -/
-noncomputable def valFunS : certLang.Sentence :=
+private noncomputable def valFunS : certLang.Sentence :=
   allNewF (envF vr0 ⟹ allOldF (allNewF (allNewF
     (valF vr3 vr2 vr1 ⟹ (valF vr3 vr2 vr0 ⟹ eqF vr1 vr0)))))
 
 /-- Environments are closed under updating one variable. -/
-noncomputable def valUpdateS : certLang.Sentence :=
+private noncomputable def valUpdateS : certLang.Sentence :=
   allNewF (envF vr0 ⟹ allOldF (allNewF (eltF vr0 ⟹
     exNewF (envF vr0 ⊓ updF vr3 vr0 vr2 vr1))))
 
 /-- The truth value of a node depends on the environment only through the
 values it gives. -/
-noncomputable def gExtS : certLang.Sentence :=
+private noncomputable def gExtS : certLang.Sentence :=
   allOldF (allNewF (allNewF (envF vr1 ⟹ (envF vr0 ⟹
     (allOldF (allNewF (valF vr3 vr1 vr0 ⇔ valF vr2 vr1 vr0)) ⟹
       (gF vr2 vr1 ⇔ gF vr2 vr0))))))
 
 /-- The truth values obey the truth definition. -/
-noncomputable def stepS : certLang.Sentence :=
+private noncomputable def stepS : certLang.Sentence :=
   allOldF (allNewF (envF vr0 ⟹ (gF vr1 vr0 ⇔ stepBodyF vr1 vr0)))
 
 /-- Two atoms of the same relation symbol whose arguments have the same values
 have the same truth value. -/
-noncomputable def atomCohS : certLang.Sentence :=
+private noncomputable def atomCohS : certLang.Sentence :=
   allOldF (allOldF (allOldF (allNewF (allNewF (envF vr1 ⟹ (envF vr0 ⟹
     ((posLF vr4 vr2 ⊔ negLF vr4 vr2) ⟹ ((posLF vr3 vr2 ⊔ negLF vr3 vr2) ⟹
       (allOldF (allOldF (allOldF (argF vr7 vr2 vr1 ⟹ (argF vr6 vr2 vr0 ⟹
@@ -717,26 +719,26 @@ noncomputable def atomCohS : certLang.Sentence :=
         (hF vr4 vr1 ⇔ hF vr3 vr0))))))))))
 
 /-- The root holds under every environment. -/
-noncomputable def rootHoldsS : certLang.Sentence :=
+private noncomputable def rootHoldsS : certLang.Sentence :=
   allOldF (rootF vr0 ⟹ allNewF (envF vr0 ⟹ gF vr1 vr0))
 
 /-- **The assignment is a certificate**: the nine conditions of
 `DescriptiveComplexity.FinSat.CertOK`, conjoined. -/
-noncomputable def certS : certLang.Sentence :=
+private noncomputable def certS : certLang.Sentence :=
   eltNeS ⊓ (envNeS ⊓ (valTotalS ⊓ (valFunS ⊓ (valUpdateS ⊓ (gExtS ⊓
     (stepS ⊓ (atomCohS ⊓ rootHoldsS)))))))
 
-theorem realize_eltNeS :
+private theorem realize_eltNeS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) eltNeS ↔ ∃ d, certElt ρ d := by
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [Sentence.Realize, eltNeS, realize_exNewF, realize_eltF, Sum.elim_inr, certElt]
 
-theorem realize_envNeS :
+private theorem realize_envNeS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) envNeS ↔ ∃ e, certEnv ρ e := by
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [Sentence.Realize, envNeS, realize_exNewF, realize_envF, Sum.elim_inr, certEnv]
 
-theorem realize_valTotalS :
+private theorem realize_valTotalS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) valTotalS ↔
       ∀ e, certEnv ρ e → ∀ x : A, ∃ d, certElt ρ d ∧ certVal ρ e x d := by
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
@@ -744,7 +746,7 @@ theorem realize_valTotalS :
     Formula.realize_imp, Formula.realize_inf, realize_envF, realize_eltF, realize_valF,
     Sum.elim_inl, Sum.elim_inr, certEnv, certElt, certVal]
 
-theorem realize_valFunS :
+private theorem realize_valFunS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) valFunS ↔
       ∀ e, certEnv ρ e → ∀ (x : A) (d d' : Fin m), certVal ρ e x d → certVal ρ e x d' → d = d' := by
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
@@ -752,7 +754,7 @@ theorem realize_valFunS :
     realize_envF, realize_valF, realize_eqF, Sum.elim_inl, Sum.elim_inr, Sum.inr.injEq,
     certEnv, certVal]
 
-theorem realize_valUpdateS :
+private theorem realize_valUpdateS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) valUpdateS ↔
       ∀ e, certEnv ρ e → ∀ (x : A) (d : Fin m), certElt ρ d →
         ∃ e', certEnv ρ e' ∧ UpdAt (certVal ρ) e e' x d := by
@@ -762,7 +764,7 @@ theorem realize_valUpdateS :
     Formula.realize_not, realize_envF, realize_eltF, realize_valF, realize_eqF,
     Sum.elim_inl, Sum.elim_inr, ne_eq, Sum.inl.injEq, certEnv, certElt, certVal]
 
-theorem realize_gExtS :
+private theorem realize_gExtS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) gExtS ↔
       ∀ (g : A) (e e' : Fin m), certEnv ρ e → certEnv ρ e' →
         (∀ x d, certVal ρ e x d ↔ certVal ρ e' x d) → (certG ρ g e ↔ certG ρ g e') := by
@@ -771,7 +773,7 @@ theorem realize_gExtS :
     Formula.realize_iff, realize_envF, realize_valF, realize_gF, Sum.elim_inl, Sum.elim_inr,
     certEnv, certVal, certG]
 
-theorem realize_stepS :
+private theorem realize_stepS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) stepS ↔
       ∀ (g : A) (e : Fin m), certEnv ρ e →
         (certG ρ g e ↔
@@ -782,7 +784,7 @@ theorem realize_stepS :
   refine forall_congr' fun a => forall_congr' fun i => imp_congr_right fun _ => ?_
   exact iff_congr Iff.rfl (realize_stepBodyF vr1 vr0 _ a i rfl rfl)
 
-theorem realize_atomCohS :
+private theorem realize_atomCohS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) atomCohS ↔
       ∀ (g g' s : A) (e e' : Fin m), certEnv ρ e → certEnv ρ e' →
         (PosG g s ∨ NegG g s) → (PosG g' s ∨ NegG g' s) →
@@ -794,7 +796,7 @@ theorem realize_atomCohS :
     realize_negLF, realize_argF, realize_valF, realize_hF, Sum.elim_inl, Sum.elim_inr,
     relMap_inl₂, relMap_inl₃, certEnv, certVal, certH]
 
-theorem realize_rootHoldsS :
+private theorem realize_rootHoldsS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) rootHoldsS ↔
       ∀ g : A, RootG g → ∀ e, certEnv ρ e → certG ρ g e := by
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
@@ -809,7 +811,7 @@ private theorem realize_inf_sentence (φ ψ : certLang.Sentence) :
   let : certLang.Structure (A ⊕ Fin m) := certStr ρ
   exact Formula.realize_inf
 
-theorem realize_certS :
+private theorem realize_certS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) certS ↔
       CertOK (certElt ρ) (certEnv ρ) (certVal ρ) (certG ρ) (certH ρ) := by
   simp only [certS, realize_inf_sentence, realize_eltNeS, realize_envNeS, realize_valTotalS,
@@ -827,9 +829,9 @@ theorem realize_certS :
 /-- **The first-order kernel of the `∃SO[new]` definition of FINSAT**: the
 instance is a well-formed encoding, and the guessed relations are a certificate
 of finite satisfiability. -/
-noncomputable def kernelS : certLang.Sentence := wfS ⊓ certS
+private noncomputable def kernelS : certLang.Sentence := wfS ⊓ certS
 
-theorem realize_kernelS :
+private theorem realize_kernelS :
     @Sentence.Realize certLang (A ⊕ Fin m) (certStr ρ) kernelS ↔
       IsWF A ∧ CertOK (certElt ρ) (certEnv ρ) (certVal ρ) (certG ρ) (certH ρ) := by
   rw [kernelS, realize_inf_sentence, realize_wfS, realize_certS]
@@ -846,7 +848,7 @@ variable (Elt Env : Fin m → Prop) (Val : Fin m → A → Fin m → Prop) (G H 
 variable holds exactly at the sort its component is meant for, and nowhere else
 – which is what makes the sort guards of the kernel harmless in this
 direction. -/
-def certAssign : certBlock.Assignment (A ⊕ Fin m) := fun i =>
+private def certAssign : certBlock.Assignment (A ⊕ Fin m) := fun i =>
   match i with
   | .elt => fun (x : Fin 1 → A ⊕ Fin m) => ∃ d, x 0 = Sum.inr d ∧ Elt d
   | .env => fun (x : Fin 1 → A ⊕ Fin m) => ∃ e, x 0 = Sum.inr e ∧ Env e
@@ -855,21 +857,21 @@ def certAssign : certBlock.Assignment (A ⊕ Fin m) := fun i =>
   | .gv => fun (x : Fin 2 → A ⊕ Fin m) => ∃ g e, x 0 = Sum.inl g ∧ x 1 = Sum.inr e ∧ G g e
   | .hv => fun (x : Fin 2 → A ⊕ Fin m) => ∃ g e, x 0 = Sum.inl g ∧ x 1 = Sum.inr e ∧ H g e
 
-theorem certElt_certAssign : certElt (certAssign Elt Env Val G H) = Elt := by
+private theorem certElt_certAssign : certElt (certAssign Elt Env Val G H) = Elt := by
   funext d
   refine propext ⟨?_, fun h => ⟨d, rfl, h⟩⟩
   rintro ⟨d', hd', h⟩
   obtain rfl : d = d' := by simpa using hd'
   exact h
 
-theorem certEnv_certAssign : certEnv (certAssign Elt Env Val G H) = Env := by
+private theorem certEnv_certAssign : certEnv (certAssign Elt Env Val G H) = Env := by
   funext e
   refine propext ⟨?_, fun h => ⟨e, rfl, h⟩⟩
   rintro ⟨e', he', h⟩
   obtain rfl : e = e' := by simpa using he'
   exact h
 
-theorem certVal_certAssign : certVal (certAssign Elt Env Val G H) = Val := by
+private theorem certVal_certAssign : certVal (certAssign Elt Env Val G H) = Val := by
   funext e x d
   refine propext ⟨?_, fun h => ⟨e, x, d, rfl, rfl, rfl, h⟩⟩
   rintro ⟨e', y, d', he', hy, hd', h⟩
@@ -878,7 +880,7 @@ theorem certVal_certAssign : certVal (certAssign Elt Env Val G H) = Val := by
   obtain rfl : d = d' := by simpa using hd'
   exact h
 
-theorem certG_certAssign : certG (certAssign Elt Env Val G H) = G := by
+private theorem certG_certAssign : certG (certAssign Elt Env Val G H) = G := by
   funext g e
   refine propext ⟨?_, fun h => ⟨g, e, rfl, rfl, h⟩⟩
   rintro ⟨g', e', hg', he', h⟩
@@ -886,7 +888,7 @@ theorem certG_certAssign : certG (certAssign Elt Env Val G H) = G := by
   obtain rfl : e = e' := by simpa using he'
   exact h
 
-theorem certH_certAssign : certH (certAssign Elt Env Val G H) = H := by
+private theorem certH_certAssign : certH (certAssign Elt Env Val G H) = H := by
   funext g e
   refine propext ⟨?_, fun h => ⟨g, e, rfl, rfl, h⟩⟩
   rintro ⟨g', e', hg', he', h⟩

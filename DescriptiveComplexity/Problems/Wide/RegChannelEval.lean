@@ -12,6 +12,11 @@ import DescriptiveComplexity.Problems.Wide.BlkLayout
 public import DescriptiveComplexity.Problems.Wide.DrawIxWidth
 public import DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
 public import Mathlib.Data.Nat.Log
+import all DescriptiveComplexity.Problems.Wide.DrawIxPack
+import all DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+import all DescriptiveComplexity.Problems.Wide.DrawIxWidth
+import all DescriptiveComplexity.Problems.Wide.NexSpine
+import all DescriptiveComplexity.Problems.Wide.RegChannelLaid
 
 /-!
 # The clocked evaluation at the file the channel hands over
@@ -53,7 +58,7 @@ def regWidthBound (t B : ℕ) : ℕ := 16 * (B + t * B + 16) ^ 2
 its `N` registers, the widths are below `2 ^ (4 N + 14)`. Every clock argument
 wants the widths as an *exponent*, and this is where the polynomial becomes
 one. -/
-theorem regWidthBound_le_two_pow (N : ℕ) :
+private theorem regWidthBound_le_two_pow (N : ℕ) :
     regWidthBound N (2 ^ N) ≤ 2 ^ (4 * N + 14) := by
   have h1 : N + 1 ≤ 2 ^ N := Nat.succ_le_of_lt (Nat.lt_two_pow_self)
   have hp : (0 : ℕ) < 2 ^ N := Nat.two_pow_pos N
@@ -87,28 +92,28 @@ theorem regWidthBound_le_two_pow (N : ℕ) :
 
 variable {t B : ℕ}
 
-theorem regW_le : 2 * B + 2 ≤ regWidthBound t B := by
+private theorem regW_le : 2 * B + 2 ≤ regWidthBound t B := by
   have hB : B ≤ B + t * B + 16 := by omega
   have hT : t * B ≤ B + t * B + 16 := by omega
   have h16 : 16 ≤ B + t * B + 16 := by omega
   simp only [regWidthBound, pow_two]
   nlinarith [hB, hT, h16]
 
-theorem regWP_le : 2 * B + t * B + 3 ≤ regWidthBound t B := by
+private theorem regWP_le : 2 * B + t * B + 3 ≤ regWidthBound t B := by
   have hB : B ≤ B + t * B + 16 := by omega
   have hT : t * B ≤ B + t * B + 16 := by omega
   have h16 : 16 ≤ B + t * B + 16 := by omega
   simp only [regWidthBound, pow_two]
   nlinarith [hB, hT, h16]
 
-theorem regWR_le : B + 4 ≤ regWidthBound t B := by
+private theorem regWR_le : B + 4 ≤ regWidthBound t B := by
   have hB : B ≤ B + t * B + 16 := by omega
   have hT : t * B ≤ B + t * B + 16 := by omega
   have h16 : 16 ≤ B + t * B + 16 := by omega
   simp only [regWidthBound, pow_two]
   nlinarith [hB, hT, h16]
 
-theorem regWK_le :
+private theorem regWK_le :
     B * (1 + (2 * B + 3 + t * B) + (2 * B + 5 + t * B)) + 1 + (2 * B + 3 + t * B) ≤
       regWidthBound t B := by
   have hB : B ≤ B + t * B + 16 := by omega
@@ -139,25 +144,25 @@ noncomputable abbrev regWidthBd : ℕ :=
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite A] [Finite R'] [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
-theorem regW_le_bound :
+private theorem regW_le_bound :
     dt.regW (A := A) (R' := R') (P' := P') ≤ dt.regWidthBd A R' P' := regW_le
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite A] [Finite R'] [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
-theorem regWP_le_bound :
+private theorem regWP_le_bound :
     dt.regWP (A := A) (R' := R') (P' := P') ≤ dt.regWidthBd A R' P' := regWP_le
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite A] [Finite R'] [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
-theorem regWR_le_bound :
+private theorem regWR_le_bound :
     dt.regWR (A := A) (R' := R') (P' := P') ≤ dt.regWidthBd A R' P' := regWR_le
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
   [Finite A] [Finite R'] [Finite P'] [Nonempty A] [L.IsRelational] [L.Structure A]
   [Finite dt.KIx] in
-theorem regWK_le_bound :
+private theorem regWK_le_bound :
     dt.regWK (A := A) (R' := R') (P' := P') ≤ dt.regWidthBd A R' P' := regWK_le
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A]
@@ -167,7 +172,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Fini
 `IxWidthBd` of `DescriptiveComplexity.Draw.Data.ixLegWidth_le`, at the four
 widths the register channel's file is charged; what an instantiation owes of
 the clock is again `q ^ 25 ≤ 2 ^ (k · m)`. -/
-theorem ixWidthBd_regLaid {q : ℕ} (hq : 16 ≤ q)
+private theorem ixWidthBd_regLaid {q : ℕ} (hq : 16 ≤ q)
     (hwidth : dt.regWidthBd A R' P' ≤ q)
     (hd0 : Nat.card (Lex (Fin dt.dd0 → A)) + 1 ≤ q)
     (heDim : Nat.card (Lex (Fin dt.eDim → A)) + 1 ≤ q)
@@ -204,7 +209,7 @@ variable (A R' P') in
 bounds every address by `2 ^ N` at `N` registers, and the widths are quadratic in
 that. This is the first of the two places the clock's exponent comes from – the
 other is the record's own dimensions. -/
-theorem regWidthBd_le_two_pow :
+private theorem regWidthBd_le_two_pow :
     dt.regWidthBd A R' P' ≤
       2 ^ (4 * Nat.card (dt.RegIx (A := A) (R' := R') (P' := P')) + 14) :=
   regWidthBound_le_two_pow _
@@ -216,7 +221,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 `DescriptiveComplexity.Draw.Data.ixEvalWidth_le` at `ixWidthBd_regLaid`. This
 is the `a` of the clock – what one round of the evaluation costs – and what an
 instantiation owes is `q ^ 26 ≤ 2 ^ (k · m)`. -/
-theorem ixEvalWidth_le_regLaid {q : ℕ} (hq : 16 ≤ q)
+private theorem ixEvalWidth_le_regLaid {q : ℕ} (hq : 16 ≤ q)
     (hwidth : dt.regWidthBd A R' P' ≤ q)
     (hd0 : Nat.card (Lex (Fin dt.dd0 → A)) + 1 ≤ q)
     (heDim : Nat.card (Lex (Fin dt.eDim → A)) + 1 ≤ q)
@@ -241,7 +246,7 @@ against the clock, which compares with `2 ^ (k · m)` and not with a
 polynomial. A number is below the next power of two above it
 (`Nat.lt_pow_succ_log_self`), so twenty-six of them are below its twenty-sixth,
 and that is the exponent `w` a reduction hands the clock. -/
-theorem ixEvalWidth_le_two_pow_regLaid {q : ℕ} (hq : 16 ≤ q)
+private theorem ixEvalWidth_le_two_pow_regLaid {q : ℕ} (hq : 16 ≤ q)
     (hwidth : dt.regWidthBd A R' P' ≤ q)
     (hd0 : Nat.card (Lex (Fin dt.dd0 → A)) + 1 ≤ q)
     (heDim : Nat.card (Lex (Fin dt.eDim → A)) + 1 ≤ q)
@@ -268,7 +273,7 @@ theorem ixEvalWidth_le_two_pow_regLaid {q : ℕ} (hq : 16 ≤ q)
 budgets, the number of variables, and the atom, gate, argument and arity counts.
 They are the kernel's own, so a clock's exponent carries them as an additive
 constant. -/
-noncomputable def dimC : ℕ :=
+private noncomputable def dimC : ℕ :=
   max dt.ntgDim (max dt.nfDim (max dt.nv
     (max (⨆ vi : dt.VarIx, max (dt.natOf vi) (max (dt.nIn vi) (dt.arOf vi)))
       (⨆ iv : dt.d.B.ι, dt.d.B.arity iv))))
@@ -278,7 +283,7 @@ variable (A R' P') in
 the pass widths, the two tuple counts, and the kernel's own dimensions
 (`dimC`). It is a maximum and nothing else, so each of the ten comparisons
 `ixEvalWidth_le_regLaid` asks for is one `le_max` away. -/
-noncomputable def evalQ : ℕ :=
+private noncomputable def evalQ : ℕ :=
   max 16 (max (dt.regWidthBd A R' P')
     (max (Nat.card (Lex (Fin dt.dd0 → A)) + 1)
       (max (Nat.card (Lex (Fin dt.eDim → A)) + 1) dt.dimC)))
@@ -289,7 +294,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R'] [LinearOrder P']
 /-- **The evaluation's width at the handed file, with nothing to discharge**:
 `ixEvalWidth_le_two_pow_regLaid` at `evalQ`, whose ten comparisons hold by
 construction. This is the `w` of the clock, and it mentions the record alone. -/
-theorem ixEvalWidth_le_two_pow_evalQ :
+private theorem ixEvalWidth_le_two_pow_evalQ :
     dt.ixEvalWidth A (dt.regW (A := A) (R' := R') (P' := P'))
         (dt.regWP (A := A) (R' := R') (P' := P'))
         (dt.regWR (A := A) (R' := R') (P' := P'))
@@ -656,7 +661,7 @@ open Classical in
 /-- **The clocked evaluation at the handed file, whatever the verdict**:
 `nexIxEvalB_regLaid_reachesIn` with the verdict not assumed
 (`nexIxEvalOutB_any_reachesIn`). -/
-theorem nexIxEvalB_regLaid_any_reachesIn
+private theorem nexIxEvalB_regLaid_any_reachesIn
     (h : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     {rEmb : ∀ i : dt.SEF, dt.NexSESh i → R}
     (hrules : ∀ (i : dt.SEF) (ρ : dt.NexSESh i),
@@ -900,7 +905,7 @@ noncomputable def regGatedSem
 as `nexIxEvalB_regLaid_reachesIn` with the tape and control families
 *constructed* – the branched thread at the packs the bridges build – so that a
 program has only to name the state it enters the evaluation in. -/
-theorem nexIxEvalB_regLaid_thread_reachesIn
+private theorem nexIxEvalB_regLaid_thread_reachesIn
     (h : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     {rEmb : ∀ i : dt.SEF, dt.NexSESh i → R}
     (hrules : ∀ (i : dt.SEF) (ρ : dt.NexSESh i),
@@ -1072,7 +1077,7 @@ verdict**: the same run
 as `nexIxEvalB_regLaid_reachesIn` with the tape and control families
 *constructed* – the branched thread at the packs the bridges build – so that a
 program has only to name the state it enters the evaluation in. -/
-theorem nexIxEvalB_regLaid_thread_any_reachesIn
+private theorem nexIxEvalB_regLaid_thread_any_reachesIn
     (h : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     {rEmb : ∀ i : dt.SEF, dt.NexSESh i → R}
     (hrules : ∀ (i : dt.SEF) (ρ : dt.NexSESh i),
@@ -1256,7 +1261,7 @@ the one thing left is its verdict, which `ixOutAcc_iff_out` reads as the
 expansion's output sentence at the stage the tracks hold. So what a program has
 to bring to its own evaluation is the entry state, the enumeration, the stage
 its guess wrote, and the sentence being true. -/
-theorem nexIxEvalOut_regLaid_realize_reachesIn
+private theorem nexIxEvalOut_regLaid_realize_reachesIn
     (h : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     {rEmb : ∀ i : dt.SEF, dt.NexSESh i → R}
     (hrules : ∀ (i : dt.SEF) (ρ : dt.NexSESh i),
@@ -1412,7 +1417,7 @@ open Classical in
 the run above with the sentence *not* assumed, and the accepting bit read as
 what it is – the sentence's own value (`ixOutAcc_iff_out`). A backward reading
 uses this: the run exists whatever the verdict, and the bit says which. -/
-theorem nexIxEvalOut_regLaid_verdict_reachesIn
+private theorem nexIxEvalOut_regLaid_verdict_reachesIn
     (h : IsLinOrd (WMLe (A := Univ A R (NexPh B (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     {rEmb : ∀ i : dt.SEF, dt.NexSESh i → R}
     (hrules : ∀ (i : dt.SEF) (ρ : dt.NexSESh i),

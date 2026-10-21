@@ -100,7 +100,7 @@ namespace Slot
 
 variable {ι : Type} {ko ki dd0 : ℕ}
 
-def slotsToSum : Slot ι ko ki dd0 →
+private def slotsToSum : Slot ι ko ki dd0 →
     (Option (Fin ko ⊕ Fin ki) ⊕ Fin dd0 ⊕ ι ⊕ ι) ⊕ Fin 11
   | .blk b => Sum.inl (Sum.inl b)
   | .name j => Sum.inl (Sum.inr (Sum.inl j))
@@ -153,7 +153,7 @@ namespace Ctl
 
 variable {e na nat nf ntg : ℕ}
 
-def slotsToSum : Ctl e na nat nf ntg →
+private def slotsToSum : Ctl e na nat nf ntg →
     Fin e ⊕ Fin na ⊕ Fin e ⊕ Fin nat ⊕ Fin nf ⊕ Fin ntg ⊕ Fin 8
   | .lv j => Sum.inl j
   | .acc j => Sum.inr (Sum.inl j)
@@ -188,7 +188,7 @@ def tagBlk : Tag R P (Fin ko ⊕ₗ Fin ki) → Option (Fin ko ⊕ Fin ki)
 omit [LinearOrder R] [LinearOrder P] in
 /-- **The block mark decodes the tag**: only an argument tag has a block, and it
 has its own. -/
-theorem tagBlk_eq_some_iff (τ : Tag R P (Fin ko ⊕ₗ Fin ki))
+private theorem tagBlk_eq_some_iff (τ : Tag R P (Fin ko ⊕ₗ Fin ki))
     (b' : Fin ko ⊕ Fin ki) :
     tagBlk τ = some b' ↔ τ = Tag.arg (toLex b') := by
   cases τ with

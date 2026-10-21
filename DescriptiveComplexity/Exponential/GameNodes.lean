@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GamePrefix
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.GameSpec
+import all DescriptiveComplexity.Exponential.GameState
+import all DescriptiveComplexity.Exponential.Peel
+import all DescriptiveComplexity.Exponential.TagBits
 
 /-!
 # The node phases play the AND/OR graph
@@ -59,7 +65,7 @@ theorem pointAssign_injective (p q : X.Map A) (h : pointAssign p = pointAssign q
 omit [Finite A] [Nonempty A] in
 /-- **A state all of whose rounds are points carries points**, and they are
 determined. -/
-theorem exists_nodeState {p : Ph T Dm} {σs : Fin n → X.pointBlock.Assignment A}
+private theorem exists_nodeState {p : Ph T Dm} {σs : Fin n → X.pointBlock.Assignment A}
     (h : ∀ i, IsPointAssign (X := X) (σs i)) :
     ∃ pts : Fin n → X.Map A, stateAssign p σs = nodeState p pts ∧
       σs = fun i => pointAssign (pts i) := by
@@ -79,7 +85,7 @@ theorem nodeAt_congr (t : T) (a : Fin 2) (pts pts' : Fin n → X.Map A)
 
 omit [Finite T] [Finite A] [Nonempty A] in
 /-- The first node only reads the rounds below `d`. -/
-theorem nodeAt_zero_congr (t : T) (pts pts' : Fin n → X.Map A)
+private theorem nodeAt_zero_congr (t : T) (pts pts' : Fin n → X.Map A)
     (hag : ∀ i : Fin n, (i : ℕ) < d → pts i = pts' i) :
     nodeAt I hdn t 0 pts = nodeAt I hdn t 0 pts' :=
   nodeAt_congr I hdn t 0 pts pts' fun b => hag _ (by simp)
@@ -87,7 +93,7 @@ theorem nodeAt_zero_congr (t : T) (pts pts' : Fin n → X.Map A)
 omit [Finite T] [Finite A] [Nonempty A] in
 /-- **Shifting the second node's rounds onto the first's reads the same
 node.** -/
-theorem nodeAt_shift (t : T) (pts : Fin n → X.Map A) :
+private theorem nodeAt_shift (t : T) (pts : Fin n → X.Map A) :
     nodeAt I hdn t 0 (fun i => pts (shiftIx d n hdn i)) = nodeAt I hdn t 1 pts := by
   refine congrArg (fun f => ((t, f) : I.Map (X.Map A))) (funext fun b => congrArg pts ?_)
   rw [shiftIx, dite_eq_left (show ((paramIx d n hdn 0 b : Fin n) : ℕ) < d by simp)]
@@ -96,7 +102,7 @@ theorem nodeAt_shift (t : T) (pts : Fin n → X.Map A) :
 omit [Finite T] [Finite A] [Nonempty A] in
 /-- **Every node of the graph sits in the second node's rounds** of some tuple
 agreeing with a given one outside them. -/
-theorem exists_pts_of_node (z : I.Map (X.Map A)) (pts : Fin n → X.Map A) :
+private theorem exists_pts_of_node (z : I.Map (X.Map A)) (pts : Fin n → X.Map A) :
     ∃ pts' : Fin n → X.Map A,
       (∀ i : Fin n, ¬(d ≤ (i : ℕ) ∧ (i : ℕ) < 2 * d) → pts' i = pts i) ∧
       nodeAt I hdn z.1 1 pts' = z := by
@@ -159,34 +165,34 @@ variable {hn : n = 2 * d + Dm} {D : Sub → T → T → ℕ} {hD : ∀ s tx ty, 
 variable {K : ∀ (_s : Sub) (_tx _ty : T),
   ((L.sum Language.order).sum (repMerged X.pointBlock n).lang).Sentence}
 
-theorem movesFrom_startPick (tx : T) :
+private theorem movesFrom_startPick (tx : T) :
     movesFrom hn D hD (.startPick tx) =
       [preEntry D hD .st tx tx, ⟨.main tx, keepAll n, []⟩] := rfl
 
-theorem movesFrom_main (tx : T) :
+private theorem movesFrom_main (tx : T) :
     movesFrom hn D hD (.main tx) = preEntry D hD .won tx tx ::
       (finEnum T).flatMap fun ty =>
         [⟨.exStep tx ty, keepOff n (isMid d n), midRounds d n⟩,
           ⟨.allCert tx ty, keepOff n (isMid d n), midRounds d n⟩] := rfl
 
-theorem movesFrom_exStep (tx ty : T) :
+private theorem movesFrom_exStep (tx ty : T) :
     movesFrom hn D hD (.exStep tx ty) =
       [preEntry D hD .notuniv tx tx, preEntry D hD .mv tx ty,
         ⟨.main ty, keepShift d n hdn, []⟩] := rfl
 
-theorem movesFrom_allCert (tx ty : T) :
+private theorem movesFrom_allCert (tx ty : T) :
     movesFrom hn D hD (.allCert tx ty) =
       preEntry D hD .univ tx tx :: preEntry D hD .mv tx ty ::
         (finEnum T).map fun ty' =>
           ⟨.allStep tx ty', keepOff n (isMid d n), midRounds d n⟩ := rfl
 
-theorem movesFrom_allStep (tx ty : T) :
+private theorem movesFrom_allStep (tx ty : T) :
     movesFrom hn D hD (.allStep tx ty) =
       [preEntry D hD .notmv tx ty, ⟨.main ty, keepShift d n hdn, []⟩] := rfl
 
 omit [Finite A] [Nonempty A] in
 /-- A move that keeps every round lands on the same points. -/
-theorem moveTo_keepAll {q : Ph T Dm} {pts : Fin n → X.Map A}
+private theorem moveTo_keepAll {q : Ph T Dm} {pts : Fin n → X.Map A}
     {σs : Fin n → X.pointBlock.Assignment A}
     (hkeep : ∀ e ∈ keepAll n, pointAssign (pts e.1) = σs e.2) :
     stateAssign q σs = nodeState q pts :=
@@ -195,7 +201,7 @@ theorem moveTo_keepAll {q : Ph T Dm} {pts : Fin n → X.Map A}
 omit [Finite A] [Nonempty A] in
 /-- A shifting move carries the second node's points onto the first node's
 rounds. -/
-theorem moveTo_keepShift {q : Ph T Dm} {pts : Fin n → X.Map A}
+private theorem moveTo_keepShift {q : Ph T Dm} {pts : Fin n → X.Map A}
     {σs : Fin n → X.pointBlock.Assignment A}
     (hkeep : ∀ e ∈ keepShift d n hdn, pointAssign (pts e.1) = σs e.2) :
     stateAssign q σs = nodeState q fun i => pts (shiftIx d n hdn i) :=
@@ -206,7 +212,7 @@ theorem moveTo_keepShift {q : Ph T Dm} {pts : Fin n → X.Map A}
 omit [Finite A] [Nonempty A] in
 /-- A move that guesses the second node's rounds lands on points agreeing
 outside them. -/
-theorem moveTo_keepMid {q : Ph T Dm} {pts : Fin n → X.Map A}
+private theorem moveTo_keepMid {q : Ph T Dm} {pts : Fin n → X.Map A}
     {σs : Fin n → X.pointBlock.Assignment A}
     (hkeep : ∀ e ∈ keepOff n (isMid d n), pointAssign (pts e.1) = σs e.2)
     (hguard : ∀ i ∈ midRounds d n, IsPointAssign (X := X) (σs i)) :
@@ -228,7 +234,7 @@ theorem moveTo_keepMid {q : Ph T Dm} {pts : Fin n → X.Map A}
 
 omit [Finite A] [Nonempty A] in
 /-- Making a move that keeps every round. -/
-theorem move_keepAll (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn D hD p)
+private theorem move_keepAll (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn D hD p)
     (hk : m.keep = keepAll n) (hg : m.guard = []) (pts : Fin n → X.Map A) :
     (graphGame X hn D hD K).Move (nodeState p pts) (nodeState m.tgt pts) :=
   (graphGame_move _ _ _ _).mpr ⟨m, hm, rfl,
@@ -238,7 +244,7 @@ theorem move_keepAll (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn 
 
 omit [Finite A] [Nonempty A] in
 /-- Making a shifting move. -/
-theorem move_keepShift (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn D hD p)
+private theorem move_keepShift (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn D hD p)
     (hk : m.keep = keepShift d n hdn) (hg : m.guard = []) (pts : Fin n → X.Map A) :
     (graphGame X hn D hD K).Move (nodeState p pts)
       (nodeState m.tgt fun i => pts (shiftIx d n hdn i)) :=
@@ -250,7 +256,7 @@ theorem move_keepShift (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom h
 
 omit [Finite A] [Nonempty A] in
 /-- Making a move that guesses the second node's rounds. -/
-theorem move_keepMid (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn D hD p)
+private theorem move_keepMid (p : Ph T Dm) (m : MoveTo T Dm n) (hm : m ∈ movesFrom hn D hD p)
     (hk : m.keep = keepOff n (isMid d n)) (hg : m.guard = midRounds d n)
     (pts pts' : Fin n → X.Map A)
     (hag : ∀ i : Fin n, ¬(d ≤ (i : ℕ) ∧ (i : ℕ) < 2 * d) → pts' i = pts i) :
@@ -269,7 +275,7 @@ variable (hK : ∀ s tx ty, KernelSpec I hdn (n - D s tx ty) (D s tx ty) s tx ty
 
 include hK in
 /-- **Entering a prefix wins exactly when its question holds.** -/
-theorem wins_preEntry (s : Sub) (tx ty : T) (pts : Fin n → X.Map A) :
+private theorem wins_preEntry (s : Sub) (tx ty : T) (pts : Fin n → X.Map A) :
     ((graphGame X hn D hD K).Wins (nodeState (preEntry (n := n) D hD s tx ty).tgt pts) ↔
       SubHolds I hdn s tx ty pts) := by
   have hle : D s tx ty ≤ Dm := hD s tx ty

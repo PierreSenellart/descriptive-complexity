@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawOuter
 import DescriptiveComplexity.Problems.Wide.DrawBuild
+import all DescriptiveComplexity.Problems.Wide.DrawReset
 
 /-!
 # The clocked program's outer layer
@@ -360,7 +361,7 @@ noncomputable def nexRule (β : SweepSpec A Q dt.SlotIx B) (γ : GuessSpec A Q d
 
 /-- **The owner of each phase**: the site whose copy of a phase it is; the
 evaluation's phases are owned through the parameter. -/
-def nexOwner (ownE : PE → SE) : NexPh B PE → NexSite SE
+private def nexOwner (ownE : PE → SE) : NexPh B PE → NexSite SE
   | .start => .start
   | .approachP => .approach
   | .buildP _ => .build
@@ -379,7 +380,7 @@ variable {bot : B} {ownE : PE → SE}
 /-- **Every rule fires from a phase its site owns**, given that the evaluation's
 do. This is the `howner` field of the program's
 `DescriptiveComplexity.Draw.Assembly`. -/
-theorem nexOwner_nexRule
+private theorem nexOwner_nexRule
     (hownE : ∀ (e : SE) (ρ : ShE e), nexOwner ownE (ruleE e ρ).srcPh = NexSite.eval e) :
     ∀ (i : NexSite SE) (ρ : NexSh SE B G ShE i),
       nexOwner ownE (dt.nexRule one β γ ruleE evalEntry bot i ρ).srcPh = i := by
@@ -409,7 +410,7 @@ told from their exits by the stop test, the walks home by their kits, and the
 accepting site has no rules at all; the guessing site is left out because its
 shapes are the certificate's values, all firing under one guard, which is the
 program's only nondeterminism. -/
-theorem nexSep
+private theorem nexSep
     (hsepE : ∀ (e : SE) (ρ ρ' : ShE e) (f : Q → A) (g : dt.SlotIx → A),
       (ruleE e ρ).guard f g → (ruleE e ρ').guard f g →
       (ruleE e ρ).srcPh = (ruleE e ρ').srcPh → ρ = ρ') :
@@ -556,34 +557,34 @@ include hrules
 
 /-- **The opening step**: mark the home cell – the working marker and the
 bottom mark alike – and set off for the file's base. -/
-theorem hasRight_start (f : Q → A) (g : dt.SlotIx → A) :
+private theorem hasRight_start (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasRight NexPh.start f g NexPh.approachP f
       (Function.update (Function.update g Slot.wk PR.one) Slot.bot PR.one) := by
   refine ⟨rEmb .start (), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     rw [hrules .start ()] <;> first | rfl | trivial
 
 /-- **A step of the approach walk**: move on, writing nothing. -/
-theorem hasRight_approach (f : Q → A) (g : dt.SlotIx → A) :
+private theorem hasRight_approach (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasRight NexPh.approachP f g NexPh.approachP f g := by
   refine ⟨rEmb .approach (Sum.inl ()), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     rw [hrules .approach (Sum.inl ())] <;> first | rfl | trivial
 
 /-- **The approach's exit**: stop walking and start laying the file here. -/
-theorem hasRight_approachExit (f : Q → A) (g : dt.SlotIx → A) :
+private theorem hasRight_approachExit (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasRight NexPh.approachP f g (NexPh.buildP bot) f g := by
   refine ⟨rEmb .approach (Sum.inr ()), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     rw [hrules .approach (Sum.inr ())] <;> first | rfl | trivial
 
 /-- **The file-laying sweep's step**: write the cell, advance the pointer, move
 on. -/
-theorem hasRight_build (b : B) (f : Q → A) (g : dt.SlotIx → A) (hg : ¬β.Roll b f) :
+private theorem hasRight_build (b : B) (f : Q → A) (g : dt.SlotIx → A) (hg : ¬β.Roll b f) :
     PR.HasRight (NexPh.buildP b) f g (NexPh.buildP b) (β.st b f g) (β.wr b f g) := by
   refine ⟨rEmb .build (Sum.inl b), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     rw [hrules .build (Sum.inl b)] <;> first | exact hg | rfl | trivial
 
 /-- **The file-laying sweep's roll-over**: the last tuple of a block is written
 and the pointer opens the next one. -/
-theorem hasRight_buildRoll (b : B) (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_buildRoll (b : B) (f : Q → A) (g : dt.SlotIx → A)
     (hroll : β.Roll b f) (hg : ¬β.Done b f) :
     PR.HasRight (NexPh.buildP b) f g (NexPh.buildP (β.nx b))
       (β.stRoll b f g) (β.wr b f g) := by
@@ -593,7 +594,7 @@ theorem hasRight_buildRoll (b : B) (f : Q → A) (g : dt.SlotIx → A)
 
 /-- **The file-laying sweep's exit**: the pointer is past the file's top, so turn
 round. -/
-theorem hasRight_buildLast (b : B) (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_buildLast (b : B) (f : Q → A) (g : dt.SlotIx → A)
     (hroll : β.Roll b f) (hg : β.Done b f) :
     PR.HasRight (NexPh.buildP b) f g NexPh.buildDoneP (β.stRoll b f g)
       (β.wr b f g) := by
@@ -603,7 +604,7 @@ theorem hasRight_buildLast (b : B) (f : Q → A) (g : dt.SlotIx → A)
 
 /-- **The file-laying sweep's turn-around**: one cell past the last register,
 the file laid, the machine turns back. -/
-theorem hasLeft_buildExit (f : Q → A) (g : dt.SlotIx → A) :
+private theorem hasLeft_buildExit (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasLeft NexPh.buildDoneP f g NexPh.homeBuildP f g := by
   refine ⟨rEmb .build (Sum.inr (Sum.inr (Sum.inr ()))), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     rw [hrules .build (Sum.inr (Sum.inr (Sum.inr ())))] <;>
@@ -611,7 +612,7 @@ theorem hasLeft_buildExit (f : Q → A) (g : dt.SlotIx → A) :
 
 /-- **The exit of the walk home after the file**: at the marker, start
 guessing. -/
-theorem hasRight_homeBuildExit (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_homeBuildExit (f : Q → A) (g : dt.SlotIx → A)
     (hg : dt.exitG PR.one g) :
     PR.HasRight NexPh.homeBuildP f g (NexPh.guessP bot) (β.st0 f g) g := by
   refine ⟨rEmb .homeBuild (Sum.inr ()), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
@@ -619,7 +620,7 @@ theorem hasRight_homeBuildExit (f : Q → A) (g : dt.SlotIx → A)
 
 /-- **The guessing sweep's step, at one value**: every value fires under the same
 guard, which is the program's whole nondeterminism. -/
-theorem hasRight_guess (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_guess (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
     (hg : ¬γ.Roll b f) :
     PR.HasRight (NexPh.guessP b) f g (NexPh.guessP b) (γ.st b x f g)
       (γ.wr b x f g) := by
@@ -627,7 +628,7 @@ theorem hasRight_guess (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
     rw [hrules .guess (Sum.inl ⟨b, x⟩)] <;> first | exact hg | rfl | trivial
 
 /-- **The guessing sweep's roll-over, at one value.** -/
-theorem hasRight_guessRoll (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_guessRoll (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
     (hroll : γ.Roll b f) (hg : ¬γ.Done b f) :
     PR.HasRight (NexPh.guessP b) f g (NexPh.guessP (γ.nx b)) (γ.stRoll b x f g)
       (γ.wr b x f g) := by
@@ -636,7 +637,7 @@ theorem hasRight_guessRoll (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
       first | exact ⟨hroll, hg⟩ | rfl | trivial
 
 /-- **The guessing sweep's exit.** -/
-theorem hasRight_guessLast (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_guessLast (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
     (hroll : γ.Roll b f) (hg : γ.Done b f) :
     PR.HasRight (NexPh.guessP b) f g NexPh.guessDoneP (γ.stRoll b x f g)
       (γ.wr b x f g) := by
@@ -645,7 +646,7 @@ theorem hasRight_guessLast (b : B) (x : G) (f : Q → A) (g : dt.SlotIx → A)
       first | exact ⟨hroll, hg⟩ | rfl | trivial
 
 /-- **The guessing sweep's turn-around.** -/
-theorem hasLeft_guessExit (f : Q → A) (g : dt.SlotIx → A) :
+private theorem hasLeft_guessExit (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasLeft NexPh.guessDoneP f g NexPh.homeGuessP f g := by
   refine ⟨rEmb .guess (Sum.inr (Sum.inr (Sum.inr (Sum.inl ())))), ?_, ?_, ?_, ?_,
     ?_, ?_⟩ <;>
@@ -655,7 +656,7 @@ theorem hasLeft_guessExit (f : Q → A) (g : dt.SlotIx → A) :
 /-- **The guessing sweep stops here**: the rule that ends a region-wide guess,
 available at every address, so where the walk stops is one more nondeterministic
 choice and nothing has to recognize the region's end. -/
-theorem hasLeft_guessStop (b : B) (f : Q → A) (g : dt.SlotIx → A) :
+private theorem hasLeft_guessStop (b : B) (f : Q → A) (g : dt.SlotIx → A) :
     PR.HasLeft (NexPh.guessP b) f g NexPh.homeGuessP f g := by
   refine ⟨rEmb .guess (Sum.inr (Sum.inr (Sum.inr (Sum.inr b)))), ?_, ?_, ?_, ?_,
     ?_, ?_⟩ <;>
@@ -664,7 +665,7 @@ theorem hasLeft_guessStop (b : B) (f : Q → A) (g : dt.SlotIx → A) :
 
 /-- **The exit of the walk home after the guess**: at the marker, enter the
 evaluation. -/
-theorem hasRight_homeGuessExit (f : Q → A) (g : dt.SlotIx → A)
+private theorem hasRight_homeGuessExit (f : Q → A) (g : dt.SlotIx → A)
     (hg : dt.exitG PR.one g) :
     PR.HasRight NexPh.homeGuessP f g (NexPh.evalP evalEntry) f g := by
   refine ⟨rEmb .homeGuess (Sum.inr ()), ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>

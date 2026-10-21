@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.SubgraphIso
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.IsoGadget
+import all DescriptiveComplexity.IsoGadget
 
 /-!
 # Digraph Isomorphism, and the degree it defines
@@ -104,33 +105,33 @@ def DigraphIso : DecisionProblem Language.twoGraphs where
 section SigmaOne
 
 /-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
-noncomputable def giTotalClause : subgraphSOLang.Sentence :=
+private noncomputable def giTotalClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀, sgPatVSym(x₀) → ∃ y, sgMapSym(x₀, y) ∧ sgHostVSym(y)
 
 /-- Kernel clause: the guessed map is a function on the pattern. -/
-noncomputable def giFuncClause : subgraphSOLang.Sentence :=
+private noncomputable def giFuncClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂,
     (sgPatVSym(x₀) ∧ sgMapSym(x₀, x₁)) ∧ sgMapSym(x₀, x₂) → x₁ ≐ x₂
 
 /-- Kernel clause: the guessed map is injective on the pattern. -/
-noncomputable def giInjClause : subgraphSOLang.Sentence :=
+private noncomputable def giInjClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂,
     ((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₂) → x₀ ≐ x₁
 
 /-- Kernel clause: every host vertex is hit – what makes the map onto, and the
 one clause Subgraph Isomorphism does not have. -/
-noncomputable def giSurjClause : subgraphSOLang.Sentence :=
+private noncomputable def giSurjClause : subgraphSOLang.Sentence :=
   fo% ∀ y₀, sgHostVSym(y₀) → ∃ x, sgPatVSym(x) ∧ sgMapSym(x, y₀)
 
 /-- Kernel clause: the guessed map carries pattern edges to host edges. -/
-noncomputable def giEdgeClause : subgraphSOLang.Sentence :=
+private noncomputable def giEdgeClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂ x₃,
     (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgPatESym(x₀, x₁)) ∧
       sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₃) → sgHostESym(x₂, x₃)
 
 /-- Kernel clause: the guessed map reflects host edges to pattern edges – the
 other clause distinguishing isomorphism from an injective homomorphism. -/
-noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
+private noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂ x₃,
     (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧
       sgMapSym(x₁, x₃)) ∧ sgHostESym(x₂, x₃) → sgPatESym(x₀, x₁)
@@ -138,7 +139,7 @@ noncomputable def giEdgeBackClause : subgraphSOLang.Sentence :=
 /-- The first-order kernel of the `Σ₁` definition of Digraph Isomorphism: the
 guessed relation is a bijection of the pattern vertices onto the host vertices,
 preserving and reflecting adjacency. -/
-noncomputable def digraphIsoKernel : subgraphSOLang.Sentence :=
+private noncomputable def digraphIsoKernel : subgraphSOLang.Sentence :=
   giTotalClause ⊓ (giFuncClause ⊓ (giInjClause ⊓
     (giSurjClause ⊓ (giEdgeClause ⊓ giEdgeBackClause))))
 
@@ -191,7 +192,7 @@ private theorem realize_digraphIsoKernel {A : Type} [Language.twoGraphs.Structur
 check first-order that it is a bijection of the pattern vertices onto the host
 vertices preserving adjacency in both directions. One binary relation variable,
 no order, no counting, no threshold. -/
-theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
+private theorem digraphIso_sigmaSODefinable : SigmaSODefinable 1 DigraphIso := by
   refine ⟨[isoGuessBlock], rfl, digraphIsoKernel, ?_⟩
   intro A _ _ _
   constructor

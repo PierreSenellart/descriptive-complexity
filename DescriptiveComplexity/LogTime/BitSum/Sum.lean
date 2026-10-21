@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitSum.Table
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitSum.Counter
+import all DescriptiveComplexity.LogTime.BitSum.Ones
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The running sum: counting a long word by counting its chunks
@@ -55,7 +61,7 @@ open Finset
 /-! ### Splitting a count -/
 
 /-- One more position, one more one to count if it is set. -/
-theorem onesBelow_succ (x w : ℕ) :
+private theorem onesBelow_succ (x w : ℕ) :
     onesBelow x (w + 1) = onesBelow x w + (if x.testBit w = true then 1 else 0) := by
   classical
   rw [onesBelow, onesBelow, Finset.range_add_one, filter_insert]
@@ -64,7 +70,7 @@ theorem onesBelow_succ (x w : ℕ) :
   · rw [ite_eq_right h, ite_eq_right h, Nat.add_zero]
 
 /-- The count only looks at the bits it counts. -/
-theorem onesBelow_congr {x y w : ℕ} (h : ∀ i, i < w → x.testBit i = y.testBit i) :
+private theorem onesBelow_congr {x y w : ℕ} (h : ∀ i, i < w → x.testBit i = y.testBit i) :
     onesBelow x w = onesBelow y w := by
   rw [onesBelow, onesBelow]
   congr 1
@@ -163,7 +169,7 @@ theorem sum_eq {c B x S : A} {Cnt : A → A → Prop} (hc : 0 < orank c) (hB : I
 
 /-- **A rank has no more ones than the universe has positions** – so a running
 sum always fits in a field wide enough to hold `posCount`. -/
-theorem onesBelow_orank_le (x : A) (k : ℕ) : onesBelow (orank x) k ≤ posCount A := by
+private theorem onesBelow_orank_le (x : A) (k : ℕ) : onesBelow (orank x) k ≤ posCount A := by
   rcases Nat.le_total k (posCount A) with h | h
   · exact le_trans (onesBelow_le _ _) h
   · have hcut : onesBelow (orank x) k = onesBelow (orank x) (posCount A) := by
@@ -183,7 +189,7 @@ fields those boundaries delimit. The one capacity condition is that a field hold
 a count of ones *of the word being counted* – weaker than the counter's, whose
 values run to the number of chunks – and the layout is
 `DescriptiveComplexity.BitSum.packVal`. -/
-theorem exists_sumOk [Nonempty A] {c B x : A} {Cnt : A → A → Prop} (hc : 0 < orank c)
+private theorem exists_sumOk [Nonempty A] {c B x : A} {Cnt : A → A → Prop} (hc : 0 < orank c)
     (hB : IsBlockSet c B)
     (hsound : ∀ w n : A, orank w < 2 ^ orank c → Cnt w n →
       orank n = onesBelow (orank w) (orank c))
@@ -261,7 +267,7 @@ variable {L : Language.{0, 0}} {α : Type}
 below is: the parameter `Cnt` is a family of relations with one distinguished
 variable – the size the level below works at – which is what both instantiations
 need. -/
-theorem bitDef_sumOk
+private theorem bitDef_sumOk
     {Cnt : ∀ (A : Type) [LinearOrder A] [Finite A], A → A → A → Prop}
     (hCnt : ∀ {β : Type} (p w n : β), BitDef (L := L) (α := β)
       fun A _ _ _ _ v => Cnt A (v p) (v w) (v n))

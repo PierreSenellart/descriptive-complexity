@@ -11,6 +11,7 @@ public import DescriptiveComplexity.Problems.Wide.DrawSeekKit
 public import DescriptiveComplexity.Problems.Wide.DrawAdvKit
 public import DescriptiveComplexity.Problems.Wide.DrawSweepKit
 public import DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # Every leaf kit's rules are definable

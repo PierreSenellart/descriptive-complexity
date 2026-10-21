@@ -10,6 +10,14 @@ public import DescriptiveComplexity.Problems.CliqueFamily.Stretch
 import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Vocabulary
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Post
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingAll
+import all DescriptiveComplexity.Problems.CliqueFamily.Pendant
+import all DescriptiveComplexity.Problems.CliqueFamily.Stretch
+import all DescriptiveComplexity.Problems.Sat.Counting
 
 /-!
 # #BIS and #PP2DNF: counting the independent sets of a bipartite graph
@@ -113,7 +121,7 @@ abbrev kbSetSym : bisSOLang.Relations 1 := Sum.inr satNuSym
 noncomputable def bisKernel : bisSOLang.Sentence :=
   fo% ∀ x y, kbSetSym(x) → kbSetSym(y) → kbLeftSym(x) → ¬ kbLeftSym(y) → ¬ kbEdgeSym(x, y)
 
-theorem realize_bisKernel {A : Type} [Language.bipGraph.Structure A]
+private theorem realize_bisKernel {A : Type} [Language.bipGraph.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize bisSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) bisKernel) ↔
@@ -150,12 +158,12 @@ noncomputable def SharpBIS : CountingProblem Language.bipGraph where
     rw [card_bipIndep_eq_witnessCount A, card_bipIndep_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock bisKernel e
 
-theorem sharpBIS_apply (A : Type) [Language.bipGraph.Structure A] :
+private theorem sharpBIS_apply (A : Type) [Language.bipGraph.Structure A] :
     SharpBIS A = Nat.card {S : A → Prop // BipIndep A S} :=
   rfl
 
 /-- **#BIS is in `#P`.** -/
-theorem sharpBIS_mem_sharpP : SharpBIS ∈ SharpP :=
+private theorem sharpBIS_mem_sharpP : SharpBIS ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (card_bipIndep_eq_witnessCount A).symm)
     (sharpPDefinable_ofKernel satAssignBlock bisKernel)
 
@@ -192,13 +200,13 @@ section Stretch
 
 variable {A : Type} [Language.graph.Structure A] [LinearOrder A]
 
-theorem realize_stretchMidDom (w : Fin 3 → A) :
+private theorem realize_stretchMidDom (w : Fin 3 → A) :
     stretchMidDom.Realize w ↔ w 0 ≠ w 1 ∧ RelMap Language.adj ![w 0, w 1] := by
   simp [stretchMidDom, LHom.realize_onFormula, Formula.realize_rel₂]
 
 /-- The points of the stretched graph: a vertex, or a middle vertex of an
 edge. -/
-noncomputable def stretchEquiv : stretchInterp.MapRel A ≃
+private noncomputable def stretchEquiv : stretchInterp.MapRel A ≃
     A ⊕ EdgePair (fun a b : A => RelMap Language.adj ![a, b]) × (Bool × A) where
   toFun x :=
     match x with
@@ -225,7 +233,7 @@ noncomputable def stretchEquiv : stretchInterp.MapRel A ≃
   right_inv := by
     rintro (a | q) <;> rfl
 
-theorem stretch_left (x : stretchInterp.MapRel A) :
+private theorem stretch_left (x : stretchInterp.MapRel A) :
     BGLeft x ↔ (stretchEquiv x).isRight = true := by
   rw [BGLeft, RelFOInterpretation.relMap_mapRel]
   obtain ⟨⟨t, w⟩, hw⟩ := x
@@ -237,7 +245,7 @@ theorem stretch_left (x : stretchInterp.MapRel A) :
     change _ ↔ true = true
     simp [stretchInterp]
 
-theorem stretch_edge (x y : stretchInterp.MapRel A) :
+private theorem stretch_edge (x y : stretchInterp.MapRel A) :
     BGEdge x y ↔ stretchEdge (fun a b : A => RelMap Language.adj ![a, b])
       (stretchEquiv x) (stretchEquiv y) := by
   rw [BGEdge, RelFOInterpretation.relMap_mapRel]
@@ -258,7 +266,7 @@ theorem stretch_edge (x y : stretchInterp.MapRel A) :
 
 /-- The independent sets of the interpreted bipartite graph are those of the
 stretched graph. -/
-theorem sharpBIS_stretch :
+private theorem sharpBIS_stretch :
     SharpBIS (stretchInterp.MapRel A) =
       Nat.card {T : A ⊕ EdgePair (fun a b : A => RelMap Language.adj ![a, b]) × (Bool × A) →
         Prop // StretchIndep (fun a b : A => RelMap Language.adj ![a, b]) T} :=
@@ -272,7 +280,7 @@ end Stretch
 /-- **Counting the independent sets of a graph reduces to #BIS with one
 call**: the number of independent sets of the stretched graph, modulo
 `2 ^ (2n)`, is the number of independent sets of the graph. -/
-noncomputable def sharpAllIndependentSets_oneCall_sharpBIS :
+private noncomputable def sharpAllIndependentSets_oneCall_sharpBIS :
     SharpAllIndependentSets ≤ᶜ[≤] SharpBIS where
   Tag := Option Bool
   dim := 3
@@ -314,7 +322,7 @@ def Pp2dnfModel (A : Type) [Language.bipGraph.Structure A] (S : A → Prop) : Pr
 
 /-- The models of the formula are the sets of vertices that are not
 independent. -/
-theorem pp2dnfModel_iff_not_bipIndep (A : Type) [Language.bipGraph.Structure A]
+private theorem pp2dnfModel_iff_not_bipIndep (A : Type) [Language.bipGraph.Structure A]
     (S : A → Prop) : Pp2dnfModel A S ↔ ¬BipIndep A S := by
   constructor
   · rintro ⟨x, y, hx, hy, hl, hr, he⟩ h
@@ -341,12 +349,12 @@ noncomputable def SharpPP2DNF : CountingProblem Language.bipGraph where
     rw [card_pp2dnfModel_eq_witnessCount A, card_pp2dnfModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock (∼bisKernel) e
 
-theorem sharpPP2DNF_apply (A : Type) [Language.bipGraph.Structure A] :
+private theorem sharpPP2DNF_apply (A : Type) [Language.bipGraph.Structure A] :
     SharpPP2DNF A = Nat.card {S : A → Prop // Pp2dnfModel A S} :=
   rfl
 
 /-- **#PP2DNF is in `#P`.** -/
-theorem sharpPP2DNF_mem_sharpP : SharpPP2DNF ∈ SharpP :=
+private theorem sharpPP2DNF_mem_sharpP : SharpPP2DNF ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (card_pp2dnfModel_eq_witnessCount A).symm)
     (sharpPDefinable_ofKernel satAssignBlock (∼bisKernel))
 
@@ -364,7 +372,7 @@ theorem sharpBIS_add_sharpPP2DNF (A : Type) [Language.bipGraph.Structure A] [Fin
 
 /-- **#BIS reduces to #PP2DNF with one call**, on the same instance:
 `#BIS = 2 ^ n - #PP2DNF`. -/
-noncomputable def sharpBIS_oneCall_sharpPP2DNF : SharpBIS ≤ᶜ[≤] SharpPP2DNF :=
+private noncomputable def sharpBIS_oneCall_sharpPP2DNF : SharpBIS ≤ᶜ[≤] SharpPP2DNF :=
   (ParsimoniousReduction.refl SharpPP2DNF).toOneCall.ofPost (.sub (.pow2 .univ) .oracle)
     fun A _ _ _ _ => by
       change SharpBIS A =

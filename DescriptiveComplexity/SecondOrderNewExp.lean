@@ -9,6 +9,7 @@ public import DescriptiveComplexity.SecondOrderNewBdd
 public import DescriptiveComplexity.Exponential.Free
 public import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Relativize
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # The expansion a bounded invention lives in
@@ -139,13 +140,13 @@ def eltOf : A → Prop := fun x => ρ none fun _ => x
 /-- The `d`-ary variables, read off the assignment. -/
 def valOf : Fin c → (Fin d → A) → Prop := fun i w => ρ (some i) w
 
-theorem realize_eltAtom {α : Type} (x : α) (v : α → A) :
+private theorem realize_eltAtom {α : Type} (x : α) (v : α → A) :
     letI := (powBlock c d).structure₁ (L := L) ρ
     (eltAtom L c d x).Realize v ↔ eltOf ρ (v x) := by
   let := (powBlock c d).structure₁ (L := L) ρ
   exact Iff.rfl
 
-theorem realize_valAtom (i : Fin c) {α : Type} (w : Fin d → α) (v : α → A) :
+private theorem realize_valAtom (i : Fin c) {α : Type} (w : Fin d → α) (v : α → A) :
     letI := (powBlock c d).structure₁ (L := L) ρ
     (valAtom L c d i w).Realize v ↔ valOf ρ i (fun j => v (w j)) := by
   let := (powBlock c d).structure₁ (L := L) ρ
@@ -163,7 +164,7 @@ theorem realize_eltEmpty :
   · intro h i hc
     exact h (i 0) ((realize_eltAtom ρ (Sum.inr 0) _).mp hc)
 
-theorem realize_valEmpty :
+private theorem realize_valEmpty :
     letI := (powBlock c d).structure₁ (L := L) ρ
     A ⊨ (valEmpty L c d) ↔
       ∀ (i : Fin c) (w : Fin d → A), ¬valOf ρ i w := by
@@ -177,7 +178,7 @@ theorem realize_valEmpty :
   · intro h u hc
     exact h u ((realize_valAtom ρ i (fun j => Sum.inr j) _).mp hc)
 
-theorem realize_eltUnique :
+private theorem realize_eltUnique :
     letI := (powBlock c d).structure₁ (L := L) ρ
     A ⊨ (eltUnique L c d) ↔
       ∃! x : A, eltOf ρ x := by
@@ -230,14 +231,14 @@ variable {L : Language.{0, 0}} [L.IsRelational] {c d : ℕ} {A : Type} [L.Struct
 instance : Nonempty (Fin ((powBlock c d).arity none)) :=
   ⟨⟨0, Nat.zero_lt_one⟩⟩
 
-theorem domHolds_false (ρ : (powBlock c d).Assignment A) :
+private theorem domHolds_false (ρ : (powBlock c d).Assignment A) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, ρ) ↔
       (∃! x : A, eltOf ρ x) ∧ ∀ (i : Fin c) (w : Fin d → A), ¬valOf ρ i w := by
   refine Iff.trans ?_ (and_congr (realize_eltUnique (L := L) ρ) (realize_valEmpty (L := L) ρ))
   let := (powBlock c d).structure₁ (L := L) ρ
   exact Sentence.realize_inf A
 
-theorem domHolds_true (ρ : (powBlock c d).Assignment A) :
+private theorem domHolds_true (ρ : (powBlock c d).Assignment A) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (true, ρ) ↔ ∀ x : A, ¬eltOf ρ x :=
   realize_eltEmpty (L := L) ρ
 
@@ -272,12 +273,12 @@ theorem valOf_valAssign (S : Fin c → (Fin d → A) → Prop) (i : Fin c) (w : 
     valOf (valAssign S) i w ↔ S i w :=
   Iff.rfl
 
-theorem domHolds_eltAssign (x : A) :
+private theorem domHolds_eltAssign (x : A) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, eltAssign x) :=
   (domHolds_false _).mpr ⟨⟨x, (eltOf_eltAssign x x).mpr rfl,
     fun y hy => (eltOf_eltAssign x y).mp hy⟩, fun i w => valOf_eltAssign x i w⟩
 
-theorem domHolds_valAssign (S : Fin c → (Fin d → A) → Prop) :
+private theorem domHolds_valAssign (S : Fin c → (Fin d → A) → Prop) :
     ExpExpansionFree.DomHolds (X := powExpFree L c d) (true, valAssign S) :=
   (domHolds_true _).mpr fun y => eltOf_valAssign S y
 
@@ -294,7 +295,7 @@ instance : Subsingleton (Fin ((powBlock c d).arity none)) :=
 
 /-- A unary variable is determined by what it holds of: its argument tuples are
 constant. -/
-theorem assign_false_ext {ρ σ : (powBlock c d).Assignment A}
+private theorem assign_false_ext {ρ σ : (powBlock c d).Assignment A}
     (h : ∀ x : A, eltOf ρ x ↔ eltOf σ x) : ρ none = σ none := by
   funext u
   have hu : u = fun _ => u (Classical.arbitrary _) :=
@@ -303,22 +304,22 @@ theorem assign_false_ext {ρ σ : (powBlock c d).Assignment A}
   exact propext (h _)
 
 /-- The element an original point names. -/
-noncomputable def pointElt {ρ : (powBlock c d).Assignment A}
+private noncomputable def pointElt {ρ : (powBlock c d).Assignment A}
     (h : ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, ρ)) : A :=
   (((domHolds_false (L := L) ρ).mp h).1).choose
 
-theorem eltOf_pointElt {ρ : (powBlock c d).Assignment A}
+private theorem eltOf_pointElt {ρ : (powBlock c d).Assignment A}
     (h : ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, ρ)) :
     eltOf ρ (pointElt h) :=
   (((domHolds_false (L := L) ρ).mp h).1).choose_spec.1
 
-theorem eq_pointElt {ρ : (powBlock c d).Assignment A}
+private theorem eq_pointElt {ρ : (powBlock c d).Assignment A}
     (h : ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, ρ)) {y : A}
     (hy : eltOf ρ y) : y = pointElt h :=
   (((domHolds_false (L := L) ρ).mp h).1).choose_spec.2 y hy
 
 /-- An original point *is* the assignment naming its element. -/
-theorem assign_eq_eltAssign {ρ : (powBlock c d).Assignment A}
+private theorem assign_eq_eltAssign {ρ : (powBlock c d).Assignment A}
     (h : ExpExpansionFree.DomHolds (X := powExpFree L c d) (false, ρ)) :
     ρ = eltAssign (pointElt h) := by
   funext b
@@ -333,7 +334,7 @@ theorem assign_eq_eltAssign {ρ : (powBlock c d).Assignment A}
     exact propext (iff_of_false (((domHolds_false (L := L) ρ).mp h).2 i w) id)
 
 /-- A new point *is* the assignment naming its value. -/
-theorem assign_eq_valAssign {ρ : (powBlock c d).Assignment A}
+private theorem assign_eq_valAssign {ρ : (powBlock c d).Assignment A}
     (h : ExpExpansionFree.DomHolds (X := powExpFree L c d) (true, ρ)) :
     ρ = valAssign (valOf ρ) := by
   funext b
@@ -345,11 +346,11 @@ theorem assign_eq_valAssign {ρ : (powBlock c d).Assignment A}
 
 /-- The point of the expansion carried by an element or by a tuple of `d`-ary
 relations. -/
-def powPoint : A ⊕ (Fin c → (Fin d → A) → Prop) → (powExpFree L c d).Map A
+private def powPoint : A ⊕ (Fin c → (Fin d → A) → Prop) → (powExpFree L c d).Map A
   | Sum.inl x => ⟨(false, eltAssign x), domHolds_eltAssign x⟩
   | Sum.inr S => ⟨(true, valAssign S), domHolds_valAssign S⟩
 
-theorem powPoint_injective :
+private theorem powPoint_injective :
     Function.Injective (powPoint (L := L) (c := c) (d := d) (A := A)) := by
   rintro (x | S) (y | T) h
   · refine congrArg Sum.inl ?_
@@ -363,7 +364,7 @@ theorem powPoint_injective :
   · refine congrArg Sum.inr (funext fun i => ?_)
     exact (congrArg (fun p => p.1.2 (some i)) h : S i = T i)
 
-theorem powPoint_surjective :
+private theorem powPoint_surjective :
     Function.Surjective (powPoint (L := L) (c := c) (d := d) (A := A)) := by
   rintro ⟨⟨t, ρ⟩, h⟩
   cases t with
@@ -377,7 +378,7 @@ theorem powPoint_surjective :
 /-- **The points of the expansion are the instance's elements and its `d`-ary
 relations**, so there are `n + 2 ^ nᵈ` of them: enough to hold any extension the
 bound of `DescriptiveComplexity.SigmaSONewExpDefinable` allows. -/
-noncomputable def powPointEquiv :
+private noncomputable def powPointEquiv :
     A ⊕ (Fin c → (Fin d → A) → Prop) ≃ (powExpFree L c d).Map A :=
   Equiv.ofBijective _ ⟨powPoint_injective, powPoint_surjective⟩
 
@@ -402,7 +403,7 @@ omit [L.IsRelational] in
 open Classical in
 /-- **A relation of the instance, at original points**: it holds exactly when it
 holds of the elements they name. -/
-theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
+private theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
     (hτ : ∀ i, τ i = false) :
     letI := ((powBlock c d).replicate n).structure₁ (L := L)
       ((powBlock c d).replicateAssign ρs)
@@ -418,14 +419,14 @@ theorem realize_powRelSentence_base (R : L.Relations n) (τ : Fin n → Bool)
 omit [L.IsRelational] in
 open Classical in
 /-- **A relation of the instance never holds of an invented point.** -/
-theorem powRelSentence_base_eq_bot (R : L.Relations n) (τ : Fin n → Bool)
+private theorem powRelSentence_base_eq_bot (R : L.Relations n) (τ : Fin n → Bool)
     (hτ : ¬∀ i, τ i = false) : powRelSentence L c d (Sum.inl R) τ = ⊥ := by
   rw [powRelSentence, ite_eq_right hτ]
 
 omit [L.IsRelational] in
 open Classical in
 /-- **The marker `old` holds exactly of the original points.** -/
-theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
+private theorem realize_powRelSentence_old (σs : Fin 1 → (powBlock c d).Assignment A)
     (τ : Fin 1 → Bool) :
     letI := ((powBlock c d).replicate 1).structure₁ (L := L)
       ((powBlock c d).replicateAssign σs)
@@ -455,13 +456,13 @@ def extOn (L : Language.{0, 0}) [L.IsRelational] (A N : Type) [L.Structure A] :
       RelMap := fun {_k} r x => ∃ y, (∀ i, x i = Sum.inl (y i)) ∧ RelMap r y }
     { RelMap := fun | .old => fun x => IsOld (x 0) }
 
-theorem relMap_extOn_base {N : Type} {k : ℕ} (R : L.Relations k) (x : Fin k → A ⊕ N) :
+private theorem relMap_extOn_base {N : Type} {k : ℕ} (R : L.Relations k) (x : Fin k → A ⊕ N) :
     letI := extOn L A N
     RelMap (L := newLang L) (Sum.inl R) x ↔
       ∃ y, (∀ i, x i = Sum.inl (y i)) ∧ RelMap R y :=
   Iff.rfl
 
-theorem relMap_extOn_old {N : Type} (x : Fin 1 → A ⊕ N) :
+private theorem relMap_extOn_old {N : Type} (x : Fin 1 → A ⊕ N) :
     letI := extOn L A N
     RelMap (L := newLang L) (Sum.inr Language.oldSym) x ↔ IsOld (x 0) :=
   Iff.rfl
@@ -469,7 +470,7 @@ theorem relMap_extOn_old {N : Type} (x : Fin 1 → A ⊕ N) :
 /-- **The expanded structure is the extended one**: the map sending an element
 to its original point and a `d`-ary relation to its new point is an isomorphism
 over `DescriptiveComplexity.newLang`. -/
-noncomputable def powExtEquiv :
+private noncomputable def powExtEquiv :
     letI := extOn L A (Fin c → (Fin d → A) → Prop)
     letI := ExpExpansionFree.mapStructure (X := powExpFree L c d) A
     @Language.Equiv (newLang L) (A ⊕ (Fin c → (Fin d → A) → Prop))
@@ -536,7 +537,7 @@ variable {L : Language.{0, 0}} [L.IsRelational] {A N : Type} [L.Structure A]
 /-- **The original elements together with the marked invented values**: a
 substructure, there being nothing to be closed under in a relational
 vocabulary. -/
-def usedSub (U : N → Prop) :
+private def usedSub (U : N → Prop) :
     letI := extOn L A N
     (newLang L).Substructure (A ⊕ N) :=
   letI := extOn L A N
@@ -547,18 +548,18 @@ def usedSub (U : N → Prop) :
 def usedPoint (U : N → Prop) : A ⊕ {y : N // U y} → A ⊕ N :=
   Sum.map id Subtype.val
 
-theorem usedPoint_mem (U : N → Prop) (x : A ⊕ {y : N // U y}) :
+private theorem usedPoint_mem (U : N → Prop) (x : A ⊕ {y : N // U y}) :
     letI := extOn L A N
     usedPoint U x ∈ usedSub (L := L) (A := A) U := by
   cases x with
   | inl a => exact trivial
   | inr y => exact y.2
 
-theorem usedPoint_isOld (U : N → Prop) (x : A ⊕ {y : N // U y}) :
+private theorem usedPoint_isOld (U : N → Prop) (x : A ⊕ {y : N // U y}) :
     IsOld (usedPoint U x) ↔ IsOld x := by
   cases x <;> exact Iff.rfl
 
-theorem usedPoint_eq_inl (U : N → Prop) (x : A ⊕ {y : N // U y}) (a : A) :
+private theorem usedPoint_eq_inl (U : N → Prop) (x : A ⊕ {y : N // U y}) (a : A) :
     usedPoint U x = Sum.inl a ↔ x = Sum.inl a := by
   cases x with
   | inl b => exact ⟨fun h => congrArg Sum.inl (Sum.inl_injective h), fun h => congrArg _ h⟩
@@ -570,7 +571,7 @@ theorem usedPoint_eq_inl (U : N → Prop) (x : A ⊕ {y : N // U y}) (a : A) :
 /-- **The marked part is the extended universe over the marked values**: the
 invented values a sentence uses are the ones it marks, and what it says of them
 it says of the extension by those alone. -/
-def usedSubEquiv (U : N → Prop) :
+private def usedSubEquiv (U : N → Prop) :
     letI := extOn L A {y : N // U y}
     letI := extOn L A N
     @Language.Equiv (newLang L) (A ⊕ {y : N // U y}) (usedSub (L := L) (A := A) U) _
@@ -657,18 +658,18 @@ variable {L : Language.{0, 0}} [L.IsRelational] {A N : Type} [L.Structure A] {B 
 
 /-- The extended structure together with an assignment of the kernel's block. -/
 @[instance_reducible]
-def extOnB (ρ : B.Assignment (A ⊕ N)) : ((newLang L).sum B.lang).Structure (A ⊕ N) :=
+private def extOnB (ρ : B.Assignment (A ⊕ N)) : ((newLang L).sum B.lang).Structure (A ⊕ N) :=
   @sumStructure (newLang L) B.lang (A ⊕ N) (extOn L A N) (B.structure ρ)
 
 /-- The assignment of the kernel's block on the extension by the marked values,
 read off one on the whole extension. -/
-def usedRestrict (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
+private def usedRestrict (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
     B.Assignment (A ⊕ {y : N // U y}) :=
   fun i x => ρ i fun j => usedPoint U (x j)
 
 /-- The marked part, as a substructure over the vocabulary the kernel is written
 in. -/
-def usedSubB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
+private def usedSubB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
     letI := extOnB (L := L) ρ
     ((newLang L).sum B.lang).Substructure (A ⊕ N) :=
   letI := extOnB (L := L) ρ
@@ -679,7 +680,7 @@ def usedSubB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
 vocabulary the kernel is written in: the same identification as
 `DescriptiveComplexity.usedSubEquiv`, with the kernel's block riding along by
 restriction. -/
-def usedSubEquivB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
+private def usedSubEquivB (U : N → Prop) (ρ : B.Assignment (A ⊕ N)) :
     letI := extOnB (L := L) (usedRestrict U ρ)
     letI := extOnB (L := L) ρ
     @Language.Equiv ((newLang L).sum B.lang) (A ⊕ {y : N // U y})
@@ -718,7 +719,7 @@ section RealizeUsed
 
 variable {L : Language.{0, 0}} [L.IsRelational] {A N : Type} [L.Structure A] {B : SOBlock}
 
-theorem usedPoint_injective (U : N → Prop) :
+private theorem usedPoint_injective (U : N → Prop) :
     Function.Injective (usedPoint (A := A) U) :=
   Sum.map_injective.mpr ⟨Function.injective_id, Subtype.val_injective⟩
 
@@ -729,7 +730,7 @@ def usedExtend (U : N → Prop) (ρ : B.Assignment (A ⊕ {y : N // U y})) :
     B.Assignment (A ⊕ N) :=
   fun i x => ∃ z, (∀ j, usedPoint U (z j) = x j) ∧ ρ i z
 
-theorem usedRestrict_usedExtend (U : N → Prop) (ρ : B.Assignment (A ⊕ {y : N // U y})) :
+private theorem usedRestrict_usedExtend (U : N → Prop) (ρ : B.Assignment (A ⊕ {y : N // U y})) :
     usedRestrict U (usedExtend U ρ) = ρ := by
   funext i x
   refine propext ⟨fun h => ?_, fun h => ⟨x, fun _ => rfl, h⟩⟩
@@ -745,7 +746,7 @@ instance : Subsingleton (Fin ((usedBlock B).arity (Sum.inr ()))) :=
   ⟨fun i j => Subsingleton.elim (α := Fin 1) i j⟩
 
 /-- The marker, as the relativization's guard reads it. -/
-theorem markerOf_iff (ρ' : (usedBlock B).Assignment (A ⊕ N)) (z : A ⊕ N) :
+private theorem markerOf_iff (ρ' : (usedBlock B).Assignment (A ⊕ N)) (z : A ⊕ N) :
     letI := extOnB (L := L) ρ'
     RelMap (markerHostSym L B) ![z] ↔ markerOf ρ' z := by
   let := extOnB (L := L) ρ'
@@ -754,7 +755,7 @@ theorem markerOf_iff (ρ' : (usedBlock B).Assignment (A ⊕ N)) (z : A ⊕ N) :
   rfl
 
 /-- The atom `mark x`, realized. -/
-theorem realize_markerAtom (ρ' : (usedBlock B).Assignment (A ⊕ N)) {α : Type} (x : α)
+private theorem realize_markerAtom (ρ' : (usedBlock B).Assignment (A ⊕ N)) {α : Type} (x : α)
     (v : α → A ⊕ N) :
     letI := extOnB (L := L) ρ'
     ((Relations.formula (markerHostSym L B) fun _ => Term.var x).Realize v) ↔
@@ -762,7 +763,7 @@ theorem realize_markerAtom (ρ' : (usedBlock B).Assignment (A ⊕ N)) {α : Type
   Iff.rfl
 
 /-- The atom `old x`, realized. -/
-theorem realize_oldUsedAtom (ρ' : (usedBlock B).Assignment (A ⊕ N)) {α : Type} (x : α)
+private theorem realize_oldUsedAtom (ρ' : (usedBlock B).Assignment (A ⊕ N)) {α : Type} (x : α)
     (v : α → A ⊕ N) :
     letI := extOnB (L := L) ρ'
     ((Relations.formula (oldUsedSym L B) fun _ => Term.var x).Realize v) ↔
@@ -792,7 +793,7 @@ theorem blockOf_usedJoin (U : N → Prop) (ρ : B.Assignment (A ⊕ {y : N // U 
 /-- **The transported kernel says what the kernel says**: the merged block is
 the kernel's own variables together with the marker, and the kernel reads only
 the former. -/
-theorem realize_usedKernelHom {N' : Type} (σ : (usedBlock B).Assignment (A ⊕ N'))
+private theorem realize_usedKernelHom {N' : Type} (σ : (usedBlock B).Assignment (A ⊕ N'))
     (φ : ((newLang L).sum B.lang).Sentence) :
     letI := extOnB (L := L) σ
     ((A ⊕ N') ⊨ (usedKernelHom L B).onSentence φ) ↔
@@ -824,7 +825,7 @@ theorem realize_usedKernelHom {N' : Type} (σ : (usedBlock B).Assignment (A ⊕ 
   exact Iff.rfl
 
 /-- **The relativized kernel says what the kernel says on the marked part.** -/
-theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A ⊕ N))
+private theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A ⊕ N))
     (hU : ∀ x : A ⊕ N, Sum.elim (fun _ => True) U x ↔ markerOf ρ' x)
     (φ : ((newLang L).sum B.lang).Sentence) :
     letI := extOnB (L := L) ρ'
@@ -846,7 +847,7 @@ theorem realize_relativized (U : N → Prop) (ρ' : (usedBlock B).Assignment (A 
     (M := A ⊕ N) (relativizeTo (markerHostSym L B) ((usedKernelHom L B).onSentence φ)) a b)
     (Subsingleton.elim _ _) (Subsingleton.elim _ _))
 
-theorem realize_oldMarked (ρ' : (usedBlock B).Assignment (A ⊕ N)) :
+private theorem realize_oldMarked (ρ' : (usedBlock B).Assignment (A ⊕ N)) :
     letI := extOnB (L := L) ρ'
     ((A ⊕ N) ⊨ oldMarked L B) ↔ ∀ a : A, markerOf ρ' (Sum.inl a) := by
   let := extOnB (L := L) ρ'
@@ -868,7 +869,7 @@ theorem realize_oldMarked (ρ' : (usedBlock B).Assignment (A ⊕ N)) :
 /-- **The sentence over the expansion, realized**: it holds exactly when the
 kernel holds over the extension by *some* set of invented values – the ones the
 marker names. -/
-theorem sorealize_usedSentence (φ : ((newLang L).sum B.lang).Sentence) :
+private theorem sorealize_usedSentence (φ : ((newLang L).sum B.lang).Sentence) :
     letI := extOn L A N
     SORealize (newLang L) (A ⊕ N) [usedBlock B] (usedSentence L B φ) true ↔
       ∃ U : N → Prop,
@@ -947,7 +948,7 @@ def extOnCongr {A N N' : Type} [L.Structure A] (e : N ≃ N') :
         cases R with
         | old => exact sumCongr_isOld e (x 0) }
 
-theorem card_pow {c : ℕ} (α : Type) [Finite α] :
+private theorem card_pow {c : ℕ} (α : Type) [Finite α] :
     Nat.card (Fin c → α → Prop) = 2 ^ (c * Nat.card α) := by
   classical
   let := Fintype.ofFinite α

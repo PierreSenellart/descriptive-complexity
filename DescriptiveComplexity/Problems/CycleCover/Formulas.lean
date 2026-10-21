@@ -12,6 +12,8 @@ import DescriptiveComplexity.OrderedComposition
 import DescriptiveComplexity.RelComposition
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Permanent.CycNext
+import all DescriptiveComplexity.Problems.CycleCover.Base
 
 /-!
 # The formulas of the reduction of #1-in-SAT to #Cycle Cover
@@ -76,7 +78,8 @@ noncomputable instance : LinearOrder LevelTag := finiteLinearOrder LevelTag
 def LevelTag.extra : LevelTag := (none : Option (OccTag × Fin 3))
 
 /-- The level of an occurrence tag and an index. -/
-def LevelTag.pos (o : OccTag) (k : Fin 3) : LevelTag := (some (o, k) : Option (OccTag × Fin 3))
+private def LevelTag.pos
+    (o : OccTag) (k : Fin 3) : LevelTag := (some (o, k) : Option (OccTag × Fin 3))
 
 /-- The tags of the drawing: the nodes of the attached graph, and the rungs,
 tagged by their two nodes, their level and their index. -/
@@ -245,16 +248,16 @@ def occTag (o : Occ A) : OccTag :=
 def occPair (o : Occ A) : A × A :=
   (o.c.unbotD o.x, o.x)
 
-theorem occTag_of_bot {o : Occ A} (hb : o.c = ⊥) : occTag o = (true, o.s) := by
+private theorem occTag_of_bot {o : Occ A} (hb : o.c = ⊥) : occTag o = (true, o.s) := by
   rw [occTag, hb, WithBot.recBotCoe_bot]
 
-theorem occTag_of_coe {o : Occ A} {c : A} (hc : o.c = c) : occTag o = (false, o.s) := by
+private theorem occTag_of_coe {o : Occ A} {c : A} (hc : o.c = c) : occTag o = (false, o.s) := by
   rw [occTag, hc, WithBot.recBotCoe_coe]
 
-theorem occPair_of_bot {o : Occ A} (hb : o.c = ⊥) : occPair o = (o.x, o.x) := by
+private theorem occPair_of_bot {o : Occ A} (hb : o.c = ⊥) : occPair o = (o.x, o.x) := by
   rw [occPair, hb, WithBot.unbotD_bot]
 
-theorem occPair_of_coe {o : Occ A} {c : A} (hc : o.c = c) : occPair o = (c, o.x) := by
+private theorem occPair_of_coe {o : Occ A} {c : A} (hc : o.c = c) : occPair o = (c, o.x) := by
   rw [occPair, hc, WithBot.unbotD_coe]
 
 theorem occDom_occTag (o : Occ A) :
@@ -320,14 +323,15 @@ def nodePair (n : Node A) : A × A :=
   | Sum.inr (Sum.inr (Sum.inl c)) => (c.1, c.1)
   | Sum.inr (Sum.inr (Sum.inr x)) => (x.1, x.1)
 
-theorem nodeDom_nodeTag (n : Node A) : NodeDom (nodeTag n) (nodePair n).1 (nodePair n).2 := by
+private theorem nodeDom_nodeTag
+    (n : Node A) : NodeDom (nodeTag n) (nodePair n).1 (nodePair n).2 := by
   rcases n with o | o | c | x
   · exact occDom_occTag o
   · exact occDom_occTag o
   · exact ⟨c.2, rfl⟩
   · exact ⟨x.2, rfl⟩
 
-theorem nodeOf_nodeTag (n : Node A) :
+private theorem nodeOf_nodeTag (n : Node A) :
     nodeOf (nodeTag n) (nodePair n).1 (nodePair n).2 (nodeDom_nodeTag n) = n := by
   rcases n with o | o | c | x
   · exact congrArg trk (occOf_occTag o)
@@ -335,7 +339,7 @@ theorem nodeOf_nodeTag (n : Node A) :
   · rfl
   · rfl
 
-theorem nodeTag_nodeOf (t : NodeTag) (c x : A) (h : NodeDom t c x) :
+private theorem nodeTag_nodeOf (t : NodeTag) (c x : A) (h : NodeDom t c x) :
     nodeTag (nodeOf t c x h) = t := by
   rcases t with ⟨d, s⟩ | ⟨d, s⟩ | _ | _
   · exact congrArg Sum.inl (occTag_occOf d s c x h)
@@ -343,7 +347,7 @@ theorem nodeTag_nodeOf (t : NodeTag) (c x : A) (h : NodeDom t c x) :
   · rfl
   · rfl
 
-theorem nodePair_nodeOf (t : NodeTag) (c x : A) (h : NodeDom t c x) :
+private theorem nodePair_nodeOf (t : NodeTag) (c x : A) (h : NodeDom t c x) :
     nodePair (nodeOf t c x h) = (c, x) := by
   rcases t with ⟨d, s⟩ | ⟨d, s⟩ | _ | _
   · exact occPair_occOf d s c x h
@@ -413,7 +417,7 @@ section Realize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
-theorem realize_satOccF {x : α} : (satOccF x).Realize v ↔ SatOccurs A (v x) := by
+private theorem realize_satOccF {x : α} : (satOccF x).Realize v ↔ SatOccurs A (v x) := by
   simp only [satOccF, Formula.realize_iExs, Formula.realize_inf, Formula.realize_sup, realize_clF,
     realize_posF, realize_negF, Sum.elim_inl, Sum.elim_inr, SatOccurs, IsCl, PosIn, NegIn]
   exact ⟨fun ⟨c, h⟩ => ⟨c 0, h⟩, fun ⟨c, h⟩ => ⟨fun _ => c, h⟩⟩
@@ -422,19 +426,20 @@ theorem realize_occDomF {d s : Bool} {c x : α} :
     (occDomF d s c x).Realize v ↔ OccDom d s (v c) (v x) := by
   cases d <;> simp [occDomF, OccDom, realize_eqF, realize_satOccF]
 
-theorem realize_nodeDomF {t : NodeTag} {c x : α} :
+private theorem realize_nodeDomF {t : NodeTag} {c x : α} :
     (nodeDomF t c x).Realize v ↔ NodeDom t (v c) (v x) := by
   rcases t with ⟨d, s⟩ | ⟨d, s⟩ | b
   · exact realize_occDomF
   · exact realize_occDomF
   · cases b <;> simp [nodeDomF, NodeDom, realize_eqF, realize_satOccF, realize_clF]
 
-theorem realize_vDomF {t : VTag} {c x : α} : (vDomF t c x).Realize v ↔ VDom t (v c) (v x) := by
+private theorem realize_vDomF
+    {t : VTag} {c x : α} : (vDomF t c x).Realize v ↔ VDom t (v c) (v x) := by
   rcases t with t | ⟨⟨d, s⟩, j⟩
   · exact realize_nodeDomF
   · exact realize_occDomF
 
-theorem realize_isMinF {c : α} : (isMinF c).Realize v ↔ ∀ y, v c ≤ y := by
+private theorem realize_isMinF {c : α} : (isMinF c).Realize v ↔ ∀ y, v c ≤ y := by
   simp only [isMinF, Formula.realize_iAlls, realize_leF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h y => h fun _ => y, fun h y => h (y 0)⟩
 
@@ -448,11 +453,11 @@ theorem realize_levelDomF {t : LevelTag} {c x : α} :
 
 variable [Fintype A]
 
-theorem mem_above_chain {x : A} {s : Bool} {a y : WithBot A} :
+private theorem mem_above_chain {x : A} {s : Bool} {a y : WithBot A} :
     y ∈ above (chain x s) a ↔ (y = ⊥ ∨ ∃ y₀ : A, y = y₀ ∧ OccIn y₀ x s) ∧ a < y := by
   rw [mem_above, mem_chain]
 
-theorem realize_nextF {d d' s : Bool} {c x c' : α} (h : OccDom d s (v c) (v x))
+private theorem realize_nextF {d d' s : Bool} {c x c' : α} (h : OccDom d s (v c) (v x))
     (h' : OccDom d' s (v c') (v x)) :
     (nextF d d' s c x c').Realize v ↔
       cycNext (chain (v x) s) (occC d (v c)) = occC d' (v c') := by
@@ -562,7 +567,7 @@ theorem nodeKind_nodeOf (t : NodeTag) (c x : A) (h : NodeDom t c x) :
 
 /-- The kinds of the ends of a base edge: along a track, from a spoke to a
 hub, or from a hub to a spoke. -/
-theorem baseEdge_kind {n n' : Node A} (h : BaseEdge n n') :
+private theorem baseEdge_kind {n n' : Node A} (h : BaseEdge n n') :
     (nodeKind n = 0 ∧ nodeKind n' = 0) ∨ (nodeKind n = 1 ∧ nodeKind n' = 2) ∨
       (nodeKind n = 2 ∧ nodeKind n' = 1) := by
   cases h with
@@ -572,7 +577,7 @@ theorem baseEdge_kind {n n' : Node A} (h : BaseEdge n n') :
 
 omit [LinearOrder A] [Fintype A] in
 /-- An occurrence is determined by its tag and its pair. -/
-theorem occOf_eq_iff {d s d' s' : Bool} {c x c' x' : A} (h : OccDom d s c x)
+private theorem occOf_eq_iff {d s d' s' : Bool} {c x c' x' : A} (h : OccDom d s c x)
     (h' : OccDom d' s' c' x') :
     occOf d s c x h = occOf d' s' c' x' h' ↔ (d, s) = (d', s') ∧ (c, x) = (c', x') := by
   constructor
@@ -587,7 +592,7 @@ theorem occOf_eq_iff {d s d' s' : Bool} {c x c' x' : A} (h : OccDom d s c x)
 
 omit [LinearOrder A] [Fintype A] in
 /-- A node is determined by its tag and its pair. -/
-theorem nodeOf_eq_iff {t t' : NodeTag} {c x c' x' : A} (h : NodeDom t c x)
+private theorem nodeOf_eq_iff {t t' : NodeTag} {c x c' x' : A} (h : NodeDom t c x)
     (h' : NodeDom t' c' x') :
     nodeOf t c x h = nodeOf t' c' x' h' ↔ t = t' ∧ (c, x) = (c', x') := by
   constructor
@@ -600,7 +605,7 @@ theorem nodeOf_eq_iff {t t' : NodeTag} {c x c' x' : A} (h : NodeDom t c x)
     rfl
 
 /-- No base edge between nodes whose kinds do not match. -/
-theorem not_baseEdge_of_kind {t t' : NodeTag} {c x c' x' : A} (h : NodeDom t c x)
+private theorem not_baseEdge_of_kind {t t' : NodeTag} {c x c' x' : A} (h : NodeDom t c x)
     (h' : NodeDom t' c' x')
     (hk : ¬((tagKind t = 0 ∧ tagKind t' = 0) ∨ (tagKind t = 1 ∧ tagKind t' = 2) ∨
       (tagKind t = 2 ∧ tagKind t' = 1))) :
@@ -608,18 +613,18 @@ theorem not_baseEdge_of_kind {t t' : NodeTag} {c x c' x' : A} (h : NodeDom t c x
   hk (by simpa only [nodeKind_nodeOf] using baseEdge_kind he)
 
 /-- The base edge from a spoke to a hub, read on the tags. -/
-theorem baseEdge_spk_hub_iff {d s : Bool} {c x : A} (h : OccDom d s c x) (k : Hub A) :
+private theorem baseEdge_spk_hub_iff {d s : Bool} {c x : A} (h : OccDom d s c x) (k : Hub A) :
     BaseEdge (spk (occOf d s c x h)) (hub k) ↔ hubOf (occOf d s c x h) = k := by
   rw [baseEdge_spk_iff]
   exact ⟨fun h => (Sum.inr.inj (Sum.inr.inj h)).symm, fun h => congrArg hub h.symm⟩
 
 /-- The base edge from a hub to a spoke, read on the tags. -/
-theorem baseEdge_hub_spk_iff (k : Hub A) {d s : Bool} {c x : A} (h : OccDom d s c x) :
+private theorem baseEdge_hub_spk_iff (k : Hub A) {d s : Bool} {c x : A} (h : OccDom d s c x) :
     BaseEdge (hub k) (spk (occOf d s c x h)) ↔ hubOf (occOf d s c x h) = k := by
   rw [baseEdge_hub_iff]
   exact ⟨fun ⟨o, ho, hk⟩ => (Sum.inl.inj (Sum.inr.inj ho)) ▸ hk, fun hk => ⟨_, rfl, hk⟩⟩
 
-theorem realize_baseEdgeF {t t' : NodeTag} {c x c' x' : α} (h : NodeDom t (v c) (v x))
+private theorem realize_baseEdgeF {t t' : NodeTag} {c x c' x' : α} (h : NodeDom t (v c) (v x))
     (h' : NodeDom t' (v c') (v x')) :
     (baseEdgeF t t' c x c' x').Realize v ↔
       BaseEdge (nodeOf t (v c) (v x) h) (nodeOf t' (v c') (v x') h') := by
@@ -688,12 +693,12 @@ at every site, on the flat node type. -/
 noncomputable abbrev attachedM : V A → V A → ℤ :=
   Site.flatAttach baseM site
 
-theorem xorGadget_bounds (j j' : Fin 4) : -1 ≤ xorGadget j j' ∧ xorGadget j j' ≤ 3 := by
+private theorem xorGadget_bounds (j j' : Fin 4) : -1 ≤ xorGadget j j' ∧ xorGadget j j' ≤ 3 := by
   revert j j'
   decide
 
 /-- The entries of the attached matrix are between `-1` and `3`. -/
-theorem attachedM_bounds (a b : V A) : -1 ≤ attachedM a b ∧ attachedM a b ≤ 3 := by
+private theorem attachedM_bounds (a b : V A) : -1 ≤ attachedM a b ∧ attachedM a b ≤ 3 := by
   rcases a with n | ⟨o, j⟩ <;> rcases b with n' | ⟨o', j'⟩
   · simp only [attachedM, Site.flatAttach, baseM]
     split_ifs <;> omega
@@ -733,7 +738,7 @@ theorem ite_eq_iff_of_ne {k z : ℤ} (_hk : k ≠ 0) (P : Prop) [Decidable P] :
   · simp [hp]
     omega
 
-theorem realize_flatEntryF {k : ℤ} (hk : k ≠ 0) {t t' : VTag} {c x c' x' : α}
+private theorem realize_flatEntryF {k : ℤ} (hk : k ≠ 0) {t t' : VTag} {c x c' x' : α}
     (h : VDom t (v c) (v x)) (h' : VDom t' (v c') (v x')) :
     (flatEntryF k t t' c x c' x').Realize v ↔
       attachedM (vOf t (v c) (v x) h) (vOf t' (v c') (v x') h') = k := by
@@ -837,7 +842,7 @@ theorem mkLevel_eq (ℓ : Level A) : mkLevel ℓ.1.1 (ℓ.1.2 0) (ℓ.1.2 1) (le
   Subtype.ext (Prod.ext rfl (funext fun j => by fin_cases j <;> rfl))
 
 /-- The extra level, for nonempty instances. -/
-noncomputable def extraLevel [Fintype A] [Nonempty A] : Level A :=
+private noncomputable def extraLevel [Fintype A] [Nonempty A] : Level A :=
   mkLevel LevelTag.extra (univ.min' univ_nonempty) (univ.min' univ_nonempty)
     ⟨fun y => min'_le _ _ (mem_univ y), rfl⟩
 
@@ -872,7 +877,7 @@ theorem tupLeLex_two (c x c' x' : A) :
       · exact Or.inl rfl
 
 /-- The order of the levels, read on the tags and the pairs. -/
-theorem mkLevel_le_iff {t t' : LevelTag} {c x c' x' : A} (h : LevelDom t c x)
+private theorem mkLevel_le_iff {t t' : LevelTag} {c x c' x' : A} (h : LevelDom t c x)
     (h' : LevelDom t' c' x') :
     mkLevel t c x h ≤ mkLevel t' c' x' h' ↔ t < t' ∨ (t = t' ∧ (c < c' ∨ (c = c' ∧ x ≤ x'))) := by
   change (tagTupleOrder : LinearOrder (LevelTag × (Fin 2 → A))).le (t, ![c, x]) (t', ![c', x']) ↔ _
@@ -886,7 +891,7 @@ section LevelRealize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {α : Type} {v : α → A}
 
-theorem realize_levelLeF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v c) (v x))
+private theorem realize_levelLeF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v c) (v x))
     (h' : LevelDom t' (v c') (v x')) :
     (levelLeF t t' c x c' x').Realize v ↔
       mkLevel t (v c) (v x) h ≤ mkLevel t' (v c') (v x') h' := by
@@ -902,7 +907,7 @@ theorem realize_levelLeF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v c
     rw [Formula.realize_sup, Formula.realize_inf, realize_ltF, realize_eqF, realize_leF]
     simp only [ht, lt_self_iff_false, false_or, true_and]
 
-theorem realize_levelLtF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v c) (v x))
+private theorem realize_levelLtF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v c) (v x))
     (h' : LevelDom t' (v c') (v x')) :
     (levelLtF t t' c x c' x').Realize v ↔
       mkLevel t (v c) (v x) h < mkLevel t' (v c') (v x') h' := by
@@ -911,7 +916,7 @@ theorem realize_levelLtF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v c
 
 variable [Finite A] [Nonempty A]
 
-theorem realize_levelMinF {t : LevelTag} {c x : α} (h : LevelDom t (v c) (v x)) :
+private theorem realize_levelMinF {t : LevelTag} {c x : α} (h : LevelDom t (v c) (v x)) :
     (levelMinF t c x).Realize v ↔ mkLevel t (v c) (v x) h = ⊥ := by
   rw [← isBot_iff_eq_bot]
   simp only [levelMinF, Formula.realize_iInf, Formula.realize_iAlls, Formula.realize_imp]
@@ -928,7 +933,7 @@ theorem realize_levelMinF {t : LevelTag} {c x : α} (h : LevelDom t (v c) (v x))
       (c' := Sum.inr 0) (x' := Sum.inr 1) h hw]
     exact H _
 
-theorem realize_levelMaxF {t : LevelTag} {c x : α} (h : LevelDom t (v c) (v x)) :
+private theorem realize_levelMaxF {t : LevelTag} {c x : α} (h : LevelDom t (v c) (v x)) :
     (levelMaxF t c x).Realize v ↔ mkLevel t (v c) (v x) h = ⊤ := by
   rw [← isTop_iff_eq_top]
   simp only [levelMaxF, Formula.realize_iInf, Formula.realize_iAlls, Formula.realize_imp]
@@ -972,7 +977,8 @@ theorem realize_levelCovF {t t' : LevelTag} {c x c' x' : α} (h : LevelDom t (v 
     exact H h1 h2
 
 /-- The widths, read on the tags and the pairs. -/
-theorem realize_widthF [Fintype A] {t t' : VTag} {l : LevelTag} {j : Fin 3} {c x c' x' c'' x'' : α}
+private theorem realize_widthF
+    [Fintype A] {t t' : VTag} {l : LevelTag} {j : Fin 3} {c x c' x' c'' x'' : α}
     (h : VDom t (v c) (v x)) (h' : VDom t' (v c') (v x')) (h'' : LevelDom l (v c'') (v x'')) :
     (widthF t t' l j c x c' x' c'' x'').Realize v ↔
       j.val < widths (Λ := Level A) attachedM (vOf t (v c) (v x) h) (vOf t' (v c') (v x') h')

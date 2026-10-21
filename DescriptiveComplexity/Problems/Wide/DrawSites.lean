@@ -49,23 +49,23 @@ The facts every discharge asks about the service slots, provable once: the
 walked registers, the register mark, the file-top mark and the marker are
 pairwise distinct constructors. -/
 
-theorem mir_ne_reg : (Slot.mir : dt.SlotIx) ≠ .reg := fun h => nomatch h
+private theorem mir_ne_reg : (Slot.mir : dt.SlotIx) ≠ .reg := fun h => nomatch h
 
-theorem tgt_ne_reg : (Slot.tgt : dt.SlotIx) ≠ .reg := fun h => nomatch h
+private theorem tgt_ne_reg : (Slot.tgt : dt.SlotIx) ≠ .reg := fun h => nomatch h
 
-theorem regLast_ne_mir : (Slot.regLast : dt.SlotIx) ≠ .mir := fun h => nomatch h
+private theorem regLast_ne_mir : (Slot.regLast : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
-theorem regLast_ne_tgt : (Slot.regLast : dt.SlotIx) ≠ .tgt := fun h => nomatch h
+private theorem regLast_ne_tgt : (Slot.regLast : dt.SlotIx) ≠ .tgt := fun h => nomatch h
 
-theorem wk_ne_mir : (Slot.wk : dt.SlotIx) ≠ .mir := fun h => nomatch h
+private theorem wk_ne_mir : (Slot.wk : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
-theorem wk_ne_tgt : (Slot.wk : dt.SlotIx) ≠ .tgt := fun h => nomatch h
+private theorem wk_ne_tgt : (Slot.wk : dt.SlotIx) ≠ .tgt := fun h => nomatch h
 
-theorem tgt_ne_mir : (Slot.tgt : dt.SlotIx) ≠ .mir := fun h => nomatch h
+private theorem tgt_ne_mir : (Slot.tgt : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
-theorem ltp_ne_mir : (Slot.ltp : dt.SlotIx) ≠ .mir := fun h => nomatch h
+private theorem ltp_ne_mir : (Slot.ltp : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
-theorem bot_ne_mir : (Slot.bot : dt.SlotIx) ≠ .mir := fun h => nomatch h
+private theorem bot_ne_mir : (Slot.bot : dt.SlotIx) ≠ .mir := fun h => nomatch h
 
 /-! ### The plain sweeps: COMPARE and COPY -/
 

@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Tape
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # What a register file has to be
@@ -110,7 +112,7 @@ theorem ixRank_lt (h : IsLinOrd ile) {u u' : I} (hlt : WMLt ile u u') :
   bitRank_lt h trivial hlt.1 fun hc => hlt.2 (hc ▸ h.1 u)
 
 /-- Rank is monotone along the order. -/
-theorem ixRank_le_of_le (h : IsLinOrd ile) {u u' : I} (hle : ile u u') :
+private theorem ixRank_le_of_le (h : IsLinOrd ile) {u u' : I} (hle : ile u u') :
     ixRank ile u ≤ ixRank ile u' := by
   rcases eq_or_ne u u' with rfl | hne
   · exact Nat.le_refl _
@@ -118,13 +120,13 @@ theorem ixRank_le_of_le (h : IsLinOrd ile) {u u' : I} (hle : ile u u') :
 
 /-- **The rank of an index is below the number of indices**, so a walk of the
 file crosses fewer registers than there are of them. -/
-theorem ixRank_lt_card (u : I) : ixRank ile u < Nat.card I := by
+private theorem ixRank_lt_card (u : I) : ixRank ile u < Nat.card I := by
   have h := bitRank_lt_card (Le := ile) (Posn := fun _ => True) (p := u) trivial
   rwa [Nat.card_congr (Equiv.subtypeUnivEquiv fun _ : I => trivial)] at h
 
 /-- **Rank increases by exactly one along a successor**, which is what makes a
 difference of ranks a count of registers. -/
-theorem ixRank_succ (h : IsLinOrd ile) {u u' : I} (hs : IxSucc ile u u') :
+private theorem ixRank_succ (h : IsLinOrd ile) {u u' : I} (hs : IxSucc ile u u') :
     ixRank ile u' = ixRank ile u + 1 := by
   refine bitRank_succPos h ⟨trivial, trivial, hs.1.1, fun hc => hs.1.2 (hc ▸ h.1 u), ?_⟩
   intro r _ hur hru
@@ -157,13 +159,13 @@ omit [Finite A] in
 theorem wmRank_eq_ixRank (u : A) : wmRank u = ixRank (WMLe (A := A)) u := rfl
 
 /-- Rank increases strictly along the order. -/
-theorem wmRank_lt (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hlt : WMLt WMLe u u') :
+private theorem wmRank_lt (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hlt : WMLt WMLe u u') :
     wmRank u < wmRank u' :=
   ixRank_lt _ h hlt
 
 /-- **The rank of an element is below the number of elements**, so a walk of the
 file crosses fewer registers than there are elements. -/
-theorem wmRank_lt_card (u : A) : wmRank u < Nat.card A :=
+private theorem wmRank_lt_card (u : A) : wmRank u < Nat.card A :=
   ixRank_lt_card _ u
 
 /-! ### The interface, at an arbitrary index
@@ -248,7 +250,7 @@ theorem gap (h : IsLinOrd ile) {u u' : I}
   exact ((F.lt_iff h x u').mp h2).2 (hs.2 x ((F.lt_iff h u x).mp h1))
 
 /-- **The empty address is below every register**, no register being empty. -/
-theorem wmSetLt_empty_cell (u : I) (ha : IsLinOrd (WMLe (A := A)) := by assumption) :
+private theorem wmSetLt_empty_cell (u : I) (ha : IsLinOrd (WMLe (A := A)) := by assumption) :
     WMSetLt WMLe (fun _ => False) (F.cell u) := by
   obtain ⟨x, hx⟩ := F.cell_nonempty u
   refine (wmSetLt_iff _ _).mpr ⟨wmSetLe_of_empty ha (fun _ hc => hc) _, fun hc => ?_⟩
@@ -256,7 +258,7 @@ theorem wmSetLt_empty_cell (u : I) (ha : IsLinOrd (WMLe (A := A)) := by assumpti
   exact hx
 
 /-- **The registers are ordered like the indices non-strictly too.** -/
-theorem cell_le (h : IsLinOrd ile) {u v : I} (hle : ile u v)
+private theorem cell_le (h : IsLinOrd ile) {u v : I} (hle : ile u v)
     (ha : IsLinOrd (WMLe (A := A)) := by assumption) :
     WMSetLe WMLe (F.cell u) (F.cell v) := by
   rcases eq_or_ne u v with rfl | hne
@@ -265,27 +267,27 @@ theorem cell_le (h : IsLinOrd ile) {u v : I} (hle : ile u v)
       (F.strictMono u v ⟨hle, fun hc => hne (h.2.2.1 u v hle hc)⟩)).1
 
 /-- **Nothing below the least register is a register**, in existential form. -/
-theorem not_exists_cell_of_lt_bot (h : IsLinOrd ile) {gbot : I}
+private theorem not_exists_cell_of_lt_bot (h : IsLinOrd ile) {gbot : I}
     (hbot : ∀ y : I, ile gbot y) {s : A → Prop} (hs : WMSetLt WMLe s (F.cell gbot))
     (ha : IsLinOrd (WMLe (A := A)) := by assumption) :
     ¬∃ u : I, s = F.cell u := fun hc => ((F.lt_iff h hc.choose gbot).mp
   (hc.choose_spec ▸ hs)).2 (hbot hc.choose)
 
 /-- **Anything below the file is below its top register.** -/
-theorem le_cell_top_of_le (h : IsLinOrd ile) {gtop gbot : I}
+private theorem le_cell_top_of_le (h : IsLinOrd ile) {gtop gbot : I}
     (hbot : ∀ y : I, ile gbot y) {s : A → Prop}
     (hs : WMSetLe WMLe s (F.cell gbot))
     (ha : IsLinOrd (WMLe (A := A)) := by assumption) : WMSetLe WMLe s (F.cell gtop) :=
   (isLinOrd_wmSetLe ha).2.1 _ _ _ hs (F.cell_le h (hbot gtop))
 
-theorem le_cell_top (h : IsLinOrd ile) {gtop gbot : I}
+private theorem le_cell_top (h : IsLinOrd ile) {gtop gbot : I}
     (hbot : ∀ y : I, ile gbot y) {s : A → Prop}
     (hs : WMSetLt WMLe s (F.cell gbot))
     (ha : IsLinOrd (WMLe (A := A)) := by assumption) : WMSetLe WMLe s (F.cell gtop) :=
   F.le_cell_top_of_le h hbot ((wmSetLt_iff _ _).mp hs).1
 
 /-- **Nothing strictly below the least register is a register.** -/
-theorem ne_cell_of_lt_cell (h : IsLinOrd ile) {gbot : I}
+private theorem ne_cell_of_lt_cell (h : IsLinOrd ile) {gbot : I}
     (hbot : ∀ y : I, ile gbot y) {r : A → Prop} (hlt : WMSetLt WMLe r (F.cell gbot))
     (u : I) (ha : IsLinOrd (WMLe (A := A)) := by assumption) : r ≠ F.cell u := by
   rintro rfl
@@ -293,7 +295,7 @@ theorem ne_cell_of_lt_cell (h : IsLinOrd ile) {gbot : I}
 
 omit [Finite A] in
 /-- **A register below another is not the whole tape.** -/
-theorem exists_not_cell {u v : I} (hlt : WMLt ile u v) : ∃ x : A, ¬F.cell u x := by
+private theorem exists_not_cell {u v : I} (hlt : WMLt ile u v) : ∃ x : A, ¬F.cell u x := by
   obtain ⟨x, -, hx, -⟩ := F.strictMono u v hlt
   exact ⟨x, hx⟩
 
@@ -359,19 +361,19 @@ theorem gap (h : IsLinOrd (WMLe (A := A))) {u u' : A} (hs : WMSucc A u u') {r : 
 
 /-- **The empty address is below every register**, no register being empty: the
 head starts below its file, wherever the file sits. -/
-theorem wmSetLt_empty_cell (h : IsLinOrd (WMLe (A := A))) (u : A) :
+private theorem wmSetLt_empty_cell (h : IsLinOrd (WMLe (A := A))) (u : A) :
     WMSetLt WMLe (fun _ => False) (F.cell u) :=
   F.toIx.wmSetLt_empty_cell u
 
 /-- **The registers are ordered like the elements non-strictly too**: what a walk
 between two named registers is bounded by. -/
-theorem cell_le (h : IsLinOrd (WMLe (A := A))) {u v : A} (hle : WMLe u v) :
+private theorem cell_le (h : IsLinOrd (WMLe (A := A))) {u v : A} (hle : WMLe u v) :
     WMSetLe WMLe (F.cell u) (F.cell v) :=
   F.toIx.cell_le h hle
 
 /-- **Nothing below the least register is a register**, in existential form: the
 shape a walk's junk-address side condition takes. -/
-theorem not_exists_cell_of_lt_bot (h : IsLinOrd (WMLe (A := A))) {gbot : A}
+private theorem not_exists_cell_of_lt_bot (h : IsLinOrd (WMLe (A := A))) {gbot : A}
     (hbot : ∀ y : A, WMLe gbot y) {s : A → Prop} (hs : WMSetLt WMLe s (F.cell gbot)) :
     ¬∃ u : A, s = F.cell u :=
   F.toIx.not_exists_cell_of_lt_bot h hbot hs
@@ -380,19 +382,19 @@ theorem not_exists_cell_of_lt_bot (h : IsLinOrd (WMLe (A := A))) {gbot : A}
 file needs of where it starts. At the input channel's ladder the top register is
 the whole tape and the bound is free; at a file a program builds it is not, and
 this is how a caller supplies it. -/
-theorem le_cell_top_of_le (h : IsLinOrd (WMLe (A := A))) {gtop gbot : A}
+private theorem le_cell_top_of_le (h : IsLinOrd (WMLe (A := A))) {gtop gbot : A}
     (hbot : ∀ y : A, WMLe gbot y) {s : A → Prop}
     (hs : WMSetLe WMLe s (F.cell gbot)) : WMSetLe WMLe s (F.cell gtop) :=
   F.toIx.le_cell_top_of_le h hbot hs
 
-theorem le_cell_top (h : IsLinOrd (WMLe (A := A))) {gtop gbot : A}
+private theorem le_cell_top (h : IsLinOrd (WMLe (A := A))) {gtop gbot : A}
     (hbot : ∀ y : A, WMLe gbot y) {s : A → Prop}
     (hs : WMSetLt WMLe s (F.cell gbot)) : WMSetLe WMLe s (F.cell gtop) :=
   F.toIx.le_cell_top h hbot hs
 
 /-- **Nothing strictly below the least register is a register**, so a program
 working under its file can never mistake its own data for one. -/
-theorem ne_cell_of_lt_cell (h : IsLinOrd (WMLe (A := A))) {gbot : A}
+private theorem ne_cell_of_lt_cell (h : IsLinOrd (WMLe (A := A))) {gbot : A}
     (hbot : ∀ y : A, WMLe gbot y) {r : A → Prop} (hlt : WMSetLt WMLe r (F.cell gbot))
     (u : A) : r ≠ F.cell u :=
   F.toIx.ne_cell_of_lt_cell h hbot hlt u
@@ -400,7 +402,7 @@ theorem ne_cell_of_lt_cell (h : IsLinOrd (WMLe (A := A))) {gbot : A}
 omit [Finite A] in
 /-- **A register below another is not the whole tape**, so the head standing on it
 can step up. -/
-theorem exists_not_cell {u v : A} (hlt : WMLt WMLe u v) : ∃ x : A, ¬F.cell u x :=
+private theorem exists_not_cell {u v : A} (hlt : WMLt WMLe u v) : ∃ x : A, ¬F.cell u x :=
   F.toIx.exists_not_cell hlt
 
 end RegFile

@@ -9,6 +9,8 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.AltRounds
 public import DescriptiveComplexity.Problems.Machine.AltDefs
 import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Problems.Machine.AltProg
+import all DescriptiveComplexity.Problems.Machine.AltTable
 
 /-!
 # The machine of a formula, written in first-order logic
@@ -237,7 +239,7 @@ noncomputable def aoneF (s : AltTag k) (x : Fin 2 × Fin 2) (t' : AltTag k) :
 variable {A : Type} [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable {v : Fin 2 × Fin 2 → A}
 
-theorem realize_acstF {s : AltTag k} {q : AltV k A}
+private theorem realize_acstF {s : AltTag k} {q : AltV k A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) :
     (acstF s q.1).Realize v ↔ q = acstI s.1 s.2 := by
   rw [acstF]
@@ -254,7 +256,7 @@ theorem realize_acstF {s : AltTag k} {q : AltV k A}
     simp only [Formula.realize_bot, false_iff]
     exact fun hq => hs (congrArg Prod.fst hq)
 
-theorem realize_aoneF {s : AltTag k} {x : Fin 2 × Fin 2} {a : A} {q : AltV k A}
+private theorem realize_aoneF {s : AltTag k} {x : Fin 2 × Fin 2} {a : A} {q : AltV k A}
     (h0 : v (1, 0) = q.2 0) (h1 : v (1, 1) = q.2 1) (hx : v x = a) :
     (aoneF s x q.1).Realize v ↔ q = aoneI s.1 s.2 a := by
   subst hx
@@ -489,7 +491,8 @@ omit [(Language.qbf k).Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 
 omit [Finite A] [Nonempty A] in
 /-- The block mark of a sweep index, read as a formula. -/
-theorem realize_blkAtF {j : Fin (k + 1)} {x : A} {v : Fin 1 × Fin 2 → A} (hx : v (0, 0) = x) :
+private theorem realize_blkAtF
+    {j : Fin (k + 1)} {x : A} {v : Fin 1 × Fin 2 → A} (hx : v (0, 0) = x) :
     ((if h : (j : ℕ) < k then blkF ⟨(j : ℕ), h⟩ (0, 0) else ⊥ :
       (qbfOrd k).Formula (Fin 1 × Fin 2))).Realize v ↔ QbfBlkAt j x := by
   by_cases h : (j : ℕ) < k
@@ -590,7 +593,7 @@ theorem relMap_le (p q : AltV k A) :
   rw [ATMLe, FOInterpretation.relMap_map]
   exact realize_lexLeF
 
-theorem relMap_inp (p q : AltV k A) :
+private theorem relMap_inp (p q : AltV k A) :
     ATMInp (k := k) (altMapEquiv (A := A) cnf p) (altMapEquiv cnf q) ↔ AltInp p q := by
   rw [ATMInp, FOInterpretation.relMap_map]
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -636,7 +639,7 @@ theorem relMap_inp (p q : AltV k A) :
       rintro (⟨h, -⟩ | ⟨h, -⟩ | ⟨h, -⟩) <;> exact AltBase.noConfusion h
   exact key t _ rfl rfl rfl
 
-theorem relMap_tsrc (p q : AltV k A) :
+private theorem relMap_tsrc (p q : AltV k A) :
     ATMSrc (k := k) (altMapEquiv (A := A) cnf p) (altMapEquiv cnf q) ↔ AltSrc cnf p q := by
   rw [ATMSrc, FOInterpretation.relMap_map]
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -654,7 +657,7 @@ theorem relMap_tsrc (p q : AltV k A) :
   case tTurnAcc _ => exact realize_aoneF rfl rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tread (p q : AltV k A) :
+private theorem relMap_tread (p q : AltV k A) :
     ATMRead (k := k) (altMapEquiv (A := A) cnf p) (altMapEquiv cnf q) ↔ AltRead p q := by
   rw [ATMRead, FOInterpretation.relMap_map]
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -672,7 +675,7 @@ theorem relMap_tread (p q : AltV k A) :
   case tTurnAcc d => cases d <;> exact realize_acstF rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_twrite (p q : AltV k A) :
+private theorem relMap_twrite (p q : AltV k A) :
     ATMWrite (k := k) (altMapEquiv (A := A) cnf p) (altMapEquiv cnf q) ↔ AltWrite p q := by
   rw [ATMWrite, FOInterpretation.relMap_map]
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -690,7 +693,7 @@ theorem relMap_twrite (p q : AltV k A) :
   case tTurnAcc d => cases d <;> exact realize_acstF rfl rfl
   all_goals exact Iff.rfl
 
-theorem relMap_tdst (p q : AltV k A) :
+private theorem relMap_tdst (p q : AltV k A) :
     ATMDst (k := k) (altMapEquiv (A := A) cnf p) (altMapEquiv cnf q) ↔ AltDst cnf p q := by
   rw [ATMDst, FOInterpretation.relMap_map]
   obtain ⟨⟨t, j⟩, w⟩ := p
@@ -744,7 +747,7 @@ theorem relMap_blk (hk : 0 < k) (j : ℕ) (p : AltV k A) :
 /-- **The interpreted structure describes the machine of the instance**: every
 field of `DescriptiveComplexity.atmData` on the interpreted structure agrees,
 along the identity equivalence, with `DescriptiveComplexity.AltQbf.altMachine`. -/
-theorem altAgree_altMachine (hk : 0 < k) :
+private theorem altAgree_altMachine (hk : 0 < k) :
     ATMData.AltAgree (altMapEquiv (A := A) cnf) (altMachine k A cnf)
       (atmData k ((altTuringInterp k cnf).Map A)) where
   base :=
@@ -767,7 +770,7 @@ yes-instance of alternating acceptance exactly when the quantified formula is
 true. Both promises hold unconditionally, and acceptance is
 `DescriptiveComplexity.AltQbf.altAccepts_iff_qbf`, transported along the
 agreement. -/
-theorem atmAccept_map_iff (hk : 0 < k) (start : Bool) :
+private theorem atmAccept_map_iff (hk : 0 < k) (start : Bool) :
     (ATMAccept k start).Holds ((altTuringInterp k cnf).Map A) ↔
       altQuant A k (QbfMatrix cnf) start := by
   have hag := altAgree_altMachine (A := A) cnf hk
@@ -784,7 +787,7 @@ end Characterize
 /-- **A quantified Boolean formula reduces to acceptance by an alternating
 machine**: the ordered first-order reduction building `M_φ` inside the
 instance. -/
-noncomputable def qbf_ordered_fo_reduction_atmAccept (hk : 0 < k) (start cnf : Bool) :
+private noncomputable def qbf_ordered_fo_reduction_atmAccept (hk : 0 < k) (start cnf : Bool) :
     QbfProblem k start cnf ≤ᶠᵒ[≤] ATMAccept k start where
   Tag := AltTag k
   dim := 2

@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Wide.DrawData
 import DescriptiveComplexity.Problems.Wide.DrawPad
 public import DescriptiveComplexity.Problems.Wide.DrawAddr
 import DescriptiveComplexity.Problems.Wide.DrawInner
+import all DescriptiveComplexity.Problems.Wide.DrawInner
 
 /-!
 # What the inner loop computes
@@ -73,7 +74,7 @@ noncomputable def levelVal (v : dt.VarIx)
 
 /-- The same valuation over the pack's own levels: the free ones off the
 working address, the quantified ones as given. -/
-noncomputable def freeVal (v : dt.VarIx)
+private noncomputable def freeVal (v : dt.VarIx)
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (u : Fin (dt.nOf v) → (Fin dt.dd → A) → Prop) :
     Fin (dt.nOf v) → (Fin dt.dd → A) → Prop :=
@@ -101,7 +102,7 @@ noncomputable def leafP (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
 variable {dt zero one}
 
 /-- The leaf is the pack-level predicate padded to the register's blocks. -/
-theorem leafP_eq_pad (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
+private theorem leafP_eq_pad (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (w : Fin dt.ki → ((Fin dt.dd → A) → Prop)) :
     dt.leafP zero one v σ mb w =
@@ -112,7 +113,7 @@ theorem leafP_eq_pad (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
 /-- The leaf ignores the register blocks the pack does not quantify: those
 below the variable's arity, whose values it reads off the working address,
 and those past its prefix, which nothing reads. -/
-theorem leafP_irrel (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
+private theorem leafP_irrel (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop) {ℓ : Fin dt.ki}
     (hℓ : (ℓ : ℕ) < dt.arOf v ∨ dt.nOf v ≤ (ℓ : ℕ))
     (w : Fin dt.ki → ((Fin dt.dd → A) → Prop)) (a : (Fin dt.dd → A) → Prop) :
@@ -132,7 +133,7 @@ points, the leaf splits into the two flags the machinery conjoins – every
 ∃-level of the register an encoding, and if every ∀-level is one, the
 matrix at the decoded valuation. The free levels' gates are absorbed by
 the address's. -/
-theorem leafP_iff_split (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
+private theorem leafP_iff_split (v : dt.VarIx) (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (w : Fin dt.ki → ((Fin dt.dd → A) → Prop))
     (houter : ∀ k : Fin dt.ko, (k : ℕ) < dt.arOf v →
@@ -263,7 +264,7 @@ theorem altQuantFrom_leafP (hzo : zero ≠ one) (i : dt.d.B.ι)
 The same three mismatches as `altQuantFrom_leafP`, minus the free levels: a
 sentence has none, so the prefix starts where the machine starts it and only
 the padding past the pack has to be skipped. -/
-theorem altQuantFrom_leafP_out (hzo : zero ≠ one)
+private theorem altQuantFrom_leafP_out (hzo : zero ≠ one)
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)
     (w : Fin dt.ki → ((Fin dt.dd → A) → Prop)) :
@@ -308,7 +309,7 @@ variable {R' P' : Type}
 every inner block of the register is full; there the accumulator at level `0`
 is the whole prefix (`DescriptiveComplexity.Draw.foldFrom_top_of_ix`), hence
 one step of the iteration at the working address's points. -/
-theorem foldFrom_leafP_top (hzo : zero ≠ one)
+private theorem foldFrom_leafP_top (hzo : zero ≠ one)
     {LeV : (Fin dt.dd → A) → (Fin dt.dd → A) → Prop} (hLeV : IsLinOrd LeV)
     (i : dt.d.B.ι) (σ : dt.d.B.Assignment (dt.X.Map A))
     (mb : Fin dt.ko → (Fin dt.dd → A) → Prop)

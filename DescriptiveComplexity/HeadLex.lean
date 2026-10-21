@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.HeadCapture
+import all DescriptiveComplexity.HeadCapture
+import all DescriptiveComplexity.HeadEval
+import all DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Counting on a block of heads
@@ -71,17 +75,17 @@ def testPos {n : ℕ} (j : Fin (n + 1)) : Option (Fin n) :=
 def testDown {n : ℕ} (j : Fin (n + 1)) : Fin (n + 1) :=
   ⟨(j : ℕ) - 1, by have := j.isLt; omega⟩
 
-theorem testPos_eq_none {n : ℕ} {j : Fin (n + 1)} (h : (j : ℕ) = 0) : testPos j = none := by
+private theorem testPos_eq_none {n : ℕ} {j : Fin (n + 1)} (h : (j : ℕ) = 0) : testPos j = none := by
   rw [testPos, dite_eq_right (by omega)]
 
-theorem testPos_eq_some {n : ℕ} {j : Fin (n + 1)} {p : ℕ} (h : (j : ℕ) = p + 1)
+private theorem testPos_eq_some {n : ℕ} {j : Fin (n + 1)} {p : ℕ} (h : (j : ℕ) = p + 1)
     (hp : p < n) : testPos j = some ⟨p, hp⟩ := by
   rw [testPos, dite_eq_left (by omega)]
   refine congrArg some (Fin.ext ?_)
   change (j : ℕ) - 1 = p
   omega
 
-theorem testDown_val {n : ℕ} {j : Fin (n + 1)} {p : ℕ} (h : (j : ℕ) = p + 1) :
+private theorem testDown_val {n : ℕ} {j : Fin (n + 1)} {p : ℕ} (h : (j : ℕ) = p + 1) :
     ((testDown j : Fin (n + 1)) : ℕ) = p := by
   change (j : ℕ) - 1 = p
   omega
@@ -144,7 +148,7 @@ def lexFamRel (blk : Fin n → Fin K) (mk : Fin K) (prot : ℕ) :
 
 variable (blk : Fin n → Fin K) (mk : Fin K) (prot : ℕ)
 
-theorem runs_lexFam (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (c : LexNode n) :
+private theorem runs_lexFam (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (c : LexNode n) :
     (lexFam (L := L) blk mk c).Runs A prot (lexFamRel blk mk prot c) := by
   cases c with
   | test j =>
@@ -163,7 +167,8 @@ theorem runs_lexFam (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (c : LexNode 
       exact absurd (hblk i) (by omega)
     rw [bumpMoves, ite_eq_right h1, ite_eq_right h2]
 
-theorem headLocal2_lexFamRel (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot)
+private theorem headLocal2_lexFamRel
+    (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot)
     (c : LexNode n) : HeadLocal2 prot (lexFamRel (A := A) blk mk prot c) := by
   cases c with
   | test j =>
@@ -186,7 +191,7 @@ theorem headLocal2_lexFamRel (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk
       · rw [ite_eq_right h2]
         trivial
 
-theorem lexRel_local (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot) :
+private theorem lexRel_local (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot) :
     HeadLocal2 prot (lexRel (A := A) blk mk prot) := by
   intro x x' y y' hx hy b
   have hxb : ∀ i, x (blk i) = x' (blk i) := fun i => hx _ (hblk i)
@@ -224,7 +229,7 @@ def lexRelFrom (blk : Fin n → Fin K) (mk : Fin K) (prot : ℕ) (jj : ℕ) :
       ∀ j : Fin K, (j : ℕ) < prot → (∀ i, j ≠ blk i) → y j = x j) ∨
     (b = false ∧ (∀ i : Fin n, x (blk i) = x mk) ∧ HeadAgree prot x y)
 
-theorem lexRelFrom_all {x : Fin K → A} {b : Bool} {y : Fin K → A} :
+private theorem lexRelFrom_all {x : Fin K → A} {b : Bool} {y : Fin K → A} :
     lexRelFrom blk mk prot n x b y ↔ lexRel blk mk prot x b y := by
   constructor
   · rintro (⟨rfl, p, -, hrest⟩ | h)
@@ -234,13 +239,14 @@ theorem lexRelFrom_all {x : Fin K → A} {b : Bool} {y : Fin K → A} :
     · exact Or.inl ⟨rfl, p, p.isLt, hrest⟩
     · exact Or.inr h
 
-theorem lexRelFrom_mono {jj jj' : ℕ} (h : jj ≤ jj') {x : Fin K → A} {b : Bool} {y : Fin K → A}
+private theorem lexRelFrom_mono
+    {jj jj' : ℕ} (h : jj ≤ jj') {x : Fin K → A} {b : Bool} {y : Fin K → A}
     (hr : lexRelFrom blk mk prot jj x b y) : lexRelFrom blk mk prot jj' x b y := by
   rcases hr with ⟨rfl, p, hp, hrest⟩ | h'
   · exact Or.inl ⟨rfl, p, lt_of_lt_of_le hp h, hrest⟩
   · exact Or.inr h'
 
-theorem lexRelFrom_local (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot)
+private theorem lexRelFrom_local (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot) (hmk : (mk : ℕ) < prot)
     (jj : ℕ) : HeadLocal2 prot (lexRelFrom (A := A) blk mk prot jj) := by
   intro x x' y y' hx hy b
   have hxb : ∀ i, x (blk i) = x' (blk i) := fun i => hx _ (hblk i)
@@ -274,7 +280,7 @@ variable {blk mk prot}
 
 /-- **Soundness of the increment**: every exit is the one the relation
 describes. -/
-theorem lexSound (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot)
+private theorem lexSound (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot)
     (hmk : (mk : ℕ) < prot) :
     ∀ (jj : ℕ) (hjj : jj < n + 1) (x : Fin K → A),
       (∀ i : Fin n, jj ≤ (i : ℕ) → x (blk i) = x mk) →
@@ -414,7 +420,8 @@ theorem bumpTuple_out (blk : Fin n → Fin K) (p : Fin n) (x y : Fin K → A) {h
 
 /-- **Completeness of the increment**: the outcome the relation describes is
 reached. -/
-theorem lexComplete (hinj : Function.Injective blk) (_hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot)
+theorem lexComplete
+    (hinj : Function.Injective blk) (_hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot)
     (_hmk : (mk : ℕ) < prot) :
     ∀ (jj : ℕ) (hjj : jj < n + 1) (x : Fin K → A),
       (∀ i : Fin n, jj ≤ (i : ℕ) → x (blk i) = x mk) →
@@ -513,7 +520,8 @@ theorem lexComplete (hinj : Function.Injective blk) (_hblk : ∀ i, ((blk i : Fi
 
 /-- **What the odometer runs**: the lexicographic successor of the tuple on the
 block, read through the marker. -/
-theorem runs_lexNextP (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot)
+private theorem runs_lexNextP
+    (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : Fin K) : ℕ) < prot)
     (hmk : (mk : ℕ) < prot) :
     (lexNextP (L := L) blk mk).Runs A prot (lexRel blk mk prot) := by
   refine (runs_wireP (C := LexNode n) (lexFam blk mk) lexWire
@@ -526,7 +534,7 @@ theorem runs_lexNextP (hinj : Function.Injective blk) (hblk : ∀ i, ((blk i : F
     exact lexComplete hinj hblk hmk n (Nat.lt_succ_self n) x
       (fun i hi => absurd i.isLt (by omega)) b y ((lexRelFrom_all blk mk prot).mpr hr)
 
-theorem deterministic_lexNextP : (lexNextP (L := L) blk mk).Deterministic A := by
+private theorem deterministic_lexNextP : (lexNextP (L := L) blk mk).Deterministic A := by
   refine deterministic_wireP _ _ _ ?_
   rintro (j | j)
   · rcases hp : testPos j with _ | p
@@ -555,7 +563,7 @@ theorem tupSucc_of_lexRel (hmax : ∀ a : A, a ≤ x mk) (h : lexRel blk mk prot
 open Classical in
 /-- **The increment can always be taken where the tuple is not the greatest**:
 the outcome the relation describes exists. -/
-theorem exists_lexRel_succ [Finite A] (hinj : Function.Injective blk)
+private theorem exists_lexRel_succ [Finite A] (hinj : Function.Injective blk)
     (hmax : ∀ a : A, a ≤ x mk) (hnotTop : ¬∀ (i : Fin n) (a : A), a ≤ x (blk i)) :
     ∃ y, lexRel blk mk prot x true y ∧ TupSucc (fun i => x (blk i)) (fun i => y (blk i)) ∧
       ∀ j : Fin K, (j : ℕ) < prot → (∀ i, j ≠ blk i) → y j = x j := by
@@ -596,7 +604,8 @@ theorem exists_lexRel_succ [Finite A] (hinj : Function.Injective blk)
 
 /-- **The increment fails exactly at the greatest tuple**, and then leaves
 everything alone. -/
-theorem lexRel_top (hmax : ∀ a : A, a ≤ x mk) (hall : ∀ (i : Fin n) (a : A), a ≤ x (blk i)) :
+private theorem lexRel_top
+    (hmax : ∀ a : A, a ≤ x mk) (hall : ∀ (i : Fin n) (a : A), a ≤ x (blk i)) :
     lexRel blk mk prot x false x :=
   Or.inr ⟨rfl, fun i => le_antisymm (hmax _) (hall i _), HeadAgree.refl x⟩
 

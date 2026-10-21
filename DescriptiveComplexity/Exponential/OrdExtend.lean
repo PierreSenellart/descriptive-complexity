@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.OrdFormula
+import all DescriptiveComplexity.Exponential.OrdFormula
 
 /-!
 # Extending an expansion with its own order
@@ -55,7 +56,7 @@ noncomputable def ordSentence (t₁ t₂ : X.Tag) :
 variable (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- **The defining sentence is the order on points.** -/
-theorem realize_ordSentence (t₁ t₂ : X.Tag) (ρs : Fin 2 → X.B.Assignment A) :
+private theorem realize_ordSentence (t₁ t₂ : X.Tag) (ρs : Fin 2 → X.B.Assignment A) :
     (@Sentence.Realize _ A
         ((X.B.replicate 2).structure₁ (L := L.sum Language.order) (X.B.replicateAssign ρs))
         (X.ordSentence t₁ t₂) ↔
@@ -114,7 +115,7 @@ noncomputable def ordExtendStructure :
 /-- **The extension produces exactly the original expanded structure equipped
 with its order**: the identity map is an isomorphism over the order-expanded
 vocabulary. -/
-noncomputable def ordExtendLEquiv :
+private noncomputable def ordExtendLEquiv :
     letI := X.mapLinearOrder A
     letI := X.ordExtendStructure A
     (ordExtend (X := X)).Map A ≃[X.E.sum Language.order] X.Map A :=

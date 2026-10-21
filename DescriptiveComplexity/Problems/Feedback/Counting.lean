@@ -12,6 +12,9 @@ public import DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
 import DescriptiveComplexity.Counting.Sized
 import DescriptiveComplexity.Counting.Subtractive
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Sized
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
 
 /-!
 # #Feedback Vertex Set
@@ -68,7 +71,7 @@ def IsAcyclicClosure (E T : A → A → Prop) : Prop :=
     ∀ x y, T x y → E x y ∨ ∃ z, E x z ∧ T z y
 
 /-- The transitive closure of an acyclic relation is one. -/
-theorem isAcyclicClosure_transGen {E : A → A → Prop} (h : AcyclicRel E) :
+private theorem isAcyclicClosure_transGen {E : A → A → Prop} (h : AcyclicRel E) :
     IsAcyclicClosure E (Relation.TransGen E) := by
   refine ⟨fun _ _ he => .single he, fun _ _ _ h₁ h₂ => h₁.trans h₂, h, fun x y hxy => ?_⟩
   induction hxy with
@@ -184,7 +187,7 @@ noncomputable def SharpFeedbackVertexSet : CountingProblem Language.markedGraph 
     (feedbackOfSizeEquiv e.toEquiv (fun a a' => relMap_equiv₂ e mgAdj a a')
       fun a => relMap_equiv₁ e mgMarked a)
 
-theorem sharpFeedbackVertexSet_apply (A : Type) [Language.markedGraph.Structure A] :
+private theorem sharpFeedbackVertexSet_apply (A : Type) [Language.markedGraph.Structure A] :
     SharpFeedbackVertexSet A = Nat.card {C : A → Prop // FvsOfSize A C} :=
   rfl
 
@@ -226,7 +229,7 @@ fo_block fvsCountBlock over Language.markedGraph mg into fvsCountLang with fc wh
 
 /-- The order-free kernel of #Feedback Vertex Set: the guessed binary relation
 is the transitive closure of the surviving arcs, and it is irreflexive. -/
-noncomputable def fvsCountKernel : fvsCountLang.Sentence :=
+private noncomputable def fvsCountKernel : fvsCountLang.Sentence :=
   fo% (∀ x y, (¬ fcSelSym(x) ∧ ¬ fcSelSym(y) ∧ fcAdjSym(x, y)) → fcTcSym(x, y)) ∧
     (∀ x y z, fcTcSym(x, y) ∧ fcTcSym(y, z) → fcTcSym(x, z)) ∧
     (∀ x, ¬ fcTcSym(x, x)) ∧
@@ -238,7 +241,7 @@ section Kernel
 variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- Realization of the order-free kernel of #Feedback Vertex Set. -/
-theorem realize_fvsCountKernel (ρ : fvsCountBlock.Assignment A) :
+private theorem realize_fvsCountKernel (ρ : fvsCountBlock.Assignment A) :
     (@Sentence.Realize fvsCountLang A
         (@sumStructure _ _ A _ (fvsCountBlock.structure ρ)) fvsCountKernel) ↔
       IsAcyclicClosure (SurvivingArc (fun x y : A => MGAdj x y) fun a => ρ .sel fun _ => a)
@@ -265,7 +268,7 @@ theorem realize_fvsCountKernel (ρ : fvsCountBlock.Assignment A) :
 
 /-- The certificate of a set: the set, and the transitive closure of the arcs
 its removal leaves. -/
-def fvsCertOf (C : A → Prop) : fvsCountBlock.Assignment A :=
+private def fvsCertOf (C : A → Prop) : fvsCountBlock.Assignment A :=
   fun i => match i with
     | .sel => fun w : Fin 1 → A => C (w 0)
     | .tc => fun w : Fin 2 → A =>
@@ -276,7 +279,7 @@ variable (A) [Finite A]
 /-- **The feedback vertex sets of the threshold size are the witnesses of the
 kernel of that size**, bijectively: the transitive closure is the one
 certificate. -/
-noncomputable def fvsEquiv :
+private noncomputable def fvsEquiv :
     {ρ : fvsCountBlock.Assignment A //
         (@Sentence.Realize fvsCountLang A
           (@sumStructure _ _ A _ (fvsCountBlock.structure ρ)) fvsCountKernel) ∧
@@ -304,7 +307,7 @@ end Kernel
 
 /-- **#Feedback Vertex Set is in `#P`**: the size is certified by the monotone
 bijection with the marked set, and acyclicity by the transitive closure. -/
-theorem sharpFeedbackVertexSet_mem_sharpP : SharpFeedbackVertexSet ∈ SharpP :=
+private theorem sharpFeedbackVertexSet_mem_sharpP : SharpFeedbackVertexSet ∈ SharpP :=
   sharpPDefinable_of_sized SharpFeedbackVertexSet fvsCountBlock mgMarked .sel rfl
     fvsCountKernel fun A _ _ => (Nat.card_congr (fvsEquiv A)).symm
 
@@ -329,7 +332,7 @@ private theorem symmetrize_marked_iff :
   exact symmetrize_marked w
 
 /-- The feedback vertex sets of the symmetrized graph are the vertex covers. -/
-theorem sharpFeedbackVertexSet_symmetrize_map :
+private theorem sharpFeedbackVertexSet_symmetrize_map :
     SharpFeedbackVertexSet (symmetrizeInterp.Map A) = SharpVertexCover A :=
   (Nat.card_congr (feedbackOfSizeEquiv (symmetrizeInterp.mapEquivSelf A)
     (AdjA := fun x y : A => x ≠ y ∧ (MGAdj x y ∨ MGAdj y x)) (symmetrize_adj_iff A)
@@ -341,7 +344,7 @@ end Hardness
 
 /-- **#Vertex Cover reduces parsimoniously to #Feedback Vertex Set**, by
 symmetrizing the adjacency relation. -/
-noncomputable def sharpVertexCover_parsimonious_sharpFeedbackVertexSet :
+private noncomputable def sharpVertexCover_parsimonious_sharpFeedbackVertexSet :
     SharpVertexCover ≤ᵖ SharpFeedbackVertexSet where
   Tag := Unit
   dim := 1

@@ -10,6 +10,7 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.MaxCut.Defs
 public import DescriptiveComplexity.Problems.Feedback.Membership
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.MaxCut.Defs
 
 /-!
 # Max Cut is in NP
@@ -41,17 +42,17 @@ fo_block maxCutGuessBlock over Language.markedArcGraph mag into mcSOLang with mc
 
 /-- Kernel conjunct: the guessed injection maps every marked pair to a pair
 crossing the cut. -/
-noncomputable def mcTotalClause : mcSOLang.Sentence :=
+private noncomputable def mcTotalClause : mcSOLang.Sentence :=
   fo% ∀ a b, mcMarkedSym(a, b) →
     ∃ c d, mcInjSym(a, b, c, d) ∧ mcAdjSym(c, d) ∧ mcSideSym(c) ∧ ¬ mcSideSym(d)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
-noncomputable def mcInjClause : mcSOLang.Sentence :=
+private noncomputable def mcInjClause : mcSOLang.Sentence :=
   fo% ∀ a b a' b' c d,
     mcInjSym(a, b, c, d) ∧ mcInjSym(a', b', c, d) → a ≐ a' ∧ b ≐ b'
 
 /-- The first-order kernel of the `Σ₁` definition of Max Cut. -/
-noncomputable def maxCutKernel : mcSOLang.Sentence :=
+private noncomputable def maxCutKernel : mcSOLang.Sentence :=
   mcTotalClause ⊓ mcInjClause
 
 /-- Realization of the kernel under an assignment of the two relation

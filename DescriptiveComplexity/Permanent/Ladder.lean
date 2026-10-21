@@ -102,11 +102,11 @@ noncomputable def ladder (K : ℕ) (wd : V → V → Λ → ℕ) (n n' : V ⊕ R
 
 variable {K : ℕ} {wd : V → V → Λ → ℕ}
 
-theorem ladderEdge_inl_inl (a b : V) : ¬LadderEdge K wd (Sum.inl a) (Sum.inl b) := by
+private theorem ladderEdge_inl_inl (a b : V) : ¬LadderEdge K wd (Sum.inl a) (Sum.inl b) := by
   intro h
   cases h
 
-theorem ladderEdge_inl_inr {a : V} {q : Rung K wd} :
+private theorem ladderEdge_inl_inr {a : V} {q : Rung K wd} :
     LadderEdge K wd (Sum.inl a) (Sum.inr q) ↔ q.src = a ∧ q.lvl = ⊥ := by
   constructor
   · intro h
@@ -115,7 +115,7 @@ theorem ladderEdge_inl_inr {a : V} {q : Rung K wd} :
   · rintro ⟨rfl, h⟩
     exact .enter q h
 
-theorem ladderEdge_inr_inl {q : Rung K wd} {b : V} :
+private theorem ladderEdge_inr_inl {q : Rung K wd} {b : V} :
     LadderEdge K wd (Sum.inr q) (Sum.inl b) ↔ q.tgt = b ∧ q.lvl = ⊤ := by
   constructor
   · intro h
@@ -124,7 +124,7 @@ theorem ladderEdge_inr_inl {q : Rung K wd} {b : V} :
   · rintro ⟨rfl, h⟩
     exact .leave q h
 
-theorem ladderEdge_inr_inr {q q' : Rung K wd} :
+private theorem ladderEdge_inr_inr {q q' : Rung K wd} :
     LadderEdge K wd (Sum.inr q) (Sum.inr q') ↔
       q = q' ∨ (q.src = q'.src ∧ q.tgt = q'.tgt ∧ q.lvl ⋖ q'.lvl) := by
   constructor
@@ -145,32 +145,33 @@ section Levels
 variable {Λ : Type} [LinearOrder Λ]
 
 /-- The next level is unique. -/
-theorem covBy_right_unique {ℓ ℓ₁ ℓ₂ : Λ} (h₁ : ℓ ⋖ ℓ₁) (h₂ : ℓ ⋖ ℓ₂) : ℓ₁ = ℓ₂ :=
+private theorem covBy_right_unique {ℓ ℓ₁ ℓ₂ : Λ} (h₁ : ℓ ⋖ ℓ₁) (h₂ : ℓ ⋖ ℓ₂) : ℓ₁ = ℓ₂ :=
   le_antisymm (h₁.ge_of_gt h₂.lt) (h₂.ge_of_gt h₁.lt)
 
 /-- The previous level is unique. -/
-theorem covBy_left_unique {ℓ₁ ℓ₂ ℓ : Λ} (h₁ : ℓ₁ ⋖ ℓ) (h₂ : ℓ₂ ⋖ ℓ) : ℓ₁ = ℓ₂ :=
+private theorem covBy_left_unique {ℓ₁ ℓ₂ ℓ : Λ} (h₁ : ℓ₁ ⋖ ℓ) (h₂ : ℓ₂ ⋖ ℓ) : ℓ₁ = ℓ₂ :=
   le_antisymm (h₂.le_of_lt h₁.lt) (h₁.le_of_lt h₂.lt)
 
 variable [Finite Λ] [BoundedOrder Λ]
 
 /-- The next level, when there is one. -/
-noncomputable def lvlSucc (ℓ : Λ) : Λ :=
+private noncomputable def lvlSucc (ℓ : Λ) : Λ :=
   if h : ℓ = ⊤ then ℓ
   else Classical.choose (exists_covBy_of_wellFoundedLT (isMax_iff_eq_top.not.mpr h))
 
-theorem covBy_lvlSucc {ℓ : Λ} (h : ℓ ≠ ⊤) : ℓ ⋖ lvlSucc ℓ := by
+private theorem covBy_lvlSucc {ℓ : Λ} (h : ℓ ≠ ⊤) : ℓ ⋖ lvlSucc ℓ := by
   rw [lvlSucc, dite_eq_right h]
   exact Classical.choose_spec (exists_covBy_of_wellFoundedLT (isMax_iff_eq_top.not.mpr h))
 
-theorem lvlSucc_injective {ℓ ℓ' : Λ} (h : ℓ ≠ ⊤) (h' : ℓ' ≠ ⊤) (he : lvlSucc ℓ = lvlSucc ℓ') :
+private theorem lvlSucc_injective
+    {ℓ ℓ' : Λ} (h : ℓ ≠ ⊤) (h' : ℓ' ≠ ⊤) (he : lvlSucc ℓ = lvlSucc ℓ') :
     ℓ = ℓ' :=
   covBy_left_unique (covBy_lvlSucc h) (he ▸ covBy_lvlSucc h')
 
-theorem lvlSucc_ne_bot {ℓ : Λ} (h : ℓ ≠ ⊤) : lvlSucc ℓ ≠ ⊥ :=
+private theorem lvlSucc_ne_bot {ℓ : Λ} (h : ℓ ≠ ⊤) : lvlSucc ℓ ≠ ⊥ :=
   fun hb => (hb ▸ (covBy_lvlSucc h).lt).not_ge bot_le
 
-theorem lvlSucc_ne {ℓ : Λ} (h : ℓ ≠ ⊤) : lvlSucc ℓ ≠ ℓ :=
+private theorem lvlSucc_ne {ℓ : Λ} (h : ℓ ≠ ⊤) : lvlSucc ℓ ≠ ℓ :=
   (covBy_lvlSucc h).lt.ne'
 
 end Levels
@@ -190,34 +191,35 @@ variable (hK : ∀ a b ℓ, wd a b ℓ ≤ K)
 include hK
 
 /-- The rung a choice picks at level `ℓ` of the edge leaving `a`. -/
-def act (c : Choice wd) (a : V) (ℓ : Λ) : Rung K wd :=
+private def act (c : Choice wd) (a : V) (ℓ : Λ) : Rung K wd :=
   ⟨(a, c.1 a, ℓ, ⟨(c.2 a ℓ).val, lt_of_lt_of_le (c.2 a ℓ).2 (hK a (c.1 a) ℓ)⟩), (c.2 a ℓ).2⟩
 
-theorem act_src (c : Choice wd) (a : V) (ℓ : Λ) : (act hK c a ℓ).src = a := rfl
+private theorem act_src (c : Choice wd) (a : V) (ℓ : Λ) : (act hK c a ℓ).src = a := rfl
 
-theorem act_tgt (c : Choice wd) (a : V) (ℓ : Λ) : (act hK c a ℓ).tgt = c.1 a := rfl
+private theorem act_tgt (c : Choice wd) (a : V) (ℓ : Λ) : (act hK c a ℓ).tgt = c.1 a := rfl
 
-theorem act_lvl (c : Choice wd) (a : V) (ℓ : Λ) : (act hK c a ℓ).lvl = ℓ := rfl
+private theorem act_lvl (c : Choice wd) (a : V) (ℓ : Λ) : (act hK c a ℓ).lvl = ℓ := rfl
 
-theorem act_idx_val (c : Choice wd) (a : V) (ℓ : Λ) :
+private theorem act_idx_val (c : Choice wd) (a : V) (ℓ : Λ) :
     (act hK c a ℓ).idx.val = (c.2 a ℓ).val := rfl
 
-theorem act_injective (c : Choice wd) {a a' : V} {ℓ ℓ' : Λ}
+private theorem act_injective (c : Choice wd) {a a' : V} {ℓ ℓ' : Λ}
     (h : act hK c a ℓ = act hK c a' ℓ') : a = a' ∧ ℓ = ℓ' :=
   ⟨congrArg Rung.src h, congrArg Rung.lvl h⟩
 
 /-- A rung is **picked** by a choice. -/
-def IsAct (c : Choice wd) (q : Rung K wd) : Prop :=
+private def IsAct (c : Choice wd) (q : Rung K wd) : Prop :=
   q.tgt = c.1 q.src ∧ q.idx.val = (c.2 q.src q.lvl).val
 
-theorem isAct_iff (c : Choice wd) (q : Rung K wd) : IsAct c q ↔ q = act hK c q.src q.lvl := by
+private theorem isAct_iff
+    (c : Choice wd) (q : Rung K wd) : IsAct c q ↔ q = act hK c q.src q.lvl := by
   constructor
   · rintro ⟨hb, hj⟩
     exact Rung.ext rfl hb rfl (Fin.ext hj)
   · intro h
     exact ⟨congrArg Rung.tgt h, congrArg (fun q : Rung K wd => q.idx.val) h⟩
 
-theorem isAct_act (c : Choice wd) (a : V) (ℓ : Λ) : IsAct c (act hK c a ℓ) :=
+private theorem isAct_act (c : Choice wd) (a : V) (ℓ : Λ) : IsAct c (act hK c a ℓ) :=
   (isAct_iff hK c _).mpr rfl
 
 variable [LinearOrder Λ] [Finite Λ] [BoundedOrder Λ]
@@ -227,31 +229,32 @@ open Classical in
 source of each edge goes to the picked rung of the least level, each picked
 rung to the picked rung of the next level, or to the target from the greatest
 level, and every other rung loops. -/
-noncomputable def toCover (c : Choice wd) : V ⊕ Rung K wd → V ⊕ Rung K wd
+private noncomputable def toCover (c : Choice wd) : V ⊕ Rung K wd → V ⊕ Rung K wd
   | Sum.inl a => Sum.inr (act hK c a ⊥)
   | Sum.inr q =>
       if IsAct c q then
         if q.lvl = ⊤ then Sum.inl q.tgt else Sum.inr (act hK c q.src (lvlSucc q.lvl))
       else Sum.inr q
 
-theorem toCover_inl (c : Choice wd) (a : V) : toCover hK c (Sum.inl a) = Sum.inr (act hK c a ⊥) :=
+private theorem toCover_inl
+    (c : Choice wd) (a : V) : toCover hK c (Sum.inl a) = Sum.inr (act hK c a ⊥) :=
   rfl
 
-theorem toCover_inr_of_not (c : Choice wd) {q : Rung K wd} (h : ¬IsAct c q) :
+private theorem toCover_inr_of_not (c : Choice wd) {q : Rung K wd} (h : ¬IsAct c q) :
     toCover hK c (Sum.inr q) = Sum.inr q := by
   rw [toCover, ite_eq_right h]
 
-theorem toCover_inr_top (c : Choice wd) {q : Rung K wd} (h : IsAct c q) (ht : q.lvl = ⊤) :
+private theorem toCover_inr_top (c : Choice wd) {q : Rung K wd} (h : IsAct c q) (ht : q.lvl = ⊤) :
     toCover hK c (Sum.inr q) = Sum.inl q.tgt := by
   rw [toCover, ite_eq_left h, ite_eq_left ht]
 
-theorem toCover_inr_of_ne_top (c : Choice wd) {q : Rung K wd} (h : IsAct c q)
+private theorem toCover_inr_of_ne_top (c : Choice wd) {q : Rung K wd} (h : IsAct c q)
     (ht : q.lvl ≠ ⊤) : toCover hK c (Sum.inr q) = Sum.inr (act hK c q.src (lvlSucc q.lvl)) := by
   rw [toCover, ite_eq_left h, ite_eq_right ht]
 
 /-- Every edge of the cover determined by a choice is an edge of the ladder
 graph. -/
-theorem ladderEdge_toCover (c : Choice wd) (n : V ⊕ Rung K wd) :
+private theorem ladderEdge_toCover (c : Choice wd) (n : V ⊕ Rung K wd) :
     LadderEdge K wd n (toCover hK c n) := by
   rcases n with a | q
   · exact .enter (act hK c a ⊥) rfl
@@ -264,7 +267,7 @@ theorem ladderEdge_toCover (c : Choice wd) (n : V ⊕ Rung K wd) :
     · rw [toCover_inr_of_not hK c h]
       exact .loop q
 
-theorem toCover_inr_ne (c : Choice wd) {q : Rung K wd} (h : IsAct c q) :
+private theorem toCover_inr_ne (c : Choice wd) {q : Rung K wd} (h : IsAct c q) :
     toCover hK c (Sum.inr q) ≠ Sum.inr q := by
   by_cases ht : q.lvl = ⊤
   · rw [toCover_inr_top hK c h ht]
@@ -274,7 +277,7 @@ theorem toCover_inr_ne (c : Choice wd) {q : Rung K wd} (h : IsAct c q) :
     exact lvlSucc_ne ht (congrArg Rung.lvl (Sum.inr.inj he))
 
 /-- The cover determined by a choice is injective. -/
-theorem toCover_injective (c : Choice wd) : Function.Injective (toCover hK c) := by
+private theorem toCover_injective (c : Choice wd) : Function.Injective (toCover hK c) := by
   intro n n' h
   rcases n with a | q <;> rcases n' with a' | q'
   · exact congrArg Sum.inl (act_injective hK c (Sum.inr.inj h)).1
@@ -340,17 +343,17 @@ variable [Finite V]
 
 /-- The cover determined by a choice, as an element of the set of cycle
 covers of the ladder graph. -/
-noncomputable def toCoverEquiv (c : Choice wd) :
+private noncomputable def toCoverEquiv (c : Choice wd) :
     {e : V ⊕ Rung K wd ≃ V ⊕ Rung K wd // ∀ n, LadderEdge K wd n (e n)} :=
   ⟨Equiv.ofBijective _ (Finite.injective_iff_bijective.mp (toCover_injective hK c)),
     ladderEdge_toCover hK c⟩
 
-theorem toCoverEquiv_apply (c : Choice wd) (n : V ⊕ Rung K wd) :
+private theorem toCoverEquiv_apply (c : Choice wd) (n : V ⊕ Rung K wd) :
     (toCoverEquiv hK c).1 n = toCover hK c n :=
   rfl
 
 /-- Distinct choices determine distinct covers. -/
-theorem toCoverEquiv_injective : Function.Injective (toCoverEquiv hK) := by
+private theorem toCoverEquiv_injective : Function.Injective (toCoverEquiv hK) := by
   rintro ⟨σ, r⟩ ⟨σ', r'⟩ h
   have h' : ∀ n, toCover hK ⟨σ, r⟩ n = toCover hK ⟨σ', r'⟩ n := fun n =>
     (toCoverEquiv_apply hK _ n).symm.trans ((congrArg (fun e => e.1 n) h).trans
@@ -389,7 +392,7 @@ theorem act_of_eq_inr {q' q : Rung K wd} (h : e (Sum.inr q') = Sum.inr q) (hne :
 include he in
 /-- The edge entering an active rung: from the source at the least level, or
 from an active rung of the previous level. -/
-theorem of_act {q : Rung K wd} (h : Act e q) :
+private theorem of_act {q : Rung K wd} (h : Act e q) :
     (q.lvl = ⊥ ∧ e (Sum.inl q.src) = Sum.inr q) ∨
       ∃ q' : Rung K wd, q'.src = q.src ∧ q'.tgt = q.tgt ∧ q'.lvl ⋖ q.lvl ∧ Act e q' ∧
         e (Sum.inr q') = Sum.inr q := by
@@ -408,7 +411,7 @@ theorem of_act {q : Rung K wd} (h : Act e q) :
 include he in
 /-- The edge leaving an active rung: to the target from the greatest level,
 to an active rung of the next level otherwise. -/
-theorem act_step {q : Rung K wd} (h : Act e q) :
+private theorem act_step {q : Rung K wd} (h : Act e q) :
     (q.lvl = ⊤ ∧ e (Sum.inr q) = Sum.inl q.tgt) ∨
       ∃ q' : Rung K wd, q'.src = q.src ∧ q'.tgt = q.tgt ∧ q.lvl ⋖ q'.lvl ∧ Act e q' ∧
         e (Sum.inr q) = Sum.inr q' := by
@@ -441,7 +444,7 @@ theorem tgt_eq {a : V} {q : Rung K wd} (h : e (Sum.inl a) = Sum.inr q) : tgt e a
 include he in
 /-- The cover sends `a` to a rung of the least level of the edge to
 `tgt e a`. -/
-theorem exists_act_bot (a : V) :
+private theorem exists_act_bot (a : V) :
     ∃ q : Rung K wd, q.src = a ∧ q.tgt = tgt e a ∧ q.lvl = ⊥ ∧ Act e q ∧
       e (Sum.inl a) = Sum.inr q := by
   have hm := he (Sum.inl a)
@@ -455,7 +458,7 @@ variable [Finite Λ]
 
 include he in
 /-- **No rung of an unused edge is active.** -/
-theorem not_act_of_ne (q : Rung K wd) (hq : q.tgt ≠ tgt e q.src) : ¬Act e q := by
+private theorem not_act_of_ne (q : Rung K wd) (hq : q.tgt ≠ tgt e q.src) : ¬Act e q := by
   induction hℓ : q.lvl using WellFoundedLT.induction generalizing q with
   | _ ℓ ih =>
   intro h
@@ -465,7 +468,7 @@ theorem not_act_of_ne (q : Rung K wd) (hq : q.tgt ≠ tgt e q.src) : ¬Act e q :
 
 include he in
 /-- **Every level of a used edge has exactly one active rung.** -/
-theorem existsUnique_act (a : V) (ℓ : Λ) :
+private theorem existsUnique_act (a : V) (ℓ : Λ) :
     ∃! q : Rung K wd, q.src = a ∧ q.tgt = tgt e a ∧ q.lvl = ℓ ∧ Act e q := by
   induction ℓ using WellFoundedLT.induction with
   | _ ℓ ih =>
@@ -489,22 +492,22 @@ theorem existsUnique_act (a : V) (ℓ : Λ) :
         exact Sum.inr.inj (hq'.symm.trans (this ▸ hq))
 
 /-- The active rung of a level of a used edge. -/
-noncomputable def actRung (a : V) (ℓ : Λ) : Rung K wd :=
+private noncomputable def actRung (a : V) (ℓ : Λ) : Rung K wd :=
   Classical.choose (existsUnique_act e he a ℓ).exists
 
-theorem actRung_spec (a : V) (ℓ : Λ) :
+private theorem actRung_spec (a : V) (ℓ : Λ) :
     (actRung e he a ℓ).src = a ∧ (actRung e he a ℓ).tgt = tgt e a ∧
       (actRung e he a ℓ).lvl = ℓ ∧ Act e (actRung e he a ℓ) :=
   Classical.choose_spec (existsUnique_act e he a ℓ).exists
 
-theorem eq_actRung {q : Rung K wd} (h : Act e q) : q = actRung e he q.src q.lvl :=
+private theorem eq_actRung {q : Rung K wd} (h : Act e q) : q = actRung e he q.src q.lvl :=
   (existsUnique_act e he q.src q.lvl).unique
     ⟨rfl, by_contra fun h' => not_act_of_ne e he q h' h, rfl, h⟩ (actRung_spec e he _ _)
 
 include he in
 /-- The target map of a cover is injective: the active rung of the greatest
 level is the only way into the target. -/
-theorem tgt_injective : Function.Injective (tgt e) := by
+private theorem tgt_injective : Function.Injective (tgt e) := by
   intro a a' h
   have h1 := act_top e he (actRung_spec e he a ⊤).2.2.2 (actRung_spec e he a ⊤).2.2.1
   have h2 := act_top e he (actRung_spec e he a' ⊤).2.2.2 (actRung_spec e he a' ⊤).2.2.1
@@ -516,7 +519,7 @@ theorem tgt_injective : Function.Injective (tgt e) := by
 variable [Finite V]
 
 /-- **The choice underneath a cover.** -/
-noncomputable def ofCover : Choice wd :=
+private noncomputable def ofCover : Choice wd :=
   ⟨Equiv.ofBijective (tgt e) (Finite.injective_iff_bijective.mp (tgt_injective e he)),
     fun a ℓ => ⟨(actRung e he a ℓ).idx.val, by
       have h := (actRung e he a ℓ).2
@@ -526,12 +529,12 @@ noncomputable def ofCover : Choice wd :=
         (actRung_spec e he a ℓ).2.2.1] at h
       exact h⟩⟩
 
-theorem act_ofCover (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (a : V) (ℓ : Λ) :
+private theorem act_ofCover (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (a : V) (ℓ : Λ) :
     act hK (ofCover e he) a ℓ = actRung e he a ℓ :=
   Rung.ext (actRung_spec e he a ℓ).1.symm (actRung_spec e he a ℓ).2.1.symm
     (actRung_spec e he a ℓ).2.2.1.symm (Fin.ext rfl)
 
-theorem isAct_ofCover_iff (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (q : Rung K wd) :
+private theorem isAct_ofCover_iff (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (q : Rung K wd) :
     IsAct (ofCover e he) q ↔ Act e q := by
   rw [isAct_iff hK, act_ofCover e he hK]
   constructor
@@ -541,7 +544,7 @@ theorem isAct_ofCover_iff (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (q : Rung K wd) :
   · exact eq_actRung e he
 
 /-- **The cover of the choice underneath a cover is that cover.** -/
-theorem toCover_ofCover (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (n : V ⊕ Rung K wd) :
+private theorem toCover_ofCover (hK : ∀ a b ℓ, wd a b ℓ ≤ K) (n : V ⊕ Rung K wd) :
     toCover hK (ofCover e he) n = e n := by
   rcases n with a | q
   · rw [toCover_inl, act_ofCover e he hK]
@@ -565,7 +568,7 @@ section Main
 variable {V Λ : Type} [LinearOrder Λ] [BoundedOrder Λ] {K : ℕ} {wd : V → V → Λ → ℕ}
 
 /-- **The covers of the ladder graph are the choices.** -/
-theorem toCoverEquiv_bijective [Finite V] [Finite Λ] (hK : ∀ a b ℓ, wd a b ℓ ≤ K) :
+private theorem toCoverEquiv_bijective [Finite V] [Finite Λ] (hK : ∀ a b ℓ, wd a b ℓ ≤ K) :
     Function.Bijective (toCoverEquiv hK) :=
   ⟨toCoverEquiv_injective hK, fun ⟨e, he⟩ => ⟨ofCover e he, Subtype.ext (Equiv.ext fun n =>
     (toCoverEquiv_apply hK _ n).trans (toCover_ofCover e he hK n))⟩⟩

@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Definable
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Fields: reading a packed number out of one element
@@ -53,7 +56,7 @@ section NatFields
 `2 ^ a`, the block scaled by `2 ^ a`, and a high part scaled by `2 ^ b`. Every
 witness of the left-hand side is at most `x`, which is what makes the statement
 survive the truncation of a finite universe. -/
-theorem field_iff (x m a d : ℕ) :
+private theorem field_iff (x m a d : ℕ) :
     (∃ lo hi : ℕ, lo + (m * 2 ^ a + hi * 2 ^ (a + d)) = x ∧ lo < 2 ^ a ∧
         m * 2 ^ a < 2 ^ (a + d)) ↔
       m = x / 2 ^ a % 2 ^ d := by
@@ -94,7 +97,7 @@ section Fields
 variable {A : Type} [LinearOrder A] [Finite A]
 
 /-- The order of the elements is the order of their ranks. -/
-theorem lt_of_orank_lt {x y : A} (h : orank x < orank y) : x < y :=
+private theorem lt_of_orank_lt {x y : A} (h : orank x < orank y) : x < y :=
   lt_of_not_ge fun hc => absurd (orank_le_iff.mpr hc) (by omega)
 
 /-- **The field of `x` between the place values `p` and `q`**, read as the number

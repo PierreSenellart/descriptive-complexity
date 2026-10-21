@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Wide.RegChannelEval
 public import DescriptiveComplexity.Problems.Wide.TrackWrites
 public import DescriptiveComplexity.Problems.Wide.RegChannelProg
 public import DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.RegChannel
+import all DescriptiveComplexity.Problems.Wide.RegChannelInit
 
 /-!
 # The tape the register channel hands over is the state the run reads
@@ -60,7 +64,7 @@ omit [Fintype dt.SlotIx] [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
   [Finite dt.KIx] in
 /-- **The element below the argument tags exists**: the elements carrying no
 argument block are finitely many and not none, so one of them is greatest. -/
-theorem exists_isTopNonArg : ∃ z : Univ A R' P' dt.KIx dt.dd, IsTopNonArg z := by
+private theorem exists_isTopNonArg : ∃ z : Univ A R' P' dt.KIx dt.dd, IsTopNonArg z := by
   obtain ⟨z, hz, hmax⟩ := exists_greatest
     (Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx) (A := A) (d := dt.dd))
     (P := fun x : Univ A R' P' dt.KIx dt.dd => ∀ i, x.1 ≠ Tag.arg i)
@@ -72,7 +76,7 @@ omit [Fintype dt.SlotIx] [Nonempty A]
   [Finite P'] [Finite dt.KIx] in
 /-- **The greatest element carries an argument block**, provided there is one:
 the argument tags come last (`DescriptiveComplexity.Draw.lt_arg`). -/
-theorem arg_of_isGreatest [Nonempty dt.KIx] {x : Univ A R' P' dt.KIx dt.dd}
+private theorem arg_of_isGreatest [Nonempty dt.KIx] {x : Univ A R' P' dt.KIx dt.dd}
     (hx : ∀ y : Univ A R' P' dt.KIx dt.dd, tagTupleLe y x) :
     ∃ i, x.1 = Tag.arg i := by
   by_contra hc
@@ -89,7 +93,7 @@ omit [Fintype dt.SlotIx] [Nonempty A]
 tags**: the channel marks the argument elements and that one, and it is the
 least of them. This is the `regFirst` slot's whole content, and the reason the
 mark had to change. -/
-theorem isTopNonArg_iff_least_marked {Marked : Univ A R' P' dt.KIx dt.dd → Prop}
+private theorem isTopNonArg_iff_least_marked {Marked : Univ A R' P' dt.KIx dt.dd → Prop}
     (hmk : ∀ x, Marked x ↔ (∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)
     (hex : ∃ z : Univ A R' P' dt.KIx dt.dd, IsTopNonArg z)
     {x : Univ A R' P' dt.KIx dt.dd} (hx : Marked x) :
@@ -118,7 +122,7 @@ omit [Fintype dt.SlotIx] [Nonempty A]
 tags being the greatest, the greatest element is one of the marked ones, so
 being greatest among them is being greatest. The `regLast` slot therefore needs
 no change. -/
-theorem isGreatest_iff_greatest_marked [Nonempty dt.KIx]
+private theorem isGreatest_iff_greatest_marked [Nonempty dt.KIx]
     {Marked : Univ A R' P' dt.KIx dt.dd → Prop}
     (hmk : ∀ x, Marked x ↔ (∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)
     {x : Univ A R' P' dt.KIx dt.dd} :
@@ -160,7 +164,7 @@ coordinates, the two end slots the file's ends
 (`isTopNonArg_iff_least_marked`, `isGreatest_iff_greatest_marked`), and every
 track is clear – except at the marker, where the start step sets `wk` and `bot`,
 and the entry state says the same. -/
-theorem startBack_initBackReg (hR : PR.table.Reads)
+private theorem startBack_initBackReg (hR : PR.table.Reads)
     (hmark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x)
     (hmk : ∀ x, PR.marked x ↔ (∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)
     (hblank : ∀ s, PR.blank s = PR.zero)
@@ -357,7 +361,7 @@ open Classical in
 `regSlotMark`, whose tracks are all `zero`, and every other cell is blank. This
 is what the semantic half of a backward reading starts from – the tracks hold
 nothing until the machine writes them. -/
-theorem initBackReg_track_zero
+private theorem initBackReg_track_zero
     (hlin : IsLinOrd (WMLe (A := Univ A R' (NexPh (Option dt.KIx) PE) dt.KIx dt.dd)))
     (hR : PR.table.Reads)
     (hmark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x)
@@ -394,7 +398,7 @@ layout's (that is `startBack_initBackReg`, read at those slots alone, the start
 step touching only tracks), the four addressed tracks are clear, and every other
 track is a bit – the marks are `regSlotMark`s and the rest is blank. This is the
 base of an opening's reading. -/
-theorem tapeShape_initBackReg (hR : PR.table.Reads)
+private theorem tapeShape_initBackReg (hR : PR.table.Reads)
     (hmark : ∀ x, PR.mark x = regSlotMark PR.zero PR.one dt.dd0Le x)
     (hmk : ∀ x, PR.marked x ↔ (∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)
     (hblank : ∀ s, PR.blank s = PR.zero)
@@ -468,14 +472,14 @@ variable (hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x 
 omit [Nonempty A] [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 include hR hmk in
 /-- **The channel writes for an element exactly when the program marks it.** -/
-theorem hasInp_iff_regMarked (x : Univ A R' P' dt.KIx dt.dd) :
+private theorem hasInp_iff_regMarked (x : Univ A R' P' dt.KIx dt.dd) :
     WMHasInp x ↔ ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x) :=
   (Table.wmHasInp_iff_marked hR x).trans (hmk x)
 
 omit [Nonempty A] [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 include hR hmk in
 /-- **Every argument element carries input**: the `hargall` the run asks for. -/
-theorem hasInp_of_arg {x : Univ A R' P' dt.KIx dt.dd}
+private theorem hasInp_of_arg {x : Univ A R' P' dt.KIx dt.dd}
     (hx : ∃ k : dt.KIx, x.1 = Tag.arg k) : WMHasInp x :=
   (hasInp_iff_regMarked hR hmk x).mpr (Or.inl hx)
 
@@ -483,7 +487,7 @@ omit [Nonempty A] [Finite A] [Finite R'] [Finite P'] [Finite dt.KIx] in
 include hR hmk in
 /-- **Every named register carries input**: the `harg` the file's `HasName`
 asks for. -/
-theorem hasInp_blkElt (zero : A) (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
+private theorem hasInp_blkElt (zero : A) (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A) :
     WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
       Univ A R' P' dt.KIx dt.dd) :=
   hasInp_of_arg hR hmk ⟨toLex b, rfl⟩
@@ -495,7 +499,7 @@ element everything is an argument element, and above the one element below them
 everything is marked. This is the `hup` the file's bound
 (`DescriptiveComplexity.wideRank_wmRegSeg_lt`) asks for, and what puts the file
 under `2 ^` the number of marks. -/
-theorem hasInp_up (x y : Univ A R' P' dt.KIx dt.dd) (hxy : WMLe x y)
+private theorem hasInp_up (x y : Univ A R' P' dt.KIx dt.dd) (hxy : WMLe x y)
     (hx : WMHasInp x) : WMHasInp y := by
   rcases (hasInp_iff_regMarked hR hmk x).mp hx with ⟨k, hk⟩ | htop
   · refine (hasInp_iff_regMarked hR hmk y).mpr (Or.inl ?_)
@@ -517,7 +521,7 @@ include hR hmk hord in
 /-- **The element below the argument tags is marked and least among the marked
 ones**: the `bot` the working area is measured against
 (`DescriptiveComplexity.Draw.Data.work_regLaid`). -/
-theorem exists_regBotElt :
+private theorem exists_regBotElt :
     ∃ z : Univ A R' P' dt.KIx dt.dd, WMHasInp z ∧
       (∀ y : Univ A R' P' dt.KIx dt.dd, WMHasInp y → WMLe z y) ∧
       ∀ i : dt.KIx, z.1 ≠ Tag.arg i := by

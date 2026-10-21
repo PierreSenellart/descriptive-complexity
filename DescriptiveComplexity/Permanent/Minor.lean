@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Permanent.Basic
+import all DescriptiveComplexity.Permanent.Basic
 
 /-!
 # Minors of the permanent
@@ -39,7 +40,7 @@ variable {α : Type} [DecidableEq α] {p : α → Prop} [DecidablePred p]
 
 /-- The elements of a set of elements satisfying `p`, as elements of the
 subtype. -/
-def subtypeSubtypeEquiv (s : Finset α) (hs : ∀ a ∈ s, p a) :
+private def subtypeSubtypeEquiv (s : Finset α) (hs : ∀ a ∈ s, p a) :
     {x : {a // p a} // x ∈ s.subtype p} ≃ s where
   toFun x := ⟨x.1.1, mem_subtype.mp x.2⟩
   invFun a := ⟨⟨a.1, hs a a.2⟩, mem_subtype.mpr a.2⟩
@@ -47,7 +48,7 @@ def subtypeSubtypeEquiv (s : Finset α) (hs : ∀ a ∈ s, p a) :
   right_inv _ := rfl
 
 /-- A set of elements of the subtype, as a set of elements. -/
-def subtypeMapEquiv (S : Finset {a // p a}) :
+private def subtypeMapEquiv (S : Finset {a // p a}) :
     S ≃ (S.map (Function.Embedding.subtype p) : Finset α) where
   toFun y := ⟨y.1.1, mem_map_of_mem _ y.2⟩
   invFun b := ⟨⟨b.1, Finset.property_of_mem_map_subtype S b.2⟩, by
@@ -61,7 +62,7 @@ def subtypeMapEquiv (S : Finset {a // p a}) :
   right_inv _ := rfl
 
 /-- The complement, in the subtype, of a set of elements. -/
-def subtypeNotEquiv (s : Finset α) :
+private def subtypeNotEquiv (s : Finset α) :
     {x : {a // p a} // x ∉ s.subtype p} ≃ {a // p a ∧ a ∉ s} where
   toFun x := ⟨x.1.1, x.1.2, fun h => x.2 (mem_subtype.mpr h)⟩
   invFun a := ⟨⟨a.1, a.2.1⟩, fun h => a.2.2 ((Finset.mem_subtype (a := ⟨a.1, a.2.1⟩)).mp h)⟩
@@ -69,7 +70,7 @@ def subtypeNotEquiv (s : Finset α) :
   right_inv _ := rfl
 
 /-- The complement, in the subtype, of a set of elements of the subtype. -/
-def subtypeNotMapEquiv (S : Finset {a // p a}) :
+private def subtypeNotMapEquiv (S : Finset {a // p a}) :
     {y : {b // p b} // y ∉ S} ≃ {b // p b ∧ b ∉ S.map (Function.Embedding.subtype p)} where
   toFun y := ⟨y.1.1, y.1.2, fun h => y.2 ((Finset.mem_map' _).mp h)⟩
   invFun b := ⟨⟨b.1, b.2.1⟩, fun h => b.2.2 ((Finset.mem_map' _).mpr h)⟩
@@ -88,18 +89,18 @@ columns in `B` deleted. -/
 noncomputable def pdel (M : α → β → R) (A : Finset α) (B : Finset β) : R :=
   bperm fun (a : {a // a ∉ A}) (b : {b // b ∉ B}) => M a b
 
-theorem pdel_empty (M : α → β → R) : pdel M ∅ ∅ = bperm M := by
+private theorem pdel_empty (M : α → β → R) : pdel M ∅ ∅ = bperm M := by
   unfold pdel
   exact (bperm_reindex (Equiv.subtypeUnivEquiv fun a => Finset.notMem_empty a)
     (Equiv.subtypeUnivEquiv fun b => Finset.notMem_empty b)
     fun (a : {a // a ∉ (∅ : Finset α)}) (b : {b // b ∉ (∅ : Finset β)}) => M a b).symm
 
-theorem pdel_flip (M : α → β → R) (A : Finset α) (B : Finset β) :
+private theorem pdel_flip (M : α → β → R) (A : Finset α) (B : Finset β) :
     pdel (fun b a => M a b) B A = pdel M A B :=
   bperm_flip _
 
 /-- Deleting the same sets gives the same minor. -/
-theorem pdel_congr (M : α → β → R) {A A' : Finset α} {B B' : Finset β} (hA : A = A')
+private theorem pdel_congr (M : α → β → R) {A A' : Finset α} {B B' : Finset β} (hA : A = A')
     (hB : B = B') : pdel M A B = pdel M A' B' := by
   subst hA hB
   rfl
@@ -138,7 +139,7 @@ theorem pdel_block (M : α → β → R) (A : Finset α) (B : Finset β) (I : Fi
 
 omit [Fintype α] [Fintype β] in
 /-- The permanent of a `1 × 1` block is its entry. -/
-theorem bperm_singleton (M : α → β → R) (a : α) (b : β) :
+private theorem bperm_singleton (M : α → β → R) (a : α) (b : β) :
     bperm (fun (x : ({a} : Finset α)) (y : ({b} : Finset β)) => M x y) = M a b := by
   have : Unique {x // x ∈ ({a} : Finset α)} :=
     ⟨⟨⟨a, mem_singleton_self a⟩⟩, fun x => Subtype.ext (mem_singleton.mp x.2)⟩
@@ -194,7 +195,7 @@ theorem pdel_col_zero (M : α → β → R) (A : Finset α) (B : Finset β) {b :
 /-! ### An isolated node with a self-loop -/
 
 /-- The nodes other than the extra one. -/
-def notExtraEquiv : {a : α ⊕ Unit // a ∉ ({Sum.inr ()} : Finset (α ⊕ Unit))} ≃ α where
+private def notExtraEquiv : {a : α ⊕ Unit // a ∉ ({Sum.inr ()} : Finset (α ⊕ Unit))} ≃ α where
   toFun a :=
     match a with
     | ⟨Sum.inl a, _⟩ => a
@@ -209,7 +210,7 @@ def notExtraEquiv : {a : α ⊕ Unit // a ∉ ({Sum.inr ()} : Finset (α ⊕ Uni
 omit [Fintype β] [DecidableEq β] in
 /-- **Adding a node with a self-loop and no other outgoing edge does not
 change the permanent.** -/
-theorem bperm_extend_loop (M : α → α → R) (N : α ⊕ Unit → α ⊕ Unit → R)
+private theorem bperm_extend_loop (M : α → α → R) (N : α ⊕ Unit → α ⊕ Unit → R)
     (hN : ∀ a b, N (Sum.inl a) (Sum.inl b) = M a b) (hloop : N (Sum.inr ()) (Sum.inr ()) = 1)
     (hrow : ∀ b, N (Sum.inr ()) (Sum.inl b) = 0) :
     bperm N = bperm M := by

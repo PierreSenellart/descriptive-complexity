@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Pcp.Hardness.Interp
 public import DescriptiveComplexity.Problems.Machine.Halt
+import all DescriptiveComplexity.Problems.Pcp.Hardness.Interp
 
 /-!
 # The halting problem reduces to Post's correspondence problem
@@ -49,7 +50,7 @@ open scoped DescriptiveComplexity
 
 /-- **`HALT ≤ᶠᵒ[≤] PCP`**: the computation-history dominoes of the machine
 described by the instance. -/
-noncomputable def halt_ordered_fo_reduction_pcp : HALT ≤ᶠᵒ[≤] PCP where
+private noncomputable def halt_ordered_fo_reduction_pcp : HALT ≤ᶠᵒ[≤] PCP where
   Tag := HaltPcp.PTag
   dim := 5
   toInterpretation := HaltPcp.haltPcpInterp

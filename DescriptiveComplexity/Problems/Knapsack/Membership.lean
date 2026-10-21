@@ -9,6 +9,8 @@ import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Knapsack.Chain
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Knapsack.Chain
 
 /-!
 # Knapsack is in NP
@@ -213,16 +215,16 @@ section Realize
 variable {A : Type} [Language.binWeights.Structure A] (ρ : knapsackGuessBlock.Assignment A)
 
 /-- The chosen items, read off an assignment of the block. -/
-def Sel (i : A) : Prop := ρ .sel ![i]
+private def Sel (i : A) : Prop := ρ .sel ![i]
 
 /-- The running total, read off an assignment of the block. -/
-def PSum (i p : A) : Prop := ρ .pS ![i, p]
+private def PSum (i p : A) : Prop := ρ .pS ![i, p]
 
 /-- The carries, read off an assignment of the block. -/
-def Cy (i p : A) : Prop := ρ .carry ![i, p]
+private def Cy (i p : A) : Prop := ρ .carry ![i, p]
 
 /-- The bit that an item contributes. -/
-def Add (i p : A) : Prop := Sel ρ i ∧ BWBit i p
+private def Add (i p : A) : Prop := Sel ρ i ∧ BWBit i p
 
 private theorem realize_knapsackKernel :
     (@Sentence.Realize ksSOLang A
@@ -371,7 +373,7 @@ variable {A : Type} [Language.binWeights.Structure A] [Finite A]
 
 /-- **A solution has a walk**: running totals and carries of a ripple-carry
 addition of the chosen weights, ending on the target. -/
-theorem exists_chain_of_subsetSum (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
+private theorem exists_chain_of_subsetSum (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
     (hSitem : ∀ i, S i → BWItem i)
     (hsumeq : (∑ᶠ i ∈ {i | S i}, BWWeight i) = BWTarget A) :
     ∃ PS Cy : A → A → Prop, IsChain BWLe BWItem BWLe BWPosn S BWBit PS Cy ∧
@@ -405,7 +407,7 @@ theorem exists_chain_of_subsetSum (hlin : IsLinOrd (BWLe (A := A))) {S : A → P
     exact this.mp
 
 /-- **A walk ending on the target is a solution.** -/
-theorem subsetSum_of_chain (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
+private theorem subsetSum_of_chain (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
     {PS Cy : A → A → Prop} (hsel : ∀ i, S i → BWItem i)
     (hchain : IsChain BWLe BWItem BWLe BWPosn S BWBit PS Cy)
     (hfinal : ∀ i p : A, MaxPos BWLe BWItem i → BWPosn p → (PS i p ↔ BWTgt p))

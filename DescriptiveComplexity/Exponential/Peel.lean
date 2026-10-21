@@ -122,7 +122,7 @@ theorem roundAssign_apply [Finite A] [Nonempty A] (pts : Fin m → X.Map A) (i :
 def IsPointAssign (σ : X.pointBlock.Assignment A) : Prop :=
   ∃ (t : X.Tag) (ρ : X.B.Assignment A), σ = SOBlock.tagAssign t ρ ∧ DomHolds (X := X) (t, ρ)
 
-theorem isPointAssign_pointAssign (p : X.Map A) : IsPointAssign (pointAssign p) :=
+private theorem isPointAssign_pointAssign (p : X.Map A) : IsPointAssign (pointAssign p) :=
   ⟨p.1.1, p.1.2, rfl, p.2⟩
 
 /-- **A guarded block is a point, existentially.** -/
@@ -154,7 +154,7 @@ moves out past the rounds that remain
 the round into a point (`exists_point_iff`, `forall_point_iff`). -/
 
 /-- **Peeling an existential quantifier.** -/
-theorem altBlockQuant_peel_ex {k : ℕ}
+private theorem altBlockQuant_peel_ex {k : ℕ}
     (R : X.pointBlock.Assignment A → (Fin k → X.pointBlock.Assignment A) → Prop) :
     altBlockQuant A X.pointBlock (k + 1)
         (fun ρs => IsPointAssign (X := X) (ρs 0) ∧ R (ρs 0) (Fin.tail ρs)) true ↔
@@ -165,7 +165,7 @@ theorem altBlockQuant_peel_ex {k : ℕ}
   exact exists_point_iff fun σ => altBlockQuant A X.pointBlock k (R σ) false
 
 /-- **Peeling a universal quantifier.** -/
-theorem altBlockQuant_peel_all {k : ℕ}
+private theorem altBlockQuant_peel_all {k : ℕ}
     (R : X.pointBlock.Assignment A → (Fin k → X.pointBlock.Assignment A) → Prop) :
     altBlockQuant A X.pointBlock (k + 1)
         (fun ρs => IsPointAssign (X := X) (ρs 0) → R (ρs 0) (Fin.tail ρs)) false ↔

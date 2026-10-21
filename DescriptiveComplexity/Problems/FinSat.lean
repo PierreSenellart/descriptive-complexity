@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.FinSat.Membership
 import DescriptiveComplexity.Problems.FinSat.Reduction
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.RecursivelyEnumerable
 
 /-!
 # Trakhtenbrot's theorem: finite satisfiability is RE-complete

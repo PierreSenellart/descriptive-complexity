@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.SecondOrderBlockHom
 public import DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.SecondOrderBlockHom
 
 /-!
 # Stratified inflationary inductions
@@ -85,7 +87,7 @@ def StratGate (σ : (stratBlock B₁ B₂).Assignment A) : Prop :=
   σ (.inl (.inr ())) Fin.elim0
 
 /-- The first-stratum part is the pullback along the block inclusion. -/
-theorem strat1Assign_eq_homAssign (σ : (stratBlock B₁ B₂).Assignment A) :
+private theorem strat1Assign_eq_homAssign (σ : (stratBlock B₁ B₂).Assignment A) :
     B₁.homAssign (B' := stratBlock B₁ B₂) (fun i => .inl (.inl i)) (fun _ => rfl)
       σ = strat1Assign σ :=
   rfl
@@ -121,7 +123,7 @@ variable {B₁ B₂ : SOBlock} {A : Type} [L.Structure A]
 
 /-- Reading the first stratum inside the combined block: realization against
 the combined assignment is realization against its first-stratum part. -/
-theorem realize_strat1Formula {α : Type} (σ : (stratBlock B₁ B₂).Assignment A)
+private theorem realize_strat1Formula {α : Type} (σ : (stratBlock B₁ B₂).Assignment A)
     (φ : (L.sum B₁.lang).Formula α) (v : α → A) :
     (@Formula.Realize _ A ((stratBlock B₁ B₂).structure₁ (L := L) σ) _
       ((strat1LHom L B₁ B₂).onFormula φ) v) ↔
@@ -153,7 +155,7 @@ theorem strat2LHom_isExpansionOn (σ : (stratBlock B₁ B₂).Assignment A) :
 /-- Reading the second stratum inside the combined block: realization against
 the combined assignment is realization over the structure expanded first by
 the first-stratum part, then by the second. -/
-theorem realize_strat2Formula {α : Type} (σ : (stratBlock B₁ B₂).Assignment A)
+private theorem realize_strat2Formula {α : Type} (σ : (stratBlock B₁ B₂).Assignment A)
     (φ : ((L.sum B₁.lang).sum B₂.lang).Formula α) (v : α → A) :
     (@Formula.Realize _ A ((stratBlock B₁ B₂).structure₁ (L := L) σ) _
       ((strat2LHom L B₁ B₂).onFormula φ) v) ↔
@@ -167,7 +169,7 @@ theorem realize_strat2Formula {α : Type} (σ : (stratBlock B₁ B₂).Assignmen
 
 /-- Realization of the gate atom: the gate bit of the assignment, whatever
 the valuation. -/
-theorem realize_gateAtom {B₁ B₂ : SOBlock} (σ : (stratBlock B₁ B₂).Assignment A)
+private theorem realize_gateAtom {B₁ B₂ : SOBlock} (σ : (stratBlock B₁ B₂).Assignment A)
     {α : Type} (v : α → A) :
     (@Formula.Realize _ A ((stratBlock B₁ B₂).structure₁ (L := L) σ) _
       (Relations.formula (stratGateSym L B₁ B₂) Fin.elim0) v) ↔ StratGate σ := by
@@ -193,7 +195,7 @@ noncomputable def stratGateF (d₁ : StepDef L) (B₂ : SOBlock) :
 
 /-- Realization of the gate formula: the first-stratum part absorbs one more
 application of the first stratum's steps. -/
-theorem realize_stratGateF {B₂ : SOBlock} {A : Type} [L.Structure A]
+private theorem realize_stratGateF {B₂ : SOBlock} {A : Type} [L.Structure A]
     (d₁ : StepDef L) (σ : (stratBlock d₁.B B₂).Assignment A) (v : Fin 0 → A) :
     (@Formula.Realize _ A ((stratBlock d₁.B B₂).structure₁ (L := L) σ) _
       (stratGateF d₁ B₂) v) ↔
@@ -255,7 +257,7 @@ variable {A : Type} [L.Structure A]
 
 /-- A step is absorbed by its current stage exactly when the stage is an
 inflationary fixed point. -/
-theorem isFixedPt_inflStep_iff (d : StepDef L) (ρ : d.B.Assignment A) :
+private theorem isFixedPt_inflStep_iff (d : StepDef L) (ρ : d.B.Assignment A) :
     IsFixedPt d.inflStep ρ ↔ ∀ i x, d.next ρ i x → ρ i x := by
   constructor
   · intro h i x hx
@@ -267,7 +269,7 @@ theorem isFixedPt_inflStep_iff (d : StepDef L) (ρ : d.B.Assignment A) :
 
 /-- The first-stratum part of the stratified stages is the first stratum's
 own stages. -/
-theorem strat1Assign_inflStage (n : ℕ) :
+private theorem strat1Assign_inflStage (n : ℕ) :
     strat1Assign ((d₁.stratify d₂).inflStage A n) = d₁.inflStage A n := by
   induction n with
   | zero => rfl
@@ -285,7 +287,7 @@ theorem strat1Assign_inflStage (n : ℕ) :
 /-- The gate of the stratified stages: false at the start, and derived
 exactly when the first stratum's current stage is an inflationary fixed
 point. -/
-theorem stratGate_inflStage_succ (n : ℕ) :
+private theorem stratGate_inflStage_succ (n : ℕ) :
     StratGate ((d₁.stratify d₂).inflStage A (n + 1)) ↔
       (StratGate ((d₁.stratify d₂).inflStage A n) ∨
         IsFixedPt d₁.inflStep (d₁.inflStage A n)) := by
@@ -306,7 +308,7 @@ theorem stratGate_inflStage_succ (n : ℕ) :
   exact h2.trans (d₁.isFixedPt_inflStep_iff (d₁.inflStage A n)).symm
 
 /-- The gate only ever turns on. -/
-theorem stratGate_mono {m n : ℕ} (hmn : m ≤ n)
+private theorem stratGate_mono {m n : ℕ} (hmn : m ≤ n)
     (h : StratGate ((d₁.stratify d₂).inflStage A m)) :
     StratGate ((d₁.stratify d₂).inflStage A n) := by
   induction n with
@@ -319,7 +321,7 @@ theorem stratGate_mono {m n : ℕ} (hmn : m ≤ n)
 
 /-- While the gate is on, the first stratum sits at an inflationary fixed
 point. -/
-theorem isFixedPt_of_stratGate {n : ℕ}
+private theorem isFixedPt_of_stratGate {n : ℕ}
     (h : StratGate ((d₁.stratify d₂).inflStage A n)) :
     IsFixedPt d₁.inflStep (d₁.inflStage A n) := by
   induction n with
@@ -341,7 +343,7 @@ theorem isFixedPt_of_stratGate {n : ℕ}
       exact hfix
 
 /-- While the gate is on, the first stratum sits at its limit. -/
-theorem inflStage_eq_limit_of_stratGate [Finite A] {n m : ℕ} (hnm : n ≤ m)
+private theorem inflStage_eq_limit_of_stratGate [Finite A] {n m : ℕ} (hnm : n ≤ m)
     (h : StratGate ((d₁.stratify d₂).inflStage A n)) :
     d₁.inflStage A m = d₁.inflLimit A := by
   have hfix := d₁.isFixedPt_of_stratGate d₂ h
@@ -360,7 +362,7 @@ theorem inflStage_eq_limit_of_stratGate [Finite A] {n m : ℕ} (hnm : n ≤ m)
 
 /-- One step of the second stratum, decomposed: the gate at the current
 stage, and the second stratum's own step over the frozen strata. -/
-theorem next_stratify_inr (σ : (stratBlock d₁.B d₂.B).Assignment A) (i : d₂.B.ι)
+private theorem next_stratify_inr (σ : (stratBlock d₁.B d₂.B).Assignment A) (i : d₂.B.ι)
     (x : Fin (d₂.B.arity i) → A) :
     (d₁.stratify d₂).next σ (.inr i) x ↔
       (StratGate σ ∧
@@ -380,7 +382,7 @@ theorem next_stratify_inr (σ : (stratBlock d₁.B d₂.B).Assignment A) (i : d�
     (realize_strat2Formula σ (d₂.step i) x))
 
 /-- While the gate is off, the second stratum does not move. -/
-theorem strat2Assign_inflStage_succ_of_not_stratGate {n : ℕ}
+private theorem strat2Assign_inflStage_succ_of_not_stratGate {n : ℕ}
     (h : ¬StratGate ((d₁.stratify d₂).inflStage A n)) :
     strat2Assign ((d₁.stratify d₂).inflStage A (n + 1)) =
       strat2Assign ((d₁.stratify d₂).inflStage A n) := by
@@ -396,7 +398,7 @@ theorem strat2Assign_inflStage_succ_of_not_stratGate {n : ℕ}
   · exact absurd ((d₁.next_stratify_inr d₂ _ i x).mp hx').1 h
 
 /-- While the gate is off, the second stratum is empty. -/
-theorem strat2Assign_eq_bot_of_not_stratGate {n : ℕ}
+private theorem strat2Assign_eq_bot_of_not_stratGate {n : ℕ}
     (h : ¬StratGate ((d₁.stratify d₂).inflStage A n)) :
     strat2Assign ((d₁.stratify d₂).inflStage A n) = d₂.B.botAssign A := by
   induction n with

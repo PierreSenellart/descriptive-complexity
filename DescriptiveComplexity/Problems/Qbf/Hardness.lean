@@ -7,6 +7,12 @@ module
 
 public import DescriptiveComplexity.Problems.Qbf.Transfer
 public import DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Qbf.Defs
+import all DescriptiveComplexity.Problems.Qbf.Transfer
+import all DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Problems.Sat.Tseitin
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Hardness of QBF
@@ -103,7 +109,7 @@ section Characterizations
 
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
-theorem qbfT_isClause_node (σp : Σ m, NodeAt ψ m) (c : Fin 3)
+private theorem qbfT_isClause_node (σp : Σ m, NodeAt ψ m) (c : Fin 3)
     (u : Fin (tseitinDim M ψ) → A) :
     RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A) (qbfIsClause (k := k))
         ![(Sum.inl (Sum.inl (σp, c)), u)] ↔
@@ -111,13 +117,13 @@ theorem qbfT_isClause_node (σp : Σ m, NodeAt ψ m) (c : Fin 3)
   rw [FOInterpretation.relMap_map]
   exact realize_isClauseF ψ (maxCtx_le_tseitinDim M ψ) σp.2 c fun j => (0, j)
 
-theorem qbfT_isClause_top (u : Fin (tseitinDim M ψ) → A) :
+private theorem qbfT_isClause_top (u : Fin (tseitinDim M ψ) → A) :
     RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A) (qbfIsClause (k := k))
         ![(Sum.inl (Sum.inr ()), u)] ↔ Canon 0 u := by
   rw [FOInterpretation.relMap_map]
   exact realize_canonF
 
-theorem qbfT_isClause_var (vt : M.ι ⊕ Σ m, NodeAt ψ m) (u : Fin (tseitinDim M ψ) → A) :
+private theorem qbfT_isClause_var (vt : M.ι ⊕ Σ m, NodeAt ψ m) (u : Fin (tseitinDim M ψ) → A) :
     ¬RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A) (qbfIsClause (k := k))
       ![(Sum.inr vt, u)] := by
   rw [FOInterpretation.relMap_map]
@@ -125,7 +131,7 @@ theorem qbfT_isClause_var (vt : M.ι ⊕ Σ m, NodeAt ψ m) (u : Fin (tseitinDim
 
 /-- The literals of the interpretation are those of the Tseitin encoding, with
 the signs swapped when `sw` is `true`. -/
-theorem qbfT_lit_iff (s : Bool) (tc tx : TseitinTag M ψ)
+private theorem qbfT_lit_iff (s : Bool) (tc tx : TseitinTag M ψ)
     (u x : Fin (tseitinDim M ψ) → A) :
     RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A)
         (if s then qbfPosIn (k := k) else qbfNegIn (k := k)) ![(tc, u), (tx, x)] ↔
@@ -142,7 +148,7 @@ theorem qbfT_lit_iff (s : Bool) (tc tx : TseitinTag M ψ)
 
 /-- A variable is marked by exactly the block it belongs to; clause elements
 are marked by no block at all. -/
-theorem qbfT_block_var (j : Fin k) (vt : M.ι ⊕ Σ m, NodeAt ψ m)
+private theorem qbfT_block_var (j : Fin k) (vt : M.ι ⊕ Σ m, NodeAt ψ m)
     (u : Fin (tseitinDim M ψ) → A) :
     RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A) (qbfBlock j)
         ![(Sum.inr vt, u)] ↔ mark vt = j := by
@@ -165,7 +171,7 @@ theorem qbfT_lit_pos (tc tx : TseitinTag M ψ) (u x : Fin (tseitinDim M ψ) → 
   rwa [show xor (!sw) sw = true by cases sw <;> rfl] at h2
 
 /-- The literal that a satisfied clause needs to make *false*. -/
-theorem qbfT_lit_neg (tc tx : TseitinTag M ψ) (u x : Fin (tseitinDim M ψ) → A) :
+private theorem qbfT_lit_neg (tc tx : TseitinTag M ψ) (u x : Fin (tseitinDim M ψ) → A) :
     RelMap (M := (qbfTseitinInterp k sw M ψ mark).Map A)
         (if sw then qbfPosIn (k := k) else qbfNegIn (k := k)) ![(tc, u), (tx, x)] ↔
       TseitinLitSem M ψ false tc tx u x := by
@@ -254,12 +260,12 @@ variable {L : Language.{0, 0}}
 
 /-- Padding a tuple that already has the interpretation's dimension does
 nothing. -/
-theorem pad_full {A : Type} {D : ℕ} (a₀ : A) (w : Fin D → A) : pad a₀ w = w := by
+private theorem pad_full {A : Type} {D : ℕ} (a₀ : A) (w : Fin D → A) : pad a₀ w = w := by
   funext j
   rw [pad, dite_eq_left j.isLt]
 
 /-- Reindexing an alternating quantification along an equality of lengths. -/
-theorem altQuant_cast {A : Type} {m n : ℕ} (h : m = n)
+private theorem altQuant_cast {A : Type} {m n : ℕ} (h : m = n)
     (P : (Fin n → A → Prop) → Prop) (pol : Bool) :
     altQuant A m (fun νs => P fun j => νs (Fin.cast h.symm j)) pol ↔ altQuant A n P pol := by
   subst h
@@ -303,7 +309,7 @@ noncomputable def qbfRedInterp :
 /-- The swap flag is the parity of the number of blocks: with an existential
 outermost block, the matrix of `DescriptiveComplexity.QBF k` is disjunctive exactly when
 a swap is needed. -/
-theorem qbfSwap_true_eq (Bs : List SOBlock) :
+private theorem qbfSwap_true_eq (Bs : List SOBlock) :
     qbfSwap true Bs = !((Bs.length + 1) % 2 == 1) := by
   rw [qbfSwap, innerPol_eq]
   rcases Nat.mod_two_eq_zero_or_one Bs.length with h | h
@@ -313,7 +319,7 @@ theorem qbfSwap_true_eq (Bs : List SOBlock) :
     rw [h, h1]; rfl
 
 /-- Dually, with a universal outermost block. -/
-theorem qbfSwap_false_eq (Bs : List SOBlock) :
+private theorem qbfSwap_false_eq (Bs : List SOBlock) :
     qbfSwap false Bs = !((Bs.length + 1) % 2 == 0) := by
   rw [qbfSwap, innerPol_eq]
   rcases Nat.mod_two_eq_zero_or_one Bs.length with h | h
@@ -329,7 +335,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 omit [LinearOrder A] in
 /-- Realization of a sentence in the expansion by an assignment is
 `DescriptiveComplexity.Tseitin.RealizeWith`. -/
-theorem realize_eq_realizeWith {M : SOBlock} (μ : M.Assignment A)
+private theorem realize_eq_realizeWith {M : SOBlock} (μ : M.Assignment A)
     (χ : (L.sum M.lang).Sentence) :
     @Sentence.Realize (L.sum M.lang) A (@sumStructure L M.lang A _ (M.structure μ)) χ ↔
       RealizeWith μ χ finZeroElim :=
@@ -341,7 +347,7 @@ theorem realize_eq_realizeWith {M : SOBlock} (μ : M.Assignment A)
 omit [LinearOrder A] in
 /-- **The gates are functionally determined**: some gate valuation satisfies
 every gate, so quantifying them existentially adds nothing. -/
-theorem exists_gates {M : SOBlock} (a₀ : A) (μ : M.Assignment A)
+private theorem exists_gates {M : SOBlock} (a₀ : A) (μ : M.Assignment A)
     (χ : (L.sum M.lang).Sentence) :
     (∃ g : (gateBlock M χ).Assignment A,
         Gates μ χ (fun m q w => g ⟨m, q⟩ (pad a₀ w)) ∧ RealizeWith μ χ finZeroElim) ↔
@@ -363,7 +369,7 @@ theorem exists_gates {M : SOBlock} (a₀ : A) (μ : M.Assignment A)
 
 /-- The reading of the interpreted instance: each propositional variable is
 read at its canonically padded tuple. -/
-noncomputable def qbfRd (a₀ : A) :
+private noncomputable def qbfRd (a₀ : A) :
     BlockRead A ((qbfRedInterp st B Bs φ).Map A) (consLast (qbfGt st B Bs φ) B Bs) :=
   fun i ν a => ν (Sum.inr (splitIdx (qbfGt st B Bs φ) B Bs i), pad a₀ a)
 
@@ -373,7 +379,7 @@ with the innermost polarity, over the Tseitin condition, is exactly the truth
 of the merged kernel. When the innermost quantifier is existential this is
 `DescriptiveComplexity.exists_gates`; when it is universal it is the same fact under the
 negation that the swapped encoding introduces. -/
-theorem qbf_inner (a₀ : A) (μ : (mergeBlocks (B :: Bs)).Assignment A) :
+private theorem qbf_inner (a₀ : A) (μ : (mergeBlocks (B :: Bs)).Assignment A) :
     quantB (innerPol Bs.length st)
         (fun g : (qbfGt st B Bs φ).Assignment A => xorP (qbfSwap st Bs)
           (Gates μ (qbfEnc st B Bs φ) (fun m q w => g ⟨m, q⟩ (pad a₀ w)) ∧

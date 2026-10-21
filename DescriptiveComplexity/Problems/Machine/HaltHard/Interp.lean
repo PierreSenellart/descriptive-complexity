@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Problems.Machine.HaltHard.Input
 public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
 public import DescriptiveComplexity.Problems.Machine.Defs
+import all DescriptiveComplexity.Padding
 
 /-!
 # Drawing the simulating machine and its input page
@@ -71,7 +72,7 @@ inductive CellTag (V : FinVocab L) where
 namespace CellTag
 
 /-- An injective numbering of the cell tags, for finiteness. -/
-def key : CellTag V → Fin 10 × Fin (V.numSyms + 1)
+private def key : CellTag V → Fin 10 × Fin (V.numSyms + 1)
   | .cEndL => (0, 0)
   | .cBit i => (1, i.castSucc)
   | .cFold i => (2, i.castSucc)
@@ -83,7 +84,7 @@ def key : CellTag V → Fin 10 × Fin (V.numSyms + 1)
   | .cComR => (8, 0)
   | .cEndR => (9, 0)
 
-theorem key_injective : Function.Injective (key V) := by
+private theorem key_injective : Function.Injective (key V) := by
   intro a b h
   rcases a <;> rcases b <;>
     simp only [key, Prod.mk.injEq] at h <;> simp_all
@@ -127,7 +128,7 @@ the junk. -/
 noncomputable def uCode : SimU (allCode cF cP) → ℕ :=
   (exists_injective_nat (SimU (allCode cF cP))).choose
 
-theorem uCode_injective : Function.Injective (uCode cF cP) :=
+private theorem uCode_injective : Function.Injective (uCode cF cP) :=
   (exists_injective_nat (SimU (allCode cF cP))).choose_spec
 
 /-- **The block index of a tag** – the primary component of the one order
@@ -154,7 +155,7 @@ def subIdx : HTag V cF cP → ℕ
   | _ => 0
 
 /-- The pair of indices determines the tag. -/
-theorem tag_eq_of_idx {t t' : HTag V cF cP} (hb : blockIdx V cF cP t = blockIdx V cF cP t')
+private theorem tag_eq_of_idx {t t' : HTag V cF cP} (hb : blockIdx V cF cP t = blockIdx V cF cP t')
     (hs : subIdx V cF cP t = subIdx V cF cP t') : t = t' := by
   have hcell : ∀ c : CellTag V, blockIdx V cF cP (Sum.inr c) ≤ V.numSyms + 7 := by
     intro c
@@ -193,11 +194,12 @@ tuple numbers. -/
 def RevLexLt (u w : Fin D → A) : Prop :=
   ∃ j, u j < w j ∧ ∀ j', j < j' → u j' = w j'
 
-theorem RevLexLt.irrefl {u : Fin D → A} (h : RevLexLt u u) : False := by
+private theorem RevLexLt.irrefl {u : Fin D → A} (h : RevLexLt u u) : False := by
   obtain ⟨j, hj, -⟩ := h
   exact absurd hj (lt_irrefl _)
 
-theorem RevLexLt.asymm {u w : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w u) : False := by
+private theorem RevLexLt.asymm
+    {u w : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w u) : False := by
   obtain ⟨j, hj, htl⟩ := h
   obtain ⟨j', hj', htl'⟩ := h'
   rcases lt_trichotomy j j' with hlt | rfl | hlt
@@ -207,7 +209,7 @@ theorem RevLexLt.asymm {u w : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w u
   · rw [htl' j hlt] at hj
     exact absurd hj (lt_irrefl _)
 
-theorem RevLexLt.trans {u w x : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w x) :
+private theorem RevLexLt.trans {u w x : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w x) :
     RevLexLt u x := by
   obtain ⟨j, hj, htl⟩ := h
   obtain ⟨j', hj', htl'⟩ := h'
@@ -216,7 +218,7 @@ theorem RevLexLt.trans {u w x : Fin D → A} (h : RevLexLt u w) (h' : RevLexLt w
   · exact ⟨j, hj.trans hj', fun k hk => (htl k hk).trans (htl' k hk)⟩
   · exact ⟨j, htl' j hlt ▸ hj, fun k hk => (htl k hk).trans (htl' k (hlt.trans hk))⟩
 
-theorem revLexLt_trichotomy (u w : Fin D → A) : RevLexLt u w ∨ u = w ∨ RevLexLt w u := by
+private theorem revLexLt_trichotomy (u w : Fin D → A) : RevLexLt u w ∨ u = w ∨ RevLexLt w u := by
   classical
   by_cases heq : u = w
   · exact Or.inr (Or.inl heq)
@@ -255,7 +257,7 @@ noncomputable def HLe (x y : HTag V cF cP × (Fin (dimOf V) → A)) : Prop :=
     (blockIdx V cF cP x.1 = blockIdx V cF cP y.1 ∧
       (RevLexLt y.2 x.2 ∨ (x.2 = y.2 ∧ subIdx V cF cP x.1 ≤ subIdx V cF cP y.1)))
 
-theorem isLinOrd_hLe : IsLinOrd (HLe V cF cP (A := A)) := by
+private theorem isLinOrd_hLe : IsLinOrd (HLe V cF cP (A := A)) := by
   refine ⟨fun a => ?_, fun a b c hab hbc => ?_, fun a b hab hba => ?_, fun a b => ?_⟩
   · exact Or.inr ⟨rfl, Or.inr ⟨rfl, le_refl _⟩⟩
   · rcases hab with h1 | ⟨h1, h2⟩ <;> rcases hbc with h3 | ⟨h3, h4⟩
@@ -429,13 +431,13 @@ theorem exists_hPt (x : (haltTuringInterp V cF cP).Map A) : ∃ t w, x = hPt t w
 
 omit [L.Structure A] in
 /-- The order, with the projections of the point reduced. -/
-theorem hLe_def (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
+private theorem hLe_def (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
     HLe V cF cP (t, w) (t', w') ↔
       blockIdx V cF cP t < blockIdx V cF cP t' ∨
         (blockIdx V cF cP t = blockIdx V cF cP t' ∧
           (RevLexLt w' w ∨ (w = w' ∧ subIdx V cF cP t ≤ subIdx V cF cP t'))) := Iff.rfl
 
-theorem realize_revLexLtF {γ : Type} {p q : Fin (dimOf V) → γ} {v : γ → A} :
+private theorem realize_revLexLtF {γ : Type} {p q : Fin (dimOf V) → γ} {v : γ → A} :
     (revLexLtF V p q).Realize v ↔ RevLexLt (fun j => v (p j)) (fun j => v (q j)) := by
   rw [revLexLtF, realize_listSup]
   constructor
@@ -459,7 +461,7 @@ theorem realize_revLexLtF {γ : Type} {p q : Fin (dimOf V) → γ} {v : γ → A
     · rw [ite_eq_right h]
       simp
 
-theorem relMap_posn (t : HTag V cF cP) (w : Fin (dimOf V) → A) :
+private theorem relMap_posn (t : HTag V cF cP) (w : Fin (dimOf V) → A) :
     TMPosn (hPt t w) ↔ ∃ c, t = Sum.inr c ∧ Canon (CellTag.used V c) w := by
   rw [TMPosn, FOInterpretation.relMap_map]
   change (hPosnF V cF cP t).Realize _ ↔ _
@@ -475,7 +477,7 @@ theorem relMap_posn (t : HTag V cF cP) (w : Fin (dimOf V) → A) :
     · rintro ⟨c', rfl, h⟩
       exact h
 
-theorem relMap_unary (Q : SimU (allCode cF cP) → Prop)
+private theorem relMap_unary (Q : SimU (allCode cF cP) → Prop)
     (R : Language.turingRel 1)
     (hR : ∀ ts : Fin 1 → HTag V cF cP,
       (haltTuringInterp V cF cP).relFormula R ts = mUnaryF V cF cP Q (ts 0))
@@ -503,7 +505,7 @@ theorem relMap_unary (Q : SimU (allCode cF cP) → Prop)
     rintro ⟨⟨u, hu, -⟩, -⟩
     simp at hu
 
-theorem relMap_binary (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Prop)
+private theorem relMap_binary (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Prop)
     (R : Language.turingRel 2)
     (hR : ∀ ts : Fin 2 → HTag V cF cP,
       (haltTuringInterp V cF cP).relFormula R ts = mBinaryF V cF cP Q (ts 0) (ts 1))
@@ -539,7 +541,7 @@ theorem relMap_binary (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Pro
     rintro ⟨⟨u₁, u₂, h1, -, -⟩, -⟩
     simp at h1
 
-theorem relMap_le (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
+private theorem relMap_le (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
     TMLe (hPt t w) (hPt t' w') ↔ HLe V cF cP (t, w) (t', w') := by
   rw [TMLe, FOInterpretation.relMap_map]
   change (hLeF V cF cP t t').Realize _ ↔ _
@@ -599,7 +601,7 @@ omit [L.Structure A] [LinearOrder A] in
 theorem posBit_false_ne_true : posBit cF cP false ≠ posBit cF cP true :=
   fun h => posBit_true_ne_false h.symm
 
-theorem relMap_inp (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
+private theorem relMap_inp (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
     TMInp (hPt t w) (hPt t' w') ↔
       ∃ c u, t = Sum.inr c ∧ t' = Sum.inl u ∧ Canon (CellTag.used V c) w ∧ Canon 0 w' ∧
         InpOn V cF cP c u w := by

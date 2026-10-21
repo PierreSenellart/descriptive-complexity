@@ -7,6 +7,17 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.AltPrefix
 public import Mathlib.Data.Set.Finite.Lemmas
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.Problems.Machine.AltCheck
+import all DescriptiveComplexity.Problems.Machine.AltGuess
+import all DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltPrefix
+import all DescriptiveComplexity.Problems.Machine.AltProg
+import all DescriptiveComplexity.Problems.Machine.AltRead
+import all DescriptiveComplexity.Problems.Machine.AltSweep
+import all DescriptiveComplexity.Problems.Machine.AltTape
+import all DescriptiveComplexity.Problems.Machine.AltVerdict
 
 /-!
 # The rounds, one block at a time
@@ -59,7 +70,7 @@ def AtRound (m : ℕ) (νs : Fin k → A → Prop) (c : Config (AltV k A)) : Pro
         ((∀ e : A, ¬QbfCl k e) ∧ cnf = true ∧ c.state = stAcc))))
 
 /-- **A round hands over to the next one.** -/
-theorem atRound_of_afterSweep {cnf : Bool} {i : Fin k} {ρ : Fin k → A → Prop}
+private theorem atRound_of_afterSweep {cnf : Bool} {i : Fin k} {ρ : Fin k → A → Prop}
     {c : Config (AltV k A)} (h : AfterSweep cnf i ρ c) : AtRound cnf ((i : ℕ) + 1) ρ c := by
   obtain ⟨hhead, htape, hcase⟩ := h
   refine ⟨hhead, htape, ?_⟩
@@ -69,7 +80,7 @@ theorem atRound_of_afterSweep {cnf : Bool} {i : Fin k} {ρ : Fin k → A → Pro
 
 /-- Before the last block has played, the entry of a round is the entry of its
 sweep. -/
-theorem eq_confSweep_of_atRound {cnf : Bool} {m : ℕ} {νs : Fin k → A → Prop}
+private theorem eq_confSweep_of_atRound {cnf : Bool} {m : ℕ} {νs : Fin k → A → Prop}
     {c : Config (AltV k A)} (i : Fin k) (hi : (i : ℕ) = m) (h : AtRound cnf m νs c) :
     c = confSweep νs i.castSucc (posCell qbotA) := by
   obtain ⟨hhead, htape, hcase⟩ := h
@@ -97,7 +108,8 @@ theorem exists_atRound {cnf : Bool} {m : ℕ} (hm : m ≤ k) (νs : Fin k → A 
 
 /-- **The handover step.** Whatever the entry of the next round is, the machine
 reaches it from the left marker in one step. -/
-theorem step_handover {cnf : Bool} {i : Fin k} {ρ : Fin k → A → Prop} {d : Config (AltV k A)}
+private theorem step_handover
+    {cnf : Bool} {i : Fin k} {ρ : Fin k → A → Prop} {d : Config (AltV k A)}
     (h : AtRound cnf ((i : ℕ) + 1) ρ d) :
     (altMachine k A cnf).Step (confBack ρ i.castSucc posStart) d := by
   obtain ⟨hhead, htape, hcase⟩ := h
@@ -125,7 +137,8 @@ theorem step_handover {cnf : Bool} {i : Fin k} {ρ : Fin k → A → Prop} {d : 
 
 omit [Nonempty A] in
 /-- **A satisfied matrix leaves the last sweep somewhere to go.** -/
-theorem canHandOver_of_qbfMatrix {cnf : Bool} {ρ : Fin k → A → Prop} (hmat : QbfMatrix cnf ρ) :
+private theorem canHandOver_of_qbfMatrix
+    {cnf : Bool} {ρ : Fin k → A → Prop} (hmat : QbfMatrix cnf ρ) :
     CanHandOver k A cnf := by
   classical
   by_cases hcl : ∃ e : A, QbfCl k e
@@ -141,7 +154,7 @@ theorem canHandOver_of_qbfMatrix {cnf : Bool} {ρ : Fin k → A → Prop} (hmat 
 
 /-- Replacing a block's assignment does not change the tape its own sweep
 starts from. -/
-theorem confSweep_update_self {i : Fin k} {ν : A → Prop} (νs : Fin k → A → Prop) :
+private theorem confSweep_update_self {i : Fin k} {ν : A → Prop} (νs : Fin k → A → Prop) :
     confSweep (Function.update νs i ν) i.castSucc (posCell qbotA) =
       confSweep νs i.castSucc (posCell qbotA) := by
   refine Config.ext rfl rfl ?_
@@ -173,7 +186,7 @@ matrix – the round's own block quantified at the polarity its index gives it.
 Both directions of both polarities are one line each, on top of the four
 corners of `AltGuess`: the existential player picks and climbs, the universal
 player is followed down one play at a time and survives all of them. -/
-theorem rounds {cnf start : Bool} :
+private theorem rounds {cnf start : Bool} :
     ∀ (r m : ℕ), m + r = k → ∀ (νs : Fin k → A → Prop) (c : Config (AltV k A)),
       AtRound cnf m νs c →
         (∀ n : ℕ, (altMachine k A cnf).AltAcc start n c →
@@ -322,7 +335,7 @@ machine reads `⊢`, which is not a guess – so it costs one unit of budget and
 nothing else. -/
 
 /-- **The machine has one initial configuration.** -/
-theorem eq_init_of_isInit {cnf : Bool} (νs : Fin k → A → Prop) {c : Config (AltV k A)}
+private theorem eq_init_of_isInit {cnf : Bool} (νs : Fin k → A → Prop) {c : Config (AltV k A)}
     (hinit : (altMachine k A cnf).IsInit c) : c = confSweep νs 0 posStart := by
   refine TMData.isInit_unique (altMachine_wellFormed cnf) ?_ hinit (isInit_confSweep νs cnf)
   rintro q q' ⟨hq, hq2⟩ ⟨hq', hq2'⟩
@@ -330,7 +343,7 @@ theorem eq_init_of_isInit {cnf : Bool} (νs : Fin k → A → Prop) {c : Config 
 
 /-- **The step over the left marker is forced**: the machine reads `⊢`, and
 only one transition applies. -/
-theorem step_init_det {cnf : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) :
+private theorem step_init_det {cnf : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) :
     ∀ c'', (altMachine k A cnf).Step (confSweep νs 0 posStart) c'' →
       c'' = confSweep νs 0 (posCell qbotA) := by
   refine fun c'' hstep => step_functional_off_guess ?_ hstep
@@ -343,13 +356,13 @@ theorem step_init_det {cnf : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) :
   exact absurd (this.symm.trans hread) (by simp [acstI, aoneI])
 
 /-- The step over the left marker descends whatever the polarity. -/
-theorem stepForced_init {cnf start : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) :
+private theorem stepForced_init {cnf start : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) :
     StepForced (altMachine k A cnf) start (confSweep νs 0 posStart)
       (confSweep νs 0 (posCell qbotA)) :=
   ⟨not_acc_stG, Or.inr (step_init_det hk νs)⟩
 
 /-- **The run before round `0`**: one forced step. -/
-theorem altAcc_init_iff {cnf start : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) (n : ℕ) :
+private theorem altAcc_init_iff {cnf start : Bool} (hk : 0 < k) (νs : Fin k → A → Prop) (n : ℕ) :
     (altMachine k A cnf).AltAcc start (n + 1) (confSweep νs 0 posStart) ↔
       (altMachine k A cnf).AltAcc start n (confSweep νs 0 (posCell qbotA)) := by
   constructor
@@ -366,7 +379,7 @@ theorem altAcc_init_iff {cnf start : Bool} (hk : 0 < k) (νs : Fin k → A → P
 the alternating quantification of the matrix over the `k` blocks – provided the
 tape is long enough to hold the run, which
 `DescriptiveComplexity.AltQbf.alt_budget` guarantees. -/
-theorem altAccepts_iff_altQuant {cnf start : Bool} (hk : 0 < k)
+private theorem altAccepts_iff_altQuant {cnf start : Bool} (hk : 0 < k)
     (hbudget : roundBound k A k + 1 ≤ Nat.card {p : AltV k A // AltPosn p} - 1) :
     (altMachine k A cnf).AltAccepts start ↔ altQuant A k (QbfMatrix cnf) start := by
   classical
@@ -419,7 +432,7 @@ theorem roundBound_eq (r : ℕ) : roundBound k A r = chkLen k A + r * sweepLen k
 
 omit [(Language.qbf k).Structure A] in
 /-- **The whole run fits in the budget.** -/
-theorem roundBound_lt_card :
+private theorem roundBound_lt_card :
     roundBound k A k + 1 ≤ Nat.card {p : AltV k A // AltPosn p} - 1 := by
   have hn : 1 ≤ Nat.card A := Nat.card_pos
   have h1 : bitRank tagTupleLe AltPosn (posEnd : AltV k A) ≤ Nat.card A + 1 :=

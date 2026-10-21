@@ -9,6 +9,9 @@ import DescriptiveComplexity.Problems.Reachability
 public import DescriptiveComplexity.TransitiveClosureReach
 public import DescriptiveComplexity.DetLogSpace
 public import DescriptiveComplexity.TransitiveClosureCompl
+import all DescriptiveComplexity.DetLogSpace
+import all DescriptiveComplexity.TransitiveClosureCompl
+import all DescriptiveComplexity.TransitiveClosureReach
 
 /-!
 # REACHd: deterministic reachability, complete for LOGSPACE
@@ -151,7 +154,7 @@ variable {A : Type} [Language.stGraph.Structure A] [LinearOrder A]
 /-- The determinized walk of `DescriptiveComplexity.reachSpec` follows exactly the
 forced arcs. The uniqueness clause quantifies over successor *nodes*, which at
 a single mode and arity one are just the successor vertices. -/
-theorem det_step_reachSpec (a b : reachSpec.Node A) :
+private theorem det_step_reachSpec (a b : reachSpec.Node A) :
     reachSpec.det.Step a b ↔ DetEdge (a.2 0) (b.2 0) := by
   rw [TCSpec.det_step_iff]
   refine and_congr (step_reachSpec a b) ⟨fun h y hy => ?_, fun h c hc => ?_⟩
@@ -164,7 +167,7 @@ theorem det_step_reachSpec (a b : reachSpec.Node A) :
     exact (hci.trans hc').trans hbi
 
 /-- A path of forced arcs is a walk of the determinized specification. -/
-theorem detReach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen DetEdge x y) :
+private theorem detReach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen DetEdge x y) :
     reachSpec.det.Reach ((), fun _ => x) ((), fun _ => y) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -172,7 +175,7 @@ theorem detReach_of_reflTransGen {x y : A} (h : Relation.ReflTransGen DetEdge x 
     exact ih.tail ((det_step_reachSpec ((), fun _ => b) ((), fun _ => c)).mpr hbc)
 
 /-- A walk of the determinized specification is a path of forced arcs. -/
-theorem reflTransGen_of_detReach {u v : reachSpec.Node A}
+private theorem reflTransGen_of_detReach {u v : reachSpec.Node A}
     (h : reachSpec.det.Reach u v) : Relation.ReflTransGen DetEdge (u.2 0) (v.2 0) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -181,7 +184,7 @@ theorem reflTransGen_of_detReach {u v : reachSpec.Node A}
 variable (A) in
 /-- The determinized specification accepts exactly the graphs with a forced
 path from a marked source to a marked target. -/
-theorem det_accepts_reachSpec_iff : reachSpec.det.Accepts A ↔ DetReachable A := by
+private theorem det_accepts_reachSpec_iff : reachSpec.det.Accepts A ↔ DetReachable A := by
   constructor
   · rintro ⟨u, v, hu, hv, huv⟩
     exact ⟨(u : reachSpec.Node A).2 0, (v : reachSpec.Node A).2 0,
@@ -236,7 +239,7 @@ end TCSpec
 open TCDischarge in
 /-- The graph interpreted from a functional specification has outdegree at most
 one: its arcs *are* the transitions of the walk. -/
-theorem functional_sgEdge_tcInterp (spec : TCSpec L) {A : Type} [L.Structure A]
+private theorem functional_sgEdge_tcInterp (spec : TCSpec L) {A : Type} [L.Structure A]
     [LinearOrder A] (h : spec.Functional A) (a b c : (tcInterp spec).Map A)
     (hb : SGEdge a b) (hc : SGEdge a c) : b = c :=
   h a b c ((sgEdge_tcInterp spec a b).mp hb) ((sgEdge_tcInterp spec a c).mp hc)

@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Numbers.BinRel
 public import DescriptiveComplexity.Interpretation
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Hamilton circuits: definitions
@@ -84,7 +85,7 @@ def TourOn (R : A → A → Prop) : Prop :=
 variable {B : Type}
 
 /-- Being the immediate successor transports along an equivalence. -/
-theorem succOf_equiv (u : A ≃ B) {Le : A → A → Prop} {x y : A} :
+private theorem succOf_equiv (u : A ≃ B) {Le : A → A → Prop} {x y : A} :
     SuccOf (fun b b' => Le (u.symm b) (u.symm b')) (u x) (u y) ↔ SuccOf Le x y := by
   simp only [SuccOf, Equiv.symm_apply_apply]
   refine and_congr Iff.rfl (and_congr ⟨fun h he => h (congrArg u he), fun h he => h ?_⟩ ?_)
@@ -99,7 +100,7 @@ theorem succOf_equiv (u : A ≃ B) {Le : A → A → Prop} {x y : A} :
 
 /-- Having a tour transports along an equivalence commuting with the two
 relations. -/
-theorem tourOn_of_equiv (u : A ≃ B) {RA : A → A → Prop} {RB : B → B → Prop}
+private theorem tourOn_of_equiv (u : A ≃ B) {RA : A → A → Prop} {RB : B → B → Prop}
     (hR : ∀ a a', RA a a' ↔ RB (u a) (u a')) (h : TourOn RA) : TourOn RB := by
   obtain ⟨Le, hlin, hsucc, hwrap⟩ := h
   refine ⟨fun b b' => Le (u.symm b) (u.symm b'), IsLinOrd.of_equiv u (fun a a' => by simp) hlin,

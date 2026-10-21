@@ -9,6 +9,9 @@ public import DescriptiveComplexity.ArithmeticDefinable
 public import DescriptiveComplexity.FixedPointInflationaryLFP
 import DescriptiveComplexity.FixedPointHorn
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # AC⁰ ⊆ PTIME: the numeric predicates are an induction
@@ -183,7 +186,7 @@ variable (out : ((L.sum Language.order).sum arithBlock.lang).Sentence)
 /-- One application of the numeric clauses, unfolded: the step formula realized
 at the current assignment. Stated because `DescriptiveComplexity.StepDef.next` is
 a `def` whose equation theorems do not rewrite. -/
-theorem next_arithStepDef_iff (ρ : arithBlock.Assignment A) (i : arithBlock.ι)
+private theorem next_arithStepDef_iff (ρ : arithBlock.Assignment A) (i : arithBlock.ι)
     (v : Fin (arithBlock.arity i) → A) :
     (arithStepDef (L := L) out).next ρ i v ↔
       @Formula.Realize ((L.sum Language.order).sum arithBlock.lang) A
@@ -192,7 +195,7 @@ theorem next_arithStepDef_iff (ρ : arithBlock.Assignment A) (i : arithBlock.ι)
 
 /-- **What the addition clause derives**: either the base case, or a step down
 on both `y` and `z` from a triple already there. -/
-theorem next_plus_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
+private theorem next_plus_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
     (arithStepDef (L := L) out).next ρ false v ↔
       ((∀ a : A, v 1 ≤ a) ∧ v 0 = v 2) ∨
         ∃ y' z' : A, (y' < v 1 ∧ ∀ a : A, ¬(y' < a ∧ a < v 1)) ∧
@@ -224,7 +227,7 @@ theorem next_plus_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
 
 /-- **What the multiplication clause derives**: either the base case, or one copy
 of `x` peeled off `y` and added back with the addition variable. -/
-theorem next_times_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
+private theorem next_times_iff (ρ : arithBlock.Assignment A) (v : Fin 3 → A) :
     (arithStepDef (L := L) out).next ρ true v ↔
       ((∀ a : A, v 1 ≤ a) ∧ ∀ a : A, v 2 ≤ a) ∨
         ∃ y' w : A, (y' < v 1 ∧ ∀ a : A, ¬(y' < a ∧ a < v 1)) ∧
@@ -298,7 +301,7 @@ theorem inflStage_arith_sound (n : ℕ) :
 
 /-- The limit of the numeric induction is closed under the step formulas: what
 one clause derives from it is already in it. -/
-theorem next_inflLimit_le {i : arithBlock.ι} {v : Fin (arithBlock.arity i) → A}
+private theorem next_inflLimit_le {i : arithBlock.ι} {v : Fin (arithBlock.arity i) → A}
     (h : (arithStepDef (L := L) out).next ((arithStepDef (L := L) out).inflLimit A) i v) :
     (arithStepDef (L := L) out).inflLimit A i v := by
   have hfix := (arithStepDef (L := L) out).isFixedPt_inflStep_inflLimit A

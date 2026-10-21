@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.TransitiveClosureReduction
 import DescriptiveComplexity.TransitiveClosureDet
+import all DescriptiveComplexity.TransitiveClosureReduction
 
 /-!
 # FO(DTC) reductions: the logarithmic-space reduction of the textbooks
@@ -107,7 +108,7 @@ noncomputable def det : ParamTCSpec L where
 
 variable {A : Type} [L.Structure A]
 
-theorem realize_detStep (m n : s.Mode) (x y : Fin s.k → A) (z : Fin s.par → A) :
+private theorem realize_detStep (m n : s.Mode) (x y : Fin s.k → A) (z : Fin s.par → A) :
     (s.detStep m n).Realize (Sum.elim (Sum.elim x y) z) ↔
       (s.step m n).Realize (Sum.elim (Sum.elim x y) z) ∧
         ∀ (m' : s.Mode) (w : Fin s.k → A),
@@ -142,7 +143,7 @@ theorem realize_detStep (m n : s.Mode) (x y : Fin s.k → A) (z : Fin s.par → 
     exact congrFun hwy i
 
 /-- **A determinized step is a step with no competitor.** -/
-theorem detStepAt_iff (z : Fin s.par → A) (a b : s.Node A) :
+private theorem detStepAt_iff (z : Fin s.par → A) (a b : s.Node A) :
     s.det.StepAt z a b ↔ s.StepAt z a b ∧ ∀ c : s.Node A, s.StepAt z a c → c = b := by
   refine Iff.trans (s.realize_detStep a.1 b.1 a.2 b.2 z) (and_congr Iff.rfl ?_)
   exact ⟨fun h c hc => Prod.ext_iff.mpr (h c.1 c.2 hc),
@@ -206,7 +207,7 @@ def Functional : Prop :=
 
 /-- **A functional family is unchanged by determinization**: its relation
 variables hold the same relations either way. -/
-theorem reachAssign_det_of_functional (h : F.Functional A) :
+private theorem reachAssign_det_of_functional (h : F.Functional A) :
     F.det.reachAssign A = F.reachAssign A := by
   funext q w
   exact propext (ParamTCSpec.reachAt_det_of_functional (h q.1) _ _ _)
@@ -224,7 +225,7 @@ walk-as-an-atom formula (`DescriptiveComplexity.TCSpec.acceptsF`) still says
 acceptance when the relation variables hold the *determinized* reachability
 relations. This is what lets an existing walk of the catalog be reused at the
 deterministic notion. -/
-theorem realize_acceptsF_det (h : (spec.toFamily).Functional A) :
+private theorem realize_acceptsF_det (h : (spec.toFamily).Functional A) :
     (@Sentence.Realize _ A
       (spec.toFamily.block.structure₁ (L := L₀.sum Language.order)
         ((spec.toFamily).det.reachAssign A)) spec.acceptsF) ↔ spec.Accepts A := by
@@ -284,7 +285,7 @@ noncomputable def DTCReduction.toTC (f : P ≤ᵈᵗᶜ Q) : P ≤ᵗᶜ Q :=
 
 /-- **A relativized ordered FO reduction is an FO(DTC) reduction**, consulting
 no walk. -/
-noncomputable def RelOrderedFOReduction.toDTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
+private noncomputable def RelOrderedFOReduction.toDTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
   letI := f.tagFinite
   { Tag := f.Tag
     dim := f.dim
@@ -298,23 +299,23 @@ noncomputable def RelOrderedFOReduction.toDTC (f : P ≤ʳᶠᵒ[≤] Q) : P ≤
         (f.toRelInterpretation.toTCFamLEquiv (TCFamily.empty _).det A)).symm }
 
 /-- **An ordered FO reduction is an FO(DTC) reduction.** -/
-noncomputable def OrderedFOReduction.toDTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
+private noncomputable def OrderedFOReduction.toDTC (f : P ≤ᶠᵒ[≤] Q) : P ≤ᵈᵗᶜ Q :=
   f.toRel.toDTC
 
 /-- **An FO reduction is an FO(DTC) reduction.** -/
-noncomputable def FOReduction.toDTC (f : P ≤ᶠᵒ Q) : P ≤ᵈᵗᶜ Q :=
+private noncomputable def FOReduction.toDTC (f : P ≤ᶠᵒ Q) : P ≤ᵈᵗᶜ Q :=
   f.toOrdered.toRel.toDTC
 
 /-- **PTIME is closed under FO(DTC) reductions.** -/
-theorem mem_PTIME_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
+private theorem mem_PTIME_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
   mem_PTIME_of_tcReduction f.toTC h
 
 /-- **NP is closed under FO(DTC) reductions.** -/
-theorem mem_NP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ NP) : P ∈ NP :=
+private theorem mem_NP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ NP) : P ∈ NP :=
   mem_NP_of_tcReduction f.toTC h
 
 /-- **coNP is closed under FO(DTC) reductions.** -/
-theorem mem_coNP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ coNP) : P ∈ coNP :=
+private theorem mem_coNP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ coNP) : P ∈ coNP :=
   mem_coNP_of_tcReduction f.toTC h
 
 end ToTC

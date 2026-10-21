@@ -146,7 +146,7 @@ theorem pt_assign {A : Type} [L.Structure A] [LinearOrder A] (t : X.Tag)
 
 /-- Two points of the expanded universe are equal as soon as their tags and
 their assignments are: the domain condition is a proof. -/
-theorem map_ext {A : Type} [L.Structure A] [LinearOrder A] {x y : X.Map A}
+private theorem map_ext {A : Type} [L.Structure A] [LinearOrder A] {x y : X.Map A}
     (h₁ : x.1.1 = y.1.1) (h₂ : x.1.2 = y.1.2) : x = y :=
   Subtype.ext (Prod.ext_iff.mpr ⟨h₁, h₂⟩)
 

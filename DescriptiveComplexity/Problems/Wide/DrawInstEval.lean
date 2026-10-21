@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstVar
 import DescriptiveComplexity.Problems.Wide.DrawRunEval
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawInstRound
+import all DescriptiveComplexity.Problems.Wide.DrawInstVar
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
 
 /-!
 # The spine, instantiated: one variable's machinery per position
@@ -83,7 +87,7 @@ omit [Fintype dt.SlotIx]
   [Finite A] [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- Off the marker, the post state's background is the round state's. -/
-theorem back_postVarSt_off
+private theorem back_postVarSt_off
     (r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hr : r ≠ v) :
     dt.back RF.cell zero one dt.dd0Le (dt.postVarSt v st m i b) r =
@@ -103,7 +107,7 @@ omit [Fintype dt.SlotIx]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 /-- At the marker, the post state's background is the round state's with
 the variable's stage slot updated to the verdict bit. -/
-theorem back_postVarSt_v :
+private theorem back_postVarSt_v :
     dt.back RF.cell zero one dt.dd0Le (dt.postVarSt v st m i b) v =
       Function.update (dt.back RF.cell zero one dt.dd0Le (dt.roundSt st m) v)
         (Slot.new i) (bitVal zero one b) := by
@@ -294,7 +298,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
 registers and its stage bit, so the mirror, the marker, the bottom and end
 marks and the stage dictionary all ride – which is what carries the next
 position's pack and, one scale up, the sweep's own invariants. -/
-theorem legStT_fields (j : Fin dt.nv)
+private theorem legStT_fields (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (tOf : Fin (dt.arOf (dt.varAt j)) → dt.X.Tag)
     (semT : ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -881,7 +885,7 @@ tape. -/
 
 /-- **The VAL-loop thread of the output's leg**, at the entry-wrapped
 control. -/
-noncomputable def outFM
+private noncomputable def outFM
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (semOf : ∀ a : ιV,
@@ -909,7 +913,7 @@ noncomputable def outFM
 
 /-- **The control after the output's leg**: the out machinery's exit
 fold. -/
-noncomputable def outCtl
+private noncomputable def outCtl
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (tOf : Fin (dt.arOf (none : dt.VarIx)) → dt.X.Tag)
     (semOf : ∀ a : ιV,
@@ -944,7 +948,7 @@ include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
 the marker, back to it, through the out machinery, and – the verdict
 holding – out into the accepting phase, the marker rewritten with the
 value it already carries. -/
-theorem outLeg_run
+private theorem outLeg_run
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (hwkSt : st.wk = fun r => r = v)
     (TestOf : Fin (dt.arOf (none : dt.VarIx)) →
@@ -1119,7 +1123,7 @@ unthreaded round, and the exit state differs from the round state in SAV and
 TARGET alone, which the background does not see off the register file. This
 is what makes `outLeg_run_thread`'s `hacc` the verdict
 `DescriptiveComplexity.Draw.Data.accVerdict_out` reads. -/
-theorem outCtlT_eq_outCtl
+private theorem outCtlT_eq_outCtl
     (hreg : ¬∃ u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       v = RF.cell u)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1355,7 +1359,7 @@ include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
 `DescriptiveComplexity.Draw.Data.outLeg_run_verdict` in which the accepting
 write at the marker is *idempotent*, so the leg ends at the machinery's own
 exit state and nothing of the tape moves. -/
-theorem outLeg_run_thread
+private theorem outLeg_run_thread
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (hwkSt : st.wk = fun r => r = v)
     (TestOf : Fin (dt.arOf (none : dt.VarIx)) →
@@ -1617,7 +1621,7 @@ threads the two scratch registers alone
 write the stage bit directly. This is the branched twin of
 `DescriptiveComplexity.Draw.Data.new_postVarSt`, and the only thing the
 spine's dictionary lemmas need of a leg. -/
-theorem legStB_new (j : Fin dt.nv)
+private theorem legStB_new (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (semT : dt.gatedAt (PR := PR) RF j st →
       ∀ (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV),
@@ -1658,7 +1662,7 @@ include hrules hR hlin htop hbot hwork hv hvi hbotV htopV hmV0 hIncr hTestT
 of the machinery under one statement, the case split on the gates made
 once and for all. This is what a sweep needs, since it visits junk
 addresses and gated ones alike. -/
-theorem varLegB_run (j : Fin dt.nv)
+private theorem varLegB_run (j : Fin dt.nv)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (hwkSt : st.wk = fun r => r = v) (hmir : st.mir = v)
     (hbotSt : st.bot = fun r => r = (fun _ => False))
@@ -1813,7 +1817,7 @@ refreshes the marker and the mirror but not SAV and TARGET, so a sweep can
 meet those two hypotheses at one address at most, while every other
 hypothesis here is about the marker, the mirror and the tracks, which do
 ride. -/
-theorem evalSpine_run_thread
+private theorem evalSpine_run_thread
     (stOf : Fin (dt.nv + 1) → TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
     (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)
@@ -1897,7 +1901,7 @@ its own gates call for, and what the caller owes is only the marker, the
 mirror and the bottom mark – all of which the advance sets and every leg
 leaves alone. This is the form a sweep can use, since it visits junk
 addresses and gated ones alike. -/
-theorem evalSpineB_run
+private theorem evalSpineB_run
     (stOf : Fin (dt.nv + 1) → TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
     (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)

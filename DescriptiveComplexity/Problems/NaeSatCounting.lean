@@ -11,6 +11,14 @@ public import DescriptiveComplexity.Problems.SetFamily.Counting
 public import DescriptiveComplexity.Problems.Sat.CountingDnf
 import DescriptiveComplexity.Numbers.DigitExtract
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting.Post
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.NaeSat
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingDnf
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
+import all DescriptiveComplexity.Problems.SetSplitting
 
 /-!
 # #NAE-SAT and #Set Splitting
@@ -61,7 +69,7 @@ noncomputable def sharpNaeKernel : satSOLang.Sentence :=
 
 variable {A}
 
-theorem realize_sharpNaeKernel (ρ : satAssignBlock.Assignment A) :
+private theorem realize_sharpNaeKernel (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpNaeKernel) ↔
       NAEModel A ((satAssignEquiv A).symm ρ) := by
@@ -88,12 +96,12 @@ noncomputable def SharpNAESAT : CountingProblem Language.sat where
     rw [card_naeModel_eq_witnessCount A, card_naeModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock sharpNaeKernel e
 
-theorem sharpNaeSat_apply (A : Type) [Language.sat.Structure A] :
+private theorem sharpNaeSat_apply (A : Type) [Language.sat.Structure A] :
     SharpNAESAT A = Nat.card {ν : A → Prop // NAEModel A ν} :=
   rfl
 
 /-- **#NAE-SAT is in `#P`.** -/
-theorem sharpNaeSat_mem_sharpP : SharpNAESAT ∈ SharpP :=
+private theorem sharpNaeSat_mem_sharpP : SharpNAESAT ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (card_naeModel_eq_witnessCount A).symm)
     (sharpPDefinable_ofKernel satAssignBlock sharpNaeKernel)
 
@@ -104,7 +112,7 @@ section Generic
 variable {A : Type} [Language.sat.Structure A]
 
 /-- Not-all-equal properness only reads the variables of the formula. -/
-theorem naeProper_congr {ν ν' : A → Prop} (h : ∀ x, SatOccurs A x → (ν x ↔ ν' x))
+private theorem naeProper_congr {ν ν' : A → Prop} (h : ∀ x, SatOccurs A x → (ν x ↔ ν' x))
     (hν : NAEProper ν) : NAEProper ν' := by
   intro c hc
   obtain ⟨⟨x, hx⟩, ⟨y, hy⟩⟩ := hν c hc
@@ -117,20 +125,20 @@ theorem naeProper_congr {ν ν' : A → Prop} (h : ∀ x, SatOccurs A x → (ν 
     exact hy
 
 /-- The flip of a model inside the variables of the formula. -/
-def flip (ν : A → Prop) (x : A) : Prop :=
+private def flip (ν : A → Prop) (x : A) : Prop :=
   SatOccurs A x ∧ ¬ν x
 
-theorem naeModel_flip {ν : A → Prop} (h : NAEModel A ν) : NAEModel A (flip ν) :=
+private theorem naeModel_flip {ν : A → Prop} (h : NAEModel A ν) : NAEModel A (flip ν) :=
   ⟨naeProper_congr (fun _ hx => (and_iff_right hx).symm) h.1.not, fun _ hx => hx.1⟩
 
-theorem flip_flip {ν : A → Prop} (h : NAEModel A ν) : flip (flip ν) = ν :=
+private theorem flip_flip {ν : A → Prop} (h : NAEModel A ν) : flip (flip ν) = ν :=
   funext fun x => propext ⟨fun hx => not_not.mp fun h' => hx.2 ⟨hx.1, h'⟩,
     fun hx => ⟨h.2 x hx, fun h' => h'.2 hx⟩⟩
 
 open Classical in
 /-- **The models come in pairs**: a variable `q` of the formula is false in
 exactly half of them. -/
-theorem card_naeModel_eq_two_mul [Finite A] {q : A} (hq : SatOccurs A q) :
+private theorem card_naeModel_eq_two_mul [Finite A] {q : A} (hq : SatOccurs A q) :
     Nat.card {ν : A → Prop // NAEModel A ν} =
       2 * Nat.card {ν : A → Prop // NAEModel A ν ∧ ¬ν q} := by
   have e1 : {ν : A → Prop // NAEModel A ν} ≃
@@ -152,7 +160,7 @@ theorem card_naeModel_eq_two_mul [Finite A] {q : A} (hq : SatOccurs A q) :
 open Classical in
 /-- **The not-all-equal assignments of every element**: each element that is
 no variable of the formula doubles the count of the models. -/
-theorem card_naeProper [Finite A] :
+private theorem card_naeProper [Finite A] :
     Nat.card {ν : A → Prop // NAEProper ν} =
       Nat.card {ν : A → Prop // NAEModel A ν} * 2 ^ Nat.card {x : A // ¬SatOccurs A x} := by
   rw [← card_subsets_eq_two_pow, ← Nat.card_prod]
@@ -190,7 +198,7 @@ theorem card_naeProper [Finite A] :
       exact ⟨Or.inr h1, h' h1⟩
 
 /-- A formula with no clause has the empty model only. -/
-theorem card_naeModel_of_no_clause [Finite A] (h : ∀ c : A, ¬RelMap satIsClause ![c]) :
+private theorem card_naeModel_of_no_clause [Finite A] (h : ∀ c : A, ¬RelMap satIsClause ![c]) :
     Nat.card {ν : A → Prop // NAEModel A ν} = 1 := by
   refine Nat.card_eq_one_iff_exists.mpr ⟨⟨fun _ => False, fun c hc => absurd hc (h c),
     fun _ h => h.elim⟩, fun ν => Subtype.ext (funext fun x => propext ⟨fun hx => ?_, False.elim⟩)⟩
@@ -198,7 +206,7 @@ theorem card_naeModel_of_no_clause [Finite A] (h : ∀ c : A, ¬RelMap satIsClau
   exact h c hc
 
 /-- A formula with no clause has the empty model only, for #SAT too. -/
-theorem card_satModel_of_no_clause [Finite A] (h : ∀ c : A, ¬RelMap satIsClause ![c]) :
+private theorem card_satModel_of_no_clause [Finite A] (h : ∀ c : A, ¬RelMap satIsClause ![c]) :
     Nat.card {ν : A → Prop // SatModel A ν} = 1 := by
   refine Nat.card_eq_one_iff_exists.mpr ⟨⟨fun _ => False, fun c hc => absurd hc (h c),
     fun _ h => h.elim⟩, fun ν => Subtype.ext (funext fun x => propext ⟨fun hx => ?_, False.elim⟩)⟩
@@ -231,7 +239,7 @@ theorem least_le (a : A) : least A ≤ a :=
 
 /-- The variables of the formula with the fresh variable: those of the formula,
 and the fresh variable when there is a clause. -/
-theorem satOccurs_map (p : naeInterp.Map A) :
+private theorem satOccurs_map (p : naeInterp.Map A) :
     SatOccurs (naeInterp.Map A) p ↔ (∃ x, p = oPt x ∧ SatOccurs A x) ∨
       (p = xPt (least A) ∧ ∃ c : A, RelMap satIsClause ![c]) := by
   constructor
@@ -260,7 +268,7 @@ theorem satOccurs_map (p : naeInterp.Map A) :
 
 /-- **The models with the fresh variable false are the models of the
 formula.** -/
-noncomputable def freshFalseEquiv :
+private noncomputable def freshFalseEquiv :
     {μ : naeInterp.Map A → Prop // NAEModel _ μ ∧ ¬μ (xPt (least A))} ≃
       {ν : A → Prop // SatModel A ν} where
   toFun μ := ⟨fun x => μ.1 (oPt x), fun c hc => by
@@ -329,7 +337,7 @@ end NaeCount
 open NaeCount in
 /-- **#SAT reduces to #NAE-SAT with one call**: add one fresh variable to every
 clause, and halve the count, rounding up. -/
-noncomputable def sharpSat_oneCall_sharpNaeSat : SharpSAT ≤ᶜ[≤] SharpNAESAT where
+private noncomputable def sharpSat_oneCall_sharpNaeSat : SharpSAT ≤ᶜ[≤] SharpNAESAT where
   Tag := Bool
   dim := 1
   toRelInterpretation := naeInterp.toRel
@@ -399,12 +407,12 @@ noncomputable def SharpSetSplitting : CountingProblem Language.setSystem where
     rw [← Nat.card_congr (splitColoringEquiv A), ← Nat.card_congr (splitColoringEquiv B)]
     exact witnessCount_iso familyGuessBlock sharpSetSplittingKernel e
 
-theorem sharpSetSplitting_apply (A : Type) [Language.setSystem.Structure A] :
+private theorem sharpSetSplitting_apply (A : Type) [Language.setSystem.Structure A] :
     SharpSetSplitting A = Nat.card {S : A → Prop // SplitColoring A S} :=
   rfl
 
 /-- **#Set Splitting is in `#P`.** -/
-theorem sharpSetSplitting_mem_sharpP : SharpSetSplitting ∈ SharpP :=
+private theorem sharpSetSplitting_mem_sharpP : SharpSetSplitting ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => Nat.card_congr (splitColoringEquiv A))
     (sharpPDefinable_ofKernel familyGuessBlock sharpSetSplittingKernel)
 
@@ -418,7 +426,7 @@ variable {A : Type} [Language.sat.Structure A]
 
 /-- A splitting of the literal set system gives the two literals of every
 element opposite colors. -/
-theorem split_lit_false {S : splInterp.Map A → Prop} (hS : SplitColoring _ S) (y : A) :
+private theorem split_lit_false {S : splInterp.Map A → Prop} (hS : SplitColoring _ S) (y : A) :
     S (splPt (.lit false) y) ↔ ¬S (splPt (.lit true) y) := by
   obtain ⟨⟨p, hpe, hpm, hp⟩, ⟨q, hqe, hqm, hq⟩⟩ := hS.2 (splPt .pairSet y) (ssFam_pairSet y)
   obtain ⟨s, x, rfl⟩ := ssElem_cases hpe
@@ -433,7 +441,8 @@ theorem split_lit_false {S : splInterp.Map A → Prop} (hS : SplitColoring _ S) 
 
 /-- The color of a literal is its truth value under the assignment read off
 the positive literals. -/
-theorem split_litTrue {S : splInterp.Map A → Prop} (hS : SplitColoring _ S) (s : Bool) (y : A) :
+private theorem split_litTrue
+    {S : splInterp.Map A → Prop} (hS : SplitColoring _ S) (s : Bool) (y : A) :
     S (splPt (.lit s) y) ↔ LitTrue (fun x => S (splPt (.lit true) x)) y s := by
   cases s
   · exact split_lit_false hS y
@@ -441,7 +450,7 @@ theorem split_litTrue {S : splInterp.Map A → Prop} (hS : SplitColoring _ S) (s
 
 /-- **The splittings of the literal set system are the not-all-equal
 assignments of every element.** -/
-noncomputable def splitEquiv :
+private noncomputable def splitEquiv :
     {S : splInterp.Map A → Prop // SplitColoring _ S} ≃ {ν : A → Prop // NAEProper ν} where
   toFun S := ⟨fun x => S.1 (splPt (.lit true) x), naeProper_of_occ fun c hc => by
       obtain ⟨⟨p, hpe, hpm, hp⟩, ⟨q, hqe, hqm, hq⟩⟩ :=
@@ -499,7 +508,7 @@ polynomial term. -/
 noncomputable def nonVarCount : PolyTerm Language.sat :=
   .count (∼satOccursFormula)
 
-theorem eval_nonVarCount (A : Type) [Language.sat.Structure A] [LinearOrder A] :
+private theorem eval_nonVarCount (A : Type) [Language.sat.Structure A] [LinearOrder A] :
     nonVarCount.eval A = Nat.card {x : A // ¬SatOccurs A x} := by
   rw [nonVarCount, PolyTerm.eval_count_one]
   exact Nat.card_congr (Equiv.subtypeEquivRight fun a => by
@@ -509,7 +518,8 @@ open NaeCount SetSplitRed in
 /-- **#NAE-SAT reduces to #Set Splitting with one call**: the literal set
 system, its count divided by `2` to the number of elements that are no
 variable of the formula. -/
-noncomputable def sharpNaeSat_oneCall_sharpSetSplitting : SharpNAESAT ≤ᶜ[≤] SharpSetSplitting :=
+private noncomputable def sharpNaeSat_oneCall_sharpSetSplitting
+    : SharpNAESAT ≤ᶜ[≤] SharpSetSplitting :=
   (SharpSetSplitting.pullbackReduction splInterp).toOneCall.ofPost
     (.div .oracle (.pow2 nonVarCount)) fun A _ _ _ _ => by
       change SharpNAESAT A = SharpSetSplitting (splInterp.Map A) / 2 ^ nonVarCount.eval A

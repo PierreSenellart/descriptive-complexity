@@ -25,6 +25,16 @@ public import DescriptiveComplexity.Counting.FP
 meta import DescriptiveComplexity.Counting.FP
 public import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Counting.Independence
+import all DescriptiveComplexity.Counting.Independence
+import all DescriptiveComplexity.Counting.PossibleWorlds
+import all DescriptiveComplexity.Counting.Probability
+import all DescriptiveComplexity.Counting.QuantitativeBinders
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Counting.UnitWeights
+import all DescriptiveComplexity.Counting.WeightedTerms
+import all DescriptiveComplexity.Counting.WeightedWorlds
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingBipartite
 
 /-!
 # Worked example: query evaluation over probabilistic databases
@@ -364,7 +374,7 @@ noncomputable def h0Interp :
 
 /-- **#PP2DNF reduces parsimoniously to counting the worlds of `h₀`**
 ([Dalvi and Suciu 2012][dalvi2012dichotomy], Proposition 5.2). -/
-noncomputable def sharpPP2DNF_parsimonious_possibleWorlds_h0 :
+private noncomputable def sharpPP2DNF_parsimonious_possibleWorlds_h0 :
     SharpPP2DNF ≤ᵖ PossibleWorlds h0 where
   Tag := Unit
   dim := 1
@@ -675,7 +685,7 @@ variable [(weightedLang Language.rst).Structure (Fin n)] {st : FactStatus}
 open Classical in
 /-- The weight the abstract problem reads at a fact is the weight of its
 status. -/
-theorem StatusAt.factWeight_eq (h : StatusAt st q)
+private theorem StatusAt.factWeight_eq (h : StatusAt st q)
     (ρ : (worldBlock Language.rst).Assignment (Fin n)) :
     factWeight ρ q = st.weight (decide (ρ q.1 q.2)) := by
   cases st with
@@ -697,7 +707,7 @@ theorem StatusAt.factWeight_eq (h : StatusAt st q)
       exact h.abs rfl
 
 /-- What a possible world may do with a fact is what its status admits. -/
-theorem StatusAt.admits_iff (h : StatusAt st q) (P : Prop) [Decidable P] :
+private theorem StatusAt.admits_iff (h : StatusAt st q) (P : Prop) [Decidable P] :
     st.admits (decide P) = true ↔
       (RelMap (L := weightedLang Language.rst) (WeightedRel.cert q.1.2) q.2 → P) ∧
         (P → RelMap (L := weightedLang Language.rst) (WeightedRel.cert q.1.2) q.2 ∨
@@ -760,7 +770,7 @@ theorem ProbDb.Matches.finprod_factWeight (hm : i.Matches)
 open Classical in
 /-- The possible worlds of the instance are the possible worlds of the
 database. -/
-theorem ProbDb.Matches.isWeightedWorld_iff (hm : i.Matches)
+private theorem ProbDb.Matches.isWeightedWorld_iff (hm : i.Matches)
     (ρ : (worldBlock Language.rst).Assignment (Fin i.n)) :
     IsWeightedWorld ρ ↔ i.Valid (worldTables ρ) := by
   constructor
@@ -780,7 +790,7 @@ end Matches
 open Classical in
 /-- The query holds in a family of relations exactly when it holds in its
 concrete world. -/
-theorem realize_h0_iff_holdsH0 (ρ : (worldBlock Language.rst).Assignment (Fin n)) :
+private theorem realize_h0_iff_holdsH0 (ρ : (worldBlock Language.rst).Assignment (Fin n)) :
     @Sentence.Realize Language.rst (Fin n) (worldStructure ρ) h0 ↔ HoldsH0 (worldTables ρ) :=
   (realize_h0 ρ).trans
     ⟨fun ⟨a, b, h1, h2, h3⟩ => ⟨a, b, decide_eq_true h1, decide_eq_true h2, decide_eq_true h3⟩,
@@ -807,7 +817,7 @@ theorem ProbDb.Matches.count_eq (hm : i.Matches) : i.count = WeightedWorlds h0 (
 
 /-- On an instance matching a database, the abstract count of all the weighted
 worlds is the total weight computed from the database. -/
-theorem ProbDb.Matches.total_eq (hm : i.Matches) :
+private theorem ProbDb.Matches.total_eq (hm : i.Matches) :
     i.total = WeightedWorlds (⊤ : Language.rst.Sentence) (Fin i.n) := by
   let := Fintype.ofFinite {ρ : (worldBlock Language.rst).Assignment (Fin i.n) //
     IsWeightedWorld ρ ∧ @Sentence.Realize Language.rst (Fin i.n) (worldStructure ρ) ⊤}
@@ -824,7 +834,7 @@ theorem ProbDb.Matches.total_eq (hm : i.Matches) :
 
 /-- On an instance matching a database, the probability of `h₀` is the ratio
 of the two numbers computed from the database. -/
-theorem ProbDb.Matches.worldProb_eq (hm : i.Matches)
+private theorem ProbDb.Matches.worldProb_eq (hm : i.Matches)
     (hpos : ∀ x : {q : Fact Language.rst (Fin i.n) // IsOpen q},
       0 < presWeight x + absWeight x) :
     worldProb h0 hpos = (i.count : ℚ) / (i.total : ℚ) := by
@@ -841,14 +851,14 @@ def probDbStructure (i : ProbDb) : (weightedLang Language.rst).Structure (Fin i.
 
 /-- The order of the positions of an encoded database is the order of its
 constants. -/
-theorem probDb_wle (i : ProbDb) (a b : Fin i.n) :
+private theorem probDb_wle (i : ProbDb) (a b : Fin i.n) :
     @WLe Language.rst (Fin i.n) (probDbStructure i) a b ↔ a ≤ b :=
   decide_eq_true_iff
 
 /-- The encoded structure of a database matches it: the binary digits the
 encoder writes decode to the weights
 (`DescriptiveComplexity.binNum_fin_of_testBit`). -/
-theorem probDb_matches (i : ProbDb) : @ProbDb.Matches i (probDbStructure i) :=
+private theorem probDb_matches (i : ProbDb) : @ProbDb.Matches i (probDbStructure i) :=
   letI := probDbStructure i
   { lin := ⟨fun a => (probDb_wle i a a).mpr le_rfl,
       fun a b c h1 h2 => (probDb_wle i a c).mpr
@@ -926,7 +936,7 @@ def numB (b : Fin S.card → Bool) : ℕ :=
   ∑ p ∈ Finset.univ.filter (fun p => b p = true),
     2 ^ (Finset.univ.filter fun q => leB S q p = true ∧ q ≠ p).card
 
-theorem numB_eq (b : Fin S.card → Bool) :
+private theorem numB_eq (b : Fin S.card → Bool) :
     numB S b = binNum (WLe Language.rst (Fin S.card)) (fun _ => True) (fun p => b p = true) := by
   rw [binNum_eq_finsetSum]
   simp only [true_and, bitRank_eq_card]
@@ -936,7 +946,7 @@ theorem numB_eq (b : Fin S.card → Bool) :
 def statusOf (c u : Bool) (a b : ℕ) : FactStatus :=
   if c then .certain else if u then .uncertain a b else .absent
 
-theorem statusAt_statusOf {q : Fact Language.rst (Fin S.card)} {c u : Bool} {a b : ℕ}
+private theorem statusAt_statusOf {q : Fact Language.rst (Fin S.card)} {c u : Bool} {a b : ℕ}
     (hc : RelMap (L := weightedLang Language.rst) (WeightedRel.cert q.1.2) q.2 ↔ c = true)
     (hu : RelMap (L := weightedLang Language.rst) (WeightedRel.unc q.1.2) q.2 ↔ u = true)
     (ha : binNum (WLe Language.rst (Fin S.card)) (fun _ => True)
@@ -1083,7 +1093,7 @@ set_option linter.hashCommand false in
 noncomputable def rs : Language.rst.Sentence :=
   fo% ∃ x y, rstR(x) ∧ rstS(x, y)
 
-theorem realize_rs {B : Type} (ρ : (worldBlock Language.rst).Assignment B) :
+private theorem realize_rs {B : Type} (ρ : (worldBlock Language.rst).Assignment B) :
     @Sentence.Realize Language.rst B (worldStructure ρ) rs ↔
       ∃ a b : B, ρ ⟨1, rstR⟩ ![a] ∧ ρ ⟨2, rstS⟩ ![a, b] := by
   let := worldStructure ρ
@@ -1149,14 +1159,14 @@ variable {A : Type} [(weightedLang Language.rst).Structure A]
 /-- The facts, as variables: the `R`-facts, the `S`-facts and the `T`-facts. -/
 abbrev Var (A : Type) : Type := A ⊕ (A × A) ⊕ A
 
-theorem pres_comp :
+private theorem pres_comp :
     (fun z : Var A => fullPresWeight ((factEquiv A).symm z)) =
       Sum.elim (aR A) (Sum.elim (fun p => aS A p.1 p.2)
         fun y => fullPresWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A)) := by
   funext z
   rcases z with x | p | y <;> rfl
 
-theorem abs_comp :
+private theorem abs_comp :
     (fun z : Var A => fullAbsWeight ((factEquiv A).symm z)) =
       Sum.elim (cR A) (Sum.elim (fun p => cS A p.1 p.2)
         fun y => fullAbsWeight (⟨⟨1, rstT⟩, ![y]⟩ : Fact Language.rst A)) := by
@@ -1167,7 +1177,7 @@ variable [Fintype A] [LinearOrder A]
 
 /-- What failing asks of each `S`-fact and `T`-fact, given the `R`-facts: an
 `S`-fact at an `x` whose `R`-fact is present must be absent. -/
-def okS (vR : A → Bool) : (A × A) ⊕ A → Bool → Bool
+private def okS (vR : A → Bool) : (A × A) ⊕ A → Bool → Bool
   | Sum.inl p, b => !(vR p.1 && b)
   | Sum.inr _, _ => true
 
@@ -1177,7 +1187,7 @@ def holdsRs (v : Var A → Bool) : Bool :=
 
 /-- **The count of the weighted worlds of the query**, as a weighted count
 over the valuations of the facts. -/
-theorem weightedWorlds_rs_eq_weightedCount (hlin : IsLinOrd (WLe Language.rst A)) :
+private theorem weightedWorlds_rs_eq_weightedCount (hlin : IsLinOrd (WLe Language.rst A)) :
     WeightedWorlds rs A =
       weightedCount (fun z : Var A => fullPresWeight ((factEquiv A).symm z))
         (fun z => fullAbsWeight ((factEquiv A).symm z)) holdsRs := by
@@ -1261,7 +1271,7 @@ theorem weightedCount_fail :
 
 /-- Failing or succeeding at `x` is the total weight of the facts about
 `x`: the first success identity, over `y`. -/
-theorem failW_add_succW (x : A) :
+private theorem failW_add_succW (x : A) :
     failW A x + succW A x = (aR A x + cR A x) * ∏ y, (aS A x y + cS A x y) := by
   have h := prod_add_eq_prod_add_sum (fun y => cS A x y) (fun y => aS A x y)
   have h' : ∏ y, (aS A x y + cS A x y) = ∏ y, (cS A x y + aS A x y) :=
@@ -1350,10 +1360,10 @@ noncomputable def rsT : QTerm (wOrd Language.rst) Empty :=
           QTerm.cond (ltF (L := weightedLang Language.rst) (up x) x')
             (.add (failT x') (succT x')) (.const 1))))
 
-theorem comp_vec1 {A : Type} (v : δ → A) (x : δ) : (fun m => v (![x] m)) = ![v x] :=
+private theorem comp_vec1 {A : Type} (v : δ → A) (x : δ) : (fun m => v (![x] m)) = ![v x] :=
   funext fun m => by fin_cases m; rfl
 
-theorem comp_vec2 {A : Type} (v : δ → A) (x y : δ) :
+private theorem comp_vec2 {A : Type} (v : δ → A) (x y : δ) :
     (fun m => v (![x, y] m)) = ![v x, v y] :=
   funext fun m => by fin_cases m <;> rfl
 
@@ -1363,26 +1373,26 @@ section Leaves
 
 variable [Finite A]
 
-theorem eval_aRT (x : δ) (v : δ → A) : (aRT x).eval v = aR A (v x) := by
+private theorem eval_aRT (x : δ) (v : δ → A) : (aRT x).eval v = aR A (v x) := by
   rw [aRT, eval_fullPresT, comp_vec1, aR]
 
-theorem eval_cRT (x : δ) (v : δ → A) : (cRT x).eval v = cR A (v x) := by
+private theorem eval_cRT (x : δ) (v : δ → A) : (cRT x).eval v = cR A (v x) := by
   rw [cRT, eval_fullAbsT, comp_vec1, cR]
 
-theorem eval_aST (x y : δ) (v : δ → A) : (aST x y).eval v = aS A (v x) (v y) := by
+private theorem eval_aST (x y : δ) (v : δ → A) : (aST x y).eval v = aS A (v x) (v y) := by
   rw [aST, eval_fullPresT, comp_vec2, aS]
 
-theorem eval_cST (x y : δ) (v : δ → A) : (cST x y).eval v = cS A (v x) (v y) := by
+private theorem eval_cST (x y : δ) (v : δ → A) : (cST x y).eval v = cS A (v x) (v y) := by
   rw [cST, eval_fullAbsT, comp_vec2, cS]
 
-theorem eval_tTT (y : δ) (v : δ → A) : (tTT y).eval v = tT A (v y) := by
+private theorem eval_tTT (y : δ) (v : δ → A) : (tTT y).eval v = tT A (v y) := by
   rw [tTT, QTerm.eval_add, eval_fullPresT, eval_fullAbsT, comp_vec1, tT]
 
 end Leaves
 
 variable [Fintype A]
 
-theorem eval_failT (x : δ) (v : δ → A) : (failT x).eval v = failW A (v x) := by
+private theorem eval_failT (x : δ) (v : δ → A) : (failT x).eval v = failW A (v x) := by
   rw [failT, QTerm.eval_add, QTerm.eval_mul, QTerm.eval_mul, QTerm.eval_prodOver,
     QTerm.eval_prodOver, eval_aRT, eval_cRT, finprod_eq_prod_of_fintype,
     finprod_eq_prod_of_fintype, failW]
@@ -1393,7 +1403,7 @@ theorem eval_failT (x : δ) (v : δ → A) : (failT x).eval v = failW A (v x) :=
     rfl
 
 open Classical in
-theorem eval_succT (x : δ) (v : δ → A) : (succT x).eval v = succW A (v x) := by
+private theorem eval_succT (x : δ) (v : δ → A) : (succT x).eval v = succW A (v x) := by
   rw [succT, QTerm.eval_mul, eval_aRT, QTerm.eval_sumOver, finsum_eq_sum_of_fintype, succW]
   refine congrArg _ (Finset.sum_congr rfl fun y _ => ?_)
   rw [QTerm.eval_mul, QTerm.eval_mul, QTerm.eval_prodOver, QTerm.eval_prodOver, eval_aST,
@@ -1409,7 +1419,7 @@ theorem eval_succT (x : δ) (v : δ → A) : (succT x).eval v = succW A (v x) :=
 omit [Fintype A] in
 open Classical in
 /-- **The term computes the weighted count of the query.** -/
-theorem rsT_value [Finite A] : WeightedWorlds rs A = rsT.value A := by
+private theorem rsT_value [Finite A] : WeightedWorlds rs A = rsT.value A := by
   let := Fintype.ofFinite A
   rw [QTerm.value, rsT, QTerm.eval_mul, eval_linGuardT]
   by_cases hlin : IsLinOrd (WLe Language.rst A)

@@ -10,6 +10,9 @@ import DescriptiveComplexity.Problems.Wide.DrawKindRule
 public import DescriptiveComplexity.Problems.Wide.DrawProg
 public import DescriptiveComplexity.Problems.Wide.DrawName
 public import DescriptiveComplexity.Problems.Wide.DrawExp
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawExp
+import all DescriptiveComplexity.Problems.Wide.DrawRepAtoms
 
 /-!
 # The semantic parameters, filled in: the comparison atoms
@@ -83,34 +86,34 @@ noncomputable def cmpRdC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) : dt.CtlIx :=
 
 variable {dt}
 
-theorem cmpAccC_ne_cmpDecC : dt.cmpAccC ≠ dt.cmpDecC :=
+private theorem cmpAccC_ne_cmpDecC : dt.cmpAccC ≠ dt.cmpDecC :=
   fun h => absurd (congrArg Fin.val (dt.scratchC_injective h)) (by decide)
 
-theorem cmpAccC_ne_cmpValC : dt.cmpAccC ≠ dt.cmpValC :=
+private theorem cmpAccC_ne_cmpValC : dt.cmpAccC ≠ dt.cmpValC :=
   fun h => absurd (congrArg Fin.val (dt.scratchC_injective h)) (by decide)
 
-theorem cmpDecC_ne_cmpValC : dt.cmpDecC ≠ dt.cmpValC :=
+private theorem cmpDecC_ne_cmpValC : dt.cmpDecC ≠ dt.cmpValC :=
   fun h => absurd (congrArg Fin.val (dt.scratchC_injective h)) (by decide)
 
-theorem cmpDecC_ne_cmpAccC : dt.cmpDecC ≠ dt.cmpAccC := cmpAccC_ne_cmpDecC.symm
+private theorem cmpDecC_ne_cmpAccC : dt.cmpDecC ≠ dt.cmpAccC := cmpAccC_ne_cmpDecC.symm
 
-theorem cmpValC_ne_cmpAccC : dt.cmpValC ≠ dt.cmpAccC := cmpAccC_ne_cmpValC.symm
+private theorem cmpValC_ne_cmpAccC : dt.cmpValC ≠ dt.cmpAccC := cmpAccC_ne_cmpValC.symm
 
-theorem cmpValC_ne_cmpDecC : dt.cmpValC ≠ dt.cmpDecC := cmpDecC_ne_cmpValC.symm
+private theorem cmpValC_ne_cmpDecC : dt.cmpValC ≠ dt.cmpDecC := cmpDecC_ne_cmpValC.symm
 
-theorem lvC_ne_cmpAccC (j : Fin dt.dd0) : dt.lvC j ≠ dt.cmpAccC := fun h => nomatch h
+private theorem lvC_ne_cmpAccC (j : Fin dt.dd0) : dt.lvC j ≠ dt.cmpAccC := fun h => nomatch h
 
-theorem lvC_ne_cmpDecC (j : Fin dt.dd0) : dt.lvC j ≠ dt.cmpDecC := fun h => nomatch h
+private theorem lvC_ne_cmpDecC (j : Fin dt.dd0) : dt.lvC j ≠ dt.cmpDecC := fun h => nomatch h
 
-theorem lvC_ne_cmpValC (j : Fin dt.dd0) : dt.lvC j ≠ dt.cmpValC := fun h => nomatch h
+private theorem lvC_ne_cmpValC (j : Fin dt.dd0) : dt.lvC j ≠ dt.cmpValC := fun h => nomatch h
 
-theorem cmpRdC_ne_cmpAccC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) :
+private theorem cmpRdC_ne_cmpAccC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) :
     dt.cmpRdC hnf k ≠ dt.cmpAccC := fun h => nomatch h
 
-theorem cmpRdC_ne_cmpDecC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) :
+private theorem cmpRdC_ne_cmpDecC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) :
     dt.cmpRdC hnf k ≠ dt.cmpDecC := fun h => nomatch h
 
-theorem cmpRdC_ne_cmpValC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) :
+private theorem cmpRdC_ne_cmpValC (hnf : 2 ≤ dt.nfDim) (k : Fin 2) :
     dt.cmpRdC hnf k ≠ dt.cmpValC := fun h => nomatch h
 
 variable (dt) (zero one : A)
@@ -152,21 +155,21 @@ variable {dt zero one}
 
 /-! ### The read-backs a run cites -/
 
-theorem ctlBit_cmpAccC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
+private theorem ctlBit_cmpAccC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
     (f : dt.CtlIx → A) :
     dt.ctlBit one (dt.cmpFold zero one hnf f) dt.cmpAccC ↔
       (dt.ctlBit one f dt.cmpAccC ∧
         (dt.ctlBit one f (dt.cmpRdC hnf 0) ↔ dt.ctlBit one f (dt.cmpRdC hnf 1))) := by
   rw [cmpFold, ctlBit_setCtl_self hzo]
 
-theorem ctlBit_cmpDecC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
+private theorem ctlBit_cmpDecC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
     (f : dt.CtlIx → A) :
     dt.ctlBit one (dt.cmpFold zero one hnf f) dt.cmpDecC ↔
       (dt.ctlBit one f dt.cmpDecC ∨
         ¬(dt.ctlBit one f (dt.cmpRdC hnf 0) ↔ dt.ctlBit one f (dt.cmpRdC hnf 1))) := by
   rw [cmpFold, ctlBit_setCtl_of_ne cmpDecC_ne_cmpAccC, ctlBit_setCtl_self hzo]
 
-theorem ctlBit_cmpValC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
+private theorem ctlBit_cmpValC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
     (f : dt.CtlIx → A) :
     dt.ctlBit one (dt.cmpFold zero one hnf f) dt.cmpValC ↔
       ((dt.ctlBit one f dt.cmpDecC ∧ dt.ctlBit one f dt.cmpValC) ∨
@@ -177,23 +180,23 @@ theorem ctlBit_cmpValC_cmpFold (hzo : zero ≠ one) (hnf : 2 ≤ dt.nfDim)
 
 /-- The loop element rides along the bookkeeping, so a round may fold and
 advance in one step. -/
-theorem readLv_cmpFold (hnf : 2 ≤ dt.nfDim) (f : dt.CtlIx → A) :
+private theorem readLv_cmpFold (hnf : 2 ≤ dt.nfDim) (f : dt.CtlIx → A) :
     dt.readLv (dt.cmpFold zero one hnf f) = dt.readLv f := by
   funext j
   rw [readLv, readLv, cmpFold, setCtl_of_ne (lvC_ne_cmpAccC (dt := dt) j),
     setCtl_of_ne (lvC_ne_cmpDecC (dt := dt) j),
     setCtl_of_ne (lvC_ne_cmpValC (dt := dt) j)]
 
-theorem ctlBit_cmpAccC_cmpInit (hzo : zero ≠ one) (f : dt.CtlIx → A) :
+private theorem ctlBit_cmpAccC_cmpInit (hzo : zero ≠ one) (f : dt.CtlIx → A) :
     dt.ctlBit one (dt.cmpInit zero one f) dt.cmpAccC :=
   (ctlBit_setCtl_self hzo _ _ _).mpr trivial
 
-theorem ctlBit_cmpDecC_cmpInit (hzo : zero ≠ one) (f : dt.CtlIx → A) :
+private theorem ctlBit_cmpDecC_cmpInit (hzo : zero ≠ one) (f : dt.CtlIx → A) :
     ¬dt.ctlBit one (dt.cmpInit zero one f) dt.cmpDecC := by
   rw [cmpInit, ctlBit_setCtl_of_ne cmpDecC_ne_cmpAccC, ctlBit_setCtl_self hzo]
   exact id
 
-theorem ctlBit_cmpValC_cmpInit (hzo : zero ≠ one) (f : dt.CtlIx → A) :
+private theorem ctlBit_cmpValC_cmpInit (hzo : zero ≠ one) (f : dt.CtlIx → A) :
     ¬dt.ctlBit one (dt.cmpInit zero one f) dt.cmpValC := by
   rw [cmpInit, ctlBit_setCtl_of_ne cmpValC_ne_cmpAccC,
     ctlBit_setCtl_of_ne cmpValC_ne_cmpDecC, ctlBit_setCtl_self hzo]
@@ -224,7 +227,7 @@ noncomputable def cmpArgs [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- **A comparison's exit reads the control alone**: the atom's verdict is
 folded out of the flags, not off the tape. -/
-theorem cmpArgs_exitSt_congr [LinearOrder A] [Finite A] [Nonempty A]
+private theorem cmpArgs_exitSt_congr [LinearOrder A] [Finite A] [Nonempty A]
     (v : dt.VarIx) (a : Fin dt.natMax) (hnf : 2 ≤ dt.nfDim) (isEq : Bool)
     (j₁ j₂ : Fin (dt.nOf v)) (f : dt.CtlIx → A) (g g' : dt.SlotIx → A) :
     (dt.cmpArgs zero one v a hnf isEq j₁ j₂).exitSt f g =
@@ -254,7 +257,7 @@ noncomputable def tagIx {k : ℕ} (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim)
 
 variable {dt}
 
-theorem tagIx_injective {k : ℕ} (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim)
+private theorem tagIx_injective {k : ℕ} (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     {ℓ ℓ' : Fin k} {t t' : dt.X.Tag} (h : dt.tagIx hk ℓ t = dt.tagIx hk ℓ' t') :
     ℓ = ℓ' ∧ t = t' := by
   have h1 := dt.tgfC_injective h
@@ -322,7 +325,7 @@ noncomputable def relLeafData {k : ℕ} (e : dt.X.E.Relations k)
     (exists_blkA_of_isBlkAtom h).choose_spec.choose⟩
 
 /-- **The leaf is that block atom**: what the trip's digit has to mean. -/
-theorem blkAtom?_relLeafData {k : ℕ} (e : dt.X.E.Relations k)
+private theorem blkAtom?_relLeafData {k : ℕ} (e : dt.X.E.Relations k)
     (τ : Fin k → dt.X.Tag) (r : Fin (dt.relNr e τ)) :
     blkAtom? ((blkAtoms (dt.relPk e τ).mat).get r) =
       some (.blkA (relLeafData e τ r).1 (relLeafData e τ r).2) :=
@@ -390,7 +393,7 @@ leaf-read flag holds its block atom's value – which
 delivers – the Boolean function of the flags and the guards is the leaf
 predicate `DescriptiveComplexity.Draw.Data.expLeaf` of
 `DescriptiveComplexity.Problems.Wide.DrawExp`. -/
-theorem expLeafVal_iff {k : ℕ} (e : dt.X.E.Relations k) (τ : Fin k → dt.X.Tag)
+private theorem expLeafVal_iff {k : ℕ} (e : dt.X.E.Relations k) (τ : Fin k → dt.X.Tag)
     (hn : (dt.relPk e τ).n ≤ dt.eDim) (hrd : dt.relNr e τ ≤ dt.nfDim)
     (ρs : Fin k → dt.X.B.Assignment A) (f : dt.CtlIx → A)
     (hav : ∀ r : Fin (dt.relNr e τ),
@@ -490,7 +493,7 @@ noncomputable def expArgs {k : ℕ} (v : dt.VarIx) (ts : Fin k → Fin (dt.nOf v
   IsMaxEl := fun _ => dt.IsMaxLvE
 
 /-- **An expansion atom's exit reads the control alone.** -/
-theorem expArgs_exitSt_congr {k : ℕ} (v : dt.VarIx)
+private theorem expArgs_exitSt_congr {k : ℕ} (v : dt.VarIx)
     (ts : Fin k → Fin (dt.nOf v)) (e : dt.X.E.Relations k) (a : Fin dt.natMax)
     (hk : k * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hn : ∀ τ : Fin k → dt.X.Tag, (dt.relPk e τ).n ≤ dt.eDim)
@@ -535,7 +538,7 @@ variable {dt zero one}
 
 omit [L.IsRelational] [LinearOrder A] [L.Structure A] [Finite A] [Nonempty A] in
 /-- **A gate's decoding is exclusive**, so its branch never co-fires. -/
-theorem gateTagsAre_unique (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
+private theorem gateTagsAre_unique (hc : Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (t t' : dt.X.Tag) (f : dt.CtlIx → A) (h : dt.GateTagsAre one hc t f)
     (h' : dt.GateTagsAre one hc t' f) : t = t' :=
   (h' t).mp ((h t).mpr rfl)
@@ -552,7 +555,7 @@ noncomputable def domLeafData (t : dt.X.Tag) (r : Fin (dt.domNr t)) :
 
 omit [LinearOrder A] [L.Structure A] [Finite A] [Nonempty A] in
 /-- **The leaf is that block atom.** -/
-theorem blkAtom?_domLeafData (t : dt.X.Tag) (r : Fin (dt.domNr t)) :
+private theorem blkAtom?_domLeafData (t : dt.X.Tag) (r : Fin (dt.domNr t)) :
     blkAtom? ((blkAtoms (dt.domPk t).mat).get r) =
       some (.blkA (domLeafData t r).1 (domLeafData t r).2) :=
   (exists_blkA_of_isBlkAtom
@@ -598,7 +601,7 @@ variable {dt zero one}
 omit [Finite A] [Nonempty A] in
 /-- **What the control computes is the domain sentence's leaf**, given that
 every leaf-read flag holds its block atom's bit. -/
-theorem domLeafVal_iff (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
+private theorem domLeafVal_iff (t : dt.X.Tag) (hn : (dt.domPk t).n ≤ dt.eDim)
     (hrd : dt.domNr t ≤ dt.nfDim) (ρ : dt.X.B.Assignment A) (f : dt.CtlIx → A)
     (hav : ∀ r : Fin (dt.domNr t),
       dt.ctlBit one f (dt.rdfC (Fin.castLE hrd r)) ↔
@@ -701,7 +704,7 @@ variable {dt zero one} in
 omit [L.IsRelational] in
 /-- **At a one-hot block value the dispatch is the decoded tag** – how a
 gated address's per-block tag data pins the dispatch. -/
-theorem dspTagOf_eq_of_onehot {S : (Fin dt.dd → A) → Prop} {t : dt.X.Tag}
+private theorem dspTagOf_eq_of_onehot {S : (Fin dt.dd → A) → Prop} {t : dt.X.Tag}
     (hone : ∀ t' : dt.X.Tag,
       S (encTagTup dt.ly zero one t') ↔ t' = t) :
     dt.dspTagOf zero one S = t := by
@@ -788,7 +791,7 @@ omit [L.IsRelational] [L.Structure A] in
 /-- **A stage atom's verdict store reads the control alone**: what it files
 is the bit the random access came back with, and that bit is a hypothesis
 of the store, not a read of it. -/
-theorem stageArgs_setAv_congr (v : dt.VarIx) (i : dt.d.B.ι)
+private theorem stageArgs_setAv_congr (v : dt.VarIx) (i : dt.d.B.ι)
     (ts : Fin (dt.d.B.arity i) → Fin (dt.nOf v)) (a : Fin dt.natMax)
     (b : Bool) (f : dt.CtlIx → A) (g g' : dt.SlotIx → A) :
     (dt.stageArgs zero one v i ts a).setAv b f g =
@@ -996,7 +999,7 @@ exactly what
 the loop's wide tuple spells. This is the join between
 `DescriptiveComplexity.Problems.Wide.DrawExp`'s leaf predicate and the
 machine. -/
-theorem regBit_expMatch (hzo : zero ≠ one)
+private theorem regBit_expMatch (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     {k : ℕ} {v : dt.VarIx} (ts : Fin k → Fin (dt.nOf v))
     (e : dt.X.E.Relations k) (τ : Fin k → dt.X.Tag) (r : Fin (dt.relNr e τ))

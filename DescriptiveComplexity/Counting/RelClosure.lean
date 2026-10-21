@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Counting.Class
 public import DescriptiveComplexity.SecondOrderRelPull
+import all DescriptiveComplexity.SecondOrderNewPull
+import all DescriptiveComplexity.SecondOrderRelPull
 
 /-!
 # `#P` is closed under relativized parsimonious reductions
@@ -61,7 +63,7 @@ def SOBlock.Supported (B : SOBlock) (J : RelFOInterpretation L₁ L₂ Tag dm)
     ∀ k : Fin (B.arity p.1), (J.domFormula (p.2 k)).Realize fun j => x (finProdFinEquiv (k, j))
 
 /-- A transferred assignment is supported. -/
-theorem SOBlock.supported_pullAssignRel (B : SOBlock) (J : RelFOInterpretation L₁ L₂ Tag dm)
+private theorem SOBlock.supported_pullAssignRel (B : SOBlock) (J : RelFOInterpretation L₁ L₂ Tag dm)
     (ρ : B.Assignment (J.MapRel A)) : B.Supported J (B.pullAssignRel J ρ) :=
   fun _ _ h k => h.1 k
 
@@ -105,7 +107,7 @@ noncomputable def supportSentence (J : RelFOInterpretation L₁ L₂ Tag dm) (B 
             (LHom.sumInl.onFormula (J.domFormula (p.2 k))).relabel
               fun j => finProdFinEquiv (k, j))).relabel Sum.inr)
 
-theorem realize_supportSentence (J : RelFOInterpretation L₁ L₂ Tag dm) (B : SOBlock)
+private theorem realize_supportSentence (J : RelFOInterpretation L₁ L₂ Tag dm) (B : SOBlock)
     (σ : (B.pull Tag dm).Assignment A) :
     @Sentence.Realize (L₁.sum (B.pull Tag dm).lang) A
         (@sumStructure L₁ (B.pull Tag dm).lang A _ ((B.pull Tag dm).structure σ))
@@ -130,7 +132,7 @@ variable {Tag : Type} [Finite Tag] {dm : ℕ} [L₂.IsRelational]
 
 /-- A pulled kernel holds at an assignment of the pulled block exactly when
 the kernel holds, in the interpreted structure, at its read-back. -/
-theorem RelFOInterpretation.realize_pullRelSentence_iff_read
+private theorem RelFOInterpretation.realize_pullRelSentence_iff_read
     (J : RelFOInterpretation L₁ L₂ Tag dm) (B : SOBlock) (φ : (L₂.sum B.lang).Sentence)
     (A : Type) [L₁.Structure A] (σ : (B.pull Tag dm).Assignment A) :
     @Sentence.Realize (L₁.sum (B.pull Tag dm).lang) A
@@ -206,7 +208,8 @@ theorem SharpPDefinable.of_relOrderedParsimonious (f : C ≤ʳᵖ[≤] D) (h : S
 
 /-- **Membership in `#P` travels backward along relativized ordered
 parsimonious reductions.** -/
-theorem mem_sharpP_of_relOrderedParsimonious (f : C ≤ʳᵖ[≤] D) (h : D ∈ SharpP) : C ∈ SharpP :=
+private theorem mem_sharpP_of_relOrderedParsimonious
+    (f : C ≤ʳᵖ[≤] D) (h : D ∈ SharpP) : C ∈ SharpP :=
   SharpPDefinable.of_relOrderedParsimonious f h
 
 end Closure

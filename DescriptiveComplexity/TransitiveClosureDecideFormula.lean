@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.TransitiveClosureDecide
 public import DescriptiveComplexity.TransitiveClosureParam
+import all DescriptiveComplexity.TransitiveClosureDecide
 
 /-!
 # Every formula over decided relations is decided

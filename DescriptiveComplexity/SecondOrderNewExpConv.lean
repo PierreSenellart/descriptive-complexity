@@ -10,6 +10,8 @@ public import DescriptiveComplexity.SecondOrderNewBdd
 import DescriptiveComplexity.Exponential.Class
 public import DescriptiveComplexity.Exponential.Classes
 import DescriptiveComplexity.SecondOrderNewExp
+import all DescriptiveComplexity.SecondOrderNewExpBuild
+import all DescriptiveComplexity.SecondOrderNewExpPull
 
 /-!
 # From a problem over an expansion to one with value invention

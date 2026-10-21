@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Wide.TilingHard.Emit
 public import DescriptiveComplexity.Problems.Wide.Increment
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Emit
+import all DescriptiveComplexity.Problems.Wide.TilingHard.Tiles
 
 /-!
 # The grid of the emitted tiling is the machine's tape
@@ -51,13 +54,13 @@ theorem tpCol_dig (s : A → Prop) (x : A) : tpCol s (tpDig (A := A) x) ↔ s x 
 
 omit [LinearOrder A] [Language.wide.Structure A] in
 /-- A coordinate holds digits alone, which is what makes it a position. -/
-theorem tpCol_dig_of_mem {s : A → Prop} {p : TilePt A} (h : tpCol s p) : TPDig p := by
+private theorem tpCol_dig_of_mem {s : A → Prop} {p : TilePt A} (h : tpCol s p) : TPDig p := by
   obtain ⟨a, -, rfl⟩ := h
   exact tpDig_isDig a
 
 omit [LinearOrder A] [Language.wide.Structure A] in
 /-- **A digit is the digit of its own first coordinate.** -/
-theorem tpDig_eq_self {p : TilePt A} (h : TPDig p) : tpDig (A := A) (p.2 0) = p := by
+private theorem tpDig_eq_self {p : TilePt A} (h : TPDig p) : tpDig (A := A) (p.2 0) = p := by
   obtain ⟨h1, h2, h3⟩ := h
   refine Prod.ext h1.symm (funext fun i => ?_)
   fin_cases i
@@ -67,7 +70,7 @@ theorem tpDig_eq_self {p : TilePt A} (h : TPDig p) : tpDig (A := A) (p.2 0) = p 
 
 omit [LinearOrder A] [Language.wide.Structure A] in
 /-- Two addresses with the same coordinate are the same address. -/
-theorem tpCol_injective : Function.Injective (tpCol (A := A)) := by
+private theorem tpCol_injective : Function.Injective (tpCol (A := A)) := by
   intro s t h
   funext x
   exact propext (by rw [← tpCol_dig s x, ← tpCol_dig t x, h])
@@ -75,7 +78,7 @@ theorem tpCol_injective : Function.Injective (tpCol (A := A)) := by
 omit [LinearOrder A] [Language.wide.Structure A] in
 /-- **Every position is a coordinate**: an address holding digits alone is the
 coordinate of the elements those digits belong to. -/
-theorem exists_tpCol {u : TilePt A → Prop} (h : ∀ p, u p → TPDig p) :
+private theorem exists_tpCol {u : TilePt A → Prop} (h : ∀ p, u p → TPDig p) :
     ∃ s : A → Prop, u = tpCol s := by
   refine ⟨fun a => u (tpDig a), funext fun p => propext ⟨fun hp => ⟨p.2 0, ?_, ?_⟩, ?_⟩⟩
   · change u (tpDig (p.2 0))
@@ -87,7 +90,7 @@ theorem exists_tpCol {u : TilePt A → Prop} (h : ∀ p, u p → TPDig p) :
 
 /-- **The order on coordinates is the machine's order on addresses**: they
 differ at a digit, and there the emitted order is the machine's. -/
-theorem tpCol_setLe (s t : A → Prop) :
+private theorem tpCol_setLe (s t : A → Prop) :
     WMSetLe (tpLe (A := A)) (tpCol s) (tpCol t) ↔ WMSetLe (WMLe (A := A)) s t := by
   constructor
   · rintro (heq | ⟨p, hbelow, hns, ht⟩)
@@ -126,7 +129,7 @@ variable (hlin : IsLinOrd (WMLe (A := A)))
 
 omit [LinearOrder A] [Finite A] [Language.wide.Structure A] hlin in
 /-- The empty coordinate holds nothing. -/
-theorem not_tpCol_bot (p : TilePt A) : ¬tpCol (fun _ : A => False) p :=
+private theorem not_tpCol_bot (p : TilePt A) : ¬tpCol (fun _ : A => False) p :=
   fun h => h.choose_spec.1
 
 include hlin
@@ -134,7 +137,7 @@ include hlin
 omit [Finite A] hlin in
 /-- Every position of the emitted tiling is the coordinate of an address of the
 machine. -/
-theorem exists_tpCol_of_posn {p : WPoint (TilePt A)}
+private theorem exists_tpCol_of_posn {p : WPoint (TilePt A)}
     (hp : letI := tileStr A; (wideTileData (TilePt A)).Posn p) :
     ∃ s : A → Prop, p = Sum.inl (tpCol s) := by
   let := tileStr A
@@ -145,7 +148,7 @@ theorem exists_tpCol_of_posn {p : WPoint (TilePt A)}
 
 /-- **The empty coordinate is the least position**, which is where the machine's
 head starts and where the bottom row is. -/
-theorem minPos_tpCol_bot :
+private theorem minPos_tpCol_bot :
     letI := tileStr A
     MinPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn
       (Sum.inl (tpCol (fun _ : A => False))) := by
@@ -155,7 +158,7 @@ theorem minPos_tpCol_bot :
   exact wmSetLe_of_empty (isLinOrd_tpLe hlin) not_tpCol_bot (tpCol r)
 
 /-- **And it is the only one**: a least position is the empty coordinate. -/
-theorem eq_bot_of_minPos {p : WPoint (TilePt A)}
+private theorem eq_bot_of_minPos {p : WPoint (TilePt A)}
     (h : letI := tileStr A
       MinPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn p) :
     p = Sum.inl (tpCol (fun _ : A => False)) := by
@@ -171,7 +174,7 @@ theorem eq_bot_of_minPos {p : WPoint (TilePt A)}
 
 /-- **The full coordinate is the last position**, which is the other column with
 a neighbor missing. -/
-theorem maxPos_tpCol_top :
+private theorem maxPos_tpCol_top :
     letI := tileStr A
     MaxPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn
       (Sum.inl (tpCol (fun _ : A => True))) := by
@@ -181,7 +184,7 @@ theorem maxPos_tpCol_top :
   exact (tpCol_setLe r _).mpr (wmSetLe_of_full hlin (fun _ => trivial) r)
 
 /-- **And it is the only one**: a last position is the full coordinate. -/
-theorem eq_top_of_maxPos {p : WPoint (TilePt A)}
+private theorem eq_top_of_maxPos {p : WPoint (TilePt A)}
     (h : letI := tileStr A
       MaxPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn p) :
     p = Sum.inl (tpCol (fun _ : A => True)) := by
@@ -197,7 +200,7 @@ theorem eq_top_of_maxPos {p : WPoint (TilePt A)}
 /-- **The successor of a coordinate is the increment of the address**: nothing
 lies strictly between an address and its increment, and every position is a
 coordinate. -/
-theorem succPos_tpCol (s t : A → Prop) :
+private theorem succPos_tpCol (s t : A → Prop) :
     letI := tileStr A
     (SuccPos (wideTileData (TilePt A)).Le (wideTileData (TilePt A)).Posn
         (Sum.inl (tpCol s)) (Sum.inl (tpCol t)) ↔

@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.HaltHard.SimNorm
+import all DescriptiveComplexity.Problems.Machine.HaltHard.SimNorm
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Zip
 
 /-!
 # The `cons` push, and the assembled dispatch simulation
@@ -44,16 +46,16 @@ def prime : SimSym c → SimSym c
   | σ => σ
 
 /-- Unmarking a letter. -/
-def unprime : SimSym c → SimSym c
+private def unprime : SimSym c → SimSym c
   | .one' => .one
   | .com' => .com
   | σ => σ
 
-theorem unprime_prime {σ : SimSym c} (h : σ = .one ∨ σ = .com) :
+private theorem unprime_prime {σ : SimSym c} (h : σ = .one ∨ σ = .com) :
     unprime (prime σ) = σ := by
   rcases h with rfl | rfl <;> rfl
 
-theorem prime_ne {σ : SimSym c} (h : σ = .one ∨ σ = .com) :
+private theorem prime_ne {σ : SimSym c} (h : σ = .one ∨ σ = .com) :
     prime σ ≠ .endL ∧ prime σ ≠ .mid ∧ prime σ ≠ .endR := by
   rcases h with rfl | rfl <;> exact ⟨by simp [prime], by simp [prime], by simp [prime]⟩
 
@@ -65,7 +67,7 @@ variable {q q₂ : SimQ c} {σ σ' : SimSym c} {P : SimSym c → Prop} {f : SimS
 
 /-- One left move, then a leftward walk over passed letters: the fused form
 every carry uses, sound whether or not the walked span is empty. -/
-theorem reach_step_then_walkL (hstep : simStep q σ = some (σ', q₂, false))
+private theorem reach_step_then_walkL (hstep : simStep q σ = some (σ', q₂, false))
     (hpass : ∀ τ, P τ → simStep q₂ τ = some (τ, q₂, false))
     (w : List (SimSym c)) (hw : ∀ τ ∈ w, P τ) (x : SimSym c) (L R : List (SimSym c)) :
     Reach ⟨q, w ++ x :: L, σ, R⟩ ⟨q₂, L, x, w.reverse ++ σ' :: R⟩ := by
@@ -78,7 +80,7 @@ theorem reach_step_then_walkL (hstep : simStep q σ = some (σ', q₂, false))
     simp
 
 /-- One right move, then a rightward walk over passed letters. -/
-theorem reach_step_then_walkR (hstep : simStep q σ = some (σ', q₂, true))
+private theorem reach_step_then_walkR (hstep : simStep q σ = some (σ', q₂, true))
     (hpass : ∀ τ, P τ → simStep q₂ τ = some (τ, q₂, true))
     (w : List (SimSym c)) (hw : ∀ τ ∈ w, P τ) (x : SimSym c) (L R : List (SimSym c)) :
     Reach ⟨q, L, σ, w ++ x :: R⟩ ⟨q₂, w.reverse ++ σ' :: L, x, R⟩ := by
@@ -91,7 +93,7 @@ theorem reach_step_then_walkR (hstep : simStep q σ = some (σ', q₂, true))
     simp
 
 /-- One right move, then a rightward transducing walk. -/
-theorem reach_step_then_walkR_map (hstep : simStep q σ = some (σ', q₂, true))
+private theorem reach_step_then_walkR_map (hstep : simStep q σ = some (σ', q₂, true))
     (hpass : ∀ τ, P τ → simStep q₂ τ = some (f τ, q₂, true))
     (w : List (SimSym c)) (hw : ∀ τ ∈ w, P τ) (x : SimSym c) (L R : List (SimSym c)) :
     Reach ⟨q, L, σ, w ++ x :: R⟩ ⟨q₂, (w.map f).reverse ++ σ' :: L, x, R⟩ := by
@@ -111,33 +113,33 @@ section Pass
 
 variable {σ : SimSym c} {p : CPos c}
 
-theorem pass_cpCar₁ (h : σ ≠ .endL) :
+private theorem pass_cpCar₁ (h : σ ≠ .endL) :
     simStep (.cpCar₁ p) σ = some (σ, .cpCar₁ p, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_cpCarC (h : σ ≠ .endL) :
+private theorem pass_cpCarC (h : σ ≠ .endL) :
     simStep (.cpCarC p) σ = some (σ, .cpCarC p, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_cpBack (h : σ ≠ .mid) :
+private theorem pass_cpBack (h : σ ≠ .mid) :
     simStep (.cpBack p) σ = some (σ, .cpBack p, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_cpHdr (h : σ ≠ .endL) :
+private theorem pass_cpHdr (h : σ ≠ .endL) :
     simStep (.cpHdr p) σ = some (σ, .cpHdr p, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_cpUnp (h : σ ≠ .mid) :
+private theorem pass_cpUnp (h : σ ≠ .mid) :
     simStep (.cpUnp p) σ = some (σ, .cpUnp p, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
 /-- The scan passes blanks and primed letters. -/
-theorem pass_cpFetch (h : σ = .bk ∨ σ = .one' ∨ σ = .com') :
+private theorem pass_cpFetch (h : σ = .bk ∨ σ = .one' ∨ σ = .com') :
     simStep (.cpFetch p) σ = some (σ, .cpFetch p, true) := by
   rcases h with rfl | rfl | rfl <;> rfl
 
 /-- The unpriming sweep, as a transducing pass. -/
-theorem pass_cpUnp₂ (h : σ = .bk ∨ σ = .one' ∨ σ = .com') :
+private theorem pass_cpUnp₂ (h : σ = .bk ∨ σ = .one' ∨ σ = .com') :
     simStep (.cpUnp₂ p) σ = some (unprime σ, .cpUnp₂ p, true) := by
   rcases h with rfl | rfl | rfl <;> rfl
 
@@ -149,7 +151,7 @@ end Pass
 prime it, carry it home to `endL`, write it by the endL-shift and walk back
 onto the gap – the loop entry one letter further. Stated over an abstract
 carry state so the digit and separator instances share the proof. -/
-theorem cp_iter (p : CPos c) {u : SimSym c} {Qcar : SimQ c}
+private theorem cp_iter (p : CPos c) {u : SimSym c} {Qcar : SimQ c}
     (hu : u = SimSym.one ∨ u = SimSym.com)
     (h1 : simStep (.cpFetch p) u = some (prime u, Qcar, false))
     (h2 : ∀ τ : SimSym c, τ ≠ SimSym.endL → simStep Qcar τ = some (τ, Qcar, false))
@@ -313,7 +315,7 @@ theorem cp_loop (p : CPos c) : ∀ (U P : List (SimSym c)),
     simp [hlen]
 
 /-- Unpriming undoes priming, letterwise on a value word. -/
-theorem unprime_map_prime {l : List (SimSym c)}
+private theorem unprime_map_prime {l : List (SimSym c)}
     (hl : ∀ σ ∈ l, σ = SimSym.one ∨ σ = SimSym.com) :
     (l.map prime).map unprime = l := by
   rw [List.map_map]
@@ -466,39 +468,40 @@ section Shapes
 
 variable {p : CPos c} {k : PCont c} {v : List ℕ}
 
-theorem pStepNormal_zero' (h : codeAt p = .zero') : pStepNormal p k v = (k, 0 :: v) := by
+private theorem pStepNormal_zero' (h : codeAt p = .zero') : pStepNormal p k v = (k, 0 :: v) := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_succ (h : codeAt p = .succ) : pStepNormal p k v = (k, [v.headI.succ]) := by
+private theorem pStepNormal_succ
+    (h : codeAt p = .succ) : pStepNormal p k v = (k, [v.headI.succ]) := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_tail (h : codeAt p = .tail) : pStepNormal p k v = (k, v.tail) := by
+private theorem pStepNormal_tail (h : codeAt p = .tail) : pStepNormal p k v = (k, v.tail) := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_cons {f fs : Code} (h : codeAt p = .cons f fs) :
+private theorem pStepNormal_cons {f fs : Code} (h : codeAt p = .cons f fs) :
     pStepNormal p k v = pStepNormal (c₁ p) (.cons₁ (c₂ p) v k) v := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_comp {f g₂ : Code} (h : codeAt p = .comp f g₂) :
+private theorem pStepNormal_comp {f g₂ : Code} (h : codeAt p = .comp f g₂) :
     pStepNormal p k v = pStepNormal (c₂ p) (.comp (c₁ p) k) v := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_case_zero {f g₂ : Code} (h : codeAt p = .case f g₂)
+private theorem pStepNormal_case_zero {f g₂ : Code} (h : codeAt p = .case f g₂)
     (hv : v.headI = 0) : pStepNormal p k v = pStepNormal (c₁ p) k v.tail := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_case_succ {f g₂ : Code} {y : ℕ} (h : codeAt p = .case f g₂)
+private theorem pStepNormal_case_succ {f g₂ : Code} {y : ℕ} (h : codeAt p = .case f g₂)
     (hv : v.headI = y + 1) : pStepNormal p k v = pStepNormal (c₂ p) k (y :: v.tail) := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
 
-theorem pStepNormal_fix {f : Code} (h : codeAt p = .fix f) :
+private theorem pStepNormal_fix {f : Code} (h : codeAt p = .fix f) :
     pStepNormal p k v = pStepNormal (c₁ p) (.fix (c₁ p) k) v := by
   rw [pStepNormal.eq_def]
   split <;> simp_all
@@ -508,7 +511,7 @@ end Shapes
 /-! ### The assembled dispatch phase -/
 
 /-- Every code has size at least one. -/
-theorem one_le_sizeOf_code (c' : Code) : 1 ≤ sizeOf c' := by
+private theorem one_le_sizeOf_code (c' : Code) : 1 ≤ sizeOf c' := by
   cases c' <;> simp <;> omega
 
 /-- **The dispatch phase of the simulation**: from the dispatch of the code

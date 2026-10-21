@@ -9,6 +9,7 @@ import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Feedback.Defs
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
 # The feedback problems are existential second-order definable
@@ -61,29 +62,29 @@ fo_block feedbackGuessBlock over Language.markedGraph mg into fvsSOLang with f w
   inj : 2
 
 /-- Kernel conjunct: the guessed order is transitive. -/
-noncomputable def fvsTransClause : fvsSOLang.Sentence :=
+private noncomputable def fvsTransClause : fvsSOLang.Sentence :=
   fo% ∀ x y z, fLtSym(x, y) ∧ fLtSym(y, z) → fLtSym(x, z)
 
 /-- Kernel conjunct: the guessed order is irreflexive. -/
-noncomputable def fvsIrreflClause : fvsSOLang.Sentence :=
+private noncomputable def fvsIrreflClause : fvsSOLang.Sentence :=
   fo% ∀ x, ¬ fLtSym(x, x)
 
 /-- Kernel conjunct: every surviving arc goes forward in the guessed
 order. -/
-noncomputable def fvsArcClause : fvsSOLang.Sentence :=
+private noncomputable def fvsArcClause : fvsSOLang.Sentence :=
   fo% ∀ x y, (fAdjSym(x, y) ∧ ¬ fSetSym(x)) ∧ ¬ fSetSym(y) → fLtSym(x, y)
 
 /-- Kernel conjunct: the guessed injection maps every removed vertex to a
 marked element. -/
-noncomputable def fvsTotalClause : fvsSOLang.Sentence :=
+private noncomputable def fvsTotalClause : fvsSOLang.Sentence :=
   fo% ∀ x, fSetSym(x) → ∃ y, fInjSym(x, y) ∧ fMarkedSym(y)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
-noncomputable def fvsInjClause : fvsSOLang.Sentence :=
+private noncomputable def fvsInjClause : fvsSOLang.Sentence :=
   fo% ∀ x x' y, fInjSym(x, y) ∧ fInjSym(x', y) → x ≐ x'
 
 /-- The first-order kernel of the `Σ₁` definition of Feedback Vertex Set. -/
-noncomputable def feedbackKernel : fvsSOLang.Sentence :=
+private noncomputable def feedbackKernel : fvsSOLang.Sentence :=
   fvsTransClause ⊓ (fvsIrreflClause ⊓ (fvsArcClause ⊓ (fvsTotalClause ⊓ fvsInjClause)))
 
 /-- Realization of the kernel under an assignment of the three relation
@@ -181,30 +182,30 @@ fo_block feedbackArcGuessBlock over Language.markedArcGraph mag into fasSOLang w
   inj : 4
 
 /-- Kernel conjunct: the guessed order is transitive. -/
-noncomputable def fasTransClause : fasSOLang.Sentence :=
+private noncomputable def fasTransClause : fasSOLang.Sentence :=
   fo% ∀ x y z, fasLtSym(x, y) ∧ fasLtSym(y, z) → fasLtSym(x, z)
 
 /-- Kernel conjunct: the guessed order is irreflexive. -/
-noncomputable def fasIrreflClause : fasSOLang.Sentence :=
+private noncomputable def fasIrreflClause : fasSOLang.Sentence :=
   fo% ∀ x, ¬ fasLtSym(x, x)
 
 /-- Kernel conjunct: every arc that is not cut goes forward in the guessed
 order. -/
-noncomputable def fasArcClause : fasSOLang.Sentence :=
+private noncomputable def fasArcClause : fasSOLang.Sentence :=
   fo% ∀ x y, fasAdjSym(x, y) ∧ ¬ fasCutSym(x, y) → fasLtSym(x, y)
 
 /-- Kernel conjunct: the guessed injection maps every cut arc to a marked
 arc. -/
-noncomputable def fasTotalClause : fasSOLang.Sentence :=
+private noncomputable def fasTotalClause : fasSOLang.Sentence :=
   fo% ∀ a b, fasCutSym(a, b) → ∃ c d, fasInjSym(a, b, c, d) ∧ fasMarkedSym(c, d)
 
 /-- Kernel conjunct: the guessed injection is injective. -/
-noncomputable def fasInjClause : fasSOLang.Sentence :=
+private noncomputable def fasInjClause : fasSOLang.Sentence :=
   fo% ∀ a b a' b' c d,
     fasInjSym(a, b, c, d) ∧ fasInjSym(a', b', c, d) → a ≐ a' ∧ b ≐ b'
 
 /-- The first-order kernel of the `Σ₁` definition of Feedback Arc Set. -/
-noncomputable def feedbackArcKernel : fasSOLang.Sentence :=
+private noncomputable def feedbackArcKernel : fasSOLang.Sentence :=
   fasTransClause ⊓ (fasIrreflClause ⊓ (fasArcClause ⊓ (fasTotalClause ⊓ fasInjClause)))
 
 /-- Realization of the kernel under an assignment of the three relation

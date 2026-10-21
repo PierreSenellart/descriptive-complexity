@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.WeightedWorlds
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Counting.PossibleWorlds
 
 /-!
 # Possible worlds are weighted worlds of weight one
@@ -184,7 +185,7 @@ noncomputable def unitWeightLEquiv (A : Type) [(L.sum L).Structure A] [LinearOrd
 /-- **Counting possible worlds reduces parsimoniously to counting weighted
 worlds**, by giving every fact the weights `1` and `1`. The reduction is
 ordered: it names the least position. -/
-noncomputable def possibleWorlds_ordered_parsimonious_weightedWorlds [L.IsRelational]
+private noncomputable def possibleWorlds_ordered_parsimonious_weightedWorlds [L.IsRelational]
     (φ : L.Sentence) : PossibleWorlds φ ≤ᵖ[≤] WeightedWorlds φ where
   Tag := Unit
   dim := 1

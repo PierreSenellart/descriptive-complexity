@@ -7,6 +7,13 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTrip
 import DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Problems.Wide.DrawTrip
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # Kits for the round trips: the file test
@@ -165,7 +172,7 @@ def rule : TestRule → Rule A Q W P
 
 /-- **In-shape separation**: two of the kit's rules firing in the same phase
 on the same data are the same rule. -/
-theorem sep (hemb : Function.Injective κ.emb) :
+private theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TestRule) (f : Q → A) (g : W → A),
       (κ.rule one ρ).guard f g → (κ.rule one ρ').guard f g →
       (κ.rule one ρ).srcPh = (κ.rule one ρ').srcPh → ρ = ρ' := by
@@ -183,7 +190,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
 /-- **Exit disjointness**: at the kit's two verdict phases – where a caller's
 exit rule, guarded `wk = one ∧ rg ≠ one`, lives – no kit rule fires on a
 symbol satisfying that guard. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : TestRule) (f : Q → A) (g : W → A), (κ.rule one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
       ((κ.rule one ρ).srcPh = κ.emb .ty ∨ (κ.rule one ρ).srcPh = κ.emb .tn) →
@@ -198,7 +205,7 @@ theorem exit_disjoint (hemb : Function.Injective κ.emb) :
 /-- **The trip stays inside its own phases**: every rule lands in one the kit
 was given, which is what a caller that must know a property of the phases the
 machine can be in reads off a sub-machinery. -/
-theorem dstPh_emb (ρ : TestRule) : ∃ p, (κ.rule one ρ).dstPh = κ.emb p := by
+private theorem dstPh_emb (ρ : TestRule) : ∃ p, (κ.rule one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-! ### The discharge -/
@@ -322,7 +329,7 @@ include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcom
 /-- **The kit runs a passing file test**: from the scan phase anywhere, up to
 the file top, down the file – every register passing – and back to the marker
 in the passing phase. -/
-theorem reachesIn_pos (hTest : ∀ u, Test u) :
+private theorem reachesIn_pos (hTest : ∀ u, Test u) :
     (wideData (Univ A R P K dd)).ReachesIn
       (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
         wideRank (F.cell gbot))
@@ -368,7 +375,7 @@ theorem reaches_pos (hTest : ∀ u, Test u) :
 include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle hgap in
 /-- **The kit runs a failing file test**: some register fails, and the trip
 ends at the marker in the failing phase. -/
-theorem reachesIn_neg {u : I} (hTest : ¬Test u) :
+private theorem reachesIn_neg {u : I} (hTest : ¬Test u) :
     (wideData (Univ A R P K dd)).ReachesIn
       (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
         wideRank (F.cell gbot))
@@ -399,7 +406,7 @@ theorem reachesIn_neg {u : I} (hTest : ¬Test u) :
 
 include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hcompat hsle in
 /-- **The kit runs a failing file test**, the budget forgotten. -/
-theorem reaches_neg {u : I} (hTest : ¬Test u) :
+private theorem reaches_neg {u : I} (hTest : ¬Test u) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -516,11 +523,11 @@ def rule : TrackRule → Rule A Q W P
 /-- **The trip stays inside its own phases**: every rule lands in one the kit
 was given, which is what a caller that must know a property of the phases the
 machine can be in reads off a sub-machinery. -/
-theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
+private theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **In-shape separation.** -/
-theorem sep (hemb : Function.Injective κ.emb) :
+private theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TrackRule) (f : Q → A) (g : W → A),
       (κ.rule zero one ρ).guard f g → (κ.rule zero one ρ').guard f g →
       (κ.rule zero one ρ).srcPh = (κ.rule zero one ρ').srcPh → ρ = ρ' := by
@@ -534,7 +541,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
     | exact absurd hg' hg.1
 
 /-- **Exit disjointness** at the kit's pass-and-return phase. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : TrackRule) (f : Q → A) (g : W → A), (κ.rule zero one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
       (κ.rule zero one ρ).srcPh = κ.emb .run → False := by
@@ -598,7 +605,7 @@ private theorem has_of_rule {ρ : TrackRule} {f : Q → A} {g : W → A}
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
 include F hlin hix hnewk hbot hwkLt hwkS in
-private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
     PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
@@ -618,7 +625,7 @@ private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
 include F hnerg hrg in
-private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hno : ∀ x : I, r ≠ F.cell x) :
     PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
@@ -629,7 +636,7 @@ include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hsle
 /-- **The kit clears its track**: from the scan phase anywhere, up to the file
 top, one pass writing the clear digit at every register, and back to the
 marker. -/
-theorem reachesIn :
+private theorem reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn
       (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
         wideRank (F.cell gbot))
@@ -664,7 +671,7 @@ theorem reachesIn :
 
 include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hsle in
 /-- **The kit clears a track**, the budget forgotten. -/
-theorem reaches :
+private theorem reaches :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -739,11 +746,11 @@ def rule : TrackRule → Rule A Q W P
 /-- **The trip stays inside its own phases**: every rule lands in one the kit
 was given, which is what a caller that must know a property of the phases the
 machine can be in reads off a sub-machinery. -/
-theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule one ρ).dstPh = κ.emb p := by
+private theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **In-shape separation.** -/
-theorem sep (hemb : Function.Injective κ.emb) :
+private theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TrackRule) (f : Q → A) (g : W → A),
       (κ.rule one ρ).guard f g → (κ.rule one ρ').guard f g →
       (κ.rule one ρ).srcPh = (κ.rule one ρ').srcPh → ρ = ρ' := by
@@ -757,7 +764,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
     | exact absurd hg' hg.1
 
 /-- **Exit disjointness** at the kit's pass-and-return phase. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : TrackRule) (f : Q → A) (g : W → A), (κ.rule one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
       (κ.rule one ρ).srcPh = κ.emb .run → False := by
@@ -824,7 +831,7 @@ private theorem has_of_rule {ρ : TrackRule} {f : Q → A} {g : W → A}
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
 include F hlin hix hnewk hbot hwkLt hwkS in
-private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
     PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
@@ -844,7 +851,7 @@ private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
 include F hnerg hrg in
-private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hno : ∀ x : I, r ≠ F.cell x) :
     PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
@@ -856,7 +863,7 @@ include hrules F hR hlin hix hnerg hnerl hnewk hnesrc htop hbot hwkLt hrg hrl hw
 /-- **The kit copies the source slot into its track**: from the scan phase
 anywhere, up to the file top, one pass replacing every register's walked digit
 by its source digit, and back to the marker. -/
-theorem reachesIn :
+private theorem reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn
       (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
         wideRank (F.cell gbot))
@@ -895,7 +902,7 @@ theorem reachesIn :
 include hrules F hR hlin hix hnerg hnerl hnewk hnesrc htop hbot hwkLt hrg hrl hwkS hsrcBit
   hsle in
 /-- **The kit copies a track**, the budget forgotten. -/
-theorem reaches :
+private theorem reaches :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -974,11 +981,11 @@ noncomputable def rule : TrackRule → Rule A Q W P
 /-- **The trip stays inside its own phases**: every rule lands in one the kit
 was given, which is what a caller that must know a property of the phases the
 machine can be in reads off a sub-machinery. -/
-theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
+private theorem dstPh_emb (ρ : TrackRule) : ∃ p, (κ.rule zero one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **In-shape separation.** -/
-theorem sep (hemb : Function.Injective κ.emb) :
+private theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : TrackRule) (f : Q → A) (g : W → A),
       (κ.rule zero one ρ).guard f g → (κ.rule zero one ρ').guard f g →
       (κ.rule zero one ρ).srcPh = (κ.rule zero one ρ').srcPh → ρ = ρ' := by
@@ -992,7 +999,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
     | exact absurd hg' hg.1
 
 /-- **Exit disjointness** at the kit's pass-and-return phase. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : TrackRule) (f : Q → A) (g : W → A), (κ.rule zero one ρ).guard f g →
       g κ.wk = one → g κ.rg ≠ one →
       (κ.rule zero one ρ).srcPh = κ.emb .run → False := by
@@ -1057,7 +1064,7 @@ private theorem has_of_rule {ρ : TrackRule} {f : Q → A} {g : W → A}
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite I] in
 include F hlin hix hnewk hbot hwkLt hwkS in
-private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hbnd : ∃ x : I, WMSetLe WMLe (F.cell x) r) :
     PR.passTracksAt F.cell κ.t rest k r κ.wk ≠ PR.one := by
   have hlinSet := isLinOrd_wmSetLe (α := Univ A R P K dd) hlin
@@ -1077,7 +1084,7 @@ private theorem wkOff (k : I → Prop) (r : Univ A R P K dd → Prop)
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Finite I] in
 include F hnerg hrg in
-private theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
+theorem rgOff (k : I → Prop) (r : Univ A R P K dd → Prop)
     (hno : ∀ x : I, r ≠ F.cell x) :
     PR.passTracksAt F.cell κ.t rest k r κ.rg ≠ PR.one := by
   rw [Prog.passTracks_of_ne (Ne.symm hnerg), hrg,
@@ -1088,7 +1095,7 @@ include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hFb 
 /-- **The kit rewrites its track by the function**: from the scan phase
 anywhere, up to the file top, one pass writing the computed bit at every
 register, and back to the marker. -/
-theorem reachesIn :
+private theorem reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn
       (wideRank (F.cell gtop) + 2 + ((ixRank ile gtop - ixRank ile gbot) * w + 1) +
         wideRank (F.cell gbot))
@@ -1125,7 +1132,7 @@ theorem reachesIn :
 
 include hrules F hR hlin hix hnerg hnerl hnewk htop hbot hwkLt hrg hrl hwkS hFb hsle in
 /-- **The kit rewrites a track**, the budget forgotten. -/
-theorem reaches :
+private theorem reaches :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .up) fc), Sum.inl s,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩

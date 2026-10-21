@@ -14,6 +14,13 @@ public import DescriptiveComplexity.Problems.Wide.Membership
 public import DescriptiveComplexity.Problems.Wide.Det
 public import DescriptiveComplexity.Relativized
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.Kernel
+import all DescriptiveComplexity.Problems.Wide.Det
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
+import all DescriptiveComplexity.Problems.Wide.Membership
+import all DescriptiveComplexity.Problems.Wide.RelExp
+import all DescriptiveComplexity.Problems.Wide.RelExpMap
 
 /-!
 # The EXPSPACE reduction, assembled
@@ -182,7 +189,7 @@ theorem ofSource_ntgDim :
 
 omit [L.IsRelational] in
 /-- **The control inventory does not read the dimension.** -/
-theorem ofSource_ctlIx :
+private theorem ofSource_ctlIx :
     (Data.ofSource X d h).CtlIx = (Data.ofSource X d h').CtlIx := by
   unfold Data.CtlIx
   rw [ofSource_eDim h h', ofSource_naDim h h', ofSource_natMax h h',
@@ -190,7 +197,7 @@ theorem ofSource_ctlIx :
 
 omit [L.IsRelational] in
 /-- **Nor does the track inventory.** -/
-theorem ofSource_slotIx :
+private theorem ofSource_slotIx :
     (Data.ofSource X d h).SlotIx = (Data.ofSource X d h').SlotIx := by
   unfold Data.SlotIx
   rw [ofSource_ki h h']
@@ -246,7 +253,7 @@ theorem srcData_payload_le :
 
 /-- The block index of the packed record is nonempty: the output pack was
 padded. -/
-noncomputable def srcKIx : (srcData X d).KIx :=
+private noncomputable def srcKIx : (srcData X d).KIx :=
   Sum.inrₗ ⟨0, Data.ki_pos X d (le_of_lt (encDim_lt_srcDim X d))⟩
 
 end Dim
@@ -375,7 +382,7 @@ noncomputable def srcEnv (L : Language.{0, 0}) [L.IsRelational] (A : Type)
 
 /-- **The emitted machine accepts exactly when the partial fixed point holds**,
 read over the doubled universe and at the order the encoding pulls back. -/
-theorem dwideAcceptSpace_srcEnv_iff :
+private theorem dwideAcceptSpace_srcEnv_iff :
     letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
       encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo
     (DWideAcceptSpace ((dblWideInterp X d).Map (srcEnv L A).α) ↔
@@ -431,7 +438,7 @@ universe. The transport is `wideProblem_wideInterp_iff`'s and nothing else –
 which problem the machine is asked about it never reads – so this half of the
 NEXPTIME reduction is free: what is not is the hypothesis, the clocked program's
 run against the kernel. -/
-theorem wideAccept_wideInterp_iff {Q₀ : DecisionProblem X.E}
+private theorem wideAccept_wideInterp_iff {Q₀ : DecisionProblem X.E}
     (hmach :
       letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
         encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo

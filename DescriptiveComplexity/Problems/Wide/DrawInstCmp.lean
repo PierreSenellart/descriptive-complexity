@@ -8,6 +8,14 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawArgs
 public import DescriptiveComplexity.Problems.Wide.DrawRunIter
 import DescriptiveComplexity.Problems.Wide.DrawRunStage
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The comparison atoms, instantiated
@@ -67,7 +75,7 @@ noncomputable def lvSet (st : TapeSt dt A R P I) (v : dt.VarIx)
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] in
 /-- A level's track is backed by its register set. -/
-theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P I) (v : dt.VarIx)
+private theorem back_lvTrack (zero one : A) (st : TapeSt dt A R P I) (v : dt.VarIx)
     (j : Fin (dt.nOf v)) (r : Univ A R P dt.KIx dt.dd → Prop) :
     dt.ixBack RF.toLayout zero one dt.dd0Le st r (dt.lvTrack v j) =
       bitVal zero one (bitAtOf RF.cell (dt.lvSet st v j) r) := by
@@ -82,7 +90,7 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] in
 /-- **A level's track is backed by its register set, at the elementwise file**:
 the same statement read at `DescriptiveComplexity.Draw.Data.back`, which is
 what a space-bounded program's files say. -/
-theorem back_lvTrackD (F : RegFile (Univ A R P dt.KIx dt.dd))
+private theorem back_lvTrackD (F : RegFile (Univ A R P dt.KIx dt.dd))
     (hord : ∀ x y : Univ A R P dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x y)
     (zero one : A) (st : TapeStD dt A R P) (v : dt.VarIx)
     (j : Fin (dt.nOf v)) (r : Univ A R P dt.KIx dt.dd → Prop) :
@@ -105,7 +113,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
 /-- The marker slot is not a level's track. -/
-theorem wk_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
+private theorem wk_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
     (Slot.wk : dt.SlotIx) ≠ dt.lvTrack v j := by
   rw [lvTrack]
   by_cases h : (j : ℕ) < dt.arOf v
@@ -118,7 +126,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
 /-- The register mark is not a level's track. -/
-theorem reg_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
+private theorem reg_ne_lvTrack (v : dt.VarIx) (j : Fin (dt.nOf v)) :
     (Slot.reg : dt.SlotIx) ≠ dt.lvTrack v j := by
   rw [lvTrack]
   by_cases h : (j : ℕ) < dt.arOf v
@@ -135,7 +143,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
 /-- The loop element rides along `cmpInit`. -/
-theorem readLv_cmpInit {zero one : A} (f : dt.CtlIx → A) :
+private theorem readLv_cmpInit {zero one : A} (f : dt.CtlIx → A) :
     dt.readLv (dt.cmpInit zero one f) = dt.readLv f := by
   funext j
   rw [readLv, readLv, cmpInit, setCtl_of_ne (lvC_ne_cmpAccC (dt := dt) j),
@@ -146,7 +154,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
 /-- The loop element rides along a read's store. -/
-theorem readLv_setCtl_cmpRdC {zero one : A} (hnf : 2 ≤ dt.nfDim) (k : Fin 2)
+private theorem readLv_setCtl_cmpRdC {zero one : A} (hnf : 2 ≤ dt.nfDim) (k : Fin 2)
     (b : Prop) (f : dt.CtlIx → A) :
     dt.readLv (dt.setCtl zero one (dt.cmpRdC hnf k) b f) = dt.readLv f := by
   funext j
@@ -157,7 +165,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] in
 /-- The loop element after an advance is the next tuple. -/
-theorem readLv_advLvN [Finite A] [Nonempty A] (f : dt.CtlIx → A) :
+private theorem readLv_advLvN [Finite A] [Nonempty A] (f : dt.CtlIx → A) :
     dt.readLv (dt.advLvN f) = tupNext (dt.readLv f) :=
   readLv_putLv f _
 
@@ -200,7 +208,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 levels' register sets, which are the mirror and VAL
 (`DescriptiveComplexity.Draw.Data.lvSet`), and its background at the
 working cell alone. -/
-theorem cmpFam_congr_scratch {st' : TapeSt dt A R P I}
+private theorem cmpFam_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st')
     (hreg : ¬∃ u : I, vAdr = RF.cell u)
     (f₀ : dt.CtlIx → A) (b : Lex (Fin dt.dd0 → A)) (j : Fin 3) :
@@ -214,7 +222,7 @@ theorem cmpFam_congr_scratch {st' : TapeSt dt A R P I}
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- The read tracks are backed by the register sets. -/
-theorem back_cmpSet (k : Fin 2) (r : Univ A R P dt.KIx dt.dd → Prop) :
+private theorem back_cmpSet (k : Fin 2) (r : Univ A R P dt.KIx dt.dd → Prop) :
     dt.ixBack RF.toLayout zero one dt.dd0Le st r
         ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k) =
       bitVal zero one (bitAtOf RF.cell (dt.cmpSet vi j₁ j₂ st k) r) := by
@@ -230,7 +238,7 @@ theorem back_cmpSet (k : Fin 2) (r : Univ A R P dt.KIx dt.dd → Prop) :
 
 omit [Fintype dt.SlotIx] in
 /-- The marker slot is no read track. -/
-theorem wk_ne_cmp_rdTrack (k : Fin 2) :
+private theorem wk_ne_cmp_rdTrack (k : Fin 2) :
     (Slot.wk : dt.SlotIx) ≠
       (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k := by
   by_cases hk : k = 0
@@ -243,7 +251,7 @@ theorem wk_ne_cmp_rdTrack (k : Fin 2) :
 
 omit [Fintype dt.SlotIx] in
 /-- The register mark is no read track. -/
-theorem reg_ne_cmp_rdTrack (k : Fin 2) :
+private theorem reg_ne_cmp_rdTrack (k : Fin 2) :
     (Slot.reg : dt.SlotIx) ≠
       (dt.cmpArgs zero one vi av hnf isEq j₁ j₂).rdTrack k := by
   by_cases hk : k = 0
@@ -260,7 +268,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- The loop element rides along a stored read. -/
-theorem readLv_cmp_setFlag (k : Fin 2) (bb : Bool) (q : dt.CtlIx → A)
+private theorem readLv_cmp_setFlag (k : Fin 2) (bb : Bool) (q : dt.CtlIx → A)
     (g : dt.SlotIx → A) :
     dt.readLv ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).setFlag k bb q g) =
       dt.readLv q := by
@@ -271,7 +279,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- The loop starts at the least tuple. -/
-theorem readLv_cmp_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
+private theorem readLv_cmp_init (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.readLv ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).initEl q g) =
       botTup := by
   change dt.readLv (dt.cmpInit zero one (dt.initLvN q)) = _
@@ -281,7 +289,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- An advance steps the tuple. -/
-theorem readLv_cmp_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
+private theorem readLv_cmp_adv (q : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.readLv ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl q g) =
       tupNext (dt.readLv q) := by
   change dt.readLv (dt.advLvN (dt.cmpFold zero one hnf q)) = _
@@ -291,7 +299,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- The loop element rides along a whole round's reads. -/
-theorem readLv_cmp_chain (bit : Fin 2 → Prop) (base : dt.CtlIx → A)
+private theorem readLv_cmp_chain (bit : Fin 2 → Prop) (base : dt.CtlIx → A)
     (g : dt.SlotIx → A) : ∀ n : ℕ,
     dt.readLv (chainSt bit
       (fun j' b q' =>
@@ -319,7 +327,7 @@ theorem readLv_cmp_chain (bit : Fin 2 → Prop) (base : dt.CtlIx → A)
 
 omit [Fintype dt.SlotIx] [Nonempty A] in
 /-- **A cover in the lexicographic order steps to the next tuple.** -/
-theorem ofLex_eq_tupNext_of_covers {D : ℕ} {w z : Lex (Fin D → A)}
+private theorem ofLex_eq_tupNext_of_covers {D : ℕ} {w z : Lex (Fin D → A)}
     (hwz : w < z) (hnb : ∀ c, ¬(w < c ∧ c < z)) :
     ofLex z = tupNext (ofLex w) := by
   have hmax : ¬IsMaxTup (ofLex w) := by
@@ -334,7 +342,7 @@ theorem ofLex_eq_tupNext_of_covers {D : ℕ} {w z : Lex (Fin D → A)}
   · exact absurd h (fun hgt => h1.2 h2.1 hgt)
 
 /-- The bottom of the lexicographic order is the least tuple. -/
-theorem ofLex_eq_botTup_of_bot {D : ℕ} {z : Lex (Fin D → A)}
+private theorem ofLex_eq_botTup_of_bot {D : ℕ} {z : Lex (Fin D → A)}
     (hz : ∀ b, z ≤ b) : ofLex z = botTup := by
   have h1 : z ≤ toLex botTup := hz _
   have h2 : toLex (botTup : Fin D → A) ≤ z := tup_isBot_iff.mpr botTup_le z
@@ -404,7 +412,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- A slot off the paired reads rides along the whole chain. -/
-theorem cmp_chain_apply_ne {bit : Fin 2 → Prop} {base : dt.CtlIx → A}
+private theorem cmp_chain_apply_ne {bit : Fin 2 → Prop} {base : dt.CtlIx → A}
     {g : dt.SlotIx → A} {q : dt.CtlIx}
     (hq : ∀ k : Fin 2, q ≠ dt.cmpRdC hnf k) : ∀ n : ℕ,
     chainSt bit
@@ -442,7 +450,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] in
 /-- **A stored-read chain reads back**, slot by slot: the chain writing each
 read into its own control slot delivers every bit already written. -/
-theorem ctlBit_chain_setCtl {zero one : A} (hzo : zero ≠ one) {nr : ℕ}
+private theorem ctlBit_chain_setCtl {zero one : A} (hzo : zero ≠ one) {nr : ℕ}
     (slotOf : Fin nr → dt.CtlIx)
     (hinj : ∀ j j' : Fin nr, slotOf j = slotOf j' → j = j')
     (bit : Fin nr → Prop) (base : dt.CtlIx → A) :
@@ -497,7 +505,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] in
 /-- **The whole chain's stored reads**: the two bits of the round. -/
-theorem ctlBit_cmp_chain_rd (hzo : zero ≠ one) {bit : Fin 2 → Prop}
+private theorem ctlBit_cmp_chain_rd (hzo : zero ≠ one) {bit : Fin 2 → Prop}
     {base : dt.CtlIx → A} {g : dt.SlotIx → A} (k : Fin 2) :
     dt.ctlBit one
       (chainSt bit
@@ -514,7 +522,7 @@ theorem ctlBit_cmp_chain_rd (hzo : zero ≠ one) {bit : Fin 2 → Prop}
 omit [Fintype dt.SlotIx] in
 /-- A control slot off the loop variables rides along an advance, showing
 the fold's value. -/
-theorem ctlBit_cmp_advEl {q : dt.CtlIx} (hq : ∀ j : Fin dt.dd0, q ≠ dt.lvC j)
+private theorem ctlBit_cmp_advEl {q : dt.CtlIx} (hq : ∀ j : Fin dt.dd0, q ≠ dt.lvC j)
     (f : dt.CtlIx → A) (g : dt.SlotIx → A) :
     dt.ctlBit one ((dt.cmpArgs zero one vi av hnf isEq j₁ j₂).advEl f g) q ↔
       dt.ctlBit one (dt.cmpFold zero one hnf f) q := by
@@ -672,12 +680,12 @@ noncomputable def topTup : Fin D → B :=
   fun _ => Finset.univ.max' Finset.univ_nonempty
 
 /-- Every element is below the last tuple's coordinates. -/
-theorem le_topTup (p : Fin D) (a : B) : a ≤ (topTup : Fin D → B) p :=
+private theorem le_topTup (p : Fin D) (a : B) : a ≤ (topTup : Fin D → B) p :=
   letI := Fintype.ofFinite B
   Finset.le_max' _ a (Finset.mem_univ a)
 
 /-- The last tuple is exhausted. -/
-theorem isMaxTup_topTup : IsMaxTup (topTup : Fin D → B) :=
+private theorem isMaxTup_topTup : IsMaxTup (topTup : Fin D → B) :=
   fun p a => le_topTup p a
 
 end TopTup
@@ -716,7 +724,7 @@ include hrules hR hlin hix hbot hv hvi hwkSt hhasP hsepP in
 /-- **The comparison atom's machine run, on a clock**: from the loop's entry
 checkpoint at the marker to the exit phase one cell to its right, the control
 carrying the whole enumeration's fold, two read trips paid per tuple. -/
-theorem cmp_reachesIn (f₀ : dt.CtlIx → A) (w : ℕ)
+private theorem cmp_reachesIn (f₀ : dt.CtlIx → A) (w : ℕ)
     (hcost : ∀ (b : Lex (Fin dt.dd0 → A)) (k : Fin 2),
       2 * (wideRank (RF.cell (dt.cmpCell RF PR.zero hhasP vi j₁ j₂ b k)) -
         wideRank v) + 2 ≤ w) :

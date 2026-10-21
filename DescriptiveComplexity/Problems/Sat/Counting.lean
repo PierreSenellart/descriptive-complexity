@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # #SAT: counting the models of a CNF formula
@@ -62,7 +64,7 @@ theorem satModel_restrict {ν : A → Prop}
   · exact ⟨x, Or.inr ⟨hn, fun h' => hx h'.1⟩⟩
 
 /-- Models transport along an isomorphism. -/
-theorem satModel_equiv {B : Type} [Language.sat.Structure B] (e : A ≃[Language.sat] B)
+private theorem satModel_equiv {B : Type} [Language.sat.Structure B] (e : A ≃[Language.sat] B)
     (ν : B → Prop) : SatModel A (fun a => ν (e a)) ↔ SatModel B ν := by
   have h1 : ∀ c, (RelMap satIsClause ![e c] : Prop) ↔ RelMap satIsClause ![c] :=
     fun c => (relMap_equiv₁ e satIsClause c).symm
@@ -93,7 +95,7 @@ theorem satModel_equiv {B : Type} [Language.sat.Structure B] (e : A ≃[Language
     exact ⟨x, h.imp (fun h => ⟨(h2 c x).mp h.1, h.2⟩) fun h => ⟨(h3 c x).mp h.1, h.2⟩⟩
 
 /-- A CNF formula is satisfiable exactly when it has a model. -/
-theorem satisfiable_iff_exists_satModel : Satisfiable A ↔ ∃ ν : A → Prop, SatModel A ν :=
+private theorem satisfiable_iff_exists_satModel : Satisfiable A ↔ ∃ ν : A → Prop, SatModel A ν :=
   ⟨fun ⟨_, hν⟩ => ⟨_, satModel_restrict hν⟩, fun ⟨ν, hν⟩ => ⟨ν, hν.1⟩⟩
 
 end Models
@@ -126,7 +128,7 @@ def satAssignEquiv (A : Type) : (A → Prop) ≃ satAssignBlock.Assignment A whe
 
 /-- Realization of the variable conjunct: the assignment holds only of
 variables of the formula. -/
-theorem realize_satVarKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_satVarKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) satVarKernel) ↔
@@ -151,7 +153,7 @@ theorem realize_satVarKernel {A : Type} [Language.sat.Structure A]
     exact ⟨fun _ => c, hc, hor⟩
 
 /-- Realization of the kernel of #SAT: the assignment is a model. -/
-theorem realize_sharpSatKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_sharpSatKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpSatKernel) ↔
@@ -180,7 +182,7 @@ noncomputable def SharpSAT : CountingProblem Language.sat where
     rw [card_satModel_eq_witnessCount A, card_satModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock sharpSatKernel e
 
-theorem sharpSat_apply (A : Type) [Language.sat.Structure A] :
+private theorem sharpSat_apply (A : Type) [Language.sat.Structure A] :
     SharpSAT A = Nat.card {ν : A → Prop // SatModel A ν} :=
   rfl
 

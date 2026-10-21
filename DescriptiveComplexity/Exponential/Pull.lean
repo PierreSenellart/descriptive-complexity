@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Exponential.Expansion
 import DescriptiveComplexity.OrderedComposition
 public import DescriptiveComplexity.SecondOrderTransitiveClosurePull
+import all DescriptiveComplexity.Exponential.Block
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Pulling an exponential expansion back through an interpretation
@@ -103,7 +106,7 @@ sentence is pulled back through the order-extended, block-extended
 interpretation – the defining sentences also being read through the renaming of
 relation variables that identifies the pullback of a replicated block with the
 replication of the pulled block. -/
-noncomputable def pullOrdered : ExpExpansion L where
+private noncomputable def pullOrdered : ExpExpansion L where
   Tag := X.Tag
   B := X.B.pull T d
   E := X.E
@@ -132,12 +135,12 @@ to. -/
 /-- The expanded structure of the pulled expansion, at the vocabulary of the
 original expansion – the two vocabularies being equal by definition. -/
 @[instance_reducible]
-noncomputable def pullOrderedStructure : X.E.Structure ((X.pullOrdered I).Map A) :=
+private noncomputable def pullOrderedStructure : X.E.Structure ((X.pullOrdered I).Map A) :=
   ExpExpansion.mapStructure (X.pullOrdered I) A
 
 /-- The domain condition of the pulled expansion, at the assignment pulled from
 the interpreted universe, is the domain condition of the original expansion. -/
-theorem domHolds_pullOrdered (t : X.Tag) (ρ : X.B.Assignment (I.Map A)) :
+private theorem domHolds_pullOrdered (t : X.Tag) (ρ : X.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     DomHolds (X := X.pullOrdered I) (t, X.B.pullAssign ρ) ↔ DomHolds (X := X) (t, ρ) :=
   realize_extendSO_pullSentence I A X.B (X.dom t) ρ
@@ -148,7 +151,7 @@ the same condition on the assignment it merges to. This is
 inverse of the universe bijection consumes it, stated at a *variable*
 assignment so that the round-trip rewrite happens away from any subtype
 coercion. -/
-theorem domHolds_pullOrdered_merge (t : X.Tag) (σ : (X.B.pull T d).Assignment A) :
+private theorem domHolds_pullOrdered_merge (t : X.Tag) (σ : (X.B.pull T d).Assignment A) :
     letI := I.mapLinearOrder A
     DomHolds (X := X.pullOrdered I) (t, σ) ↔
       DomHolds (X := X) (A := I.Map A) (t, X.B.mergeAssign σ) := by
@@ -159,7 +162,7 @@ theorem domHolds_pullOrdered_merge (t : X.Tag) (σ : (X.B.pull T d).Assignment A
 /-- **The relations match**: the defining sentence of the pulled expansion, at
 the pulled assignments, says what the original defining sentence says of the
 points of the expansion of the interpreted structure. -/
-theorem relMap_pullOrdered {n : ℕ} (r : X.E.Relations n)
+private theorem relMap_pullOrdered {n : ℕ} (r : X.E.Relations n)
     (ys : Fin n → (letI := I.mapLinearOrder A; X.Map (I.Map A)))
     (h : ∀ i, DomHolds (X := X.pullOrdered I) ((ys i).1.1, X.B.pullAssign (ys i).1.2)) :
     letI := I.mapLinearOrder A
@@ -181,7 +184,7 @@ structure is the pulled expansion of the base structure.
 The bijection is `DescriptiveComplexity.SOBlock.pullAssign` on assignments,
 with `DescriptiveComplexity.SOBlock.mergeAssign` as its inverse; the tags are
 carried unchanged. -/
-noncomputable def pullOrderedLEquiv :
+private noncomputable def pullOrderedLEquiv :
     letI := I.mapLinearOrder A
     letI := X.pullOrderedStructure I A
     X.Map (I.Map A) ≃[X.E] (X.pullOrdered I).Map A :=

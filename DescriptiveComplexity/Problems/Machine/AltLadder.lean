@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.AltRound
 import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.MachinesAltPlay
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltGame
+import all DescriptiveComplexity.Problems.Machine.AltSplice
 
 /-!
 # The round game as an implication ladder
@@ -52,7 +56,7 @@ def bareQ (pol : Bool) {α : Type} (C P : α → Prop) : Prop :=
 
 /-- Unguarded quantification only depends on its two predicates up to pointwise
 equivalence. -/
-theorem bareQ_congr (pol : Bool) {α : Type} {C C' P P' : α → Prop}
+private theorem bareQ_congr (pol : Bool) {α : Type} {C C' P P' : α → Prop}
     (hC : ∀ a, C a ↔ C' a) (hP : ∀ a, C a → (P a ↔ P' a)) :
     bareQ pol C P ↔ bareQ pol C' P' := by
   cases pol
@@ -63,7 +67,7 @@ theorem bareQ_congr (pol : Bool) {α : Type} {C C' P P' : α → Prop}
 
 /-- **A satisfiable guard makes the two quantifications agree**: the existence
 clause of `DescriptiveComplexity.guardQ` is the only difference between them. -/
-theorem guardQ_iff_bareQ (pol : Bool) {α : Type} {C P : α → Prop} (hne : ∃ a, C a) :
+private theorem guardQ_iff_bareQ (pol : Bool) {α : Type} {C P : α → Prop} (hne : ∃ a, C a) :
     guardQ pol C P ↔ bareQ pol C P := by
   cases pol
   · exact ⟨fun h => h.2, fun h => ⟨hne, h⟩⟩
@@ -81,7 +85,7 @@ move a round can always make. It is
 `DescriptiveComplexity.ATMData.splice` of the greedy sequence, with no bound on
 its length – a walk never has to stand still, since
 `DescriptiveComplexity.ATMData.greedy` already does when it must. -/
-noncomputable def greedyFrom (M : ATMData A) (prev : A → Config A) (t : A) : A → Config A :=
+private noncomputable def greedyFrom (M : ATMData A) (prev : A → Config A) (t : A) : A → Config A :=
   fun x =>
     if M.Posn x ∧ ¬M.Le x t then
       M.greedy (prev t) (bitRank M.Le M.Posn x - bitRank M.Le M.Posn t)
@@ -89,14 +93,14 @@ noncomputable def greedyFrom (M : ATMData A) (prev : A → Config A) (t : A) : A
 
 omit [Finite A] in
 /-- Below the entry time the continuation is the previous walk. -/
-theorem greedyFrom_of_le {prev : A → Config A} {t x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
+private theorem greedyFrom_of_le {prev : A → Config A} {t x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
     M.greedyFrom prev t x = prev x := by
   classical
   rw [greedyFrom, ite_eq_right h]
 
 omit [Finite A] in
 /-- From the entry time on, the continuation is the greedy sequence. -/
-theorem greedyFrom_of_lt (hlin : IsLinOrd M.Le) {prev : A → Config A} {t x : A}
+private theorem greedyFrom_of_lt (hlin : IsLinOrd M.Le) {prev : A → Config A} {t x : A}
     (hx : M.Posn x) (hle : M.Le t x) :
     M.greedyFrom prev t x =
       M.greedy (prev t) (bitRank M.Le M.Posn x - bitRank M.Le M.Posn t) := by
@@ -111,7 +115,7 @@ theorem greedyFrom_of_lt (hlin : IsLinOrd M.Le) {prev : A → Config A} {t x : A
 entry `t` into block `i`: it reproduces everything the earlier rounds committed
 – they committed exactly the times strictly below `t` – and it is legal below
 block `i + 1` because the greedy sequence is. -/
-theorem roundCond_greedyFrom (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) {i : ℕ}
+private theorem roundCond_greedyFrom (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) {i : ℕ}
     {prev : A → Config A} (hprev : M.LegalBelow i prev) {t : A}
     (ht : M.Posn t) (hti : M.Blk i (prev t).state)
     (hpast : ∀ s, M.Posn s → M.Le s t → s ≠ t → M.BlkLt i (prev s).state) :
@@ -180,7 +184,8 @@ theorem roundCond_greedyFrom (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le
 /-- **Either the previous walk never reaches block `i`, or it enters it at a
 definite time.** The entry is the lowest time whose block is not below `i`, and
 it is in block `i` exactly because the step into it is legal. -/
-theorem exists_entry (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) {i : ℕ} (hi : 0 < i)
+private theorem exists_entry
+    (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) {i : ℕ} (hi : 0 < i)
     {prev : A → Config A} (hprev : M.LegalBelow i prev) :
     (∀ x, M.Posn x → M.BlkLt i (prev x).state) ∨
       ∃ t, M.Posn t ∧ M.Blk i (prev t).state ∧
@@ -210,7 +215,7 @@ existence clause of `DescriptiveComplexity.guardQ` redundant from round `1` on.
 If the previous walk never reaches block `i` it is itself admissible – it has
 nothing left to answer for – and otherwise the greedy continuation of its entry
 into the block is. -/
-theorem exists_roundCond (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) {i : ℕ}
+private theorem exists_roundCond (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le) {i : ℕ}
     (hi : 0 < i) {prev : A → Config A} (hprev : M.LegalBelow i prev) :
     ∃ w, M.RoundCond i prev w := by
   rcases exists_entry hbwf hlin hi hprev with hall | ⟨t, ht, hti, hpast⟩
@@ -237,7 +242,7 @@ def AltLadder (start : Bool) : ℕ → Prop
       bareQ (blockPol start 0) (fun w => M.LegalBelow 1 w) fun w => M.gameLadder start 1 m w
 
 /-- **The game is the ladder, from round `1` on.** -/
-theorem gameFrom_iff_gameLadder (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
+private theorem gameFrom_iff_gameLadder (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
     (start : Bool) :
     ∀ (m i : ℕ), 0 < i → ∀ prev : A → Config A, M.LegalBelow i prev →
       (M.gameFrom start i m prev ↔ M.gameLadder start i m prev) := by
@@ -268,7 +273,7 @@ theorem altGame_iff_altLadder (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.L
 
 /-- **Alternating acceptance is the ladder**, the statement the `Σₖ` sentence
 of the membership half expresses. -/
-theorem altAccepts_iff_altLadder (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
+private theorem altAccepts_iff_altLadder (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
     {p₀ p₁ : A} (hmin : MinPos M.Le M.Posn p₀) (hmax : MaxPos M.Le M.Posn p₁) (hk : 0 < k)
     (hinit : ∃ c₀, M.IsInit c₀) (start : Bool) :
     M.AltAccepts start ↔ M.AltLadder start k :=

@@ -8,6 +8,14 @@ module
 import DescriptiveComplexity.Exponential.GameAskBack
 public import DescriptiveComplexity.Exponential.GameSweep
 import DescriptiveComplexity.Exponential.GamePlay
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.GameBack
+import all DescriptiveComplexity.Exponential.GameCtrl
+import all DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Exponential.GamePlay
+import all DescriptiveComplexity.Exponential.GameProgram
+import all DescriptiveComplexity.Exponential.GameRun
+import all DescriptiveComplexity.Exponential.GameTape
 
 /-!
 # The game, read back
@@ -137,13 +145,13 @@ structure GameStmt (d : Config (GamePt spec.B V M A)) : Prop where
 variable (a₀) in
 /-- The guard of the chain the motive quantifies over: a step taken *from* a
 universal sweep. -/
-def AtAllSweep (d : Config (GamePt spec.B V M A)) : Prop :=
+private def AtAllSweep (d : Config (GamePt spec.B V M A)) : Prop :=
   ∃ r tgt par : Bool, d.state = phasePt (MachPh.sweepPh r tgt .allMove par) (fun _ => a₀)
 
 variable (spec a₀ hdim prog) in
 /-- **The motive**: the clauses hold not only here but everywhere a universal
 sweep can carry the play. See the module docstring for why. -/
-def Sound (c : Config (GamePt spec.B V M A)) : Prop :=
+private def Sound (c : Config (GamePt spec.B V M A)) : Prop :=
   ∀ d, Relation.ReflTransGen
     (fun x y => (𝕄).toTMData.Step x y ∧ AtAllSweep a₀ x) c d → GameStmt spec prog a₀ hdim d
 
@@ -172,7 +180,7 @@ theorem SweptCfg.of_ctrlCfg {ρ₀ σ₀ : spec.B.Assignment A} {tgt : Bool} {p 
 
 omit [Finite A] in
 /-- No phase of the game is accepting. -/
-theorem not_acc_of_state {d : Config (GamePt spec.B V M A)} {p : MachPh V M}
+private theorem not_acc_of_state {d : Config (GamePt spec.B V M A)} {p : MachPh V M}
     {vv : Fin (gameDim spec.B V) → A} (hst : d.state = phasePt p vv) (hk : p.kind ≠ .acc) :
     ¬ (𝕄).Acc d.state := by
   rintro ⟨ph, hph, hkind⟩
@@ -182,7 +190,7 @@ theorem not_acc_of_state {d : Config (GamePt spec.B V M A)} {p : MachPh V M}
 omit [Finite A] in
 /-- A configuration belongs to the universal player exactly when its phase
 does. -/
-theorem isUniv_state {d : Config (GamePt spec.B V M A)} {p : MachPh V M}
+private theorem isUniv_state {d : Config (GamePt spec.B V M A)} {p : MachPh V M}
     {vv : Fin (gameDim spec.B V) → A} (hst : d.state = phasePt p vv) :
     (𝕄).IsUniv true d.state ↔ MachPh.IsUniv prog.pol p = true := by
   rw [hst]
@@ -193,7 +201,7 @@ theorem isUniv_state {d : Config (GamePt spec.B V M A)} {p : MachPh V M}
 omit [Finite A] in
 /-- **At an accepting configuration the clauses are vacuous**: no phase of the
 game is the accepting one. -/
-theorem gameStmt_of_acc {d : Config (GamePt spec.B V M A)} (hacc : (𝕄).Acc d.state) :
+private theorem gameStmt_of_acc {d : Config (GamePt spec.B V M A)} (hacc : (𝕄).Acc d.state) :
     GameStmt spec prog a₀ hdim d := by
   constructor
   · intro _ _ _ _ h
@@ -218,7 +226,7 @@ theorem gameStmt_of_acc {d : Config (GamePt spec.B V M A)} (hacc : (𝕄).Acc d.
 omit [Finite A] in
 /-- **At an existential configuration**, the play chose one successor and what
 that choice proves is read off the step analysis. -/
-theorem gameStmt_of_ex (h₀ : IsBot a₀)
+private theorem gameStmt_of_ex (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     {d d' : Config (GamePt spec.B V M A)} (hnu : ¬ (𝕄).IsUniv true d.state)
     (hstep : (𝕄).toTMData.Step d d') (hw' : (𝕄).AltWin true d')
@@ -290,7 +298,7 @@ theorem gameStmt_of_ex (h₀ : IsBot a₀)
 
 omit [Finite A] in
 /-- The chain a sweep's run produces is guarded by *at a universal sweep*. -/
-theorem chain_atAllSweep {r tgt par : Bool} {d dR : Config (GamePt spec.B V M A)}
+private theorem chain_atAllSweep {r tgt par : Bool} {d dR : Config (GamePt spec.B V M A)}
     (hst : d.state = phasePt (MachPh.sweepPh r tgt .allMove par) (fun _ => a₀))
     (h : Relation.ReflTransGen
       (fun x y => (𝕄).toTMData.Step x y ∧ x.state = d.state) d dR) :
@@ -303,7 +311,7 @@ theorem chain_atAllSweep {r tgt par : Bool} {d dR : Config (GamePt spec.B V M A)
 instantiated at each of the ones the forward direction knows how to build. The
 universal sweep is the exception: it is followed *forward*, through the chain
 the motive quantifies over. -/
-theorem gameStmt_of_all (h₀ : IsBot a₀)
+private theorem gameStmt_of_all (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     {d : Config (GamePt spec.B V M A)} (hu : (𝕄).IsUniv true d.state)
     (hall : ∀ c', (𝕄).toTMData.Step d c' → (𝕄).AltWin true c')
@@ -433,7 +441,7 @@ theorem gameStmt_of_all (h₀ : IsBot a₀)
 /-- **A winning configuration of the machine proves what its phase says.** One
 induction on `DescriptiveComplexity.ATMData.AltWin`, the three cases being the
 three lemmas above; the chain in the motive is what carries a universal sweep. -/
-theorem sound_of_altWin (h₀ : IsBot a₀)
+private theorem sound_of_altWin (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q)) :
     ∀ c : Config (GamePt spec.B V M A), (𝕄).AltWin true c → Sound spec prog a₀ hdim c := by
   intro c hw
@@ -462,7 +470,7 @@ theorem sound_of_altWin (h₀ : IsBot a₀)
 one that guessed the starting position, so what it proves – by
 `DescriptiveComplexity.ContGoal` at `start` – is that *some* assignment starts
 the game and wins it. -/
-theorem accepts_of_altAcceptsSpace (h₀ : IsBot a₀)
+private theorem accepts_of_altAcceptsSpace (h₀ : IsBot a₀)
     (hplays : ∀ q, (prog.data q).Plays (spec.question q))
     (hacc : (𝕄).AltAcceptsSpace true) : spec.Accepts A := by
   obtain ⟨c₀, hinit, hw⟩ := hacc

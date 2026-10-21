@@ -10,6 +10,7 @@ import Mathlib.Data.Finset.Max
 public import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Logic.Equiv.Prod
 import Mathlib.Tactic.Ring.RingNF
+import all DescriptiveComplexity.Counting.Probability
 
 /-!
 # Weighted counts of independent events
@@ -95,7 +96,7 @@ theorem weightedCount_sum_type {Y : Type} [Fintype Y] [DecidableEq Y] (a' c' : Y
   exact Finset.sum_congr rfl fun vY _ => by split_ifs <;> simp
 
 /-- Weighted counts do not depend on how the variables are named. -/
-theorem weightedCount_equiv {X' : Type} [Fintype X'] [DecidableEq X'] (e : X' ≃ X)
+private theorem weightedCount_equiv {X' : Type} [Fintype X'] [DecidableEq X'] (e : X' ≃ X)
     (f : (X → Bool) → Bool) :
     weightedCount a c f =
       weightedCount (fun x => a (e x)) (fun x => c (e x)) (fun v => f fun x => v (e.symm x)) := by

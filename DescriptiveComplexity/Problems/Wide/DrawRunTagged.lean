@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTagged
 import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The tag-branched machinery's run
@@ -65,7 +70,7 @@ variable (hrules : ∀ (i : TagSite m T nrOf) (ρ : TagSh m T nrOf i),
 
 /-- The phase before the `k`-th witness read – the branch checkpoint once
 they are exhausted. -/
-def tagPhaseAt (emb : TagPh m T nrOf → P) (k : ℕ) : P :=
+private def tagPhaseAt (emb : TagPh m T nrOf → P) (k : ℕ) : P :=
   if h : k < m then emb (.tagRdP ⟨k, h⟩ .start) else emb .brP
 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P]
@@ -338,7 +343,7 @@ include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt�
 the marker – the witness chain, the branch on the decoded tag tuple, and that
 tuple's element loop – to the exit phase one cell to the marker's right, at the
 chain's reads, the branch's two steps and the loop's own cost. -/
-theorem tag_reachesIn :
+private theorem tag_reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn
       ((c + 2) * m + 2 + ((2 + (c + 2) * nrOf τ) * (Nat.card ι + 1) + 1))
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) (fsT 0)), Sum.inl v,
@@ -403,7 +408,7 @@ include RF hrules hR hlin hix hbot hv hvi hwkS hrg hmT hnewkT hnergT hm₀ hwkt�
   hnameE huniqE hfsET hfsEF hadv hmaxT hmaxF hinit in
 /-- **The tag-branched machinery's run**, the budget forgotten: what a
 space-bounded caller reads, at the width every trip has anyway. -/
-theorem tag_run :
+private theorem tag_run :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (tagFirstRd emb) (fsT 0)), Sum.inl v,
         wideTape (PR.trackTapeAt RF.cell t₀ rest m₀) (PR.syElt PR.blank)⟩

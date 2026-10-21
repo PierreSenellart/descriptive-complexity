@@ -8,6 +8,10 @@ module
 import DescriptiveComplexity.FixedPointExpand
 public import DescriptiveComplexity.FixedPointReductionComposition
 import DescriptiveComplexity.SecondOrderRelPull
+import all DescriptiveComplexity.Composition
+import all DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointReduction
+import all DescriptiveComplexity.FixedPointReductionComposition
 
 /-!
 # The classes are closed under FO(LFP) reductions
@@ -72,12 +76,12 @@ open Classical in
 /-- “Some tagged tuple is in the domain”, as a first-order sentence of the
 source vocabulary: the disjunction over the (finitely many) tags of the
 existential closure of the domain formula. -/
-noncomputable def RelFOInterpretation.domNonemptyS
+private noncomputable def RelFOInterpretation.domNonemptyS
     (I : RelFOInterpretation L₁ L₂ Tag dim) : L₁.Sentence :=
   letI : Fintype Tag := Fintype.ofFinite Tag
   Formula.iSup fun t : Tag => ((I.domFormula t).relabel Sum.inr).iExs (Fin dim)
 
-theorem RelFOInterpretation.realize_domNonemptyS (I : RelFOInterpretation L₁ L₂ Tag dim)
+private theorem RelFOInterpretation.realize_domNonemptyS (I : RelFOInterpretation L₁ L₂ Tag dim)
     (A : Type) [L₁.Structure A] :
     A ⊨ I.domNonemptyS ↔ Nonempty (I.MapRel A) := by
   classical
@@ -102,7 +106,7 @@ variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q :
 /-- **FO(≤, IFP) definability is closed under FO(LFP) reductions**: the
 reduction's induction and the definition's induction stratify into one, the
 latter pulled back through the (order-extended) interpretation. -/
-theorem IFPDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : IFPDefinable Q) :
+private theorem IFPDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : IFPDefinable Q) :
     IFPDefinable P := by
   obtain ⟨d, hd⟩ := h
   let := f.tagFinite
@@ -149,7 +153,7 @@ from the pulled definition
 (`DescriptiveComplexity.sigmaSODefinable_of_ifpExpand`), and the order the
 reduction uses is re-quantified inside the block
 (`DescriptiveComplexity.sigmaSODefinable_of_orderPull`). -/
-theorem SigmaSODefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : SigmaSODefinable 1 Q) :
+private theorem SigmaSODefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : SigmaSODefinable 1 Q) :
     SigmaSODefinable 1 P := by
   obtain ⟨Bs, hlen, φ, hφ⟩ := h
   let := f.tagFinite
@@ -211,7 +215,7 @@ theorem mem_coNP_of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : Q ∈ coNP) : P ∈ 
 /-- `Π₁`-definability is closed under FO(LFP) reductions – the same statement
 as `DescriptiveComplexity.mem_coNP_of_lfpReduction`, at the level of the
 logic. -/
-theorem PiSODefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : PiSODefinable 1 Q) :
+private theorem PiSODefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : PiSODefinable 1 Q) :
     PiSODefinable 1 P :=
   (piSODefinable_iff_compl 1 P).mpr
     (SigmaSODefinable.of_lfpReduction f.compl ((piSODefinable_iff_compl 1 Q).mp h))
@@ -238,16 +242,16 @@ variable [L₁.IsRelational] [L₂.IsRelational] {P : DecisionProblem L₁} {Q :
 /-- **PTIME is closed under relativized ordered reductions.**
 Registered in the Lax archive as
 [`Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction`](https://laxarchive.org/lax-535992/Lax535992.PTIMEClosure.html#s-Lax535992.PTIMEClosure.PTIME_mem_of_relOrderedReduction). -/
-theorem mem_PTIME_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
+private theorem mem_PTIME_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ PTIME) : P ∈ PTIME :=
   (ifpDefinable_iff_mem_PTIME P).mp
     (((ifpDefinable_iff_mem_PTIME Q).mpr h).of_relOrderedReduction f)
 
 /-- **NP is closed under relativized ordered reductions.** -/
-theorem mem_NP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ NP) : P ∈ NP :=
+private theorem mem_NP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ NP) : P ∈ NP :=
   SigmaSODefinable.of_relOrderedReduction f h
 
 /-- **coNP is closed under relativized ordered reductions.** -/
-theorem mem_coNP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ coNP) : P ∈ coNP :=
+private theorem mem_coNP_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q) (h : Q ∈ coNP) : P ∈ coNP :=
   PiSODefinable.of_relOrderedReduction f h
 
 end RelOrdered
@@ -274,7 +278,7 @@ def CofinalHardLFP (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], Deci
 
 /-- **Hardness under FO(LFP) reductions is the usual notion**: every problem of
 the collection reduces to `P` itself. -/
-theorem cofinalHardLFP_iff
+private theorem cofinalHardLFP_iff
     (Mem : ∀ {L₀ : Language.{0, 0}} [L₀.IsRelational], DecisionProblem L₀ → Prop)
     (P : DecisionProblem L) :
     CofinalHardLFP Mem P ↔

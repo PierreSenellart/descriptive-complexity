@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.TransitiveClosureDecideReachDet
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Permanent.Ladder
+import all DescriptiveComplexity.TransitiveClosureDecide
 
 /-!
 # Flattening a walk whose steps are decided: the suspension
@@ -106,14 +109,14 @@ noncomputable def toParam : ParamTCSpec L where
   par := C.par
   step m n := (C.step m n).relabel (Sum.map (Sum.map C.coordEquiv C.coordEquiv) id)
 
-theorem stepAt_toParam (z : Fin C.par → A) (a b : C.toParam.Node A) :
+private theorem stepAt_toParam (z : Fin C.par → A) (a b : C.toParam.Node A) :
     C.toParam.StepAt z a b ↔ C.StepAt z (a.1, a.2 ∘ C.coordEquiv) (b.1, b.2 ∘ C.coordEquiv) := by
   change ((C.step a.1 b.1).relabel _).Realize (Sum.elim (Sum.elim a.2 b.2) z) ↔ _
   rw [Formula.realize_relabel]
   refine iff_of_eq (congrArg (Formula.Realize (M := A) (C.step a.1 b.1)) (funext fun i => ?_))
   rcases i with (i | i) | i <;> rfl
 
-theorem reachAt_toParam (z : Fin C.par → A) (a b : C.toParam.Node A) :
+private theorem reachAt_toParam (z : Fin C.par → A) (a b : C.toParam.Node A) :
     C.toParam.ReachAt z a b ↔ C.ReachAt z (a.1, a.2 ∘ C.coordEquiv) (b.1, b.2 ∘ C.coordEquiv) := by
   constructor
   · intro h
@@ -131,7 +134,7 @@ theorem reachAt_toParam (z : Fin C.par → A) (a b : C.toParam.Node A) :
     have := key _ _ h
     simpa [Function.comp_def] using this
 
-theorem functional_toParam (h : C.Functional A) : C.toParam.Functional A := by
+private theorem functional_toParam (h : C.Functional A) : C.toParam.Functional A := by
   intro z a b c hb hc
   have := h z _ _ _ ((C.stepAt_toParam z a b).mp hb) ((C.stepAt_toParam z a c).mp hc)
   refine Prod.ext (Prod.mk.inj this).1 (funext fun i => ?_)
@@ -317,25 +320,26 @@ abbrev dpar (t : S.FlatCoord D → A) (z : Fin S.par → A) : (Fin S.k ⊕ Fin S
 
 open Classical in
 /-- A tuple with one slice replaced. -/
-noncomputable def setSlice (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
+private noncomputable def setSlice (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
     (u : (D p.1 p.2).Coord → A) : S.FlatCoord D → A
   | Sum.inl q => t (Sum.inl q)
   | Sum.inr ⟨q, c⟩ =>
       if h : q = p then u (cast (congrArg (fun r : S.Mode × S.Mode => (D r.1 r.2).Coord) h) c)
       else t (Sum.inr ⟨q, c⟩)
 
-theorem setSlice_inl (t : S.FlatCoord D → A) (p : S.Mode × S.Mode) (u : (D p.1 p.2).Coord → A)
+private theorem setSlice_inl
+    (t : S.FlatCoord D → A) (p : S.Mode × S.Mode) (u : (D p.1 p.2).Coord → A)
     (q : Fin S.k ⊕ Fin S.k) : setSlice t p u (Sum.inl q) = t (Sum.inl q) := rfl
 
-theorem setSlice_comp_inl (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
+private theorem setSlice_comp_inl (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
     (u : (D p.1 p.2).Coord → A) : setSlice t p u ∘ Sum.inl = t ∘ Sum.inl := rfl
 
-theorem tsl_setSlice_self (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
+private theorem tsl_setSlice_self (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
     (u : (D p.1 p.2).Coord → A) : tsl (setSlice t p u) p = u := by
   funext c
   simp [tsl, setSlice]
 
-theorem setSlice_of_not_inSlice (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
+private theorem setSlice_of_not_inSlice (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
     (u : (D p.1 p.2).Coord → A) (c : S.FlatCoord D) (hc : ¬S.InSlice D p c) :
     setSlice t p u c = t c := by
   rcases c with q | ⟨q, c⟩
@@ -343,10 +347,11 @@ theorem setSlice_of_not_inSlice (t : S.FlatCoord D → A) (p : S.Mode × S.Mode)
   · have hq : q ≠ p := fun h => hc ⟨h ▸ c, by subst h; rfl⟩
     simp [setSlice, hq]
 
-theorem dpar_setSlice (t : S.FlatCoord D → A) (p : S.Mode × S.Mode) (u : (D p.1 p.2).Coord → A)
+private theorem dpar_setSlice
+    (t : S.FlatCoord D → A) (p : S.Mode × S.Mode) (u : (D p.1 p.2).Coord → A)
     (z : Fin S.par → A) : dpar (setSlice t p u) z = dpar t z := rfl
 
-theorem setSlice_tsl (t : S.FlatCoord D → A) (p : S.Mode × S.Mode) :
+private theorem setSlice_tsl (t : S.FlatCoord D → A) (p : S.Mode × S.Mode) :
     setSlice t p (tsl t p) = t := by
   funext c
   by_cases hc : S.InSlice D p c
@@ -366,7 +371,7 @@ section Semantics
 
 variable {det : Bool} {A : Type} [L.Structure A] [LinearOrder A] (z : Fin S.par → A)
 
-theorem realize_copyExceptF (p : S.Mode × S.Mode) (t t' : S.FlatCoord D → A) :
+private theorem realize_copyExceptF (p : S.Mode × S.Mode) (t t' : S.FlatCoord D → A) :
     (S.copyExceptF D p).Realize (Sum.elim (Sum.elim t t') z) ↔
       ∀ c, ¬S.InSlice D p c → t' c = t c := by
   classical
@@ -377,13 +382,13 @@ theorem realize_copyExceptF (p : S.Mode × S.Mode) (t t' : S.FlatCoord D → A) 
   · simp only [Formula.realize_equal, Term.realize_var, Sum.elim_inl, Sum.elim_inr]
     exact ⟨fun h' _ => h'.symm, fun h' => (h' h).symm⟩
 
-theorem realize_minSlicesF (t t' : S.FlatCoord D → A) :
+private theorem realize_minSlicesF (t t' : S.FlatCoord D → A) :
     (S.minSlicesF D).Realize (Sum.elim (Sum.elim t t') z) ↔
       ∀ (c : Σ p : S.Mode × S.Mode, (D p.1 p.2).Coord) (a : A), t' (Sum.inr c) ≤ a := by
   rw [minSlicesF, Formula.realize_iInf]
   exact forall_congr' fun c => realize_minF _
 
-theorem realize_resetF (t t' : S.FlatCoord D → A) :
+private theorem realize_resetF (t t' : S.FlatCoord D → A) :
     (S.resetF D).Realize (Sum.elim (Sum.elim t t') z) ↔
       tx t' = ty t ∧ (∀ (i : Fin S.k) (a : A), t' (Sum.inl (Sum.inr i)) ≤ a) ∧
         ∀ (c : Σ p : S.Mode × S.Mode, (D p.1 p.2).Coord) (a : A), t' (Sum.inr c) ≤ a := by
@@ -403,14 +408,14 @@ theorem realize_resetF (t t' : S.FlatCoord D → A) :
     · simpa using h2 i
     · simpa using h3 c
 
-theorem realize_copyCurF (t t' : S.FlatCoord D → A) :
+private theorem realize_copyCurF (t t' : S.FlatCoord D → A) :
     (S.copyCurF D).Realize (Sum.elim (Sum.elim t t') z) ↔ tx t' = tx t := by
   rw [copyCurF, realize_copyF]
   exact ⟨fun h => funext fun i => congrFun h i, fun h => funext fun i => congrFun h i⟩
 
 variable [Nonempty A]
 
-theorem realize_candSuccF (c c' : S.Mode) (t t' : S.FlatCoord D → A) :
+private theorem realize_candSuccF (c c' : S.Mode) (t t' : S.FlatCoord D → A) :
     (S.candSuccF D c c').Realize (Sum.elim (Sum.elim t t') z) ↔
       (letI := S.outerModeOrder; toLex (c, toLex (ty t)) ⋖ toLex (c', toLex (ty t'))) := by
   classical
@@ -486,14 +491,14 @@ theorem realize_retF (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (t t' : S.Fla
   rw [retF, Formula.realize_inf, S.realize_exit_relabel, S.realize_resetF]
 
 /-- The advance, as a relation between the two nodes. -/
-def Adv (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (p' : S.Mode × S.Mode)
+private def Adv (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (p' : S.Mode × S.Mode)
     (t t' : S.FlatCoord D → A) : Prop :=
   p'.1 = p.1 ∧ (D p.1 p.2).ExitAt (dpar t z) (d, tsl t p) false ∧
     (letI := S.outerModeOrder; toLex (p.2, toLex (ty t)) ⋖ toLex (p'.2, toLex (ty t'))) ∧
     tx t' = tx t ∧
     ∀ (c : Σ p : S.Mode × S.Mode, (D p.1 p.2).Coord) (a : A), t' (Sum.inr c) ≤ a
 
-theorem realize_advF (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (p' : S.Mode × S.Mode)
+private theorem realize_advF (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (p' : S.Mode × S.Mode)
     (t t' : S.FlatCoord D → A) :
     (S.advF D p d p').Realize (Sum.elim (Sum.elim t t') z) ↔ S.Adv D z p d p' t t' := by
   classical
@@ -550,7 +555,7 @@ theorem flat_stepAt_inr_inl (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (n : S
 
 /-- A step between decider nodes of the *same* pair of modes: the run, or an
 advance. -/
-theorem flat_stepAt_inr_inr_same (p : S.Mode × S.Mode) (d d' : (D p.1 p.2).Mode)
+private theorem flat_stepAt_inr_inr_same (p : S.Mode × S.Mode) (d d' : (D p.1 p.2).Mode)
     (t t' : S.FlatCoord D → A) :
     (S.flat D det).StepAt z (Sum.inr ⟨p, d⟩, t) (Sum.inr ⟨p, d'⟩, t') ↔
       ((D p.1 p.2).StepAt (dpar t z) (d, tsl t p) (d', tsl t' p) ∧
@@ -570,7 +575,8 @@ theorem flat_stepAt_inr_inr_same (p : S.Mode × S.Mode) (d d' : (D p.1 p.2).Mode
 
 /-- A step between decider nodes of *different* pairs of modes: an advance
 only. -/
-theorem flat_stepAt_inr_inr_ne {p p' : S.Mode × S.Mode} (hne : p ≠ p') (d : (D p.1 p.2).Mode)
+private theorem flat_stepAt_inr_inr_ne
+    {p p' : S.Mode × S.Mode} (hne : p ≠ p') (d : (D p.1 p.2).Mode)
     (d' : (D p'.1 p'.2).Mode) (t t' : S.FlatCoord D → A) :
     (S.flat D det).StepAt z (Sum.inr ⟨p, d⟩, t) (Sum.inr ⟨p', d'⟩, t') ↔
       det = true ∧ d' = (D p'.1 p'.2).start ∧ S.Adv D z p d p' t t' := by
@@ -617,7 +623,7 @@ theorem ty_flatEnc (a₀ : A) (a : S.Node A) : ty (S.flatEnc D det a₀ a).2 = f
 
 omit [L.Structure A] instE in
 /-- Coordinates at the minimum are equal. -/
-theorem bot_unique {u u' : A} (h : ∀ a, u ≤ a) (h' : ∀ a, u' ≤ a) : u = u' :=
+private theorem bot_unique {u u' : A} (h : ∀ a, u ≤ a) (h' : ∀ a, u' ≤ a) : u = u' :=
   le_antisymm (h u') (h' u)
 
 /-- The step deciders decide the steps of the outer walk. -/
@@ -628,7 +634,7 @@ def DecidesSteps : Prop :=
 /-- What the flat walk may have reached from the encoding of `a`: an outer
 node reached from `a`, or a decider node whose outer node is reached from
 `a` and whose decider has run from its start. -/
-def FlatInv (a : S.Node A) (c : (S.flat D det).Node A) : Prop :=
+private def FlatInv (a : S.Node A) (c : (S.flat D det).Node A) : Prop :=
   (∃ (m : S.Mode) (t' : S.FlatCoord D → A), c = (Sum.inl m, t') ∧ S.ReachAt z a (m, tx t')) ∨
     (∃ (p : S.Mode × S.Mode) (d : (D p.1 p.2).Mode) (t' : S.FlatCoord D → A),
       c = (Sum.inr ⟨p, d⟩, t') ∧ S.ReachAt z a (p.1, tx t') ∧
@@ -636,7 +642,7 @@ def FlatInv (a : S.Node A) (c : (S.flat D det).Node A) : Prop :=
 
 variable {z} [Nonempty A]
 
-theorem flatInv_of_reachAt (hD : S.DecidesSteps D z) (a₀ : A) (a : S.Node A)
+private theorem flatInv_of_reachAt (hD : S.DecidesSteps D z) (a₀ : A) (a : S.Node A)
     {c : (S.flat D det).Node A} (h : (S.flat D det).ReachAt z (S.flatEnc D det a₀ a) c) :
     S.FlatInv D z (det := det) a c := by
   refine reach_invariant (P := S.FlatInv D z (det := det) a) (fun c b hc hcb => ?_) h
@@ -680,7 +686,7 @@ theorem flatInv_of_reachAt (hD : S.DecidesSteps D z) (a₀ : A) (a : S.Node A)
         exact h'
 
 /-- **The flat walk reaches only what the outer walk reaches.** -/
-theorem reachAt_of_flat_reachAt (hD : S.DecidesSteps D z) (a₀ : A) (a b : S.Node A)
+private theorem reachAt_of_flat_reachAt (hD : S.DecidesSteps D z) (a₀ : A) (a b : S.Node A)
     (h : (S.flat D det).ReachAt z (S.flatEnc D det a₀ a) (S.flatEnc D det a₀ b)) :
     S.ReachAt z a b := by
   rcases S.flatInv_of_reachAt D hD a₀ a h with ⟨m, t', he, hr⟩ | ⟨p, d, t', he, -⟩
@@ -691,7 +697,7 @@ theorem reachAt_of_flat_reachAt (hD : S.DecidesSteps D z) (a₀ : A) (a b : S.No
 
 omit instE in
 /-- A run of a decider lifts to the flat walk, on its slice. -/
-theorem flat_reachAt_of_decider (p : S.Mode × S.Mode) (t : S.FlatCoord D → A)
+private theorem flat_reachAt_of_decider (p : S.Mode × S.Mode) (t : S.FlatCoord D → A)
     {e e' : (D p.1 p.2).Node A} (h : (D p.1 p.2).ReachAt (dpar t z) e e') :
     (S.flat D det).ReachAt z (Sum.inr ⟨p, e.1⟩, setSlice t p e.2)
       (Sum.inr ⟨p, e'.1⟩, setSlice t p e'.2) := by
@@ -707,7 +713,7 @@ theorem flat_reachAt_of_decider (p : S.Mode × S.Mode) (t : S.FlatCoord D → A)
 
 /-- **Finishing a step**: from the start of the decider of a step that holds,
 the flat walk reaches the encoding of the step's target. -/
-theorem flat_finish (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
+private theorem flat_finish (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
     (m n : S.Mode) (x y : Fin S.k → A) (h : S.StepAt z (m, x) (n, y)) :
     (S.flat D det).ReachAt z
       (Sum.inr ⟨(m, n), (D m n).start⟩, Sum.elim (Sum.elim x y) fun _ => a₀)
@@ -727,7 +733,7 @@ theorem flat_finish (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀
   exact hex
 
 /-- **Guessing: the flat walk reaches what the outer walk reaches.** -/
-theorem flat_reachAt_of_reachAt (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
+private theorem flat_reachAt_of_reachAt (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
     {a b : S.Node A} (h : S.ReachAt z a b) :
     (S.flat D false).ReachAt z (S.flatEnc D false a₀ a) (S.flatEnc D false a₀ b) := by
   induction h with
@@ -742,7 +748,7 @@ abbrev Cand (A : Type) [LinearOrder A] : Type := Lex (S.Mode × Lex (Fin S.k →
 
 /-- **Searching: from a candidate at or before the successor, the flat walk
 reaches the encoding of the successor**, the outer walk being functional. -/
-theorem flat_search [Finite A] (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
+private theorem flat_search [Finite A] (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ a : A, a₀ ≤ a)
     (hS : ∀ a b c : S.Node A, S.StepAt z a b → S.StepAt z a c → b = c)
     (m n : S.Mode) (x y : Fin S.k → A) (h : S.StepAt z (m, x) (n, y)) (κ : S.Cand A) :
     letI := S.outerModeOrder
@@ -809,7 +815,7 @@ theorem flat_search [Finite A] (hD : S.DecidesSteps D z) {a₀ : A} (hbot : ∀ 
 
 /-- **Searching: the flat walk reaches what a functional outer walk
 reaches.** -/
-theorem flat_reachAt_of_reachAt_det [Finite A] (hD : S.DecidesSteps D z) {a₀ : A}
+private theorem flat_reachAt_of_reachAt_det [Finite A] (hD : S.DecidesSteps D z) {a₀ : A}
     (hbot : ∀ a : A, a₀ ≤ a)
     (hS : ∀ a b c : S.Node A, S.StepAt z a b → S.StepAt z a c → b = c) {a b : S.Node A}
     (h : S.ReachAt z a b) :
@@ -847,7 +853,8 @@ theorem reachAt_flat_iff_of_functional [Finite A] (hD : S.DecidesSteps D z) {a�
 
 omit instE [Nonempty A] in
 /-- Two advances from the same node go to the same node. -/
-theorem adv_unique {p p₁ p₂ : S.Mode × S.Mode} {d : (D p.1 p.2).Mode} {t t₁ t₂ : S.FlatCoord D → A}
+private theorem adv_unique
+    {p p₁ p₂ : S.Mode × S.Mode} {d : (D p.1 p.2).Mode} {t t₁ t₂ : S.FlatCoord D → A}
     (h₁ : S.Adv D z p d p₁ t t₁) (h₂ : S.Adv D z p d p₂ t t₂) : p₁ = p₂ ∧ t₁ = t₂ := by
   let := S.outerModeOrder
   obtain ⟨hp₁, -, hc₁, hx₁, hs₁⟩ := h₁

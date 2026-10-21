@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GamePhase
+import all DescriptiveComplexity.Exponential.GamePhase
+import all DescriptiveComplexity.Padding
 
 /-!
 # Reading a block sentence in a copy, and moving one variable onto another
@@ -76,7 +78,7 @@ def moveSndLHom :
 
 variable {L C T} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
-theorem moveFstLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
+private theorem moveFstLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
     @LHom.IsExpansionOn _ _ (moveFstLHom L C T) A
       (@SOBlock.structure₁ (L.sum Language.order) C A
         (@sumOrderStructure L A instL _) (SOBlock.dropTag σ))
@@ -94,7 +96,7 @@ theorem moveFstLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
     | _, Sum.inl s => rfl
     | _, Sum.inr s => rfl
 
-theorem moveSndLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
+private theorem moveSndLHom_isExpansionOn (σ τ : (C.withTag T).Assignment A) :
     @LHom.IsExpansionOn _ _ (moveSndLHom L C T) A
       (@SOBlock.structure₁ (L.sum Language.order) C A
         (@sumOrderStructure L A instL _) (SOBlock.dropTag τ))
@@ -148,7 +150,7 @@ theorem realize_moveSndLHom (σ τ : (C.withTag T).Assignment A)
 `DescriptiveComplexity.realize_moveFstLHom` this reads a sentence over the
 *tagged* block, which is what a move's guard on its own phase
 (`DescriptiveComplexity.atTagF`) is. -/
-theorem realize_tagFst (σ τ : (C.withTag T).Assignment A)
+private theorem realize_tagFst (σ τ : (C.withTag T).Assignment A)
     (ψ : ((L.sum Language.order).sum (C.withTag T).lang).Sentence) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
@@ -165,7 +167,7 @@ theorem realize_tagFst (σ τ : (C.withTag T).Assignment A)
 the one-copy counterpart of
 `DescriptiveComplexity.exists_tagAssign_two`: a start sentence that asserts it
 admits no junk assignment. -/
-theorem eq_tagAssign_of_atTagF (p : T) (σ : (C.withTag T).Assignment A)
+private theorem eq_tagAssign_of_atTagF (p : T) (σ : (C.withTag T).Assignment A)
     (h : @Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ) (atTagF L C T p)) :
@@ -200,7 +202,7 @@ noncomputable def varsPairAgreeS (ps : List ({p : C.ι × C.ι // C.arity p.2 = 
 
 variable {L C T}
 
-theorem realize_varPairAgreeS (σ τ : (C.withTag T).Assignment A) (i j : C.ι)
+private theorem realize_varPairAgreeS (σ τ : (C.withTag T).Assignment A) (i j : C.ι)
     (h : C.arity j = C.arity i) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
@@ -215,7 +217,7 @@ theorem realize_varPairAgreeS (σ τ : (C.withTag T).Assignment A) (i j : C.ι)
     Sum.elim_inr]
   exact ⟨fun hh => ⟨hh.1, hh.2⟩, fun hh => ⟨hh.1, hh.2⟩⟩
 
-theorem realize_varsPairAgreeS (σ τ : (C.withTag T).Assignment A)
+private theorem realize_varsPairAgreeS (σ τ : (C.withTag T).Assignment A)
     (ps : List ({p : C.ι × C.ι // C.arity p.2 = C.arity p.1})) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A

@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Counting.Class
 public import DescriptiveComplexity.FixedPointHorn
 public import Mathlib.Algebra.BigOperators.Finprod
+import all DescriptiveComplexity.Counting
 
 /-!
 # Quantitative first-order logic, and the class FP
@@ -110,7 +111,7 @@ def onTerm (Φ : L →ᴸ L') : ∀ {α : Type}, QTerm L α → QTerm L' α
   | _, sum n t => sum n (t.onTerm Φ)
   | _, prod n t => prod n (t.onTerm Φ)
 
-theorem eval_onTerm (Φ : L →ᴸ L') {A : Type} [L.Structure A] [L'.Structure A]
+private theorem eval_onTerm (Φ : L →ᴸ L') {A : Type} [L.Structure A] [L'.Structure A]
     [Φ.IsExpansionOn A] {α : Type} (t : QTerm L α) (v : α → A) :
     (t.onTerm Φ).eval v = t.eval v := by
   induction t with
@@ -131,7 +132,7 @@ def relabel : ∀ {α : Type}, QTerm L α → ∀ {β : Type}, (α → β) → Q
   | _, sum n t, _, f => sum n (t.relabel (Sum.map f id))
   | _, prod n t, _, f => prod n (t.relabel (Sum.map f id))
 
-theorem eval_relabel {A : Type} [L.Structure A] {α : Type} (t : QTerm L α) :
+private theorem eval_relabel {A : Type} [L.Structure A] {α : Type} (t : QTerm L α) :
     ∀ {β : Type} (f : α → β) (v : β → A), (t.relabel f).eval v = t.eval (v ∘ f) := by
   induction t with
   | ind φ =>
@@ -148,7 +149,7 @@ theorem eval_relabel {A : Type} [L.Structure A] {α : Type} (t : QTerm L α) :
     simp only [relabel, eval, ht, Sum.elim_comp_map, Function.comp_id]
 
 /-- **The value of a term is isomorphism-invariant.** -/
-theorem eval_equiv {A B : Type} [L.Structure A] [L.Structure B] (e : A ≃[L] B) {α : Type}
+private theorem eval_equiv {A B : Type} [L.Structure A] [L.Structure B] (e : A ≃[L] B) {α : Type}
     (t : QTerm L α) (v : α → A) : t.eval (e ∘ v) = t.eval v := by
   induction t with
   | ind φ =>
@@ -182,7 +183,7 @@ noncomputable def pos : ∀ {α : Type}, QTerm L α → L.Formula α
   | _, sum n t => Formula.iExs (Fin n) t.pos
   | _, prod n t => Formula.iAlls (Fin n) t.pos
 
-theorem realize_pos {A : Type} [L.Structure A] [Finite A] {α : Type} (t : QTerm L α)
+private theorem realize_pos {A : Type} [L.Structure A] [Finite A] {α : Type} (t : QTerm L α)
     (v : α → A) : t.pos.Realize v ↔ t.eval v ≠ 0 := by
   classical
   let := Fintype.ofFinite A

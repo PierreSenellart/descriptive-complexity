@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Running a phase of a machine
@@ -44,7 +46,7 @@ namespace TMData
 variable {A : Type} [Finite A] {M : TMData A}
 
 /-- The rank of a position is monotone along the order. -/
-theorem bitRank_le_of_le (hlin : IsLinOrd M.Le) {p q : A} (hp : M.Posn p)
+private theorem bitRank_le_of_le (hlin : IsLinOrd M.Le) {p q : A} (hp : M.Posn p)
     (hle : M.Le p q) : bitRank M.Le M.Posn p ≤ bitRank M.Le M.Posn q := by
   rcases eq_or_ne p q with rfl | hne
   · exact Nat.le_refl _
@@ -61,7 +63,7 @@ omit [Finite A] in
 /-- **The successor of a position is unique.** `DescriptiveComplexity.succPos_left_unique`
 gives the predecessor; a step of a machine needs this direction, since the head
 moves to *the* neighbor in the direction the transition names. -/
-theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
+private theorem succPos_right_unique (hlin : IsLinOrd M.Le) {p q q' : A}
     (h : SuccPos M.Le M.Posn p q) (h' : SuccPos M.Le M.Posn p q') : q = q' := by
   rcases hlin.2.2.2 q q' with hle | hle
   · rcases h'.2.2.2.2 q h.2.1 h.2.2.1 hle with hcon | hcon
@@ -80,7 +82,7 @@ That is what a program which guesses in one phase has: everywhere but the guess,
 the state and the symbol read name the transition, and the two remaining clauses
 – that a transition has one destination and writes one symbol – hold outright.
 Feed it to `DescriptiveComplexity.TMData.uniqueFrom_of_invariant`. -/
-theorem step_functional_at (hlin : IsLinOrd M.Le)
+private theorem step_functional_at (hlin : IsLinOrd M.Le)
     (hdstf : ∀ (τ q q' : A), M.Dst τ q → M.Dst τ q' → q = q')
     (hwritef : ∀ (τ a a' : A), M.Write τ a → M.Write τ a' → a = a')
     {c : Config A}
@@ -128,7 +130,7 @@ theorem stepsIn_functional (hlin : IsLinOrd M.Le) (hdet : M.Deterministic) :
 
 /-- Every position that is not the highest has one immediately above it – the
 mirror of `DescriptiveComplexity.exists_predPos`, read in the reversed order. -/
-theorem exists_succPos' (hlin : IsLinOrd M.Le) {p : A} (hp : M.Posn p)
+private theorem exists_succPos' (hlin : IsLinOrd M.Le) {p : A} (hp : M.Posn p)
     (hmax : ¬ MaxPos M.Le M.Posn p) : ∃ q, SuccPos M.Le M.Posn p q := by
   obtain ⟨q, hq⟩ := exists_predPos (Le := fun a b => M.Le b a) hlin.reverse hp hmax
   exact ⟨q, hq.2.1, hq.1, hq.2.2.1, fun h => hq.2.2.2.1 h.symm,
@@ -139,7 +141,7 @@ theorem exists_succPos' (hlin : IsLinOrd M.Le) {p : A} (hp : M.Posn p)
 segment carries a step *downwards*, the machine walks from the top of the
 segment to any position of it. The check sweeps of a reduction alternate
 direction, so both readings are needed. -/
-theorem stepsIn_of_segment_down (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p₁ : A}
+private theorem stepsIn_of_segment_down (hlin : IsLinOrd M.Le) {conf : A → Config A} {p₀ p₁ : A}
     (hp₁ : M.Posn p₁)
     (hstep : ∀ p q, SuccPos M.Le M.Posn p q → M.Le p₀ p → M.Le q p₁ →
       M.Step (conf q) (conf p)) :

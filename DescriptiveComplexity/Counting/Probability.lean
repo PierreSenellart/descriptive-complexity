@@ -135,7 +135,7 @@ theorem sum_valProb_eq_one : ∑ v : X → Bool, P.valProb v = 1 := by
 def funcProb (f : (X → Bool) → Bool) : ℚ :=
   ∑ v : X → Bool, if f v then P.valProb v else 0
 
-theorem funcProb_nonneg (f : (X → Bool) → Bool) : 0 ≤ P.funcProb f := by
+private theorem funcProb_nonneg (f : (X → Bool) → Bool) : 0 ≤ P.funcProb f := by
   unfold funcProb
   apply Finset.sum_nonneg
   intro v _
@@ -144,7 +144,7 @@ theorem funcProb_nonneg (f : (X → Bool) → Bool) : 0 ≤ P.funcProb f := by
   · simp [hv]
 
 /-- `Pr(f) ≤ ∑_v Pr(v) = 1`. -/
-theorem funcProb_le_one (f : (X → Bool) → Bool) : P.funcProb f ≤ 1 := by
+private theorem funcProb_le_one (f : (X → Bool) → Bool) : P.funcProb f ≤ 1 := by
   rw [← P.sum_valProb_eq_one]
   unfold funcProb
   apply Finset.sum_le_sum
@@ -172,7 +172,7 @@ def weightedCount (f : (X → Bool) → Bool) : ℕ :=
 
 /-- The weighted count of the sure event is the product of the total weights
 of the variables. -/
-theorem weightedCount_true :
+private theorem weightedCount_true :
     weightedCount a c (fun _ => true) = ∏ x, (a x + c x) := by
   have hps : (∏ x : X, ∑ b : Bool, (if b then a x else c x)) =
       ∑ v : X → Bool, ∏ x : X, (if v x then a x else c x) :=

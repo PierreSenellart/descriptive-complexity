@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.PSpaceCompl
 public import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Problems.HornSat
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.PSpaceCompl
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # `PH ⊆ PSPACE`
@@ -93,7 +97,7 @@ def consTwoLHom :
 
 variable {L B M} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
-theorem consOneLHom_isExpansionOn (ρ₀ : B.Assignment A) (ρ₁ : M.Assignment A) :
+private theorem consOneLHom_isExpansionOn (ρ₀ : B.Assignment A) (ρ₁ : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (consOneLHom L B M) A
       (@SOBlock.structure₁ ((L.sum B.lang).sum Language.order) M A
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁)
@@ -115,7 +119,7 @@ theorem consOneLHom_isExpansionOn (ρ₀ : B.Assignment A) (ρ₁ : M.Assignment
     | Sum.inl (Sum.inr s) => rfl
     | Sum.inr s => rfl
 
-theorem consTwoLHom_isExpansionOn (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignment A) :
+private theorem consTwoLHom_isExpansionOn (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (consTwoLHom L B M) A
       (@SOBlock.structure₂ ((L.sum B.lang).sum Language.order) M A
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ₀) _) ρ₁ σ₁)
@@ -181,7 +185,7 @@ noncomputable def fixedS :
 
 variable {L B M} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
-theorem realize_fixedAtS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignment A) (i : B.ι) :
+private theorem realize_fixedAtS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignment A) (i : B.ι) :
     @Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
           (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁))
@@ -195,7 +199,7 @@ theorem realize_fixedAtS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignm
     Sum.elim_inr]
   exact ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.1, h.2⟩⟩
 
-theorem realize_fixedS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignment A) :
+private theorem realize_fixedS (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : M.Assignment A) :
     @Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (SOBlock.cons B M) A
           (@sumOrderStructure L A instL _) (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁))
@@ -234,7 +238,7 @@ noncomputable def SOTCSpec.exBlock : SOTCSpec L where
 
 variable {B spec} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
-theorem exBlock_isSrc_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A) :
+private theorem exBlock_isSrc_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A) :
     (spec.exBlock B).IsSrc (consAssign ρ₀ ρ₁) ↔
       @SOTCSpec.IsSrc (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ := by
   let := B.structure₁ (L := L) ρ₀
@@ -245,7 +249,7 @@ theorem exBlock_isSrc_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A)
   have := consOneLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ ρ₁
   exact LHom.realize_onSentence (M := A) (consOneLHom L B spec.B) spec.src
 
-theorem exBlock_isTgt_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A) :
+private theorem exBlock_isTgt_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A) :
     (spec.exBlock B).IsTgt (consAssign ρ₀ ρ₁) ↔
       @SOTCSpec.IsTgt (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ := by
   let := B.structure₁ (L := L) ρ₀
@@ -256,7 +260,7 @@ theorem exBlock_isTgt_iff (ρ₀ : B.Assignment A) (ρ₁ : spec.B.Assignment A)
   have := consOneLHom_isExpansionOn (L := L) (B := B) (M := spec.B) ρ₀ ρ₁
   exact LHom.realize_onSentence (M := A) (consOneLHom L B spec.B) spec.tgt
 
-theorem exBlock_step_iff (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : spec.B.Assignment A) :
+private theorem exBlock_step_iff (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : spec.B.Assignment A) :
     (spec.exBlock B).Step (consAssign ρ₀ ρ₁) (consAssign σ₀ σ₁) ↔
       (ρ₀ = σ₀ ∧ @SOTCSpec.Step (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ σ₁) := by
   let := B.structure₁ (L := L) ρ₀
@@ -270,7 +274,7 @@ theorem exBlock_step_iff (ρ₀ σ₀ : B.Assignment A) (ρ₁ σ₁ : spec.B.As
   refine Iff.trans (b := _ ∧ _) Formula.realize_inf (and_congr (realize_fixedS ρ₀ σ₀ ρ₁ σ₁) ?_)
   exact LHom.realize_onSentence (M := A) (consTwoLHom L B spec.B) spec.step
 
-theorem exBlock_step_split (c d : (SOBlock.cons B spec.B).Assignment A)
+private theorem exBlock_step_split (c d : (SOBlock.cons B spec.B).Assignment A)
     (h : (spec.exBlock B).Step c d) :
     (fun i => c (Sum.inl i)) = (fun i => d (Sum.inl i)) ∧
       @SOTCSpec.Step (L.sum B.lang) spec A (B.structure₁ fun i => c (Sum.inl i)) _
@@ -294,7 +298,7 @@ theorem exBlock_reach (ρ σ : (SOBlock.cons B spec.B).Assignment A)
     rw [← hfst] at hcd₁
     exact ⟨hfst.trans hcd₀, hreach.tail hcd₁⟩
 
-theorem exBlock_reach_of (ρ₀ : B.Assignment A) {ρ₁ σ₁ : spec.B.Assignment A}
+private theorem exBlock_reach_of (ρ₀ : B.Assignment A) {ρ₁ σ₁ : spec.B.Assignment A}
     (h : @SOTCSpec.Reach (L.sum B.lang) spec A (B.structure₁ ρ₀) _ ρ₁ σ₁) :
     (spec.exBlock B).Reach (consAssign ρ₀ ρ₁) (consAssign ρ₀ σ₁) := by
   induction h with
@@ -353,7 +357,7 @@ def soProblem (L : Language.{0, 0}) [L.IsRelational] (Bs : List SOBlock)
 
 /-- The base case: a first-order sentence is an SO(TC) condition – a walk with a
 trivial block and no step. -/
-theorem sotcDefinable_soProblem_nil (L : Language.{0, 0}) [L.IsRelational]
+private theorem sotcDefinable_soProblem_nil (L : Language.{0, 0}) [L.IsRelational]
     (φ : (soLang L []).Sentence)
     (pol : Bool) : SOTCDefinable (soProblem L [] φ pol) := by
   refine SOTCDefinable.of_sigmaSODefinable ⟨[SOBlock.trivial], rfl,
@@ -398,7 +402,8 @@ end Prefix
 variable {L : Language.{0, 0}}
 
 /-- **Every `Σₖ`-definable problem is SO(TC) definable.** -/
-theorem SOTCDefinable.of_sigmaSODefinable_any {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
+private theorem SOTCDefinable.of_sigmaSODefinable_any
+    {k : ℕ} [L.IsRelational] {P : DecisionProblem L}
     (h : SigmaSODefinable k P) : SOTCDefinable P := by
   obtain ⟨Bs, -, φ, hφ⟩ := h
   obtain ⟨spec, hspec⟩ := sotcDefinable_soProblem Bs L φ true

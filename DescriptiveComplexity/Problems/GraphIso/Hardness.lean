@@ -9,6 +9,12 @@ public import DescriptiveComplexity.Problems.GraphIso.Defs
 public import DescriptiveComplexity.Problems.GraphIso.Gadget
 public import DescriptiveComplexity.Problems.DigraphIso.Bridge
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Degree
+import all DescriptiveComplexity.GadgetDouble
+import all DescriptiveComplexity.Problems.DigraphIso.Bridge
+import all DescriptiveComplexity.Problems.GraphIso.Defs
+import all DescriptiveComplexity.Problems.GraphIso.Gadget
 
 /-!
 # Graph Isomorphism is GI-complete
@@ -48,7 +54,7 @@ variable {Z : Type} [(Language.twoCopies Language.graph).Structure Z]
 
 /-- The pattern side of the doubled gadget is a simple graph: its adjacency is
 the gadget's, which is symmetric and loopless. -/
-theorem simpleOn_pat :
+private theorem simpleOn_pat :
     SimpleOn (TCPatMark (L₁ := Language.graph) (A := gadget.double.Map Z))
       DigraphBridge.TCPatAdj := by
   have hside : ∀ (x y : gadget.double.Map Z) (hx : TCPatMark (L₁ := Language.graph) x)
@@ -74,7 +80,7 @@ theorem simpleOn_pat :
     exact edge_irrefl _ hxx
 
 /-- The host side of the doubled gadget is a simple graph. -/
-theorem simpleOn_host :
+private theorem simpleOn_host :
     SimpleOn (TCHostMark (L₁ := Language.graph) (A := gadget.double.Map Z))
       DigraphBridge.TCHostAdj := by
   have hside : ∀ (x y : gadget.double.Map Z) (hx : TCHostMark (L₁ := Language.graph) x)
@@ -109,7 +115,7 @@ variable {Y : Type} [(Language.twoCopies Language.graph).Structure Y]
 
 /-- If the two sides of a generic instance are simple, so are the two sides of
 its renaming into `FirstOrder.Language.twoGraphs`. -/
-theorem simpleOn_ofTC_pat
+private theorem simpleOn_ofTC_pat
     (h : SimpleOn (TCPatMark (L₁ := Language.graph) (A := Y)) DigraphBridge.TCPatAdj) :
     SimpleOn (TGPatV (A := DigraphBridge.ofTC.Map Y)) TGPatE := by
   obtain ⟨hsymm, hirr⟩ := h
@@ -122,7 +128,7 @@ theorem simpleOn_ofTC_pat
     exact hirr _ ((DigraphBridge.ofTC_patV x).mp hx) hxx
 
 @[inherit_doc simpleOn_ofTC_pat]
-theorem simpleOn_ofTC_host
+private theorem simpleOn_ofTC_host
     (h : SimpleOn (TCHostMark (L₁ := Language.graph) (A := Y)) DigraphBridge.TCHostAdj) :
     SimpleOn (TGHostV (A := DigraphBridge.ofTC.Map Y)) TGHostE := by
   obtain ⟨hsymm, hirr⟩ := h
@@ -178,7 +184,7 @@ noncomputable def twoCopiesIso_fo_reduction_graphIso :
 /-- **Digraph Isomorphism reduces to Graph Isomorphism**: the classical
 digraph-to-graph construction, through the renaming into the generic
 vocabulary. -/
-noncomputable def digraphIso_fo_reduction_graphIso : DigraphIso ≤ᶠᵒ GraphIso :=
+private noncomputable def digraphIso_fo_reduction_graphIso : DigraphIso ≤ᶠᵒ GraphIso :=
   digraphIso_fo_reduction_twoCopiesIso.trans twoCopiesIso_fo_reduction_graphIso
 
 /-- **Graph Isomorphism is GI-complete**, the degree being defined on it.
@@ -208,7 +214,8 @@ theorem GI_eq_below_digraphIso : GI = ComplexityClass.below DigraphIso :=
 
 /-- And the same as the degree of the generic isomorphism problem of the graph
 vocabulary, which is what a new entry stated over `twoCopies` reduces to. -/
-theorem GI_eq_below_twoCopiesIso : GI = ComplexityClass.below (TwoCopiesIso Language.graph) :=
+private theorem GI_eq_below_twoCopiesIso
+    : GI = ComplexityClass.below (TwoCopiesIso Language.graph) :=
   GI_eq_below_digraphIso.trans below_digraphIso_eq_below_twoCopiesIso
 
 end DescriptiveComplexity

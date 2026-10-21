@@ -47,7 +47,7 @@ def polQuant (pol : Bool) (Q : (A → Prop) → Prop) : Prop :=
   | true => ∃ ν : A → Prop, Q ν
   | false => ∀ ν : A → Prop, Q ν
 
-theorem polQuant_congr {pol : Bool} {Q Q' : (A → Prop) → Prop} (h : ∀ ν, Q ν ↔ Q' ν) :
+private theorem polQuant_congr {pol : Bool} {Q Q' : (A → Prop) → Prop} (h : ∀ ν, Q ν ↔ Q' ν) :
     polQuant pol Q ↔ polQuant pol Q' := by
   cases pol with
   | true => exact exists_congr h
@@ -64,7 +64,7 @@ def AltTail (P : (Fin k → A → Prop) → Prop) : ℕ → ℕ → (Fin k → A
         polQuant pol fun ν => AltTail P r (m + 1) (Function.update νs ⟨m, h⟩ ν) (!pol)
       else P νs
 
-theorem altTail_succ (P : (Fin k → A → Prop) → Prop) {r m : ℕ} (h : m < k)
+private theorem altTail_succ (P : (Fin k → A → Prop) → Prop) {r m : ℕ} (h : m < k)
     (νs : Fin k → A → Prop) (pol : Bool) :
     AltTail P (r + 1) m νs pol =
       polQuant pol fun ν => AltTail P r (m + 1) (Function.update νs ⟨m, h⟩ ν) (!pol) := by
@@ -79,7 +79,7 @@ def glueTail (m r : ℕ) (νs : Fin k → A → Prop) (σ : Fin r → A → Prop
   else if h : (i : ℕ) - m < r then σ ⟨(i : ℕ) - m, h⟩ else νs i
 
 /-- Gluing nothing leaves the prefix alone. -/
-theorem glueTail_zero (m : ℕ) (νs : Fin k → A → Prop) (σ : Fin 0 → A → Prop) :
+private theorem glueTail_zero (m : ℕ) (νs : Fin k → A → Prop) (σ : Fin 0 → A → Prop) :
     glueTail m 0 νs σ = νs := by
   funext i
   simp only [glueTail, Nat.not_lt_zero]
@@ -87,7 +87,7 @@ theorem glueTail_zero (m : ℕ) (νs : Fin k → A → Prop) (σ : Fin 0 → A �
 
 /-- **Pushing one block from the tail into the prefix is an update.** This is
 the whole content of the bridge between the two shapes of the prefix. -/
-theorem glueTail_cons {m r : ℕ} (h : m < k) (νs : Fin k → A → Prop) (ν : A → Prop)
+private theorem glueTail_cons {m r : ℕ} (h : m < k) (νs : Fin k → A → Prop) (ν : A → Prop)
     (σ : Fin r → A → Prop) :
     glueTail m (r + 1) νs (Fin.cons ν σ) =
       glueTail (m + 1) r (Function.update νs ⟨m, h⟩ ν) σ := by
@@ -148,7 +148,7 @@ theorem altTail_iff_altQuant (P : (Fin k → A → Prop) → Prop) :
 
 /-- **The whole prefix**: quantifying every block in place is the alternating
 quantification of `DescriptiveComplexity.QbfProblem`. -/
-theorem altTail_zero_iff_altQuant (P : (Fin k → A → Prop) → Prop) (νs : Fin k → A → Prop)
+private theorem altTail_zero_iff_altQuant (P : (Fin k → A → Prop) → Prop) (νs : Fin k → A → Prop)
     (pol : Bool) : AltTail P k 0 νs pol ↔ altQuant A k P pol := by
   refine (altTail_iff_altQuant P k 0 (by omega) νs pol).trans (altQuant_congr k _ _ ?_ pol)
   intro σ

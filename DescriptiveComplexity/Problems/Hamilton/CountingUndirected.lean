@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Hamilton.CircuitPerm
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Hamilton.Counting
 
 /-!
 # #Hamilton Circuit: counting the circuits of an undirected graph
@@ -52,7 +55,7 @@ def IsUCircuit (R : A → A → Prop) (E : A → A → Prop) : Prop :=
   ∃ Nxt : A → A → Prop, IsCircuit R Nxt ∧ ∀ x y, E x y ↔ (Nxt x y ∨ Nxt y x)
 
 /-- A relation has a tour iff it has an undirected circuit. -/
-theorem tourOn_iff_exists_ucircuit {R : A → A → Prop} :
+private theorem tourOn_iff_exists_ucircuit {R : A → A → Prop} :
     TourOn R ↔ ∃ E, IsUCircuit R E := by
   rw [tourOn_iff_exists_circuit]
   exact ⟨fun ⟨Nxt, h⟩ => ⟨_, Nxt, h, fun _ _ => Iff.rfl⟩, fun ⟨_, Nxt, h, _⟩ => ⟨Nxt, h⟩⟩
@@ -205,14 +208,14 @@ noncomputable def SharpHamCircuit : CountingProblem Language.digraph where
     (ucircuitEquiv e.toEquiv fun a a' =>
       or_congr (relMap_equiv₂ e dgArc a a') (relMap_equiv₂ e dgArc a' a))
 
-theorem sharpHamCircuit_apply (A : Type) [Language.digraph.Structure A] :
+private theorem sharpHamCircuit_apply (A : Type) [Language.digraph.Structure A] :
     SharpHamCircuit A = Nat.card {E : A → A → Prop // UCircuit A E} :=
   rfl
 
 /-- **The support of #Hamilton Circuit is Hamilton Circuit.**
 Registered in the Lax archive as
 [`Lax280166.HamCircuitComplete.sharpHamCircuit_support_iff`](https://laxarchive.org/lax-280166/Lax280166.HamCircuitComplete.html#s-Lax280166.HamCircuitComplete.sharpHamCircuit_support_iff). -/
-theorem sharpHamCircuit_support_iff (A : Type) [Language.digraph.Structure A] [Finite A] :
+private theorem sharpHamCircuit_support_iff (A : Type) [Language.digraph.Structure A] [Finite A] :
     SharpHamCircuit.support A ↔ HamCircuit A := by
   rw [CountingProblem.support_iff, sharpHamCircuit_apply, Nat.card_pos_iff]
   constructor
@@ -231,20 +234,20 @@ noncomputable def cycF {α : Type} (x y : α) : dhcLang.Formula α :=
     ((∀ w, dhcVarSym(w, x)) ∧ (∀ w, dhcVarSym(y, w)))
 
 /-- Kernel conjunct: the guessed order is oriented. -/
-noncomputable def hamOrientClause : dhcLang.Sentence :=
+private noncomputable def hamOrientClause : dhcLang.Sentence :=
   fo% ∀ x y z, ((∀ w, dhcOrdSym(x, w)) ∧ cycF⟨x, y⟩) ∧ cycF⟨z, x⟩ → dhcOrdSym(y, z)
 
 /-- The first-order kernel of #Hamilton Circuit: the guessed relation is a
 linear order carrying a tour of the edges, it starts at the least element of
 the instance, and it is oriented. -/
-noncomputable def sharpHamKernel : dhcLang.Sentence :=
+private noncomputable def sharpHamKernel : dhcLang.Sentence :=
   rootedHamKernel false ⊓ hamOrientClause
 
 section Kernel
 
 variable {A : Type} [Language.digraph.Structure A] [LinearOrder A]
 
-theorem realize_cycF (ρ : hamGuessBlock.Assignment A) {α : Type} (v : α → A) (x y : α) :
+private theorem realize_cycF (ρ : hamGuessBlock.Assignment A) {α : Type} (v : α → A) (x y : α) :
     (@Formula.Realize dhcLang A (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) _
         (cycF x y) v) ↔ CycSucc (fun a b : A => ρ .le ![a, b]) (v x) (v y) := by
   let := hamGuessBlock.structure ρ
@@ -260,7 +263,7 @@ theorem realize_cycF (ρ : hamGuessBlock.Assignment A) {α : Type} (v : α → A
       ⟨fun h z => h fun _ => z, fun h i => h (i 0)⟩)
 
 /-- Realization of the kernel of #Hamilton Circuit. -/
-theorem realize_sharpHamKernel (ρ : hamGuessBlock.Assignment A) :
+private theorem realize_sharpHamKernel (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize dhcLang A
         (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) sharpHamKernel) ↔
       IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧

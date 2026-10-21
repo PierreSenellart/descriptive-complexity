@@ -8,6 +8,15 @@ module
 public import DescriptiveComplexity.Problems.Machine.Counting
 public import DescriptiveComplexity.Problems.Machine.Interp
 import DescriptiveComplexity.Counting.Subtractive
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.Counting
+import all DescriptiveComplexity.Problems.Machine.Hardness
+import all DescriptiveComplexity.Problems.Machine.Interp
+import all DescriptiveComplexity.Problems.Machine.Tape
+import all DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
 
 /-!
 # Counting accepting runs is parsimoniously `#P`-complete
@@ -101,7 +110,7 @@ theorem good_of_haltWalk {conf : SatV A → Config (SatV A)}
   exact htape
 
 /-- A truth value on the tape survives a step. -/
-theorem step_symV_persist {c d : Config (SatV A)} (hs : (satMachine A).Step c d)
+private theorem step_symV_persist {c d : Config (SatV A)} (hs : (satMachine A).Step c d)
     {r : SatV A} {v : Bool} {x : A} (hr : c.tape r = symV v x) : d.tape r = symV v x := by
   by_cases hrh : r = c.head
   · have hng : ¬ (c.state = stGuess ∧ ∃ y : A, c.tape c.head = symU y) := by
@@ -115,7 +124,7 @@ theorem step_symV_persist {c d : Config (SatV A)} (hs : (satMachine A).Step c d)
     exact hr
 
 /-- **A truth value on the tape survives the rest of a walk.** -/
-theorem walk_symV_persist {conf : SatV A → Config (SatV A)} (h : (satMachine A).IsWalk conf)
+private theorem walk_symV_persist {conf : SatV A → Config (SatV A)} (h : (satMachine A).IsWalk conf)
     {p r : SatV A} {v : Bool} {x : A} (hp : SatPosn p) (hr : (conf p).tape r = symV v x) :
     ∀ p', SatPosn p' → tagTupleLe p p' → (conf p').tape r = symV v x := by
   have hlin := isLinOrd_tagTupleLe (A := A)
@@ -222,7 +231,7 @@ theorem card_haltWalk_satMachine :
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- The assignments the machine can guess and accept are the models of the
 formula, with truth values read as propositions. -/
-theorem card_satGood_eq_card_satModel :
+private theorem card_satGood_eq_card_satModel :
     Nat.card {ν : A → Bool // SatGood ν} = Nat.card {ν : A → Prop // SatModel A ν} := by
   classical
   let e : (A → Bool) ≃ (A → Prop) :=
@@ -250,7 +259,7 @@ namespace SatTM
 /-- **Correctness of the interpretation, for counting**: the machine described
 by the interpreted structure has as many accepting runs as the CNF instance has
 models. -/
-theorem sharpNtmAccept_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
+private theorem sharpNtmAccept_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
     [Nonempty A] : SharpNTMAccept (satTuringInterp.Map A) = SharpSAT A := by
   have hag := agree_satMachine (A := A)
   have hwf : (tmData (satTuringInterp.Map A)).WellFormed :=
@@ -262,7 +271,7 @@ theorem sharpNtmAccept_map (A : Type) [Language.sat.Structure A] [LinearOrder A]
 /-- **#SAT reduces parsimoniously to counting the accepting runs of a
 machine**: the reduction building `M_φ` inside the instance preserves the
 number of solutions. -/
-def sharpSat_ordered_parsimonious_sharpNtmAccept : SharpSAT ≤ᵖ[≤] SharpNTMAccept where
+private def sharpSat_ordered_parsimonious_sharpNtmAccept : SharpSAT ≤ᵖ[≤] SharpNTMAccept where
   Tag := SatTag
   dim := 2
   toInterpretation := satTuringInterp

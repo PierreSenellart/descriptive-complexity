@@ -93,7 +93,7 @@ theorem ncard_initSeg (n k : ℕ) (h : k ≤ n) : (initSeg n k).ncard = k := by
   rw [Nat.card_congr e, Nat.card_eq_fintype_card, Fintype.card_fin]
 
 /-- A decoded number never exceeds the size of the universe. -/
-theorem ncard_le_card {A : Type} [Finite A] (s : Set A) : s.ncard ≤ Nat.card A := by
+private theorem ncard_le_card {A : Type} [Finite A] (s : Set A) : s.ncard ≤ Nat.card A := by
   rw [← Set.ncard_univ]
   exact Set.ncard_le_ncard (Set.subset_univ s)
 

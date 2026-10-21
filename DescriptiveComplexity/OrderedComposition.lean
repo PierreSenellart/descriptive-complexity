@@ -162,7 +162,7 @@ noncomputable def lexTupleLeF (d : ℕ) : (L.sum Language.order).Formula (Fin 2 
       (Formula.iInf fun i : {i : Fin d // i < j} => oEqF (0, i.1) (1, i.1)) ⊓
         oLtF (0, j) (1, j)
 
-theorem realize_lexTupleLeF {d : ℕ} {v : Fin 2 × Fin d → A} :
+private theorem realize_lexTupleLeF {d : ℕ} {v : Fin 2 × Fin d → A} :
     (lexTupleLeF L d).Realize v ↔
       tupLeLex (fun i => v (0, i)) (fun i => v (1, i)) := by
   simp only [lexTupleLeF, Formula.realize_sup, Formula.realize_iSup, Formula.realize_iInf,

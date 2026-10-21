@@ -62,7 +62,7 @@ def wideLe (Le : A → A → Prop) : A × A → A × A → Prop := fun u v =>
 
 omit [Finite A] in
 /-- The wide order is a linear order. -/
-theorem isLinOrd_wideLe (hlin : IsLinOrd Le) : IsLinOrd (wideLe Le) := by
+private theorem isLinOrd_wideLe (hlin : IsLinOrd Le) : IsLinOrd (wideLe Le) := by
   refine ⟨fun u => Or.inr ⟨rfl, hlin.1 _⟩, fun u v w h₁ h₂ => ?_, fun u v h₁ h₂ => ?_,
     fun u v => ?_⟩
   · rcases h₁ with ⟨h, hne⟩ | ⟨he, h⟩ <;> rcases h₂ with ⟨h', hne'⟩ | ⟨he', h'⟩
@@ -145,7 +145,7 @@ theorem binNum_wide_bot (hlin : IsLinOrd Le) {a₀ : A} (h₀ : ∀ x, Le a₀ x
 
 omit [Finite A] in
 /-- There are `|A|` times as many wide positions as positions. -/
-theorem ncard_widePosn :
+private theorem ncard_widePosn :
     ({u : A × A | WidePosn Posn u} : Set (A × A)).ncard =
       Nat.card A * ({p : A | Posn p} : Set A).ncard := by
   have hset : {u : A × A | WidePosn Posn u} = (Set.univ : Set A) ×ˢ {p : A | Posn p} := by
@@ -293,7 +293,7 @@ private theorem add_sub_le_mul {m k : ℕ} (hm : 1 ≤ m) (hk : 1 ≤ k) : m - 1
 
 /-- A sum of numbers below `2 ^ n`, over a universe of `m` elements, is below
 `2 ^ (m * n)`. -/
-theorem finsum_lt_two_pow_mul {n : ℕ} (w : A → ℕ) (S : Set A) (hw : ∀ i, w i < 2 ^ n) :
+private theorem finsum_lt_two_pow_mul {n : ℕ} (w : A → ℕ) (S : Set A) (hw : ∀ i, w i < 2 ^ n) :
     (∑ᶠ i ∈ S, w i) < 2 ^ (Nat.card A * n) := by
   classical
   rcases isEmpty_or_nonempty A with hA | hA

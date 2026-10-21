@@ -10,6 +10,13 @@ import DescriptiveComplexity.Problems.OneInSat.ExactlyOne
 public import DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
 import DescriptiveComplexity.Counting.Subtractive
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrencePrefix
+import all DescriptiveComplexity.Problems.OneInSat.Counting
+import all DescriptiveComplexity.Problems.OneInSat.ExactlyOne
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
+import all DescriptiveComplexity.Problems.ThreeSat.CountingFromSat
 
 /-!
 # #SAT reduces parsimoniously to #1-in-SAT
@@ -145,7 +152,7 @@ section Characterizations
 variable {A : Type} [instS : Language.sat.Structure A] [instO : LinearOrder A]
 
 /-- The semantic content of `isClauseF`. -/
-def ClauseSem : OTag → (Fin 2 → A) → Prop
+private def ClauseSem : OTag → (Fin 2 → A) → Prop
   | .gk _ s, w => Chained (w 0) (w 1) s
   | .kd s, w => MinOcc (w 0) (w 1) s
   | .top s, w => MaxOcc (w 0) (w 1) s
@@ -153,7 +160,7 @@ def ClauseSem : OTag → (Fin 2 → A) → Prop
   | _, _ => False
 
 /-- The semantic content of `posInF`. -/
-def PosSem : OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
+private def PosSem : OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | .gk k s, .g i t, w₁, w₂ =>
       (gateIn k i = true ∧ t = s) ∧ Same w₁ w₂ ∧ Chained (w₁ 0) (w₁ 1) s
   | .gk k s, .var, w₁, w₂ => (k = .b ∧ s = false) ∧ OwnVar w₁ w₂ ∧ Chained (w₁ 0) (w₁ 1) s
@@ -162,7 +169,7 @@ def PosSem : OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | _, _, _, _ => False
 
 /-- The semantic content of `negInF`. -/
-def NegSem : OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
+private def NegSem : OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | .gk k s, .pre t, w₁, w₂ =>
       (k = .a ∧ Pred t s w₁ w₂) ∨
         ((k = .c ∧ t = s) ∧ Same w₁ w₂ ∧ Chained (w₁ 0) (w₁ 1) s)
@@ -171,12 +178,12 @@ def NegSem : OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | .kd s, .pre t, w₁, w₂ => t = s ∧ Same w₁ w₂ ∧ MinOcc (w₁ 0) (w₁ 1) s
   | _, _, _, _ => False
 
-theorem isClause_iff (t : OTag) (w : Fin 2 → A) :
+private theorem isClause_iff (t : OTag) (w : Fin 2 → A) :
     RelMap (M := interp.Map A) satIsClause ![(t, w)] ↔ ClauseSem t w := by
   rw [FOInterpretation.relMap_map]
   cases t <;> simp [interp, isClauseF, ClauseSem]
 
-theorem posIn_iff (t₁ t₂ : OTag) (w₁ w₂ : Fin 2 → A) :
+private theorem posIn_iff (t₁ t₂ : OTag) (w₁ w₂ : Fin 2 → A) :
     RelMap (M := interp.Map A) satPosIn ![(t₁, w₁), (t₂, w₂)] ↔ PosSem t₁ t₂ w₁ w₂ := by
   rw [FOInterpretation.relMap_map]
   cases t₁ <;> cases t₂ <;> try exact Iff.rfl
@@ -190,7 +197,7 @@ theorem posIn_iff (t₁ t₂ : OTag) (w₁ w₂ : Fin 2 → A) :
   case top.pre s t =>
     cases s <;> cases t <;> simp [interp, posInF, PosSem, sameF, Same, and_assoc]
 
-theorem negIn_iff (t₁ t₂ : OTag) (w₁ w₂ : Fin 2 → A) :
+private theorem negIn_iff (t₁ t₂ : OTag) (w₁ w₂ : Fin 2 → A) :
     RelMap (M := interp.Map A) satNegIn ![(t₁, w₁), (t₂, w₂)] ↔ NegSem t₁ t₂ w₁ w₂ := by
   rw [FOInterpretation.relMap_map]
   cases t₁ <;> cases t₂ <;> try exact Iff.rfl
@@ -213,11 +220,11 @@ section Literals
 variable {A : Type} [instS : Language.sat.Structure A] [instO : LinearOrder A]
 
 /-- The literals of the interpreted instance, with their sign. -/
-def LitSem : Bool → OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
+private def LitSem : Bool → OTag → OTag → (Fin 2 → A) → (Fin 2 → A) → Prop
   | true => PosSem
   | false => NegSem
 
-theorem occIn_map_iff (t te : OTag) (w we : Fin 2 → A) (sg : Bool) :
+private theorem occIn_map_iff (t te : OTag) (w we : Fin 2 → A) (sg : Bool) :
     OccIn (A := interp.Map A) (t, w) (te, we) sg ↔ ClauseSem t w ∧ LitSem sg t te w we := by
   cases sg
   · exact and_congr (isClause_iff t w) (negIn_iff t te w we)
@@ -227,10 +234,10 @@ theorem occIn_map_iff (t te : OTag) (w we : Fin 2 → A) (sg : Bool) :
 def varP (x : A) : interp.Map A := (OTag.var, fun _ => x)
 
 /-- The prefix variable of the occurrence `(x, s)` of `c`. -/
-def preP (s : Bool) (c x : A) : interp.Map A := (OTag.pre s, ![c, x])
+private def preP (s : Bool) (c x : A) : interp.Map A := (OTag.pre s, ![c, x])
 
 /-- A case variable of the gate of the occurrence `(x, s)` of `c`. -/
-def gP (i : GI) (s : Bool) (c x : A) : interp.Map A := (OTag.g i s, ![c, x])
+private def gP (i : GI) (s : Bool) (c x : A) : interp.Map A := (OTag.g i s, ![c, x])
 
 omit instS instO in
 theorem pair_eq {t : OTag} {we : Fin 2 → A} {c x : A} (h0 : we 0 = c) (h1 : we 1 = x) :
@@ -249,7 +256,8 @@ theorem var_eq {w we : Fin 2 → A} (h : OwnVar w we) :
   rfl
 
 /-- The literal of the unit clause of a last occurrence. -/
-theorem occIn_top {c x : A} {s : Bool} (hmax : MaxOcc c x s) (e : interp.Map A) (sg : Bool) :
+private theorem occIn_top
+    {c x : A} {s : Bool} (hmax : MaxOcc c x s) (e : interp.Map A) (sg : Bool) :
     OccIn (A := interp.Map A) (OTag.top s, ![c, x]) e sg ↔ e = preP s c x ∧ sg = true := by
   constructor
   · obtain ⟨te, we⟩ := e
@@ -263,7 +271,7 @@ theorem occIn_top {c x : A} {s : Bool} (hmax : MaxOcc c x s) (e : interp.Map A) 
     exact (occIn_map_iff _ _ _ _ _).mpr ⟨hmax, rfl, ⟨rfl, rfl⟩, hmax⟩
 
 /-- The literals of the clause of a first occurrence. -/
-theorem occIn_kd {c x : A} {s : Bool} (hmin : MinOcc c x s) (e : interp.Map A) (sg : Bool) :
+private theorem occIn_kd {c x : A} {s : Bool} (hmin : MinOcc c x s) (e : interp.Map A) (sg : Bool) :
     OccIn (A := interp.Map A) (OTag.kd s, ![c, x]) e sg ↔
       (e = preP s c x ∧ sg = false) ∨ (e = varP x ∧ sg = s) := by
   constructor
@@ -292,7 +300,7 @@ theorem chained_of_succOcc [LinearOrder A] {c y x : A} {t s : Bool}
   ⟨h.2.1, fun hmin => hmin.2 y t h.1 h.2.2.1⟩
 
 /-- The literals of the first gate clause, `{¬z', g₁₁, g₁₀}`. -/
-theorem occIn_ka {c y x : A} {t s : Bool} (hsucc : SuccOcc c y t x s) (e : interp.Map A)
+private theorem occIn_ka {c y x : A} {t s : Bool} (hsucc : SuccOcc c y t x s) (e : interp.Map A)
     (sg : Bool) :
     OccIn (A := interp.Map A) (OTag.gk .a s, ![c, x]) e sg ↔
       (e = preP t c y ∧ sg = false) ∨ (e = gP .tt s c x ∧ sg = true) ∨
@@ -322,7 +330,7 @@ theorem occIn_ka {c y x : A} {t s : Bool} (hsucc : SuccOcc c y t x s) (e : inter
     · exact (occIn_map_iff _ _ _ _ _).mpr ⟨hch, ⟨rfl, rfl⟩, ⟨rfl, rfl⟩, hch⟩
 
 /-- The literals of the second gate clause, `{¬ℓ, g₁₁, g₀₁}`. -/
-theorem occIn_kb {c x : A} {s : Bool} (hch : Chained c x s) (e : interp.Map A) (sg : Bool) :
+private theorem occIn_kb {c x : A} {s : Bool} (hch : Chained c x s) (e : interp.Map A) (sg : Bool) :
     OccIn (A := interp.Map A) (OTag.gk .b s, ![c, x]) e sg ↔
       (e = varP x ∧ sg = !s) ∨ (e = gP .tt s c x ∧ sg = true) ∨
         (e = gP .ft s c x ∧ sg = true) := by
@@ -353,7 +361,7 @@ theorem occIn_kb {c x : A} {s : Bool} (hch : Chained c x s) (e : interp.Map A) (
     · exact (occIn_map_iff _ _ _ _ _).mpr ⟨hch, ⟨rfl, rfl⟩, ⟨rfl, rfl⟩, hch⟩
 
 /-- The literals of the third gate clause, `{¬z, g₁₁, g₁₀, g₀₁}`. -/
-theorem occIn_kc {c x : A} {s : Bool} (hch : Chained c x s) (e : interp.Map A) (sg : Bool) :
+private theorem occIn_kc {c x : A} {s : Bool} (hch : Chained c x s) (e : interp.Map A) (sg : Bool) :
     OccIn (A := interp.Map A) (OTag.gk .c s, ![c, x]) e sg ↔
       (e = preP s c x ∧ sg = false) ∨ (e = gP .tt s c x ∧ sg = true) ∨
         (e = gP .tf s c x ∧ sg = true) ∨ (e = gP .ft s c x ∧ sg = true) := by
@@ -381,7 +389,7 @@ theorem occIn_kc {c x : A} {s : Bool} (hch : Chained c x s) (e : interp.Map A) (
     · exact (occIn_map_iff _ _ _ _ _).mpr ⟨hch, ⟨rfl, rfl⟩, ⟨rfl, rfl⟩, hch⟩
 
 /-- The copy of an empty clause has no literal. -/
-theorem not_occIn_empty {w : Fin 2 → A} (e : interp.Map A) (sg : Bool) :
+private theorem not_occIn_empty {w : Fin 2 → A} (e : interp.Map A) (sg : Bool) :
     ¬OccIn (A := interp.Map A) (OTag.empty, w) e sg := by
   obtain ⟨te, we⟩ := e
   rw [occIn_map_iff]
@@ -415,7 +423,7 @@ structure GateVal (ν : A → Prop) (Z : A → A → Bool → Prop)
   nonempty : ∀ c : A, ¬EmptyCl c
 
 /-- A gate valuation is in particular a prefix valuation. -/
-theorem GateVal.prefixVal [Finite A] {ν : A → Prop} {Z : A → A → Bool → Prop}
+private theorem GateVal.prefixVal [Finite A] {ν : A → Prop} {Z : A → A → Bool → Prop}
     {G : GI → A → A → Bool → Prop} (h : GateVal ν Z G) : PrefixVal ν Z where
   step c x s hocc := by
     by_cases hmin : MinOcc c x s
@@ -436,7 +444,7 @@ omit instS instO in
 /-- The propositional content of a gate: the three exactly-one clauses
 `{¬a, g₁₁, g₁₀}`, `{¬b, g₁₁, g₀₁}` and `{¬z, g₁₁, g₁₀, g₀₁}` say that the case
 variables name the cases of `a` and `b`, and that `z` is `a ∨ b`. -/
-theorem gate_prop (a b z g₁₁ g₁₀ g₀₁ : Prop) :
+private theorem gate_prop (a b z g₁₁ g₁₀ g₀₁ : Prop) :
     (((¬a ∧ ¬g₁₁ ∧ ¬g₁₀) ∨ (¬¬a ∧ g₁₁ ∧ ¬g₁₀) ∨ (¬¬a ∧ ¬g₁₁ ∧ g₁₀)) ∧
       ((¬b ∧ ¬g₁₁ ∧ ¬g₀₁) ∨ (¬¬b ∧ g₁₁ ∧ ¬g₀₁) ∨ (¬¬b ∧ ¬g₁₁ ∧ g₀₁)) ∧
       ((¬z ∧ ¬g₁₁ ∧ ¬g₁₀ ∧ ¬g₀₁) ∨ (¬¬z ∧ g₁₁ ∧ ¬g₁₀ ∧ ¬g₀₁) ∨ (¬¬z ∧ ¬g₁₁ ∧ g₁₀ ∧ ¬g₀₁) ∨
@@ -448,13 +456,13 @@ theorem gate_prop (a b z g₁₁ g₁₀ g₀₁ : Prop) :
 variable (μ : interp.Map A → Prop)
 
 /-- The assignment read on the variable copies. -/
-def varVal (x : A) : Prop := μ (varP x)
+private def varVal (x : A) : Prop := μ (varP x)
 
 /-- The assignment read on the prefix variables. -/
-def preVal (c x : A) (s : Bool) : Prop := μ (preP s c x)
+private def preVal (c x : A) (s : Bool) : Prop := μ (preP s c x)
 
 /-- The assignment read on the case variables. -/
-def gVal (i : GI) (c x : A) (s : Bool) : Prop := μ (gP i s c x)
+private def gVal (i : GI) (c x : A) (s : Bool) : Prop := μ (gP i s c x)
 
 variable {μ}
 
@@ -465,7 +473,7 @@ theorem ne_of_tag {t t' : OTag} {w w' : Fin 2 → A} (h : t ≠ t') :
 /-- **Every clause of the interpreted instance has exactly one true literal
 exactly when the assignment is a gate valuation**, read on the variable copies,
 the prefix variables and the case variables. -/
-theorem oneInProper_iff_gateVal [Finite A] :
+private theorem oneInProper_iff_gateVal [Finite A] :
     OneInProper μ ↔ GateVal (varVal μ) (preVal μ) (gVal μ) := by
   have hpre : ∀ c x s, (LitTrue μ (preP s c x) false ↔ ¬preVal μ c x s) ∧
       (LitTrue μ (preP s c x) true ↔ preVal μ c x s) := fun c x s => ⟨Iff.rfl, Iff.rfl⟩
@@ -544,13 +552,13 @@ variable {A : Type} [instS : Language.sat.Structure A] [instO : LinearOrder A]
 /-- The elements of the interpreted instance that are variables of it: the
 copies of the variables of the input, the prefix variables of its occurrences,
 and the case variables of its occurrences that have a predecessor. -/
-def OccElem : OTag → (Fin 2 → A) → Prop
+private def OccElem : OTag → (Fin 2 → A) → Prop
   | .var, w => w 0 = w 1 ∧ ∃ c s, OccIn c (w 0) s
   | .pre t, w => OccIn (w 0) (w 1) t
   | .g _ t, w => Chained (w 0) (w 1) t
   | _, _ => False
 
-theorem posSem_occElem {t te : OTag} {w we : Fin 2 → A} (h : PosSem t te w we) :
+private theorem posSem_occElem {t te : OTag} {w we : Fin 2 → A} (h : PosSem t te w we) :
     OccElem te we := by
   cases t <;> cases te <;> try exact h.elim
   case gk.var k s =>
@@ -570,7 +578,7 @@ theorem posSem_occElem {t te : OTag} {w we : Fin 2 → A} (h : PosSem t te w we)
     rw [← hsame.1, ← hsame.2]
     exact hmax.occIn
 
-theorem negSem_occElem {t te : OTag} {w we : Fin 2 → A} (h : NegSem t te w we) :
+private theorem negSem_occElem {t te : OTag} {w we : Fin 2 → A} (h : NegSem t te w we) :
     OccElem te we := by
   cases t <;> cases te <;> try exact h.elim
   case gk.var k s =>
@@ -593,7 +601,7 @@ theorem negSem_occElem {t te : OTag} {w we : Fin 2 → A} (h : NegSem t te w we)
     exact hmin.occIn
 
 /-- **The variables of the interpreted instance**, characterized. -/
-theorem satOccurs_iff (te : OTag) (we : Fin 2 → A) :
+private theorem satOccurs_iff (te : OTag) (we : Fin 2 → A) :
     SatOccurs (interp.Map A) (te, we) ↔ OccElem te we := by
   constructor
   · rintro ⟨⟨t, w⟩, -, hp | hn⟩
@@ -635,7 +643,7 @@ variable {A : Type} [instS : Language.sat.Structure A] [instO : LinearOrder A] [
 
 /-- The assignment of the interpreted instance determined by an assignment of
 the input, before its restriction to the variables of the instance. -/
-def canon (ν : A → Prop) : OTag × (Fin 2 → A) → Prop
+private def canon (ν : A → Prop) : OTag × (Fin 2 → A) → Prop
   | (.var, w) => ν (w 0)
   | (.pre s, w) => PrefixOr ν (w 0) (w 1) s
   | (.g .tt s, w) => PrefixOrStrict ν (w 0) (w 1) s ∧ LitTrue ν (w 1) s
@@ -650,7 +658,7 @@ theorem val_congr {μ : interp.Map A → Prop} (t : OTag) {u u' : Fin 2 → A} (
   rfl
 
 /-- **A satisfying assignment has a gate valuation.** -/
-theorem gateVal_canon {ν : A → Prop}
+private theorem gateVal_canon {ν : A → Prop}
     (hν : ∀ c, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s) :
     GateVal (varVal (canon ν)) (preVal (canon ν)) (gVal (canon ν)) := by
   have hpv := prefixVal_prefixOr hν
@@ -666,7 +674,7 @@ theorem gateVal_canon {ν : A → Prop}
 variable (A) in
 /-- **The exactly-one models of the interpreted instance are the models of the
 input**, bijectively. -/
-noncomputable def modelEquiv :
+private noncomputable def modelEquiv :
     {ν : A → Prop // SatModel A ν} ≃
       {μ : interp.Map A → Prop // OneInModel (interp.Map A) μ} where
   toFun ν := ⟨fun e => canon ν.1 e ∧ SatOccurs (interp.Map A) e,
@@ -723,7 +731,7 @@ end Models
 
 /-- **Correctness of the interpretation, for counting**: the interpreted
 instance has as many exactly-one models as the input has models. -/
-theorem sharpOneInSat_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
+private theorem sharpOneInSat_map (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A] :
     SharpOneInSAT (interp.Map A) = SharpSAT A := by
   rw [sharpOneInSat_apply, sharpSat_apply]
   exact (Nat.card_congr (modelEquiv A)).symm
@@ -732,7 +740,7 @@ end SharpSatToOneIn
 
 open SharpSatToOneIn in
 /-- **#SAT reduces parsimoniously to #1-in-SAT.** -/
-noncomputable def sharpSat_ordered_parsimonious_sharpOneInSat :
+private noncomputable def sharpSat_ordered_parsimonious_sharpOneInSat :
     SharpSAT ≤ᵖ[≤] SharpOneInSAT where
   Tag := OTag
   dim := 2

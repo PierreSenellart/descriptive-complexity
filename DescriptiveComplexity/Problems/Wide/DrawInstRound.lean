@@ -8,6 +8,16 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawInstSeq
 public import DescriptiveComplexity.Problems.Wide.DrawInstIGate
 public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawInstIGate
+import all DescriptiveComplexity.Problems.Wide.DrawInstSeq
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # One round of the VAL loop, assembled
@@ -208,7 +218,7 @@ include hrules hR hlin hord htop hbot hv hvi hwkSt hcompat in
 so the file test fails and the block leaves through the failing exit – for
 an inner gate, the *next* checkpoint – with the fail store applied at the
 marker's symbol. -/
-theorem igateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
+private theorem igateBlock_hStage_neg {u : Univ A R P dt.KIx dt.dd}
     (hTest : ¬Test u) (f : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (Sum.inl .up)) f), Sum.inl v',
@@ -310,7 +320,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [Finite A] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **A gate's file test reads four slots**: the block mark, the VAL digit,
 the padding mark and the name slots. -/
-theorem wellShapedIG_congr (zero one : A) (b : Fin dt.ko ⊕ Fin dt.ki)
+private theorem wellShapedIG_congr (zero one : A) (b : Fin dt.ko ⊕ Fin dt.ki)
     {g g' : dt.SlotIx → A}
     (hblk : g (Slot.blk (some b)) = g' (Slot.blk (some b)))
     (hval : g Slot.val = g' Slot.val)
@@ -324,7 +334,7 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **A file test depends on the VAL register alone**: everything else it
 reads is the tape's permanent geometry. -/
-theorem igTest_congr (zero one : A)
+private theorem igTest_congr (zero one : A)
     {st st' : TapeStD dt A R P}
     (hval : st.val = st'.val) (b : Fin dt.ko ⊕ Fin dt.ki)
     (u : Univ A R P dt.KIx dt.dd) :
@@ -450,7 +460,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The inner fold's vector survives the inner gates**: no level's
 machinery – witness chain, domain loop, conjoining exit, fail store or
 entry reset – ever writes an accumulator. -/
-theorem igFs_apply_accC (vi : dt.VarIx) (stV : TapeStD dt A R P)
+private theorem igFs_apply_accC (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
     (jj : Fin dt.naDim) (n : ℕ) :
     dt.igFs RF zero one vi stV v f₀ n (dt.accC jj) = f₀ (dt.accC jj) := by
@@ -589,7 +599,7 @@ theorem igFs_apply_accC (vi : dt.VarIx) (stV : TapeStD dt A R P)
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round flag survives one atom's machinery**: no kind's exit control
 writes the two VAL-round gate flags. -/
-theorem kindExitCtl_apply_roundFlag {q : dt.CtlIx}
+private theorem kindExitCtl_apply_roundFlag {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (av : Fin dt.natMax) (st : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -803,7 +813,7 @@ theorem kindExitCtl_apply_roundFlag {q : dt.CtlIx}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round flag survives the whole matrix**: what the branch checkpoint
 read, the fold checkpoint still reads. -/
-theorem matFs_apply_roundFlag {q : dt.CtlIx}
+private theorem matFs_apply_roundFlag {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (st : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -849,7 +859,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **One level's effect on a round flag**: its own polarity flag becomes
 “held at entry ∧ the level's verdict”; the other polarity's rides
 through. -/
-theorem ctlBit_flag_igFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
+private theorem ctlBit_flag_igFs_succ (hzo : zero ≠ one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
@@ -1025,7 +1035,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 a round flag holds exactly when every quantified level of its polarity
 passes its gate – the file test, the one-hot witness at the dispatched
 tag, and the domain condition there. -/
-theorem ctlBit_flag_igFs (hzo : zero ≠ one) {q : dt.CtlIx}
+private theorem ctlBit_flag_igFs (hzo : zero ≠ one) {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC)
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A)
@@ -1163,7 +1173,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit state differs from its entry in SAV and TARGET
 alone** – the same fact as
 `DescriptiveComplexity.Draw.Data.matSt_fields`, through the branch. -/
-theorem roundEndSt_fields (vi : dt.VarIx) (stV : TapeStD dt A R P)
+private theorem roundEndSt_fields (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
     (dt.roundEndSt RF zero one vi stV v f₀).wk = stV.wk ∧
       (dt.roundEndSt RF zero one vi stV v f₀).mir = stV.mir ∧
@@ -1196,7 +1206,7 @@ theorem roundEndSt_eq (vi : dt.VarIx) (stV : TapeStD dt A R P)
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit state differs from its entry state in the two scratch
 registers alone** – `roundEndSt_eq` in the form the congruences take. -/
-theorem scratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeStD dt A R P)
+private theorem scratchEq_roundEndSt (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop) (f₀ : dt.CtlIx → A) :
     dt.ScratchEq (dt.roundEndSt RF zero one vi stV v f₀) stV := by
   rw [dt.roundEndSt_eq RF vi stV v f₀]
@@ -1285,7 +1295,7 @@ theorem roundCtlT_eq_roundCtl (hzo : zero ≠ one)
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The accumulators survive one whole round.** -/
-theorem roundCtl_apply_accC {hzo : zero ≠ one} (vi : dt.VarIx)
+private theorem roundCtl_apply_accC {hzo : zero ≠ one} (vi : dt.VarIx)
     (stV : TapeStD dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
     (sem : (∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ) →
       ∀ a : Fin (dt.natOf vi), dt.KindSem zero one vi stV (dt.kindOf vi a))
@@ -1301,7 +1311,7 @@ theorem roundCtl_apply_accC {hzo : zero ≠ one} (vi : dt.VarIx)
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A round's exit reads the two flags off the inner gates' thread**:
 the matrix – run or skipped – never writes them. -/
-theorem roundCtl_apply_roundFlag {q : dt.CtlIx}
+private theorem roundCtl_apply_roundFlag {q : dt.CtlIx}
     (hq : q = dt.existGateC ∨ q = dt.allGateC) {hzo : zero ≠ one}
     (vi : dt.VarIx) (stV : TapeStD dt A R P)
     (v : Univ A R P dt.KIx dt.dd → Prop)
@@ -1318,7 +1328,7 @@ theorem roundCtl_apply_roundFlag {q : dt.CtlIx}
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A passing round's exit is the matrix thread**, at any proof of the
 pass – the branch's own derivation is proof-irrelevant. -/
-theorem roundCtl_of_flags {hzo : zero ≠ one} (vi : dt.VarIx)
+private theorem roundCtl_of_flags {hzo : zero ≠ one} (vi : dt.VarIx)
     (stV : TapeStD dt A R P) (v : Univ A R P dt.KIx dt.dd → Prop)
     (sem : (∀ ℓ : Fin (dt.nIn vi), dt.igPassP RF zero one vi stV ℓ) →
       ∀ a : Fin (dt.natOf vi), dt.KindSem zero one vi stV (dt.kindOf vi a))
@@ -1703,7 +1713,7 @@ include hrules hR hlin hord htop hbot hwork hv hvi in
 assumed, so it applies at every address of the outer sweep. The tape ends
 in `DescriptiveComplexity.Draw.Data.roundEndSt`, which is the entry state
 unless the round's matrix ran and contained a stage atom. -/
-theorem round_run_thread (stV : TapeStD dt A R P)
+private theorem round_run_thread (stV : TapeStD dt A R P)
     (hwkV : stV.wk = fun r => r = v) (hmirV : stV.mir = v)
     (hbotV : stV.bot = fun r => r = (fun _ => False))
     (sem : (∀ ℓ : Fin (dt.nIn vi),

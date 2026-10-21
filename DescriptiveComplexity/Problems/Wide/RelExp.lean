@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Double
 import DescriptiveComplexity.SecondOrderTransitiveClosure
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Wide.Double
 
 /-!
 # Reading the instance inside the doubled universe
@@ -45,7 +47,7 @@ section Order
 variable {A : Type} [LinearOrder A]
 
 /-- On a one-coordinate tuple the lexicographic order is the order itself. -/
-theorem tupLeLex_one (u v : Fin 1 → A) : tupLeLex u v ↔ u 0 ≤ v 0 := by
+private theorem tupLeLex_one (u v : Fin 1 → A) : tupLeLex u v ↔ u 0 ≤ v 0 := by
   constructor
   · rintro (rfl | ⟨j, -, hj⟩)
     · exact le_rfl
@@ -384,7 +386,7 @@ theorem supported_extAssignM (ρ₀ : B.Assignment (MarkPart L M)) :
 omit [L.IsRelational] in
 /-- **The support condition, read**: an assignment satisfies the support
 sentence exactly when it never holds of an unmarked entry. -/
-theorem realize_suppAt (ρ : B.Assignment M) (i : B.ι) :
+private theorem realize_suppAt (ρ : B.Assignment M) (i : B.ι) :
     @Sentence.Realize _ M (B.structure₁ ρ) (suppAt L B i) ↔
       ∀ w : Fin (B.arity i) → M, ρ i w → ∀ j, RelMap (oldNewSym L) ![w j] := by
   let := B.structure₁ (L := (newLang L).sum Language.order) ρ

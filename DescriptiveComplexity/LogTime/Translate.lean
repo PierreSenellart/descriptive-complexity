@@ -9,6 +9,7 @@ public import DescriptiveComplexity.LogTime.Small
 import DescriptiveComplexity.LogTime.BitSum.Times
 import DescriptiveComplexity.LogTime.Compile
 import DescriptiveComplexity.LogTime.Simulate
+import all DescriptiveComplexity.LogTime.BitLogic
 
 /-!
 # `FO(≤, +, ×)` into the bit logic: the machine model is AC⁰
@@ -98,7 +99,7 @@ theorem timesBitDef : TimesBitDef L := fun x y z => BitSum.bitDef_times x y z
 
 /-- Splitting a valuation of `α ⊕ Fin n` into its two halves and putting it back
 is the identity – the one bookkeeping step the atom cases need. -/
-theorem elim_proj {A : Type} {n : ℕ} (u : α ⊕ Fin n → A) :
+private theorem elim_proj {A : Type} {n : ℕ} (u : α ⊕ Fin n → A) :
     Sum.elim (fun a => u (Sum.inl a)) (fun i => u (Sum.inr i)) = u := by
   funext z
   rcases z with a | i <;> rfl
@@ -106,7 +107,7 @@ theorem elim_proj {A : Type} {n : ℕ} (u : α ⊕ Fin n → A) :
 /-- **Every formula of `FO(≤, +, ×)` is bit-definable**: the induction over
 `FirstOrder.Language.BoundedFormula`, with the bound variables carried as the
 right-hand summand of the variable type. -/
-theorem bitDef_realize {α : Type} :
+private theorem bitDef_realize {α : Type} :
     ∀ {n : ℕ} (φ : (L.sum Language.arith).BoundedFormula α n),
       BitDef (L := L) (α := α ⊕ Fin n)
         fun _ _ _ _ _ u => φ.Realize (fun a => u (Sum.inl a)) fun i => u (Sum.inr i) := by

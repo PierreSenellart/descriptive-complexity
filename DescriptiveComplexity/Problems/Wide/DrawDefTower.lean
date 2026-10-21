@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.Wide.DrawDefKit
 import DescriptiveComplexity.Problems.Wide.DrawTuple
 public import DescriptiveComplexity.Problems.Wide.DrawTagged
 public import DescriptiveComplexity.Problems.Wide.DrawSeq
+import all DescriptiveComplexity.Problems.Wide.DrawDefKit
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The combinators carry definability up the tower
@@ -41,7 +43,7 @@ variable {L : Language.{0, 0}} {Q W P : Type} [Fintype Q] [Fintype W]
 
 /-! ### A rule may be transported along an equality of families -/
 
-theorem URuleDefinable.congr {rl rl' : ∀ e : Env L, Rule e.α Q W P}
+private theorem URuleDefinable.congr {rl rl' : ∀ e : Env L, Rule e.α Q W P}
     (h : URuleDefinable rl) (he : ∀ e : Env L, rl' e = rl e) :
     URuleDefinable rl' where
   srcPh := h.srcPh.imp fun _ hp e => by rw [he]; exact hp e
@@ -68,7 +70,7 @@ structure UPreDefinable (pr : ∀ e : Env L, PreRule e.α Q W P) : Prop where
   wr : UTrDefinable fun e => (pr e).wr
 
 /-- **A descriptor at a source phase is a definable rule.** -/
-theorem UPreDefinable.toRule {pr : ∀ e : Env L, PreRule e.α Q W P}
+private theorem UPreDefinable.toRule {pr : ∀ e : Env L, PreRule e.α Q W P}
     (h : UPreDefinable pr) (p : P) :
     URuleDefinable fun e => (pr e).toRule p :=
   ⟨⟨p, fun _ => rfl⟩, h.dstPh, h.right, h.guard, h.dst, h.wr⟩
@@ -76,7 +78,7 @@ theorem UPreDefinable.toRule {pr : ∀ e : Env L, PreRule e.α Q W P}
 /-- **The dispatch shape of every checkpoint**: the standard exit guard,
 conjoined with a question the caller supplies, a control update and the tracks
 riding along. -/
-theorem uPreDefinable_dsp {wk rg : W} {p : P} {b : Bool}
+private theorem uPreDefinable_dsp {wk rg : W} {p : P} {b : Bool}
     {N : ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     {F : ∀ e : Env L, (Q → e.α) → (W → e.α) → Q → e.α}
     (hN : UGDefinable N) (hF : UStDefinable F) :
@@ -101,7 +103,7 @@ variable {PS SS : Type} {n : ℕ} {ShS : SS → Type}
 
 /-- **A chain's rules are definable**: its stages' are the parameter, and each
 checkpoint contributes the walk back and its two descriptors. -/
-theorem uRulesDefinable_chainRule {wk : W} {emb : ChainPh n PS → P}
+private theorem uRulesDefinable_chainRule {wk : W} {emb : ChainPh n PS → P}
     {ruleS : ∀ e : Env L, ∀ s : SS, ShS s → Rule e.α Q W P}
     {dsp : ∀ e : Env L, Fin n → Bool → PreRule e.α Q W P}
     (hS : URulesDefinable ruleS)
@@ -128,7 +130,7 @@ variable {n : ℕ} {PA SA : Fin n → Type} {ShA : ∀ a : Fin n, SA a → Type}
 /-- **A sequencer's rules are definable**: its stages' are the parameter, its
 dispatch enters the next stage with the caller's control update or leaves after
 the last, and the second descriptor is dead. -/
-theorem uRulesDefinable_seqRule {wk rg : W} {emb : SeqPh n PA → P}
+private theorem uRulesDefinable_seqRule {wk rg : W} {emb : SeqPh n PA → P}
     {ruleA : ∀ e : Env L, ∀ (a : Fin n) (s : SA a), ShA a s → Rule e.α Q W P}
     {entry : ∀ a : Fin n, PA a}
     {enterSt : ∀ e : Env L, Fin n → (Q → e.α) → (W → e.α) → Q → e.α}
@@ -173,7 +175,7 @@ variable {nr : ℕ}
 /-- **An element loop's rules are definable**: the read trips by
 `DescriptiveComplexity.Draw.ReadKit.uRuleDefinable`, and the three checkpoints –
 the entry, each read's verdict exit and the fold – by the dispatch shape. -/
-theorem uRulesDefinable_elemRule {wk rg : W} {emb : ElemPh nr → P}
+private theorem uRulesDefinable_elemRule {wk rg : W} {emb : ElemPh nr → P}
     {rdTrack : Fin nr → W}
     {MatchOf : Fin nr → ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     {setFlag : ∀ e : Env L, Fin nr → Bool → (Q → e.α) → (W → e.α) → Q → e.α}
@@ -233,7 +235,7 @@ variable {T : Type} {m : ℕ} {nrOf : T → ℕ}
 the read kit, the branch checkpoint by the dispatch shape – one dispatch per
 tag, each guarded by the caller's decoding question – and the loops by
 `DescriptiveComplexity.Draw.uRulesDefinable_elemRule`. -/
-theorem uRulesDefinable_tagRule {wk rg : W} {emb : TagPh m T nrOf → P}
+private theorem uRulesDefinable_tagRule {wk rg : W} {emb : TagPh m T nrOf → P}
     {rdTrackT : Fin m → W}
     {MatchT : Fin m → ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     {setTagFlag : ∀ e : Env L, Fin m → Bool → (Q → e.α) → (W → e.α) → Q → e.α}
@@ -291,7 +293,7 @@ section Tuple
 
 /-- **A tuple loop's stages are definable**: the read trip storing its bit and
 the write trip handing it back. -/
-theorem uRulesDefinable_tupleStageRule [DecidableEq W] {wk rg tSrc tDst : W}
+private theorem uRulesDefinable_tupleStageRule [DecidableEq W] {wk rg tSrc tDst : W}
     {emb : ChainPh 3 TuplePS → P}
     {MatchS MatchD : ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     {bitFlag : ∀ e : Env L, (Q → e.α) → Prop}
@@ -320,7 +322,7 @@ theorem uRulesDefinable_tupleStageRule [DecidableEq W] {wk rg tSrc tDst : W}
 
 /-- **A tuple loop's dispatch descriptors are definable**: begin, hand over,
 advance or leave. -/
-theorem uPreDefinable_tupleDsp {wk rg : W} {emb : ChainPh 3 TuplePS → P}
+private theorem uPreDefinable_tupleDsp {wk rg : W} {emb : ChainPh 3 TuplePS → P}
     {initLv advLv : ∀ e : Env L, (Q → e.α) → (W → e.α) → Q → e.α}
     {IsMaxLv : ∀ e : Env L, (Q → e.α) → Prop} {exitPh : P}
     (hinit : UStDefinable initLv) (hadv : UStDefinable advLv)
@@ -354,7 +356,7 @@ theorem uPreDefinable_tupleDsp {wk rg : W} {emb : ChainPh 3 TuplePS → P}
       hg.and hmax, uStDefinable_id, hkeep⟩
 
 /-- **A tuple loop's rules are definable**, the chain over its two stages. -/
-theorem uRulesDefinable_tupleRule [DecidableEq W] {wk rg tSrc tDst : W}
+private theorem uRulesDefinable_tupleRule [DecidableEq W] {wk rg tSrc tDst : W}
     {emb : ChainPh 3 TuplePS → P}
     {MatchS MatchD : ∀ e : Env L, (Q → e.α) → (W → e.α) → Prop}
     {bitFlag : ∀ e : Env L, (Q → e.α) → Prop}

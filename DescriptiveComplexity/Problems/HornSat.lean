@@ -12,6 +12,9 @@ import DescriptiveComplexity.Problems.HornSat.Definability
 public import DescriptiveComplexity.FixedPoint
 import DescriptiveComplexity.FixedPointHorn
 import DescriptiveComplexity.Problems.HornSat.Hardness
+import all DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.HornSat.Definability
+import all DescriptiveComplexity.Problems.HornSat.Membership
 
 /-!
 # HORN-SAT
@@ -133,7 +136,7 @@ theorem coPTIME_subset_NP : PiP 0 ⊆ NP := by
     hornSat_compl_mem_NP
 
 /-- `PiP 0 ⊆ PH`, the level-0 case of `DescriptiveComplexity.piP_subset_PH`. -/
-theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
+private theorem piP_zero_subset_PH : PiP 0 ⊆ PH :=
   fun _ _ _ hP => ⟨1, coPTIME_subset_NP hP⟩
 
 /-! ### Monotonicity of the hierarchy
@@ -146,13 +149,13 @@ therefore has to happen here, downstream of the Horn discharge. -/
 
 /-- One step up, at every level: `Σₖᵖ ⊆ Σₖ₊₁ᵖ`, by padding above level 0 and by
 the Horn discharge at level 0. -/
-theorem sigmaP_subset_succ (k : ℕ) : SigmaP k ⊆ SigmaP (k + 1) := by
+private theorem sigmaP_subset_succ (k : ℕ) : SigmaP k ⊆ SigmaP (k + 1) := by
   cases k with
   | zero => exact PTIME_subset_NP
   | succ k => exact sigmaP_subset_sigmaP_succ k
 
 /-- One step up on the `Π` side: `Πₖᵖ ⊆ Πₖ₊₁ᵖ`. -/
-theorem piP_subset_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
+private theorem piP_subset_succ (k : ℕ) : PiP k ⊆ PiP (k + 1) := by
   cases k with
   | zero => exact coPTIME_subset_coNP
   | succ k => exact piP_subset_piP_succ k
@@ -181,12 +184,12 @@ theorem piP_mono {j k : ℕ} (h : j ≤ k) : PiP j ⊆ PiP k := by
 level, so `DescriptiveComplexity.sigmaP_mono` does not apply as it stands.
 Registered in the Lax archive as
 [`Lax564036.PolynomialTimeInHierarchy.PTIME_subset_sigmaP`](https://laxarchive.org/lax-564036/Lax564036.PolynomialTimeInHierarchy.html#s-Lax564036.PolynomialTimeInHierarchy.PTIME_subset_sigmaP). -/
-theorem PTIME_subset_sigmaP (k : ℕ) : PTIME ⊆ SigmaP k :=
+private theorem PTIME_subset_sigmaP (k : ℕ) : PTIME ⊆ SigmaP k :=
   sigmaP_mono (Nat.zero_le k)
 
 /-- **`co-PTIME ⊆ Πₖᵖ`** at every level, the mirror of
 `DescriptiveComplexity.PTIME_subset_sigmaP`. -/
-theorem piP_zero_subset_piP (k : ℕ) : PiP 0 ⊆ PiP k :=
+private theorem piP_zero_subset_piP (k : ℕ) : PiP 0 ⊆ PiP k :=
   piP_mono (Nat.zero_le k)
 
 /-- HORN-SAT is FO(LFP) definable, being SO-Horn definable. -/

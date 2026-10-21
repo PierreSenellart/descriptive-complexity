@@ -9,6 +9,8 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Pcp.Hardness.Match
 public import DescriptiveComplexity.Ordered
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Pcp.Hardness.Draw
+import all DescriptiveComplexity.Problems.Pcp.Hardness.Match
 
 /-!
 # The interpretation: drawing the domino system first-order
@@ -312,7 +314,7 @@ def posTagN : ℕ → PTag
   | _ => .pos7
 
 /-- The shared positions are the constants of their tags. -/
-theorem posE_eq {A : Type} [LinearOrder A] [Finite A] [Nonempty A] :
+private theorem posE_eq {A : Type} [LinearOrder A] [Finite A] [Nonempty A] :
     ∀ i : ℕ, posE (A := A) i = cstE (posTagN i)
   | 0 => rfl
   | 1 => rfl
@@ -440,7 +442,7 @@ section LetterRealize
 variable {A : Type} [Language.turing.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 variable {v : Fin 3 × Fin 5 → A} {wd wp wc : Fin 5 → A}
 
-theorem realize_minAllF {k : Fin 3} {w : Fin 5 → A} (hv : ∀ j, v (k, j) = w j) :
+private theorem realize_minAllF {k : Fin 3} {w : Fin 5 → A} (hv : ∀ j, v (k, j) = w j) :
     (minAllF k).Realize v ↔ w = fun _ => pbot := by
   rw [minAllF]
   simp only [Formula.realize_inf, realize_minF, hv]
@@ -452,7 +454,7 @@ theorem realize_minAllF {k : Fin 3} {w : Fin 5 → A} (hv : ∀ j, v (k, j) = w 
     rw [h]
     exact ⟨pbot_le, pbot_le, pbot_le, pbot_le, pbot_le⟩
 
-theorem realize_minTailF {k : Fin 3} {w : Fin 5 → A} (hv : ∀ j, v (k, j) = w j) :
+private theorem realize_minTailF {k : Fin 3} {w : Fin 5 → A} (hv : ∀ j, v (k, j) = w j) :
     (minTailF k).Realize v ↔ (w 1 = pbot ∧ w 2 = pbot ∧ w 3 = pbot ∧ w 4 = pbot) := by
   rw [minTailF]
   simp only [Formula.realize_inf, realize_minF, hv]
@@ -462,14 +464,14 @@ theorem realize_minTailF {k : Fin 3} {w : Fin 5 → A} (hv : ∀ j, v (k, j) = w
 omit [Language.turing.Structure A] in
 /-- A pair with the right tag is a constant element exactly when its tuple is
 padding. -/
-theorem eq_cstE_iff {t t' : PTag} {w : Fin 5 → A} :
+private theorem eq_cstE_iff {t t' : PTag} {w : Fin 5 → A} :
     ((t, w) : PV A) = cstE t' ↔ t = t' ∧ w = fun _ => pbot := by
   rw [cstE, Prod.mk.injEq]
 
 omit [Language.turing.Structure A] in
 /-- A pair with the right tag carries an element exactly when its head
 coordinate is it and its tail is padding. -/
-theorem eq_idxE_iff {t t' : PTag} {w : Fin 5 → A} {a : A} :
+private theorem eq_idxE_iff {t t' : PTag} {w : Fin 5 → A} {a : A} :
     ((t, w) : PV A) = idxE t' a ↔
       t = t' ∧ w 0 = a ∧ w 1 = pbot ∧ w 2 = pbot ∧ w 3 = pbot ∧ w 4 = pbot := by
   rw [idxE, Prod.mk.injEq]
@@ -481,7 +483,7 @@ theorem eq_idxE_iff {t t' : PTag} {w : Fin 5 → A} {a : A} :
     fin_cases j <;> simpa
   
 
-theorem realize_cstLF {s tc : PTag} (hv2 : ∀ j, v (2, j) = wc j) :
+private theorem realize_cstLF {s tc : PTag} (hv2 : ∀ j, v (2, j) = wc j) :
     (cstLF s tc).Realize v ↔ ((tc, wc) : PV A) = cstE s := by
   rw [cstLF]
   by_cases htc : tc = s
@@ -492,7 +494,7 @@ theorem realize_cstLF {s tc : PTag} (hv2 : ∀ j, v (2, j) = wc j) :
     rw [eq_cstE_iff]
     exact fun h => htc h.1
 
-theorem realize_idxLF {s : PTag} {j : Fin 5} {tc : PTag}
+private theorem realize_idxLF {s : PTag} {j : Fin 5} {tc : PTag}
     (hv0 : ∀ i, v (0, i) = wd i) (hv2 : ∀ i, v (2, i) = wc i) :
     (idxLF s j tc).Realize v ↔ ((tc, wc) : PV A) = idxE s (wd j) := by
   rw [idxLF]
@@ -509,14 +511,14 @@ theorem realize_idxLF {s : PTag} {j : Fin 5} {tc : PTag}
     rw [eq_idxE_iff]
     exact fun h => htc h.1
 
-theorem realize_specF {sp : LSpec} {tc : PTag}
+private theorem realize_specF {sp : LSpec} {tc : PTag}
     (hv0 : ∀ i, v (0, i) = wd i) (hv2 : ∀ i, v (2, i) = wc i) :
     (specF sp tc).Realize v ↔ ((tc, wc) : PV A) = sp.eval wd := by
   cases sp with
   | cst s => exact realize_cstLF hv2
   | idx s j => exact realize_idxLF hv0 hv2
 
-theorem realize_posIsF {i : ℕ} {tp : PTag} (hv1 : ∀ j, v (1, j) = wp j) :
+private theorem realize_posIsF {i : ℕ} {tp : PTag} (hv1 : ∀ j, v (1, j) = wp j) :
     (posIsF i tp).Realize v ↔ ((tp, wp) : PV A) = posE i := by
   rw [posIsF, posE_eq]
   by_cases htp : tp = posTagN i
@@ -527,7 +529,7 @@ theorem realize_posIsF {i : ℕ} {tp : PTag} (hv1 : ∀ j, v (1, j) = wp j) :
     rw [eq_cstE_iff]
     exact fun h => htp h.1
 
-theorem realize_specListF {specs : List LSpec} {i : ℕ} {tp tc : PTag}
+private theorem realize_specListF {specs : List LSpec} {i : ℕ} {tp tc : PTag}
     (hv0 : ∀ j, v (0, j) = wd j) (hv1 : ∀ j, v (1, j) = wp j)
     (hv2 : ∀ j, v (2, j) = wc j) :
     (specListF specs i tp tc).Realize v ↔
@@ -543,14 +545,14 @@ theorem realize_specListF {specs : List LSpec} {i : ℕ} {tp tc : PTag}
 
 omit [Language.turing.Structure A] in
 /-- The top table relation, in terms of `List.range'`. -/
-theorem pUAt_iff_range' {d p c : PV A} :
+private theorem pUAt_iff_range' {d p c : PV A} :
     PUAt d p c ↔ (p, c) ∈
       ((List.range' 0 (uSpec d.1).length).map posE).zip
         ((uSpec d.1).map (LSpec.eval d.2)) := by
   rw [PUAt, posPrefix, List.range_eq_range']
   exact Iff.rfl
 
-theorem realize_uAtF {td tp tc : PTag}
+private theorem realize_uAtF {td tp tc : PTag}
     (hv0 : ∀ j, v (0, j) = wd j) (hv1 : ∀ j, v (1, j) = wp j)
     (hv2 : ∀ j, v (2, j) = wc j) :
     (uAtF td tp tc).Realize v ↔ PUAt ((td, wd) : PV A) (tp, wp) (tc, wc) := by
@@ -558,14 +560,14 @@ theorem realize_uAtF {td tp tc : PTag}
   exact realize_specListF hv0 hv1 hv2
 
 /-- The bottom table relation, in terms of `List.range'`. -/
-theorem pVAt_iff_range' {d p c : PV A} (hne : d.1 ≠ .dStart) :
+private theorem pVAt_iff_range' {d p c : PV A} (hne : d.1 ≠ .dStart) :
     PVAt d p c ↔ (p, c) ∈
       ((List.range' 0 (vSpec d.1).length).map posE).zip
         ((vSpec d.1).map (LSpec.eval d.2)) := by
   rw [pVAt_of_ne hne, posPrefix, List.range_eq_range']
   exact Iff.rfl
 
-theorem realize_startBotF {tp tc : PTag}
+private theorem realize_startBotF {tp tc : PTag}
     (hv1 : ∀ j, v (1, j) = wp j) (hv2 : ∀ j, v (2, j) = wc j) :
     (startBotF tp tc).Realize v ↔ StartBotAt ((tp, wp) : PV A) (tc, wc) := by
   have hcst : ∀ s s' : PTag,
@@ -646,7 +648,7 @@ theorem realize_startBotF {tp tc : PTag}
   | dEraseSymR => exact iff_of_false (fun h => h) (fun h => h)
   | dEraseRgt => exact iff_of_false (fun h => h) (fun h => h)
 
-theorem realize_vAtF {td tp tc : PTag}
+private theorem realize_vAtF {td tp tc : PTag}
     (hv0 : ∀ j, v (0, j) = wd j) (hv1 : ∀ j, v (1, j) = wp j)
     (hv2 : ∀ j, v (2, j) = wc j) :
     (vAtF td tp tc).Realize v ↔ PVAt ((td, wd) : PV A) (tp, wp) (tc, wc) := by
@@ -767,7 +769,7 @@ variable (A : Type) [Language.turing.Structure A] [LinearOrder A] [Finite A] [No
 /-- **The interpreted structure reads as the drawn instance**: each relation
 of `Language.pcp`, realized through the defining formulas, is the semantic
 predicate of the drawing. -/
-theorem reads_haltPcp :
+private theorem reads_haltPcp :
     Reads (B := haltPcpInterp.Map A) (Equiv.refl (PV A)) where
   ord x y := by
     rw [Pcp.Ord, FOInterpretation.relMap_map]
@@ -783,7 +785,7 @@ theorem reads_haltPcp :
     exact realize_vAtF (fun j => rfl) (fun j => rfl) (fun j => rfl)
 
 /-- **The image is a yes-instance exactly when the machine halts.** -/
-theorem pcp_map_iff :
+private theorem pcp_map_iff :
     PCP (haltPcpInterp.Map A) ↔ (tmData A).WellFormed ∧ (tmData A).AcceptsU :=
   pcpOn_iff_of_reads (reads_haltPcp A)
 

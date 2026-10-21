@@ -8,6 +8,11 @@ module
 import DescriptiveComplexity.Problems.Sat.CountingHardness
 public import DescriptiveComplexity.Problems.Machine.CountingHardness
 public import DescriptiveComplexity.Counting.DecisionClasses
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Class
+import all DescriptiveComplexity.Counting.DecisionClasses
+import all DescriptiveComplexity.Problems.Machine.CountingHardness
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
 
 /-!
 # ⊕SAT and Mod_k-SAT: complete problems for the classes defined by one count
@@ -69,13 +74,13 @@ count. -/
 noncomputable abbrev countClass₁ (R : ℕ → Prop) : ComplexityClass :=
   countClass (fun _ _ => True) fun c _ => R c
 
-theorem parityP_eq : ParityP = countClass₁ Odd := rfl
+private theorem parityP_eq : ParityP = countClass₁ Odd := rfl
 
-theorem modP_eq (k : ℕ) : ModP k = countClass₁ fun c => ¬ k ∣ c := rfl
+private theorem modP_eq (k : ℕ) : ModP k = countClass₁ fun c => ¬ k ∣ c := rfl
 
 /-- The decision version of a problem of `#P` is in the class of its
 property. -/
-theorem decide_mem_countClass₁ (R : ℕ → Prop) {C : CountingProblem L} (hC : C ∈ SharpP) :
+private theorem decide_mem_countClass₁ (R : ℕ → Prop) {C : CountingProblem L} (hC : C ∈ SharpP) :
     C.decide R ∈ countClass₁ R :=
   mem_countClass_of_sharpP hC hC fun _ _ _ _ => ⟨trivial, Iff.rfl⟩
 
@@ -96,7 +101,7 @@ def RelOrderedParsimoniousReduction.decide (R : ℕ → Prop) {C : CountingProbl
 
 /-- An ordered parsimonious reduction is an ordered first-order reduction
 between the decision versions by any property. -/
-def OrderedParsimoniousReduction.decide (R : ℕ → Prop) {C : CountingProblem L}
+private def OrderedParsimoniousReduction.decide (R : ℕ → Prop) {C : CountingProblem L}
     {D : CountingProblem L'} (f : C ≤ᵖ[≤] D) : C.decide R ≤ᶠᵒ[≤] D.decide R :=
   letI := f.tagFinite
   letI := f.tagNonempty
@@ -130,7 +135,7 @@ noncomputable def CountDefinable.orderedReduction_decide_sharpSat (R : ℕ → P
       sharpSat_sharpTseitin B φ A]
 
 /-- The decision version of `#SAT` by `R` is hard for the class of `R`. -/
-theorem decide_sharpSat_countClass₁_hard (R : ℕ → Prop) :
+private theorem decide_sharpSat_countClass₁_hard (R : ℕ → Prop) :
     (countClass₁ R).Hard (SharpSAT.decide R) := by
   rw [hard_countClass_iff]
   rintro L'' _ Q ⟨B, φ, B', φ', hφ⟩
@@ -159,7 +164,7 @@ end Sat
 /-- **The machine characterization of the class of `R`**: a problem is in it
 exactly when it reduces to the decision version by `R` of the number of
 accepting runs of a nondeterministic machine. -/
-theorem mem_countClass₁_iff_le_decide_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational]
+private theorem mem_countClass₁_iff_le_decide_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational]
     (R : ℕ → Prop) (P : DecisionProblem L) :
     P ∈ countClass₁ R ↔ Nonempty (P ≤ᶠᵒ[≤] SharpNTMAccept.decide R) := by
   constructor
@@ -214,7 +219,7 @@ theorem mem_parityP_iff_le_parity_sharpNtmAccept {L : Language.{0, 0}} [L.IsRela
 /-- **The machine characterization of `Mod_k P`**.
 Registered in the Lax archive as
 [`Lax175070.ParitySatComplete.mem_modP_iff_le_mod_sharpNtmAccept`](https://laxarchive.org/lax-175070/Lax175070.ParitySatComplete.html#s-Lax175070.ParitySatComplete.mem_modP_iff_le_mod_sharpNtmAccept). -/
-theorem mem_modP_iff_le_mod_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational] (k : ℕ)
+private theorem mem_modP_iff_le_mod_sharpNtmAccept {L : Language.{0, 0}} [L.IsRelational] (k : ℕ)
     (P : DecisionProblem L) :
     P ∈ ModP k ↔ Nonempty (P ≤ᶠᵒ[≤] SharpNTMAccept.decide fun c => ¬ k ∣ c) :=
   mem_countClass₁_iff_le_decide_sharpNtmAccept _ P

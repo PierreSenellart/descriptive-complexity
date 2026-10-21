@@ -10,6 +10,9 @@ import DescriptiveComplexity.Problems.OneInSat.Slots
 import DescriptiveComplexity.Problems.OneInSat.Reduction
 import DescriptiveComplexity.Problems.ThreeSat
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.OneInSat.Reduction
+import all DescriptiveComplexity.Problems.ThreeSat
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
 
 /-!
 # 1-in-SAT is NP-complete

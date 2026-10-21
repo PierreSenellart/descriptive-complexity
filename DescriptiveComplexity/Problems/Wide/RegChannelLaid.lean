@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Wide.RegChannel
 import DescriptiveComplexity.Problems.Wide.DrawBack
 import DescriptiveComplexity.Problems.Wide.LowFile
 public import DescriptiveComplexity.Problems.Wide.DrawName
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawSlots
+import all DescriptiveComplexity.Problems.Wide.RegChannel
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The file of the register channel, laid out
@@ -72,7 +76,8 @@ variable {hord : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y ↔ tagTupleLe x 
 
 /-- **The file's layout order is linear**, being the universe's own read on a
 subtype. -/
-theorem isLinOrd_regLaid_le : IsLinOrd (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le :=
+private theorem isLinOrd_regLaid_le
+    : IsLinOrd (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le :=
   ⟨fun u => (Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx) (A := A) (d := dt.dd)).1 u.1,
     fun u v w h1 h2 => (Wide.isLinOrd_tagTupleLe (Tag := Tag R' P' dt.KIx)
       (A := A) (d := dt.dd)).2.1 u.1 v.1 w.1 h1 h2,
@@ -83,7 +88,7 @@ theorem isLinOrd_regLaid_le : IsLinOrd (dt.regLaid (A := A) (R' := R') (P' := P'
 
 /-- **The file's marks tell its registers apart**: a register *is* an element, so
 its block and its named coordinates spell it. -/
-theorem nameSep_regLaid (zero : A) (hdd : dt.dd0 ≤ dt.dd) :
+private theorem nameSep_regLaid (zero : A) (hdd : dt.dd0 ≤ dt.dd) :
     (dt.regLaid (A := A) (R' := R') (P' := P') h hord).toLayout.NameSep zero hdd :=
   fun _ _ _ hb hb' hp hp' hn =>
     Subtype.ext (eq_of_slotMark_name (hdd := hdd) (hb.trans hb'.symm) hb hn hp hp')
@@ -112,7 +117,7 @@ marks are «the argument elements **and one element below them**» rather than t
 argument elements alone: with the latter the least marked element would itself be
 an argument element, and an address holding it would be a register's neighbor
 instead of lying under the file. -/
-theorem work_regLaid {bot : Univ A R' P' dt.KIx dt.dd} (hbot : WMHasInp bot)
+private theorem work_regLaid {bot : Univ A R' P' dt.KIx dt.dd} (hbot : WMHasInp bot)
     (hleast : ∀ y : Univ A R' P' dt.KIx dt.dd, WMHasInp y → WMLe bot y)
     (hbotarg : ∀ i : dt.KIx, bot.1 ≠ Tag.arg i)
     {r : Univ A R' P' dt.KIx dt.dd → Prop}
@@ -133,7 +138,7 @@ variable (dt) in
 /-- **The registers an address uses**: the ones standing for argument elements.
 The register below them – the one the reduction marks so that the file lies
 above the working area – is never part of a logical address. -/
-def RegUse (u : dt.RegIx (A := A) (R' := R') (P' := P')) : Prop :=
+private def RegUse (u : dt.RegIx (A := A) (R' := R') (P' := P')) : Prop :=
   ∃ i : dt.KIx, (u.1).1 = Tag.arg i
 
 /-- **A named register stands for the element it names**: the `heltP`
@@ -152,13 +157,13 @@ theorem elt_reg_regLaid (zero : A)
 
 /-- **A register's block is the block of the element it stands for**: the
 `hblkP` coherence, both sides being the tag's own block. -/
-theorem blk_regLaid_eq_tagBlk (u : dt.RegIx (A := A) (R' := R') (P' := P')) :
+private theorem blk_regLaid_eq_tagBlk (u : dt.RegIx (A := A) (R' := R') (P' := P')) :
     (dt.regLaid (A := A) (R' := R') (P' := P') h hord).blk u = tagBlk (u.1).1 := rfl
 
 /-- **The registers are ordered like the elements they stand for**: the `hmono`
 coherence, which at this file is the channel's own agreement between the tag
 order and the address order. -/
-theorem mono_regLaid (u u' : dt.RegIx (A := A) (R' := R') (P' := P')) :
+private theorem mono_regLaid (u u' : dt.RegIx (A := A) (R' := R') (P' := P')) :
     WMLt (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le u u' ↔
       WMLt WMLe (u.1 : Univ A R' P' dt.KIx dt.dd) u'.1 := by
   unfold WMLt
@@ -170,7 +175,7 @@ include hord in
 /-- **Nothing above a used register escapes the file**: the argument tags come
 last, so an element above an argument element is an argument element, and the
 reduction marks all of them. This is the `hup` coherence. -/
-theorem up_regLaid
+private theorem up_regLaid
     (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd, (∃ i : dt.KIx, x.1 = Tag.arg i) →
       WMHasInp x)
     {u : dt.RegIx (A := A) (R' := R') (P' := P')} (hu : dt.RegUse u)
@@ -190,7 +195,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] [Finite A] [Finite R']
   [Finite P'] [Finite dt.KIx] in
 /-- **A logical address is held by the file's registers**: the `hvh`
 coherence. -/
-theorem ixHolds_regLaid
+private theorem ixHolds_regLaid
     (hargall : ∀ x : Univ A R' P' dt.KIx dt.dd, (∃ i : dt.KIx, x.1 = Tag.arg i) →
       WMHasInp x)
     {s : Univ A R' P' dt.KIx dt.dd → Prop}
@@ -201,7 +206,7 @@ theorem ixHolds_regLaid
 
 /-- **A named register is a used one**: it stands for an argument element. This
 is the `hxdUse` the stage atom's destination registers ask for. -/
-theorem regUse_reg_regLaid (zero : A)
+private theorem regUse_reg_regLaid (zero : A)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
       WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd))
@@ -226,7 +231,7 @@ noncomputable def regBound : ℕ := 2 ^ Nat.card (dt.RegIx (A := A) (R' := R') (
 /-- **Every register of the file lies below the bound**: its address is
 supported on the elements the channel writes for, and so is every address below
 it once those are upward closed. -/
-theorem wideRank_regLaid_cell_lt
+private theorem wideRank_regLaid_cell_lt
     (hup : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y → WMHasInp x → WMHasInp y)
     (u : dt.RegIx (A := A) (R' := R') (P' := P')) :
     wideRank ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell u) <
@@ -238,7 +243,7 @@ registers differ by one bit of the address, and the whole file is below the
 bound. This is the `w` of every budgeted walk, where a file laid on consecutive
 addresses has `w = 1` and pays the difference in the number of registers
 instead. -/
-theorem gap_regLaid
+private theorem gap_regLaid
     (hup : ∀ x y : Univ A R' P' dt.KIx dt.dd, WMLe x y → WMHasInp x → WMHasInp y)
     (u u' : dt.RegIx (A := A) (R' := R') (P' := P')) :
     wideRank ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell u') -
@@ -295,7 +300,7 @@ private theorem regSpan_le :
 
 include hup in
 /-- **The pass over the file fits `regWP`.** -/
-theorem hwP_regLaid :
+private theorem hwP_regLaid :
     wideRank ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell gtop) + 2 +
         ((ixRank (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le gtop -
             ixRank (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le gbot) *
@@ -310,7 +315,7 @@ theorem hwP_regLaid :
 
 include hup in
 /-- **A read below the file fits `regWR`.** -/
-theorem hwR_regLaid (s : Univ A R' P' dt.KIx dt.dd → Prop)
+private theorem hwR_regLaid (s : Univ A R' P' dt.KIx dt.dd → Prop)
     (hs : WMSetLt WMLe s ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell gbot)) :
     wideRank s + 4 ≤ dt.regWR (A := A) (R' := R') (P' := P') := by
   have h1 := dt.wideRank_regLaid_cell_lt h hord hup gbot
@@ -322,7 +327,7 @@ theorem hwR_regLaid (s : Univ A R' P' dt.KIx dt.dd → Prop)
 
 include hup in
 /-- **A stage's inner loop fits `regWK`.** -/
-theorem hwK_regLaid (T : Univ A R' P' dt.KIx dt.dd → Prop)
+private theorem hwK_regLaid (T : Univ A R' P' dt.KIx dt.dd → Prop)
     (hT : WMSetLt WMLe T ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell gbot)) :
     wideRank T *
         (1 + (wideRank ((dt.regLaid (A := A) (R' := R') (P' := P') h hord).cell gtop) + 3 +
@@ -353,7 +358,7 @@ theorem hwK_regLaid (T : Univ A R' P' dt.KIx dt.dd → Prop)
 
 include hup in
 /-- **A walk to a register fits `regW`.** -/
-theorem hcostR_regLaid (zero : A)
+private theorem hcostR_regLaid (zero : A)
     (harg : ∀ (b : Fin dt.ko ⊕ Fin dt.ki) (c : Fin dt.dd0 → A),
       WMHasInp ((Tag.arg (toLex b), padTup (dt := dt) zero c) :
         Univ A R' P' dt.KIx dt.dd))
@@ -381,7 +386,7 @@ variable (h) (hord)
 
 /-- **The file has a greatest register**, the marked elements being finitely
 many and linearly ordered. -/
-theorem exists_regTop (hne : ∃ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x) :
+private theorem exists_regTop (hne : ∃ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x) :
     ∃ g : dt.RegIx (A := A) (R' := R') (P' := P'),
       ∀ u, (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le u g := by
   obtain ⟨x, hx⟩ := hne
@@ -392,7 +397,7 @@ theorem exists_regTop (hne : ∃ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x) :
 
 /-- **The file has a least register**, the one the reduction places below the
 argument elements. -/
-theorem exists_regBot (hne : ∃ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x) :
+private theorem exists_regBot (hne : ∃ x : Univ A R' P' dt.KIx dt.dd, WMHasInp x) :
     ∃ g : dt.RegIx (A := A) (R' := R') (P' := P'),
       ∀ u, (dt.regLaid (A := A) (R' := R') (P' := P') h hord).le g u := by
   obtain ⟨x, hx⟩ := hne

@@ -9,6 +9,9 @@ public import DescriptiveComplexity.Problems.Wide.TilingHard.Draw
 import DescriptiveComplexity.Problems.Wide.TilingHard.No
 import DescriptiveComplexity.Problems.Wide.TilingExp
 public import DescriptiveComplexity.Problems.Wide.RegChannelReduce
+import all DescriptiveComplexity.Problems.Wide.RegChannelReduce
+import all DescriptiveComplexity.Problems.Wide.RegChannelTape
+import all DescriptiveComplexity.Problems.Wide.TilingExp
 
 /-!
 # Tiling a wide square is NEXPTIME-complete
@@ -76,7 +79,7 @@ variable (A : Type) [Language.wide.Structure A] [LinearOrder A]
 /-- **The interpreted structure is the emitted one**: the identity map is an
 isomorphism, since every symbol's formula was checked against the predicate it
 draws. -/
-noncomputable def tileEquivOf (F : TilePt A → TilePt A → Prop)
+private noncomputable def tileEquivOf (F : TilePt A → TilePt A → Prop)
     (fF : TileTag → TileTag → wideOrd.Formula (Fin 2 × Fin 3))
     (hF : ∀ (v : Fin 2 × Fin 3 → A) (t₁ t₂ : TileTag),
       (fF t₁ t₂).Realize v ↔ F (argPt v t₁ 0) (argPt v t₂ 1)) :
@@ -123,20 +126,20 @@ noncomputable def tileEquivOf (F : TilePt A → TilePt A → Prop)
         exact Iff.rfl }
 
 /-- The clocked machine's drawing, as an isomorphism. -/
-noncomputable def tileEquiv :
+private noncomputable def tileEquiv :
     letI := tileStr A
     ((tileInterp.Map A) ≃[Language.wtile] (TilePt A)) :=
   tileEquivOf A TPFirst firstF fun _ _ _ => realize_firstF
 
 /-- And the space-bounded machine's. -/
-noncomputable def tileEquivR :
+private noncomputable def tileEquivR :
     letI := tileStrR A
     ((tileInterpR.Map A) ≃[Language.wtile] (TilePt A)) :=
   tileEquivOf A TPFirstR firstRF fun _ _ _ => realize_firstRF
 
 /-- **The interpreted structure is a yes-instance exactly when the emitted one
 is.** -/
-theorem wideTiling_map_iff [Finite A] [Nonempty A] :
+private theorem wideTiling_map_iff [Finite A] [Nonempty A] :
     letI := tileStr A
     (WideTiling (tileInterp.Map A) ↔ WideTiling (TilePt A)) :=
   letI := tileStr A
@@ -156,7 +159,7 @@ open TilingHard
 The universe is three-dimensional – a tag with a symbol, a state and a
 transition – and the machine's promises ride on the start tile, so a
 no-instance's drawing has no corner and hence no tiling. -/
-noncomputable def wideRegAccept_ordered_fo_reduction_wideTiling :
+private noncomputable def wideRegAccept_ordered_fo_reduction_wideTiling :
     WideRegAccept ≤ᶠᵒ[≤] WideTiling where
   Tag := TileTag
   dim := 3

@@ -9,6 +9,8 @@ import DescriptiveComplexity.Problems.MaxCut.Defs
 import DescriptiveComplexity.Problems.MaxCut.Membership
 public import DescriptiveComplexity.Problems.MaxCut.Reduction
 import DescriptiveComplexity.Problems.NaeThreeSat
+import all DescriptiveComplexity.Problems.MaxCut.Reduction
+import all DescriptiveComplexity.Problems.NaeThreeSat
 
 /-!
 # Max Cut is NP-complete

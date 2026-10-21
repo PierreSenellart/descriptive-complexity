@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameRun
+import all DescriptiveComplexity.Exponential.AltQuant
+import all DescriptiveComplexity.Exponential.GameCtrl
+import all DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Exponential.GameRun
+import all DescriptiveComplexity.Exponential.GameTape
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Reading a win back: the phases of a question
@@ -102,7 +108,7 @@ local notation "𝕄" => gameMachine vars pol a₀ hdim (gameRule vars natoms co
 
 omit [Finite A] in
 /-- A configuration of the control accepts only in the accepting phase. -/
-theorem not_acc_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
+private theorem not_acc_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
     {c : Config (GamePt B V M A)} (h : CtrlCfg a₀ hdim vars ρ σ p vv c)
     (hk : p.kind ≠ .acc) : ¬ (𝕄).Acc c.state := by
   rintro ⟨ph, hph, hkind⟩
@@ -114,7 +120,7 @@ theorem not_acc_ctrlCfg {p : MachPh V M} {vv : Fin (gameDim B V) → A}
 omit [Finite A] in
 /-- **What a step of a seek may be**: it stays in the phase with the tape
 untouched, or it is the arrival at the cell the seek was looking for. -/
-theorem seekCfg_cases (h₀ : IsBot a₀) {ph : MachPh V M} (hk : ph.kind = .seek)
+private theorem seekCfg_cases (h₀ : IsBot a₀) {ph : MachPh V M} (hk : ph.kind = .seek)
     (hmark : ∀ (b : Bool) (w : Fin (gameDim B V) → A), ¬ isTarget ph (SymTag.mark b) w)
     {vv : Fin (gameDim B V) → A} (hcv : Canon (MachPh.arity vars ph) vv)
     {c c' : Config (GamePt B V M A)} (hstate : c.state = phasePt ph vv)
@@ -225,7 +231,7 @@ omit [Finite A] in
 /-- **A rewind either walks on or hands over**, and either way the tape is
 untouched – both its rules write back what they read. The handover lands on the
 lowest position, which is what the two sentinels being adjacent buys. -/
-theorem rewindCfg_cases (h₀ : IsBot a₀) {r tgt : Bool} {cont : SweepCont} {par : Bool}
+private theorem rewindCfg_cases (h₀ : IsBot a₀) {r tgt : Bool} {cont : SweepCont} {par : Bool}
     {c c' : Config (GamePt B V M A)}
     (hstate : c.state = phasePt (MachPh.rewindPh r tgt cont par) (fun _ => a₀))
     (hpos : (𝕄).Posn c.head)
@@ -290,7 +296,7 @@ omit [Finite A] in
 owns it: the universal one because every successor wins, the existential one
 because the successor it chose is that one. The valuation is carried over
 because the two phases declare the same coordinates. -/
-theorem exists_altWin_succ_uniq (h₀ : IsBot a₀) {p p' : MachPh V M}
+private theorem exists_altWin_succ_uniq (h₀ : IsBot a₀) {p p' : MachPh V M}
     {vv : Fin (gameDim B V) → A} {c : Config (GamePt B V M A)}
     (hsw : p.kind ≠ .sweep) (hrw : p.kind ≠ .rewind) (hsk : p.kind ≠ .seek)
     (hnc : p.kind ≠ .conc) (hna : p.kind ≠ .acc)

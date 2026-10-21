@@ -10,6 +10,9 @@ public import DescriptiveComplexity.Problems.Machine.Fixpoint
 public import DescriptiveComplexity.Problems.CircuitNumber.Membership
 import Mathlib.Tactic.FinCases
 import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Problems.CircuitNumber.Membership
+import all DescriptiveComplexity.Problems.Machine.Fixpoint
+import all DescriptiveComplexity.Problems.MachineNumber.Defs
 
 /-!
 # The number written by a machine is in FP
@@ -319,7 +322,7 @@ theorem realize_lowF (w u : Fin 1 → A) :
 omit [Nonempty A] in
 open Classical in
 /-- **The definition computes the number written by the machine.** -/
-theorem numDef_value : numDef.value A = machineNumber A := by
+private theorem numDef_value : numDef.value A = machineNumber A := by
   let := outStr A
   have hprod : ∀ w : Fin 1 → A,
       ∏ᶠ u : Fin 1 → A, ((if LowerCell (w 0) (u 0) then 1 else 0) + 1) = 2 ^ cellRank (w 0) :=

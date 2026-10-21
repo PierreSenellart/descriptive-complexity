@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.SecondOrderNew
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Relativization of a formula to a unary predicate
@@ -69,7 +70,7 @@ def relativizeTo (R : L.Relations 1) :
 
 variable {M : Type} [L.Structure M] {R : L.Relations 1}
 
-theorem realize_lastGuard {n : ℕ} (v : α → M) (xs : Fin (n + 1) → M) :
+private theorem realize_lastGuard {n : ℕ} (v : α → M) (xs : Fin (n + 1) → M) :
     (lastGuard R n).Realize v xs ↔ RelMap R ![xs (Fin.last n)] := by
   rw [lastGuard, BoundedFormula.realize_rel₁]
   rfl

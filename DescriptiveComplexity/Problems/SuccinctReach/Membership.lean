@@ -77,7 +77,7 @@ noncomputable def writesS (mark : L.Relations 1) (nxt : L.Relations 2)
     (nu st : L.Relations 1) : L.Sentence :=
   fo% ∀ x y, mark(x) → nxt(x, y) → (nu(y) ↔ st(x))
 
-theorem realize_clausesHoldS (grp : L.Relations 1) (pos neg : L.Relations 2)
+private theorem realize_clausesHoldS (grp : L.Relations 1) (pos neg : L.Relations 2)
     (nu : L.Relations 1) :
     M ⊨ clausesHoldS grp pos neg nu ↔
       ∀ c : M, RelMap grp ![c] → ∃ x : M,
@@ -94,7 +94,7 @@ theorem realize_clausesHoldS (grp : L.Relations 1) (pos neg : L.Relations 2)
     obtain ⟨x, hx⟩ := h (i 0) hc
     exact ⟨fun _ => x, hx⟩
 
-theorem realize_agreeOnS (mark nu st : L.Relations 1) :
+private theorem realize_agreeOnS (mark nu st : L.Relations 1) :
     M ⊨ agreeOnS mark nu st ↔
       ∀ x : M, RelMap mark ![x] → (RelMap nu ![x] ↔ RelMap st ![x]) := by
   rw [agreeOnS]
@@ -102,7 +102,7 @@ theorem realize_agreeOnS (mark nu st : L.Relations 1) :
     Formula.realize_iff, Formula.realize_rel₁, Term.realize_var, Sum.elim_inr]
   exact ⟨fun h x hx => h (fun _ => x) hx, fun h i hi => h (i 0) hi⟩
 
-theorem realize_writesS (mark : L.Relations 1) (nxt : L.Relations 2)
+private theorem realize_writesS (mark : L.Relations 1) (nxt : L.Relations 2)
     (nu st : L.Relations 1) :
     M ⊨ writesS mark nxt nu st ↔
       ∀ x y : M, RelMap mark ![x] → RelMap nxt ![x, y] →
@@ -219,50 +219,50 @@ theorem srPred_srAssign (f : Bool × Bool → A → Prop) (i : Bool × Bool) :
 /-- Splitting a conjunction of endpoint sentences, with the block expansion
 supplied explicitly: instance search does not see through the specification's
 block field. -/
-theorem srRealize_inf₁ (ρ : srBlock.Assignment A) (φ ψ : srLang₁.Sentence) :
+private theorem srRealize_inf₁ (ρ : srBlock.Assignment A) (φ ψ : srLang₁.Sentence) :
     letI := srBlock.structure₁ (L := srBase) ρ
     ((A ⊨ (φ ⊓ ψ)) ↔ (A ⊨ φ) ∧ (A ⊨ ψ)) :=
   letI := srBlock.structure₁ (L := srBase) ρ
   Formula.realize_inf
 
 /-- The same splitting for the transition sentence. -/
-theorem srRealize_inf₂ (ρ σ : srBlock.Assignment A) (φ ψ : srLang₂.Sentence) :
+private theorem srRealize_inf₂ (ρ σ : srBlock.Assignment A) (φ ψ : srLang₂.Sentence) :
     letI := srBlock.structure₂ (L := srBase) ρ σ
     ((A ⊨ (φ ⊓ ψ)) ↔ (A ⊨ φ) ∧ (A ⊨ ψ)) :=
   letI := srBlock.structure₂ (L := srBase) ρ σ
   Formula.realize_inf
 
-theorem relMap_srVar₁ (ρ : srBlock.Assignment A) (i : Bool × Bool) (w : Fin 1 → A) :
+private theorem relMap_srVar₁ (ρ : srBlock.Assignment A) (i : Bool × Bool) (w : Fin 1 → A) :
     @RelMap srLang₁ A (srBlock.structure₁ (L := srBase) ρ) 1 (srVar₁ i) w ↔
       srPred ρ i (w 0) := by
   change ρ i _ ↔ ρ i _
   exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
 
-theorem relMap_srIn₁ {n : ℕ} (ρ : srBlock.Assignment A)
+private theorem relMap_srIn₁ {n : ℕ} (ρ : srBlock.Assignment A)
     (r : Language.transSys.Relations n) (w : Fin n → A) :
     @RelMap srLang₁ A (srBlock.structure₁ (L := srBase) ρ) n (srIn₁ r) w ↔ RelMap r w :=
   Iff.rfl
 
-theorem relMap_srCur₂ (ρ σ : srBlock.Assignment A) (i : Bool × Bool) (w : Fin 1 → A) :
+private theorem relMap_srCur₂ (ρ σ : srBlock.Assignment A) (i : Bool × Bool) (w : Fin 1 → A) :
     @RelMap srLang₂ A (srBlock.structure₂ (L := srBase) ρ σ) 1 (srCur₂ i) w ↔
       srPred ρ i (w 0) := by
   change ρ i _ ↔ ρ i _
   exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
 
-theorem relMap_srNext₂ (ρ σ : srBlock.Assignment A) (i : Bool × Bool) (w : Fin 1 → A) :
+private theorem relMap_srNext₂ (ρ σ : srBlock.Assignment A) (i : Bool × Bool) (w : Fin 1 → A) :
     @RelMap srLang₂ A (srBlock.structure₂ (L := srBase) ρ σ) 1 (srNext₂ i) w ↔
       srPred σ i (w 0) := by
   change σ i _ ↔ σ i _
   exact iff_of_eq (congrArg _ (funext fun j => congrArg w (Subsingleton.elim _ _)))
 
-theorem relMap_srIn₂ {n : ℕ} (ρ σ : srBlock.Assignment A)
+private theorem relMap_srIn₂ {n : ℕ} (ρ σ : srBlock.Assignment A)
     (r : Language.transSys.Relations n) (w : Fin n → A) :
     @RelMap srLang₂ A (srBlock.structure₂ (L := srBase) ρ σ) n (srIn₂ r) w ↔ RelMap r w :=
   Iff.rfl
 
 /-- A starting state of the specification is a state whose `W₁` component
 witnesses the source condition. -/
-theorem srSpec_isSrc_iff (ρ : srBlock.Assignment A) :
+private theorem srSpec_isSrc_iff (ρ : srBlock.Assignment A) :
     srSpec.IsSrc ρ ↔
       ClausesHold A (srPred ρ srW₁) tsSrcCl ∧ ReadsCur A (srPred ρ srW₁) (srPred ρ srX) := by
   let := srBlock.structure₁ (L := srBase) ρ
@@ -276,7 +276,7 @@ theorem srSpec_isSrc_iff (ρ : srBlock.Assignment A) :
 
 /-- An accepting state of the specification is a state whose `W₂` component
 witnesses the target condition. -/
-theorem srSpec_isTgt_iff (ρ : srBlock.Assignment A) :
+private theorem srSpec_isTgt_iff (ρ : srBlock.Assignment A) :
     srSpec.IsTgt ρ ↔
       ClausesHold A (srPred ρ srW₂) tsTgtCl ∧ ReadsCur A (srPred ρ srW₂) (srPred ρ srX) := by
   let := srBlock.structure₁ (L := srBase) ρ
@@ -290,7 +290,7 @@ theorem srSpec_isTgt_iff (ρ : srBlock.Assignment A) :
 
 /-- A transition of the specification is a transition of the system, witnessed
 by the `V` component of the state it enters. -/
-theorem srSpec_step_iff (ρ σ : srBlock.Assignment A) :
+private theorem srSpec_step_iff (ρ σ : srBlock.Assignment A) :
     srSpec.Step ρ σ ↔
       (ClausesHold A (srPred σ srV) tsStepCl ∧ ReadsCur A (srPred σ srV) (srPred ρ srX) ∧
         WritesNext A (srPred σ srV) (srPred σ srX)) := by
@@ -314,7 +314,7 @@ variable {A : Type} [Language.transSys.Structure A] [LinearOrder A]
 
 /-- The state of the walk holding a given state, transition witness and pair of
 endpoint witnesses. -/
-def srLift (S v w₁ w₂ : A → Prop) : srBlock.Assignment A :=
+private def srLift (S v w₁ w₂ : A → Prop) : srBlock.Assignment A :=
   srAssign fun i => if i = srX then S else if i = srV then v else if i = srW₁ then w₁ else w₂
 
 /-- A walk of the system lifts to a walk of the specification, along which the

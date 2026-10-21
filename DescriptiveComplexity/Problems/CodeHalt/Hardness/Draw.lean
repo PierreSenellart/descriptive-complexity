@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
 public import Mathlib.Data.Fintype.Sort
+import all DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
+import all DescriptiveComplexity.Problems.CodeHalt.Hardness.Value
 
 /-!
 # The drawn instance draws the intended code
@@ -154,25 +156,25 @@ noncomputable def ordEnum : Fin (Nat.card A) ≃o A :=
 
 variable {A}
 
-theorem isBot_ordEnum_zero (h : 0 < Nat.card A) : IsBot (ordEnum A ⟨0, h⟩) := fun a => by
+private theorem isBot_ordEnum_zero (h : 0 < Nat.card A) : IsBot (ordEnum A ⟨0, h⟩) := fun a => by
   rw [← (ordEnum A).apply_symm_apply a, (ordEnum A).le_iff_le, Fin.le_def]
   change 0 ≤ ((ordEnum A).symm a : ℕ)
   omega
 
-theorem isTop_ordEnum_last (h : 0 < Nat.card A) :
+private theorem isTop_ordEnum_last (h : 0 < Nat.card A) :
     IsTop (ordEnum A ⟨Nat.card A - 1, by omega⟩) := fun a => by
   rw [← (ordEnum A).apply_symm_apply a, (ordEnum A).le_iff_le, Fin.le_def]
   have h2 := ((ordEnum A).symm a).isLt
   change ((ordEnum A).symm a : ℕ) ≤ Nat.card A - 1
   omega
 
-theorem ordEnum_lt_succ {k : ℕ} (h : k + 1 < Nat.card A) :
+private theorem ordEnum_lt_succ {k : ℕ} (h : k + 1 < Nat.card A) :
     ordEnum A ⟨k, by omega⟩ < ordEnum A ⟨k + 1, h⟩ := by
   rw [(ordEnum A).lt_iff_lt, Fin.lt_def]
   change k < k + 1
   omega
 
-theorem ordEnum_covBy {k : ℕ} (h : k + 1 < Nat.card A) :
+private theorem ordEnum_covBy {k : ℕ} (h : k + 1 < Nat.card A) :
     ∀ a : A, ¬(ordEnum A ⟨k, by omega⟩ < a ∧ a < ordEnum A ⟨k + 1, h⟩) := by
   rintro a ⟨h1, h2⟩
   rw [← (ordEnum A).apply_symm_apply a, (ordEnum A).lt_iff_lt, Fin.lt_def] at h1 h2
@@ -188,26 +190,28 @@ section Unique
 
 variable {A : Type} [LinearOrder A]
 
-theorem eq_of_isBot {a b : A} (ha : IsBot a) (hb : IsBot b) : a = b :=
+private theorem eq_of_isBot {a b : A} (ha : IsBot a) (hb : IsBot b) : a = b :=
   le_antisymm (ha b) (hb a)
 
-theorem canon_ext {D m : ℕ} {u u' : Fin D → A} (h : Canon m u) (h' : Canon m u')
+private theorem canon_ext {D m : ℕ} {u u' : Fin D → A} (h : Canon m u) (h' : Canon m u')
     (hag : ∀ j : Fin D, (j : ℕ) < m → u j = u' j) : u = u' := by
   funext j
   by_cases hj : (j : ℕ) < m
   · exact hag j hj
   · exact eq_of_isBot (h j (by omega)) (h' j (by omega))
 
-theorem cov_unique {a b b' : A} (h1 : a < b) (h2 : ∀ c : A, ¬(a < c ∧ c < b))
+private theorem cov_unique {a b b' : A} (h1 : a < b) (h2 : ∀ c : A, ¬(a < c ∧ c < b))
     (h1' : a < b') (h2' : ∀ c : A, ¬(a < c ∧ c < b')) : b = b' := by
   rcases lt_trichotomy b b' with hlt | heq | hgt
   · exact absurd ⟨h1, hlt⟩ (h2' b)
   · exact heq
   · exact absurd ⟨h1', hgt⟩ (h2 b')
 
-theorem not_isTop_of_lt {a b : A} (h : a < b) : ¬IsTop a := fun ht => absurd (ht b) (not_le.mpr h)
+private theorem not_isTop_of_lt
+    {a b : A} (h : a < b) : ¬IsTop a := fun ht => absurd (ht b) (not_le.mpr h)
 
-theorem canon_mono {D m m' : ℕ} {u : Fin D → A} (h : Canon m u) (hm : m ≤ m') : Canon m' u :=
+private theorem canon_mono
+    {D m m' : ℕ} {u : Fin D → A} (h : Canon m u) (hm : m ≤ m') : Canon m' u :=
   fun j hj => h j (le_trans hm hj)
 
 end Unique
@@ -228,44 +232,44 @@ noncomputable def botTup : Fin (dimOf V) → A := fun _ => botOrd A
 
 variable {V A}
 
-theorem isBot_botA : IsBot (botOrd A) := isBot_ordEnum_zero _
+private theorem isBot_botA : IsBot (botOrd A) := isBot_ordEnum_zero _
 
 omit [L.Structure A] in
 theorem canon_botTup (m : ℕ) : Canon m (botTup V A) := fun _ _ => isBot_botA
 
-theorem ordEnum_zero : ordEnum A ⟨0, Nat.card_pos⟩ = botOrd A := rfl
+private theorem ordEnum_zero : ordEnum A ⟨0, Nat.card_pos⟩ = botOrd A := rfl
 
 variable (V A)
 
 open Classical in
 /-- The element carrying the bit of a tuple: the shared `succ` element if the
 symbol holds of it, the shared `zero` element if it does not. -/
-noncomputable def bitPt (i : Fin V.numSyms) (u : Fin (dimOf V) → A) :
+private noncomputable def bitPt (i : Fin V.numSyms) (u : Fin (dimOf V) → A) :
     (codeProgInterp V cP).Map A :=
   if bitOf V i u then progPt ProgTag.oneN (botTup V A) else progPt ProgTag.zeroN (botTup V A)
 
 /-- The element standing at position `k` of the level-`l` chain of the block
 of the symbol `i`, above the prefix `u`. -/
-noncomputable def chainPt (i : Fin V.numSyms) (l : Fin (dimOf V))
+private noncomputable def chainPt (i : Fin V.numSyms) (l : Fin (dimOf V))
     (u : Fin (dimOf V) → A) (k : ℕ) : (codeProgInterp V cP).Map A :=
   if h : k < Nat.card A then progPt (ProgTag.chainN i l) (setCo V (l : ℕ) (ordEnum A ⟨k, h⟩) u)
   else progPt ProgTag.zeroN (botTup V A)
 
 /-- The element whose value is that of `DescriptiveComplexity.levelVal`: the
 bit at the bottom, the head of the next chain above it. -/
-noncomputable def levelPt (i : Fin V.numSyms) :
+private noncomputable def levelPt (i : Fin V.numSyms) :
     ℕ → (Fin (dimOf V) → A) → (codeProgInterp V cP).Map A
   | 0, u => bitPt V cP A i u
   | m + 1, u =>
       chainPt V cP A i ⟨dimOf V - (m + 1), Nat.sub_lt (dimOf_pos V) (Nat.succ_pos m)⟩ u 0
 
 /-- The element standing at position `k` of the numeral chain. -/
-noncomputable def numPt (k : ℕ) : (codeProgInterp V cP).Map A :=
+private noncomputable def numPt (k : ℕ) : (codeProgInterp V cP).Map A :=
   if h : k < Nat.card A then progPt ProgTag.numN (setCo V 0 (ordEnum A ⟨k, h⟩) (botTup V A))
   else progPt ProgTag.zeroN (botTup V A)
 
 /-- The element standing at the symbol `k` of the chain of blocks. -/
-noncomputable def symPt (k : ℕ) : (codeProgInterp V cP).Map A :=
+private noncomputable def symPt (k : ℕ) : (codeProgInterp V cP).Map A :=
   if h : k < V.numSyms then progPt (ProgTag.symN ⟨k, h⟩) (botTup V A)
   else progPt ProgTag.zeroN (botTup V A)
 
@@ -273,11 +277,11 @@ variable {V cP A}
 
 /-! ### The two shared leaves -/
 
-theorem decodesTo_zeroPt :
+private theorem decodesTo_zeroPt :
     DecodesTo (progPt (ProgTag.zeroN : ProgTag V cP) (botTup V A)) Code.zero :=
   (mark_pt CodeTag.zero ProgTag.zeroN (botTup V A)).mpr ⟨canon_botTup 0, rfl⟩
 
-theorem decodesTo_onePt :
+private theorem decodesTo_onePt :
     DecodesTo (progPt (ProgTag.oneN : ProgTag V cP) (botTup V A)) Code.succ :=
   (mark_pt CodeTag.succ ProgTag.oneN (botTup V A)).mpr ⟨canon_botTup 0, rfl⟩
 
@@ -313,7 +317,7 @@ theorem okOn_chainN (i : Fin V.numSyms) (l : Fin (dimOf V)) (u : Fin (dimOf V) �
     OkOn (ProgTag.chainN i l : ProgTag V cP) u ↔ Canon ((l : ℕ) + 1) u := Iff.rfl
 
 open Classical in
-theorem cArg1_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) (m : ℕ)
+private theorem cArg1_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) (m : ℕ)
     (hm : (l : ℕ) + m + 1 = dimOf V) {uk : Fin (dimOf V) → A}
     (hok : Canon ((l : ℕ) + 1) uk) :
     CArg1 (progPt (ProgTag.chainN i l) uk) (levelPt V cP A i m uk) := by
@@ -337,7 +341,7 @@ theorem cArg1_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) (m : ℕ)
     exact (cArg1_pt _ _ _ _).mpr
       ⟨hok, (okOn_chainN _ _ _).mpr (canon_mono hok (by rw [hl'v]; omega)), ⟨rfl, hl'v⟩, rfl⟩
 
-theorem cArg2_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) {u : Fin (dimOf V) → A}
+private theorem cArg2_chainPt (i : Fin V.numSyms) (l : Fin (dimOf V)) {u : Fin (dimOf V) → A}
     (hu : Canon (l : ℕ) u) (k : ℕ) (hk : k < Nat.card A) :
     CArg2 (progPt (ProgTag.chainN i l) (setCo V (l : ℕ) (ordEnum A ⟨k, hk⟩) u))
       (chainPt V cP A i l u (k + 1)) := by
@@ -364,7 +368,7 @@ open Classical in
 `dimOf V - m` draws the nest of the values below it. The induction is on the
 level, and inside it on the position along the chain, downwards from its
 tail. -/
-theorem decodesTo_levelPt : ∀ (m : ℕ), m ≤ dimOf V → ∀ (i : Fin V.numSyms)
+private theorem decodesTo_levelPt : ∀ (m : ℕ), m ≤ dimOf V → ∀ (i : Fin V.numSyms)
     (u : Fin (dimOf V) → A), Canon (dimOf V - m) u →
     DecodesTo (levelPt V cP A i m u) (levelCode V (Nat.card A) (ordEnum A) i m u) := by
   intro m
@@ -411,7 +415,7 @@ theorem decodesTo_levelPt : ∀ (m : ℕ), m ≤ dimOf V → ∀ (i : Fin V.numS
 
 open Classical in
 /-- The head of the chains of a block draws the block. -/
-theorem decodesTo_blockPt (cP : Code) (i : Fin V.numSyms) :
+private theorem decodesTo_blockPt (cP : Code) (i : Fin V.numSyms) :
     DecodesTo (progPt (ProgTag.chainN i ⟨0, dimOf_pos V⟩ : ProgTag V cP) (botTup V A))
       (blockCode V (Nat.card A) (ordEnum A) (botTup V A) i) := by
   obtain ⟨d, hd⟩ : ∃ d, dimOf V = d + 1 :=
@@ -427,7 +431,7 @@ theorem decodesTo_blockPt (cP : Code) (i : Fin V.numSyms) :
 /-! ### The chain of the blocks of the symbols -/
 
 open Classical in
-theorem decodesTo_symPt : ∀ (j k : ℕ), k + j = V.numSyms →
+private theorem decodesTo_symPt : ∀ (j k : ℕ), k + j = V.numSyms →
     DecodesTo (symPt V cP A k)
       (codeNestFrom (blockCode V (Nat.card A) (ordEnum A) (botTup V A)) k) := by
   intro j
@@ -454,7 +458,7 @@ theorem decodesTo_symPt : ∀ (j k : ℕ), k + j = V.numSyms →
 
 /-! ### The numeral chain -/
 
-theorem decodesTo_numPt : ∀ (j k : ℕ), k + j = Nat.card A →
+private theorem decodesTo_numPt : ∀ (j k : ℕ), k + j = Nat.card A →
     DecodesTo (numPt V cP A k) (numCode (Nat.card A - k)) := by
   intro j
   induction j with
@@ -491,7 +495,7 @@ theorem decodesTo_numPt : ∀ (j k : ℕ), k + j = Nat.card A →
 open Classical in
 /-- The element of the `pair` draws the numeral of the universe size beside
 the nest of the tables. -/
-theorem decodesTo_pairPt (cP : Code) :
+private theorem decodesTo_pairPt (cP : Code) :
     DecodesTo (progPt (ProgTag.pairN : ProgTag V cP) (botTup V A))
       (Code.pair (numCode (Nat.card A))
         (codeNestFrom (blockCode V (Nat.card A) (ordEnum A) (botTup V A)) 0)) := by
@@ -557,7 +561,7 @@ theorem okOn_numN (u : Fin (dimOf V) → A) :
 
 omit [Finite A] [Nonempty A] in
 /-- **The first child of an element is unique.** -/
-theorem arg1_det {ta tb tb' : ProgTag V cP} {ua ub ub' : Fin (dimOf V) → A}
+private theorem arg1_det {ta tb tb' : ProgTag V cP} {ua ub ub' : Fin (dimOf V) → A}
     (hob : OkOn tb ub) (hob' : OkOn tb' ub')
     (h : Arg1On ta tb ua ub) (h' : Arg1On ta tb' ua ub') :
     (progPt tb ub : (codeProgInterp V cP).Map A) = progPt tb' ub' := by
@@ -625,7 +629,7 @@ theorem arg1_det {ta tb tb' : ProgTag V cP} {ua ub ub' : Fin (dimOf V) → A}
 
 omit [L.Structure A] [Finite A] [Nonempty A] in
 /-- **The second child of an element is unique.** -/
-theorem arg2_det {ta tb tb' : ProgTag V cP} {ua ub ub' : Fin (dimOf V) → A}
+private theorem arg2_det {ta tb tb' : ProgTag V cP} {ua ub ub' : Fin (dimOf V) → A}
     (hob : OkOn tb ub) (hob' : OkOn tb' ub')
     (h : Arg2On ta tb ua ub) (h' : Arg2On ta tb' ua ub') :
     (progPt tb ub : (codeProgInterp V cP).Map A) = progPt tb' ub' := by

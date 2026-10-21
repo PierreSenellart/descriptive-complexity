@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Cvp.Defs
 public import DescriptiveComplexity.FixedPointHorn
+import all DescriptiveComplexity.FixedPoint
 
 /-!
 # CVP is in polynomial time
@@ -141,14 +142,14 @@ section Model
 variable {A : Type} [Language.circuit.Structure A] [LinearOrder A]
 
 /-- Realization of a kind guard, down to the circuit structure. -/
-theorem realize_kindF (r : cvLang.Relations 1) (i : Fin nvars)
+private theorem realize_kindF (r : cvLang.Relations 1) (i : Fin nvars)
     (v : Fin nvars → A) :
     (kindF r i).Realize v ↔ RelMap r ![v i] := by
   rw [kindF, Formula.realize_rel₁]
   rfl
 
 /-- Realization of a wire guard, down to the circuit structure. -/
-theorem realize_wireF (r : cvLang.Relations 2) (i j : Fin nvars)
+private theorem realize_wireF (r : cvLang.Relations 2) (i j : Fin nvars)
     (v : Fin nvars → A) :
     (wireF r i j).Realize v ↔ RelMap r ![v i, v j] := by
   rw [wireF, Formula.realize_rel₂]
@@ -161,13 +162,13 @@ abbrev gateAssign : valBlock.Assignment A := fun b x => GateVal b (x 0)
 omit [LinearOrder A] in
 /-- A rail atom holds of the inductive semantics exactly when the variable it
 names derives the value it names. -/
-theorem gateAssign_rail (b : Bool) (i : Fin nvars) (v : Fin nvars → A) :
+private theorem gateAssign_rail (b : Bool) (i : Fin nvars) (v : Fin nvars → A) :
     (rail b i).Holds (gateAssign (A := A)) v ↔ GateVal b (v i) :=
   Iff.rfl
 
 /-- **The inductive semantics is closed under the rules**, one case per gate
 rule. -/
-theorem gateAssign_closed :
+private theorem gateAssign_closed :
     ∀ c ∈ cvpRules, ∀ a : SOAtom valBlock nvars, c.head = some a →
       ∀ v : Fin nvars → A, c.guard.Realize v →
         (∀ b ∈ c.body, b.Holds (gateAssign (A := A)) v) → a.Holds gateAssign v := by
@@ -294,7 +295,7 @@ theorem derives_of_gateVal {b : Bool} {g : A} (h : GateVal b g) :
       exact ihi
 
 /-- **The least model of the rules is the inductive semantics.** -/
-theorem lfpAssign_iff {b : Bool} {x : Fin 1 → A} :
+private theorem lfpAssign_iff {b : Bool} {x : Fin 1 → A} :
     lfpAssign (A := A) cvpRules b x ↔ GateVal b (x 0) := by
   refine ⟨gateVal_of_derives, fun h => ?_⟩
   have hx : (fun _ : Fin 1 => x 0) = x := funext fun j => congrArg x (Fin.eq_zero j).symm
@@ -304,7 +305,7 @@ theorem lfpAssign_iff {b : Bool} {x : Fin 1 → A} :
 
 /-- Realization of the output sentence at the least fixed point: some output
 gate is in the true rail. -/
-theorem realize_cvpOut :
+private theorem realize_cvpOut :
     (@Sentence.Realize (cvLang.sum valBlock.lang) A
         (@sumStructure _ _ A _ (valBlock.structure (lfpAssign (A := A) cvpRules))) cvpOut) ↔
       CircuitAccepts A := by
@@ -319,7 +320,7 @@ theorem realize_cvpOut :
     exact ⟨fun _ => g, hout, (lfpAssign_iff (x := fun _ => g)).mpr hval⟩
 
 /-- **The FO(LFP) definition computes CVP.** -/
-theorem cvpDef_holds [Finite A] [Nonempty A] :
+private theorem cvpDef_holds [Finite A] [Nonempty A] :
     cvpDef.Holds A ↔ CircuitAccepts A :=
   realize_cvpOut
 

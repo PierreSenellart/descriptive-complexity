@@ -183,12 +183,12 @@ namespace MachPh
 variable {V M : ℕ}
 
 /-- A phase as a tuple, for the `Finite` instance. -/
-def toProd (p : MachPh V M) :
+private def toProd (p : MachPh V M) :
     PhKind × GameQuestion × Bool × Bool × Fin (V + 1) × Fin (M + 1) ×
       (Fin M → Bool) × SweepCont × Bool :=
   (p.kind, p.q, p.r, p.tgt, p.j, p.k, p.claims, p.cont, p.par)
 
-theorem toProd_injective : Function.Injective (toProd (V := V) (M := M)) := by
+private theorem toProd_injective : Function.Injective (toProd (V := V) (M := M)) := by
   intro a b h
   simp only [toProd, Prod.mk.injEq] at h
   exact MachPh.ext h.1 h.2.1 h.2.2.1 h.2.2.2.1 h.2.2.2.2.1 h.2.2.2.2.2.1 h.2.2.2.2.2.2.1
@@ -244,7 +244,7 @@ def IsUniv (pol : GameQuestion → ℕ → Bool) (p : MachPh V M) : Bool :=
 
 /-- **The four splits belong to the universal player**, which is what makes a
 split a conjunction: each of its branches has to win. -/
-theorem isUniv_split (pol : GameQuestion → ℕ → Bool) {p : MachPh V M}
+private theorem isUniv_split (pol : GameQuestion → ℕ → Bool) {p : MachPh V M}
     (h : p.kind = .splitStart ∨ p.kind = .splitEx ∨ p.kind = .splitAll ∨
       p.kind = .splitMove) : IsUniv pol p = true := by
   rcases h with h | h | h | h <;> simp [IsUniv, h]
@@ -256,12 +256,13 @@ theorem isUniv_split (pol : GameQuestion → ℕ → Bool) {p : MachPh V M}
     (h : p.kind = .rewind) : IsUniv pol p = false := by simp [IsUniv, h]
 
 /-- A sweep is universal exactly when it is the universal player's own move. -/
-theorem isUniv_sweep (pol : GameQuestion → ℕ → Bool) {p : MachPh V M} (h : p.kind = .sweep) :
+private theorem isUniv_sweep
+    (pol : GameQuestion → ℕ → Bool) {p : MachPh V M} (h : p.kind = .sweep) :
     IsUniv pol p = (p.cont == SweepCont.allMove) := by
   cases hc : p.cont <;> simp [IsUniv, h, hc]
 
 /-- A prefix phase belongs to the player its polarity names. -/
-theorem isUniv_pre (pol : GameQuestion → ℕ → Bool) {p : MachPh V M} (h : p.kind = .pre) :
+private theorem isUniv_pre (pol : GameQuestion → ℕ → Bool) {p : MachPh V M} (h : p.kind = .pre) :
     IsUniv pol p = !(pol p.q (p.j : ℕ)) := by simp [IsUniv, h]
 
 end MachPh
@@ -424,21 +425,21 @@ records. -/
     simp [rewindTarget, hc, splitStartPh, splitMovePh, prePh, allStepPh]
 
 /-- A seek declares the variables of its own question. -/
-theorem arity_seekPh (q : GameQuestion) (r : Bool) (b : Fin M → Bool) (k : Fin (M + 1))
+private theorem arity_seekPh (q : GameQuestion) (r : Bool) (b : Fin M → Bool) (k : Fin (M + 1))
     (par : Bool) : arity vars (seekPh q r b k par : MachPh V M) = vars q := rfl
 
-theorem arity_concPh (q : GameQuestion) (r : Bool) (b : Fin M → Bool) (par : Bool) :
+private theorem arity_concPh (q : GameQuestion) (r : Bool) (b : Fin M → Bool) (par : Bool) :
     arity vars (concPh q r b par : MachPh V M) = vars q := rfl
 
 /-- A prefix phase declares the variables it has already written. -/
-theorem arity_prePh (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par : Bool) :
+private theorem arity_prePh (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par : Bool) :
     arity vars (prePh q r j par : MachPh V M) = min (j : ℕ) (vars q) := rfl
 
-theorem arity_claimPh (q : GameQuestion) (r par : Bool) :
+private theorem arity_claimPh (q : GameQuestion) (r par : Bool) :
     arity vars (claimPh q r par : MachPh V M) = vars q := rfl
 
 /-- A question that has reached its matrix declares its whole prefix. -/
-theorem arity_of_matrix {p : MachPh V M}
+private theorem arity_of_matrix {p : MachPh V M}
     (h : p.kind = .claim ∨ p.kind = .check ∨ p.kind = .seek ∨ p.kind = .conc) :
     arity vars p = vars p.q := by
   rcases h with h | h | h | h <;> simp [arity, h]
@@ -452,48 +453,48 @@ variable (vars natoms : GameQuestion → ℕ)
 /-! The six phases of the game proper, each with its successors named. Stated
 as equivalences, because the universal ones are read backwards. -/
 
-theorem ctrlStep_splitStartPh (r par : Bool) (p' : MachPh V M) :
+private theorem ctrlStep_splitStartPh (r par : Bool) (p' : MachPh V M) :
     CtrlStep vars natoms (splitStartPh r par) p' ↔
       (p' = prePh .start r 0 (!par) ∨ p' = playPh r (!par)) := Iff.rfl
 
-theorem ctrlStep_playPh (r par : Bool) (p' : MachPh V M) :
+private theorem ctrlStep_playPh (r par : Bool) (p' : MachPh V M) :
     CtrlStep vars natoms (playPh r par) p' ↔
       (p' = prePh .won r 0 (!par) ∨ p' = splitExPh r (!par) ∨ p' = splitAllPh r (!par)) :=
   Iff.rfl
 
-theorem ctrlStep_splitExPh (r par : Bool) (p' : MachPh V M) :
+private theorem ctrlStep_splitExPh (r par : Bool) (p' : MachPh V M) :
     CtrlStep vars natoms (splitExPh r par) p' ↔
       (p' = prePh .notUniv r 0 (!par) ∨ p' = sweepPh r (!r) .exMove (!par)) := Iff.rfl
 
-theorem ctrlStep_splitAllPh (r par : Bool) (p' : MachPh V M) :
+private theorem ctrlStep_splitAllPh (r par : Bool) (p' : MachPh V M) :
     CtrlStep vars natoms (splitAllPh r par) p' ↔
       (p' = prePh .univ r 0 (!par) ∨ p' = sweepPh r (!r) .certify (!par) ∨
         p' = sweepPh r (!r) .allMove (!par)) := Iff.rfl
 
-theorem ctrlStep_splitMovePh (r par : Bool) (p' : MachPh V M) :
+private theorem ctrlStep_splitMovePh (r par : Bool) (p' : MachPh V M) :
     CtrlStep vars natoms (splitMovePh r par) p' ↔
       (p' = prePh .move r 0 (!par) ∨ p' = playPh (!r) (!par)) := Iff.rfl
 
-theorem ctrlStep_allStepPh (r par : Bool) (p' : MachPh V M) :
+private theorem ctrlStep_allStepPh (r par : Bool) (p' : MachPh V M) :
     CtrlStep vars natoms (allStepPh r par) p' ↔
       (p' = prePh .notMove r 0 (!par) ∨ p' = playPh (!r) (!par)) := Iff.rfl
 
 /-- **A prefix phase with a variable left writes it**, moving to the next
 index. Stated as an equivalence so that the backward reading has it too. -/
-theorem ctrlStep_prePh (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par : Bool)
+private theorem ctrlStep_prePh (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par : Bool)
     (h : (j : ℕ) < vars q) (p' : MachPh V M) :
     CtrlStep vars natoms (prePh q r j par) p' ↔
       ∃ j' : Fin (V + 1), (j' : ℕ) = (j : ℕ) + 1 ∧ p' = prePh q r j' (!par) := by
   simp [CtrlStep, prePh, h]
 
 /-- **A prefix phase with no variable left hands over to the claim.** -/
-theorem ctrlStep_prePh_last (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par : Bool)
+private theorem ctrlStep_prePh_last (q : GameQuestion) (r : Bool) (j : Fin (V + 1)) (par : Bool)
     (h : ¬ ((j : ℕ) < vars q)) (p' : MachPh V M) :
     CtrlStep vars natoms (prePh q r j par) p' ↔ p' = claimPh q r (!par) := by
   simp [CtrlStep, prePh, h]
 
 /-- **A control step flips the parity**: the head really does bounce. -/
-theorem par_of_ctrlStep {p p' : MachPh V M} (h : CtrlStep vars natoms p p') :
+private theorem par_of_ctrlStep {p p' : MachPh V M} (h : CtrlStep vars natoms p p') :
     p'.par = !p.par := by
   unfold CtrlStep at h
   rcases hk : p.kind <;> rw [hk] at h

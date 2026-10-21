@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 public import DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # #3SAT: counting the models of a 3-CNF formula
@@ -37,7 +42,7 @@ noncomputable def sharpThreeSatKernel : satSOLang.Sentence :=
   ∼(LHom.sumInl.onSentence ThreeSatToSat.wideS) ⊓ sharpSatKernel
 
 /-- Realization of the kernel of #3SAT. -/
-theorem realize_sharpThreeSatKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_sharpThreeSatKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) sharpThreeSatKernel) ↔
@@ -70,19 +75,19 @@ noncomputable def SharpThreeSAT : CountingProblem Language.sat where
     rw [card_threeSatModel_eq_witnessCount A, card_threeSatModel_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock sharpThreeSatKernel e
 
-theorem sharpThreeSat_apply (A : Type) [Language.sat.Structure A] :
+private theorem sharpThreeSat_apply (A : Type) [Language.sat.Structure A] :
     SharpThreeSAT A = Nat.card {ν : A → Prop // WidthAtMostThree A ∧ SatModel A ν} :=
   rfl
 
 /-- On an instance within the width bound, #3SAT is #SAT. -/
-theorem sharpThreeSat_eq_sharpSat {A : Type} [Language.sat.Structure A]
+private theorem sharpThreeSat_eq_sharpSat {A : Type} [Language.sat.Structure A]
     (h : WidthAtMostThree A) : SharpThreeSAT A = SharpSAT A :=
   Nat.card_congr (Equiv.subtypeEquivRight fun _ => and_iff_right h)
 
 /-- **The support of #3SAT is 3SAT.**
 Registered in the Lax archive as
 [`Lax280166.ThreeSATComplete.sharpThreeSat_support_iff`](https://laxarchive.org/lax-280166/Lax280166.ThreeSATComplete.html#s-Lax280166.ThreeSATComplete.sharpThreeSat_support_iff). -/
-theorem sharpThreeSat_support_iff (A : Type) [Language.sat.Structure A] [Finite A] :
+private theorem sharpThreeSat_support_iff (A : Type) [Language.sat.Structure A] [Finite A] :
     SharpThreeSAT.support A ↔ ThreeSAT A := by
   by_cases h : WidthAtMostThree A
   · rw [CountingProblem.support_iff, sharpThreeSat_eq_sharpSat h]

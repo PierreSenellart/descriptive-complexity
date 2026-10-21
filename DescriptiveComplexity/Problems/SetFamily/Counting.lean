@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.SetFamily.Membership
 public import DescriptiveComplexity.Counting.Class
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.SetFamily.Defs
 
 /-!
 # #ExactCover: counting exact covers
@@ -70,7 +73,7 @@ noncomputable def SharpExactCover : CountingProblem Language.setSystem where
     rw [← Nat.card_congr (exactCoverEquiv A), ← Nat.card_congr (exactCoverEquiv B)]
     exact witnessCount_iso familyGuessBlock sharpExactCoverKernel e
 
-theorem sharpExactCover_apply (A : Type) [Language.setSystem.Structure A] :
+private theorem sharpExactCover_apply (A : Type) [Language.setSystem.Structure A] :
     SharpExactCover A =
       Nat.card {G : A → Prop // ExactCoverBy (SSElem (A := A)) SSFam SSMem G} :=
   rfl
@@ -78,7 +81,7 @@ theorem sharpExactCover_apply (A : Type) [Language.setSystem.Structure A] :
 /-- **The support of #ExactCover is Exact Cover.**
 Registered in the Lax archive as
 [`Lax280166.ExactCoverComplete.sharpExactCover_support_iff`](https://laxarchive.org/lax-280166/Lax280166.ExactCoverComplete.html#s-Lax280166.ExactCoverComplete.sharpExactCover_support_iff). -/
-theorem sharpExactCover_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
+private theorem sharpExactCover_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
     SharpExactCover.support A ↔ ExactCover A := by
   rw [CountingProblem.support_iff, sharpExactCover_apply, Nat.card_pos_iff]
   exact ⟨fun ⟨⟨G, hG⟩, _⟩ => ⟨G, hG⟩, fun ⟨G, hG⟩ => ⟨⟨⟨G, hG⟩⟩, inferInstance⟩⟩

@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.Arithmetic
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Machine
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The upper fence: a machine's acceptance is a sentence of the bit-level logic
@@ -81,7 +86,7 @@ variable {L : Language.{0, 0}} {α : Type} {V : Type}
 
 /-- A Boolean expression of definable bits is definable: the translation is a
 recursion over the expression, not an enumeration of its truth table. -/
-theorem bitDef_bitExpr {val : V → ArithRel L α} (h : ∀ z, BitDef (val z)) :
+private theorem bitDef_bitExpr {val : V → ArithRel L α} (h : ∀ z, BitDef (val z)) :
     ∀ e : BitExpr V,
       BitDef (L := L) (α := α) (fun A _ _ _ _ v => e.Holds fun z => val z A v)
   | .var z => (h z).congr fun _A _ _ _ _ _v => Iff.rfl
@@ -106,7 +111,7 @@ trace: the state bits before the position are the initial ones at the lowest
 index, and the trace bits at the index *covered* by this one otherwise. Under
 the index naming the previous position is the predecessor in the order, so
 nothing but `≤` is needed to find it. -/
-def stepAt (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : Fin S.σ) : Prop :=
+private def stepAt (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : Fin S.σ) : Prop :=
   (S.step j).Holds (Sum.elim
     (fun j' => (orank i = 0 ∧ S.init j' = true) ∨
       ∃ i' : A, (i' < i ∧ ∀ k : A, i' < k → i ≤ k) ∧ BitIx i' (t j'))
@@ -116,7 +121,7 @@ def stepAt (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : F
 the state after each index below the top, the flags record the state after the
 top position, and the acceptance condition holds of the flags – of the initial
 state, if the universe has no bit position at all. -/
-def SweepWitness (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A) : Prop :=
+private def SweepWitness (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A) : Prop :=
   (∀ i : A, IsLowIx i → ∀ j, (BitIx i (t j) ↔ stepAt S x t i j)) ∧
     (∀ i : A, IsTopIx i → ∀ j, (orank (f j) ≠ 0 ↔ stepAt S x t i j)) ∧
       ((∃ i : A, IsTopIx i) → S.acc.Holds fun j => orank (f j) ≠ 0) ∧
@@ -124,11 +129,11 @@ def SweepWitness (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A) : Prop
 
 /-- The state the witnesses record after position `i`: a trace bit below the
 top, a flag at the top. -/
-def storedAfter (S : Sweep ρ) (t f : Fin S.σ → A) (i : ℕ) (j : Fin S.σ) : Prop :=
+private def storedAfter (S : Sweep ρ) (t f : Fin S.σ → A) (i : ℕ) (j : Fin S.σ) : Prop :=
   if i + 1 < posCount A then (orank (t j)).testBit i = true else orank (f j) ≠ 0
 
 /-- A top index exists exactly when the universe has more than one element. -/
-theorem exists_isTopIx_iff : (∃ i : A, IsTopIx i) ↔ 0 < posCount A := by
+private theorem exists_isTopIx_iff : (∃ i : A, IsTopIx i) ↔ 0 < posCount A := by
   constructor
   · rintro ⟨i, hi⟩
     rw [IsTopIx] at hi
@@ -141,7 +146,7 @@ theorem exists_isTopIx_iff : (∃ i : A, IsTopIx i) ↔ 0 < posCount A := by
 /-- **The transition read from the trace is the transition of the sweep**: at
 the index `i`, the guessed bits say exactly what the automaton computes from the
 state before that position. -/
-theorem stepAt_iff (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : Fin S.σ) :
+private theorem stepAt_iff (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A) (j : Fin S.σ) :
     stepAt S x t i j ↔ (S.step j).eval (Sum.elim
       (fun j' => if orank i = 0 then S.init j' else (orank (t j')).testBit (orank i - 1))
       fun k => (orank (x k)).testBit (orank i)) = true := by
@@ -178,7 +183,7 @@ theorem stepAt_iff (S : Sweep ρ) (x : Fin ρ → A) (t : Fin S.σ → A) (i : A
 /-- **The guessed trace is the run**: the witnesses of the formula record,
 position by position, the states of the sweep. Determinism does the work – the
 local conditions pin the trace by induction along the indices. -/
-theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A)
+private theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ → A)
     (hw : SweepWitness S x t f) :
     ∀ i, i < posCount A → ∀ j, (storedAfter S t f i j ↔ S.state x (i + 1) j = true) := by
   intro i
@@ -217,7 +222,7 @@ theorem storedAfter_iff_state (S : Sweep ρ) (x : Fin ρ → A) (t f : Fin S.σ 
       exact hstep
 
 /-- **The formula says what the sweep does.** -/
-theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
+private theorem sweepWitness_iff [Nonempty A] (S : Sweep ρ) (x : Fin ρ → A) :
     (∃ t f : Fin S.σ → A, SweepWitness S x t f) ↔ S.Accepts x := by
   constructor
   · rintro ⟨t, f, hw⟩
@@ -302,7 +307,7 @@ section MachineDef
 variable {L : Language.{0, 0}} {α : Type} {ρ : ℕ}
 
 /-- The transition condition at an index is definable. -/
-theorem bitDef_stepAt (S : Sweep ρ) (reg : Fin ρ → α) (tr : Fin S.σ → α) (p : α)
+private theorem bitDef_stepAt (S : Sweep ρ) (reg : Fin ρ → α) (tr : Fin S.σ → α) (p : α)
     (j : Fin S.σ) :
     BitDef (L := L) (α := α) (fun _A _ _ _ _ v =>
       stepAt S (fun k => v (reg k)) (fun j' => v (tr j')) (v p) j) := by
@@ -329,7 +334,7 @@ theorem bitDef_stepAt (S : Sweep ρ) (reg : Fin ρ → α) (tr : Fin S.σ → α
 
 /-- **A sweep is definable**: the formula guesses the trace and the flags, and
 asks that they be the run. -/
-theorem bitDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
+private theorem bitDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
     BitDef (L := L) (α := α)
       (fun _A _ _ _ _ v => S.Accepts fun k => v (reg k)) := by
   classical
@@ -389,7 +394,7 @@ theorem bitDef_sweep (S : Sweep ρ) (reg : Fin ρ → α) :
 
 /-- **A base test is definable**: sweeps by the construction above, reads and
 queries as atoms, and the Boolean structure by the closure lemmas. -/
-theorem bitDef_baseTest (t : BaseTest L ρ) (reg : Fin ρ → α) :
+private theorem bitDef_baseTest (t : BaseTest L ρ) (reg : Fin ρ → α) :
     BitDef (L := L) (α := α) (fun _A _ _ _ _ v => t.Holds fun k => v (reg k)) := by
   induction t with
   | sweep S => exact (bitDef_sweep S reg).congr fun A _ _ _ _ v => Iff.rfl

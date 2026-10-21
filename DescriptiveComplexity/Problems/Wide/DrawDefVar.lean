@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefKind
 public import DescriptiveComplexity.Problems.Wide.DrawVarRule
+import all DescriptiveComplexity.Problems.Wide.DrawDefKind
+import all DescriptiveComplexity.Problems.Wide.DrawDefKit
+import all DescriptiveComplexity.Problems.Wide.DrawDefTower
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The matrix and the gates carry definability
@@ -44,7 +48,7 @@ variable [Fintype dt.SlotIx]
 
 /-- **A matrix's rules are definable**: the sequencer over the classified
 atoms, each stage its kind's machinery. -/
-theorem uRulesDefinable_matrixRule {v : dt.VarIx} {emb : dt.MatrixPh v → P}
+private theorem uRulesDefinable_matrixRule {v : dt.VarIx} {emb : dt.MatrixPh v → P}
     {argsA : ∀ (e : Env L) (a : Fin (dt.natOf v)),
       dt.KindArgs (A := e.α) (Q := Q) (dt.kindOf v a)}
     {enterSt : ∀ e : Env L,
@@ -66,7 +70,7 @@ theorem uRulesDefinable_matrixRule {v : dt.VarIx} {emb : dt.MatrixPh v → P}
 /-- **A gate block's rules are definable**: the well-shapedness file test, its
 two verdict exits – the failing one clearing the caller's flag – and the
 tag-branched domain evaluation. -/
-theorem uRulesDefinable_gateBlockRule {emb : dt.GateBlockPh → P}
+private theorem uRulesDefinable_gateBlockRule {emb : dt.GateBlockPh → P}
     {args : ∀ e : Env L,
       letI := Fintype.ofFinite dt.X.Tag
       TagArgs e.α Q dt.SlotIx (Fintype.card dt.X.Tag) dt.X.Tag dt.domNr}
@@ -96,7 +100,7 @@ theorem uRulesDefinable_gateBlockRule {emb : dt.GateBlockPh → P}
 
 /-- **The gates' rules are definable**: the sequencer over the argument
 blocks. -/
-theorem uRulesDefinable_gatesRule {v : dt.VarIx} {emb : dt.GatesPh v → P}
+private theorem uRulesDefinable_gatesRule {v : dt.VarIx} {emb : dt.GatesPh v → P}
     {argsG : ∀ (e : Env L), Fin (dt.arOf v) →
       letI := Fintype.ofFinite dt.X.Tag
       TagArgs e.α Q dt.SlotIx (Fintype.card dt.X.Tag) dt.X.Tag dt.domNr}
@@ -124,7 +128,7 @@ theorem uRulesDefinable_gatesRule {v : dt.VarIx} {emb : dt.GatesPh v → P}
 
 /-- **The inner gates' rules are definable**: the same sequencer, every fail
 exit continuing to the next block with the level's flag cleared. -/
-theorem uRulesDefinable_igatesRule {v : dt.VarIx} {emb : dt.IGatesPh v → P}
+private theorem uRulesDefinable_igatesRule {v : dt.VarIx} {emb : dt.IGatesPh v → P}
     {argsG : ∀ (e : Env L), Fin (dt.nIn v) →
       letI := Fintype.ofFinite dt.X.Tag
       TagArgs e.α Q dt.SlotIx (Fintype.card dt.X.Tag) dt.X.Tag dt.domNr}

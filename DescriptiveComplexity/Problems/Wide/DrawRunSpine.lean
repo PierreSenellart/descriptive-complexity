@@ -7,6 +7,14 @@ module
 
 import DescriptiveComplexity.Problems.Wide.DrawRunOuter
 public import DescriptiveComplexity.Problems.Wide.DrawSpineSem
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRun
+import all DescriptiveComplexity.Problems.Wide.DrawRunOuter
+import all DescriptiveComplexity.Problems.Wide.DrawSites
+import all DescriptiveComplexity.Problems.Wide.DrawSpineSem
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The sweep and MAIN, at the concrete program
@@ -313,7 +321,7 @@ noncomputable def stageFs
 
 omit [Finite ιV] in
 /-- **`reaches_main`'s `hnextSt`** – by construction. -/
-theorem stageSt_succ (st₀ : TapeStD dt A
+private theorem stageSt_succ (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
     dt.stageSt hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀
@@ -329,7 +337,7 @@ theorem stageSt_succ (st₀ : TapeStD dt A
 
 omit [Finite ιV] in
 /-- **`reaches_main`'s `hnextFs`** – by construction. -/
-theorem stageFs_succ (st₀ : TapeStD dt A
+private theorem stageFs_succ (st₀ : TapeStD dt A
       (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w)) dt.PF)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
     dt.stageFs hpl hlin hord (aT := aT) mV semAt ltpAddr st₀ f₀
@@ -343,7 +351,7 @@ omit [Finite ιV] in
 /-- **A register no leg and no advance writes rides a whole stage** – the
 sweep by `sweepSWG_ride`, the top address's own evaluation by
 `stEndB_ride`. -/
-theorem stageEnd_ride {β : Sort _}
+private theorem stageEnd_ride {β : Sort _}
     (F : TapeStD dt A (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
       dt.PF → β)
     (hFmir : ∀ (X : TapeStD dt A
@@ -391,7 +399,7 @@ omit [Finite ιV] in
 empty address, the mirror with it, the bottom mark, and the end marker
 where the reduction planted it. The first two are rewritten by the
 copy-back's own itinerary, the last two ride. -/
-theorem stageSt_fields (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
+private theorem stageSt_fields (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
     (hmir₀ : st₀.mir = fun _ => False)
     (hbot₀ : st₀.bot = fun r => r = (fun _ => False))
     (hltp₀ : st₀.ltp = fun r => r = ltpAddr) (n : ℕ) :
@@ -535,7 +543,7 @@ theorem stageSt_old
 include hord hbot hbotV hmV0 hIncr hTestT in
 /-- **What the convergence test compares**: at the end of a stage the `old`
 tracks still hold that stage. -/
-theorem stageEnd_old_trackOf
+private theorem stageEnd_old_trackOf
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
@@ -582,7 +590,7 @@ theorem stageEnd_old_trackOf
 include hord hbot hbotV hmV0 hIncr hTestT in
 /-- **And the `new` tracks hold the next one**: the stage's own sweep wrote
 them, and the top address's evaluation leaves every other cell alone. -/
-theorem stageEnd_new_trackOf
+private theorem stageEnd_new_trackOf
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
@@ -764,7 +772,7 @@ include hord hbot hbotV hmV0 hIncr hTestT in
 /-- **`reaches_main`'s `hnotconv`, from a moving stage**: the dictionary is
 faithful over an interval that carries every tuple's own address
 (`assignment_ext_of_trackOf`), so a stage that moves moves its tracks. -/
-theorem stageEnd_not_conv_of_ne
+private theorem stageEnd_not_conv_of_ne
     (hordP : ∀ p q : dt.X.Map A,
       p ≤ q ↔ (encOrder dt.ly zero one hzo).le p q)
     (hKin : ∀ (a : ιV)
@@ -1123,7 +1131,7 @@ variable (hlin : IsLinOrd (WMLe (A := Univ A
 include hR hlin in
 /-- **The startup's exit**: at the marker, the exit guard holds and the rule
 steps right into the evaluation's first checkpoint. -/
-theorem step_clearMir1_exit
+private theorem step_clearMir1_exit
     {v' : Univ A (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
       dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}
@@ -1164,7 +1172,7 @@ include hR hlin in
 /-- **The checkpoint walks back to the marker**: off the marker the
 checkpoint's `stay` rule fires and moves left, which is the one step between
 the startup's exit and `reaches_mainB`'s starting configuration. -/
-theorem step_chk0_back
+private theorem step_chk0_back
     {v' : Univ A (dt.RIx zero one hzo (fun w => dt.varArgsOf zero one w))
       dt.PF dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe (fun _ => False) v') {fc : dt.CtlIx → A}

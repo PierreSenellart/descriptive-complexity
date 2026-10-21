@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.Problems.Sat.TseitinFormulas
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Sat.Tseitin
 
 /-!
 # The Cook–Levin theorem: hardness of SAT
@@ -122,7 +126,7 @@ section Characterizations
 
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
-theorem tseitin_isClause_node (σp : Σ m, NodeAt φ m) (k : Fin 3)
+private theorem tseitin_isClause_node (σp : Σ m, NodeAt φ m) (k : Fin 3)
     (u : Fin (tseitinDim B φ) → A) :
     RelMap (M := (tseitinInterp B φ).Map A) satIsClause
         ![(Sum.inl (Sum.inl (σp, k)), u)] ↔
@@ -130,13 +134,13 @@ theorem tseitin_isClause_node (σp : Σ m, NodeAt φ m) (k : Fin 3)
   rw [FOInterpretation.relMap_map]
   exact realize_isClauseF φ (maxCtx_le_tseitinDim B φ) σp.2 k fun j => (0, j)
 
-theorem tseitin_isClause_top (u : Fin (tseitinDim B φ) → A) :
+private theorem tseitin_isClause_top (u : Fin (tseitinDim B φ) → A) :
     RelMap (M := (tseitinInterp B φ).Map A) satIsClause
         ![(Sum.inl (Sum.inr ()), u)] ↔ Canon 0 u := by
   rw [FOInterpretation.relMap_map]
   exact realize_canonF
 
-theorem tseitin_isClause_var (vt : B.ι ⊕ Σ m, NodeAt φ m)
+private theorem tseitin_isClause_var (vt : B.ι ⊕ Σ m, NodeAt φ m)
     (u : Fin (tseitinDim B φ) → A) :
     ¬RelMap (M := (tseitinInterp B φ).Map A) satIsClause ![(Sum.inr vt, u)] := by
   rw [FOInterpretation.relMap_map]
@@ -153,7 +157,7 @@ def TseitinLitSem (s : Bool) (tc tx : TseitinTag B φ)
       s = true ∧ σp' = ⟨0, rootAt φ⟩ ∧ Canon 0 u ∧ Canon 0 x
   | _, _ => False
 
-theorem tseitin_lit_iff (s : Bool) (tc tx : TseitinTag B φ)
+private theorem tseitin_lit_iff (s : Bool) (tc tx : TseitinTag B φ)
     (u x : Fin (tseitinDim B φ) → A) :
     RelMap (M := (tseitinInterp B φ).Map A) (if s then satPosIn else satNegIn)
         ![(tc, u), (tx, x)] ↔ TseitinLitSem B φ s tc tx u x := by
@@ -298,7 +302,7 @@ theorem tseitin_gates_of_clauses {a₀ : A} (ha₀ : IsBot a₀)
 /-- **From an assignment to clauses**: a truth assignment of the interpreted
 instance that reads, at the propositional variables, the valuation determined
 by a block assignment realizing the kernel, satisfies every clause. -/
-theorem tseitin_clauses_of_realize {a₀ : A} (ha₀ : IsBot a₀) (μ : B.Assignment A)
+private theorem tseitin_clauses_of_realize {a₀ : A} (ha₀ : IsBot a₀) (μ : B.Assignment A)
     (hμ : RealizeWith μ φ finZeroElim) (ν : (tseitinInterp B φ).Map A → Prop)
     (hνμ : ∀ vt x, ν (Sum.inr vt, x) ↔ tseitinVal B φ μ vt x)
     (c : (tseitinInterp B φ).Map A) (hcl : RelMap satIsClause ![c]) :
@@ -422,7 +426,7 @@ theorem sat_NP_hard : NP.Hard SAT :=
 
 /-- The complement of SAT (essentially, propositional entailment of `⊥`) is
 in coNP. -/
-theorem sat_compl_mem_coNP : SATᶜ ∈ coNP :=
+private theorem sat_compl_mem_coNP : SATᶜ ∈ coNP :=
   (compl_mem_coNP_iff SAT).mpr sat_mem_NP
 
 end DescriptiveComplexity

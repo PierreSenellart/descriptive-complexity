@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.Knapsack.Membership
 public import DescriptiveComplexity.Counting.Class
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.Knapsack.Chain
+import all DescriptiveComplexity.Problems.Knapsack.Membership
 
 /-!
 # #Knapsack: counting the solutions of a subset-sum instance
@@ -58,7 +62,7 @@ def certOfWalk (S : A → Prop) (PS Cy : A → A → Prop) : knapsackGuessBlock.
         Cy (w 0) (w 1) ∧ BWItem (w 0) ∧ BWPosn (w 1) ∧ ¬MinPos BWLe BWItem (w 0)
 
 /-- A walk ending on the target gives a certificate of the counting kernel. -/
-theorem knapsackCert_certOfWalk (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
+private theorem knapsackCert_certOfWalk (hlin : IsLinOrd (BWLe (A := A))) {S : A → Prop}
     {PS Cy : A → A → Prop} (hSitem : ∀ i, S i → BWItem i)
     (hchain : IsChain BWLe BWItem BWLe BWPosn S BWBit PS Cy)
     (hfinal : ∀ i p : A, MaxPos BWLe BWItem i → BWPosn p → (PS i p ↔ BWTgt p))
@@ -153,14 +157,14 @@ noncomputable def SharpKnapsack : CountingProblem Language.binWeights where
       have hB0 : IsEmpty {S : B → Prop // KnapsackSol B S} := ⟨fun S => hB S.2.1⟩
       rw [Nat.card_of_isEmpty, Nat.card_of_isEmpty]
 
-theorem sharpKnapsack_apply (A : Type) [Language.binWeights.Structure A] :
+private theorem sharpKnapsack_apply (A : Type) [Language.binWeights.Structure A] :
     SharpKnapsack A = Nat.card {S : A → Prop // KnapsackSol A S} :=
   rfl
 
 /-- **The support of #Knapsack is Knapsack.**
 Registered in the Lax archive as
 [`Lax280166.KnapsackComplete.sharpKnapsack_support_iff`](https://laxarchive.org/lax-280166/Lax280166.KnapsackComplete.html#s-Lax280166.KnapsackComplete.sharpKnapsack_support_iff). -/
-theorem sharpKnapsack_support_iff (A : Type) [Language.binWeights.Structure A] [Finite A] :
+private theorem sharpKnapsack_support_iff (A : Type) [Language.binWeights.Structure A] [Finite A] :
     SharpKnapsack.support A ↔ Knapsack A := by
   rw [CountingProblem.support_iff, sharpKnapsack_apply, Nat.card_pos_iff]
   constructor

@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameNode
+import all DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.Padding
 
 /-!
 # The sentences a phased game is made of
@@ -93,7 +95,7 @@ variable {L C T} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
 /-! ### What they say -/
 
-theorem realize_atTagF (p q : T) (ν : C.Assignment A) :
+private theorem realize_atTagF (p q : T) (ν : C.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) (SOBlock.tagAssign q ν)) (atTagF L C T p) ↔ p = q) := by
@@ -102,7 +104,7 @@ theorem realize_atTagF (p q : T) (ν : C.Assignment A) :
   refine Iff.trans Formula.realize_inf (and_iff_right ?_)
   exact (SOBlock.realize_tagGuardF (L := L.sum Language.order) _).mpr ⟨q, ν, rfl⟩
 
-theorem realize_tagTwoF' (p : T) (σ τ : (C.withTag T).Assignment A)
+private theorem realize_tagTwoF' (p : T) (σ τ : (C.withTag T).Assignment A)
     (x : Fin ((C.withTag T).arity (Sum.inl p)) → A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
@@ -112,14 +114,14 @@ theorem realize_tagTwoF' (p : T) (σ τ : (C.withTag T).Assignment A)
   have : IsEmpty (Fin ((C.withTag T).arity (Sum.inl p))) := inferInstanceAs (IsEmpty (Fin 0))
   exact iff_of_eq (congrArg (τ (Sum.inl p)) (funext fun i => isEmptyElim i))
 
-theorem realize_tagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.Assignment A) :
+private theorem realize_tagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ (SOBlock.tagAssign q ν)) (tagTwoF L C T p) ↔ p = q) :=
   realize_tagTwoF' p σ (SOBlock.tagAssign q ν) fun i => i.elim0
 
 open Classical in
-theorem realize_atTagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.Assignment A) :
+private theorem realize_atTagTwoF (p q : T) (σ : (C.withTag T).Assignment A) (ν : C.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (C.withTag T) A
         (@sumOrderStructure L A instL _) σ (SOBlock.tagAssign q ν))

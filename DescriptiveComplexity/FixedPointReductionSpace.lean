@@ -8,6 +8,12 @@ module
 import DescriptiveComplexity.FixedPointStratifyPartial
 import DescriptiveComplexity.FixedPointPartialMachine
 public import DescriptiveComplexity.FixedPointReductionHierarchy
+import all DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.FixedPointReduction
+import all DescriptiveComplexity.FixedPointReductionComposition
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.TransitiveClosureReduction
+import all DescriptiveComplexity.TransitiveClosureReductionDet
 
 /-!
 # PSPACE is closed under FO(LFP) reductions
@@ -59,7 +65,7 @@ variable {P : DecisionProblem L₁} {Q : DecisionProblem L₂}
 membership iteration is pulled back through the (order-extended)
 interpretation, and the reduction's induction is absorbed as an inflationary
 stratum gating it. -/
-theorem PFPDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : PFPDefinable Q) :
+private theorem PFPDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : PFPDefinable Q) :
     PFPDefinable P := by
   obtain ⟨d, hd⟩ := h
   let := f.tagFinite
@@ -90,17 +96,17 @@ theorem mem_PSPACE_of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : Q ∈ PSPACE) : P 
     (PFPDefinable.of_lfpReduction f ((pfpDefinable_iff_mem_PSPACE Q).mpr h))
 
 /-- **PSPACE is closed under FO(TC) reductions.** -/
-theorem mem_PSPACE_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PSPACE) : P ∈ PSPACE :=
+private theorem mem_PSPACE_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PSPACE) : P ∈ PSPACE :=
   mem_PSPACE_of_lfpReduction f.toLFP h
 
 /-- **PSPACE is closed under FO(DTC) reductions.** -/
-theorem mem_PSPACE_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PSPACE) : P ∈ PSPACE :=
+private theorem mem_PSPACE_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PSPACE) : P ∈ PSPACE :=
   mem_PSPACE_of_tcReduction f.toTC h
 
 /-- **SO(TC) definability is closed under FO(LFP) reductions** – the same
 statement as `DescriptiveComplexity.mem_PSPACE_of_lfpReduction`, at the logic
 PSPACE is defined by. -/
-theorem SOTCDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : SOTCDefinable Q) :
+private theorem SOTCDefinable.of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : SOTCDefinable Q) :
     SOTCDefinable P :=
   (mem_PSPACE_iff P).mp (mem_PSPACE_of_lfpReduction f ((mem_PSPACE_iff Q).mpr h))
 

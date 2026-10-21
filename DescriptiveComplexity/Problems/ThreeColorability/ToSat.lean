@@ -228,7 +228,7 @@ theorem threeColorable_iff_satisfiable (V : Type) [Language.graph.Structure V] :
 /-- **3-colorability FO-reduces to SAT.** The `fo_reduction` theorem: the
 first-order interpretation `threeColToSat` maps a graph to a satisfiable CNF
 instance iff the graph is 3-colorable. -/
-def threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT where
+private def threeCol_fo_reduction_sat : ThreeCol ≤ᶠᵒ SAT where
   Tag := ColTag
   dim := 2
   toInterpretation := threeColToSat

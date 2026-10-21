@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The address a file's marks stand for
@@ -72,15 +73,15 @@ theorem ixAddr_ixMark {s : A → Prop} (hs : IxHolds elt Use s) :
   exact ⟨u, he, by change s (elt u); rw [he]; exact hx⟩
 
 /-- **A mark is the mark of the address it stands for.** -/
-theorem ixMark_ixAddr (hinj : Function.Injective elt) (m : I → Prop) :
+private theorem ixMark_ixAddr (hinj : Function.Injective elt) (m : I → Prop) :
     ixMark elt (ixAddr elt m) = m :=
   funext fun u => propext (ixAddr_elt hinj m u)
 
 /-- **The address of a mark is one the file can hold.** -/
-theorem ixHolds_ixAddr {m : I → Prop} (hm : ∀ u, m u → Use u) :
+private theorem ixHolds_ixAddr {m : I → Prop} (hm : ∀ u, m u → Use u) :
     IxHolds elt Use (ixAddr elt m) := fun _x ⟨u, he, hmu⟩ => ⟨u, hm u hmu, he⟩
 
-theorem ixAddr_empty : ixAddr elt (fun _ : I => False) = fun _ : A => False :=
+private theorem ixAddr_empty : ixAddr elt (fun _ : I => False) = fun _ : A => False :=
   funext fun _ => propext ⟨fun ⟨_, _, h⟩ => h, fun h => h.elim⟩
 
 variable (hinj : Function.Injective elt)
@@ -105,7 +106,7 @@ theorem ixHolds_of_wmSetLe (hLe : IsLinOrd Le) {s t : A → Prop}
 
 include hinj hmono in
 /-- **Comparing marks is comparing the addresses they stand for**, strictly. -/
-theorem wmSetLt_ixAddr (m m' : I → Prop) :
+private theorem wmSetLt_ixAddr (m m' : I → Prop) :
     WMSetLt ile m m' ↔ WMSetLt Le (ixAddr elt m) (ixAddr elt m') := by
   constructor
   · rintro ⟨u, hagree, hnm, hm'u⟩
@@ -140,7 +141,7 @@ theorem wmSetLe_ixAddr (m m' : I → Prop) :
 include hinj hmono in
 /-- **An increment of the addresses is an increment of the marks**: the carry is
 an element the file has a register for, and so is everything above it. -/
-theorem wmIncr_ixMark {s s' : A → Prop} (hs' : IxHolds elt Use s')
+private theorem wmIncr_ixMark {s s' : A → Prop} (hs' : IxHolds elt Use s')
     (hi : WMIncr Le s s') : WMIncr ile (ixMark elt s) (ixMark elt s') := by
   obtain ⟨x, hnx, habove, hnext⟩ := hi
   obtain ⟨u, _hu, rfl⟩ := hs' x ((hnext x).mpr (Or.inl rfl))
@@ -179,10 +180,10 @@ theorem wmIncr_ixAddr {m m' : I → Prop} (hm' : ∀ u, m' u → Use u)
 /-- **At the elementwise file the address is the mark**: a register is an
 element, so the correspondence is the identity and every statement here is the
 one the space-bounded program already had. -/
-theorem ixAddr_id (m : A → Prop) : ixAddr (id : A → A) m = m :=
+private theorem ixAddr_id (m : A → Prop) : ixAddr (id : A → A) m = m :=
   funext fun x => propext ⟨fun ⟨_, he, hm⟩ => he ▸ hm, fun h => ⟨x, rfl, h⟩⟩
 
-theorem ixMark_id (s : A → Prop) : ixMark (id : A → A) s = s := rfl
+private theorem ixMark_id (s : A → Prop) : ixMark (id : A → A) s = s := rfl
 
 end IxAddr
 

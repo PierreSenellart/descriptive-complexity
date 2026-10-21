@@ -170,7 +170,7 @@ variable [Finite A]
 
 /-- The feedback-vertex-set property, with acyclicity certified by an order
 and the threshold by an injection. -/
-theorem feedbackOn_iff_certificate (Adjp : A → A → Prop) (Kp : A → Prop) :
+private theorem feedbackOn_iff_certificate (Adjp : A → A → Prop) (Kp : A → Prop) :
     FeedbackOn Adjp Kp ↔ ∃ C : A → Prop,
       (∃ Lt : A → A → Prop, (∀ x y z, Lt x y → Lt y z → Lt x z) ∧ (∀ x, ¬Lt x x) ∧
         ∀ a b, SurvivingArc Adjp C a b → Lt a b) ∧
@@ -180,7 +180,7 @@ theorem feedbackOn_iff_certificate (Adjp : A → A → Prop) (Kp : A → Prop) :
 
 /-- The feedback-arc-set property, with acyclicity certified by an order and
 the threshold by an injection of pairs. -/
-theorem feedbackArcOn_iff_certificate (Adjp : A → A → Prop) (Kp : A → A → Prop) :
+private theorem feedbackArcOn_iff_certificate (Adjp : A → A → Prop) (Kp : A → A → Prop) :
     FeedbackArcOn Adjp Kp ↔ ∃ F : A → A → Prop,
       (∃ Lt : A → A → Prop, (∀ x y z, Lt x y → Lt y z → Lt x z) ∧ (∀ x, ¬Lt x x) ∧
         ∀ a b, UncutArc Adjp F a b → Lt a b) ∧
@@ -234,7 +234,7 @@ private theorem feedback_symm_hBin {RB : B → B → Prop} {RA : A → A → Pro
   simp
 
 /-- `FeedbackOn` transports along an equivalence, iff version. -/
-theorem FeedbackOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
+private theorem FeedbackOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B → Prop}
     {AdjA : A → A → Prop} {KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hK : ∀ b, KB b ↔ KA (u b)) :
     FeedbackOn AdjB KB ↔ FeedbackOn AdjA KA :=
@@ -242,7 +242,7 @@ theorem FeedbackOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {KB : B →
     FeedbackOn.of_equiv u.symm (feedback_symm_hBin u hadj) (feedback_symm_hUn u hK)⟩
 
 /-- `FeedbackArcOn` transports along an equivalence, iff version. -/
-theorem FeedbackArcOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop}
+private theorem FeedbackArcOn.equiv_iff (u : B ≃ A) {AdjB KB : B → B → Prop}
     {AdjA KA : A → A → Prop} (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b'))
     (hK : ∀ b b', KB b b' ↔ KA (u b) (u b')) :
     FeedbackArcOn AdjB KB ↔ FeedbackArcOn AdjA KA :=

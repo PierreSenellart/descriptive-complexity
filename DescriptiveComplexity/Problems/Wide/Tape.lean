@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Marks
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # A program's tape is a function of the address
@@ -77,7 +80,7 @@ omit [Language.wide.Structure A] [Finite A] in
 /-- **The frame condition, in the program's form**: two symbol assignments
 agreeing off one address present tapes agreeing off that cell. The control points
 are where the general statement needs a case and this one does not. -/
-theorem wideTape_frame {f f' : (A → Prop) → A} {s : A → Prop}
+private theorem wideTape_frame {f f' : (A → Prop) → A} {s : A → Prop}
     (hagree : ∀ r : A → Prop, r ≠ s → f' r = f r) (b : A) :
     ∀ p : WPoint A, p ≠ Sum.inl s → wideTape f' b p = wideTape f b p := by
   rintro (r | x) hne
@@ -100,7 +103,7 @@ theorem step_wideTape_right (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop}
 
 /-- **A left-moving step of a program**, the head stepping down to the address
 whose increment it is on. -/
-theorem step_wideTape_left (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop}
+private theorem step_wideTape_left (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop}
     (hi : WMIncr WMLe t s) {τ q q' b : A} {f f' : (A → Prop) → A}
     (htr : WMTr τ) (hsrc : WMSrc τ q) (hread : WMRead τ (f s)) (hdst : WMDst τ q')
     (hwrite : WMWrite τ (f' s)) (hright : ¬WMRight τ)
@@ -114,7 +117,7 @@ theorem step_wideTape_left (h : IsLinOrd (WMLe (A := A))) {s t : A → Prop}
 /-- **A program scans right to the first cell that stops it.** The scanning
 transition is asked for at the symbol the assignment gives, so no symbol is
 quantified: a caller supplies one transition per symbol it does not stop at. -/
-theorem reachesIn_scan_tape (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A}
+private theorem reachesIn_scan_tape (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A}
     {Stop : (A → Prop) → Prop} {s : A → Prop} (hex : ∃ t, Stop t ∧ WMSetLe WMLe s t)
     (hstep : ∀ r : A → Prop, WMSetLe WMLe s r →
       (∃ t : A → Prop, Stop t ∧ WMSetLe WMLe r t) → ¬Stop r →
@@ -143,7 +146,8 @@ theorem reaches_scan_tape (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → P
 
 /-- **A program scans left to the first cell that stops it**, the same reading
 downwards. -/
-theorem reachesIn_scanBack_tape (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A}
+private theorem reachesIn_scanBack_tape
+    (h : IsLinOrd (WMLe (A := A))) {q b : A} {f : (A → Prop) → A}
     {Stop : (A → Prop) → Prop} {s : A → Prop} (hex : ∃ t, Stop t ∧ WMSetLe WMLe t s)
     (hstep : ∀ r : A → Prop, WMSetLe WMLe r s →
       (∃ t : A → Prop, Stop t ∧ WMSetLe WMLe t r) → ¬Stop r →
@@ -192,19 +196,19 @@ noncomputable def midTape {B : Type} (f₀ f₁ : (A → Prop) → B) (s : A →
 
 omit [Finite A] in
 /-- The cell the head stands on still holds its old symbol. -/
-theorem midTape_self {B : Type} (f₀ f₁ : (A → Prop) → B) (s : A → Prop) :
+private theorem midTape_self {B : Type} (f₀ f₁ : (A → Prop) → B) (s : A → Prop) :
     midTape f₀ f₁ s s = f₀ s :=
   ite_eq_right fun hlt => ((wmSetLt_iff _ _).mp hlt).2 rfl
 
 /-- One increment later, the cell holds its new symbol. -/
-theorem midTape_incr {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A → Prop) → B)
+private theorem midTape_incr {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A → Prop) → B)
     {s t : A → Prop}
     (hi : WMIncr WMLe s t) : midTape f₀ f₁ t s = f₁ s :=
   ite_eq_left ((wmSetLt_iff_of_wmIncr h hi s).mpr ((isLinOrd_wmSetLe h).1 s))
 
 /-- **A step of the sweep changes one cell**: off the cell the head is on, the
 tape before and after the write agree. -/
-theorem midTape_agree {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A → Prop) → B)
+private theorem midTape_agree {B : Type} (h : IsLinOrd (WMLe (A := A))) (f₀ f₁ : (A → Prop) → B)
     {s t : A → Prop} (hi : WMIncr WMLe s t) :
     ∀ r : A → Prop, r ≠ s → midTape f₀ f₁ t r = midTape f₀ f₁ s r := by
   intro r hne
@@ -228,7 +232,7 @@ tape it reads is blank everywhere, so a phase laying down a pattern has to hold
 the pattern's index in the state. That is how a program builds its own register
 file – the state holds the element whose register the head is on, and the order
 successor moves it along. -/
-theorem reachesIn_of_wideWriteSt (h : IsLinOrd (WMLe (A := A))) {b : A}
+private theorem reachesIn_of_wideWriteSt (h : IsLinOrd (WMLe (A := A))) {b : A}
     {st : (A → Prop) → A} {f₀ f₁ : (A → Prop) → A} {s₀ s₁ : A → Prop}
     (hle : WMSetLe WMLe s₀ s₁)
     (hstep : ∀ r r' : A → Prop, WMIncr WMLe r r' → WMSetLe WMLe s₀ r → WMSetLe WMLe r' s₁ →
@@ -298,7 +302,7 @@ theorem acceptsSpace_of_wideTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WM
 
 /-- **A program on a clock accepts**: the same run with its budget kept and
 compared once with the number of addresses. -/
-theorem accepts_of_wideTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
+private theorem accepts_of_wideTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
     {sym : A → A} (hinp : ∀ x : A, WMInp x (sym x)) {f : (A → Prop) → A}
     (hmark : ∀ x : A, f (wmSeg x) = sym x)
     (hrest : ∀ s : A → Prop, (∀ x : A, s ≠ wmSeg x) → f s = b) {q₀ : A} (hq : WMStart q₀)
@@ -315,7 +319,8 @@ theorem accepts_of_wideTape (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank
 
 /-- **A program with a register file accepts on its clock**, the budget compared
 against `2 ^ n`. -/
-theorem accepts_of_wideTape_lt_two_pow (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
+private theorem accepts_of_wideTape_lt_two_pow
+    (h : IsLinOrd (WMLe (A := A))) {b : A} (hb : WMBlank b)
     {sym : A → A} (hinp : ∀ x : A, WMInp x (sym x)) {f : (A → Prop) → A}
     (hmark : ∀ x : A, f (wmSeg x) = sym x)
     (hrest : ∀ s : A → Prop, (∀ x : A, s ≠ wmSeg x) → f s = b) {q₀ : A} (hq : WMStart q₀)

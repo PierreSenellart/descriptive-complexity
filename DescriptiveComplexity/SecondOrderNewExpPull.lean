@@ -10,6 +10,12 @@ public import DescriptiveComplexity.SecondOrderNewMeansB
 public import DescriptiveComplexity.SecondOrderNewOrdered
 public import DescriptiveComplexity.SubstFormula
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.SecondOrderNewMeansB
+import all DescriptiveComplexity.SecondOrderNewOrdered
+import all DescriptiveComplexity.SecondOrderNewPoint
+import all DescriptiveComplexity.SecondOrderOrdered
+import all DescriptiveComplexity.SubstFormula
 
 /-!
 # The block a problem over an expansion is guessed in
@@ -115,7 +121,7 @@ def pullLe (a b : A) : Prop :=
 
 /-- The linear order the guard's order variable carries. -/
 @[instance_reducible]
-noncomputable def pullLinearOrder (hrefl : ∀ a : A, pullLe ρ a a)
+private noncomputable def pullLinearOrder (hrefl : ∀ a : A, pullLe ρ a a)
     (htrans : ∀ a b c : A, pullLe ρ a b → pullLe ρ b c → pullLe ρ a c)
     (hanti : ∀ a b : A, pullLe ρ a b → pullLe ρ b a → a = b)
     (htotal : ∀ a b : A, pullLe ρ a b ∨ pullLe ρ b a) : LinearOrder A :=
@@ -197,7 +203,7 @@ include h hr in
 /-- **The structure the kernel's formulas define on the points is the one the
 source problem is read in**: the expansion's own structure, and the source
 problem's block read at the values naming the points. -/
-theorem pullSubst_rel {n : ℕ} (r : (X.E.sum C.lang).Relations n) (ts : Fin n → X.Map A) :
+private theorem pullSubst_rel {n : ℕ} (r : (X.E.sum C.lang).Relations n) (ts : Fin n → X.Map A) :
     letI := (pullBlock X C).structure₁ (L := newLang L) ρ
     (@RelMap _ (X.Map A) ((pullSubst X C).strucOn e) n r ts ↔
       @RelMap _ (X.Map A) (C.structure₁ (L := X.E) (pullCert ρ e)) n r ts) := by
@@ -229,7 +235,7 @@ theorem pullSubst_rel {n : ℕ} (r : (X.E.sum C.lang).Relations n) (ts : Fin n �
 include h hr in
 /-- The structure identification of `DescriptiveComplexity.pullSubst_rel`, as an
 isomorphism. -/
-noncomputable def pullSubstEquiv :
+private noncomputable def pullSubstEquiv :
     letI := (pullBlock X C).structure₁ (L := newLang L) ρ
     @Language.Equiv (X.E.sum C.lang) (X.Map A) (X.Map A)
       ((pullSubst X C).strucOn e) (C.structure₁ (L := X.E) (pullCert ρ e)) :=
@@ -282,7 +288,7 @@ theorem meanHom_arity (i : (meanBlockB (taggedBlock X)).ι) :
 
 variable (X C) in
 /-- The meaning guard, in the vocabulary of the whole block. -/
-noncomputable def pullMeanGuard : (pullLang X C).Sentence :=
+private noncomputable def pullMeanGuard : (pullLang X C).Sentence :=
   (LHom.sumMap (LHom.id (newLang L))
       (SOBlock.homLHom (meanHom X C) (meanHom_arity X C))).onSentence
     (meanGuardB L (taggedBlock X))
@@ -295,7 +301,7 @@ def pullMeanPart : (meanBlockB (taggedBlock X)).Assignment (A ⊕ Fin m) :=
 
 /-- **The meaning guard, read in the whole block**: it says of the meaning part
 what `DescriptiveComplexity.meanGuardB` says. -/
-theorem realize_pullMeanGuard :
+private theorem realize_pullMeanGuard :
     letI := (pullBlock X C).structure₁ (L := newLang L) ρ
     (((A ⊕ Fin m) ⊨ pullMeanGuard X C) ↔
       @Sentence.Realize _ (A ⊕ Fin m) (meanStrucB (L := L) (pullMeanPart ρ))
@@ -310,7 +316,7 @@ variable {X C} {A : Type} [L.Structure A] [LinearOrder A] [Finite A] {m : ℕ}
 variable (ρ : (pullBlock X C).Assignment (A ⊕ Fin m))
 
 omit [L.IsRelational] [L.Structure A] [LinearOrder A] [Finite A] in
-private theorem fin1_cases {M : Type} (v : M) (w : Fin 0 → M) :
+theorem fin1_cases {M : Type} (v : M) (w : Fin 0 → M) :
     (Fin.cases v w : Fin (0 + 1) → M) = fun _ => v := by
   funext j
   induction j using Fin.cases with
@@ -325,7 +331,7 @@ def pointAssign (p : X.Map A) : (taggedBlock X).Assignment A :=
 omit [L.IsRelational] [Finite A] in
 /-- **Distinct points have distinct assignments**: the assignment holds the
 point's own, and its tag in the tag bits. -/
-theorem pointAssign_injective : Function.Injective (pointAssign (X := X) (A := A)) := by
+private theorem pointAssign_injective : Function.Injective (pointAssign (X := X) (A := A)) := by
   intro p q hα
   refine map_ext ?_ ?_
   · have h₂ : (p.1.1 = p.1.1) = (p.1.1 = q.1.1) :=
@@ -336,7 +342,7 @@ theorem pointAssign_injective : Function.Injective (pointAssign (X := X) (A := A
 
 omit [L.IsRelational] [L.Structure A] [LinearOrder A] [Finite A] in
 /-- A tag atom is the meaning relation of a nullary variable. -/
-theorem pullTags_meaning (v : A ⊕ Fin m) (t : X.Tag)
+private theorem pullTags_meaning (v : A ⊕ Fin m) (t : X.Tag)
     (ts : Fin ((taggedBlock X).arity (Sum.inr t)) → A ⊕ Fin m) :
     pullTags ρ v t ↔ meaningOfB (pullMeanPart ρ) (Sum.inr t) v ts :=
   iff_of_eq (congrArg (pullMeanPart ρ (Sum.inr t)) (fin1_cases v ts).symm)
@@ -373,7 +379,7 @@ include hbij in
 its assignment and carries its tag alone, and – given that a meaning relates an
 invented value to original elements only – every value that is a point is
 named. -/
-theorem pullPointRep
+private theorem pullPointRep
     (hshaped : ∀ (i : (taggedBlock X).ι) (v : A ⊕ Fin m)
       (w : Fin ((taggedBlock X).arity i) → A ⊕ Fin m),
       meaningOfB (pullMeanPart ρ) i v w → ¬IsOld v ∧ ∀ j, IsOld (w j)) :
@@ -414,7 +420,7 @@ section Back
 
 /-- **The sentence**: the order guard, the meaning guard, and the translated
 kernel. -/
-noncomputable def pullSentence (φ : (X.E.sum C.lang).Sentence) : (pullLang X C).Sentence :=
+private noncomputable def pullSentence (φ : (X.E.sum C.lang).Sentence) : (pullLang X C).Sentence :=
   extLinearGuard L (guessBlock X C) ⊓ pullMeanGuard X C ⊓
     (pullSubst X C).substSentence (pullDom X C) φ
 
@@ -424,7 +430,7 @@ variable {X C} {A : Type} [L.Structure A] [Finite A] {m : ℕ}
 sentence carries a linear order of the instance and an assignment of the source
 problem's block over the expansion at that order, for which the source kernel
 holds. -/
-theorem pullSentence_back (φ : (X.E.sum C.lang).Sentence)
+private theorem pullSentence_back (φ : (X.E.sum C.lang).Sentence)
     (ρ : (pullBlock X C).Assignment (A ⊕ Fin m))
     (hψ : letI := (pullBlock X C).structure₁ (L := newLang L) ρ
       ((A ⊕ Fin m) ⊨ pullSentence X C φ)) :

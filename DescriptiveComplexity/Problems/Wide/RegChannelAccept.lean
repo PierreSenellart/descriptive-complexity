@@ -8,6 +8,8 @@ module
 import DescriptiveComplexity.Problems.Wide.RegChannelEntry
 import DescriptiveComplexity.Problems.Wide.RegChannelEval
 public import DescriptiveComplexity.Problems.Wide.RegChannelJoin
+import all DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+import all DescriptiveComplexity.Problems.Wide.RegChannelEval
 
 /-!
 # The evaluation with its verdict read, and the two exits
@@ -69,7 +71,7 @@ omit [LinearOrder A'] [LinearOrder R''] [LinearOrder P''] [Finite A'] [Finite R'
 `wk` track marks, and that address is nobody's register. Both are what the entry
 state says, so the two exits an opening asks for are facts about *where the
 marker is*, not about what the machine has written. -/
-theorem exitG_at_marker {lay : Layout dt' A' R'' P'' I'}
+private theorem exitG_at_marker {lay : Layout dt' A' R'' P'' I'}
     {st : TapeSt dt' A' R'' P'' I'}
     {v : Univ A' R'' P'' dt'.KIx dt'.dd → Prop} (hwk : st.wk v)
     (hnc : ∀ u : I', v ≠ lay.cell u) :
@@ -98,7 +100,7 @@ assumed**: the clocked evaluation without the sentence as a hypothesis,
 the accepting bit coming back as the sentence's own value. This is the form a
 *backward* reading needs – the run exists whatever the verdict, and the bit says
 which. -/
-theorem nexProgHanded_reachesIn_eval_verdict
+private theorem nexProgHanded_reachesIn_eval_verdict
     (hE : NexEmitted PR bot)
     (h : IsLinOrd (WMLe (A := Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))

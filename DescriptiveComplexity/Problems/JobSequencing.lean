@@ -12,6 +12,8 @@ import DescriptiveComplexity.Problems.JobSequencing.Membership
 public import DescriptiveComplexity.Problems.JobSequencing.Hardness
 import DescriptiveComplexity.Problems.NaeThreeSat
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.JobSequencing.Hardness
+import all DescriptiveComplexity.Problems.NaeThreeSat
 
 /-!
 # Job sequencing

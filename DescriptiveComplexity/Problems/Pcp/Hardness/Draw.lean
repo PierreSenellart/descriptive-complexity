@@ -162,7 +162,8 @@ def PTag.sIdx : PTag → ℕ
   | _ => 0
 
 /-- The pair of indices identifies the tag. -/
-theorem PTag.bIdx_sIdx_inj : ∀ {t t' : PTag}, t.bIdx = t'.bIdx → t.sIdx = t'.sIdx → t = t' :=
+theorem PTag.bIdx_sIdx_inj
+    : ∀ {t t' : PTag}, t.bIdx = t'.bIdx → t.sIdx = t'.sIdx → t = t' :=
   by decide
 
 /-! ### The universe and its distinguished elements -/
@@ -180,11 +181,11 @@ variable [LinearOrder A] [Finite A] [Nonempty A]
 /-- The least source element, the padding of the unused coordinates. -/
 noncomputable def pbot : A := (Finite.exists_min (id : A → A)).choose
 
-theorem pbot_le (a : A) : pbot (A := A) ≤ a :=
+private theorem pbot_le (a : A) : pbot (A := A) ≤ a :=
   (Finite.exists_min (id : A → A)).choose_spec a
 
 /-- An element is minimal exactly when it is the least element. -/
-theorem eq_pbot_iff {a : A} : a = pbot ↔ ∀ b, a ≤ b :=
+private theorem eq_pbot_iff {a : A} : a = pbot ↔ ∀ b, a ≤ b :=
   ⟨fun h b => h ▸ pbot_le b, fun h => le_antisymm (h pbot) (pbot_le a)⟩
 
 /-- The constant element of a tag. -/
@@ -201,12 +202,12 @@ noncomputable def idxE (t : PTag) (a : A) : PV A :=
 @[simp] theorem idxE_snd_zero (t : PTag) (a : A) : (idxE t a).2 0 = a := by
   simp [idxE]
 
-theorem idxE_inj {t : PTag} {a a' : A} (h : idxE t a = idxE t a') : a = a' := by
+private theorem idxE_inj {t : PTag} {a a' : A} (h : idxE t a = idxE t a') : a = a' := by
   have := congrFun (congrArg Prod.snd h) 0
   simpa using this
 
 /-- The image of a letter of the domino alphabet. -/
-noncomputable def letterElem : Pcp.History.Letter (TapeLetter A) → PV A
+private noncomputable def letterElem : Pcp.History.Letter (TapeLetter A) → PV A
   | .star => cstE .ltStar
   | .sep => cstE .ltSep
   | .tri => cstE .ltTri
@@ -219,7 +220,7 @@ noncomputable def letterElem : Pcp.History.Letter (TapeLetter A) → PV A
   | .sym (.state q) => idxE .ltState q
 
 /-- The letter map is injective: distinct letters are distinct elements. -/
-theorem letterElem_injective :
+private theorem letterElem_injective :
     Function.Injective (letterElem (A := A)) := by
   intro x y h
   rcases x with (_ | _ | _ | _ | a | q) | _ | _ | _ | _ <;>
@@ -264,7 +265,7 @@ omit [Language.turing.Structure A] in
 theorem tupLe_refl (w : Fin 5 → A) : TupLe w w := by
   simp [TupLe]
 
-theorem pLe_refl (x : PV A) : PLe x x :=
+private theorem pLe_refl (x : PV A) : PLe x x :=
   Or.inr ⟨rfl, Or.inr ⟨rfl, Or.inr ⟨rfl, tupLe_refl x.2⟩⟩⟩
 
 omit [Language.turing.Structure A] in
@@ -328,7 +329,7 @@ theorem mLt_trans (hlin : IsLinOrd (TMLe (A := A))) {a b c : A}
   exact h1.2 (hlin.2.2.1 _ _ h1.1 (hcon ▸ h2.1))
 
 /-- On a well-formed machine, the order of the drawn instance is transitive. -/
-theorem pLe_trans (hlin : IsLinOrd (TMLe (A := A))) {x y z : PV A}
+private theorem pLe_trans (hlin : IsLinOrd (TMLe (A := A))) {x y z : PV A}
     (h1 : PLe x y) (h2 : PLe y z) : PLe x z := by
   rcases h1 with h1 | ⟨e1, h1⟩ <;> rcases h2 with h2 | ⟨e2, h2⟩
   · exact Or.inl (h1.trans h2)
@@ -348,7 +349,7 @@ theorem pLe_trans (hlin : IsLinOrd (TMLe (A := A))) {x y z : PV A}
 
 /-- On a well-formed machine, the order of the drawn instance is
 antisymmetric. -/
-theorem pLe_antisymm (hlin : IsLinOrd (TMLe (A := A))) {x y : PV A}
+private theorem pLe_antisymm (hlin : IsLinOrd (TMLe (A := A))) {x y : PV A}
     (h1 : PLe x y) (h2 : PLe y x) : x = y := by
   rcases h1 with h1 | ⟨e1, h1⟩ <;> rcases h2 with h2 | ⟨e2, h2⟩
   · exact absurd (h1.trans h2) (lt_irrefl _)
@@ -374,7 +375,7 @@ theorem pLe_antisymm (hlin : IsLinOrd (TMLe (A := A))) {x y : PV A}
   fin_cases i <;> assumption
 
 /-- On a well-formed machine, the order of the drawn instance is total. -/
-theorem pLe_total (hlin : IsLinOrd (TMLe (A := A))) (x y : PV A) :
+private theorem pLe_total (hlin : IsLinOrd (TMLe (A := A))) (x y : PV A) :
     PLe x y ∨ PLe y x := by
   rcases Nat.lt_trichotomy x.1.bIdx y.1.bIdx with h | h | h
   · exact Or.inl (Or.inl h)
@@ -391,7 +392,7 @@ theorem pLe_total (hlin : IsLinOrd (TMLe (A := A))) (x y : PV A) :
   · exact Or.inr (Or.inl h)
 
 /-- A block-index gap is a strict comparison, whatever the tuples. -/
-theorem pLt_of_bIdx_lt {x y : PV A} (h : x.1.bIdx < y.1.bIdx) : PLt x y :=
+private theorem pLt_of_bIdx_lt {x y : PV A} (h : x.1.bIdx < y.1.bIdx) : PLt x y :=
   ⟨Or.inl h, fun hcon => absurd (hcon ▸ h) (lt_irrefl _)⟩
 
 end Order
@@ -580,7 +581,7 @@ def decodeDom (x : PV A) : Pcp.History.Dom (TapeLetter A) :=
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- **A domino element stands for a legitimate domino** of the machine's
 system. -/
-theorem ok_decodeDom {x : PV A} (hx : PDom x) :
+private theorem ok_decodeDom {x : PV A} (hx : PDom x) :
     Pcp.History.Ok (MRule (tmData A)) (decodeDom x) := by
   obtain ⟨t, w⟩ := x
   obtain ⟨-, hg⟩ := hx
@@ -608,7 +609,7 @@ theorem ok_decodeDom {x : PV A} (hx : PDom x) :
 
 /-- The top table of a domino element is the decorated top word of the domino
 it stands for. -/
-theorem uWord_eq {x : PV A} (hx : PDom x) :
+private theorem uWord_eq {x : PV A} (hx : PDom x) :
     uWord x = (Pcp.History.topW TapeLetter.halt (decodeDom x)).map letterElem := by
   obtain ⟨t, w⟩ := x
   cases t <;> first
@@ -618,7 +619,7 @@ theorem uWord_eq {x : PV A} (hx : PDom x) :
 /-- The bottom table of a domino element other than the start domino is the
 decorated bottom word of the domino it stands for; the start word of the
 system is irrelevant to those. -/
-theorem vWord_eq {x : PV A} (hx : PDom x) (hne : x.1 ≠ .dStart) (C₀ : List (TapeLetter A)) :
+private theorem vWord_eq {x : PV A} (hx : PDom x) (hne : x.1 ≠ .dStart) (C₀ : List (TapeLetter A)) :
     vWord x = (Pcp.History.botW C₀ (decodeDom x)).map letterElem := by
   obtain ⟨t, w⟩ := x
   cases t <;> first
@@ -669,7 +670,7 @@ theorem exists_encode (hwf : (tmData A).WellFormed) {d : Pcp.History.Dom (TapeLe
 
 omit [Language.turing.Structure A] in
 /-- The block index of a shared position is its number. -/
-theorem posE_bIdx : ∀ {i : ℕ}, i < 8 → (posE (A := A) i).1.bIdx = i
+private theorem posE_bIdx : ∀ {i : ℕ}, i < 8 → (posE (A := A) i).1.bIdx = i
   | 0, _ => rfl
   | 1, _ => rfl
   | 2, _ => rfl
@@ -680,7 +681,7 @@ theorem posE_bIdx : ∀ {i : ℕ}, i < 8 → (posE (A := A) i).1.bIdx = i
   | 7, _ => rfl
 
 /-- The shared positions are strictly increasing. -/
-theorem pairwise_posPrefix {n : ℕ} (hn : n ≤ 8) :
+private theorem pairwise_posPrefix {n : ℕ} (hn : n ≤ 8) :
     (posPrefix (A := A) n).Pairwise PLt := by
   rw [posPrefix, List.pairwise_map]
   refine (List.pairwise_lt_range).imp_of_mem ?_
@@ -728,7 +729,7 @@ omit [Language.turing.Structure A] in
 
 omit [Language.turing.Structure A] in
 /-- Members of the page block are page positions over members of the list. -/
-theorem mem_pagePos {ps : List A} {x : PV A} :
+private theorem mem_pagePos {ps : List A} {x : PV A} :
     x ∈ pagePos ps ↔ ∃ p ∈ ps, x = idxE .pairSym p ∨ x = idxE .pairStar p := by
   rw [pagePos, List.mem_flatMap]
   constructor
@@ -742,7 +743,7 @@ theorem mem_pagePos {ps : List A} {x : PV A} :
     · exact ⟨p, hp, by simp⟩
 
 /-- The page block is strictly increasing along a sorted list of positions. -/
-theorem pairwise_pagePos {ps : List A}
+private theorem pairwise_pagePos {ps : List A}
     (hps : ps.Pairwise fun p q => TMLe p q ∧ p ≠ q) :
     (pagePos ps).Pairwise PLt := by
   induction ps with
@@ -779,7 +780,7 @@ theorem pairwise_pagePos {ps : List A}
 
 /-- The whole position list of the start domino's bottom word is strictly
 increasing. -/
-theorem pairwise_startPos {ps : List A}
+private theorem pairwise_startPos {ps : List A}
     (hps : ps.Pairwise fun p q => TMLe p q ∧ p ≠ q) :
     (startPos ps).Pairwise PLt := by
   have hbounds : ∀ x ∈ pagePos (A := A) ps, x.1.bIdx = 8 := by
@@ -825,7 +826,7 @@ theorem pairwise_startPos {ps : List A}
 
 omit [Language.turing.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- The decorated page, letter by letter. -/
-theorem starR_page (l : List A) :
+private theorem starR_page (l : List A) :
     Pcp.History.starR (Pcp.History.symW (l.map TapeLetter.sym)) =
       l.flatMap fun a =>
         [Pcp.History.Letter.sym (TapeLetter.sym a), Pcp.History.Letter.star] := by
@@ -835,7 +836,7 @@ theorem starR_page (l : List A) :
 
 omit [Language.turing.Structure A] in
 /-- The drawn page, letter by letter. -/
-theorem map_letterElem_page (l : List A) :
+private theorem map_letterElem_page (l : List A) :
     (l.flatMap fun a =>
       [Pcp.History.Letter.sym (TapeLetter.sym a), Pcp.History.Letter.star]).map
         (letterElem (A := A)) = pageBot l := by
@@ -848,7 +849,7 @@ theorem map_letterElem_page (l : List A) :
 omit [Language.turing.Structure A] in
 /-- **The letters of the start domino's bottom word** are the drawn bottom
 word of the abstract start domino. -/
-theorem startBot_eq (inp : List A) :
+private theorem startBot_eq (inp : List A) :
     startBot inp =
       (Pcp.History.botW (startWord inp) Pcp.History.Dom.start).map
         (letterElem (A := A)) := by
@@ -864,7 +865,7 @@ theorem startBot_eq (inp : List A) :
 
 omit [Language.turing.Structure A] in
 /-- The two sides of the start domino's bottom word have the same length. -/
-theorem length_startPos {ps inp : List A} (h : ps.length = inp.length) :
+private theorem length_startPos {ps inp : List A} (h : ps.length = inp.length) :
     (startPos (A := A) ps).length = (startBot (A := A) inp).length := by
   simp only [startPos, startBot, posPrefix, List.length_append, List.length_map,
     List.length_range, List.length_cons, List.length_nil, length_pagePos, length_pageBot, h]

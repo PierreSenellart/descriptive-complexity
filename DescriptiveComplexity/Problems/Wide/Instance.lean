@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Step
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # A wide machine that accepts
@@ -79,17 +80,17 @@ instance structure₂ : Language.wide.Structure (Fin 2) where
 @[simp] theorem wmWrite_iff (a b : Fin 2) : WMWrite a b ↔ False := Iff.rfl
 
 /-- The order of the instance is linear, being the order of `Fin 2`. -/
-theorem isLinOrd_wmLe : IsLinOrd (WMLe (A := Fin 2)) := isLinOrd_le
+private theorem isLinOrd_wmLe : IsLinOrd (WMLe (A := Fin 2)) := isLinOrd_le
 
 /-- The instance is well formed: a linear order, no input to be functional about,
 and exactly one blank. -/
-theorem wellFormed : (wideData (Fin 2)).WellFormed :=
+private theorem wellFormed : (wideData (Fin 2)).WellFormed :=
   wideData_wellFormed_iff.mpr
     ⟨isLinOrd_wmLe, fun _ _ _ hc => absurd hc (wmInp_iff _ _).mp,
       ⟨1, rfl⟩, fun _a _b ha hb => ha.trans hb.symm⟩
 
 /-- The instance is deterministic: it has one start state and no transitions. -/
-theorem deterministic : (wideData (Fin 2)).Deterministic :=
+private theorem deterministic : (wideData (Fin 2)).Deterministic :=
   wideData_deterministic_iff.mpr
     ⟨fun _ _ hq hq' => hq.trans hq'.symm, fun _ _ _ _ ht => absurd ht (wmTr_iff _).mp,
       fun _ _ _ hd => absurd hd (wmDst_iff _ _).mp,
@@ -97,7 +98,7 @@ theorem deterministic : (wideData (Fin 2)).Deterministic :=
 
 /-- **The machine accepts, in no steps**: it starts on the empty address with a
 blank tape in the state `0`, which is accepting. -/
-theorem accepts : (wideData (Fin 2)).Accepts := by
+private theorem accepts : (wideData (Fin 2)).Accepts := by
   have hpos : 0 < Nat.card {p : WPoint (Fin 2) // (wideData (Fin 2)).Posn p} := by
     have : Nonempty {p : WPoint (Fin 2) // (wideData (Fin 2)).Posn p} :=
       ⟨⟨Sum.inl fun _ => False, trivial⟩⟩
@@ -109,7 +110,7 @@ theorem accepts : (wideData (Fin 2)).Accepts := by
 
 /-- **The machine accepts in bounded space too**, the same run with the step bound
 dropped. -/
-theorem acceptsSpace : (wideData (Fin 2)).AcceptsSpace :=
+private theorem acceptsSpace : (wideData (Fin 2)).AcceptsSpace :=
   ⟨⟨Sum.inr 0, Sum.inl fun _ => False, fun _ => Sum.inr 1⟩,
     ⟨Sum.inr 0, Sum.inl fun _ => False, fun _ => Sum.inr 1⟩,
     isInit_wide isLinOrd_wmLe (fun _ _ hc => absurd hc (wmInp_iff _ _).mp) rfl rfl,
@@ -125,12 +126,12 @@ theorem wideAccept_nonvacuous : WideAccept (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.accepts⟩
 
 /-- **`DescriptiveComplexity.WideAcceptSpace` has a yes-instance.** -/
-theorem wideAcceptSpace_nonvacuous : WideAcceptSpace (Fin 2) :=
+private theorem wideAcceptSpace_nonvacuous : WideAcceptSpace (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.acceptsSpace⟩
 
 /-- **`DescriptiveComplexity.DWideAcceptSpace` has a yes-instance**: the instance
 has no transitions, so it is deterministic. -/
-theorem dwideAcceptSpace_nonvacuous : DWideAcceptSpace (Fin 2) :=
+private theorem dwideAcceptSpace_nonvacuous : DWideAcceptSpace (Fin 2) :=
   ⟨WideSmoke.wellFormed, WideSmoke.deterministic, WideSmoke.acceptsSpace⟩
 
 end DescriptiveComplexity

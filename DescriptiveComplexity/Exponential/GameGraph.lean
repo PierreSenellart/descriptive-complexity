@@ -197,7 +197,7 @@ private theorem relMap_nodeAt₂ (h : 2 * d ≤ n) (r : Language.andOrGraph.Rela
   rw [htag, harg]
 
 /-- **Each defining formula asks its question.** -/
-theorem realize_subFormula (h : 2 * d ≤ n) (s : Sub) (tx ty : T) (pts : Fin n → X.Map A) :
+private theorem realize_subFormula (h : 2 * d ≤ n) (s : Sub) (tx ty : T) (pts : Fin n → X.Map A) :
     letI := X.mapLinearOrder A
     ((subFormula I s tx ty).Realize (M := X.Map A)
         (fun p => pts (paramIx d n h p.1 p.2)) ↔ SubHolds I h s tx ty pts) := by

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawGeom
 import DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Padding
 
 /-!
 # The layout's geometry is the padding layer's, so its formulas are written

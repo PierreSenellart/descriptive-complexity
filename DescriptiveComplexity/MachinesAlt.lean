@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Machines
 
 /-!
 # Alternating Turing machines over a universe, without a vocabulary
@@ -89,7 +90,8 @@ def blockPol (start : Bool) (j : ℕ) : Bool :=
 theorem blockPol_zero (start : Bool) : blockPol start 0 = start := rfl
 
 /-- The polarities of consecutive blocks are opposite. -/
-theorem blockPol_succ (start : Bool) (j : ℕ) : blockPol start (j + 1) = !blockPol start j := by
+private theorem blockPol_succ
+    (start : Bool) (j : ℕ) : blockPol start (j + 1) = !blockPol start j := by
   unfold blockPol
   rcases Nat.mod_two_eq_zero_or_one j with h | h
   · have h1 : (j + 1) % 2 = 1 := by omega
@@ -109,15 +111,15 @@ def guardQ (pol : Bool) {α : Type} (C P : α → Prop) : Prop :=
   | true => ∃ a, C a ∧ P a
   | false => (∃ a, C a) ∧ ∀ a, C a → P a
 
-theorem guardQ_true {α : Type} (C P : α → Prop) :
+private theorem guardQ_true {α : Type} (C P : α → Prop) :
     guardQ true C P ↔ ∃ a, C a ∧ P a := Iff.rfl
 
-theorem guardQ_false {α : Type} (C P : α → Prop) :
+private theorem guardQ_false {α : Type} (C P : α → Prop) :
     guardQ false C P ↔ (∃ a, C a) ∧ ∀ a, C a → P a := Iff.rfl
 
 /-- Guarded quantification only depends on its two predicates up to pointwise
 equivalence. -/
-theorem guardQ_congr (pol : Bool) {α : Type} {C C' P P' : α → Prop}
+private theorem guardQ_congr (pol : Bool) {α : Type} {C C' P P' : α → Prop}
     (hC : ∀ a, C a ↔ C' a) (hP : ∀ a, C a → (P a ↔ P' a)) :
     guardQ pol C P ↔ guardQ pol C' P' := by
   cases pol
@@ -204,12 +206,12 @@ section Basic
 variable {M}
 
 /-- Being stuck is the negation of having a successor. -/
-theorem stuck_iff_not_exists_step {c : Config A} : M.Stuck c ↔ ¬∃ c', M.Step c c' := by
+private theorem stuck_iff_not_exists_step {c : Config A} : M.Stuck c ↔ ¬∃ c', M.Step c c' := by
   simp only [Stuck, not_exists]
 
 /-- **Spare budget is never harmful**: one more step to spare cannot turn an
 accepting configuration into a rejecting one. -/
-theorem altAcc_succ {start : Bool} :
+private theorem altAcc_succ {start : Bool} :
     ∀ (n : ℕ) {c : Config A}, M.AltAcc start n c → M.AltAcc start (n + 1) c := by
   intro n
   induction n with
@@ -222,7 +224,7 @@ theorem altAcc_succ {start : Bool} :
     · exact Or.inr (Or.inr ⟨hu, c', hstep, ih hacc⟩)
 
 /-- **Acceptance is monotone in the budget.** -/
-theorem altAcc_mono {start : Bool} :
+private theorem altAcc_mono {start : Bool} :
     ∀ {m n : ℕ}, n ≤ m → ∀ {c : Config A}, M.AltAcc start n c → M.AltAcc start m c := by
   intro m
   induction m with
@@ -236,7 +238,7 @@ theorem altAcc_mono {start : Bool} :
     · rwa [Nat.le_antisymm hn hge] at h
 
 /-- An accepting state accepts, whatever the budget. -/
-theorem altAcc_of_acc {start : Bool} {n : ℕ} {c : Config A} (h : M.Acc c.state) :
+private theorem altAcc_of_acc {start : Bool} {n : ℕ} {c : Config A} (h : M.Acc c.state) :
     M.AltAcc start n c := by
   cases n with
   | zero => exact h
@@ -247,7 +249,7 @@ recursion unfolds to “some run of at most `n` steps reaches an accepting
 state”. This is what makes the one-block problem the machine problem of
 `DescriptiveComplexity.Machines` again, and it is why the alternating model is
 a conservative extension rather than a new one. -/
-theorem altAcc_iff_stepsIn {start : Bool} (hex : ∀ q : A, ¬M.IsUniv start q) :
+private theorem altAcc_iff_stepsIn {start : Bool} (hex : ∀ q : A, ¬M.IsUniv start q) :
     ∀ (n : ℕ) (c : Config A),
       M.AltAcc start n c ↔ ∃ m, m ≤ n ∧ ∃ d, M.StepsIn m c d ∧ M.Acc d.state := by
   intro n
@@ -316,7 +318,7 @@ theorem AltAgree.isUniv (h : AltAgree u N M) (start : Bool) (b : B) :
   exists_congr fun j => and_congr_left' (h.blk j b)
 
 /-- Being stuck transports along an equivalence. -/
-theorem AltAgree.stuck (h : AltAgree u N M) (c : Config B) :
+private theorem AltAgree.stuck (h : AltAgree u N M) (c : Config B) :
     N.Stuck c ↔ M.Stuck (c.map u) := by
   constructor
   · intro hs d hd
@@ -327,7 +329,7 @@ theorem AltAgree.stuck (h : AltAgree u N M) (c : Config B) :
 
 /-- **Alternating acceptance within a budget transports along an
 equivalence.** -/
-theorem AltAgree.altAcc (h : AltAgree u N M) (start : Bool) :
+private theorem AltAgree.altAcc (h : AltAgree u N M) (start : Bool) :
     ∀ (n : ℕ) (c : Config B), N.AltAcc start n c ↔ M.AltAcc start n (c.map u) := by
   intro n
   induction n with

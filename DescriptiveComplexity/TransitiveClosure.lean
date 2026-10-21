@@ -152,7 +152,7 @@ def mapNode (e : A ≃[L.sum Language.order] B) (a : spec.Node A) : spec.Node B 
   (a.1, fun i => e (a.2 i))
 
 /-- One step is preserved by an isomorphism of the ordered expansions. -/
-theorem step_equiv (e : A ≃[L.sum Language.order] B) (a b : spec.Node A) :
+private theorem step_equiv (e : A ≃[L.sum Language.order] B) (a b : spec.Node A) :
     spec.Step (spec.mapNode e a) (spec.mapNode e b) ↔ spec.Step a b := by
   rw [Step, Step, mapNode, mapNode, ← StrongHomClass.realize_formula
     (φ := spec.step a.1 b.1) e]
@@ -160,7 +160,7 @@ theorem step_equiv (e : A ≃[L.sum Language.order] B) (a b : spec.Node A) :
   cases i <;> rfl
 
 /-- Reachability is preserved by an isomorphism of the ordered expansions. -/
-theorem reach_equiv (e : A ≃[L.sum Language.order] B) {a b : spec.Node A}
+private theorem reach_equiv (e : A ≃[L.sum Language.order] B) {a b : spec.Node A}
     (h : spec.Reach a b) : spec.Reach (spec.mapNode e a) (spec.mapNode e b) := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -179,7 +179,7 @@ private theorem accepts_of_equiv (e : A ≃[L.sum Language.order] B) (h : spec.A
 
 /-- **Acceptance is isomorphism-invariant** (for isomorphisms of the ordered
 expansions, the order being visible to the formulas). -/
-theorem accepts_equiv (e : A ≃[L.sum Language.order] B) : spec.Accepts A ↔ spec.Accepts B :=
+private theorem accepts_equiv (e : A ≃[L.sum Language.order] B) : spec.Accepts A ↔ spec.Accepts B :=
   ⟨spec.accepts_of_equiv e, spec.accepts_of_equiv e.symm⟩
 
 end Iso
@@ -205,7 +205,7 @@ def TCDefinable [L.IsRelational] (P : DecisionProblem L) : Prop :=
       P A ↔ spec.Accepts A
 
 /-- FO(TC) definability only depends on the finite instances of a problem. -/
-theorem tcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
+private theorem tcDefinable_congr [L.IsRelational] {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     TCDefinable P ↔ TCDefinable Q := by
   constructor <;> rintro ⟨spec, hspec⟩ <;> refine ⟨spec, ?_⟩ <;> intro A _ _ _ _

@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.Class
 import DescriptiveComplexity.Numbers.DigitExtract
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # Counting possible worlds
@@ -146,7 +147,7 @@ private theorem realize_iInf' {L' : Language.{0, 0}} {M : Type} [L'.Structure M]
     (Formula.iInf f).Realize v ↔ ∀ b, (f b).Realize v :=
   BoundedFormula.realize_iInf
 
-theorem realize_worldSentence {A : Type} [(L.sum L).Structure A]
+private theorem realize_worldSentence {A : Type} [(L.sum L).Structure A]
     (ρ : (worldBlock L).Assignment A) :
     @Sentence.Realize (worldLang L) A
         (@sumStructure (L.sum L) (worldBlock L).lang A _ ((worldBlock L).structure ρ))
@@ -165,7 +166,7 @@ theorem realize_worldSentence {A : Type} [(L.sum L).Structure A]
 
 /-- A sentence of the schema, read in the guessed world, holds exactly when it
 holds in the structure the world is. -/
-theorem realize_toWorld [L.IsRelational] {A : Type} [(L.sum L).Structure A]
+private theorem realize_toWorld [L.IsRelational] {A : Type} [(L.sum L).Structure A]
     (ρ : (worldBlock L).Assignment A) (φ : L.Sentence) :
     @Sentence.Realize (worldLang L) A
         (@sumStructure (L.sum L) (worldBlock L).lang A _ ((worldBlock L).structure ρ))
@@ -183,7 +184,7 @@ which the sentence holds. -/
 noncomputable def worldKernel [L.IsRelational] (φ : L.Sentence) : (worldLang L).Sentence :=
   worldSentence L ⊓ (toWorld L).onSentence φ
 
-theorem realize_worldKernel [L.IsRelational] {A : Type} [(L.sum L).Structure A]
+private theorem realize_worldKernel [L.IsRelational] {A : Type} [(L.sum L).Structure A]
     (ρ : (worldBlock L).Assignment A) (φ : L.Sentence) :
     @Sentence.Realize (worldLang L) A
         (@sumStructure (L.sum L) (worldBlock L).lang A _ ((worldBlock L).structure ρ))
@@ -208,7 +209,7 @@ instance in which the sentence `φ` of the schema holds. -/
 noncomputable def PossibleWorlds (φ : L.Sentence) : CountingProblem (L.sum L) :=
   CountingProblem.ofKernel (worldBlock L) (worldKernel φ)
 
-theorem possibleWorlds_apply (φ : L.Sentence) (A : Type) [(L.sum L).Structure A] :
+private theorem possibleWorlds_apply (φ : L.Sentence) (A : Type) [(L.sum L).Structure A] :
     PossibleWorlds φ A =
       Nat.card {ρ : (worldBlock L).Assignment A //
         IsWorld ρ ∧ @Sentence.Realize L A (worldStructure ρ) φ} :=

@@ -155,7 +155,8 @@ pinned to. -/
 def IsMinTup3 (w : Fin 3 → A) : Prop :=
   (∀ a : A, w 0 ≤ a) ∧ (∀ a : A, w 1 ≤ a) ∧ ∀ a : A, w 2 ≤ a
 
-theorem isMinTup3_unique {w w' : Fin 3 → A} (h : IsMinTup3 w) (h' : IsMinTup3 w') : w = w' := by
+private theorem isMinTup3_unique
+    {w w' : Fin 3 → A} (h : IsMinTup3 w) (h' : IsMinTup3 w') : w = w' := by
   funext i
   fin_cases i
   · exact le_antisymm (h.1 _) (h'.1 _)
@@ -174,14 +175,14 @@ def HPosn (p : UPTag × (Fin 3 → A)) : Prop :=
 
 variable [Finite A] [Nonempty A]
 
-theorem exists_isMinTup3 : ∃ w : Fin 3 → A, IsMinTup3 w := by
+private theorem exists_isMinTup3 : ∃ w : Fin 3 → A, IsMinTup3 w := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   exact ⟨fun _ => m, hm, hm, hm⟩
 
 /-- The blank symbol of the machine: pinned to the triple of minima. -/
 def HBlank (p : UPTag × (Fin 3 → A)) : Prop := p.1 = UPTag.sBlank ∧ IsMinTup3 p.2
 
-theorem exists_hBlank : ∃ p : UPTag × (Fin 3 → A), HBlank p := by
+private theorem exists_hBlank : ∃ p : UPTag × (Fin 3 → A), HBlank p := by
   obtain ⟨w, hw⟩ := exists_isMinTup3 (A := A)
   exact ⟨(UPTag.sBlank, w), rfl, hw⟩
 
@@ -199,7 +200,7 @@ def HInp (p a : UPTag × (Fin 3 → A)) : Prop :=
 
 omit [Finite A] [Nonempty A] in
 /-- The initial tape is functional. -/
-theorem hInp_functional {p a b : UPTag × (Fin 3 → A)} (ha : HInp p a) (hb : HInp p b) :
+private theorem hInp_functional {p a b : UPTag × (Fin 3 → A)} (ha : HInp p a) (hb : HInp p b) :
     a = b := by
   have htup : ∀ u v : Fin 3 → A, u 0 = p.2 0 → (∀ c : A, u 1 ≤ c) → (∀ c : A, u 2 ≤ c) →
       v 0 = p.2 0 → (∀ c : A, v 1 ≤ c) → (∀ c : A, v 2 ≤ c) → u = v := by
@@ -217,19 +218,19 @@ theorem hInp_functional {p a b : UPTag × (Fin 3 → A)} (ha : HInp p a) (hb : H
         | (rw [hp] at hq; exact absurd hq (by decide))
 
 /-- There is a position: the left marker. -/
-theorem exists_hPosn : ∃ p : UPTag × (Fin 3 → A), HPosn p := by
+private theorem exists_hPosn : ∃ p : UPTag × (Fin 3 → A), HPosn p := by
   obtain ⟨w, hw⟩ := exists_isMinTup3 (A := A)
   exact ⟨(UPTag.pStart, w), hw⟩
 
 omit [Finite A] [Nonempty A] in
-private theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOrd o.le :=
+theorem isLinOrd_of_linearOrder {X : Type} (o : LinearOrder X) : IsLinOrd o.le :=
   ⟨fun a => @le_refl X o.toPreorder a, fun a b c => @le_trans X o.toPreorder a b c,
     fun a b => @le_antisymm X o.toPartialOrder a b, fun a b => @le_total X o a b⟩
 
 omit [Finite A] [Nonempty A] in
 /-- **The interpreted order is linear**, from `DescriptiveComplexity.tagTupleOrder` –
 no tag-pair case analysis, exactly as for the SAT machine. -/
-theorem isLinOrd_hTagTupleLe :
+private theorem isLinOrd_hTagTupleLe :
     IsLinOrd (tagTupleLe (Tag := UPTag) (d := 3) (A := A)) := by
   have heq : (tagTupleLe (Tag := UPTag) (d := 3) (A := A)) =
       (tagTupleOrder : LinearOrder (UPTag × (Fin 3 → A))).le := by
@@ -246,13 +247,13 @@ end Positions
 round and clause, one sweep per clause of verification: at most
 `(2n² + n + 2)(n + 2)` steps for `n` elements, while the sixteen filler tags
 contribute `16n³` positions by themselves. -/
-theorem horn_budget {n : ℕ} (hn : 1 ≤ n) :
+private theorem horn_budget {n : ℕ} (hn : 1 ≤ n) :
     (2 * n * n + n + 2) * (n + 2) < 16 * n * n * n := by
   nlinarith [hn, Nat.mul_le_mul (Nat.mul_le_mul hn hn) hn]
 
 /-- The tape really has that many positions: the filler tuples alone inject
 into the positions. -/
-theorem card_le_card_hPosn (A : Type) [LinearOrder A] [Finite A] :
+private theorem card_le_card_hPosn (A : Type) [LinearOrder A] [Finite A] :
     16 * Nat.card A * Nat.card A * Nat.card A ≤
       Nat.card {p : UPTag × (Fin 3 → A) // HPosn p} := by
   have hinj : Function.Injective

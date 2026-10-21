@@ -8,6 +8,9 @@ module
 import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.ThreeColorability.ToSat
 import DescriptiveComplexity.Problems.ThreeColorability.FromSat
+import all DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Problems.ThreeColorability.FromSat
+import all DescriptiveComplexity.Problems.ThreeColorability.ToSat
 
 /-!
 # 3-colorability is NP-complete

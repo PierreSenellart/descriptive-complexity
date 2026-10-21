@@ -10,6 +10,7 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Hamilton.Defs
 public import DescriptiveComplexity.Counting.Class
 public import DescriptiveComplexity.Permanent.Basic
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # #Cycle Cover: the permanent of a 0-1 matrix
@@ -46,23 +47,24 @@ def IsCycleCover (R F : A → A → Prop) : Prop :=
   (∀ x, ∃! y, F x y) ∧ (∀ y, ∃! x, F x y) ∧ ∀ x y, F x y → R x y
 
 /-- A cycle cover, as a permutation: `x` goes to the unique `y` with `F x y`. -/
-noncomputable def IsCycleCover.toFun {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) : A :=
+noncomputable def IsCycleCover.toFun
+    {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) : A :=
   Classical.choose (h.1 x).exists
 
-theorem IsCycleCover.rel_toFun {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) :
+private theorem IsCycleCover.rel_toFun {R F : A → A → Prop} (h : IsCycleCover R F) (x : A) :
     F x (h.toFun x) :=
   Classical.choose_spec (h.1 x).exists
 
-theorem IsCycleCover.eq_toFun {R F : A → A → Prop} (h : IsCycleCover R F) {x y : A}
+private theorem IsCycleCover.eq_toFun {R F : A → A → Prop} (h : IsCycleCover R F) {x y : A}
     (hxy : F x y) : y = h.toFun x :=
   (h.1 x).unique hxy (h.rel_toFun x)
 
-theorem IsCycleCover.toFun_injective {R F : A → A → Prop} (h : IsCycleCover R F) :
+private theorem IsCycleCover.toFun_injective {R F : A → A → Prop} (h : IsCycleCover R F) :
     Function.Injective h.toFun := fun x x' hxx' =>
   (h.2.1 (h.toFun x)).unique (h.rel_toFun x) (hxx' ▸ h.rel_toFun x')
 
 /-- The relation of a permutation along `R` is a cycle cover. -/
-theorem isCycleCover_of_equiv {R : A → A → Prop} (e : A ≃ A) (he : ∀ x, R x (e x)) :
+private theorem isCycleCover_of_equiv {R : A → A → Prop} (e : A ≃ A) (he : ∀ x, R x (e x)) :
     IsCycleCover R fun x y => e x = y :=
   ⟨fun x => ⟨e x, rfl, fun _ h => h.symm⟩,
     fun y => ⟨e.symm y, e.apply_symm_apply y, fun _ h => by rw [← h, e.symm_apply_apply]⟩,
@@ -70,7 +72,7 @@ theorem isCycleCover_of_equiv {R : A → A → Prop} (e : A ≃ A) (he : ∀ x, 
 
 /-- **The cycle covers of a finite digraph are the permutations along its
 arcs.** -/
-noncomputable def cycleCoverEquiv [Finite A] (R : A → A → Prop) :
+private noncomputable def cycleCoverEquiv [Finite A] (R : A → A → Prop) :
     {F : A → A → Prop // IsCycleCover R F} ≃ {e : A ≃ A // ∀ x, R x (e x)} where
   toFun F := ⟨Equiv.ofBijective F.2.toFun (Finite.injective_iff_bijective.mp
     F.2.toFun_injective), fun x => F.2.2.2 x _ (F.2.rel_toFun x)⟩
@@ -81,7 +83,7 @@ noncomputable def cycleCoverEquiv [Finite A] (R : A → A → Prop) :
     ((isCycleCover_of_equiv e.1 e.2).eq_toFun (rfl : e.1 x = e.1 x)).symm)
 
 /-- **The number of cycle covers is the permanent of the adjacency matrix.** -/
-theorem card_isCycleCover_eq_bperm [Fintype A] [DecidableEq A] (R : A → A → Prop)
+private theorem card_isCycleCover_eq_bperm [Fintype A] [DecidableEq A] (R : A → A → Prop)
     [DecidableRel R] :
     Nat.card {F : A → A → Prop // IsCycleCover R F} =
       bperm fun x y => if R x y then (1 : ℕ) else 0 := by
@@ -115,7 +117,7 @@ noncomputable def cycleCoverKernel : coverSOLang.Sentence :=
 variable {A : Type} [Language.digraph.Structure A]
 
 /-- Realization of the kernel under an assignment of the guessed cover. -/
-theorem realize_cycleCoverKernel (ρ : coverGuessBlock.Assignment A) :
+private theorem realize_cycleCoverKernel (ρ : coverGuessBlock.Assignment A) :
     (@Sentence.Realize coverSOLang A
         (@sumStructure _ _ A _ (coverGuessBlock.structure ρ)) cycleCoverKernel) ↔
       IsCycleCover (fun x y : A => DGArc x y) fun x y : A => ρ .nxt ![x, y] := by
@@ -178,7 +180,7 @@ noncomputable def SharpCycleCover : CountingProblem Language.digraph where
     rw [card_isCycleCover_eq_witnessCount A, card_isCycleCover_eq_witnessCount B]
     exact witnessCount_iso coverGuessBlock cycleCoverKernel e
 
-theorem sharpCycleCover_apply (A : Type) [Language.digraph.Structure A] :
+private theorem sharpCycleCover_apply (A : Type) [Language.digraph.Structure A] :
     SharpCycleCover A = Nat.card {F : A → A → Prop // IsCycleCover (fun x y : A => DGArc x y) F} :=
   rfl
 

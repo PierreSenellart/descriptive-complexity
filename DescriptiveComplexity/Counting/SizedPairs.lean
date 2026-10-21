@@ -46,7 +46,7 @@ def SOBlock.restPart₂ (ρ : B.withBij₂.Assignment A) : B.Assignment A :=
 
 /-- The assignment of the extended block determined by a quaternary relation
 and an assignment of the original block. -/
-def SOBlock.joinBij₂ (R : (Fin 4 → A) → Prop) (ρ : B.Assignment A) :
+private def SOBlock.joinBij₂ (R : (Fin 4 → A) → Prop) (ρ : B.Assignment A) :
     B.withBij₂.Assignment A :=
   fun p => match p with
     | Sum.inl _ => R
@@ -65,7 +65,7 @@ def sizedPairsLHom : L.sum B.lang →ᴸ (L.sum Language.order).sum B.withBij₂
     | _, Sum.inr s => Sum.inr ⟨Sum.inr s.1, s.2⟩
 
 /-- The structure of the sized kernel expands that of the order-free one. -/
-theorem sizedPairsLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
+private theorem sizedPairsLHom_isExpansionOn (instA : L.Structure A) (lo : LinearOrder A)
     (ρ : B.withBij₂.Assignment A) :
     @LHom.IsExpansionOn _ _ (sizedPairsLHom L B) A
       (@sumStructure L B.lang A instA (B.structure (B.restPart₂ ρ)))
@@ -152,7 +152,7 @@ theorem pairArg_eta (w : Fin (B.arity i₀) → A) :
   fin_cases k <;> rfl
 
 /-- Realization of the monotone-bijection sentence. -/
-theorem realize_monoBij₂S (instA : L.Structure A) [LinearOrder A]
+private theorem realize_monoBij₂S (instA : L.Structure A) [LinearOrder A]
     (ρ : B.withBij₂.Assignment A) :
     @Sentence.Realize _ A
         (@sumStructure (L.sum Language.order) B.withBij₂.lang A _
@@ -224,7 +224,7 @@ noncomputable def sizedPairsKernel :
   (sizedPairsLHom L B).onSentence φ₀ ⊓ monoBij₂S L B mk i₀ h₀
 
 /-- Realization of the sized kernel for pairs. -/
-theorem realize_sizedPairsKernel (instA : L.Structure A) [LinearOrder A]
+private theorem realize_sizedPairsKernel (instA : L.Structure A) [LinearOrder A]
     (ρ : B.withBij₂.Assignment A) :
     @Sentence.Realize _ A
         (@sumStructure (L.sum Language.order) B.withBij₂.lang A _

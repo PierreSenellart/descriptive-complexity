@@ -10,6 +10,8 @@ public import DescriptiveComplexity.Counting.SizedPairs
 import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Problems.Feedback.Counting
 
 /-!
 # #Feedback Arc Set: counting the feedback arc sets of the threshold size
@@ -103,7 +105,7 @@ noncomputable def SharpFeedbackArcSet : CountingProblem Language.markedArcGraph 
     (fasOfSizeEquiv e.toEquiv (fun a a' => relMap_equiv₂ e magAdj a a')
       fun a a' => relMap_equiv₂ e magMarked a a')
 
-theorem sharpFeedbackArcSet_apply (A : Type) [Language.markedArcGraph.Structure A] :
+private theorem sharpFeedbackArcSet_apply (A : Type) [Language.markedArcGraph.Structure A] :
     SharpFeedbackArcSet A = Nat.card {F : A → A → Prop // FasOfSize A F} :=
   rfl
 
@@ -120,7 +122,7 @@ theorem sharpFeedbackArcSet_support_iff (A : Type) [Language.markedArcGraph.Stru
 fails when the threshold exceeds the number of arcs.
 Registered in the Lax archive as
 [`Lax280166.FeedbackArcSetComplete.feedbackArcSet_of_sharpFeedbackArcSet_support`](https://laxarchive.org/lax-280166/Lax280166.FeedbackArcSetComplete.html#s-Lax280166.FeedbackArcSetComplete.feedbackArcSet_of_sharpFeedbackArcSet_support). -/
-theorem feedbackArcSet_of_sharpFeedbackArcSet_support (A : Type)
+private theorem feedbackArcSet_of_sharpFeedbackArcSet_support (A : Type)
     [Language.markedArcGraph.Structure A] [Finite A] (h : SharpFeedbackArcSet.support A) :
     FeedbackArcSet A := by
   obtain ⟨F, hfin, -, hac, hcard⟩ := (sharpFeedbackArcSet_support_iff A).mp h
@@ -138,7 +140,7 @@ fo_block fasCountBlock over Language.markedArcGraph mag into fasCountLang with f
 
 /-- The order-free kernel of #Feedback Arc Set: the removed pairs are arcs, and
 the second relation is the transitive closure of the other arcs, irreflexive. -/
-noncomputable def fasCountKernel : fasCountLang.Sentence :=
+private noncomputable def fasCountKernel : fasCountLang.Sentence :=
   fo% (∀ x y, faCutSym(x, y) → faAdjSym(x, y)) ∧
     (∀ x y, (faAdjSym(x, y) ∧ ¬ faCutSym(x, y)) → faTcSym(x, y)) ∧
     (∀ x y z, faTcSym(x, y) ∧ faTcSym(y, z) → faTcSym(x, z)) ∧
@@ -151,7 +153,7 @@ section Kernel
 variable {A : Type} [Language.markedArcGraph.Structure A]
 
 /-- Realization of the order-free kernel of #Feedback Arc Set. -/
-theorem realize_fasCountKernel (ρ : fasCountBlock.Assignment A) :
+private theorem realize_fasCountKernel (ρ : fasCountBlock.Assignment A) :
     (@Sentence.Realize fasCountLang A
         (@sumStructure _ _ A _ (fasCountBlock.structure ρ)) fasCountKernel) ↔
       (∀ a b : A, ρ .cut ![a, b] → MAGAdj a b) ∧
@@ -177,7 +179,7 @@ theorem realize_fasCountKernel (ρ : fasCountBlock.Assignment A) :
 
 /-- The certificate of a set of arcs: the set, and the transitive closure of
 the arcs its removal leaves. -/
-def fasCertOf (F : A → A → Prop) : fasCountBlock.Assignment A :=
+private def fasCertOf (F : A → A → Prop) : fasCountBlock.Assignment A :=
   fun i => match i with
     | .cut => fun w : Fin 2 → A => F (w 0) (w 1)
     | .tc => fun w : Fin 2 → A =>
@@ -187,7 +189,7 @@ variable (A) [Finite A]
 
 /-- **The feedback arc sets of the threshold size are the witnesses of the
 kernel of that size**, bijectively. -/
-noncomputable def fasEquiv :
+private noncomputable def fasEquiv :
     {ρ : fasCountBlock.Assignment A //
         (@Sentence.Realize fasCountLang A
           (@sumStructure _ _ A _ (fasCountBlock.structure ρ)) fasCountKernel) ∧

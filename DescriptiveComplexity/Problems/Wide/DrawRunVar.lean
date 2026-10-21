@@ -9,6 +9,13 @@ public import DescriptiveComplexity.Problems.Wide.DrawBack
 public import DescriptiveComplexity.Problems.Wide.DrawVar
 public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 public import DescriptiveComplexity.Problems.Wide.DrawLoop
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawIncrKit
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # One variable's machinery: the run
@@ -191,7 +198,7 @@ include hrules hR hlin hix hbot hwork hv hvi hbg hGates in
 omit hwork [Finite I] in
 /-- **The machinery, entered**: from the entry checkpoint at the marker,
 through the gates, to the verdict checkpoint. -/
-theorem var_reachesIn_gates :
+private theorem var_reachesIn_gates :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn (1 + wG)
       ⟨Sum.inr (PR.stElt (emb .vchk0) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt RF.cell Slot.val rest mval) (PR.syElt PR.blank)⟩
@@ -258,7 +265,7 @@ include hrules hR hlin hix htop hbot hv hvi hbg hGates hflag hbgC hCoff hbotV ht
 marker, through the gates, the VAL clear and the rounds of matrix pass, test
 and increment, to the exit checkpoint – VAL exhausted, the verdict spelled by
 the accumulators the dispatches folded. -/
-theorem var_reachesIn (hS : wideRank (RF.cell gtop) + 2 +
+private theorem var_reachesIn (hS : wideRank (RF.cell gtop) + 2 +
       ((ixRank RF.le gtop - ixRank RF.le gbot) * w + 1) +
       wideRank (RF.cell gbot) ≤ wS) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
@@ -682,7 +689,7 @@ include hrules hR hlin hix hbot hv hvi in
 /-- **The failing exit step**: at the marker with the gates' verdict flag
 clear, the verdict checkpoint erases the variable's stage slot and leaves
 right into the exit phase, skipping the whole VAL loop. -/
-theorem step_var_failExit
+private theorem step_var_failExit
     {rest rest' : (Univ A R P dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     {mval : I → Prop} {f : Q → A}
     (hbgV : dt.VarBg RF PR.zero PR.one v gtop rest mval)
@@ -731,7 +738,7 @@ include hrules hR hlin hix hbot hv hvi hbg hGates in
 /-- **The machinery on a failing address**: through the gates to the
 verdict checkpoint, whose clear flag routes straight to the exit – the
 stage slot erased, the VAL loop never entered. -/
-theorem var_reachesIn_fail (hflagF : fG gateFlag ≠ PR.one)
+private theorem var_reachesIn_fail (hflagF : fG gateFlag ≠ PR.one)
     (hns : newSlot ≠ Slot.val)
     {rest' : (Univ A R P dt.KIx dt.dd → Prop) → dt.SlotIx → A}
     (hoff : ∀ r, r ≠ v → rest' r = rest r)
@@ -754,7 +761,7 @@ sweeps' from `wideRank_lt_card`, so nothing has to have been counted. -/
 omit [Finite I] in
 include hrules hR hlin hix hbot hv hvi hbg in
 /-- **The machinery on a failing address**, the budget forgotten. -/
-theorem var_run_fail
+private theorem var_run_fail
     (hGatesR : Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt pgEntry (enterSt f₀ (rest v))), Sum.inl v',
         wideTape (PR.trackTapeAt RF.cell Slot.val rest mval) (PR.syElt PR.blank)⟩

@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawCtl
 public import DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawData
 
 /-!
 # The fold, in the control's slots
@@ -63,7 +66,7 @@ noncomputable def putVec {m : ℕ} (accs : Fin m → dt.CtlIx) (f : dt.CtlIx →
 
 variable {dt zero one}
 
-theorem putVec_of_not_mem {m : ℕ} {accs : Fin m → dt.CtlIx} {f : dt.CtlIx → A}
+private theorem putVec_of_not_mem {m : ℕ} {accs : Fin m → dt.CtlIx} {f : dt.CtlIx → A}
     {b : Fin m → Prop} {q : dt.CtlIx} (h : ∀ j : Fin m, q ≠ accs j) :
     dt.putVec zero one accs f b q = f q := by
   classical
@@ -72,7 +75,7 @@ theorem putVec_of_not_mem {m : ℕ} {accs : Fin m → dt.CtlIx} {f : dt.CtlIx �
   exact h j hj
 
 /-- **A vector reads back**, index by index. -/
-theorem readVec_putVec (hzo : zero ≠ one) {m : ℕ} {accs : Fin m → dt.CtlIx}
+private theorem readVec_putVec (hzo : zero ≠ one) {m : ℕ} {accs : Fin m → dt.CtlIx}
     (hinj : Function.Injective accs) (f : dt.CtlIx → A) (b : Fin m → Prop)
     {j : ℕ} (hj : j < m) :
     dt.readVec one accs (dt.putVec zero one accs f b) j ↔ b ⟨j, hj⟩ := by
@@ -111,30 +114,30 @@ noncomputable def putSac (f : dt.CtlIx → A) (b : Fin dt.eDim → Prop) :
     dt.CtlIx → A :=
   dt.putVec zero one dt.sacC f b
 
-theorem sacC_injective : Function.Injective dt.sacC := by
+private theorem sacC_injective : Function.Injective dt.sacC := by
   intro j j' h
   injection h
 
 variable {dt zero one}
 
-theorem putAcc_of_not_acc {f : dt.CtlIx → A} {b : Fin dt.naDim → Prop}
+private theorem putAcc_of_not_acc {f : dt.CtlIx → A} {b : Fin dt.naDim → Prop}
     {q : dt.CtlIx} (h : ∀ j : Fin dt.naDim, q ≠ dt.accC j) :
     dt.putAcc zero one f b q = f q :=
   putVec_of_not_mem h
 
-theorem putSac_of_not_sac {f : dt.CtlIx → A} {b : Fin dt.eDim → Prop}
+private theorem putSac_of_not_sac {f : dt.CtlIx → A} {b : Fin dt.eDim → Prop}
     {q : dt.CtlIx} (h : ∀ j : Fin dt.eDim, q ≠ dt.sacC j) :
     dt.putSac zero one f b q = f q :=
   putVec_of_not_mem h
 
 /-- The inner fold's vector reads back, level by level. -/
-theorem readAcc_putAcc (hzo : zero ≠ one) (f : dt.CtlIx → A)
+private theorem readAcc_putAcc (hzo : zero ≠ one) (f : dt.CtlIx → A)
     (b : Fin dt.naDim → Prop) {j : ℕ} (hj : j < dt.naDim) :
     dt.readAcc one (dt.putAcc zero one f b) j ↔ b ⟨j, hj⟩ :=
   readVec_putVec hzo dt.accC_injective f b hj
 
 /-- A sub-fold's vector reads back, level by level. -/
-theorem readSac_putSac (hzo : zero ≠ one) (f : dt.CtlIx → A)
+private theorem readSac_putSac (hzo : zero ≠ one) (f : dt.CtlIx → A)
     (b : Fin dt.eDim → Prop) {j : ℕ} (hj : j < dt.eDim) :
     dt.readSac one (dt.putSac zero one f b) j ↔ b ⟨j, hj⟩ :=
   readVec_putVec hzo dt.sacC_injective f b hj
@@ -160,21 +163,21 @@ noncomputable def setLeaf (b : Prop) (f : dt.CtlIx → A) : dt.CtlIx → A :=
 
 variable {dt zero one}
 
-theorem accC_ne_leafC (j : Fin dt.naDim) : dt.accC j ≠ dt.leafC := fun h => nomatch h
+private theorem accC_ne_leafC (j : Fin dt.naDim) : dt.accC j ≠ dt.leafC := fun h => nomatch h
 
-theorem leafC_ne_accC (j : Fin dt.naDim) : dt.leafC ≠ dt.accC j := fun h => nomatch h
+private theorem leafC_ne_accC (j : Fin dt.naDim) : dt.leafC ≠ dt.accC j := fun h => nomatch h
 
 @[simp]
 theorem ctlBit_setLeaf (hzo : zero ≠ one) (b : Prop) (f : dt.CtlIx → A) :
     dt.ctlBit one (dt.setLeaf zero one b f) dt.leafC ↔ b :=
   ctlBit_setCtl_self hzo _ _ _
 
-theorem setLeaf_of_ne {q : dt.CtlIx} (hne : q ≠ dt.leafC) (b : Prop)
+private theorem setLeaf_of_ne {q : dt.CtlIx} (hne : q ≠ dt.leafC) (b : Prop)
     (f : dt.CtlIx → A) : dt.setLeaf zero one b f q = f q :=
   setCtl_of_ne hne _ _
 
 /-- The accumulators ride along a write of the leaf flag. -/
-theorem readAcc_setLeaf (b : Prop) (f : dt.CtlIx → A) (j : ℕ) :
+private theorem readAcc_setLeaf (b : Prop) (f : dt.CtlIx → A) (j : ℕ) :
     dt.readAcc one (dt.setLeaf zero one b f) j ↔ dt.readAcc one f j := by
   refine exists_congr fun h => ?_
   rw [setLeaf_of_ne (accC_ne_leafC (dt := dt) ⟨j, h⟩)]
@@ -214,14 +217,14 @@ variable {dt zero one}
 
 /-- **What the initialized vector reads**: the polarity's unit at every
 level, which is `DescriptiveComplexity.Draw.accCVal_bot`'s value. -/
-theorem readAcc_initAcc (hzo : zero ≠ one) (pol : ℕ → Bool) (f : dt.CtlIx → A)
+private theorem readAcc_initAcc (hzo : zero ≠ one) (pol : ℕ → Bool) (f : dt.CtlIx → A)
     {j : ℕ} (hj : j < dt.naDim) :
     dt.readAcc one (dt.initAcc zero one pol f) j ↔ (pol j = false) :=
   readAcc_putAcc hzo f _ hj
 
 /-- **What the vector reads after a carry**: exactly the shape
 `DescriptiveComplexity.Draw.accCVal_step` asks for. -/
-theorem readAcc_carryAcc (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
+private theorem readAcc_carryAcc (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
     (f : dt.CtlIx → A) {j : ℕ} (hj : j < dt.naDim) :
     dt.readAcc one (dt.carryAcc zero one pol c f) j ↔
       (if j < c then dt.readAcc one f j
@@ -278,10 +281,10 @@ noncomputable def carrySac (pol : ℕ → Bool) (c : ℕ) (f : dt.CtlIx → A) :
 
 variable {dt zero one}
 
-theorem sacC_ne_subLeafC (j : Fin dt.eDim) : dt.sacC j ≠ dt.subLeafC :=
+private theorem sacC_ne_subLeafC (j : Fin dt.eDim) : dt.sacC j ≠ dt.subLeafC :=
   fun h => nomatch h
 
-theorem subLeafC_ne_sacC (j : Fin dt.eDim) : dt.subLeafC ≠ dt.sacC j :=
+private theorem subLeafC_ne_sacC (j : Fin dt.eDim) : dt.subLeafC ≠ dt.sacC j :=
   fun h => nomatch h
 
 @[simp]
@@ -290,18 +293,18 @@ theorem ctlBit_setSubLeaf (hzo : zero ≠ one) (b : Prop) (f : dt.CtlIx → A) :
   ctlBit_setCtl_self hzo _ _ _
 
 /-- A sub-fold's accumulators ride along a write of its leaf flag. -/
-theorem readSac_setSubLeaf (b : Prop) (f : dt.CtlIx → A) (j : ℕ) :
+private theorem readSac_setSubLeaf (b : Prop) (f : dt.CtlIx → A) (j : ℕ) :
     dt.readSac one (dt.setSubLeaf zero one b f) j ↔ dt.readSac one f j := by
   refine exists_congr fun h => ?_
   rw [setSubLeaf, setCtl_of_ne (sacC_ne_subLeafC (dt := dt) ⟨j, h⟩)]
 
 /-- The loop's wide tuple rides along a write of a sub-fold's
 accumulators. -/
-theorem putSac_of_lvE (f : dt.CtlIx → A) (b : Fin dt.eDim → Prop) (j : Fin dt.eDim) :
+private theorem putSac_of_lvE (f : dt.CtlIx → A) (b : Fin dt.eDim → Prop) (j : Fin dt.eDim) :
     dt.putSac zero one f b (dt.lvE j) = f (dt.lvE j) :=
   putSac_of_not_sac fun _ => fun h => nomatch h
 
-theorem readSac_carrySac (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
+private theorem readSac_carrySac (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
     (f : dt.CtlIx → A) {j : ℕ} (hj : j < dt.eDim) :
     dt.readSac one (dt.carrySac zero one pol c f) j ↔
       (if j < c then dt.readSac one f j
@@ -318,7 +321,7 @@ theorem readSac_carrySac (hzo : zero ≠ one) (pol : ℕ → Bool) (c : ℕ)
   readSac_putSac hzo f _ hj
 
 /-- **A sub-fold's verdict is its fold**, by the same chain. -/
-theorem sacVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
+private theorem sacVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
     {P : (Fin dt.eDim → α) → Prop} {pol : ℕ → Bool} {v : Fin dt.eDim → α}
     {f : dt.CtlIx → A}
     (hacc : ∀ j : ℕ, j < dt.eDim → (dt.readSac one f j ↔ accCVal pol P le j v))
@@ -332,7 +335,7 @@ theorem sacVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
 and the leaf flag the matrix at the current valuation, the chain from level
 `0` is the fold's value there – so the exit checkpoint's guard reads the
 sweep's answer off the control. -/
-theorem accVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
+private theorem accVerdict_iff_foldFrom {α : Type} {le : α → α → Prop}
     {P : (Fin dt.ki → α) → Prop} {pol : ℕ → Bool} {v : Fin dt.ki → α}
     {f : dt.CtlIx → A}
     (hacc : ∀ j : ℕ, j < dt.ki → (dt.readAcc one f j ↔ accCVal pol P le j v))
@@ -350,7 +353,7 @@ omit [Finite A] [Nonempty A] in
 filed its verdict, the Boolean function the control computes is the matrix at
 the atoms' readings – `DescriptiveComplexity.Draw.realize_iff_qfValue_holds`'s
 right-hand side, which is what the machine's leaf must be. -/
-theorem postLeaf_iff_qfValue {v : dt.VarIx} {f : dt.CtlIx → A}
+private theorem postLeaf_iff_qfValue {v : dt.VarIx} {f : dt.CtlIx → A}
     {σ : dt.d.B.Assignment (dt.X.Map A)} {w : Fin (dt.nOf v) → dt.X.Map A}
     (hav : ∀ k : Fin (dt.natOf v),
       dt.ctlBit one f (dt.avC (Fin.castLE (dt.natOf_le_natMax v) k)) ↔

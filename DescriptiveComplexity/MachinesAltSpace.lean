@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.MachinesAlt
 
 /-!
 # Alternating machines in bounded space
@@ -96,7 +98,7 @@ def AltAcceptsSpace (start : Bool) : Prop :=
 variable {M}
 
 /-- A budgeted win is a win. -/
-theorem altWin_of_altAcc {start : Bool} :
+private theorem altWin_of_altAcc {start : Bool} :
     ∀ (n : ℕ) {c : Config A}, M.AltAcc start n c → M.AltWin start c := by
   intro n
   induction n with
@@ -111,7 +113,7 @@ theorem altWin_of_altAcc {start : Bool} :
 /-- A win is a budgeted win, the budget being the depth of the winning
 strategy. The universal case takes the greatest budget its successors need,
 which is where the finiteness of the configuration space is used. -/
-theorem exists_altAcc_of_altWin [Finite A] {start : Bool} {c : Config A}
+private theorem exists_altAcc_of_altWin [Finite A] {start : Bool} {c : Config A}
     (h : M.AltWin start c) : ∃ n, M.AltAcc start n c := by
   classical
   induction h with
@@ -146,7 +148,7 @@ alternating model is a conservative extension of the space-bounded
 nondeterministic one, exactly as
 `DescriptiveComplexity.ATMData.altAcc_iff_stepsIn` says of the budgeted
 model. -/
-theorem altWin_iff_reach {start : Bool} (hex : ∀ q : A, ¬M.IsUniv start q) (c : Config A) :
+private theorem altWin_iff_reach {start : Bool} (hex : ∀ q : A, ¬M.IsUniv start q) (c : Config A) :
     M.AltWin start c ↔ ∃ d, Relation.ReflTransGen M.Step c d ∧ M.Acc d.state := by
   constructor
   · intro hw
@@ -217,7 +219,7 @@ variable {B : Type} {u : B ≃ A} {N : ATMData B}
 implication rather than an equivalence, and proved without any finiteness: the
 converse comes from the agreement in the other direction, which the
 isomorphism-invariance of a decision problem has anyway. -/
-theorem AltAgree.altWin_mp (h : AltAgree u N M) (start : Bool) :
+private theorem AltAgree.altWin_mp (h : AltAgree u N M) (start : Bool) :
     ∀ {c : Config B}, N.AltWin start c → M.AltWin start (c.map u) := by
   intro c hw
   induction hw with

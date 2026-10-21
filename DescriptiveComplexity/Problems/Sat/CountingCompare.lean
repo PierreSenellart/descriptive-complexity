@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Problems.Sat.CountingDecision
 public import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.DecisionClasses
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.CountingHardness
 
 /-!
 # SelMajSAT and SelEqSAT: complete problems for PP and C₌P
@@ -113,7 +119,7 @@ instance selHom_isExpansionOn (ρ : satAssignBlock.Assignment A) :
   let := satAssignBlock.structure ρ
   ⟨fun f _ => by rcases f with f | f <;> rfl, fun r _ => by rcases r with r | r <;> rfl⟩
 
-theorem realize_selKernel (b : Bool) (ρ : satAssignBlock.Assignment A) :
+private theorem realize_selKernel (b : Bool) (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize selSOLang A (@sumStructure _ _ A _ (satAssignBlock.structure ρ))
       (selKernel b)) ↔ SelModel A b ((satAssignEquiv A).symm ρ) := by
   let := satAssignBlock.structure ρ
@@ -150,12 +156,12 @@ noncomputable def SharpSelSAT (b : Bool) : CountingProblem Language.satSel where
     rw [card_selModel_eq_witnessCount, card_selModel_eq_witnessCount]
     exact witnessCount_iso satAssignBlock (selKernel b) e
 
-theorem sharpSelSat_apply (b : Bool) (A : Type) [Language.satSel.Structure A] :
+private theorem sharpSelSat_apply (b : Bool) (A : Type) [Language.satSel.Structure A] :
     SharpSelSAT b A = Nat.card {ν : A → Prop // SelModel A b ν} :=
   rfl
 
 /-- Both counts are in `#P`. -/
-theorem sharpSelSat_mem_sharpP (b : Bool) : SharpSelSAT b ∈ SharpP :=
+private theorem sharpSelSat_mem_sharpP (b : Bool) : SharpSelSAT b ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (card_selModel_eq_witnessCount (A := A) b).symm)
     (sharpPDefinable_ofKernel satAssignBlock (selKernel b))
 
@@ -232,12 +238,12 @@ def satEquiv :
 variable (B B' φ φ') in
 /-- The variable point of the selector, at a tuple. (The kernels are explicit:
 left to unification, they would make it unfold the pair kernel.) -/
-def selPt (x : Fin (tseitinDim (PB B B') (PK B B' φ φ')) → A) :
+private def selPt (x : Fin (tseitinDim (PB B B') (PK B B' φ φ')) → A) :
     (pairTseitinInterp B B' φ φ').Map A :=
   (Sum.inl (Sum.inr (Sum.inl (pairZ B B'))), x)
 
 /-- The selected points are the canonical variable points of the selector. -/
-theorem sel_iff (p : (pairTseitinInterp B B' φ φ').Map A) :
+private theorem sel_iff (p : (pairTseitinInterp B B' φ φ').Map A) :
     RelMap (M := (pairTseitinInterp B B' φ φ').Map A) ssSel ![p] ↔
       ∃ x, p = selPt B B' φ φ' x ∧ Canon 0 x := by
   classical
@@ -271,7 +277,7 @@ theorem sel_iff (p : (pairTseitinInterp B B' φ φ').Map A) :
 
 /-- The models of the marked formula are the models of the plain Tseitin
 formula: the two universes meet only through this map. -/
-def modelsEquiv :
+private def modelsEquiv :
     {ν : (pairTseitinInterp B B' φ φ').Map A → Prop //
         SatModel ((pairTseitinInterp B B' φ φ').Map A) ν} ≃
       {ν : (sharpTseitinInterp (PB B B') (PK B B' φ φ')).Map A → Prop //
@@ -289,7 +295,7 @@ variable [Finite A] [Nonempty A]
 pair kernel whose selector is `b`.**
 Registered in the Lax archive as
 [`Lax175070.CountingValues.sharpSelSat_eq`](https://laxarchive.org/lax-175070/Lax175070.CountingValues.html#s-Lax175070.CountingValues.sharpSelSat_eq). -/
-theorem sharpSelSat_eq (b : Bool) :
+private theorem sharpSelSat_eq (b : Bool) :
     SharpSelSAT b ((pairTseitinInterp B B' φ φ').Map A) =
       Nat.card {w : Witness (PB B B') (PK B B' φ φ') A // pairSel w.1 ↔ b = true} := by
   obtain ⟨a₀, ha₀⟩ : ∃ a₀ : A, IsBot a₀ := Finite.exists_min (id : A → A)

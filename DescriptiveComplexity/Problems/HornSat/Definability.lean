@@ -11,6 +11,7 @@ public import DescriptiveComplexity.OrderWalk
 public import DescriptiveComplexity.Problems.HornSat.Unsat
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Problems.HornSat.Unsat
 
 /-!
 # HORN-SAT is SO-Horn definable
@@ -196,13 +197,13 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonem
 
 /-- The intended interpretation of the variable `B`: every negative literal of
 the clause `c` up to `z` is forced. -/
-def BodyUpTo (c z : A) : Prop :=
+private def BodyUpTo (c z : A) : Prop :=
   ∀ y : A, y ≤ z → RelMap satNegIn ![c, y] → Forced y
 
 variable (A) in
 /-- The canonical assignment: the propagation closure and its partial
 bodies. -/
-noncomputable def hsAssign : hsBlock.Assignment A :=
+private noncomputable def hsAssign : hsBlock.Assignment A :=
   fun i => match i with
     | true => fun w : Fin 1 → A => Forced (w 0)
     | false => fun w : Fin 2 → A => BodyUpTo (w 0) (w 1)
@@ -210,7 +211,7 @@ noncomputable def hsAssign : hsBlock.Assignment A :=
 omit [Finite A] [Nonempty A] in
 /-- A complete body at a maximum means that all negative literals are
 forced. -/
-theorem allNeg_of_bodyUpTo_max {c m : A} (hm : ∀ a : A, a ≤ m) (h : BodyUpTo c m)
+private theorem allNeg_of_bodyUpTo_max {c m : A} (hm : ∀ a : A, a ≤ m) (h : BodyUpTo c m)
     (y : A) (hy : RelMap satNegIn ![c, y]) : Forced y :=
   h y (hm y) hy
 

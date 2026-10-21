@@ -9,6 +9,8 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Epr.Expansion
 import DescriptiveComplexity.PSpaceHierarchy
 public import DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Problems.Epr.Expansion
+import all DescriptiveComplexity.Problems.Epr.Small
 
 /-!
 # EPR is in NEXPTIME
@@ -250,19 +252,19 @@ def WFPt (A : Type) [Language.epr.Structure A] [LinearOrder A] : Prop :=
     ∀ l s p : eprExp.Map A, IsEltPt l → IsEltPt s → IsEltPt p →
       (PosPt l s ∨ NegPt l s) → SigPt s p → ∃ x, IsEltPt x ∧ ArgPt l p x
 
-theorem exists_eltPt {p : eprExp.Map A} (h : IsEltPt p) : ∃ x, p = eltPt x := by
+private theorem exists_eltPt {p : eprExp.Map A} (h : IsEltPt p) : ∃ x, p = eltPt x := by
   rcases cases_point p with ⟨x, rfl⟩ | ⟨x, y, rfl⟩ | ⟨R, rfl⟩
   · exact ⟨x, rfl⟩
   · exact absurd ((realize_isElt _).mp h) (by simp)
   · exact absurd ((realize_isElt _).mp h) (by simp)
 
-theorem exists_pairPt {p : eprExp.Map A} (h : IsPairPt p) : ∃ x y, p = pairPt x y := by
+private theorem exists_pairPt {p : eprExp.Map A} (h : IsPairPt p) : ∃ x y, p = pairPt x y := by
   rcases cases_point p with ⟨x, rfl⟩ | ⟨x, y, rfl⟩ | ⟨R, rfl⟩
   · exact absurd ((realize_isPair _).mp h) (by simp)
   · exact ⟨x, y, rfl⟩
   · exact absurd ((realize_isPair _).mp h) (by simp)
 
-theorem exists_asgPt {p : eprExp.Map A} (h : IsAsgPt p) : ∃ R, p = asgPt R := by
+private theorem exists_asgPt {p : eprExp.Map A} (h : IsAsgPt p) : ∃ R, p = asgPt R := by
   rcases cases_point p with ⟨x, rfl⟩ | ⟨x, y, rfl⟩ | ⟨R, rfl⟩
   · exact absurd ((realize_isAsg _).mp h) (by simp)
   · exact absurd ((realize_isAsg _).mp h) (by simp)
@@ -539,7 +541,7 @@ variable (ρ : ivBlock.Assignment (eprExp.Map A))
 
 /-- Splitting a conjunction of sentences, kept at the level of `Sentence.Realize`
 so that the clause lemmas still apply to the parts. -/
-theorem realizeS_inf (φ ψ : eprSOLang.Sentence) :
+private theorem realizeS_inf (φ ψ : eprSOLang.Sentence) :
     (@Sentence.Realize eprSOLang (eprExp.Map A) (eprSOStructure ρ) (φ ⊓ ψ) ↔
       ((@Sentence.Realize eprSOLang (eprExp.Map A) (eprSOStructure ρ) φ) ∧
         @Sentence.Realize eprSOLang (eprExp.Map A) (eprSOStructure ρ) ψ)) :=
@@ -605,12 +607,12 @@ theorem isAsgPt_funPt (f : A → A) : IsAsgPt (funPt f) := isAsgPt_asgPt _
 theorem memPt_funPt (f : A → A) (x y : A) : MemPt (funPt f) (eltPt x) (eltPt y) ↔ f x = y :=
   memPt_iff _ x y
 
-theorem totalPt_funPt (f : A → A) : TotalPt (funPt f) := by
+private theorem totalPt_funPt (f : A → A) : TotalPt (funPt f) := by
   intro x hx
   obtain ⟨a, rfl⟩ := exists_eltPt hx
   exact ⟨eltPt (f a), isEltPt_eltPt _, (memPt_funPt f a (f a)).mpr rfl⟩
 
-theorem funcPt_funPt (f : A → A) : FuncPt (funPt f) := by
+private theorem funcPt_funPt (f : A → A) : FuncPt (funPt f) := by
   intro x y z hx hy hz h1 h2
   obtain ⟨a, rfl⟩ := exists_eltPt hx
   obtain ⟨b, rfl⟩ := exists_eltPt hy
@@ -619,7 +621,7 @@ theorem funcPt_funPt (f : A → A) : FuncPt (funPt f) := by
 
 open Classical in
 /-- **A total functional assignment is the graph of a function.** -/
-theorem exists_funPt {w : eprExp.Map A} (hw : IsAsgPt w) (ht : TotalPt w) (hf : FuncPt w) :
+private theorem exists_funPt {w : eprExp.Map A} (hw : IsAsgPt w) (ht : TotalPt w) (hf : FuncPt w) :
     ∃ f : A → A, w = funPt f := by
   classical
   obtain ⟨R, rfl⟩ := exists_asgPt hw
@@ -647,7 +649,7 @@ section Agreement
 variable {A : Type} [Language.epr.Structure A] [LinearOrder A]
 
 /-- **Well-formedness read at the points is well-formedness.** -/
-theorem wfPt_iff : WFPt A ↔ IsWF A := by
+private theorem wfPt_iff : WFPt A ↔ IsWF A := by
   constructor
   · rintro ⟨h1, h2⟩
     refine ⟨fun l p x y hx hy => eltPt_injective (h1 (eltPt l) (eltPt p) (eltPt x) (eltPt y)
@@ -676,12 +678,12 @@ theorem wfPt_iff : WFPt A ↔ IsWF A := by
 /-- **The guess a model is**: a symbol holds of an assignment when the
 interpretation holds of a function the assignment agrees with on the signature
 positions. -/
-noncomputable def modelGuess (I : A → (A → A) → Prop) :
+private noncomputable def modelGuess (I : A → (A → A) → Prop) :
     ivBlock.Assignment (eprExp.Map A) :=
   fun _ v => ∃ (x : A) (f : A → A), v 0 = eltPt x ∧
     (∀ p y : A, SigG x p → (MemPt (v 1) (eltPt p) (eltPt y) ↔ f p = y)) ∧ I x f
 
-theorem modelGuess_funPt {I : A → (A → A) → Prop} (hlocal : Local I) (x : A) (f : A → A) :
+private theorem modelGuess_funPt {I : A → (A → A) → Prop} (hlocal : Local I) (x : A) (f : A → A) :
     modelGuess I () ![eltPt x, funPt f] ↔ I x f := by
   constructor
   · rintro ⟨x', f', hx, hag, hI⟩
@@ -694,7 +696,7 @@ theorem modelGuess_funPt {I : A → (A → A) → Prop} (hlocal : Local I) (x : 
     exact memPt_funPt f p y
 
 /-- **The environment two assignments make, as a point.** -/
-theorem combPt_funPt (e g : A → A) :
+private theorem combPt_funPt (e g : A → A) :
     CombPt (funPt e) (funPt g) (funPt (eprVal e g)) := by
   classical
   intro x y hx hy
@@ -708,7 +710,7 @@ theorem combPt_funPt (e g : A → A) :
     exact ⟨fun h => Or.inr ⟨ha, h⟩, fun h => h.elim (fun h => absurd h.1 ha) (fun h => h.2)⟩
 
 /-- **A model on the instance is a guess the kernel accepts, and back.** -/
-theorem selfModel_iff_kernel :
+private theorem selfModel_iff_kernel :
     (SelfModel A ↔ ∃ ρ : ivBlock.Assignment (eprExp.Map A),
       LocalPt ρ ∧ ∃ e, (IsAsgPt e ∧ TotalPt e ∧ FuncPt e) ∧
         ∀ u w, IsAsgPt u → TotalPt u → FuncPt u → IsAsgPt w → CombPt e u w →
@@ -810,7 +812,7 @@ end Agreement
 section Membership
 
 /-- **The kernel says what the problem does.** -/
-theorem epr_iff_kernel (A : Type) [Language.epr.Structure A] [LinearOrder A]
+private theorem epr_iff_kernel (A : Type) [Language.epr.Structure A] [LinearOrder A]
     [Finite A] [Nonempty A] :
     (EPR A ↔ ∃ ρ : ivBlock.Assignment (eprExp.Map A),
       @Sentence.Realize eprSOLang (eprExp.Map A) (eprSOStructure ρ) eprKernel) := by

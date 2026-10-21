@@ -10,6 +10,18 @@ public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 import DescriptiveComplexity.Problems.Wide.RegChannelNo
 import DescriptiveComplexity.Problems.Wide.RegChannelExpansion
 import DescriptiveComplexity.Exponential.KernelArity
+import all DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.Kernel
+import all DescriptiveComplexity.Exponential.KernelArity
+import all DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.Problems.Wide.NexInterp
+import all DescriptiveComplexity.Problems.Wide.Reduce
+import all DescriptiveComplexity.Problems.Wide.RegChannelEval
+import all DescriptiveComplexity.Problems.Wide.RegChannelExpansion
+import all DescriptiveComplexity.Problems.Wide.RegChannelInit
+import all DescriptiveComplexity.Problems.Wide.RegChannelNo
+import all DescriptiveComplexity.Problems.Wide.RegChannelPad
+import all DescriptiveComplexity.Problems.Wide.RelExpMap
 
 /-!
 # The reduction into the register channel
@@ -115,7 +127,7 @@ noncomputable abbrev srcNexPFOrder : LinearOrder (srcDt X d).NexPF :=
 /-- **The interpreted structure reads the handed program's table** – `srcReads`
 at the program a reduction into `DescriptiveComplexity.WideRegAccept`
 emits. -/
-theorem srcRegReads (n : ℕ) :
+private theorem srcRegReads (n : ℕ) :
     letI := srcNexRTagOrder X d n
     letI := srcNexPFOrder X d
     letI : Language.wide.Structure
@@ -153,7 +165,7 @@ own facts – its table is read (`srcRegReads`), its payload fits, its dimension
 has slack, its channel marks the argument elements – plus the two the source side
 owes, that every guessed variable has an argument and that the padded rule names
 outnumber the constant the clock is measured against. -/
-theorem wideRegAccept_srcEnv_iff (n : ℕ) :
+private theorem wideRegAccept_srcEnv_iff (n : ℕ) :
     letI := srcNexRTagOrder X d n
     letI := srcNexPFOrder X d
     letI : Language.wide.Structure
@@ -207,7 +219,7 @@ record's correctness (`wideRegAccept_srcEnv_iff`) read through
 `NexKernel.holds_iff_structure₁`, which is the same proposition spelled the
 kernel's way. This is `hmach`'s content, with the two obligations the source
 side owes still in front of it. -/
-theorem wideRegAccept_kernel_iff (K : NexKernel L) (n : ℕ) :
+private theorem wideRegAccept_kernel_iff (K : NexKernel L) (n : ℕ) :
     letI := srcNexRTagOrder K.X K.toStepDef n
     letI := srcNexPFOrder K.X K.toStepDef
     letI : Language.wide.Structure
@@ -243,7 +255,7 @@ over the doubled universe (`wideRegInterpEquiv`), the caller says what the
 machine decides there, and the relativized expansion's points are the
 original's. Which problem `PW` is, the transport never asks – which is why the
 register channel costs nothing here. -/
-theorem wideRegProblem_wideRegInterp_iff (PW : DecisionProblem Language.wide)
+private theorem wideRegProblem_wideRegInterp_iff (PW : DecisionProblem Language.wide)
     (n : ℕ) {Q₀ : DecisionProblem X.E}
     (hmach :
       letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
@@ -269,7 +281,7 @@ theorem wideRegProblem_wideRegInterp_iff (PW : DecisionProblem Language.wide)
 /-- **The emitted instance is a yes-instance of acceptance on a clock at the
 register channel exactly when the source is**, given the handed machine's own
 correctness at the doubled universe. -/
-theorem wideRegAccept_wideRegInterp_iff (n : ℕ) {Q₀ : DecisionProblem X.E}
+private theorem wideRegAccept_wideRegInterp_iff (n : ℕ) {Q₀ : DecisionProblem X.E}
     (hmach :
       letI : LinearOrder ((srcDt X d).X.Map (srcEnv L A).α) :=
         encOrder (srcDt X d).ly (srcEnv L A).zero (srcEnv L A).one (srcEnv L A).hzo

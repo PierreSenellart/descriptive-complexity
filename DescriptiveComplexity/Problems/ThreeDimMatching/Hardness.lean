@@ -12,6 +12,9 @@ import DescriptiveComplexity.OccurrenceSlack
 public import DescriptiveComplexity.Padding
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrenceSlack
+import all DescriptiveComplexity.OccurrenceVar
 
 /-!
 # 3-dimensional matching is NP-hard
@@ -185,9 +188,9 @@ variable {A : Type}
 /-- The point of tag `t` over the pair `w`. -/
 def tPt (t : TTag) (w : Fin 2 → A) : tdmInterp.Map A := (t, w)
 
-theorem tPt_surj (q : tdmInterp.Map A) : ∃ t w, q = tPt t w := ⟨q.1, q.2, rfl⟩
+private theorem tPt_surj (q : tdmInterp.Map A) : ∃ t w, q = tPt t w := ⟨q.1, q.2, rfl⟩
 
-theorem tPt_eq_iff {t t' : TTag} {w w' : Fin 2 → A} :
+private theorem tPt_eq_iff {t t' : TTag} {w w' : Fin 2 → A} :
     tPt t w = tPt t' w' ↔ t = t' ∧ w = w' := by
   constructor
   · intro h
@@ -197,7 +200,7 @@ theorem tPt_eq_iff {t t' : TTag} {w w' : Fin 2 → A} :
     rfl
 
 /-- Two `2`-tuples with the same coordinates are equal. -/
-theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
+private theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
   funext j
   fin_cases j
   · exact h0
@@ -225,7 +228,7 @@ def tGy (s : Bool) (x c : A) : tdmInterp.Map A := tPt (.gy s) ![x, c]
 /-- The third-class element of that garbage pair. -/
 def tGz (s : Bool) (x c : A) : tdmInterp.Map A := tPt (.gz s) ![x, c]
 
-theorem tTip_eq_iff {s σ s' σ' : Bool} {x c x' c' : A} :
+private theorem tTip_eq_iff {s σ s' σ' : Bool} {x c x' c' : A} :
     tTip s σ x c = tTip s' σ' x' c' ↔ s = s' ∧ σ = σ' ∧ x = x' ∧ c = c' := by
   rw [tTip, tTip, tPt_eq_iff]
   constructor
@@ -238,7 +241,7 @@ theorem tTip_eq_iff {s σ s' σ' : Bool} {x c x' c' : A} :
   · rintro ⟨rfl, rfl, rfl, rfl⟩
     exact ⟨rfl, rfl⟩
 
-theorem tAv_eq_iff {s s' : Bool} {x c x' c' : A} :
+private theorem tAv_eq_iff {s s' : Bool} {x c x' c' : A} :
     tAv s x c = tAv s' x' c' ↔ s = s' ∧ x = x' ∧ c = c' := by
   rw [tAv, tAv, tPt_eq_iff]
   constructor
@@ -250,7 +253,7 @@ theorem tAv_eq_iff {s s' : Bool} {x c x' c' : A} :
   · rintro ⟨rfl, rfl, rfl⟩
     exact ⟨rfl, rfl⟩
 
-theorem tBv_eq_iff {s s' : Bool} {x c x' c' : A} :
+private theorem tBv_eq_iff {s s' : Bool} {x c x' c' : A} :
     tBv s x c = tBv s' x' c' ↔ s = s' ∧ x = x' ∧ c = c' := by
   rw [tBv, tBv, tPt_eq_iff]
   constructor
@@ -262,7 +265,7 @@ theorem tBv_eq_iff {s s' : Bool} {x c x' c' : A} :
   · rintro ⟨rfl, rfl, rfl⟩
     exact ⟨rfl, rfl⟩
 
-theorem tGy_eq_iff {s s' : Bool} {x c x' c' : A} :
+private theorem tGy_eq_iff {s s' : Bool} {x c x' c' : A} :
     tGy s x c = tGy s' x' c' ↔ s = s' ∧ x = x' ∧ c = c' := by
   rw [tGy, tGy, tPt_eq_iff]
   constructor
@@ -274,7 +277,7 @@ theorem tGy_eq_iff {s s' : Bool} {x c x' c' : A} :
   · rintro ⟨rfl, rfl, rfl⟩
     exact ⟨rfl, rfl⟩
 
-theorem tGz_eq_iff {s s' : Bool} {x c x' c' : A} :
+private theorem tGz_eq_iff {s s' : Bool} {x c x' c' : A} :
     tGz s x c = tGz s' x' c' ↔ s = s' ∧ x = x' ∧ c = c' := by
   rw [tGz, tGz, tPt_eq_iff]
   constructor
@@ -286,7 +289,7 @@ theorem tGz_eq_iff {s s' : Bool} {x c x' c' : A} :
   · rintro ⟨rfl, rfl, rfl⟩
     exact ⟨rfl, rfl⟩
 
-theorem tCz_eq_iff {a₀ c c' : A} : tCz a₀ c = tCz a₀ c' ↔ c = c' := by
+private theorem tCz_eq_iff {a₀ c c' : A} : tCz a₀ c = tCz a₀ c' ↔ c = c' := by
   rw [tCz, tCz, tPt_eq_iff]
   constructor
   · rintro ⟨-, hw⟩
@@ -294,7 +297,7 @@ theorem tCz_eq_iff {a₀ c c' : A} : tCz a₀ c = tCz a₀ c' ↔ c = c' := by
   · rintro rfl
     exact ⟨rfl, rfl⟩
 
-theorem tCy_eq_iff {a₀ c c' : A} : tCy a₀ c = tCy a₀ c' ↔ c = c' := by
+private theorem tCy_eq_iff {a₀ c c' : A} : tCy a₀ c = tCy a₀ c' ↔ c = c' := by
   rw [tCy, tCy, tPt_eq_iff]
   constructor
   · rintro ⟨-, hw⟩
@@ -346,7 +349,7 @@ theorem tsZ_gz (s : Bool) (x c : A) : TSZEl (tGz s x c) ↔ Chained c x s := by
   simp [tdmInterp, zElF]
 
 /-- Every element of the first class is a tip. -/
-theorem tsX_shape {q : tdmInterp.Map A} (h : TSXEl q) :
+private theorem tsX_shape {q : tdmInterp.Map A} (h : TSXEl q) :
     ∃ s σ x c, OccIn c x s ∧ q = tTip s σ x c := by
   obtain ⟨t, w, rfl⟩ := tPt_surj q
   rw [TSXEl, tPt, FOInterpretation.relMap_map] at h
@@ -363,7 +366,7 @@ theorem tsX_shape {q : tdmInterp.Map A} (h : TSXEl q) :
   | gz s => exact absurd h (by simp [tdmInterp, xElF])
 
 /-- Every element of the second class is one of the three kinds. -/
-theorem tsY_shape {a₀ : A} (ha₀ : IsBot a₀) {q : tdmInterp.Map A} (h : TSYEl q) :
+private theorem tsY_shape {a₀ : A} (ha₀ : IsBot a₀) {q : tdmInterp.Map A} (h : TSYEl q) :
     (∃ s x c, OccIn c x s ∧ q = tAv s x c) ∨ (∃ c, IsCl c ∧ q = tCy a₀ c) ∨
       ∃ s x c, Chained c x s ∧ q = tGy s x c := by
   obtain ⟨t, w, rfl⟩ := tPt_surj q
@@ -390,7 +393,7 @@ theorem tsY_shape {a₀ : A} (ha₀ : IsBot a₀) {q : tdmInterp.Map A} (h : TSY
   | gz s => exact absurd h (by simp [tdmInterp, yElF])
 
 /-- Every element of the third class is one of the three kinds. -/
-theorem tsZ_shape {a₀ : A} (ha₀ : IsBot a₀) {q : tdmInterp.Map A} (h : TSZEl q) :
+private theorem tsZ_shape {a₀ : A} (ha₀ : IsBot a₀) {q : tdmInterp.Map A} (h : TSZEl q) :
     (∃ s x c, OccIn c x s ∧ q = tBv s x c) ∨ (∃ c, IsCl c ∧ q = tCz a₀ c) ∨
       ∃ s x c, Chained c x s ∧ q = tGz s x c := by
   obtain ⟨t, w, rfl⟩ := tPt_surj q
@@ -425,33 +428,33 @@ section Triples
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- The triple of the truth-setting gadget that frees the `false`-tip. -/
-theorem tsTrip_wheelT {s : Bool} {x c : A} (h : OccIn c x s) :
+private theorem tsTrip_wheelT {s : Bool} {x c : A} (h : OccIn c x s) :
     TSTrip (tTip s true x c) (tAv s x c) (tBv s x c) := by
   rw [TSTrip, tTip, tAv, tBv, tPt, tPt, tPt, FOInterpretation.relMap_map]
   simp [tdmInterp, tripF, h]
 
 /-- The triple of the truth-setting gadget that frees the `true`-tip: it
 carries the `Y`-element of the *next* occurrence of the variable. -/
-theorem tsTrip_wheelF {s t : Bool} {x c c' : A} (h : VarNext x c s c' t) :
+private theorem tsTrip_wheelF {s t : Bool} {x c c' : A} (h : VarNext x c s c' t) :
     TSTrip (tTip s false x c) (tAv t x c') (tBv s x c) := by
   rw [TSTrip, tTip, tAv, tBv, tPt, tPt, tPt, FOInterpretation.relMap_map]
   simp [tdmInterp, tripF, h]
 
 /-- The triple of a clause, hanging on the tip of one of its occurrences. -/
-theorem tsTrip_clause {a₀ : A} (ha₀ : IsBot a₀) {s : Bool} {x c : A} (h : OccIn c x s) :
+private theorem tsTrip_clause {a₀ : A} (ha₀ : IsBot a₀) {s : Bool} {x c : A} (h : OccIn c x s) :
     TSTrip (tTip s (!s) x c) (tCy a₀ c) (tCz a₀ c) := by
   rw [TSTrip, tTip, tCy, tCz, tPt, tPt, tPt, FOInterpretation.relMap_map]
   simp [tdmInterp, tripF, h, ha₀]
 
 /-- A garbage triple: any tip together with any garbage pair. -/
-theorem tsTrip_garbage {s σ t : Bool} {x c x' c' : A} (h : OccIn c x s)
+private theorem tsTrip_garbage {s σ t : Bool} {x c x' c' : A} (h : OccIn c x s)
     (h' : Chained c' x' t) : TSTrip (tTip s σ x c) (tGy t x' c') (tGz t x' c') := by
   rw [TSTrip, tTip, tGy, tGz, tPt, tPt, tPt, FOInterpretation.relMap_map]
   simp [tdmInterp, tripF, h, h']
 
 /-- **What can cover a `b`-element**: only the two triples of the
 truth-setting gadget of its own occurrence. -/
-theorem tsTrip_bv_inv {s : Bool} {x c : A} {p q : tdmInterp.Map A}
+private theorem tsTrip_bv_inv {s : Bool} {x c : A} {p q : tdmInterp.Map A}
     (h : TSTrip p q (tBv s x c)) :
     (p = tTip s true x c ∧ q = tAv s x c ∧ OccIn c x s) ∨
       ∃ c' t, VarNext x c s c' t ∧ p = tTip s false x c ∧ q = tAv t x c' := by
@@ -509,7 +512,7 @@ theorem tsTrip_bv_inv {s : Bool} {x c : A} {p q : tdmInterp.Map A}
 
 /-- **What can cover an `a`-element**: the gadget triple of its own
 occurrence, or the one of the occurrence *before* it. -/
-theorem tsTrip_av_inv {s : Bool} {x c : A} {p r : tdmInterp.Map A}
+private theorem tsTrip_av_inv {s : Bool} {x c : A} {p r : tdmInterp.Map A}
     (h : TSTrip p (tAv s x c) r) :
     (p = tTip s true x c ∧ r = tBv s x c ∧ OccIn c x s) ∨
       ∃ c₀ s₀, VarNext x c₀ s₀ c s ∧ p = tTip s₀ false x c₀ ∧ r = tBv s₀ x c₀ := by
@@ -566,7 +569,7 @@ theorem tsTrip_av_inv {s : Bool} {x c : A} {p r : tdmInterp.Map A}
 
 /-- **What can cover the `Y`-element of a clause**: only a triple hanging on
 the tip of one of its occurrences. -/
-theorem tsTrip_cy_inv {a₀ : A} (ha₀ : IsBot a₀) {c : A} {p r : tdmInterp.Map A}
+private theorem tsTrip_cy_inv {a₀ : A} (ha₀ : IsBot a₀) {c : A} {p r : tdmInterp.Map A}
     (h : TSTrip p (tCy a₀ c) r) :
     ∃ x s, OccIn c x s ∧ p = tTip s (!s) x c ∧ r = tCz a₀ c := by
   obtain ⟨tp, wp, rfl⟩ := tPt_surj p
@@ -612,7 +615,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A]
 
 /-- The truth-setting gadget of `x` uses, at the occurrence `(c, s)`, the
 triple that frees the `false`-tip. -/
-def WheelTrue (M : tdmInterp.Map A → tdmInterp.Map A → tdmInterp.Map A → Prop)
+private def WheelTrue (M : tdmInterp.Map A → tdmInterp.Map A → tdmInterp.Map A → Prop)
     (x c : A) (s : Bool) : Prop :=
   M (tTip s true x c) (tAv s x c) (tBv s x c)
 
@@ -624,7 +627,7 @@ include hM
 omit [Finite A] in
 /-- **One triple per occurrence**: the gadget of `x` either frees the
 `false`-tip of `(c, s)` or the `true` one. -/
-theorem wheel_other {x c : A} {s : Bool} (hocc : OccIn c x s) (hn : ¬WheelTrue M x c s) :
+private theorem wheel_other {x c : A} {s : Bool} (hocc : OccIn c x s) (hn : ¬WheelTrue M x c s) :
     ∃ c' t, VarNext x c s c' t ∧ M (tTip s false x c) (tAv t x c') (tBv s x c) := by
   obtain ⟨p, q, hpq⟩ := hM.2.2.2.1 (tBv s x c) ((tsZ_bv s x c).mpr hocc)
   rcases tsTrip_bv_inv (hM.1 _ _ _ hpq).1 with ⟨rfl, rfl, -⟩ | ⟨c', t, hnext, rfl, rfl⟩
@@ -634,7 +637,7 @@ theorem wheel_other {x c : A} {s : Bool} (hocc : OccIn c x s) (hn : ¬WheelTrue 
 omit [Finite A] in
 /-- **The gadget is consistent**: neighboring occurrences of a variable make
 the same choice. -/
-theorem wheel_step {x c₀ c : A} {s₀ s : Bool} (hnext : VarNext x c₀ s₀ c s) :
+private theorem wheel_step {x c₀ c : A} {s₀ s : Bool} (hnext : VarNext x c₀ s₀ c s) :
     (WheelTrue M x c s ↔ WheelTrue M x c₀ s₀) := by
   obtain ⟨p, r, hp⟩ := hM.2.2.1 (tAv s x c) ((tsY_av s x c).mpr hnext.occIn_right)
   rcases tsTrip_av_inv (hM.1 _ _ _ hp).1 with ⟨rfl, rfl, -⟩ | ⟨c₁, s₁, hnext₁, rfl, rfl⟩
@@ -660,7 +663,8 @@ theorem wheel_step {x c₀ c : A} {s₀ s : Bool} (hnext : VarNext x c₀ s₀ c
 
 /-- **The gadget is a truth value**: all the occurrences of a variable make
 the same choice, since the walk closes into a cycle. -/
-theorem wheel_const {x c c' : A} {s s' : Bool} (hocc : OccIn c x s) (hocc' : OccIn c' x s') :
+private theorem wheel_const
+    {x c c' : A} {s s' : Bool} (hocc : OccIn c x s) (hocc' : OccIn c' x s') :
     (WheelTrue M x c s ↔ WheelTrue M x c' s') := by
   obtain ⟨cm, sm, hmin⟩ := exists_varMin ⟨c, s, hocc⟩
   have key : ∀ d : A, ∀ u : Bool, OccIn d x u → (WheelTrue M x d u ↔ WheelTrue M x cm sm) := by
@@ -683,10 +687,11 @@ theorem wheel_const {x c c' : A} {s s' : Bool} (hocc : OccIn c x s) (hocc' : Occ
 
 /-- The assignment a matching defines: a variable is true when its gadget
 frees the `false`-tips. -/
-def matchAssign (M : tdmInterp.Map A → tdmInterp.Map A → tdmInterp.Map A → Prop) (x : A) : Prop :=
+private def matchAssign
+    (M : tdmInterp.Map A → tdmInterp.Map A → tdmInterp.Map A → Prop) (x : A) : Prop :=
   ∃ c s, OccIn c x s ∧ WheelTrue M x c s
 
-theorem matchAssign_iff {x c : A} {s : Bool} (hocc : OccIn c x s) :
+private theorem matchAssign_iff {x c : A} {s : Bool} (hocc : OccIn c x s) :
     matchAssign M x ↔ WheelTrue M x c s := by
   constructor
   · rintro ⟨c', s', hocc', hw⟩
@@ -697,7 +702,7 @@ theorem matchAssign_iff {x c : A} {s : Bool} (hocc : OccIn c x s) :
 /-- **A matching satisfies every clause**: covering the pair of a clause
 takes the tip of one of its occurrences, and that tip is free exactly when the
 literal is true. -/
-theorem matchAssign_sat (ha₀ : IsBot a₀) {c : A} (hc : IsCl c) :
+private theorem matchAssign_sat (ha₀ : IsBot a₀) {c : A} (hc : IsCl c) :
     ∃ x s, OccIn c x s ∧ LitTrue (matchAssign M) x s := by
   obtain ⟨p, r, hp⟩ := hM.2.2.1 (tCy a₀ c) ((tsY_cy ha₀ c).mpr hc)
   obtain ⟨x, s, hocc, rfl, rfl⟩ := tsTrip_cy_inv ha₀ (hM.1 _ _ _ hp).1
@@ -738,13 +743,14 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A]
 first occurrence of its clause, which is sent to the occurrence the clause
 gadget consumes. This is the bijection between the tips left over and the
 garbage pairs. -/
-def gbMap (ch fst : A → A × Bool) (c x : A) (s : Bool) : A × Bool :=
+private def gbMap (ch fst : A → A × Bool) (c x : A) (s : Bool) : A × Bool :=
   if (x, s) = fst c then ch c else (x, s)
 
 /-- The matching an assignment defines: the gadget triples of the side the
 assignment picks, one triple per clause, and a garbage triple for every tip
 left over. -/
-def satMatch (a₀ : A) (β : A → Bool) (nxt : A × A × Bool → A × Bool) (ch fst : A → A × Bool) :
+private def satMatch
+    (a₀ : A) (β : A → Bool) (nxt : A × A × Bool → A × Bool) (ch fst : A → A × Bool) :
     tdmInterp.Map A → tdmInterp.Map A → tdmInterp.Map A → Prop := fun p q r =>
   (∃ x c s, OccIn c x s ∧ β x = true ∧
       p = tTip s true x c ∧ q = tAv s x c ∧ r = tBv s x c) ∨
@@ -766,7 +772,7 @@ include hch hfst
 omit [Finite A] in
 /-- The garbage pair an occurrence is sent to is a genuine one: a non-first
 occurrence of its clause. -/
-theorem gbMap_chained {c x : A} {s : Bool} (hocc : OccIn c x s) (hne : (x, s) ≠ ch c) :
+private theorem gbMap_chained {c x : A} {s : Bool} (hocc : OccIn c x s) (hne : (x, s) ≠ ch c) :
     Chained c (gbMap ch fst c x s).1 (gbMap ch fst c x s).2 := by
   have hmin := hfst c ⟨x, s, hocc⟩
   rw [gbMap]
@@ -781,7 +787,7 @@ theorem gbMap_chained {c x : A} {s : Bool} (hocc : OccIn c x s) (hne : (x, s) �
 
 omit [Finite A] [Language.sat.Structure A] hch hfst in
 /-- The garbage map is injective on the tips left over. -/
-theorem gbMap_inj {c x x' : A} {s s' : Bool} (hne : (x, s) ≠ ch c) (hne' : (x', s') ≠ ch c)
+private theorem gbMap_inj {c x x' : A} {s s' : Bool} (hne : (x, s) ≠ ch c) (hne' : (x', s') ≠ ch c)
     (h : gbMap ch fst c x s = gbMap ch fst c x' s') : (x, s) = (x', s') := by
   rw [gbMap, gbMap] at h
   by_cases hx : (x, s) = fst c <;> by_cases hx' : (x', s') = fst c
@@ -795,7 +801,7 @@ theorem gbMap_inj {c x x' : A} {s s' : Bool} (hne : (x, s) ≠ ch c) (hne' : (x'
 
 omit [Finite A] hch in
 /-- Every garbage pair is used: the map is onto the non-first occurrences. -/
-theorem gbMap_surj {c x' : A} {s' : Bool} (hchained : Chained c x' s') :
+private theorem gbMap_surj {c x' : A} {s' : Bool} (hchained : Chained c x' s') :
     ∃ x s, OccIn c x s ∧ (x, s) ≠ ch c ∧ gbMap ch fst c x s = (x', s') := by
   have hmin := hfst c ⟨x', s', hchained.1⟩
   have hnefst : ((x', s') : A × Bool) ≠ fst c := by
@@ -816,7 +822,7 @@ include hnxt
 
 /-- **The construction is a matching**: every marked element is covered
 exactly once. -/
-theorem satMatch_isMatching (ha₀ : IsBot a₀) :
+private theorem satMatch_isMatching (ha₀ : IsBot a₀) :
     IsMatchingOn (TSXEl (A := tdmInterp.Map A)) TSYEl TSZEl TSTrip
       (satMatch a₀ β nxt ch fst) := by
   classical
@@ -1025,7 +1031,7 @@ section Correct
 
 /-- **Correctness**: a CNF structure is satisfiable exactly when the
 interpreted triple system has a matching. -/
-theorem satisfiable_iff_hasThreeDimMatching (A : Type) [Language.sat.Structure A]
+private theorem satisfiable_iff_hasThreeDimMatching (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     Satisfiable A ↔ HasThreeDimMatching (tdmInterp.Map A) := by
   classical
@@ -1082,7 +1088,8 @@ non-first occurrence. The truth-setting gadget of a variable runs cyclically
 through its occurrences, so it admits exactly two matchings – the variable's
 two truth values – and the pair of a clause can only be covered through the
 tip of a true literal. -/
-noncomputable def sat_ordered_fo_reduction_threeDimMatching : SAT ≤ᶠᵒ[≤] ThreeDimMatching where
+private noncomputable def sat_ordered_fo_reduction_threeDimMatching
+    : SAT ≤ᶠᵒ[≤] ThreeDimMatching where
   Tag := TTag
   dim := 2
   toInterpretation := tdmInterp

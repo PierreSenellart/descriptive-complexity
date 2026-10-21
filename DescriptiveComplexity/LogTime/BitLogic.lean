@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.LogTime.Machine
 import DescriptiveComplexity.LogTime.Pow
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Definable
+import all DescriptiveComplexity.LogTime.Machine
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The bit-level logic, and definability in it
@@ -118,14 +122,14 @@ def Holds {A : Type} [L.Structure A] [LinearOrder A] [Finite A] :
   | .rel R arg, v => RelMap R fun t => v (arg t)
 
 /-- Renaming the variables of an atom. -/
-def relabel (f : γ → δ) : BitAtom L γ → BitAtom L δ
+private def relabel (f : γ → δ) : BitAtom L γ → BitAtom L δ
   | .le x y => .le (f x) (f y)
   | .plus x y z => .plus (f x) (f y) (f z)
   | .bit i x => .bit (f i) (f x)
   | .rel R arg => .rel R fun t => f (arg t)
 
 /-- Renaming is composition on the valuation. -/
-theorem holds_relabel {A : Type} [L.Structure A] [LinearOrder A] [Finite A] (f : γ → δ)
+private theorem holds_relabel {A : Type} [L.Structure A] [LinearOrder A] [Finite A] (f : γ → δ)
     (a : BitAtom L γ) (v : δ → A) : (a.relabel f).Holds v ↔ a.Holds (v ∘ f) := by
   cases a <;> exact Iff.rfl
 
@@ -143,7 +147,7 @@ def Holds {A : Type} [L.Structure A] [LinearOrder A] [Finite A] :
   | .or k k', v => k.Holds v ∨ k'.Holds v
 
 /-- Renaming the variables of a kernel. -/
-def relabel (f : γ → δ) : BitKernel L γ → BitKernel L δ
+private def relabel (f : γ → δ) : BitKernel L γ → BitKernel L δ
   | .atom a => .atom (a.relabel f)
   | .tt => .tt
   | .not k => .not (k.relabel f)
@@ -151,7 +155,7 @@ def relabel (f : γ → δ) : BitKernel L γ → BitKernel L δ
   | .or k k' => .or (k.relabel f) (k'.relabel f)
 
 /-- Renaming is composition on the valuation. -/
-theorem holds_relabel {A : Type} [L.Structure A] [LinearOrder A] [Finite A] (f : γ → δ)
+private theorem holds_relabel {A : Type} [L.Structure A] [LinearOrder A] [Finite A] (f : γ → δ)
     (k : BitKernel L γ) (v : δ → A) : (k.relabel f).Holds v ↔ k.Holds (v ∘ f) := by
   induction k with
   | atom a => exact a.holds_relabel f v
@@ -195,7 +199,7 @@ def BitDef (R : ArithRel L α) : Prop :=
       R A v ↔ prefixHolds k pol fun w => K.Holds (Sum.elim v w)
 
 /-- Composing a valuation with a renaming that fixes the free variables. -/
-theorem elim_comp_map {A : Type} (v : α → A) (u : γ → A) (f : δ → γ) :
+private theorem elim_comp_map {A : Type} (v : α → A) (u : γ → A) (f : δ → γ) :
     Sum.elim v u ∘ Sum.map (id : α → α) f = Sum.elim v (u ∘ f) := by
   funext z
   rcases z with a | d <;> rfl
@@ -203,14 +207,14 @@ theorem elim_comp_map {A : Type} (v : α → A) (u : γ → A) (f : δ → γ) :
 namespace BitDef
 
 /-- Definability transfers along a pointwise equivalence of relations. -/
-theorem congr {R S : ArithRel L α} (h : BitDef R)
+private theorem congr {R S : ArithRel L α} (h : BitDef R)
     (he : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A] (v : α → A),
       R A v ↔ S A v) : BitDef S := by
   obtain ⟨k, pol, K, hK⟩ := h
   exact ⟨k, pol, K, fun A _ _ _ _ v => (he A v).symm.trans (hK A v)⟩
 
 /-- **Renaming the free variables**. -/
-theorem relabel {R : ArithRel L α} (h : BitDef R) (f : α → β) :
+private theorem relabel {R : ArithRel L α} (h : BitDef R) (f : α → β) :
     BitDef (L := L) (α := β) fun A _ _ _ _ v => R A (v ∘ f) := by
   obtain ⟨k, pol, K, hK⟩ := h
   refine ⟨k, pol, K.relabel (Sum.map f id), fun A _ _ _ _ v => ?_⟩
@@ -267,11 +271,11 @@ theorem and {R S : ArithRel L α} (h : BitDef R) (h' : BitDef S) :
     ((prefixHolds_and_const k₂ pol₂ _ _).trans and_comm)
 
 /-- The always-true relation is bit-definable. -/
-theorem top : BitDef (L := L) (α := α) fun _ _ _ _ _ _ => True :=
+private theorem top : BitDef (L := L) (α := α) fun _ _ _ _ _ _ => True :=
   ⟨0, Fin.elim0, .tt, fun _ _ _ _ _ _ => Iff.rfl⟩
 
 /-- The always-false relation is bit-definable. -/
-theorem bot : BitDef (L := L) (α := α) fun _ _ _ _ _ _ => False :=
+private theorem bot : BitDef (L := L) (α := α) fun _ _ _ _ _ _ => False :=
   top.not.congr fun _ _ _ _ _ _ => ⟨fun h => h trivial, fun h => h.elim⟩
 
 /-- The disjunction of two bit-definable relations is bit-definable, by De
@@ -282,33 +286,33 @@ theorem or {R S : ArithRel L α} (h : BitDef R) (h' : BitDef S) :
     (not_congr not_or.symm).trans not_not
 
 /-- An implication between bit-definable relations is bit-definable. -/
-theorem imp {R S : ArithRel L α} (h : BitDef R) (h' : BitDef S) :
+private theorem imp {R S : ArithRel L α} (h : BitDef R) (h' : BitDef S) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => R A v → S A v :=
   (h.not.or h').congr fun _ _ _ _ _ _ => imp_iff_not_or.symm
 
 /-- An equivalence between bit-definable relations is bit-definable. -/
-theorem iff {R S : ArithRel L α} (h : BitDef R) (h' : BitDef S) :
+private theorem iff {R S : ArithRel L α} (h : BitDef R) (h' : BitDef S) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => (R A v ↔ S A v) :=
   ((h.imp h').and (h'.imp h)).congr fun _ _ _ _ _ _ =>
     ⟨fun hc => ⟨hc.1, hc.2⟩, fun hc => ⟨hc.mp, hc.mpr⟩⟩
 
 /-- A case distinction made outside the structure is bit-definable when both
 branches are. -/
-theorem ite {R S : ArithRel L α} (c : Prop) [Decidable c] (h : BitDef R) (h' : BitDef S) :
+private theorem ite {R S : ArithRel L α} (c : Prop) [Decidable c] (h : BitDef R) (h' : BitDef S) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => if c then R A v else S A v := by
   by_cases hc : c
   · simpa [hc] using h
   · simpa [hc] using h'
 
 /-- A truth value fixed outside the structure is bit-definable. -/
-theorem prop (c : Prop) : BitDef (L := L) (α := α) fun _ _ _ _ _ _ => c := by
+private theorem prop (c : Prop) : BitDef (L := L) (α := α) fun _ _ _ _ _ _ => c := by
   by_cases hc : c
   · exact top.congr fun _ _ _ _ _ _ => by simp [hc]
   · exact bot.congr fun _ _ _ _ _ _ => by simp [hc]
 
 /-- **A finite conjunction** of bit-definable relations, the index ranging over
 a `Fin k` of the machine rather than of the instance. -/
-theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, BitDef (R j)) →
+private theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, BitDef (R j)) →
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∀ j, R j A v := by
   intro k
   induction k with
@@ -322,7 +326,7 @@ theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, BitDef 
     exact ⟨fun hc j => Fin.cases hc.1 (fun j' => hc.2 j') j, fun hall => ⟨hall 0, fun j => hall _⟩⟩
 
 /-- **A conjunction over any finite index** of the machine. -/
-theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, BitDef (R j)) :
+private theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, BitDef (R j)) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∀ j, R j A v := by
   obtain ⟨m, ⟨e⟩⟩ := Finite.exists_equiv_fin ι
   refine (forallFin (R := fun j => R (e.symm j)) fun j => h _).congr fun _ _ _ _ _ _ => ?_
@@ -331,7 +335,7 @@ theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀
   rwa [Equiv.symm_apply_apply] at this
 
 /-- **A disjunction over any finite index** of the machine, by De Morgan. -/
-theorem existsFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, BitDef (R j)) :
+private theorem existsFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, BitDef (R j)) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∃ j, R j A v :=
   (forallFinite (R := fun j A _ _ _ _ v => ¬ R j A v) fun j => (h j).not).not.congr
     fun _ _ _ _ _ _ => not_forall_not
@@ -342,7 +346,7 @@ theorem existsFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀
 outermost, so it is the first `m` indices of `Fin (m + k)`; this is the one
 construction that touches the prefix, and `exs`/`alls` below are its
 constant-polarity instances. A machine's register list is the general case. -/
-theorem block {m : ℕ} (polB : Fin m → Bool) {R : ArithRel L (α ⊕ Fin m)} (h : BitDef R) :
+private theorem block {m : ℕ} (polB : Fin m → Bool) {R : ArithRel L (α ⊕ Fin m)} (h : BitDef R) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v =>
       prefixHolds m polB fun w => R A (Sum.elim v w) := by
   obtain ⟨k, pol, K, hK⟩ := h
@@ -369,18 +373,18 @@ theorem block {m : ℕ} (polB : Fin m → Bool) {R : ArithRel L (α ⊕ Fin m)} 
   rw [hp₁, hp₂]
 
 /-- **Existential quantification of a block** of `m` variables at once. -/
-theorem exs {m : ℕ} {R : ArithRel L (α ⊕ Fin m)} (h : BitDef R) :
+private theorem exs {m : ℕ} {R : ArithRel L (α ⊕ Fin m)} (h : BitDef R) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∃ w : Fin m → A, R A (Sum.elim v w) :=
   (h.block fun _ => true).congr fun _ _ _ _ _ _ => prefixHolds_const_true m _
 
 /-- **Universal quantification of a block** of `m` variables at once. -/
-theorem alls {m : ℕ} {R : ArithRel L (α ⊕ Fin m)} (h : BitDef R) :
+private theorem alls {m : ℕ} {R : ArithRel L (α ⊕ Fin m)} (h : BitDef R) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∀ w : Fin m → A, R A (Sum.elim v w) :=
   (h.block fun _ => false).congr fun _ _ _ _ _ _ => prefixHolds_const_false m _
 
 /-- **Existential quantification** of one variable, in the layout the
 `ArithDef` API uses. -/
-theorem ex {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
+private theorem ex {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∃ a, R A (Sum.elim v fun _ => a) :=
   h.exs.congr fun _ _ _ _ _ _ => by
     refine ⟨fun hw => ?_, fun ha => ?_⟩
@@ -393,7 +397,7 @@ theorem ex {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
       exact ⟨fun _ => a, ha⟩
 
 /-- **Universal quantification** of one variable, in the same layout. -/
-theorem all {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
+private theorem all {R : ArithRel L (α ⊕ Fin 1)} (h : BitDef R) :
     BitDef (L := L) (α := α) fun A _ _ _ _ v => ∀ a, R A (Sum.elim v fun _ => a) :=
   h.alls.congr fun _ _ _ _ _ _ => by
     refine ⟨fun hw a => hw _, fun ha w => ?_⟩
@@ -408,40 +412,40 @@ end BitDef
 Every atom is a kernel with an empty prefix, so each of these is `Iff.rfl`. -/
 
 /-- The order between two variables is bit-definable. -/
-theorem bitDef_le (x y : α) : BitDef (L := L) fun _ _ _ _ _ v => v x ≤ v y :=
+private theorem bitDef_le (x y : α) : BitDef (L := L) fun _ _ _ _ _ v => v x ≤ v y :=
   ⟨0, Fin.elim0, .atom (.le (Sum.inl x) (Sum.inl y)), fun _ _ _ _ _ _ => Iff.rfl⟩
 
 /-- Addition of the ranks of three variables is bit-definable. -/
-theorem bitDef_plus (x y z : α) :
+private theorem bitDef_plus (x y z : α) :
     BitDef (L := L) fun _ _ _ _ _ v => orank (v x) + orank (v y) = orank (v z) :=
   ⟨0, Fin.elim0, .atom (.plus (Sum.inl x) (Sum.inl y) (Sum.inl z)), fun _ _ _ _ _ _ => Iff.rfl⟩
 
 /-- The bit at an index is bit-definable: it is an atom of this logic, and the
 one the machine reads by addressing. -/
-theorem bitDef_bit (i x : α) :
+private theorem bitDef_bit (i x : α) :
     BitDef (L := L) fun _ _ _ _ _ v => BitIx (v i) (v x) :=
   ⟨0, Fin.elim0, .atom (.bit (Sum.inl i) (Sum.inl x)), fun _ _ _ _ _ _ => Iff.rfl⟩
 
 /-- **Reading the input**: an input relation at a tuple of variables is
 bit-definable. In the machine reading of this logic it is the query
 instruction. -/
-theorem bitDef_rel {a : ℕ} (R : L.Relations a) (arg : Fin a → α) :
+private theorem bitDef_rel {a : ℕ} (R : L.Relations a) (arg : Fin a → α) :
     BitDef (L := L) fun _ _ _ _ _ v => RelMap R fun t => v (arg t) :=
   ⟨0, Fin.elim0, .atom (.rel R fun t => Sum.inl (arg t)), fun _ _ _ _ _ _ => Iff.rfl⟩
 
 /-- The strict order is bit-definable. -/
-theorem bitDef_lt (x y : α) : BitDef (L := L) fun _ _ _ _ _ v => v x < v y :=
+private theorem bitDef_lt (x y : α) : BitDef (L := L) fun _ _ _ _ _ v => v x < v y :=
   ((bitDef_le x y).and (bitDef_le y x).not).congr fun _ _ _ _ _ _ =>
     lt_iff_le_not_ge.symm
 
 /-- Being the least element is bit-definable: `x + x = x`. -/
-theorem bitDef_isZero (x : α) : BitDef (L := L) fun _ _ _ _ _ v => orank (v x) = 0 :=
+private theorem bitDef_isZero (x : α) : BitDef (L := L) fun _ _ _ _ _ v => orank (v x) = 0 :=
   (bitDef_plus x x x).congr fun _ _ _ _ _ _ => by omega
 
 /-- Being the least *nonzero* element is bit-definable. Where `FO(≤, +, ×)`
 reads `orank x = 1` off the idempotence `x * x = x`, this logic has no `×` and
 reads it off the order: nonzero, and below every nonzero element. -/
-theorem bitDef_isOne (x : α) : BitDef (L := L) fun _ _ _ _ _ v => orank (v x) = 1 := by
+private theorem bitDef_isOne (x : α) : BitDef (L := L) fun _ _ _ _ _ v => orank (v x) = 1 := by
   refine (((bitDef_isZero x).not).and
     ((((bitDef_isZero (Sum.inr 0 : α ⊕ Fin 1)).not).imp
       (bitDef_le (Sum.inl x) (Sum.inr 0))).all)).congr fun A _ _ _ _ v => ?_
@@ -463,7 +467,7 @@ theorem bitDef_isOne (x : α) : BitDef (L := L) fun _ _ _ _ _ v => orank (v x) =
     omega
 
 /-- Being the greatest element is bit-definable, through the order alone. -/
-theorem bitDef_isMax (x : α) :
+private theorem bitDef_isMax (x : α) :
     BitDef (L := L) fun A _ _ _ _ v => ∀ k : A, k ≤ v x :=
   (bitDef_le (L := L) (α := α ⊕ Fin 1) (Sum.inr 0) (Sum.inl x)).all
 
@@ -472,7 +476,7 @@ bit atom: it is the highest index carrying a bit of the greatest element
 (`DescriptiveComplexity.isTopIx_iff_bits`). This is where the index naming pays
 for itself – the end of the tape is *read*, where the place-value naming had to
 compute a doubling that overflows. -/
-theorem bitDef_isTopIx (i : α) : BitDef (L := L) fun _ _ _ _ _ v => IsTopIx (v i) := by
+private theorem bitDef_isTopIx (i : α) : BitDef (L := L) fun _ _ _ _ _ v => IsTopIx (v i) := by
   have hk : BitDef (L := L) (α := (α ⊕ Fin 1) ⊕ Fin 1) fun _ _ _ _ _ w =>
       w (Sum.inl (Sum.inl i)) < w (Sum.inr 0) →
         ¬ BitIx (w (Sum.inr 0)) (w (Sum.inl (Sum.inr 0))) :=
@@ -495,7 +499,7 @@ theorem bitDef_isTopIx (i : α) : BitDef (L := L) fun _ _ _ _ _ v => IsTopIx (v 
 
 /-- **A low index is bit-definable** in the same way: one with a bit of the
 greatest element above it. -/
-theorem bitDef_isLowIx (i : α) : BitDef (L := L) fun _ _ _ _ _ v => IsLowIx (v i) := by
+private theorem bitDef_isLowIx (i : α) : BitDef (L := L) fun _ _ _ _ _ v => IsLowIx (v i) := by
   have hk : BitDef (L := L) (α := (α ⊕ Fin 1) ⊕ Fin 1) fun _ _ _ _ _ w =>
       w (Sum.inl (Sum.inl i)) < w (Sum.inr 0) ∧
         BitIx (w (Sum.inr 0)) (w (Sum.inl (Sum.inr 0))) :=
@@ -515,7 +519,7 @@ theorem bitDef_isLowIx (i : α) : BitDef (L := L) fun _ _ _ _ _ v => IsLowIx (v 
     exact (isLowIx_iff_bits hmax).mp h
 
 /-- Equality is bit-definable, through the order. -/
-theorem bitDef_eq (x y : α) : BitDef (L := L) fun _ _ _ _ _ v => v x = v y :=
+private theorem bitDef_eq (x y : α) : BitDef (L := L) fun _ _ _ _ _ v => v x = v y :=
   ((bitDef_le x y).and (bitDef_le y x)).congr fun _ _ _ _ _ _ =>
     ⟨fun h => le_antisymm h.1 h.2, fun h => ⟨h.le, h.ge⟩⟩
 

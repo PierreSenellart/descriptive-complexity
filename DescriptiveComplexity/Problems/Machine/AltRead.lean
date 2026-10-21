@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.AltCheck
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltPos
+import all DescriptiveComplexity.Problems.Machine.AltSweep
+import all DescriptiveComplexity.Problems.Machine.AltTable
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # Reading a block's assignment off an arbitrary run
@@ -49,7 +54,7 @@ variable {νs : Fin k → A → Prop}
 
 /-- Two tapes agree at a tuple as soon as they give its variable the same
 value. -/
-theorem tapeAfter_congr_at {ρ σ : Fin k → A → Prop} {m m' : ℕ} {r : AltV k A}
+private theorem tapeAfter_congr_at {ρ σ : Fin k → A → Prop} {m m' : ℕ} {r : AltV k A}
     (h : valAfter ρ m (r.2 0) = valAfter σ m' (r.2 0)) : tapeAfter ρ m r = tapeAfter σ m' r := by
   classical
   obtain ⟨⟨t, j⟩, w⟩ := r
@@ -74,7 +79,7 @@ def InSweepR (i : Fin k) (νs : Fin k → A → Prop) (c : Config (AltV k A)) : 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Writing nothing in block `i` leaves the tape where the sweeps below it left
 it. -/
-theorem valAfter_update_bot {i : Fin k} {x : A} :
+private theorem valAfter_update_bot {i : Fin k} {x : A} :
     valAfter (Function.update νs i fun _ => False) ((i : ℕ) + 1) x = valAfter νs (i : ℕ) x := by
   refine Bool.eq_iff_iff.mpr ⟨fun h => ?_, fun h => ?_⟩
   · rcases valAfter_update_succ.mp h with h' | ⟨-, h'⟩
@@ -83,7 +88,7 @@ theorem valAfter_update_bot {i : Fin k} {x : A} :
   · exact valAfter_update_succ.mpr (Or.inl h)
 
 /-- **The pass starts with nothing written.** -/
-theorem inSweepR_start (i : Fin k) (νs : Fin k → A → Prop) :
+private theorem inSweepR_start (i : Fin k) (νs : Fin k → A → Prop) :
     InSweepR i νs (confSweep νs i.castSucc (posCell qbotA)) := by
   classical
   refine ⟨fun _ => False, fun x hx => hx.elim, rfl, altPosn_posCell _,
@@ -94,7 +99,8 @@ theorem inSweepR_start (i : Fin k) (νs : Fin k → A → Prop) :
 /-! ### What the tape says about the head -/
 
 /-- The four kinds of symbol a position can hold. -/
-theorem tapeAfter_head_cases {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr : AltPosn r) :
+private theorem tapeAfter_head_cases
+    {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr : AltPosn r) :
     (r.1.1 = AltBase.pStart ∧ tapeAfter ρ m r = symStart) ∨
       (r.1.1 = AltBase.pEnd ∧ tapeAfter ρ m r = symEnd) ∨
       (r.1.1 = AltBase.pCell ∧ tapeAfter ρ m r = symV (valAfter ρ m (r.2 0)) (r.2 0)) ∨
@@ -109,7 +115,7 @@ theorem tapeAfter_head_cases {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A
       | exact Or.inr (Or.inr (Or.inr rfl))
 
 /-- Reading the left marker pins the head. -/
-theorem head_eq_posStart {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr : AltPosn r)
+private theorem head_eq_posStart {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr : AltPosn r)
     (h : tapeAfter ρ m r = symStart) : r = posStart := by
   rcases tapeAfter_head_cases (m := m) (ρ := ρ) hr with ⟨hb, -⟩ | ⟨-, he⟩ | ⟨-, he⟩ | he
   · exact eq_posStart_of_posn hr hb
@@ -118,7 +124,7 @@ theorem head_eq_posStart {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (h
   · exact absurd (congrArg (fun p => p.1.1) (he.symm.trans h)) (by simp [acstI])
 
 /-- Reading the right marker pins the head. -/
-theorem head_eq_posEnd {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr : AltPosn r)
+private theorem head_eq_posEnd {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr : AltPosn r)
     (h : tapeAfter ρ m r = symEnd) : r = posEnd := by
   rcases tapeAfter_head_cases (m := m) (ρ := ρ) hr with ⟨-, he⟩ | ⟨hb, -⟩ | ⟨-, he⟩ | he
   · exact absurd (congrArg (fun p => p.1.1) (he.symm.trans h)) (by simp [acstI])
@@ -127,7 +133,7 @@ theorem head_eq_posEnd {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} (hr 
   · exact absurd (congrArg (fun p => p.1.1) (he.symm.trans h)) (by simp [acstI])
 
 /-- Reading a cell's symbol pins the head to that cell. -/
-theorem head_eq_posCell {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} {b : Bool} {x : A}
+private theorem head_eq_posCell {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} {b : Bool} {x : A}
     (hr : AltPosn r) (h : tapeAfter ρ m r = symV b x) :
     r = posCell x ∧ b = valAfter ρ m x := by
   rcases tapeAfter_head_cases (m := m) (ρ := ρ) hr with ⟨-, he⟩ | ⟨-, he⟩ | ⟨hb, he⟩ | he
@@ -146,7 +152,7 @@ theorem head_eq_posCell {m : ℕ} {ρ : Fin k → A → Prop} {r : AltV k A} {b 
 
 omit [(Language.qbf k).Structure A] [Finite A] [Nonempty A] in
 /-- A tuple with a cell's tag and a cell's shape is a position. -/
-theorem altPosn_of_isCellTup {r : AltV k A} (hb : r.1.1 = AltBase.pCell) (h : IsCellTup r) :
+private theorem altPosn_of_isCellTup {r : AltV k A} (hb : r.1.1 = AltBase.pCell) (h : IsCellTup r) :
     AltPosn r := by
   obtain ⟨⟨t, j⟩, w⟩ := r
   simp only at hb
@@ -155,7 +161,7 @@ theorem altPosn_of_isCellTup {r : AltV k A} (hb : r.1.1 = AltBase.pCell) (h : Is
 
 /-- Two tapes agree at a tuple as soon as they agree at it *when it is a real
 cell*: a junk cell reads `false` on either. -/
-theorem tapeAfter_congr_off {ρ σ : Fin k → A → Prop} {m m' : ℕ} {r : AltV k A}
+private theorem tapeAfter_congr_off {ρ σ : Fin k → A → Prop} {m m' : ℕ} {r : AltV k A}
     (h : r.1.1 = AltBase.pCell → IsCellTup r →
       valAfter ρ m (r.2 0) = valAfter σ m' (r.2 0)) :
     tapeAfter ρ m r = tapeAfter σ m' r := by
@@ -171,7 +177,7 @@ the only computation the read-off of a sweep performs: the cell of `x` turns
 from `false` to `true`, and every other tuple is left alone – a real cell
 because its variable is not `x`, a junk one because it reads `false`
 regardless. -/
-theorem tapeAfter_set {i : Fin k} {ν' : A → Prop} {x : A} {T T' : AltV k A → AltV k A}
+private theorem tapeAfter_set {i : Fin k} {ν' : A → Prop} {x : A} {T T' : AltV k A → AltV k A}
     (hblk : QbfBlk i x) (hT : T = tapeAfter (Function.update νs i ν') ((i : ℕ) + 1))
     (hx : T' (posCell x) = symV true x)
     (hframe : ∀ r, r ≠ (posCell x : AltV k A) → T' r = T r) :
@@ -210,7 +216,7 @@ def InSweepL (i : Fin k) (νs : Fin k → A → Prop) (c : Config (AltV k A)) : 
 
 omit [(Language.qbf k).Structure A] [Finite A] [Nonempty A] in
 /-- Moving the head up keeps everything already written below it. -/
-theorem supp_step {p q r : AltV k A} (hsucc : SuccPos tagTupleLe AltPosn p q)
+private theorem supp_step {p q r : AltV k A} (hsucc : SuccPos tagTupleLe AltPosn p q)
     (hle : tagTupleLe r p) : tagTupleLe r q ∧ r ≠ q := by
   refine ⟨isLinOrd_altTagTupleLe.2.1 r p q hle hsucc.2.2.1, ?_⟩
   rintro rfl
@@ -218,20 +224,20 @@ theorem supp_step {p q r : AltV k A} (hsucc : SuccPos tagTupleLe AltPosn p q)
 
 omit [(Language.qbf k).Structure A] [Nonempty A] in
 /-- A step up raises the rank. -/
-theorem bitRank_lt_of_succPos {p q : AltV k A} (h : SuccPos tagTupleLe AltPosn p q) :
+private theorem bitRank_lt_of_succPos {p q : AltV k A} (h : SuccPos tagTupleLe AltPosn p q) :
     bitRank tagTupleLe AltPosn p < bitRank tagTupleLe AltPosn q :=
   bitRank_lt isLinOrd_altTagTupleLe h.1 h.2.2.1 h.2.2.2.1
 
 omit [(Language.qbf k).Structure A] in
 /-- A cell is not the right marker. -/
-theorem posCell_ne_posEnd (x : A) : (posCell x : AltV k A) ≠ posEnd := fun h =>
+private theorem posCell_ne_posEnd (x : A) : (posCell x : AltV k A) ≠ posEnd := fun h =>
   absurd (congrArg (fun p => p.1.1) h) (show ¬(AltBase.pCell = AltBase.pEnd) by decide)
 
 omit [(Language.qbf k).Structure A] in
 /-- **The head cannot step over the right marker.** Anything strictly below it
 has its successor at or below it, since a successor admits nothing strictly
 between. -/
-theorem le_posEnd_of_succPos {p q : AltV k A} (hsucc : SuccPos tagTupleLe AltPosn p q)
+private theorem le_posEnd_of_succPos {p q : AltV k A} (hsucc : SuccPos tagTupleLe AltPosn p q)
     (hle : tagTupleLe p (posEnd : AltV k A)) (hne : p ≠ posEnd) :
     tagTupleLe q (posEnd : AltV k A) := by
   by_contra hcon

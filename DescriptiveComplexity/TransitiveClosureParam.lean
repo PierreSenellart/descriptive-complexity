@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.FixedPointInflationary
 public import DescriptiveComplexity.TransitiveClosure
+import all DescriptiveComplexity.FixedPointStep
 
 /-!
 # Transitive closures with parameters, as relations a formula may read
@@ -164,7 +165,7 @@ theorem pack_par {V : Type} (x y : Fin s.k → V) (z : Fin s.par → V) (j : Fin
   exact congrArg z (Fin.ext (by simp only [parIx]; omega))
 
 /-- Every tuple is packed from its three parts. -/
-theorem pack_eta {V : Type} (w : Fin (s.k + s.k + s.par) → V) :
+private theorem pack_eta {V : Type} (w : Fin (s.k + s.k + s.par) → V) :
     pack (fun i => w (s.leftIx i)) (fun i => w (s.rightIx i)) (fun j => w (s.parIx j)) = w := by
   funext j
   have hj := j.isLt
@@ -180,7 +181,7 @@ theorem pack_eta {V : Type} (w : Fin (s.k + s.k + s.par) → V) :
       rw [hje, pack_par]
 
 /-- Post-composing a packed tuple with a function packs the components. -/
-theorem pack_comp {V W : Type} (f : V → W) (x y : Fin s.k → V) (z : Fin s.par → V) :
+private theorem pack_comp {V W : Type} (f : V → W) (x y : Fin s.k → V) (z : Fin s.par → V) :
     (fun j => f (pack x y z j)) =
       pack (fun t => f (x t)) (fun t => f (y t)) (fun t => f (z t)) := by
   funext j
@@ -241,7 +242,7 @@ theorem reachAssign_iff (q : F.block.ι) (w : Fin (F.block.arity q) → A) :
       (q.2.2, fun t => w ((F.spec q.1).rightIx t)) :=
   Iff.rfl
 
-theorem reachAssign_pack (q : F.block.ι) (x y : Fin (F.spec q.1).k → A)
+private theorem reachAssign_pack (q : F.block.ι) (x y : Fin (F.spec q.1).k → A)
     (z : Fin (F.spec q.1).par → A) :
     F.reachAssign A q (ParamTCSpec.pack x y z) ↔
       (F.spec q.1).ReachAt z (q.2.1, x) (q.2.2, y) := by
@@ -308,7 +309,7 @@ section Realize
 
 variable (ρ : F.block.Assignment A)
 
-theorem realize_diagF (q : F.block.ι) (w : Fin (F.block.arity q) → A) :
+private theorem realize_diagF (q : F.block.ι) (w : Fin (F.block.arity q) → A) :
     (@Formula.Realize _ A (F.block.structure₁ (L := L) ρ) _ (F.diagF q) w) ↔
       q.2.1 = q.2.2 ∧ ∀ t, w ((F.spec q.1).leftIx t) = w ((F.spec q.1).rightIx t) := by
   classical
@@ -320,7 +321,7 @@ theorem realize_diagF (q : F.block.ι) (w : Fin (F.block.arity q) → A) :
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem realize_reachAtomF (q : F.block.ι) (m : (F.spec q.1).Mode)
+private theorem realize_reachAtomF (q : F.block.ι) (m : (F.spec q.1).Mode)
     (w : Fin (F.block.arity q) → A) (y : Fin (F.spec q.1).k → A) :
     (@Formula.Realize _ A (F.block.structure₁ (L := L) ρ) _ (F.reachAtomF q m) (Sum.elim w y)) ↔
       ρ ⟨q.1, (q.2.1, m)⟩ (ParamTCSpec.pack (fun t => w ((F.spec q.1).leftIx t)) y
@@ -330,7 +331,7 @@ theorem realize_reachAtomF (q : F.block.ι) (m : (F.spec q.1).Mode)
   refine iff_of_eq (congrArg (ρ ⟨q.1, (q.2.1, m)⟩) ?_)
   exact ParamTCSpec.pack_comp (s := F.spec q.1) (Sum.elim w y) _ _ _
 
-theorem realize_lastStepF (q : F.block.ι) (m : (F.spec q.1).Mode)
+private theorem realize_lastStepF (q : F.block.ι) (m : (F.spec q.1).Mode)
     (w : Fin (F.block.arity q) → A) (y : Fin (F.spec q.1).k → A) :
     (@Formula.Realize _ A (F.block.structure₁ (L := L) ρ) _ (F.lastStepF q m) (Sum.elim w y)) ↔
       (F.spec q.1).StepAt (fun t => w ((F.spec q.1).parIx t)) (m, y)
@@ -341,7 +342,7 @@ theorem realize_lastStepF (q : F.block.ι) (m : (F.spec q.1).Mode)
   funext v
   rcases v with (t | t) | t <;> rfl
 
-theorem realize_stepF (q : F.block.ι) (w : Fin (F.block.arity q) → A) :
+private theorem realize_stepF (q : F.block.ι) (w : Fin (F.block.arity q) → A) :
     (@Formula.Realize _ A (F.block.structure₁ (L := L) ρ) _ (F.stepF q) w) ↔
       (q.2.1 = q.2.2 ∧ ∀ t, w ((F.spec q.1).leftIx t) = w ((F.spec q.1).rightIx t)) ∨
         ∃ (y : Fin (F.spec q.1).k → A) (m : (F.spec q.1).Mode),
@@ -365,7 +366,7 @@ section Limit
 variable [Finite A]
 
 omit [Finite A] in
-private theorem inflStage_le_reachAssign (n : ℕ) (q : F.block.ι)
+theorem inflStage_le_reachAssign (n : ℕ) (q : F.block.ι)
     (w : Fin (F.block.arity q) → A) (h : (F.toStepDef).inflStage A n q w) :
     F.reachAssign A q w := by
   induction n generalizing q w with
@@ -451,12 +452,12 @@ noncomputable def toFamily : TCFamily (L₀.sum Language.order) where
 
 variable {A : Type} [L₀.Structure A] [LinearOrder A]
 
-theorem stepAt_toParam (z : Fin 0 → A) (a b : spec.Node A) :
+private theorem stepAt_toParam (z : Fin 0 → A) (a b : spec.Node A) :
     spec.toParam.StepAt z a b ↔ spec.Step a b := by
   simp only [ParamTCSpec.StepAt, TCSpec.Step, toParam, Formula.realize_relabel]
   exact iff_of_eq (congrArg (spec.step a.1 b.1).Realize (funext fun v => rfl))
 
-theorem reachAt_toParam (z : Fin 0 → A) (a b : spec.Node A) :
+private theorem reachAt_toParam (z : Fin 0 → A) (a b : spec.Node A) :
     spec.toParam.ReachAt z a b ↔ spec.Reach a b := by
   constructor
   · intro h
@@ -476,7 +477,7 @@ noncomputable def reachAtomAcc (p : spec.Mode × spec.Mode) :
     Term.var (ParamTCSpec.pack (V := Empty ⊕ (Fin spec.k ⊕ Fin spec.k))
       (fun t => Sum.inr (Sum.inl t)) (fun t => Sum.inr (Sum.inr t)) Fin.elim0 j)
 
-theorem realize_reachAtomAcc (p : spec.Mode × spec.Mode)
+private theorem realize_reachAtomAcc (p : spec.Mode × spec.Mode)
     (v : (Empty ⊕ (Fin spec.k ⊕ Fin spec.k)) → A) :
     (@Formula.Realize _ A
       (spec.toFamily.block.structure₁ (L := L₀.sum Language.order)

@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.DagIso.Defs
+import all DescriptiveComplexity.IsoGadget
 
 /-!
 # DAG Isomorphism reduces to Digraph Isomorphism
@@ -66,7 +67,8 @@ noncomputable def topoSentence {α : Type} (V : Language.twoDags.Relations 1)
   topoIrreflClause V Lt ⊓ (topoTransClause V Lt ⊓ topoMonoClause V Lt Arc)
 
 /-- The sentence says what it is named after. -/
-theorem realize_topoSentence {A : Type} [Language.twoDags.Structure A] {α : Type} (v : α → A)
+private theorem realize_topoSentence
+    {A : Type} [Language.twoDags.Structure A] {α : Type} (v : α → A)
     (V : Language.twoDags.Relations 1) (Lt Arc : Language.twoDags.Relations 2) :
     (topoSentence V Lt Arc).Realize v ↔
       TopoOn (fun a : A => RelMap V ![a]) (fun a b : A => RelMap Lt ![a, b])
@@ -84,7 +86,8 @@ theorem realize_topoSentence {A : Type} [Language.twoDags.Structure A] {α : Typ
 noncomputable def wfSentence {α : Type} : Language.twoDags.Formula α :=
   topoSentence tdPatV tdPatLt tdPatArc ⊓ topoSentence tdHostV tdHostLt tdHostArc
 
-theorem realize_wfSentence {A : Type} [Language.twoDags.Structure A] {α : Type} (v : α → A) :
+private theorem realize_wfSentence
+    {A : Type} [Language.twoDags.Structure A] {α : Type} (v : α → A) :
     (wfSentence.Realize v) ↔
       TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧ TopoOn (TDHostV (A := A)) TDHostLt TDHostArc := by
   rw [wfSentence, Formula.realize_inf, realize_topoSentence, realize_topoSentence]
@@ -112,13 +115,13 @@ section Points
 variable {A : Type}
 
 /-- The unique copy of a vertex. -/
-def dagPt (v : A) : dagInterp.Map A := ((), fun _ => v)
+private def dagPt (v : A) : dagInterp.Map A := ((), fun _ => v)
 
-theorem dagPt_eta (t : Unit) (w : Fin 1 → A) : ((t, w) : dagInterp.Map A) = dagPt (w 0) :=
+private theorem dagPt_eta (t : Unit) (w : Fin 1 → A) : ((t, w) : dagInterp.Map A) = dagPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
 /-- The map is a copy of the universe: dimension one, one tag. -/
-def dagEquiv : dagInterp.Map A ≃ A where
+private def dagEquiv : dagInterp.Map A ≃ A where
   toFun p := p.2 0
   invFun := dagPt
   left_inv p := (dagPt_eta p.1 p.2).symm
@@ -144,25 +147,25 @@ variable (hwf : TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧
 
 include hwf
 
-theorem patV_map (p : dagInterp.Map A) : TGPatV p ↔ TDPatV (dagEquiv p) := by
+private theorem patV_map (p : dagInterp.Map A) : TGPatV p ↔ TDPatV (dagEquiv p) := by
   rw [TGPatV, FOInterpretation.relMap_map]
   simp only [dagInterp, Formula.realize_inf, Formula.realize_rel₁, Term.realize_var]
   exact ⟨fun h => h.2, fun h => ⟨(wf_iff _).mpr hwf, h⟩⟩
 
-theorem hostV_map (p : dagInterp.Map A) : TGHostV p ↔ TDHostV (dagEquiv p) := by
+private theorem hostV_map (p : dagInterp.Map A) : TGHostV p ↔ TDHostV (dagEquiv p) := by
   rw [TGHostV, FOInterpretation.relMap_map]
   simp only [dagInterp, Formula.realize_sup, Formula.realize_inf, Formula.realize_not,
     Formula.realize_rel₁, Term.realize_var]
   exact ⟨fun h => h.elim (fun h => h.2) fun h => absurd ((wf_iff _).mpr hwf) h,
     fun h => Or.inl ⟨(wf_iff _).mpr hwf, h⟩⟩
 
-theorem patE_map (p q : dagInterp.Map A) :
+private theorem patE_map (p q : dagInterp.Map A) :
     TGPatE p q ↔ TDPatArc (dagEquiv p) (dagEquiv q) := by
   rw [TGPatE, FOInterpretation.relMap_map]
   simp only [dagInterp, Formula.realize_inf, Formula.realize_rel₂, Term.realize_var]
   exact ⟨fun h => h.2, fun h => ⟨(wf_iff _).mpr hwf, h⟩⟩
 
-theorem hostE_map (p q : dagInterp.Map A) :
+private theorem hostE_map (p q : dagInterp.Map A) :
     TGHostE p q ↔ TDHostArc (dagEquiv p) (dagEquiv q) := by
   rw [TGHostE, FOInterpretation.relMap_map]
   simp only [dagInterp, Formula.realize_inf, Formula.realize_rel₂, Term.realize_var]
@@ -176,7 +179,7 @@ variable {A : Type} [Language.twoDags.Structure A]
 
 /-- When the instance is ill formed, no element of the image is a pattern
 vertex. -/
-theorem not_patV_map_of_not_wf
+private theorem not_patV_map_of_not_wf
     (hwf : ¬(TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧
       TopoOn (TDHostV (A := A)) TDHostLt TDHostArc)) (p : dagInterp.Map A) : ¬TGPatV p := by
   rw [TGPatV, FOInterpretation.relMap_map]
@@ -185,7 +188,7 @@ theorem not_patV_map_of_not_wf
 
 /-- When the instance is ill formed, every element of the image is a host
 vertex. -/
-theorem hostV_map_of_not_wf
+private theorem hostV_map_of_not_wf
     (hwf : ¬(TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧
       TopoOn (TDHostV (A := A)) TDHostLt TDHostArc)) (p : dagInterp.Map A) : TGHostV p := by
   rw [TGHostV, FOInterpretation.relMap_map]
@@ -203,7 +206,7 @@ variable {A : Type} [Language.twoDags.Structure A]
 
 /-- Correctness of the interpretation: the image is a yes-instance of Graph
 Isomorphism exactly when the input is one of DAG Isomorphism. -/
-theorem hasDagIso_iff_hasDigraphIso_map (A : Type) [Language.twoDags.Structure A] [Finite A]
+private theorem hasDagIso_iff_hasDigraphIso_map (A : Type) [Language.twoDags.Structure A] [Finite A]
     [Nonempty A] :
     HasDagIso A ↔ HasDigraphIso (dagInterp.Map A) := by
   by_cases hwf : TopoOn (TDPatV (A := A)) TDPatLt TDPatArc ∧
@@ -227,7 +230,7 @@ end DagIso
 /-- **DAG Isomorphism FO-reduces to Digraph Isomorphism**: forget the two
 topological orders, after checking first-order that they are ones. The
 reduction is order-free. -/
-noncomputable def dagIso_fo_reduction_digraphIso : DagIso ≤ᶠᵒ DigraphIso where
+private noncomputable def dagIso_fo_reduction_digraphIso : DagIso ≤ᶠᵒ DigraphIso where
   Tag := Unit
   dim := 1
   toInterpretation := DagIso.dagInterp

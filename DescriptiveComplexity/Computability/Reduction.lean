@@ -11,6 +11,8 @@ public import Mathlib.Logic.Equiv.Fin.Basic
 public import DescriptiveComplexity.Relativized
 public import DescriptiveComplexity.OrderedComposition
 public import Mathlib.Data.List.GetD
+import all DescriptiveComplexity.Computability.Eval
+import all DescriptiveComplexity.Computability.FinStruct
 
 /-!
 # First-order reductions are computable
@@ -300,12 +302,12 @@ def flatDom (t : Tag) : (L.sum Language.order).BoundedFormula Empty dim :=
 
 variable {M : Type} [(L.sum Language.order).Structure M]
 
-theorem realize_flatRel {n : ℕ} (R : L'.Relations n) (τ : Fin n → Tag)
+private theorem realize_flatRel {n : ℕ} (R : L'.Relations n) (τ : Fin n → Tag)
     (v : Empty → M) (x : Fin (n * dim) → M) :
     (flatRel I R τ).Realize v x ↔ (I.relFormula R τ).Realize (x ∘ finProdFinEquiv) :=
   (Formula.realize_relabel_sumInr _).trans Formula.realize_relabel
 
-theorem realize_flatDom (t : Tag) (v : Empty → M) (x : Fin dim → M) :
+private theorem realize_flatDom (t : Tag) (v : Empty → M) (x : Fin dim → M) :
     (flatDom I t).Realize v x ↔ (I.domFormula t).Realize x :=
   Formula.realize_relabel_sumInr _
 
@@ -322,7 +324,7 @@ variable {L L' : Language.{0, 0}} [L.IsRelational] [L'.IsRelational]
 omit [L'.IsRelational] in
 /-- Evaluating a formula on the encoded ordered expansion is realizing it on
 the instance's universe with its own linear order. -/
-theorem evalBF_ord_iff (s : FinStruct V) {l : ℕ}
+private theorem evalBF_ord_iff (s : FinStruct V) {l : ℕ}
     (φ : (L.sum Language.order).BoundedFormula Empty l) (xs : List ℕ) (h : xs.length = l) :
     FinStruct.evalBF (V.sum orderVocab) φ (ordStruct V s) xs = true ↔
       @BoundedFormula.Realize (L.sum Language.order) s.Univ (sumOrderStructure L s.Univ) Empty l
@@ -340,7 +342,7 @@ theorem evalBF_ord_iff (s : FinStruct V) {l : ℕ}
 
 omit [L.IsRelational] [L'.IsRelational] in
 /-- The valuation read off a list of digits is the tuple those digits are. -/
-theorem valOf_ofFn_digitAt (s : FinStruct V) {d : ℕ} (v : ℕ) (i : Fin d) :
+private theorem valOf_ofFn_digitAt (s : FinStruct V) {d : ℕ} (v : ℕ) (i : Fin d) :
     FinStruct.valOf (ordStruct V s)
         (List.ofFn fun j : Fin d => digitAt s.card v (j : ℕ)) (i : ℕ) =
       (⟨digitAt s.card v (i : ℕ), digitAt_lt (Nat.succ_pos _) _ _⟩ : s.Univ) := by
@@ -389,7 +391,7 @@ def relBool (s : FinStruct V) {n : ℕ} (R : L'.Relations n) (p : List ℕ) : Bo
 
 omit [L.IsRelational] [L'.IsRelational] in
 /-- The valuation read off the pair-indexed list of digits. -/
-theorem valOf_ofFn_pair (s : FinStruct V) {n : ℕ} (p : List ℕ) (q : Fin n × Fin dim) :
+private theorem valOf_ofFn_pair (s : FinStruct V) {n : ℕ} (p : List ℕ) (q : Fin n × Fin dim) :
     FinStruct.valOf (ordStruct V s)
         (List.ofFn fun q' : Fin (n * dim) =>
           digitAt s.card (p.getD ((finProdFinEquiv.symm q').1 : ℕ) 0 / (T + 1))
@@ -496,7 +498,7 @@ theorem relMapBool_mapStruct (s : FinStruct V) {a : ℕ} (R' : L'.Relations a)
 
 /-! ### Everything above is primitive recursive -/
 
-theorem filter_eq_flatMap (p : ℕ → Bool) (l : List ℕ) :
+private theorem filter_eq_flatMap (p : ℕ → Bool) (l : List ℕ) :
     l.filter p = l.flatMap fun a => bif p a then [a] else [] := by
   induction l with
   | nil => rfl
@@ -672,7 +674,7 @@ source.
 The renumbering forced by the definable domain is the whole content; the
 interpretation itself is an evaluation of fixed formulas, primitive recursive
 by `FirstOrder.Language.FinStruct.primrec_evalBF`. -/
-theorem computablePred_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q)
+private theorem computablePred_of_relOrderedReduction (f : P ≤ʳᶠᵒ[≤] Q)
     (V : FinVocab L) (V' : FinVocab L') (hQ : ComputablePred (Q.toPred V')) :
     ComputablePred (P.toPred V) := by
   classical

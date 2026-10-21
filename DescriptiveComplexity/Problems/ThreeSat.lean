@@ -8,6 +8,10 @@ module
 import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 import DescriptiveComplexity.Problems.ThreeSat.FromSat
+import all DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
+import all DescriptiveComplexity.Problems.ThreeSat.FromSat
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # 3SAT is NP-complete

@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # Plain sweeps: one step per address, a flag or a write
@@ -59,7 +64,7 @@ the phase `DescriptiveComplexity.sweepState` names – passing exactly when ever
 cell strictly below passed. The three rule families are the two branches of the
 passing phase and the cruise of the failing one, each at the cells of the
 stretch only. -/
-theorem reachesIn_flagSweep (hR : PR.table.Reads)
+private theorem reachesIn_flagSweep (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
     {Test : (Univ A R P K dd → Prop) → Prop} {py pn : P} {f : Q → A}
@@ -142,7 +147,7 @@ cell. The tape a phase like this starts from is blank, so the rule has nothing
 to read that distinguishes one cell from the next; what distinguishes them is the
 pointer, whose slots hold elements of the instance. That is how a program lays
 down a pattern indexed by the elements – its own register file, for instance. -/
-theorem reachesIn_writeSweepSt (hR : PR.table.Reads)
+private theorem reachesIn_writeSweepSt (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {m : I → Prop}
     {restAt : (Univ A R P K dd → Prop) → (Univ A R P K dd → Prop) → W → A}
@@ -170,7 +175,7 @@ theorem reachesIn_writeSweepSt (hR : PR.table.Reads)
 frontier – everything strictly below has its new value, everything at or above
 its old one – and one rule per cell writes the change as the head leaves. COPY
 is this sweep. -/
-theorem reachesIn_writeSweep (hR : PR.table.Reads)
+private theorem reachesIn_writeSweep (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {m : I → Prop}
     {restAt : (Univ A R P K dd → Prop) → (Univ A R P K dd → Prop) → W → A}

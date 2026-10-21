@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Games.Distance
 public import DescriptiveComplexity.Games.Ehrenfeucht
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Games.Distance
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The game on finite linear orders
@@ -73,25 +75,25 @@ noncomputable def extRank {A : Type} [LinearOrder A] {j : ℕ} (a : Fin j → A)
 /-- **The duplicator's invariant on two finite linear orders**: any two points
 of the position – sentinels included – are at the same distance on both sides,
 up to truncation at `2 ^ n`. -/
-def OrdInv (n : ℕ) (a : Fin j → A) (b : Fin j → B) : Prop :=
+private def OrdInv (n : ℕ) (a : Fin j → A) (b : Fin j → B) : Prop :=
   ∀ i i' : Fin j ⊕ Bool,
     truncAt n (extRank a i - extRank a i') = truncAt n (extRank b i - extRank b i')
 
 variable {a : Fin j → A} {b : Fin j → B}
 
 /-- The invariant is symmetric. -/
-theorem OrdInv.symm (h : OrdInv n a b) : OrdInv n b a :=
+private theorem OrdInv.symm (h : OrdInv n a b) : OrdInv n b a :=
   fun i i' => (h i i').symm
 
 /-- The invariant weakens as the budget is spent. -/
-theorem OrdInv.mono {m : ℕ} (hmn : m ≤ n) (h : OrdInv n a b) : OrdInv m a b :=
+private theorem OrdInv.mono {m : ℕ} (hmn : m ≤ n) (h : OrdInv n a b) : OrdInv m a b :=
   fun i i' => truncAt_eq_of_le hmn (h i i')
 
 /-! ### One round -/
 
 /-- The extended tuple of a position lengthened by one point, at an old
 coordinate. -/
-theorem extRank_snoc_lift (a : Fin j → A) (c : A) (i : Fin j ⊕ Bool) :
+private theorem extRank_snoc_lift (a : Fin j → A) (c : A) (i : Fin j ⊕ Bool) :
     extRank (Fin.snoc a c) (Sum.map Fin.castSucc id i) = extRank a i := by
   rcases i with i | β
   · change ((orank ((Fin.snoc a c : Fin (j + 1) → A) i.castSucc) : ℤ)) = (orank (a i) : ℤ)
@@ -100,14 +102,14 @@ theorem extRank_snoc_lift (a : Fin j → A) (c : A) (i : Fin j ⊕ Bool) :
 
 /-- The extended tuple of a position lengthened by one point, at the new
 coordinate. -/
-theorem extRank_snoc_last (a : Fin j → A) (c : A) :
+private theorem extRank_snoc_last (a : Fin j → A) (c : A) :
     extRank (Fin.snoc a c) (Sum.inl (Fin.last j)) = (orank c : ℤ) := by
   change ((orank ((Fin.snoc a c : Fin (j + 1) → A) (Fin.last j)) : ℤ)) = (orank c : ℤ)
   rw [Fin.snoc_last]
 
 /-- An extended coordinate of a lengthened position is either an old one or
 the new one. -/
-theorem extIndex_cases (i : Fin (j + 1) ⊕ Bool) :
+private theorem extIndex_cases (i : Fin (j + 1) ⊕ Bool) :
     (∃ i₀ : Fin j ⊕ Bool, i = Sum.map Fin.castSucc id i₀) ∨ i = Sum.inl (Fin.last j) := by
   rcases i with k | β
   · induction k using Fin.lastCases with
@@ -118,7 +120,7 @@ theorem extIndex_cases (i : Fin (j + 1) ⊕ Bool) :
 /-- The empty position satisfies the invariant as soon as both orders have at
 least `2 ^ n` elements: the only distance to check is the one between the two
 sentinels, and it is beyond the truncation on both sides. -/
-theorem ordInv_default (n : ℕ) (hA : 2 ^ n ≤ Nat.card A) (hB : 2 ^ n ≤ Nat.card B) :
+private theorem ordInv_default (n : ℕ) (hA : 2 ^ n ≤ Nat.card A) (hB : 2 ^ n ≤ Nat.card B) :
     OrdInv n (default : Fin 0 → A) (default : Fin 0 → B) := by
   have hA' : (2 : ℤ) ^ n ≤ (Nat.card A : ℤ) := by
     simpa using (Nat.cast_le (α := ℤ)).mpr hA
@@ -141,7 +143,7 @@ the duplicator has an answer on the right keeping the invariant, at the cost
 of one unit of budget. The answer is computed in the integers
 (`DescriptiveComplexity.exists_answer`) and comes back into the structure
 because it lands strictly between the two sentinels. -/
-theorem exists_ordInv_snoc (h : OrdInv (n + 1) a b) (c : A) :
+private theorem exists_ordInv_snoc (h : OrdInv (n + 1) a b) (c : A) :
     ∃ d : B, OrdInv n (Fin.snoc a c) (Fin.snoc b d) := by
   have hcA : extRank a (Sum.inr true) = (Nat.card A : ℤ) := rfl
   have hcB : extRank b (Sum.inr true) = (Nat.card B : ℤ) := rfl
@@ -183,7 +185,7 @@ variable [Language.empty.Structure A] [Language.empty.Structure B]
 /-- **A position satisfying the invariant is legal**: the equalities between
 coordinates and the order between them are read off the ranks, which the
 invariant preserves. -/
-theorem partialIso_of_ordInv (h : OrdInv n a b) :
+private theorem partialIso_of_ordInv (h : OrdInv n a b) :
     PartialIso (Language.empty.sum Language.order) a b := by
   constructor
   · intro i i'
@@ -203,7 +205,7 @@ theorem partialIso_of_ordInv (h : OrdInv n a b) :
 
 /-- **The duplicator survives on a line**: a position satisfying the invariant
 with budget `n` survives `n` rounds. -/
-theorem efStage_of_ordInv : ∀ (n : ℕ) {j : ℕ} (a : Fin j → A) (b : Fin j → B),
+private theorem efStage_of_ordInv : ∀ (n : ℕ) {j : ℕ} (a : Fin j → A) (b : Fin j → B),
     OrdInv n a b → efStage (Language.empty.sum Language.order) n a b := by
   intro n
   induction n with

@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawName
 public import DescriptiveComplexity.Problems.Wide.DrawOrd
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawOrd
 
 /-!
 # What a comparison loop decides
@@ -60,7 +63,7 @@ variable {dt}
 omit [L.Structure A] [Finite A] in
 /-- **Two padded tuples compare inside the coordinates they carry**: they
 agree beyond `dd₀`, so the lexicographic comparison is settled before it. -/
-theorem padLt_iff (zero : A) (w w' : Fin dt.dd0 → A) :
+private theorem padLt_iff (zero : A) (w w' : Fin dt.dd0 → A) :
     (∃ p : Fin dt.dd, (∀ j : Fin dt.dd, j < p →
         pad (dd := dt.dd) zero w j = pad (dd := dt.dd) zero w' j) ∧
       pad (dd := dt.dd) zero w p < pad (dd := dt.dd) zero w' p) ↔
@@ -96,7 +99,7 @@ theorem padLt_iff (zero : A) (w w' : Fin dt.dd0 → A) :
 
 omit [L.Structure A] [Finite A] in
 /-- The strict order the address layer reads on tuples, spelled out. -/
-theorem wmLt_tupLeLex_iff' (x y : Fin dt.dd → A) :
+private theorem wmLt_tupLeLex_iff' (x y : Fin dt.dd → A) :
     WMLt tupLeLex x y ↔ ∃ p : Fin dt.dd, (∀ j : Fin dt.dd, j < p → x j = y j) ∧ x p < y p := by
   rw [wmLt_tupLeLex_iff]
   exact lex_lt_iff
@@ -118,7 +121,7 @@ omit [Finite A] in
 /-- **An encoding is what its padded bits say**: two encodings agreeing at
 every padded tuple agree everywhere, since neither holds off the padded
 tuples. -/
-theorem encMap_eq_padBits {zero one : A} {p q : dt.X.Map A}
+private theorem encMap_eq_padBits {zero one : A} {p q : dt.X.Map A}
     (h : ∀ w : Fin dt.dd0 → A,
       dt.padBits zero (encMap dt.ly zero one p) w ↔
         dt.padBits zero (encMap dt.ly zero one q) w) :

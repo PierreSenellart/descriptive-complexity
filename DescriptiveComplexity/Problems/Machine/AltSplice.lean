@@ -8,6 +8,11 @@ module
 public import DescriptiveComplexity.Problems.Machine.AltRank
 import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.MachinesAltPlay
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltGame
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Splicing a play into a walk
@@ -55,7 +60,7 @@ variable (hlin : IsLinOrd M.Le) {prev : A → Config A} {t : A} {ℓ : ℕ} {f :
 
 omit [Finite A] in
 /-- Below the entry time the spliced walk is the previous one. -/
-theorem splice_of_le {x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
+private theorem splice_of_le {x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
     M.splice prev t ℓ f x = prev x := by
   classical
   rw [splice, ite_eq_right h]
@@ -63,7 +68,7 @@ theorem splice_of_le {x : A} (h : ¬(M.Posn x ∧ ¬M.Le x t)) :
 omit [Finite A] in
 include hlin in
 /-- Above the entry time the spliced walk replays the play. -/
-theorem splice_of_lt {x : A} (hx : M.Posn x) (ht : M.Posn t) (hle : M.Le t x)
+private theorem splice_of_lt {x : A} (hx : M.Posn x) (ht : M.Posn t) (hle : M.Le t x)
     (h0 : prev t = f 0) :
     M.splice prev t ℓ f x =
       f (min (bitRank M.Le M.Posn x - bitRank M.Le M.Posn t) ℓ) := by
@@ -76,7 +81,7 @@ theorem splice_of_lt {x : A} (hx : M.Posn x) (ht : M.Posn t) (hle : M.Le t x)
 
 include hlin in
 /-- The spliced walk at the `j`-th position after `t`. -/
-theorem splice_posSeq {p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁)
+private theorem splice_posSeq {p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁)
     (h0 : prev t = f 0) {j : ℕ}
     (hj : j ≤ bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn t) :
     M.splice prev t ℓ f (M.posSeq t j) = f (min j ℓ) := by
@@ -190,7 +195,7 @@ allowed. -/
 open Classical in
 /-- The greedy continuation of a configuration: step while a step is available,
 and stand still once stuck. -/
-noncomputable def greedy (M : ATMData A) (c₀ : Config A) : ℕ → Config A
+private noncomputable def greedy (M : ATMData A) (c₀ : Config A) : ℕ → Config A
   | 0 => c₀
   | j + 1 =>
       if M.Acc (M.greedy c₀ j).state then M.greedy c₀ j
@@ -198,7 +203,7 @@ noncomputable def greedy (M : ATMData A) (c₀ : Config A) : ℕ → Config A
 
 omit [Finite A] in
 /-- One greedy move is a step, or standing still in a stuck configuration. -/
-theorem greedy_step (M : ATMData A) (c₀ : Config A) (j : ℕ) :
+private theorem greedy_step (M : ATMData A) (c₀ : Config A) (j : ℕ) :
     (M.Step (M.greedy c₀ j) (M.greedy c₀ (j + 1)) ∧ ¬M.Acc (M.greedy c₀ j).state) ∨
       (M.greedy c₀ (j + 1) = M.greedy c₀ j ∧
         (M.Acc (M.greedy c₀ j).state ∨ M.Stuck (M.greedy c₀ j))) := by
@@ -213,11 +218,11 @@ theorem greedy_step (M : ATMData A) (c₀ : Config A) (j : ℕ) :
       Or.inr fun d hd => h ⟨d, hd⟩⟩
 
 /-- The walk that runs the greedy continuation along the positions. -/
-noncomputable def greedyWalk (M : ATMData A) (c₀ : Config A) : A → Config A :=
+private noncomputable def greedyWalk (M : ATMData A) (c₀ : Config A) : A → Config A :=
   fun x => M.greedy c₀ (bitRank M.Le M.Posn x)
 
 /-- **Every initial configuration extends to a walk legal below any block.** -/
-theorem legalBelow_greedyWalk (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
+private theorem legalBelow_greedyWalk (hbwf : M.BlocksWellFormed k) (hlin : IsLinOrd M.Le)
     {c₀ : Config A} (hinit : M.IsInit c₀) (i : ℕ) :
     M.LegalBelow i (M.greedyWalk c₀) ∧
       ∀ p, MinPos M.Le M.Posn p → M.greedyWalk c₀ p = c₀ := by

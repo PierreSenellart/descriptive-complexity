@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Fold
+import all DescriptiveComplexity.Problems.Wide.Fold
 
 /-!
 # What the control carries: contributions, not fold values
@@ -60,13 +61,13 @@ noncomputable def accCVal (j : ℕ) (v : Fin n → A) : Prop :=
 
 variable {pol P le}
 
-theorem accCVal_of_lt {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
+private theorem accCVal_of_lt {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
     accCVal pol P le j v ↔
       ∃ a : A, WMLt le a (v ⟨j, h⟩) ∧
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
   rw [accCVal, dite_eq_left h, ite_eq_left hp]
 
-theorem accCVal_of_lt_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
+private theorem accCVal_of_lt_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
     accCVal pol P le j v ↔
       ∀ a : A, WMLt le a (v ⟨j, h⟩) →
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a) := by
@@ -212,11 +213,11 @@ def chainFrom (pol : ℕ → Bool) (acc : ℕ → Prop) (leaf : Prop) (n j : ℕ
 
 variable {acc acc' : ℕ → Prop} {leaf : Prop}
 
-theorem chainFrom_of_le {j : ℕ} (h : n ≤ j) : chainFrom pol acc leaf n j = leaf := by
+private theorem chainFrom_of_le {j : ℕ} (h : n ≤ j) : chainFrom pol acc leaf n j = leaf := by
   rw [chainFrom, show n - j = 0 from Nat.sub_eq_zero_of_le h]
   rfl
 
-theorem chainFrom_succ {j : ℕ} (h : j < n) :
+private theorem chainFrom_succ {j : ℕ} (h : j < n) :
     chainFrom pol acc leaf n j =
       (if pol j = true then acc j ∨ chainFrom pol acc leaf n (j + 1)
         else acc j ∧ chainFrom pol acc leaf n (j + 1)) := by
@@ -226,7 +227,7 @@ theorem chainFrom_succ {j : ℕ} (h : j < n) :
 /-- **The chain is the fold value**: a control whose bits are the
 contributions and whose leaf bit is the matrix at the current valuation reads
 off every accumulator of the sweep. -/
-theorem chainFrom_iff_foldFrom {v : Fin n → A}
+private theorem chainFrom_iff_foldFrom {v : Fin n → A}
     (hacc : ∀ i : ℕ, i < n → (acc i ↔ accCVal pol P le i v))
     (hleaf : leaf ↔ P v) (j : ℕ) :
     chainFrom pol acc leaf n j ↔ foldFrom pol P le j v := by
@@ -255,7 +256,7 @@ theorem chainFrom_iff_foldFrom {v : Fin n → A}
 the carry keep their bit, the carry level absorbs the chain below it at the
 old valuation, and the levels after it reset to the polarity's unit. This is
 the whole content of the `dstSt` a landing rule carries. -/
-theorem accCVal_step (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c < n)
+private theorem accCVal_step (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c < n)
     (hagree : ∀ i : Fin n, (i : ℕ) < c → v i = v' i)
     (htop : ∀ i : Fin n, c < (i : ℕ) → ∀ a : A, le a (v i))
     (hbot : ∀ i : Fin n, c < (i : ℕ) → ∀ a : A, le (v' i) a)
@@ -287,7 +288,7 @@ theorem accCVal_step (h : IsLinOrd le) {v v' : Fin n → A} {c : ℕ} (hc : c < 
 /-- **At the first valuation every accumulator is the polarity's unit**:
 nothing lies below a minimal coordinate, so a cleared register starts the
 sweep. -/
-theorem accCVal_bot {v : Fin n → A}
+private theorem accCVal_bot {v : Fin n → A}
     (hbot : ∀ (i : Fin n) (a : A), le (v i) a) (i : ℕ) :
     accCVal pol P le i v ↔ (pol i = false) := by
   by_cases hin : i < n

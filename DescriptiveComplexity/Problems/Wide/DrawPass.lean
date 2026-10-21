@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawRules
 import DescriptiveComplexity.Problems.Wide.Mirror
 import DescriptiveComplexity.Problems.Wide.Test
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawRules
+import all DescriptiveComplexity.Problems.Wide.DrawTracks
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Tape
+import all DescriptiveComplexity.Problems.Wide.Walk
 
 /-!
 # A program's rules run its register passes
@@ -104,7 +110,7 @@ variable {PR}
 
 omit [DecidableEq W] in
 /-- A leftward rule is a transition with its six attributes. -/
-theorem step_of_hasLeft (hR : PR.table.Reads) {p p' : P} {f f' : Q → A} {g g' : W → A}
+private theorem step_of_hasLeft (hR : PR.table.Reads) {p p' : P} {f f' : Q → A} {g g' : W → A}
     (h : PR.HasLeft p f g p' f' g') :
     ∃ τ : Univ A R P K dd, WMTr τ ∧ WMSrc τ (PR.stElt p f) ∧ WMRead τ (PR.syElt g) ∧
       WMDst τ (PR.stElt p' f') ∧ WMWrite τ (PR.syElt g') ∧ ¬WMRight τ := by
@@ -115,7 +121,7 @@ theorem step_of_hasLeft (hR : PR.table.Reads) {p p' : P} {f f' : Q → A} {g g' 
 
 omit [DecidableEq W] in
 /-- A rightward rule is a transition with its six attributes. -/
-theorem step_of_hasRight (hR : PR.table.Reads) {p p' : P} {f f' : Q → A} {g g' : W → A}
+private theorem step_of_hasRight (hR : PR.table.Reads) {p p' : P} {f f' : Q → A} {g g' : W → A}
     (h : PR.HasRight p f g p' f' g') :
     ∃ τ : Univ A R P K dd, WMTr τ ∧ WMSrc τ (PR.stElt p f) ∧ WMRead τ (PR.syElt g) ∧
       WMDst τ (PR.stElt p' f') ∧ WMWrite τ (PR.syElt g') ∧ WMRight τ := by
@@ -150,7 +156,7 @@ noncomputable def passTracksAt
 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
-theorem trackTapeAt_eq (m : I → Prop) (r : Univ A R P K dd → Prop) :
+private theorem trackTapeAt_eq (m : I → Prop) (r : Univ A R P K dd → Prop) :
     PR.trackTapeAt cell t rest m r = PR.syElt (PR.passTracksAt cell t rest m r) := rfl
 
 variable {PR cell t rg rest}
@@ -158,7 +164,7 @@ variable {PR cell t rg rest}
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- At a register cell the walked slot holds the track's digit there. -/
-theorem passTracks_cell (F : IxFile (Univ A R P K dd) I ile)
+private theorem passTracks_cell (F : IxFile (Univ A R P K dd) I ile)
     (hix : IsLinOrd ile)
     (m : I → Prop) (u : I) :
     PR.passTracksAt F.cell t rest m (F.cell u) =
@@ -173,7 +179,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- **The walked slot at a register cell**: the track's digit there, which is what
 the acting rules of a pass are guarded by. -/
-theorem passTracks_cell_apply (F : IxFile (Univ A R P K dd) I ile)
+private theorem passTracks_cell_apply (F : IxFile (Univ A R P K dd) I ile)
     (hix : IsLinOrd ile)
     (m : I → Prop) (u : I) :
     PR.passTracksAt F.cell t rest m (F.cell u) t = bitVal PR.zero PR.one (m u) := by
@@ -184,7 +190,8 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- **A slot other than the walked one** shows what the program keeps there. Every
 guard of a register pass that is not about the track itself reads through this. -/
-theorem passTracks_of_ne {sl : W} (hne : sl ≠ t) (m : I → Prop) (r : Univ A R P K dd → Prop) :
+private theorem passTracks_of_ne
+    {sl : W} (hne : sl ≠ t) (m : I → Prop) (r : Univ A R P K dd → Prop) :
     PR.passTracksAt cell t rest m r sl = rest r sl := by
   simp only [passTracksAt, ite_eq_right hne]
 
@@ -194,7 +201,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
 backgrounds agreeing at one address present the same tracks there, whatever they
 do elsewhere – which is what lets a sweep describe its progress by a frontier
 rather than by an induction. -/
-theorem passTracks_congr {bgA bgB : (Univ A R P K dd → Prop) → W → A}
+private theorem passTracks_congr {bgA bgB : (Univ A R P K dd → Prop) → W → A}
     {r : Univ A R P K dd → Prop} (hbg : bgA r = bgB r) (m : I → Prop) :
     PR.passTracksAt cell t bgA m r = PR.passTracksAt cell t bgB m r := by
   refine funext fun sl => ?_
@@ -204,7 +211,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- **The register mark, read**: the slot `rg` is set exactly at the cells of the
 file, which is what tells the acting rules of a pass from its walking one. -/
-theorem passTracks_rg (hne : t ≠ rg)
+private theorem passTracks_rg (hne : t ≠ rg)
     (hrest : ∀ r : Univ A R P K dd → Prop,
       rest r rg = bitVal PR.zero PR.one (∃ u : I, r = cell u))
     (m : I → Prop) (r : Univ A R P K dd → Prop) :
@@ -227,7 +234,7 @@ variable {I : Type} {ile : I → I → Prop} {cell : I → (Univ A R P K dd → 
 omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- **Backgrounds agreeing off a cell present tapes agreeing off it.** -/
-theorem trackTape_frame {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A}
+private theorem trackTape_frame {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A}
     {m : I → Prop} {v : Univ A R P K dd → Prop}
     (hframe : ∀ r, r ≠ v → rest' r = rest r) :
     ∀ r, r ≠ v →
@@ -253,7 +260,7 @@ theorem step_move (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P 
   exact step_wideTape_right hlin hi htr hsrc hread hdst hwrite hright (PR.trackTape_frame hframe)
 
 /-- **One step of the program to the left.** -/
-theorem step_moveBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem step_moveBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {v v' : Univ A R P K dd → Prop} (hi : WMIncr WMLe v' v)
     {t : W} {rest rest' : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
     (hframe : ∀ r, r ≠ v → rest' r = rest r) {p p' : P} {f f' : Q → A}
@@ -278,7 +285,7 @@ and the same theorem serves both ends by taking the target as a parameter. -/
 /-- **Walking up to a marked register.** From any cell at or below the register of
 `u`, the machine scans right to it, stopped by the slot `sl` that marks that cell
 and no other. The cost is the stretch of addresses it crosses. -/
-theorem reachesIn_fileToMark (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
+private theorem reachesIn_fileToMark (F : IxFile (Univ A R P K dd) I ile) (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
     {u : I}
@@ -326,7 +333,7 @@ rounds ago – so the arrival comes with the promise that nothing passed was mar
 which is where the extremum is taken. -/
 
 /-- **Seeking right to the nearest marked cell.** -/
-theorem reachesIn_seek (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem reachesIn_seek (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
     {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasRight p f g p f g)
@@ -365,7 +372,8 @@ theorem reaches_seek (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R
   obtain ⟨r, hr, hge, hfirst, hrun⟩ := reachesIn_seek hR hlin hne hgo hex
   exact ⟨r, hr, hge, hfirst, hrun.reflTransGen⟩
 /-- **Seeking left to the nearest marked cell.** -/
-theorem reachesIn_seekBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem reachesIn_seekBack
+    (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
     {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasLeft p f g p f g)
@@ -387,7 +395,8 @@ theorem reachesIn_seekBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Un
     exact ⟨τ, htr, hsrc, hread, hdst, hwrite, hright⟩
 
 /-- **Seeking left to the nearest marked cell**, the budget forgotten. -/
-theorem reaches_seekBack (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem reaches_seekBack
+    (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t sl : W} (hne : sl ≠ t) {rest : (Univ A R P K dd → Prop) → W → A}
     {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, g sl ≠ PR.one → PR.HasLeft p f g p f g)
@@ -422,7 +431,7 @@ position.
 
 The four families of rules are the whole of what the program supplies, and each is
 a statement about the tracks a symbol carries, not about the tape. -/
-theorem reachesIn_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
+private theorem reachesIn_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
     (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {m m' : I → Prop} (hi : WMIncr ile m m')
@@ -525,7 +534,7 @@ theorem reachesIn_fileIncrBlk [Finite I] (F : IxFile (Univ A R P K dd) I ile)
 `DescriptiveComplexity.Draw.Prog.reachesIn_fileIncrBlk` with a single block, the register
 mark serving as its indicator. This is the form every use that only has to *move*
 an address takes – advancing the working cell, seeking. -/
-theorem reachesIn_fileIncr [Finite I] (F : IxFile (Univ A R P K dd) I ile)
+private theorem reachesIn_fileIncr [Finite I] (F : IxFile (Univ A R P K dd) I ile)
     (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd))) (hix : IsLinOrd ile)
     {m m' : I → Prop} (hi : WMIncr ile m m')

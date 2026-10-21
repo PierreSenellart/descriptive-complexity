@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Hamilton.Counting
 import Mathlib.GroupTheory.Perm.Cycle.Basic
 import Mathlib.GroupTheory.OrderOfElement
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Hamilton.Counting
+import all DescriptiveComplexity.Problems.Hamilton.Cycle
 
 /-!
 # Circuits, locally and from a potential
@@ -39,14 +42,14 @@ section Circuit
 
 variable {V : Type}
 
-theorem nextIdx_injective {n : ℕ} : Function.Injective (nextIdx : Fin n → Fin n) := by
+private theorem nextIdx_injective {n : ℕ} : Function.Injective (nextIdx : Fin n → Fin n) := by
   intro i j h
   have h' : ((i : ℕ) + 1) % n = ((j : ℕ) + 1) % n := congrArg Fin.val h
   have h'' : (i : ℕ) % n = (j : ℕ) % n := Nat.ModEq.add_right_cancel' 1 h'
   rw [Nat.mod_eq_of_lt i.isLt, Nat.mod_eq_of_lt j.isLt] at h''
   exact Fin.ext h''
 
-theorem nextIdx_iterate {n : ℕ} (k : ℕ) (i : Fin n) :
+private theorem nextIdx_iterate {n : ℕ} (k : ℕ) (i : Fin n) :
     ((nextIdx^[k] i : Fin n) : ℕ) = ((i : ℕ) + k) % n := by
   induction k with
   | zero => simp [Nat.mod_eq_of_lt i.isLt]
@@ -67,7 +70,7 @@ theorem cycSucc_reverse {Le : V → V → Prop} {x y : V} :
     · exact Or.inr ⟨h₂, h₁⟩
 
 /-- A circuit of a symmetric relation, traversed backwards, is a circuit. -/
-theorem IsCircuit.reverse {R Nxt : V → V → Prop} (hsym : ∀ x y, R x y → R y x)
+private theorem IsCircuit.reverse {R Nxt : V → V → Prop} (hsym : ∀ x y, R x y → R y x)
     (h : IsCircuit R Nxt) : IsCircuit R fun x y => Nxt y x := by
   obtain ⟨Le, hlin, hiff, hR⟩ := h
   exact ⟨fun a b => Le b a, hlin.reverse, fun x y => (hiff y x).trans cycSucc_reverse.symm,

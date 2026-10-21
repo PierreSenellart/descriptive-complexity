@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Computability.CodeHalt
 import DescriptiveComplexity.Problems.CodeHalt.Hardness
+import all DescriptiveComplexity.Problems.FinSat
 
 /-!
 # RE is exactly recursive enumerability

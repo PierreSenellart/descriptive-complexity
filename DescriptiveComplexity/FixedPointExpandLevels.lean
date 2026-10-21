@@ -9,6 +9,10 @@ public import DescriptiveComplexity.FixedPointExpand
 public import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Problems.HornSat
 import DescriptiveComplexity.FixedPointOrderTransfer
+import all DescriptiveComplexity.FixedPointExpand
+import all DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointOrderTransfer
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # Eliminating an induction under a quantifier prefix
@@ -59,7 +63,7 @@ variable {L : Language.{0, 0}} {B C : SOBlock} {A : Type}
 
 /-- Two consecutive quantifiers of the same polarity, over two blocks, are one
 quantifier over the merged block. -/
-theorem sorealize_cons_merge (instA : L.Structure A)
+private theorem sorealize_cons_merge (instA : L.Structure A)
     (ψ : ((L.sum B.lang).sum C.lang).Sentence) (pol : Bool) :
     (@SORealize L A instA [SOBlock.cons B C] ((mergeStep L B C).onSentence ψ) pol) ↔
       quantB pol fun ρ : B.Assignment A =>

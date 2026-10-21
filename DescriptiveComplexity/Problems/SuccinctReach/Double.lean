@@ -130,7 +130,7 @@ variable {A : Type} [instA : L₀.Structure A]
 
 /-- The pair renaming is an expansion, the two copies being interpreted by the
 two components of a joined assignment. -/
-theorem blockPairLHom_isExpansionOn (ρ σ : B.Assignment A) :
+private theorem blockPairLHom_isExpansionOn (ρ σ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (blockPairLHom (L₀ := L₀) B) A
       (B.structure₂ ρ σ) (B.double.structure₁ (B.joinAssign ρ σ)) := by
   let := B.structure₂ (L := L₀) ρ σ
@@ -146,7 +146,7 @@ theorem blockPairLHom_isExpansionOn (ρ σ : B.Assignment A) :
     | Sum.inr s => rfl
 
 /-- The first-copy renaming is an expansion. -/
-theorem blockFstLHom_isExpansionOn (μ : B.double.Assignment A) :
+private theorem blockFstLHom_isExpansionOn (μ : B.double.Assignment A) :
     @LHom.IsExpansionOn _ _ (blockFstLHom (L₀ := L₀) B) A
       (B.structure₁ (B.fstAssign μ)) (B.double.structure₁ μ) := by
   let := B.structure₁ (L := L₀) (B.fstAssign μ)
@@ -208,7 +208,7 @@ variable {L₀} {A : Type} [L₀.Structure A] [LinearOrder A]
 
 /-- Merging the two order symbols is an expansion: both are read by the same
 linear order. -/
-theorem mergeOrdLHom_isExpansionOn :
+private theorem mergeOrdLHom_isExpansionOn :
     (mergeOrdLHom L₀).IsExpansionOn A := by
   refine ⟨fun {n} f x => ?_, fun {n} r x => ?_⟩
   · match f with
@@ -219,7 +219,8 @@ theorem mergeOrdLHom_isExpansionOn :
     | Sum.inr s => rfl
 
 /-- **Merging the two order symbols preserves realization.** -/
-theorem realize_mergeOrdLHom {γ : Type} (φ : ((L₀.sum Language.order).sum Language.order).Formula γ)
+private theorem realize_mergeOrdLHom
+    {γ : Type} (φ : ((L₀.sum Language.order).sum Language.order).Formula γ)
     (v : γ → A) : ((mergeOrdLHom L₀).onFormula φ).Realize v ↔ φ.Realize v :=
   haveI := mergeOrdLHom_isExpansionOn (L₀ := L₀) (A := A)
   LHom.realize_onFormula (mergeOrdLHom L₀) φ

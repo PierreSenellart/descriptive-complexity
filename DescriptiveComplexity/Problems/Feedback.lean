@@ -10,6 +10,8 @@ public import DescriptiveComplexity.Problems.Feedback.Reductions
 import DescriptiveComplexity.Problems.Feedback.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.Composition
+import all DescriptiveComplexity.Problems.CliqueFamily
+import all DescriptiveComplexity.Problems.Feedback.Reductions
 
 /-!
 # The feedback problems are NP-complete
@@ -49,7 +51,8 @@ open FirstOrder
 
 /-- **Vertex Cover FO-reduces to Feedback Arc Set**, by composing the
 symmetrization with the vertex splitting. -/
-noncomputable def vertexCover_fo_reduction_feedbackArcSet : VertexCover ≤ᶠᵒ FeedbackArcSet :=
+private noncomputable def vertexCover_fo_reduction_feedbackArcSet
+    : VertexCover ≤ᶠᵒ FeedbackArcSet :=
   vertexCover_fo_reduction_feedbackVertexSet.trans feedbackVertexSet_fo_reduction_feedbackArcSet
 
 /-! ### NP-completeness -/

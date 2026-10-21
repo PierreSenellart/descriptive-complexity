@@ -55,7 +55,7 @@ variable {L : Language.{0, 0}}
 
 /-- Over the full agreement family there is nothing to check: every formula's
 relation symbols lie in it. -/
-theorem relsIn_blockRelsExtend_univ {B : SOBlock} {α : Type*} {n : ℕ}
+private theorem relsIn_blockRelsExtend_univ {B : SOBlock} {α : Type*} {n : ℕ}
     (φ : (L.sum B.lang).BoundedFormula α n) :
     RelsIn (blockRelsExtend (Set.univ : Set (Σ n, L.Relations n)) B) φ := by
   induction φ with
@@ -77,7 +77,7 @@ variable {A : Type} {k : ℕ}
 
 /-- A tuple of `k` elements leaves a `k`-element set an element to spare once
 one of its pebbles is freed. -/
-theorem exists_notMem_image_erase [Finite A] (w : Fin k → A) (i : Fin k)
+private theorem exists_notMem_image_erase [Finite A] (w : Fin k → A) (i : Fin k)
     (hA : k ≤ Nat.card A) : ∃ d : A, ∀ j, j ≠ i → w j ≠ d := by
   classical
   let := Fintype.ofFinite A
@@ -95,7 +95,7 @@ theorem exists_notMem_image_erase [Finite A] (w : Fin k → A) (i : Fin k)
 /-- Replacing a pebble on both sides by a matching pair of elements –
 matching in the sense that each *other* coordinate hits the new element on the
 left exactly when it does on the right – preserves the equality pattern. -/
-theorem update_pattern {B : Type} {v : Fin k → A} {w : Fin k → B} {c : A} {d : B}
+private theorem update_pattern {B : Type} {v : Fin k → A} {w : Fin k → B} {c : A} {d : B}
     (hpat : ∀ p q, v p = v q ↔ w p = w q) (i : Fin k)
     (hc : ∀ j, j ≠ i → (v j = c ↔ w j = d)) :
     ∀ p q, Function.update v i c p = Function.update v i c q ↔
@@ -118,7 +118,7 @@ theorem update_pattern {B : Type} {v : Fin k → A} {w : Fin k → B} {c : A} {d
 wherever, the equality pattern can be restored – by the matching repetition,
 or by a fresh element, of which there is one since the moved pebble no longer
 constrains the answer. -/
-theorem exists_update_pattern [Finite A] (hA : k ≤ Nat.card A) {v w : Fin k → A}
+private theorem exists_update_pattern [Finite A] (hA : k ≤ Nat.card A) {v w : Fin k → A}
     (hpat : ∀ p q, v p = v q ↔ w p = w q) (i : Fin k) (c : A) :
     ∃ d : A, ∀ p q, Function.update v i c p = Function.update v i c q ↔
       Function.update w i d p = Function.update w i d q := by
@@ -163,7 +163,7 @@ set**: the transposition exchanging the two arguments leaves the equality
 pattern of the tuple alone, so `≡ᵏ`-invariance
 (`DescriptiveComplexity.StepDef.inflLimit_invariant`) cannot tell the pair
 from the swapped pair. -/
-theorem inflLimit_swap_bare (hd : d.VarBound k) (harity : d.B.arity i = 2)
+private theorem inflLimit_swap_bare (hd : d.VarBound k) (harity : d.B.arity i = 2)
     (A : Type) [Language.empty.Structure A] [Finite A] (hA : k ≤ Nat.card A) (x y : A) :
     d.inflLimit A i (fun p => ![x, y] (Fin.cast harity p)) ↔
       d.inflLimit A i (fun p => ![y, x] (Fin.cast harity p)) := by

@@ -53,7 +53,7 @@ def matVar {LM : Language.{0, 0}} [LM.IsRelational] {n : ℕ} :
   | .var (Sum.inr j) => j
   | .func f _ => isEmptyElim f
 
-theorem realize_matVar {LM : Language.{0, 0}} [LM.IsRelational] {n : ℕ}
+private theorem realize_matVar {LM : Language.{0, 0}} [LM.IsRelational] {n : ℕ}
     {A : Type} [LM.Structure A] (xs : Empty → A) (w : Fin n → A) :
     ∀ t : LM.Term (Empty ⊕ Fin n), t.realize (Sum.elim xs w) = w (matVar t)
   | .var (Sum.inl e) => e.elim

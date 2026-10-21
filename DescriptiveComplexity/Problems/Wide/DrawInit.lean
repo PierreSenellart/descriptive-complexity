@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Problems.Wide.DrawTable
 
 /-!
 # The two ends of a program's run, at the pass-layer presentation
@@ -59,7 +60,7 @@ variable {PR}
 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] in
 /-- On a register cell the background is the mark. -/
-theorem initBack_wmSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem initBack_wmSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     (x : Univ A R P K dd) : PR.initBack (wmSeg x) = PR.mark x := by
   funext s
   rw [initBack, dite_eq_left ⟨x, rfl⟩]
@@ -70,7 +71,7 @@ theorem initBack_wmSeg (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- Off the register file the background is the blank. -/
-theorem initBack_of_not_reg {r : Univ A R P K dd → Prop}
+private theorem initBack_of_not_reg {r : Univ A R P K dd → Prop}
     (hno : ∀ x : Univ A R P K dd, r ≠ wmSeg x) : PR.initBack r = PR.blank := by
   funext s
   rw [initBack, dite_eq_right fun hc => hno _ hc.choose_spec]
@@ -167,7 +168,7 @@ theorem isInit_prog (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R 
 omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K]
   [Language.wide.Structure (Univ A R P K dd)] [Finite A] [Finite R] [Finite P] [Finite K] in
 /-- A program's accepting states are the table's. -/
-theorem accept_table {p : P} {f : Q → A} (h : PR.accept p f) :
+private theorem accept_table {p : P} {f : Q → A} (h : PR.accept p f) :
     PR.table.accept p (stPl (W := W) PR.zero f) := by
   have he : (fun q => unslot (stPl (W := W) PR.zero f) (Sum.inl q)) = f :=
     funext fun q => by
@@ -183,7 +184,7 @@ omit [DecidableEq W] [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrde
 The pointer is recovered from the payload by the same equation, which is what a
 *backward* reading needs – it is handed an accepting configuration and has to
 say what the program decided. -/
-theorem accept_of_isAcc {p : P} {f : Q → A}
+private theorem accept_of_isAcc {p : P} {f : Q → A}
     (h : PR.table.IsAcc (PR.stElt p f)) : PR.accept p f := by
   have h2 : PR.table.accept p (stPl (W := W) PR.zero f) := by
     have h3 : PR.table.accept p
@@ -219,7 +220,7 @@ theorem acceptsSpace_prog (hR : PR.table.Reads)
 /-- **A program's run accepts on the clock**: start as
 `DescriptiveComplexity.Draw.Prog.isInit_prog` says, run for fewer steps than there
 are addresses, and end in a phase and pointer the program accepts. -/
-theorem accepts_prog (hR : PR.table.Reads)
+private theorem accepts_prog (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     (hall : ∀ x : Univ A R P K dd, PR.marked x)
     {t₀ : W} (hmk : ∀ x : Univ A R P K dd, PR.mark x t₀ = PR.zero)

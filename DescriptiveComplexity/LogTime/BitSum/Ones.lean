@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.LogTime.BitSum.Counter
 public import Mathlib.Data.Nat.Bitwise
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Counting ones, and the two atoms level 3 counts with
@@ -57,14 +60,14 @@ def onesBelow (x w : ℕ) : ℕ := ((range w).filter fun i => x.testBit i = true
 @[simp] theorem onesBelow_zero (x : ℕ) : onesBelow x 0 = 0 := by simp [onesBelow]
 
 /-- There are no more ones than positions. -/
-theorem onesBelow_le (x w : ℕ) : onesBelow x w ≤ w := by
+private theorem onesBelow_le (x w : ℕ) : onesBelow x w ≤ w := by
   have h := card_le_card (filter_subset (fun i => x.testBit i = true) (range w))
   rw [card_range] at h
   exact h
 
 /-- **Nothing is counted only when there is nothing**: with all bits below `w`,
 the count is `0` exactly at `0`. This is the base case of the table. -/
-theorem onesBelow_eq_zero_iff {x w : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = false) :
+private theorem onesBelow_eq_zero_iff {x w : ℕ} (hx : ∀ i, w ≤ i → x.testBit i = false) :
     onesBelow x w = 0 ↔ x = 0 := by
   constructor
   · intro h
@@ -113,7 +116,7 @@ def ClearLow (x x' : A) : Prop :=
     ∀ j : A, (BitIx j x' ↔ (BitIx j x ∧ j ≠ i))
 
 /-- **What clearing costs**: one one. -/
-theorem onesBelow_of_clearLow {x x' : A} {w : ℕ} (h : ClearLow x x')
+private theorem onesBelow_of_clearLow {x x' : A} {w : ℕ} (h : ClearLow x x')
     (hx : ∀ i, w ≤ i → (orank x).testBit i = false) :
     onesBelow (orank x') w + 1 = onesBelow (orank x) w := by
   obtain ⟨i, hi, -, hbit⟩ := h
@@ -142,7 +145,7 @@ theorem onesBelow_of_clearLow {x x' : A} {w : ℕ} (h : ClearLow x x')
 
 /-- **Clearing a one makes the number smaller** – so a recursion on “clear the
 lowest one” terminates, which is what the level-3 table's induction rests on. -/
-theorem orank_lt_of_clearLow {x x' : A} (h : ClearLow x x') : orank x' < orank x := by
+private theorem orank_lt_of_clearLow {x x' : A} (h : ClearLow x x') : orank x' < orank x := by
   obtain ⟨i, hi, -, hbit⟩ := h
   rw [bitIx_iff] at hi
   refine Nat.lt_of_testBit (orank i) ?_ hi fun j hj => ?_
@@ -166,7 +169,8 @@ theorem orank_lt_of_clearLow {x x' : A} (h : ClearLow x x') : orank x' < orank x
 
 /-- **The lowest one can always be cleared**: the result is smaller, hence a
 rank. -/
-theorem exists_clearLow [Nonempty A] {x : A} (hx : orank x ≠ 0) : ∃ x' : A, ClearLow x x' := by
+private theorem exists_clearLow
+    [Nonempty A] {x : A} (hx : orank x ≠ 0) : ∃ x' : A, ClearLow x x' := by
   classical
   have hex : ∃ i : ℕ, (orank x).testBit i = true := by
     by_contra hc
@@ -216,7 +220,7 @@ index naming, this one line. -/
 def IsPowIx (i p : A) : Prop := ∀ j : A, (BitIx j p ↔ j = i)
 
 /-- **What a place value is worth.** -/
-theorem orank_of_isPowIx {i p : A} (hi : orank i < posCount A) (h : IsPowIx i p) :
+private theorem orank_of_isPowIx {i p : A} (hi : orank i < posCount A) (h : IsPowIx i p) :
     orank p = 2 ^ orank i := by
   have : Nonempty A := ⟨i⟩
   refine Nat.eq_of_testBit_eq fun j => ?_
@@ -239,7 +243,7 @@ theorem orank_of_isPowIx {i p : A} (hi : orank i < posCount A) (h : IsPowIx i p)
 
 /-- **Every position has its place value**, the two being the two namings of the
 same thing. -/
-theorem exists_isPowIx {i : A} (hi : orank i < posCount A) : ∃ p : A, IsPowIx i p := by
+private theorem exists_isPowIx {i : A} (hi : orank i < posCount A) : ∃ p : A, IsPowIx i p := by
   obtain ⟨p, hp⟩ := exists_isPos (A := A) hi
   refine ⟨p, fun j => ?_⟩
   rw [bitIx_iff, hp, Nat.testBit_two_pow]
@@ -259,7 +263,7 @@ open Language
 variable {L : Language.{0, 0}} {α : Type}
 
 /-- **Clearing the lowest one is first-order in the bit logic.** -/
-theorem bitDef_clearLow (x x' : α) :
+private theorem bitDef_clearLow (x x' : α) :
     BitDef (L := L) fun _ _ _ _ _ v => ClearLow (v x) (v x') := by
   have hlow : BitDef (L := L) (α := α ⊕ Fin 1)
       (fun _ _ _ _ _ u => ∀ j, j < u (Sum.inr 0) → ¬ BitIx j (u (Sum.inl x))) :=
@@ -278,7 +282,7 @@ theorem bitDef_clearLow (x x' : α) :
 
 /-- **Being a place value is first-order in the bit logic** – one quantifier and
 two atoms, where the other naming needed a two-element certificate. -/
-theorem bitDef_isPowIx (i p : α) :
+private theorem bitDef_isPowIx (i p : α) :
     BitDef (L := L) fun _ _ _ _ _ v => IsPowIx (v i) (v p) := by
   refine (((bitDef_bit (L := L) (α := α ⊕ Fin 1) (Sum.inr 0) (Sum.inl p)).iff
     (bitDef_eq (Sum.inr 0) (Sum.inl i))).all).congr fun A _ _ _ _ v => ?_

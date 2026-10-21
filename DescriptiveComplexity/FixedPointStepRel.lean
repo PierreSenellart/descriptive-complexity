@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.FixedPointPartialSpace
 public import DescriptiveComplexity.SecondOrderNewPull
+import all DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.SecondOrderNewPull
 
 /-!
 # Pulling a simultaneous induction through a relativized interpretation
@@ -122,7 +126,7 @@ theorem SOBlock.pullAssignRel_iff (B : SOBlock) (I : RelFOInterpretation L₁ L�
 
 omit [L₂.IsRelational] in
 /-- Transferring the empty assignment gives the empty assignment. -/
-theorem SOBlock.pullAssignRel_botAssign (B : SOBlock)
+private theorem SOBlock.pullAssignRel_botAssign (B : SOBlock)
     (I : RelFOInterpretation L₁ L₂ Tag dm) {A : Type} [L₁.Structure A] :
     B.pullAssignRel I (B.botAssign (I.MapRel A)) = (B.pull Tag dm).botAssign A := by
   funext p x
@@ -186,7 +190,7 @@ noncomputable def guardPullRel {L₃ L₄ : Language.{0, 0}} [L₄.IsRelational]
   (J.pullRel (φ : L₄.BoundedFormula (Fin k) 0) (Sum.elim t finZeroElim)).relabel
     fun p => finProdFinEquiv (Sum.elim id finZeroElim p.1, p.2)
 
-theorem realize_guardPullRel {L₃ L₄ : Language.{0, 0}} [L₄.IsRelational]
+private theorem realize_guardPullRel {L₃ L₄ : Language.{0, 0}} [L₄.IsRelational]
     (J : RelFOInterpretation L₃ L₄ Tag dm) {A : Type} [L₃.Structure A] {k : ℕ}
     (φ : L₄.Formula (Fin k)) (t : Fin k → Tag) (w : Fin (k * dm) → A)
     (hw : ∀ q, (J.domFormula (t q)).Realize fun j => w (finProdFinEquiv (q, j))) :
@@ -343,7 +347,7 @@ theorem next_pullRel (ρ : dd.B.Assignment (I.MapRel A)) :
 
 /-- The partial stages of the relativized pullback are the transfers of the
 original stages. -/
-theorem partStage_pullRel (n : ℕ) :
+private theorem partStage_pullRel (n : ℕ) :
     (dd.pullRel I).partStage A n =
       dd.B.pullAssignRel I (dd.partStage (I.MapRel A) n) := by
   induction n with
@@ -352,7 +356,7 @@ theorem partStage_pullRel (n : ℕ) :
     rw [(dd.pullRel I).partStage_succ, dd.partStage_succ, ih, next_pullRel]
 
 /-- The inflationary step commutes with the transfer. -/
-theorem inflStep_pullRel (ρ : dd.B.Assignment (I.MapRel A)) :
+private theorem inflStep_pullRel (ρ : dd.B.Assignment (I.MapRel A)) :
     (dd.pullRel I).inflStep (dd.B.pullAssignRel I ρ) =
       dd.B.pullAssignRel I (dd.inflStep (A := I.MapRel A) ρ) := by
   funext p x
@@ -370,7 +374,7 @@ theorem inflStep_pullRel (ρ : dd.B.Assignment (I.MapRel A)) :
 
 /-- The inflationary stages of the relativized pullback are the transfers of
 the original stages. -/
-theorem inflStage_pullRel (n : ℕ) :
+private theorem inflStage_pullRel (n : ℕ) :
     (dd.pullRel I).inflStage A n =
       dd.B.pullAssignRel I (dd.inflStage (I.MapRel A) n) := by
   induction n with
@@ -395,7 +399,7 @@ theorem inflLimit_pullRel :
     exact ⟨n, (hstage n).mpr ⟨h, hρ⟩⟩
 
 /-- Being a fixed point of the step is insensitive to the transfer. -/
-theorem isFixedPt_next_pullRel_iff (ρ : dd.B.Assignment (I.MapRel A)) :
+private theorem isFixedPt_next_pullRel_iff (ρ : dd.B.Assignment (I.MapRel A)) :
     IsFixedPt (dd.pullRel I).next (dd.B.pullAssignRel I ρ) ↔
       IsFixedPt (dd.next (A := I.MapRel A)) ρ :=
   ⟨fun h => dd.B.pullAssignRel_injective I ((next_pullRel dd I ρ).symm.trans h),

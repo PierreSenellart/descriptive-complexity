@@ -383,7 +383,7 @@ def tagVal (I : FOInterpretation L₁ L₂ Tag d) {A : Type} (t : Fin k → Tag)
     (w : Fin (k * d) → A) : Fin k → I.Map A :=
   fun p => (t p, fun j => w (finProdFinEquiv (p, j)))
 
-theorem SOAtom.pull_holds {A : Type} (I : FOInterpretation L₁ L₂ Tag d) (a : SOAtom B k)
+private theorem SOAtom.pull_holds {A : Type} (I : FOInterpretation L₁ L₂ Tag d) (a : SOAtom B k)
     (t : Fin k → Tag) (ρ : B.Assignment (I.Map A)) (w : Fin (k * d) → A) :
     (a.pull d t).Holds (B.pullAssign ρ) w ↔ a.Holds ρ (tagVal I t w) := by
   refine iff_of_eq (congrArg (ρ a.idx) (funext fun j => ?_))
@@ -416,7 +416,7 @@ noncomputable def guardPull (I : FOInterpretation L₁ L₂ Tag d) (φ : L₂.Fo
   (I.pull (φ : L₂.BoundedFormula (Fin k) 0) (Sum.elim t finZeroElim)).relabel
     fun p => finProdFinEquiv (Sum.elim id finZeroElim p.1, p.2)
 
-theorem realize_guardPull {A : Type} [L₁.Structure A] (I : FOInterpretation L₁ L₂ Tag d)
+private theorem realize_guardPull {A : Type} [L₁.Structure A] (I : FOInterpretation L₁ L₂ Tag d)
     (φ : L₂.Formula (Fin k)) (t : Fin k → Tag) (w : Fin (k * d) → A) :
     (guardPull I φ t).Realize w ↔ φ.Realize (M := I.Map A) (tagVal I t w) := by
   rw [guardPull, Formula.realize_relabel, I.realize_pull]
@@ -434,7 +434,7 @@ noncomputable def allTagAssign (Tag : Type) [Finite Tag] (k : ℕ) : List (Fin k
   (Finset.univ : Finset (Fin k → Tag)).toList
 
 open Classical in
-theorem mem_allTagAssign (t : Fin k → Tag) : t ∈ allTagAssign Tag k := by
+private theorem mem_allTagAssign (t : Fin k → Tag) : t ∈ allTagAssign Tag k := by
   let : Fintype Tag := Fintype.ofFinite Tag
   exact Finset.mem_toList.mpr (Finset.mem_univ t)
 

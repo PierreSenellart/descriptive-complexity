@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Pcp.Hardness.Draw
 public import DescriptiveComplexity.Problems.Pcp.Cert
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Pcp.Cert
+import all DescriptiveComplexity.Problems.Pcp.Enum
+import all DescriptiveComplexity.Problems.Pcp.Hardness.Draw
 
 /-!
 # The drawn instance has a match exactly when the machine accepts
@@ -62,7 +66,7 @@ section Generic
 variable {α β : Type}
 
 /-- Two strictly sorted lists with the same members are equal. -/
-theorem sorted_eq {Lt : α → α → Prop} (hasym : ∀ a b, Lt a b → Lt b a → False) :
+private theorem sorted_eq {Lt : α → α → Prop} (hasym : ∀ a b, Lt a b → Lt b a → False) :
     ∀ {l₁ l₂ : List α}, l₁.Pairwise Lt → l₂.Pairwise Lt →
       (∀ x, x ∈ l₁ ↔ x ∈ l₂) → l₁ = l₂
   | [], [], _, _, _ => rfl
@@ -91,7 +95,7 @@ theorem sorted_eq {Lt : α → α → Prop} (hasym : ∀ a b, Lt a b → Lt b a 
     rw [sorted_eq hasym h₁.2 h₂.2 hmem]
 
 /-- The entries of a zip of two lists of equal length, by index. -/
-theorem mem_zip_iff {l : List α} {w : List β} (hlen : l.length = w.length) {p : α} {c : β} :
+private theorem mem_zip_iff {l : List α} {w : List β} (hlen : l.length = w.length) {p : α} {c : β} :
     (p, c) ∈ l.zip w ↔
       ∃ (i : ℕ) (h : i < l.length), l[i] = p ∧ w[i]'(hlen ▸ h) = c := by
   rw [List.mem_iff_getElem]
@@ -108,7 +112,7 @@ theorem mem_zip_iff {l : List α} {w : List β} (hlen : l.length = w.length) {p 
     · rw [List.getElem_zip, hp, hc]
 
 /-- With a duplicate-free position side, a zip is functional. -/
-theorem zip_fun {l : List α} {w : List β} (hlen : l.length = w.length) (hnd : l.Nodup)
+private theorem zip_fun {l : List α} {w : List β} (hlen : l.length = w.length) (hnd : l.Nodup)
     {p : α} {c c' : β} (h : (p, c) ∈ l.zip w) (h' : (p, c') ∈ l.zip w) : c = c' := by
   obtain ⟨i, hi, hpi, hci⟩ := (mem_zip_iff hlen).mp h
   obtain ⟨j, hj, hpj, hcj⟩ := (mem_zip_iff hlen).mp h'
@@ -118,7 +122,7 @@ theorem zip_fun {l : List α} {w : List β} (hlen : l.length = w.length) (hnd : 
 
 /-- A position of the table carries a letter exactly when it is on the
 position side. -/
-theorem exists_mem_zip {l : List α} {w : List β} (hlen : l.length = w.length) {p : α} :
+private theorem exists_mem_zip {l : List α} {w : List β} (hlen : l.length = w.length) {p : α} :
     (∃ c, (p, c) ∈ l.zip w) ↔ p ∈ l := by
   constructor
   · rintro ⟨c, hc⟩
@@ -129,7 +133,7 @@ theorem exists_mem_zip {l : List α} {w : List β} (hlen : l.length = w.length) 
     exact ⟨w[i]'(hlen ▸ hi), (mem_zip_iff hlen).mpr ⟨i, hi, rfl, rfl⟩⟩
 
 /-- A zip relates its two sides entry by entry. -/
-theorem forall₂_zip_self :
+private theorem forall₂_zip_self :
     ∀ {l : List α} {w : List β}, l.length = w.length →
       List.Forall₂ (fun p c => (p, c) ∈ l.zip w) l w
   | [], [], _ => List.Forall₂.nil
@@ -141,7 +145,7 @@ theorem forall₂_zip_self :
     exact List.mem_cons_of_mem _ hab
 
 /-- A functional `List.Forall₂` determines its right list. -/
-theorem forall₂_unique {R : α → β → Prop} :
+private theorem forall₂_unique {R : α → β → Prop} :
     ∀ {l : List α} {w w' : List β},
       (∀ a ∈ l, ∀ b b', R a b → R a b' → b = b') →
       List.Forall₂ R l w → List.Forall₂ R l w' → w = w'
@@ -243,13 +247,13 @@ end Word
 section Tags
 
 /-- Every short word fits in the shared positions. -/
-theorem uSpec_length_le : ∀ t : PTag, (uSpec t).length ≤ 8 := by decide
+private theorem uSpec_length_le : ∀ t : PTag, (uSpec t).length ≤ 8 := by decide
 
 /-- Every short bottom word fits in the shared positions. -/
-theorem vSpec_length_le : ∀ t : PTag, (vSpec t).length ≤ 8 := by decide
+private theorem vSpec_length_le : ∀ t : PTag, (vSpec t).length ≤ 8 := by decide
 
 /-- Away from the start domino, the bottom relation is its table. -/
-theorem pVAt_of_ne {d p c : PV A} (hne : d.1 ≠ PTag.dStart) :
+private theorem pVAt_of_ne {d p c : PV A} (hne : d.1 ≠ PTag.dStart) :
     PVAt d p c ↔ (p, c) ∈ (posPrefix (vSpec d.1).length).zip (vWord d) := by
   obtain ⟨t, w⟩ := d
   cases t <;> first
@@ -257,7 +261,7 @@ theorem pVAt_of_ne {d p c : PV A} (hne : d.1 ≠ PTag.dStart) :
     | exact Iff.rfl
 
 /-- At the start domino, the bottom relation is the page layout. -/
-theorem pVAt_start {d p c : PV A} (hd : d.1 = PTag.dStart) :
+private theorem pVAt_start {d p c : PV A} (hd : d.1 = PTag.dStart) :
     PVAt d p c ↔ StartBotAt p c := by
   obtain ⟨t, w⟩ := d
   cases hd
@@ -265,7 +269,7 @@ theorem pVAt_start {d p c : PV A} (hd : d.1 = PTag.dStart) :
 
 omit [Language.turing.Structure A] in
 /-- The lengths of the two sides of a short top table agree. -/
-theorem length_posPrefix (n : ℕ) : (posPrefix (A := A) n).length = n := by
+private theorem length_posPrefix (n : ℕ) : (posPrefix (A := A) n).length = n := by
   simp [posPrefix]
 
 end Tags
@@ -276,13 +280,13 @@ section StartTable
 
 omit [Language.turing.Structure A] in
 /-- The shared position prefix, spelt out. -/
-theorem posPrefix_seven :
+private theorem posPrefix_seven :
     posPrefix (A := A) 7 = [cstE .pos0, cstE .pos1, cstE .pos2, cstE .pos3,
       cstE .pos4, cstE .pos5, cstE .pos6] := by
   simp [posPrefix, List.range_succ, posE]
 
 /-- The entries of the page block of the start table. -/
-theorem mem_zip_page (hwf : (tmData A).WellFormed) {ps inp : List A}
+private theorem mem_zip_page (hwf : (tmData A).WellFormed) {ps inp : List A}
     (hinp : List.Forall₂ (tmData A).InitTape ps inp) {p c : PV A} :
     (p, c) ∈ (pagePos ps).zip (pageBot inp) ↔
       ∃ q a, q ∈ ps ∧ (tmData A).InitTape q a ∧
@@ -373,14 +377,14 @@ section Forall
 
 variable {α β : Type} {R S : α → β → Prop} {f : α → β}
 
-theorem eq_map_of_forall₂ :
+private theorem eq_map_of_forall₂ :
     ∀ {l : List α} {w : List β}, List.Forall₂ (fun a b => b = f a) l w → w = l.map f
   | [], _, h => List.forall₂_nil_left_iff.mp h
   | a :: l, _, h => by
     rcases h with - | ⟨hb, ht⟩
     rw [List.map_cons, hb, eq_map_of_forall₂ ht]
 
-theorem forall₂_imp_mem :
+private theorem forall₂_imp_mem :
     ∀ {l : List α} {w : List β}, (∀ a ∈ l, ∀ b, R a b → S a b) →
       List.Forall₂ R l w → List.Forall₂ S l w
   | [], _, _, h => by
@@ -391,7 +395,7 @@ theorem forall₂_imp_mem :
     exact List.Forall₂.cons (himp a List.mem_cons_self _ hb)
       (forall₂_imp_mem (fun x hx => himp x (List.mem_cons_of_mem a hx)) ht)
 
-theorem forall₂_mem_right :
+private theorem forall₂_mem_right :
     ∀ {l : List α} {w : List β}, List.Forall₂ R l w → ∀ {b}, b ∈ w → ∃ a ∈ l, R a b
   | [], _, h, b, hb => by
     rw [List.forall₂_nil_left_iff.mp h] at hb
@@ -403,7 +407,7 @@ theorem forall₂_mem_right :
     · obtain ⟨a', ha', hr⟩ := forall₂_mem_right ht hb''
       exact ⟨a', List.mem_cons_of_mem a ha', hr⟩
 
-theorem flatten_map {δ ε ζ : Type} (f : δ → List ε) (g : ε → ζ) (l : List δ) :
+private theorem flatten_map {δ ε ζ : Type} (f : δ → List ε) (g : ε → ζ) (l : List δ) :
     (l.map fun d => (f d).map g).flatten = ((l.map f).flatten).map g := by
   induction l with
   | nil => rfl
@@ -419,7 +423,7 @@ variable (h : Reads e)
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Every input cell holds something: its input symbol or the blank. -/
-theorem initTape_exists (hwf : (tmData A).WellFormed) (p : A) :
+private theorem initTape_exists (hwf : (tmData A).WellFormed) (p : A) :
     ∃ a, (tmData A).InitTape p a := by
   by_cases hex : ∃ a, TMInp p a
   · obtain ⟨a, ha⟩ := hex
@@ -429,13 +433,13 @@ theorem initTape_exists (hwf : (tmData A).WellFormed) (p : A) :
 
 include h in
 /-- The top word of any element is its top table. -/
-theorem isWordU_elem (d : B) : Pcp.IsWordU d ((uWord (e d)).map e.symm) :=
+private theorem isWordU_elem (d : B) : Pcp.IsWordU d ((uWord (e d)).map e.symm) :=
   isWord_of_zip h (by simp [uWord, length_posPrefix])
     (pairwise_posPrefix (uSpec_length_le _)) (fun p c => h.uAt d p c)
 
 include h in
 /-- The top word of any element is only its top table. -/
-theorem eq_of_isWordU (hwfB : Pcp.IsWF B) {d : B} {w : List B}
+private theorem eq_of_isWordU (hwfB : Pcp.IsWF B) {d : B} {w : List B}
     (hw : Pcp.IsWordU d w) : w = (uWord (e d)).map e.symm := by
   obtain ⟨ps, hs, hm, hf⟩ := hw
   exact eq_of_isWord_zip h (fun a b => Pcp.asymm_ordLt hwfB a b)
@@ -445,7 +449,7 @@ theorem eq_of_isWordU (hwfB : Pcp.IsWF B) {d : B} {w : List B}
 include h in
 /-- The bottom word of an element other than the start domino is its bottom
 table. -/
-theorem isWordV_elem_ne {d : B} (hne : (e d).1 ≠ .dStart) :
+private theorem isWordV_elem_ne {d : B} (hne : (e d).1 ≠ .dStart) :
     Pcp.IsWordV d ((vWord (e d)).map e.symm) :=
   isWord_of_zip h (by simp [vWord, length_posPrefix])
     (pairwise_posPrefix (vSpec_length_le _))
@@ -461,7 +465,7 @@ theorem eq_of_isWordV_ne (hwfB : Pcp.IsWF B) {d : B} (hne : (e d).1 ≠ .dStart)
 
 include h in
 /-- The bottom word of the start domino is its layout. -/
-theorem isWordV_elem_start (hwf : (tmData A).WellFormed) {ps inp : List A}
+private theorem isWordV_elem_start (hwf : (tmData A).WellFormed) {ps inp : List A}
     (hps : IsPosEnum (tmData A) ps) (hinp : List.Forall₂ (tmData A).InitTape ps inp)
     {d : B} (hd : (e d).1 = .dStart) :
     Pcp.IsWordV d ((startBot inp).map e.symm) :=
@@ -482,7 +486,7 @@ theorem eq_of_isWordV_start (hwfB : Pcp.IsWF B) (hwf : (tmData A).WellFormed)
 
 omit [Language.turing.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- The start tag decodes to the abstract start domino. -/
-theorem decode_of_tag_start {x : PV A} (hx : x.1 = PTag.dStart) :
+private theorem decode_of_tag_start {x : PV A} (hx : x.1 = PTag.dStart) :
     decodeDom x = Pcp.History.Dom.start := by
   obtain ⟨t, w⟩ := x
   have ht : t = PTag.dStart := hx
@@ -492,7 +496,7 @@ theorem decode_of_tag_start {x : PV A} (hx : x.1 = PTag.dStart) :
 end Words
 
 /-- The start layout is functional in the position. -/
-theorem startBotAt_fun (hwf : (tmData A).WellFormed) {p c c' : PV A}
+private theorem startBotAt_fun (hwf : (tmData A).WellFormed) {p c c' : PV A}
     (h₁ : StartBotAt p c) (h₂ : StartBotAt p c') : c = c' := by
   obtain ⟨t, w⟩ := p
   cases t <;> try first
@@ -507,7 +511,7 @@ theorem startBotAt_fun (hwf : (tmData A).WellFormed) {p c c' : PV A}
 
 /-! ### Well-formedness of the drawn instance -/
 
-theorem isWF_of_reads (h : Reads e) (hwf : (tmData A).WellFormed) : Pcp.IsWF B where
+private theorem isWF_of_reads (h : Reads e) (hwf : (tmData A).WellFormed) : Pcp.IsWF B where
   ord_refl x := (h.ord x x).mpr (pLe_refl _)
   ord_trans x y z hxy hyz :=
     (h.ord x z).mpr (pLe_trans hwf.1 ((h.ord x y).mp hxy) ((h.ord y z).mp hyz))

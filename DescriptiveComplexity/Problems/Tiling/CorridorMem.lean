@@ -75,7 +75,7 @@ variable {M : Type} [L.Structure M] {v : γ → M}
 
 /-- Splitting a conjunction of sentences, kept at the level of `⊨` so that the
 clause lemmas of this file still apply to the parts. -/
-theorem realize_infS (φ ψ : L.Sentence) : (M ⊨ (φ ⊓ ψ)) ↔ ((M ⊨ φ) ∧ (M ⊨ ψ)) :=
+private theorem realize_infS (φ ψ : L.Sentence) : (M ⊨ (φ ⊓ ψ)) ↔ ((M ⊨ φ) ∧ (M ⊨ ψ)) :=
   Formula.realize_inf
 
 @[simp]
@@ -410,7 +410,7 @@ def corRow (ρ : corBlock.Assignment A) : A → A → Prop := fun x t => ρ () !
 
 /-- **Being a row**: one tile per column, horizontally compatible, with the
 tiles the two edge columns allow. -/
-def RowLegal (R : A → A → Prop) : Prop :=
+private def RowLegal (R : A → A → Prop) : Prop :=
   (∀ x, TLPosn x → ∃ t, R x t ∧ TLTile t) ∧
     (∀ x t t', R x t → R x t' → t = t') ∧
     (∀ x x' t t', SuccPos (tileData A).Le (tileData A).Posn x x' → R x t → R x' t' →
@@ -420,7 +420,7 @@ def RowLegal (R : A → A → Prop) : Prop :=
 
 /-- **Being the bottom row**: the corner carries a start tile, every other
 column one the description allows there. -/
-def RowFirst (R : A → A → Prop) : Prop :=
+private def RowFirst (R : A → A → Prop) : Prop :=
   ∀ x t, TLPosn x → R x t →
     ((MinPos (tileData A).Le (tileData A).Posn x → TLStart t) ∧
       (¬MinPos (tileData A).Le (tileData A).Posn x → (tileData A).FirstTile x t))
@@ -454,7 +454,7 @@ theorem relMap_corNext₂ (ρ σ : corBlock.Assignment A) (w : Fin 2 → A) :
 
 /-- **What a starting state is**: the instance is well-formed and the state is
 the bottom row. -/
-theorem isSrc_iff (ρ : corBlock.Assignment A) :
+private theorem isSrc_iff (ρ : corBlock.Assignment A) :
     corSpec.IsSrc ρ ↔
       ((tileData A).WellFormed ∧ (RowLegal (corRow ρ) ∧ RowFirst (corRow ρ))) := by
   change @Sentence.Realize corLang₁ A (corBlock.structure₁ (L := corBase) ρ) corSpec.src ↔ _
@@ -466,7 +466,7 @@ theorem isSrc_iff (ρ : corBlock.Assignment A) :
 
 /-- **What a transition is**: the state entered is a row, and it stands above
 the state left. -/
-theorem step_iff (ρ σ : corBlock.Assignment A) :
+private theorem step_iff (ρ σ : corBlock.Assignment A) :
     corSpec.Step ρ σ ↔
       (RowLegal (corRow σ) ∧
         ∀ x t t', TLPosn x → corRow ρ x t → corRow σ x t' → TLVert t t') := by
@@ -478,7 +478,7 @@ theorem step_iff (ρ σ : corBlock.Assignment A) :
   rfl
 
 /-- **What an accepting state is**: a row with an accepting tile in it. -/
-theorem isTgt_iff (ρ : corBlock.Assignment A) :
+private theorem isTgt_iff (ρ : corBlock.Assignment A) :
     corSpec.IsTgt ρ ↔ ∃ x t, TLPosn x ∧ corRow ρ x t ∧ TLAcc t := by
   change @Sentence.Realize corLang₁ A (corBlock.structure₁ (L := corBase) ρ) corSpec.tgt ↔ _
   simp only [corSpec]
@@ -506,7 +506,7 @@ theorem corRow_corAsg (τ : ℕ → A → A) (k : ℕ) (x t : A) :
 /-- **A corridor is a walk**: its rows, read as assignments, start at a
 bottom row, step one above the other, and end at a row with an accepting
 tile. -/
-theorem accepts_of_corridor (hwf : (tileData A).WellFormed)
+private theorem accepts_of_corridor (hwf : (tileData A).WellFormed)
     (h : (tileData A).CorridorTileable) : corSpec.Accepts A := by
   obtain ⟨n, τ, htiles, hfst, hel, her, hhor, hver, xa, hxa, hacc⟩ := h
   have hlegal : ∀ k, k ≤ n → RowLegal (corRow (corAsg τ k)) := by
@@ -557,7 +557,7 @@ theorem rowFun_spec {R : A → A → Prop} {x : A} (h : ∃ t, R x t) : R x (row
 
 /-- **The corridor a walk has built so far**, with the row it has reached on
 top: the induction invariant of `DescriptiveComplexity.corridor_of_accepts`. -/
-def CorridorTo (n : ℕ) (τ : ℕ → A → A) (σ : corBlock.Assignment A) : Prop :=
+private def CorridorTo (n : ℕ) (τ : ℕ → A → A) (σ : corBlock.Assignment A) : Prop :=
   (∀ k x, k ≤ n → TLPosn x → TLTile (τ k x)) ∧
     (∀ x, TLPosn x →
       ((MinPos (tileData A).Le (tileData A).Posn x → TLStart (τ 0 x)) ∧
@@ -571,7 +571,7 @@ def CorridorTo (n : ℕ) (τ : ℕ → A → A) (σ : corBlock.Assignment A) : P
 
 /-- **A row a walk reaches stands on a corridor**: the rows it went through are
 its cells, and the row itself is its top. -/
-theorem exists_corridorTo {ρ σ : corBlock.Assignment A} (hsrc : corSpec.IsSrc ρ)
+private theorem exists_corridorTo {ρ σ : corBlock.Assignment A} (hsrc : corSpec.IsSrc ρ)
     (hreach : corSpec.Reach ρ σ) : ∃ (n : ℕ) (τ : ℕ → A → A), CorridorTo n τ σ := by
   classical
   obtain ⟨hwf, hlegal, hfirst⟩ := (isSrc_iff ρ).mp hsrc
@@ -640,7 +640,7 @@ theorem exists_corridorTo {ρ σ : corBlock.Assignment A} (hsrc : corSpec.IsSrc 
 
 /-- **A walk is a corridor**: the rows it goes through tile one, up to the row
 where the accepting tile stands. -/
-theorem corridor_of_accepts (h : corSpec.Accepts A) :
+private theorem corridor_of_accepts (h : corSpec.Accepts A) :
     (tileData A).WellFormed ∧ (tileData A).CorridorTileable := by
   obtain ⟨ρ, σ, hsrc, htgt, hreach⟩ := h
   obtain ⟨hwf, -, -⟩ := (isSrc_iff ρ).mp hsrc

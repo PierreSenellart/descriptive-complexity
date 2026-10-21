@@ -145,7 +145,7 @@ variable {ownG : PG → SG} {ownX : PX → SX}
 
 /-- **A property of a round's phases and its exit holds of every phase it can
 move to**, given it holds of the two sub-machineries'. -/
-theorem roundRule_dstIn {S : P → Prop} (hemb : ∀ p : RoundPh PG PX, S (emb p))
+private theorem roundRule_dstIn {S : P → Prop} (hemb : ∀ p : RoundPh PG PX, S (emb p))
     (hexit : S exitPh)
     (hG : ∀ (s : SG) (ρ : ShG s), S (ruleG s ρ).dstPh)
     (hX : ∀ (s : SX) (ρ : ShX s), S (ruleX s ρ).dstPh)
@@ -162,7 +162,7 @@ theorem roundRule_dstIn {S : P → Prop} (hemb : ∀ p : RoundPh PG PX, S (emb p
 
 /-- **Every rule of one round's machinery fires from a phase its site
 owns**; the two sub-machineries' obligations are parameters. -/
-theorem roundHosrc
+private theorem roundHosrc
     (hosrcG : ∀ (s : SG) (ρ : ShG s),
       ∃ p : PG, (ruleG s ρ).srcPh = emb (.igP p) ∧ ownG p = s)
     (hosrcX : ∀ (s : SX) (ρ : ShX s),
@@ -185,7 +185,7 @@ theorem roundHosrc
 
 /-- **One round's machinery separates in-shape**: the sub-machineries by
 their own separations, the checkpoint by its guards. -/
-theorem roundSep
+private theorem roundSep
     (hsepG : ∀ (s : SG) (ρ ρ' : ShG s) (f : Q → A) (g : dt.SlotIx → A),
       (ruleG s ρ).guard f g → (ruleG s ρ').guard f g →
       (ruleG s ρ).srcPh = (ruleG s ρ').srcPh → ρ = ρ')

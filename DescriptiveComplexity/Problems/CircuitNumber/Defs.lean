@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Counting
 public import Mathlib.Algebra.BigOperators.Finprod
 public import Mathlib.SetTheory.Cardinal.Finite
 import DescriptiveComplexity.Vocabulary
+import all DescriptiveComplexity.Problems.Cvp.Defs
 
 /-!
 # The number written by a circuit: definition
@@ -151,21 +152,22 @@ section Iso
 
 variable {A B : Type} [Language.numCircuit.Structure A] [Language.numCircuit.Structure B]
 
-theorem outBit_equiv (e : A ≃[Language.numCircuit] B) (g : A) : OutBit (e g) ↔ OutBit g :=
+private theorem outBit_equiv (e : A ≃[Language.numCircuit] B) (g : A) : OutBit (e g) ↔ OutBit g :=
   and_congr (relMap_equiv₁ e ncOut g).symm
     ⟨fun h => (congrArg (GateVal true) (e.toEquiv.symm_apply_apply g)).mp
         (gateVal_map (numCircuitEquiv e).symm h),
       fun h => gateVal_map (numCircuitEquiv e) h⟩
 
-theorem lowerOut_equiv (e : A ≃[Language.numCircuit] B) (g h : A) :
+private theorem lowerOut_equiv (e : A ≃[Language.numCircuit] B) (g h : A) :
     LowerOut (e g) (e h) ↔ LowerOut g h :=
   and_congr (relMap_equiv₁ e ncOut h).symm
     (and_congr e.toEquiv.injective.ne_iff (relMap_equiv₂ e ncBelow h g).symm)
 
-theorem outRank_equiv (e : A ≃[Language.numCircuit] B) (g : A) : outRank (e g) = outRank g :=
+private theorem outRank_equiv
+    (e : A ≃[Language.numCircuit] B) (g : A) : outRank (e g) = outRank g :=
   (Nat.card_congr (e.toEquiv.subtypeEquiv fun h => (lowerOut_equiv e g h).symm)).symm
 
-theorem outOrder_equiv (e : A ≃[Language.numCircuit] B) : OutOrder A ↔ OutOrder B := by
+private theorem outOrder_equiv (e : A ≃[Language.numCircuit] B) : OutOrder A ↔ OutOrder B := by
   have h1 : ∀ p, (RelMap ncOut ![e p] : Prop) ↔ RelMap ncOut ![p] :=
     fun p => (relMap_equiv₁ e ncOut p).symm
   have h2 : ∀ p q, (RelMap ncBelow ![e p, e q] : Prop) ↔ RelMap ncBelow ![p, q] :=
@@ -217,7 +219,7 @@ noncomputable def CircuitNumber : CountingProblem Language.numCircuit where
   Count := fun A inst => @circuitNumber A inst
   iso_invariant := fun e => circuitNumber_iso e
 
-theorem circuitNumber_apply (A : Type) [Language.numCircuit.Structure A] :
+private theorem circuitNumber_apply (A : Type) [Language.numCircuit.Structure A] :
     CircuitNumber A = circuitNumber A :=
   rfl
 

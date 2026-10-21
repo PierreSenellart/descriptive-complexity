@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Counting.Digits.Formulas
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Counting.Digits.Formulas
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # The rows of a product sweep
@@ -52,7 +55,7 @@ theorem append_ut_jt (i : Fin (m + ℓ) → A) : Fin.append (ut i) (jt i) = i :=
   Fin.append_castAdd_natAdd
 
 /-- A digit of a quotient by a power of two: Horner's step. -/
-theorem div_two_pow_step (x r : ℕ) :
+private theorem div_two_pow_step (x r : ℕ) :
     x / 2 ^ r = 2 * (x / 2 ^ (r + 1)) + if x.testBit r = true then 1 else 0 := by
   rw [Nat.testBit_eq_decide_div_mod_eq, pow_succ, ← Nat.div_div_eq_div_mul]
   generalize x / 2 ^ r = y
@@ -71,18 +74,18 @@ def prodIx : (Fin (m + ℓ) → A) ≃ Lex (Fin m → A) ×ₗ (Lex (Fin ℓ →
     rw [ut_append, jt_append]
     rfl
 
-theorem prodIx_lt (i₀ i : Fin (m + ℓ) → A) :
+private theorem prodIx_lt (i₀ i : Fin (m + ℓ) → A) :
     prodIx i₀ < prodIx i ↔ toLex (ut i₀) < toLex (ut i) ∨
       (toLex (ut i₀) = toLex (ut i) ∧ toLex (jt i) < toLex (jt i₀)) :=
   prodLex_lt_iff
 
-theorem prodIx_bot (i : Fin (m + ℓ) → A) :
+private theorem prodIx_bot (i : Fin (m + ℓ) → A) :
     (∀ c, prodIx i ≤ c) ↔
       (∀ c : Lex (Fin m → A), toLex (ut i) ≤ c) ∧ ∀ c : Lex (Fin ℓ → A), c ≤ toLex (jt i) :=
   prodLex_isBot_iff.trans (and_congr Iff.rfl
     ⟨fun h c => h (OrderDual.toDual c), fun h c => h (OrderDual.ofDual c)⟩)
 
-theorem prodIx_cov [Nonempty A] (i₀ i : Fin (m + ℓ) → A) :
+private theorem prodIx_cov [Nonempty A] (i₀ i : Fin (m + ℓ) → A) :
     prodIx i₀ ⋖ prodIx i ↔
       (toLex (ut i₀) = toLex (ut i) ∧ toLex (jt i) ⋖ toLex (jt i₀)) ∨
         (toLex (ut i₀) ⋖ toLex (ut i) ∧ (∀ c : Lex (Fin ℓ → A), toLex (jt i₀) ≤ c) ∧

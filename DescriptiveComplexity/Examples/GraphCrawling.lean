@@ -29,6 +29,9 @@ public import DescriptiveComplexity.Problems.SetFamily
 meta import DescriptiveComplexity.Problems.SetFamily
 public import Mathlib.Data.Finset.Sort
 meta import Mathlib.Data.Finset.Sort
+import all DescriptiveComplexity.Decoding
+import all DescriptiveComplexity.Problems.SetFamily
+import all DescriptiveComplexity.Problems.Steiner.Defs
 
 /-!
 # Worked example: web crawling – data acquisition as graph crawling
@@ -275,7 +278,7 @@ open Classical in
 reachable (and `0` when it is not reachable at all, a value the certificate
 never looks at). Same device as in `DescriptiveComplexity.Problems.Steiner.Defs`,
 over the directed step relation. -/
-noncomputable def crawlRdist (R : A → A → Prop) (r x : A) : ℕ :=
+private noncomputable def crawlRdist (R : A → A → Prop) (r x : A) : ℕ :=
   if h : ∃ n, reachIn R n r x then Nat.find h else 0
 
 private theorem rdist_step {R : A → A → Prop} {r x : A}
@@ -307,7 +310,7 @@ every non-root member of `S` have a chosen in-neighbor strictly below it.
 Walking down the order reaches the root; the order “distance to the root”
 witnesses the converse. The in-neighbors below are the parent pointers of an
 `r`-rooted spanning subtree of `S`. -/
-theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : A)
+private theorem reachesAllOn_iff_exists_order [Finite A] (Adjp : A → A → Prop) (r : A)
     (S : A → Prop) :
     ReachesAllOn Adjp r S ↔ ∃ Lt : A → A → Prop,
       (∀ x y z, Lt x y → Lt y z → Lt x z) ∧ (∀ x, ¬Lt x x) ∧
@@ -402,7 +405,7 @@ theorem CrawlOn.of_equiv (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB : B �
     exact hcard
 
 /-- `CrawlOn` transports along an equivalence, iff version. -/
-theorem CrawlOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB : B → Prop}
+private theorem CrawlOn.equiv_iff (u : B ≃ A) {AdjB : B → B → Prop} {RB TB KB : B → Prop}
     {AdjA : A → A → Prop} {RA TA KA : A → Prop}
     (hadj : ∀ b b', AdjB b b' ↔ AdjA (u b) (u b')) (hR : ∀ b, RB b ↔ RA (u b))
     (hT : ∀ b, TB b ↔ TA (u b)) (hK : ∀ b, KB b ↔ KA (u b)) :
@@ -554,11 +557,11 @@ theorem crawlEncoding_faithful :
 /-- A small worked instance: four pages, root `0`, links `0 → 1`, `1 → 2`
 and `0 → 3`, targets `{2, 3}`, budget `4` – a *tight* yes-instance (both
 targets need the whole chain through `1`). -/
-def crawlExample : CrawlInstance :=
+private def crawlExample : CrawlInstance :=
   ⟨3, {(0, 1), (1, 2), (0, 3)}, 0, {2, 3}, 4⟩
 
 /-- The packaged instance is a concrete yes-instance: crawl everything. -/
-theorem crawlExample_holds : ConcreteCrawlHolds crawlExample := by
+private theorem crawlExample_holds : ConcreteCrawlHolds crawlExample := by
   refine ⟨{0, 1, 2, 3}, by decide, by decide, ?_, by decide⟩
   intro v hv
   fin_cases hv
@@ -600,7 +603,7 @@ honest decoder possible. -/
 noncomputable def crawlWFSentence : Language.siteGraph.Sentence :=
   fo% ∃ x, wsRoot(x) ∧ ∀ y, wsRoot(y) → y ≐ x
 
-theorem realize_crawlWFSentence {A : Type} [Language.siteGraph.Structure A] :
+private theorem realize_crawlWFSentence {A : Type} [Language.siteGraph.Structure A] :
     A ⊨ crawlWFSentence ↔ ∃ x : A, WSRoot x ∧ ∀ y : A, WSRoot y → y = x := by
   simp only [crawlWFSentence, Sentence.Realize, Formula.realize_iExs, Formula.realize_inf,
     Formula.realize_iAlls, Formula.realize_imp, Formula.realize_rel₁, Formula.realize_equal,
@@ -619,7 +622,7 @@ variable (S : FinPresentation Language.siteGraph)
 def crawlRoots : Finset (Fin S.card) :=
   Finset.univ.filter fun x => S.relBool wsRoot ![x]
 
-theorem mem_crawlRoots (x : Fin S.card) : x ∈ crawlRoots S ↔ WSRoot x := by
+private theorem mem_crawlRoots (x : Fin S.card) : x ∈ crawlRoots S ↔ WSRoot x := by
   simp [crawlRoots, WSRoot]
 
 private theorem gc_cast_cast {n m : ℕ} (h : n = m) (v : Fin n) :
@@ -895,47 +898,47 @@ fo_block crawlGuessBlock over Language.siteGraph ws into crawlSOLang with kCr wh
 /-! ### The clauses -/
 
 /-- Kernel clause: every target is crawled. -/
-noncomputable def crTargetClause : crawlSOLang.Sentence :=
+private noncomputable def crTargetClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrTargetSym(x) → kCrSetSym(x)
 
 /-- Kernel clause: some root is guessed. -/
-noncomputable def crRootExistsClause : crawlSOLang.Sentence :=
+private noncomputable def crRootExistsClause : crawlSOLang.Sentence :=
   fo% ∃ x, kCrStartSym(x)
 
 /-- Kernel clause: the guessed root carries the vocabulary's root mark and is
 crawled. -/
-noncomputable def crRootClause : crawlSOLang.Sentence :=
+private noncomputable def crRootClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrStartSym(x) → kCrRootSym(x) ∧ kCrSetSym(x)
 
 /-- Kernel clause: there is at most one guessed root. -/
-noncomputable def crRootUniqueClause : crawlSOLang.Sentence :=
+private noncomputable def crRootUniqueClause : crawlSOLang.Sentence :=
   fo% ∀ x y, kCrStartSym(x) ∧ kCrStartSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
-noncomputable def crTransClause : crawlSOLang.Sentence :=
+private noncomputable def crTransClause : crawlSOLang.Sentence :=
   fo% ∀ x y z, kCrOrderSym(x, y) ∧ kCrOrderSym(y, z) → kCrOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
-noncomputable def crIrreflClause : crawlSOLang.Sentence :=
+private noncomputable def crIrreflClause : crawlSOLang.Sentence :=
   fo% ∀ x, ¬ kCrOrderSym(x, x)
 
 /-- Kernel clause: every crawled non-root page is linked from a crawled page
 strictly below it. -/
-noncomputable def crStepClause : crawlSOLang.Sentence :=
+private noncomputable def crStepClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrSetSym(x) ∧ ¬ kCrStartSym(x) →
     ∃ y, (kCrSetSym(y) ∧ kCrEdgeSym(y, x)) ∧ kCrOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every crawled page to a marked
 element. -/
-noncomputable def crTotalClause : crawlSOLang.Sentence :=
+private noncomputable def crTotalClause : crawlSOLang.Sentence :=
   fo% ∀ x, kCrSetSym(x) → ∃ y, kCrInjSym(x, y) ∧ kCrMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
-noncomputable def crInjClause : crawlSOLang.Sentence :=
+private noncomputable def crInjClause : crawlSOLang.Sentence :=
   fo% ∀ x y z, kCrInjSym(x, z) ∧ kCrInjSym(y, z) → x ≐ y
 
 /-- The first-order kernel of the `Σ₁` definition of Graph Crawling. -/
-noncomputable def crawlKernel : crawlSOLang.Sentence :=
+private noncomputable def crawlKernel : crawlSOLang.Sentence :=
   crTargetClause ⊓ (crRootExistsClause ⊓ (crRootClause ⊓ (crRootUniqueClause ⊓
     (crTransClause ⊓ (crIrreflClause ⊓ (crStepClause ⊓ (crTotalClause ⊓ crInjClause)))))))
 
@@ -1273,7 +1276,7 @@ variable {A : Type}
 
 /-- Membership in a per-tag family of subsets of the input, stated at the raw
 product type so that it applies to interpreted elements. -/
-def InSlices (s : CrawlTag → Set A) (p : CrawlTag × (Fin 1 → A)) : Prop :=
+private def InSlices (s : CrawlTag → Set A) (p : CrawlTag × (Fin 1 → A)) : Prop :=
   p.2 0 ∈ s p.1
 
 private theorem sum_crawlTag (f : CrawlTag → ℕ) :
@@ -1287,7 +1290,7 @@ variable [Language.setSystem.Structure A] [LinearOrder A]
 omit [Language.setSystem.Structure A] [LinearOrder A] in
 /-- The cardinality of a per-tag family of slices is the sum of the slice
 sizes. -/
-theorem ncard_inSlices [Finite A] (s : CrawlTag → Set A) :
+private theorem ncard_inSlices [Finite A] (s : CrawlTag → Set A) :
     {p : crawlInterp.Map A | InSlices s p}.ncard =
       (s .root).ncard + (s .fam).ncard + (s .elem).ncard := by
   have h1 : {q : CrawlTag × A | q.2 ∈ s q.1}.ncard =
@@ -1300,7 +1303,7 @@ theorem ncard_inSlices [Finite A] (s : CrawlTag → Set A) :
 the root tag, `G` on the set tag, the ground elements on the element tag.
 Instantiated at `G := SSMarked` this is also the decomposition of the marked
 set. -/
-def coverSlices (G : A → Prop) : CrawlTag → Set A
+private def coverSlices (G : A → Prop) : CrawlTag → Set A
   | .root => {a : A | ∀ b : A, a ≤ b}
   | .fam => {a : A | G a}
   | .elem => {a : A | SSElem a}
@@ -1308,7 +1311,7 @@ def coverSlices (G : A → Prop) : CrawlTag → Set A
 omit [Language.setSystem.Structure A] in
 /-- On a finite linearly ordered nonempty type, the set of minima is a
 singleton. -/
-theorem ncard_min_slice [Finite A] [Nonempty A] :
+private theorem ncard_min_slice [Finite A] [Nonempty A] :
     {a : A | ∀ b : A, a ≤ b}.ncard = 1 := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   have hset : {a : A | ∀ b : A, a ≤ b} = {m} := by
@@ -1329,7 +1332,7 @@ private theorem marked_iff_inSlices (p : crawlInterp.Map A) :
   · exact (crawl_marked_iff _ w).trans Iff.rfl
 
 /-- The marked set of the interpreted website decomposes into tag slices. -/
-theorem marked_eq_slices :
+private theorem marked_eq_slices :
     {p : crawlInterp.Map A | WSMarked p} =
       {p : crawlInterp.Map A | InSlices (coverSlices SSMarked) p} :=
   Set.ext fun p => marked_iff_inSlices p
@@ -1347,7 +1350,7 @@ private theorem tuple_eta (w : Fin 1 → A) : w = fun _ => w 0 :=
 
 /-- Correctness of the interpretation: the set system has a small cover iff
 the interpreted website has a cheap crawl. -/
-theorem hasSmallSetCover_iff_crawl_map (A : Type) [Language.setSystem.Structure A]
+private theorem hasSmallSetCover_iff_crawl_map (A : Type) [Language.setSystem.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     HasSmallSetCover A ↔ HasCheapCrawl (crawlInterp.Map A) := by
   have hfin : Finite (crawlInterp.Map A) := crawlInterp.map_finite A
@@ -1462,7 +1465,7 @@ end Correctness
 [Gauquier–Manolescu–Senellart 2026][gauquier2026efficient2], Prop. 4: a cover
 of at most `B` sets is a crawl of at most `|U| + B + 1` pages of the depth-2
 website. -/
-noncomputable def setCover_ordered_fo_reduction_graphCrawling :
+private noncomputable def setCover_ordered_fo_reduction_graphCrawling :
     SetCover ≤ᶠᵒ[≤] GraphCrawling where
   Tag := CrawlTag
   dim := 1
@@ -1498,7 +1501,7 @@ theorem graphCrawling_NP_complete : NP.Complete GraphCrawling :=
 
 /-- The image of the hardness reduction is well-formed: the only root-marked
 page of an interpreted website is the minimum\'s root copy. -/
-theorem crawlInterp_wf (A : Type) [Language.setSystem.Structure A] [LinearOrder A]
+private theorem crawlInterp_wf (A : Type) [Language.setSystem.Structure A] [LinearOrder A]
     [Finite A] [Nonempty A] :
     DecisionProblem.ofSentence crawlWFSentence (crawlInterp.Map A) := by
   obtain ⟨mn, hmn⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id

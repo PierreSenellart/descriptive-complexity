@@ -103,14 +103,14 @@ noncomputable def atomOccF (a : SOAtom B k) (u x : Fin (clauseDim B k) → γ) :
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_guardF {φ : (L.sum Language.order).Formula (Fin k)}
+private theorem realize_guardF {φ : (L.sum Language.order).Formula (Fin k)}
     {u : Fin (clauseDim B k) → γ} :
     (guardF (L := L) (B := B) φ u).Realize v ↔
       φ.Realize fun j => v (u (Fin.castLE le_clauseDim j)) := by
   rw [guardF, Formula.realize_relabel]
   rfl
 
-theorem realize_atomOccF {a : SOAtom B k} {u x : Fin (clauseDim B k) → γ} :
+private theorem realize_atomOccF {a : SOAtom B k} {u x : Fin (clauseDim B k) → γ} :
     (atomOccF (L := L) a u x).Realize v ↔
       PadTup (atomIdx a) (fun j => v (u j)) fun j => v (x j) := by
   rw [atomOccF, realize_padTupF]

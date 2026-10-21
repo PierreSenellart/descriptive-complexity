@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.FixedPointPartial
 public import DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.Padding
 
 /-!
 # FO(≤, PFP) is contained in SO(TC)
@@ -72,7 +75,7 @@ noncomputable def SOBlock.idxList (B : SOBlock) : List B.ι :=
   (Finset.univ : Finset B.ι).toList
 
 open Classical in
-theorem SOBlock.mem_idxList (B : SOBlock) (i : B.ι) : i ∈ B.idxList := by
+private theorem SOBlock.mem_idxList (B : SOBlock) (i : B.ι) : i ∈ B.idxList := by
   let : Fintype B.ι := Fintype.ofFinite B.ι
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
 
@@ -121,7 +124,7 @@ section Realize
 
 variable {A : Type} [L.Structure A]
 
-theorem realize_nextSentence (ρ σ : d.B.Assignment A) :
+private theorem realize_nextSentence (ρ σ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₂ (L := L) ρ σ) d.nextSentence) ↔
       σ = d.next ρ := by
   let := d.B.structure σ
@@ -145,7 +148,7 @@ theorem realize_nextSentence (ρ σ : d.B.Assignment A) :
       LHom.realize_onFormula]
     exact Iff.rfl
 
-theorem realize_botSentence (ρ : d.B.Assignment A) :
+private theorem realize_botSentence (ρ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₁ (L := L) ρ) d.botSentence) ↔
       ρ = d.B.botAssign A := by
   let := d.B.structure ρ
@@ -166,7 +169,7 @@ theorem realize_botSentence (ρ : d.B.Assignment A) :
     rw [Formula.realize_not, Formula.realize_rel]
     exact fun h => h
 
-theorem realize_isFixedPtF (ρ : d.B.Assignment A) :
+private theorem realize_isFixedPtF (ρ : d.B.Assignment A) :
     (@Sentence.Realize _ A (d.B.structure₁ (L := L) ρ) d.isFixedPtF) ↔
       IsFixedPt d.next ρ := by
   let := d.B.structure ρ
@@ -212,11 +215,11 @@ theorem StepDef.toSOTCSpec_step_iff (ρ σ : d.B.Assignment A) :
     d.toSOTCSpec.Step ρ σ ↔ σ = d.next ρ :=
   d.realize_nextSentence ρ σ
 
-theorem StepDef.toSOTCSpec_isSrc_iff (ρ : d.B.Assignment A) :
+private theorem StepDef.toSOTCSpec_isSrc_iff (ρ : d.B.Assignment A) :
     d.toSOTCSpec.IsSrc ρ ↔ ρ = d.B.botAssign A :=
   d.realize_botSentence ρ
 
-theorem StepDef.toSOTCSpec_isTgt_iff (ρ : d.B.Assignment A) :
+private theorem StepDef.toSOTCSpec_isTgt_iff (ρ : d.B.Assignment A) :
     d.toSOTCSpec.IsTgt ρ ↔ IsFixedPt d.next ρ ∧
       @Sentence.Realize _ A (d.B.structure₁ (L := L.sum Language.order) ρ) d.out := by
   let := d.B.structure ρ
@@ -230,7 +233,7 @@ theorem StepDef.toSOTCSpec_isTgt_iff (ρ : d.B.Assignment A) :
 
 /-- The states reachable from the empty assignment are exactly the partial
 stages. -/
-theorem StepDef.reach_toSOTCSpec (σ : d.B.Assignment A) :
+private theorem StepDef.reach_toSOTCSpec (σ : d.B.Assignment A) :
     d.toSOTCSpec.Reach (d.B.botAssign A) σ ↔ ∃ n, σ = d.partStage A n := by
   constructor
   · intro h

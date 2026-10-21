@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Machine.AltRel
 public import DescriptiveComplexity.SecondOrderReplicate
+import all DescriptiveComplexity.MachinesAlt
+import all DescriptiveComplexity.SecondOrderReplicate
 
 /-!
 # The matrix of the ladder
@@ -89,7 +91,7 @@ theorem altBlockQuant_imp_left (ρ₀ : B.Assignment A) :
 /-- **One round of the prefix.** The outermost block of the prefix is the round
 `DescriptiveComplexity.bareQ` quantifies, once the condition on it is pulled out
 of the blocks that follow. -/
-theorem altBlockQuant_step (ρ₀ : B.Assignment A) (m : ℕ) (pol : Bool)
+private theorem altBlockQuant_step (ρ₀ : B.Assignment A) (m : ℕ) (pol : Bool)
     (C : B.Assignment A → Prop) (Q : B.Assignment A → (Fin m → B.Assignment A) → Prop)
     (R : B.Assignment A → Prop) (h : ∀ ρ, altBlockQuant A B m (Q ρ) (!pol) ↔ R ρ) :
     altBlockQuant A B (m + 1)
@@ -137,7 +139,7 @@ variable {M : ATMData A} {start : Bool}
 
 /-- **The prefix puts the rounds back**, from a round that has a predecessor
 on. -/
-theorem altBlockQuant_runMatrix_some :
+private theorem altBlockQuant_runMatrix_some :
     ∀ (m i : ℕ) (ρp : tmGuessBlock.Assignment A),
       altBlockQuant A tmGuessBlock m (M.runMatrix start m i (some ρp)) (blockPol start i) ↔
         M.runLadder start i m ρp := by

@@ -8,6 +8,9 @@ module
 public import Mathlib.Computability.RE
 public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
 import DescriptiveComplexity.RecursivelyEnumerable
+import all DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
+import all DescriptiveComplexity.Problems.CodeHalt.Hardness.Interp
+import all DescriptiveComplexity.Problems.CodeHalt.Hardness.Value
 
 /-!
 # Every semi-decidable problem reduces to CODEHALT
@@ -70,7 +73,7 @@ omit [L.IsRelational] in
 /-- **The drawn code runs the procedure on the value of the instance.** Every
 branch is evaluated at input `0`, so the argument of the `comp` is a constant:
 the pair of the numeral of the universe size with the nest of the tables. -/
-theorem eval_drawnCode :
+private theorem eval_drawnCode :
     Code.eval (Code.comp cP (Code.pair (numCode (Nat.card A))
         (codeNestFrom (blockCode V (Nat.card A) (ordEnum A) (botTup V A)) 0))) 0 =
       Code.eval cP (structVal V (Nat.card A) (ordEnum A) (botTup V A)) := by
@@ -82,7 +85,7 @@ open Classical in
 omit [L.IsRelational] in
 /-- **The instance is a yes-instance of CODEHALT exactly when the procedure
 halts on the value of the instance.** -/
-theorem codehalt_codeProg :
+private theorem codehalt_codeProg :
     CODEHALT ((codeProgInterp V cP).Map A) ↔
       (Code.eval cP (structVal V (Nat.card A) (ordEnum A) (botTup V A))).Dom := by
   have hev := eval_drawnCode V cP A
@@ -103,7 +106,7 @@ variable {A}
 
 open Classical in
 /-- **Decoding the value of an instance answers about the instance.** -/
-theorem toPred_structOf_structVal (P : DecisionProblem L) :
+private theorem toPred_structOf_structVal (P : DecisionProblem L) :
     P.toPred V (structOf V (structVal V (Nat.card A) (ordEnum A) (botTup V A))) ↔ P A :=
   P.iso_invariant
     (structValEquiv V (Nat.card A) Nat.card_pos (ordEnum A).toEquiv (botTup V A))

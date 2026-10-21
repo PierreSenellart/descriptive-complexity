@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Sat.Tseitin
+import all DescriptiveComplexity.Problems.Sat.Tseitin
 
 /-!
 # The Tseitin encoding determines its gate variables

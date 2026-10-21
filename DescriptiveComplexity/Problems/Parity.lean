@@ -9,6 +9,9 @@ import DescriptiveComplexity.Vocabulary
 public import DescriptiveComplexity.Problems.Even
 import DescriptiveComplexity.DetLogSpace
 import DescriptiveComplexity.TransitiveClosurePull
+import all DescriptiveComplexity.FirstOrderPull
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Even
 
 /-!
 # PARITY: the parity of a marked subset
@@ -115,7 +118,7 @@ def PARITY : DecisionProblem Language.markedSet where
     rw [hcard]
 
 /-- The value of PARITY, unfolded. -/
-theorem parity_holds_iff (A : Type) [Language.markedSet.Structure A] :
+private theorem parity_holds_iff (A : Type) [Language.markedSet.Structure A] :
     PARITY A ↔ Even (Marked A).ncard :=
   Iff.rfl
 
@@ -142,12 +145,12 @@ theorem realize_markF {α : Type} (x : α) (v : α → A) :
   exact Iff.rfl
 
 /-- The number of marked elements up to and including `x`. -/
-noncomputable def parCount [Finite A] (x : A) : ℕ :=
+private noncomputable def parCount [Finite A] (x : A) : ℕ :=
   {y : A | y ≤ x ∧ y ∈ Marked A}.ncard
 
 /-- The mode carried at `x`: whether an even number of marked elements has been
 seen so far. -/
-noncomputable def parMode [Finite A] (x : A) : Bool :=
+private noncomputable def parMode [Finite A] (x : A) : Bool :=
   decide (Even (parCount x))
 
 /-- The transition of the parity walk: step to the immediate successor, and flip
@@ -177,7 +180,7 @@ noncomputable def parSpec : TCSpec Language.markedSet where
   src := parSrc
   tgt := parTgt
 
-theorem realize_parStep (m m' : Bool) (x y : Fin 1 → A) :
+private theorem realize_parStep (m m' : Bool) (x y : Fin 1 → A) :
     (parStep m m').Realize (Sum.elim x y) ↔
       x 0 ⋖ y 0 ∧ ((m' = !m ∧ y 0 ∈ Marked A) ∨ (m' = m ∧ y 0 ∉ Marked A)) := by
   rw [parStep, Formula.realize_inf, realize_succF]
@@ -200,19 +203,19 @@ theorem realize_parStep (m m' : Bool) (x y : Fin 1 → A) :
       · exact absurd hm h
       · exact hy
 
-theorem step_parSpec_iff (m m' : Bool) (x y : Fin 1 → A) :
+private theorem step_parSpec_iff (m m' : Bool) (x y : Fin 1 → A) :
     parSpec.Step (m, x) (m', y) ↔
       x 0 ⋖ y 0 ∧ ((m' = !m ∧ y 0 ∈ Marked A) ∨ (m' = m ∧ y 0 ∉ Marked A)) :=
   realize_parStep m m' x y
 
-theorem isSrc_parSpec_iff (m : Bool) (x : Fin 1 → A) :
+private theorem isSrc_parSpec_iff (m : Bool) (x : Fin 1 → A) :
     parSpec.IsSrc (m, x) ↔
       (∀ a : A, x 0 ≤ a) ∧
         ((m = true ∧ x 0 ∉ Marked A) ∨ (m = false ∧ x 0 ∈ Marked A)) := by
   change (parSrc m).Realize x ↔ _
   cases m <;> simp [parSrc]
 
-theorem isTgt_parSpec_iff (m : Bool) (x : Fin 1 → A) :
+private theorem isTgt_parSpec_iff (m : Bool) (x : Fin 1 → A) :
     parSpec.IsTgt (m, x) ↔ m = true ∧ ∀ a : A, a ≤ x 0 := by
   change (parTgt m).Realize x ↔ _
   cases m <;> simp [parTgt]
@@ -220,7 +223,7 @@ theorem isTgt_parSpec_iff (m : Bool) (x : Fin 1 → A) :
 variable [Finite A]
 
 /-- The prefix of a minimum is the minimum itself, when it is marked. -/
-theorem parCount_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Marked A) :
+private theorem parCount_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Marked A) :
     parCount z = 1 := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = {z} := by
     ext y
@@ -229,7 +232,7 @@ theorem parCount_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Mark
   rw [parCount, hset, Set.ncard_singleton]
 
 /-- The prefix of an unmarked minimum is empty. -/
-theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ Marked A) :
+private theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ Marked A) :
     parCount z = 0 := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = ∅ := by
     ext y
@@ -240,7 +243,7 @@ theorem parCount_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ 
   rw [parCount, hset, Set.ncard_empty]
 
 /-- The prefix grows by one along a cover onto a marked element. -/
-theorem parCount_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
+private theorem parCount_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
     parCount z = parCount w + 1 := by
   have hnot : z ∉ {y : A | y ≤ w ∧ y ∈ Marked A} := by
     simp only [Set.mem_ofPred_eq, not_and]
@@ -260,7 +263,7 @@ theorem parCount_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
   rw [parCount, parCount, hset, Set.ncard_insert_of_notMem hnot]
 
 /-- The prefix is unchanged along a cover onto an unmarked element. -/
-theorem parCount_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) :
+private theorem parCount_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) :
     parCount z = parCount w := by
   have hset : {y : A | y ≤ z ∧ y ∈ Marked A} = {y : A | y ≤ w ∧ y ∈ Marked A} := by
     ext y
@@ -275,19 +278,19 @@ theorem parCount_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) 
   rw [parCount, parCount, hset]
 
 /-- The mode of a marked minimum is odd. -/
-theorem parMode_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Marked A) :
+private theorem parMode_isMin_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∈ Marked A) :
     parMode z = false := by
   rw [parMode, parCount_isMin_marked hz hm]
   simp
 
 /-- The mode of an unmarked minimum is even. -/
-theorem parMode_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ Marked A) :
+private theorem parMode_isMin_not_marked {z : A} (hz : ∀ a : A, z ≤ a) (hm : z ∉ Marked A) :
     parMode z = true := by
   rw [parMode, parCount_isMin_not_marked hz hm]
   simp
 
 /-- The mode flips along a cover onto a marked element. -/
-theorem parMode_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
+private theorem parMode_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
     parMode z = !parMode w := by
   rw [parMode, parMode, parCount_covBy_marked h hm]
   cases Nat.even_or_odd (parCount w) with
@@ -295,12 +298,12 @@ theorem parMode_covBy_marked {w z : A} (h : w ⋖ z) (hm : z ∈ Marked A) :
   | inr ho => simp [Nat.even_add_one, Nat.not_even_iff_odd.mpr ho]
 
 /-- The mode is unchanged along a cover onto an unmarked element. -/
-theorem parMode_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) :
+private theorem parMode_covBy_not_marked {w z : A} (h : w ⋖ z) (hm : z ∉ Marked A) :
     parMode z = parMode w := by
   rw [parMode, parMode, parCount_covBy_not_marked h hm]
 
 /-- **The walk reaches every element**, in the mode its prefix prescribes. -/
-theorem reach_parSpec {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) (x : A) :
+private theorem reach_parSpec {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) (x : A) :
     parSpec.Reach (parMode x₀, fun _ => x₀) (parMode x, fun _ => x) := by
   induction x using order_induction with
   | hmin z hz =>
@@ -316,7 +319,7 @@ theorem reach_parSpec {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) (x : A) :
 
 /-- **The mode of a reachable node is the parity of its prefix**: the invariant
 that reads the walk backwards. -/
-theorem parMode_of_reach {x₀ : A} :
+private theorem parMode_of_reach {x₀ : A} :
     ∀ p : parSpec.Node A, parSpec.Reach (parMode x₀, fun _ => x₀) p →
       p.1 = parMode (p.2 (0 : Fin 1)) := by
   intro p h
@@ -336,7 +339,7 @@ variable [Nonempty A]
 /-- **The walk accepts exactly the structures whose marked subset is even**: it
 visits every element once, from the minimum to the maximum, so the mode it ends
 in is the parity of the whole marked subset. -/
-theorem accepts_parSpec_iff : parSpec.Accepts A ↔ Even (Marked A).ncard := by
+private theorem accepts_parSpec_iff : parSpec.Accepts A ↔ Even (Marked A).ncard := by
   obtain ⟨x₀, -, h₀'⟩ := Set.exists_min_image (Set.univ : Set A) id (Set.toFinite _)
     ⟨Classical.arbitrary A, trivial⟩
   obtain ⟨x₁, -, h₁'⟩ := Set.exists_max_image (Set.univ : Set A) id (Set.toFinite _)
@@ -429,7 +432,7 @@ noncomputable def evenParityInterp :
   relFormula {_} _ _ := ⊤
 
 /-- Every point of the interpreted structure is marked. -/
-theorem marked_evenParityInterp (A : Type) [Language.empty.Structure A] :
+private theorem marked_evenParityInterp (A : Type) [Language.empty.Structure A] :
     Marked (evenParityInterp.Map A) = Set.univ := by
   ext p
   rw [mem_marked_iff]
@@ -438,7 +441,7 @@ theorem marked_evenParityInterp (A : Type) [Language.empty.Structure A] :
   exact Formula.realize_top.mpr trivial
 
 /-- **EVEN reduces to PARITY**: mark everything. -/
-noncomputable def even_fo_reduction_parity : EVEN ≤ᶠᵒ PARITY where
+private noncomputable def even_fo_reduction_parity : EVEN ≤ᶠᵒ PARITY where
   Tag := Unit
   dim := 1
   toInterpretation := evenParityInterp

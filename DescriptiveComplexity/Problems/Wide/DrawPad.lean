@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.AltQuant
+import all DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Levels a prefix's matrix does not read
@@ -88,7 +89,7 @@ theorem altQuantFrom_congr_mat {n : ℕ} {P P' : (Fin n → α) → Prop} {j : �
 
 /-- **A coordinate the matrix ignores may be overwritten** at any point of the
 walk: the prefix's value does not change. -/
-theorem altQuantFrom_update_irrel {n : ℕ} {P : (Fin n → α) → Prop} {ℓ : Fin n}
+private theorem altQuantFrom_update_irrel {n : ℕ} {P : (Fin n → α) → Prop} {ℓ : Fin n}
     (hirr : ∀ (w : Fin n → α) (a : α), P (Function.update w ℓ a) ↔ P w) :
     ∀ (j : ℕ) (v : Fin n → α) (a : α),
       altQuantFrom pol P j (Function.update v ℓ a) ↔ altQuantFrom pol P j v := by

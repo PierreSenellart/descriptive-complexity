@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Tiling.Defs
+import all DescriptiveComplexity.Problems.Tiling.Defs
 
 /-!
 # Tiling a corridor: the same tiles, one dimension unbounded
@@ -85,7 +86,7 @@ variable (hedgeL : ∀ a, T.EdgeL a ↔ S.EdgeL (u a)) (hedgeR : ∀ a, T.EdgeR 
 include hposn hle htile hacc hhoriz hvert hfirst hbase hstart hedgeL hedgeR
 
 /-- **A bijection matching the two systems carries a corridor across.** -/
-theorem isCorridor_map {h : ℕ} {τ : ℕ → A → A} (hcor : T.IsCorridor h τ) :
+private theorem isCorridor_map {h : ℕ} {τ : ℕ → A → A} (hcor : T.IsCorridor h τ) :
     S.IsCorridor h fun k x => u (τ k (u.symm x)) := by
   obtain ⟨htiles, hfst, hel, her, hhor, hver, x, hx, hax⟩ := hcor
   have hpt : ∀ p : B, ∃ a, p = u a := fun p => ⟨u.symm p, (u.apply_symm_apply p).symm⟩
@@ -121,7 +122,7 @@ theorem isCorridor_map {h : ℕ} {τ : ℕ → A → A} (hcor : T.IsCorridor h �
     exact (hacc _).mp hax
 
 /-- **And with it, the corridor's tileability.** -/
-theorem corridorTileable_map (h : T.CorridorTileable) : S.CorridorTileable :=
+private theorem corridorTileable_map (h : T.CorridorTileable) : S.CorridorTileable :=
   ⟨h.choose, _, isCorridor_map T u S hposn hle htile hacc hhoriz hvert hfirst hbase hstart
     hedgeL hedgeR h.choose_spec.choose_spec⟩
 
@@ -136,7 +137,7 @@ section Problem
 variable {A B : Type} [Language.tiling.Structure A] [Language.tiling.Structure B]
 
 /-- **An isomorphism carries a corridor across.** -/
-theorem isCorridor_map (e : A ≃[Language.tiling] B) {h : ℕ} {τ : ℕ → A → A}
+private theorem isCorridor_map (e : A ≃[Language.tiling] B) {h : ℕ} {τ : ℕ → A → A}
     (hcor : (tileData A).IsCorridor h τ) :
     (tileData B).IsCorridor h fun k u => e (τ k (e.symm u)) :=
   TileData.isCorridor_map _ e.toEquiv _ (tlPosn_map e) (tlLe_map e) (tlTile_map e)

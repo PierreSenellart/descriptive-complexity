@@ -14,6 +14,9 @@ package "descriptive-complexity" where
     ⟨`relaxedAutoImplicit, false⟩,
     ⟨`maxSynthPendingDepth, .ofNat 3⟩,
     ⟨`weak.linter.mathlibStandardSet, true⟩,
+    -- Implementation modules of this library have no public declaration: their siblings
+    -- reach them with `import all`, which is the design, not an omission.
+    ⟨`weak.linter.privateModule, false⟩,
   ]
 
 require "leanprover-community" / "mathlib" @ git "v4.35.0"

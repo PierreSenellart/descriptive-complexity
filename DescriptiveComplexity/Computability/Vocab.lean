@@ -106,10 +106,10 @@ def sum (V : FinVocab L) (W : FinVocab L') : FinVocab (L.sum L') where
 their numbers, those of the right summand are shifted past them. This is the
 only fact about `FirstOrder.Language.FinVocab.sum` anything downstream uses –
 it is what fixes the layout of the table of an encoded structure. -/
-theorem index_sum_inl (V : FinVocab L) (W : FinVocab L') {n : ℕ} (r : L.Relations n) :
+private theorem index_sum_inl (V : FinVocab L) (W : FinVocab L') {n : ℕ} (r : L.Relations n) :
     (V.sum W).index (Sum.inl r) = Fin.castAdd W.numSyms (V.index r) := rfl
 
-theorem index_sum_inr (V : FinVocab L) (W : FinVocab L') {n : ℕ} (r : L'.Relations n) :
+private theorem index_sum_inr (V : FinVocab L) (W : FinVocab L') {n : ℕ} (r : L'.Relations n) :
     (V.sum W).index (Sum.inr r) = Fin.natAdd V.numSyms (W.index r) := rfl
 
 @[simp] theorem val_index_sum_inl (V : FinVocab L) (W : FinVocab L') {n : ℕ}

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Invariant.Bare
+import all DescriptiveComplexity.Invariant.Bare
 
 /-!
 # The `k`-pebble game between two structures
@@ -67,13 +68,13 @@ def PebbleBackForth₂ (E : PebbleRel₂ M N k) : PebbleRel₂ M N k :=
 def pebbleRefine₂ (E₀ E : PebbleRel₂ M N k) : PebbleRel₂ M N k :=
   fun a b => E₀ a b ∧ PebbleBackForth₂ E a b
 
-theorem pebbleBackForth₂_mono {E E' : PebbleRel₂ M N k} (h : E.Le E') :
+private theorem pebbleBackForth₂_mono {E E' : PebbleRel₂ M N k} (h : E.Le E') :
     (PebbleBackForth₂ E).Le (PebbleBackForth₂ E') := by
   intro a b hab i
   exact ⟨fun c => (hab i).1 c |>.imp fun _ hd => h _ _ hd,
     fun d => (hab i).2 d |>.imp fun _ hc => h _ _ hc⟩
 
-theorem pebbleRefine₂_mono (E₀ : PebbleRel₂ M N k) {E E' : PebbleRel₂ M N k} (h : E.Le E') :
+private theorem pebbleRefine₂_mono (E₀ : PebbleRel₂ M N k) {E E' : PebbleRel₂ M N k} (h : E.Le E') :
     (pebbleRefine₂ E₀ E).Le (pebbleRefine₂ E₀ E') :=
   fun a b hab => ⟨hab.1, pebbleBackForth₂_mono h a b hab.2⟩
 
@@ -89,13 +90,13 @@ def EquivK₂ (E₀ : PebbleRel₂ M N k) : PebbleRel₂ M N k :=
 
 variable {E₀ : PebbleRel₂ M N k}
 
-theorem pebbleStage₂_succ_le (E₀ : PebbleRel₂ M N k) (n : ℕ) :
+private theorem pebbleStage₂_succ_le (E₀ : PebbleRel₂ M N k) (n : ℕ) :
     (pebbleStage₂ E₀ (n + 1)).Le (pebbleStage₂ E₀ n) := by
   induction n with
   | zero => exact fun _ _ _ => trivial
   | succ n ih => exact pebbleRefine₂_mono E₀ ih
 
-theorem pebbleStage₂_le_of_le (E₀ : PebbleRel₂ M N k) {m n : ℕ} (hmn : m ≤ n) :
+private theorem pebbleStage₂_le_of_le (E₀ : PebbleRel₂ M N k) {m n : ℕ} (hmn : m ≤ n) :
     (pebbleStage₂ E₀ n).Le (pebbleStage₂ E₀ m) := by
   induction n with
   | zero => rw [Nat.le_zero.mp hmn]; exact fun _ _ h => h
@@ -123,7 +124,7 @@ section Finite
 
 variable [Finite M] [Finite N]
 
-theorem exists_pebbleStage₂_succ_eq (E₀ : PebbleRel₂ M N k) :
+private theorem exists_pebbleStage₂_succ_eq (E₀ : PebbleRel₂ M N k) :
     ∃ n ≤ Nat.card ((Fin k → M) × (Fin k → N)),
       pebbleStage₂ E₀ (n + 1) = pebbleStage₂ E₀ n := by
   obtain ⟨n, hn, heq⟩ := exists_succ_eq_of_antitone_subset
@@ -135,7 +136,7 @@ theorem exists_pebbleStage₂_succ_eq (E₀ : PebbleRel₂ M N k) :
     fun h => (Set.ext_iff.mp heq (a, b)).mpr h⟩
 
 omit [Finite M] [Finite N] in
-private theorem pebbleStage₂_eq_of_succ_eq {n : ℕ}
+theorem pebbleStage₂_eq_of_succ_eq {n : ℕ}
     (hn : pebbleStage₂ E₀ (n + 1) = pebbleStage₂ E₀ n) {m : ℕ} (hm : n ≤ m) :
     pebbleStage₂ E₀ m = pebbleStage₂ E₀ n := by
   induction m with
@@ -149,7 +150,7 @@ private theorem pebbleStage₂_eq_of_succ_eq {n : ℕ}
     · rw [le_antisymm hm h]
 
 /-- **On finite structures the limit is a fixed point of the refinement.** -/
-theorem pebbleRefine₂_equivK₂ (E₀ : PebbleRel₂ M N k) :
+private theorem pebbleRefine₂_equivK₂ (E₀ : PebbleRel₂ M N k) :
     pebbleRefine₂ E₀ (EquivK₂ E₀) = EquivK₂ E₀ := by
   obtain ⟨n, -, hn⟩ := exists_pebbleStage₂_succ_eq E₀
   have hlim : EquivK₂ E₀ = pebbleStage₂ E₀ n := by
@@ -173,7 +174,8 @@ theorem EquivK₂.update {a : Fin k → M} {b : Fin k → N} (h : EquivK₂ E₀
   (((equivK₂_iff E₀ a b).mp h).2 i).1 c
 
 /-- **The game move**, from the right. -/
-theorem EquivK₂.update_right {a : Fin k → M} {b : Fin k → N} (h : EquivK₂ E₀ a b) (i : Fin k)
+private theorem EquivK₂.update_right
+    {a : Fin k → M} {b : Fin k → N} (h : EquivK₂ E₀ a b) (i : Fin k)
     (d : N) : ∃ c : M, EquivK₂ E₀ (Function.update a i c) (Function.update b i d) :=
   (((equivK₂_iff E₀ a b).mp h).2 i).2 d
 
@@ -181,13 +183,13 @@ end Finite
 
 /-! ### Monotonicity and expansion -/
 
-theorem pebbleStage₂_mono {E₀ E₀' : PebbleRel₂ M N k} (h : E₀'.Le E₀) (n : ℕ) :
+private theorem pebbleStage₂_mono {E₀ E₀' : PebbleRel₂ M N k} (h : E₀'.Le E₀) (n : ℕ) :
     (pebbleStage₂ E₀' n).Le (pebbleStage₂ E₀ n) := by
   induction n with
   | zero => exact fun _ _ h => h
   | succ n ih => exact fun a b hab => ⟨h a b hab.1, pebbleBackForth₂_mono ih a b hab.2⟩
 
-theorem equivK₂_mono {E₀ E₀' : PebbleRel₂ M N k} (h : E₀'.Le E₀) :
+private theorem equivK₂_mono {E₀ E₀' : PebbleRel₂ M N k} (h : E₀'.Le E₀) :
     (EquivK₂ E₀').Le (EquivK₂ E₀) :=
   fun a b hab n => pebbleStage₂_mono h n a b (hab n)
 

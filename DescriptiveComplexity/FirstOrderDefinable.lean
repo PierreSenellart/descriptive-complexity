@@ -53,7 +53,7 @@ def FODefinable (P : DecisionProblem L) : Prop :=
 
 /-- Order-free first-order definability only depends on the finite instances
 of a problem. -/
-theorem foDefinableFree_congr {P Q : DecisionProblem L}
+private theorem foDefinableFree_congr {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     FODefinableFree P ↔ FODefinableFree Q := by
   constructor <;> rintro ⟨φ, hφ⟩ <;> refine ⟨φ, ?_⟩ <;> intro A _ _ _
@@ -61,7 +61,7 @@ theorem foDefinableFree_congr {P Q : DecisionProblem L}
   · exact (h A).trans (hφ A)
 
 /-- FO(≤) definability only depends on the finite instances of a problem. -/
-theorem foDefinable_congr {P Q : DecisionProblem L}
+private theorem foDefinable_congr {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     FODefinable P ↔ FODefinable Q := by
   constructor <;> rintro ⟨φ, hφ⟩ <;> refine ⟨φ, ?_⟩ <;> intro A _ _ _ _

@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.ImmermanSzelepcsenyi
 import DescriptiveComplexity.TransitiveClosureCompl
+import all DescriptiveComplexity.ImmermanSzelepcsenyi
+import all DescriptiveComplexity.LogSpace
+import all DescriptiveComplexity.TransitiveClosureCompl
 
 /-!
 # REACH is NL-complete
@@ -132,41 +135,41 @@ section Correctness
 
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
-theorem realize_edgeF (m m' : spec.Mode) (v : Fin 2 × Fin spec.k → A) :
+private theorem realize_edgeF (m m' : spec.Mode) (v : Fin 2 × Fin spec.k → A) :
     (edgeF spec m m').Realize v ↔
       spec.Step ((m, fun i => v (0, i)) : spec.Node A) (m', fun i => v (1, i)) := by
   rw [edgeF, Formula.realize_relabel]
   exact iff_of_eq (congrArg (spec.step m m').Realize (funext fun j => by cases j <;> rfl))
 
-theorem realize_srcF (m : spec.Mode) (v : Fin 1 × Fin spec.k → A) :
+private theorem realize_srcF (m : spec.Mode) (v : Fin 1 × Fin spec.k → A) :
     (srcF spec m).Realize v ↔ spec.IsSrc ((m, fun i => v (0, i)) : spec.Node A) := by
   rw [srcF, Formula.realize_relabel]
   exact iff_of_eq (congrArg (spec.src m).Realize (funext fun _ => rfl))
 
-theorem realize_tgtF (m : spec.Mode) (v : Fin 1 × Fin spec.k → A) :
+private theorem realize_tgtF (m : spec.Mode) (v : Fin 1 × Fin spec.k → A) :
     (tgtF spec m).Realize v ↔ spec.IsTgt ((m, fun i => v (0, i)) : spec.Node A) := by
   rw [tgtF, Formula.realize_relabel]
   exact iff_of_eq (congrArg (spec.tgt m).Realize (funext fun _ => rfl))
 
 /-- An arc of the interpreted graph is a transition of the walk. -/
-theorem sgEdge_tcInterp (a b : (tcInterp spec).Map A) : SGEdge a b ↔ spec.Step a b := by
+private theorem sgEdge_tcInterp (a b : (tcInterp spec).Map A) : SGEdge a b ↔ spec.Step a b := by
   rw [SGEdge, FOInterpretation.relMap_map]
   exact realize_edgeF spec a.1 b.1 _
 
 /-- A marked source of the interpreted graph is a starting node of the walk. -/
-theorem sgSource_tcInterp (a : (tcInterp spec).Map A) : SGSource a ↔ spec.IsSrc a := by
+private theorem sgSource_tcInterp (a : (tcInterp spec).Map A) : SGSource a ↔ spec.IsSrc a := by
   rw [SGSource, FOInterpretation.relMap_map]
   exact realize_srcF spec a.1 _
 
 /-- A marked target of the interpreted graph is an accepting node of the
 walk. -/
-theorem sgTarget_tcInterp (a : (tcInterp spec).Map A) : SGTarget a ↔ spec.IsTgt a := by
+private theorem sgTarget_tcInterp (a : (tcInterp spec).Map A) : SGTarget a ↔ spec.IsTgt a := by
   rw [SGTarget, FOInterpretation.relMap_map]
   exact realize_tgtF spec a.1 _
 
 /-- A directed path of the interpreted graph is a walk of the specification,
 and conversely. -/
-theorem reflTransGen_tcInterp (a b : (tcInterp spec).Map A) :
+private theorem reflTransGen_tcInterp (a b : (tcInterp spec).Map A) :
     Relation.ReflTransGen SGEdge a b ↔ spec.Reach a b := by
   constructor
   · intro h

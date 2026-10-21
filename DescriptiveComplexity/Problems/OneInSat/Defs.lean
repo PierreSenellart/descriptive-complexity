@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Problems.Sat
 public import DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # 1-in-SAT: the problem, and its membership in NP
@@ -69,7 +70,7 @@ section Iso
 variable {A B : Type} [Language.sat.Structure A] [Language.sat.Structure B]
 
 /-- Isomorphisms preserve literal occurrences. -/
-theorem occIn_iso (e : A ≃[Language.sat] B) {c x : A} {s : Bool} :
+private theorem occIn_iso (e : A ≃[Language.sat] B) {c x : A} {s : Bool} :
     OccIn c x s ↔ OccIn (e c) (e x) s := by
   cases s with
   | false => exact and_congr (relMap_equiv₁ e satIsClause c) (relMap_equiv₂ e satNegIn c x)
@@ -211,7 +212,7 @@ end Realize
 
 /-- **The kernel says exactly what it should**: the guessed assignment gives
 every clause exactly one true literal. -/
-theorem realize_oneInKernel_iff_oneInProper {A : Type} [Language.sat.Structure A]
+private theorem realize_oneInKernel_iff_oneInProper {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) oneInKernel) ↔

@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.CliqueFamily
 import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Problems.CliqueFamily
 
 /-!
 # Subgraph Isomorphism is NP-complete
@@ -199,16 +200,17 @@ def patPt (v : A) : cliquePatternInterp.Map A := (true, fun _ => v)
 /-- The host copy of a vertex. -/
 def hostPt (v : A) : cliquePatternInterp.Map A := (false, fun _ => v)
 
-theorem patPt_injective : Function.Injective (patPt (A := A)) :=
+private theorem patPt_injective : Function.Injective (patPt (A := A)) :=
   fun _ _ h => congrArg (fun p : Bool × (Fin 1 → A) => p.2 0) h
 
-theorem hostPt_injective : Function.Injective (hostPt (A := A)) :=
+private theorem hostPt_injective : Function.Injective (hostPt (A := A)) :=
   fun _ _ h => congrArg (fun p : Bool × (Fin 1 → A) => p.2 0) h
 
-theorem patPt_eta (w : Fin 1 → A) : ((true, w) : cliquePatternInterp.Map A) = patPt (w 0) :=
+private theorem patPt_eta (w : Fin 1 → A) : ((true, w) : cliquePatternInterp.Map A) = patPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
-theorem hostPt_eta (w : Fin 1 → A) : ((false, w) : cliquePatternInterp.Map A) = hostPt (w 0) :=
+private theorem hostPt_eta
+    (w : Fin 1 → A) : ((false, w) : cliquePatternInterp.Map A) = hostPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
 end Points
@@ -250,14 +252,15 @@ theorem clPat_hostE (u v : A) :
   simp [cliquePatternInterp, hostPt, MGAdj, Formula.realize_rel₂]
 
 /-- Only pattern copies are pattern vertices. -/
-theorem patV_eq_patPt {p : cliquePatternInterp.Map A} (h : TGPatV p) : ∃ v, p = patPt v := by
+private theorem patV_eq_patPt
+    {p : cliquePatternInterp.Map A} (h : TGPatV p) : ∃ v, p = patPt v := by
   rcases p with ⟨(_ | _), w⟩
   · exact absurd h (by rw [hostPt_eta w]; exact clPat_patV_host (w 0))
   · exact ⟨w 0, patPt_eta w⟩
 
 /-- Only host copies are host vertices, so the image of a pattern vertex is a
 host copy. -/
-theorem hostV_eq_hostPt {p : cliquePatternInterp.Map A} (h : TGHostV p) :
+private theorem hostV_eq_hostPt {p : cliquePatternInterp.Map A} (h : TGHostV p) :
     ∃ v, p = hostPt v := by
   rcases p with ⟨(_ | _), w⟩
   · exact ⟨w 0, hostPt_eta w⟩
@@ -273,7 +276,7 @@ open Classical in
 /-- Where a vertex goes under the embedding of the pattern: a marked vertex to
 its image under the guessed injection into the clique, anything else to
 itself – a value no condition of the problem mentions. -/
-noncomputable def cliqueVertex {S : A → Prop}
+private noncomputable def cliqueVertex {S : A → Prop}
     (e : {x : A // MGMarked x} ↪ {x : A // S x}) (v : A) : A :=
   if h : MGMarked v then (e ⟨v, h⟩).1 else v
 
@@ -336,7 +339,7 @@ end Correctness
 
 /-- **Clique FO-reduces to Subgraph Isomorphism**: the pattern is the
 complete graph on the marked set, the host is the input graph. -/
-def clique_fo_reduction_subgraphIso : Clique ≤ᶠᵒ SubgraphIso where
+private def clique_fo_reduction_subgraphIso : Clique ≤ᶠᵒ SubgraphIso where
   Tag := Bool
   dim := 1
   toInterpretation := cliquePatternInterp
@@ -353,23 +356,23 @@ fo_block isoGuessBlock over Language.twoGraphs tg into subgraphSOLang with sg wh
   map : 2
 
 /-- Kernel clause: every pattern vertex is mapped to some host vertex. -/
-noncomputable def sgTotalClause : subgraphSOLang.Sentence :=
+private noncomputable def sgTotalClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀, sgPatVSym(x₀) → ∃ y, sgMapSym(x₀, y) ∧ sgHostVSym(y)
 
 /-- Kernel clause: the guessed map is injective on the pattern. -/
-noncomputable def sgInjClause : subgraphSOLang.Sentence :=
+private noncomputable def sgInjClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂,
     ((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₂) → x₀ ≐ x₁
 
 /-- Kernel clause: the guessed map carries pattern edges to host edges. -/
-noncomputable def sgEdgeClause : subgraphSOLang.Sentence :=
+private noncomputable def sgEdgeClause : subgraphSOLang.Sentence :=
   fo% ∀ x₀ x₁ x₂ x₃,
     (((sgPatVSym(x₀) ∧ sgPatVSym(x₁)) ∧ sgPatESym(x₀, x₁)) ∧
       sgMapSym(x₀, x₂)) ∧ sgMapSym(x₁, x₃) → sgHostESym(x₂, x₃)
 
 /-- The first-order kernel of the `Σ₁` definition of Subgraph
 Isomorphism. -/
-noncomputable def subgraphKernel : subgraphSOLang.Sentence :=
+private noncomputable def subgraphKernel : subgraphSOLang.Sentence :=
   sgTotalClause ⊓ (sgInjClause ⊓ sgEdgeClause)
 
 /-- Realization of the kernel under an assignment of the guessed map. -/
@@ -404,7 +407,7 @@ private theorem realize_subgraphKernel {A : Type} [Language.twoGraphs.Structure 
 /-- **Subgraph Isomorphism is `Σ₁`-definable**: existentially guess the map,
 then check first-order that it sends pattern vertices to host vertices,
 injectively, carrying pattern edges to host edges. -/
-theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
+private theorem subgraphIso_sigmaSODefinable : SigmaSODefinable 1 SubgraphIso := by
   refine ⟨[isoGuessBlock], rfl, subgraphKernel, ?_⟩
   intro A _ _ _
   constructor

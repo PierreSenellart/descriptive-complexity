@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.TwoSat.Defs
 public import DescriptiveComplexity.TwoCnf
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.TwoCnf
 
 /-!
 # The implication graph of a width-two CNF
@@ -68,9 +70,9 @@ variable (A) in
 /-- The structure read as a 2-CNF in the sense of `DescriptiveComplexity.TwoCnf`: the
 variables are the elements, and `p ∨ q` is a clause when some clause of the
 structure is covered by the occurrences `p` and `q`. -/
-def clauseRel (p q : A × Bool) : Prop := ∃ c : A, Covers c p.1 p.2 q.1 q.2
+private def clauseRel (p q : A × Bool) : Prop := ∃ c : A, Covers c p.1 p.2 q.1 q.2
 
-theorem step_iff (p q : A × Bool) : Step p q ↔ TwoCnf.Step (clauseRel A) p q := by
+private theorem step_iff (p q : A × Bool) : Step p q ↔ TwoCnf.Step (clauseRel A) p q := by
   constructor
   · rintro ⟨c, x, s, y, u, hcov, ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩⟩
     · exact Or.inl ⟨c, by simpa [TwoCnf.neg] using hcov⟩
@@ -81,12 +83,12 @@ theorem step_iff (p q : A × Bool) : Step p q ↔ TwoCnf.Step (clauseRel A) p q 
     · exact ⟨c, q.1, q.2, p.1, !p.2, by simpa [TwoCnf.neg] using hcov,
         Or.inr ⟨by simp, rfl⟩⟩
 
-theorem reach_iff (p q : A × Bool) : Reach p q ↔ TwoCnf.Reach (clauseRel A) p q :=
+private theorem reach_iff (p q : A × Bool) : Reach p q ↔ TwoCnf.Reach (clauseRel A) p q :=
   ⟨fun h => Relation.ReflTransGen.mono (fun a b hab => (step_iff a b).mp hab) _ _ h,
     fun h => Relation.ReflTransGen.mono (fun a b hab => (step_iff a b).mpr hab) _ _ h⟩
 
 /-- A satisfying assignment of the structure satisfies the abstract 2-CNF. -/
-theorem satisfies_of_satClauses {ν : A → Prop}
+private theorem satisfies_of_satClauses {ν : A → Prop}
     (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s) :
     TwoCnf.Satisfies (clauseRel A) ν := by
   rintro p q ⟨c, hp, hq, hcov⟩
@@ -98,7 +100,7 @@ theorem satisfies_of_satClauses {ν : A → Prop}
 /-- Conversely, an assignment satisfying the abstract 2-CNF satisfies the
 structure – provided the width promise holds and no clause is empty, which is
 what makes every clause the disjunction of a covering pair. -/
-theorem satisfiable_of_satisfies (hw : WidthAtMostTwo A) (hempty : ∀ c : A, ¬EmptyCl c)
+private theorem satisfiable_of_satisfies (hw : WidthAtMostTwo A) (hempty : ∀ c : A, ¬EmptyCl c)
     {ν : A → Prop} (h : TwoCnf.Satisfies (clauseRel A) ν) : Satisfiable A := by
   refine ⟨ν, fun c hc => ?_⟩
   obtain ⟨x, s, hx⟩ : ∃ (x : A) (s : Bool), OccIn c x s := by

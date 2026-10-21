@@ -53,7 +53,7 @@ theorem SOBlock.pad_arity_inl (B : SOBlock) (n a : ℕ) (i : B.ι) :
 /-- **The variables of a padded block**, counted: the original's and the new
 ones. This is what a clock's counting hypothesis is discharged by – the guessing
 site's rule names are indexed by assignments of the block. -/
-theorem SOBlock.card_pad_ι (B : SOBlock) (n a : ℕ) :
+private theorem SOBlock.card_pad_ι (B : SOBlock) (n a : ℕ) :
     Nat.card (B.pad n a).ι = Nat.card B.ι + n := by
   classical
   have : Fintype B.ι := Fintype.ofFinite _
@@ -90,7 +90,7 @@ def blockPadLHom (L : Language.{0, 0}) (B : SOBlock) (n a : ℕ) :
 
 /-- **The padded structure is an expansion along it**: the new symbols are the
 only ones added, and no formula in the image mentions them. -/
-theorem blockPadLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (n a : ℕ)
+private theorem blockPadLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (n a : ℕ)
     (M : Type) (instM : L.Structure M) (ρ : (B.pad n a).Assignment M) :
     @LHom.IsExpansionOn _ _ (blockPadLHom L B n a) M
       (@sumStructure L B.lang M instM (B.structure (B.unpadAssign ρ)))

@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.NaeSat
 public import DescriptiveComplexity.Problems.ThreeSat.ToSat
 public import DescriptiveComplexity.Problems.ThreeSat.FromSat
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.NaeSat
+import all DescriptiveComplexity.Problems.ThreeSat.Defs
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # NAE-3SAT is NP-complete
@@ -103,7 +107,7 @@ open ThreeSatToSat
 NAE-3SAT iff the interpreted structure – a faithful copy of it if no clause is
 wide, a structure made of empty clauses otherwise – is not-all-equal
 satisfiable. -/
-theorem naeThreeSatisfiable_iff_naeSatisfiable (A : Type) [Language.sat.Structure A] :
+private theorem naeThreeSatisfiable_iff_naeSatisfiable (A : Type) [Language.sat.Structure A] :
     NAEThreeSatisfiable A ↔ NAESatisfiable (threeSatToSat.Map A) := by
   by_cases hw : Wide A
   · -- wide input: both sides fail
@@ -159,7 +163,7 @@ open NaeThreeSatToNaeSat ThreeSatToSat in
 `ThreeSatToSat.threeSatToSat`, gated on the first-order width check, maps a
 CNF structure to a not-all-equal satisfiable instance iff it is a yes-instance
 of NAE-3SAT. -/
-noncomputable def nae3Sat_fo_reduction_naeSat : NAE3SAT ≤ᶠᵒ NAESAT where
+private noncomputable def nae3Sat_fo_reduction_naeSat : NAE3SAT ≤ᶠᵒ NAESAT where
   Tag := Unit
   dim := 1
   toInterpretation := threeSatToSat
@@ -186,7 +190,7 @@ def LinkVal (ν : A → Prop) (c x : A) (s : Bool) : Prop :=
   (UniformBefore ν c x s ∧ ¬PrefixOrStrict ν c x s) ∨
     (¬UniformBefore ν c x s ∧ LitTrue ν x s)
 
-theorem linkVal_of_uniform {ν : A → Prop} {c x : A} {s : Bool}
+private theorem linkVal_of_uniform {ν : A → Prop} {c x : A} {s : Bool}
     (h : UniformBefore ν c x s) : LinkVal ν c x s ↔ ¬PrefixOrStrict ν c x s := by
   constructor
   · rintro (⟨-, h'⟩ | ⟨h', -⟩)
@@ -194,7 +198,7 @@ theorem linkVal_of_uniform {ν : A → Prop} {c x : A} {s : Bool}
     · exact absurd h h'
   · exact fun h' => Or.inl ⟨h, h'⟩
 
-theorem linkVal_of_not_uniform {ν : A → Prop} {c x : A} {s : Bool}
+private theorem linkVal_of_not_uniform {ν : A → Prop} {c x : A} {s : Bool}
     (h : ¬UniformBefore ν c x s) : LinkVal ν c x s ↔ LitTrue ν x s := by
   constructor
   · rintro (⟨h', -⟩ | ⟨-, h'⟩)
@@ -224,7 +228,7 @@ variable [Finite A]
 same value as `(x, s)` while some occurrence differs, then `(x, s)` has an
 immediate successor, and the successor's linking variable carries the opposite
 value – which is what gives the piece of `(x, s)` a literal of each sign. -/
-theorem exists_succ_linkVal {ν : A → Prop} {c x : A} {s : Bool} (hocc : OccIn c x s)
+private theorem exists_succ_linkVal {ν : A → Prop} {c x : A} {s : Bool} (hocc : OccIn c x s)
     (hup : ∀ z u, OccIn c z u → ¬occLt x s z u → (LitTrue ν z u ↔ LitTrue ν x s))
     (hdiff : ∃ z u, OccIn c z u ∧ ¬(LitTrue ν z u ↔ LitTrue ν x s)) :
     ∃ y t, SuccOcc c x s y t ∧ (LinkVal ν c y t ↔ ¬LitTrue ν x s) := by
@@ -256,7 +260,7 @@ theorem exists_succ_linkVal {ν : A → Prop} {c x : A} {s : Bool} (hocc : OccIn
 
 /-- Correctness of the reduction, not-all-equal half: an ordered CNF structure
 is not-all-equal satisfiable iff its width-three split is. -/
-theorem naeSatisfiable_iff_map :
+private theorem naeSatisfiable_iff_map :
     NAESatisfiable A ↔ NAESatisfiable (satToThreeSat.Map A) := by
   constructor
   · -- a not-all-equal assignment extends to the split
@@ -363,7 +367,7 @@ theorem naeSatisfiable_iff_map :
 
 /-- Correctness of the reduction: an ordered CNF structure is not-all-equal
 satisfiable iff its width-three split is a yes-instance of NAE-3SAT. -/
-theorem naeSatisfiable_iff_naeThreeSatisfiable (A : Type) [Language.sat.Structure A]
+private theorem naeSatisfiable_iff_naeThreeSatisfiable (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] :
     NAESatisfiable A ↔ NAEThreeSatisfiable (satToThreeSat.Map A) := by
   rw [NAEThreeSatisfiable, and_iff_right widthAtMostThree_map]
@@ -376,7 +380,7 @@ open NaeSatToNaeThreeSat SatToThreeSat in
 interpretation `SatToThreeSat.satToThreeSat`, applied unchanged: read as
 not-all-equal clauses, the chain of pieces of a clause carries the value of
 its first literal forward until an occurrence disagrees. -/
-noncomputable def naeSat_ordered_fo_reduction_nae3Sat : NAESAT ≤ᶠᵒ[≤] NAE3SAT where
+private noncomputable def naeSat_ordered_fo_reduction_nae3Sat : NAESAT ≤ᶠᵒ[≤] NAE3SAT where
   Tag := SplitTag
   dim := 2
   toInterpretation := satToThreeSat

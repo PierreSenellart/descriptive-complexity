@@ -11,6 +11,12 @@ public import DescriptiveComplexity.Counting.Reduction
 public import Mathlib.ModelTheory.Graph
 import DescriptiveComplexity.Syntax
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting.Post
+import all DescriptiveComplexity.Counting.Reduction
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import all DescriptiveComplexity.Problems.CliqueFamily.Pendant
+import all DescriptiveComplexity.Problems.Sat.Counting
 
 /-!
 # Counting all the independent sets of a graph
@@ -65,7 +71,7 @@ abbrev kisSetSym : indepSOLang.Relations 1 := Sum.inr satNuSym
 noncomputable def indepKernel : indepSOLang.Sentence :=
   fo% ∀ x y, kisSetSym(x) → kisSetSym(y) → ¬ x ≐ y → ¬ kisAdjSym(x, y)
 
-theorem realize_indepKernel {A : Type} [Language.graph.Structure A]
+private theorem realize_indepKernel {A : Type} [Language.graph.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize indepSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) indepKernel) ↔
@@ -106,13 +112,13 @@ noncomputable def SharpAllIndependentSets : CountingProblem Language.graph where
     rw [card_indepSet_eq_witnessCount A, card_indepSet_eq_witnessCount B]
     exact witnessCount_iso satAssignBlock indepKernel e
 
-theorem sharpAllIndependentSets_apply (A : Type) [Language.graph.Structure A] :
+private theorem sharpAllIndependentSets_apply (A : Type) [Language.graph.Structure A] :
     SharpAllIndependentSets A =
       Nat.card {S : A → Prop // IndepSet (fun x y : A => RelMap Language.adj ![x, y]) S} :=
   rfl
 
 /-- **Counting all the independent sets is in `#P`.** -/
-theorem sharpAllIndependentSets_mem_sharpP : SharpAllIndependentSets ∈ SharpP :=
+private theorem sharpAllIndependentSets_mem_sharpP : SharpAllIndependentSets ∈ SharpP :=
   sharpPDefinable_congr (fun A _ _ => (card_indepSet_eq_witnessCount A).symm)
     (sharpPDefinable_ofKernel satAssignBlock indepKernel)
 
@@ -141,7 +147,7 @@ section Pend
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A]
 
 /-- The points of the graph with leaves: a vertex or a leaf. -/
-noncomputable def pendEquiv : pendInterp.MapRel A ≃ A ⊕ A × A where
+private noncomputable def pendEquiv : pendInterp.MapRel A ≃ A ⊕ A × A where
   toFun x :=
     match x.1.1 with
     | false => .inl (x.1.2 0)
@@ -165,7 +171,7 @@ noncomputable def pendEquiv : pendInterp.MapRel A ≃ A ⊕ A × A where
 
 /-- Adjacency in the interpreted graph is adjacency of the graph with pendant
 leaves. -/
-theorem pend_adj (x y : pendInterp.MapRel A) :
+private theorem pend_adj (x y : pendInterp.MapRel A) :
     RelMap Language.adj ![x, y] ↔
       pendAdj (fun a b : A => MGAdj a b) (pendEquiv x) (pendEquiv y) := by
   rw [RelFOInterpretation.relMap_mapRel]
@@ -189,7 +195,7 @@ noncomputable def mgUnmarkedAt {α : Type} (x : α) : Language.markedGraph.Formu
 noncomputable def unmarkedCount : PolyTerm Language.markedGraph :=
   .count (LHom.sumInl.onFormula (mgUnmarkedAt (0 : Fin 1)))
 
-theorem eval_unmarkedCount : unmarkedCount.eval A = Nat.card {v : A // ¬MGMarked v} := by
+private theorem eval_unmarkedCount : unmarkedCount.eval A = Nat.card {v : A // ¬MGMarked v} := by
   rw [unmarkedCount, PolyTerm.eval_count_one]
   refine Nat.card_congr (Equiv.subtypeEquivRight fun a => ?_)
   rw [LHom.realize_onFormula, mgUnmarkedAt]
@@ -197,7 +203,7 @@ theorem eval_unmarkedCount : unmarkedCount.eval A = Nat.card {v : A // ¬MGMarke
 
 /-- The independent sets of the interpreted graph are those of the graph with
 pendant leaves. -/
-theorem sharpAllIndependentSets_pend :
+private theorem sharpAllIndependentSets_pend :
     SharpAllIndependentSets (pendInterp.MapRel A) =
       Nat.card {T : A ⊕ A × A → Prop // IndepSet (pendAdj fun a b : A => MGAdj a b) T} :=
   Nat.card_congr (Equiv.subtypeEquiv (Equiv.arrowCongr pendEquiv (Equiv.refl Prop))
@@ -211,7 +217,7 @@ end Pend
 call**: in the graph with `n` pendant leaves at each of its `n` vertices, the
 independent sets of size `k` of the graph are counted by the digit of rank
 `n - k` of the number of independent sets, in base `2 ^ n`. -/
-noncomputable def sharpIndependentSet_oneCall_sharpAllIndependentSets :
+private noncomputable def sharpIndependentSet_oneCall_sharpAllIndependentSets :
     SharpIndependentSet ≤ᶜ[≤] SharpAllIndependentSets where
   Tag := Bool
   dim := 2
@@ -230,7 +236,8 @@ noncomputable def sharpIndependentSet_oneCall_sharpAllIndependentSets :
       ⟨fun h => h.2, fun h => ⟨inferInstance, h⟩⟩)
 
 /-- **Counting all the independent sets is one-call `#P`-hard.** -/
-theorem sharpAllIndependentSets_sharpP_oneCallHard : SharpP.OneCallHard SharpAllIndependentSets :=
+theorem sharpAllIndependentSets_sharpP_oneCallHard
+    : SharpP.OneCallHard SharpAllIndependentSets :=
   CountingClass.OneCallHard.of_oneCall sharpIndependentSet_oneCall_sharpAllIndependentSets
     (oneCallHard_sharpP_of_parsimoniousHard sharpIndependentSet_sharpP_parsimoniousHard)
 

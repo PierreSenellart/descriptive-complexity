@@ -58,34 +58,34 @@ def adjF (dir : Bool) {α : Type} (x y : α) : hamSOLang.Formula α :=
   fo%[x, y] if dir then hArcSym(x, y) else hArcSym(x, y) ∨ hArcSym(y, x)
 
 /-- Kernel conjunct: the guessed order is reflexive. -/
-noncomputable def hamReflClause : hamSOLang.Sentence :=
+private noncomputable def hamReflClause : hamSOLang.Sentence :=
   fo% ∀ x, hamLeF⟨x, x⟩
 
 /-- Kernel conjunct: the guessed order is transitive. -/
-noncomputable def hamTransClause : hamSOLang.Sentence :=
+private noncomputable def hamTransClause : hamSOLang.Sentence :=
   fo% ∀ x y z, hamLeF⟨x, y⟩ ∧ hamLeF⟨y, z⟩ → hamLeF⟨x, z⟩
 
 /-- Kernel conjunct: the guessed order is antisymmetric. -/
-noncomputable def hamAntisymClause : hamSOLang.Sentence :=
+private noncomputable def hamAntisymClause : hamSOLang.Sentence :=
   fo% ∀ x y, hamLeF⟨x, y⟩ ∧ hamLeF⟨y, x⟩ → x ≐ y
 
 /-- Kernel conjunct: the guessed order is total. -/
-noncomputable def hamTotalClause : hamSOLang.Sentence :=
+private noncomputable def hamTotalClause : hamSOLang.Sentence :=
   fo% ∀ x y, hamLeF⟨x, y⟩ ∨ hamLeF⟨y, x⟩
 
 /-- Kernel conjunct: every element is adjacent to its immediate successor. -/
-noncomputable def hamSuccClause (dir : Bool) : hamSOLang.Sentence :=
+private noncomputable def hamSuccClause (dir : Bool) : hamSOLang.Sentence :=
   fo% ∀ x y,
     (hamLeF⟨x, y⟩ ∧ ¬ x ≐ y) ∧ (∀ z, hamLeF⟨x, z⟩ ∧ hamLeF⟨z, y⟩ → z ≐ x ∨ z ≐ y) →
       (adjF dir)⟨x, y⟩
 
 /-- Kernel conjunct: the last element is adjacent to the first. -/
-noncomputable def hamWrapClause (dir : Bool) : hamSOLang.Sentence :=
+private noncomputable def hamWrapClause (dir : Bool) : hamSOLang.Sentence :=
   fo% ∀ x y, (∀ z, hamLeF⟨x, z⟩) ∧ (∀ z, hamLeF⟨z, y⟩) → (adjF dir)⟨y, x⟩
 
 /-- The first-order kernel of the `Σ₁` definitions: the guessed relation is a
 linear order carrying a tour. -/
-noncomputable def hamKernel (dir : Bool) : hamSOLang.Sentence :=
+private noncomputable def hamKernel (dir : Bool) : hamSOLang.Sentence :=
   hamReflClause ⊓ (hamTransClause ⊓ (hamAntisymClause ⊓
     (hamTotalClause ⊓ (hamSuccClause dir ⊓ hamWrapClause dir))))
 
@@ -103,7 +103,7 @@ private theorem realize_adjF (dir : Bool) (ρ : hamGuessBlock.Assignment A) {α 
     simp [adjF, DGArc, DGEdge, Language.relMap_sumInl, Formula.realize_rel₂]
 
 /-- Realization of the kernel under an assignment of the guessed order. -/
-theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
+private theorem realize_hamKernel (dir : Bool) (ρ : hamGuessBlock.Assignment A) :
     (@Sentence.Realize hamSOLang A
         (@sumStructure _ _ A _ (hamGuessBlock.structure ρ)) (hamKernel dir)) ↔
       IsLinOrd (fun x y : A => ρ .le ![x, y]) ∧

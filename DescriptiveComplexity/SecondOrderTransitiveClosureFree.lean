@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.PSpace
 import DescriptiveComplexity.SecondOrderOrdered
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # SO(TC) needs no order: the order is a guessed state component
@@ -156,7 +158,7 @@ def addOrderTwo :
 
 variable {L B} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
-theorem addOrderOne_isExpansionOn (ρ : B.Assignment A) :
+private theorem addOrderOne_isExpansionOn (ρ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (addOrderOne L B) A
       (B.structure₁ (L := L) ρ)
       (@SOBlock.structure₁ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ) := by
@@ -170,7 +172,7 @@ theorem addOrderOne_isExpansionOn (ρ : B.Assignment A) :
     | Sum.inl s => rfl
     | Sum.inr s => rfl
 
-theorem addOrderTwo_isExpansionOn (ρ σ : B.Assignment A) :
+private theorem addOrderTwo_isExpansionOn (ρ σ : B.Assignment A) :
     @LHom.IsExpansionOn _ _ (addOrderTwo L B) A
       (B.structure₂ (L := L) ρ σ)
       (@SOBlock.structure₂ (L.sum Language.order) B A (@sumOrderStructure L A instL _) ρ σ) := by
@@ -202,19 +204,19 @@ def toSpec (spec : SOTCSpecFree L) : SOTCSpec L where
 
 variable {spec : SOTCSpecFree L} {A : Type} [instL : L.Structure A] [LinearOrder A]
 
-theorem toSpec_step_iff (ρ σ : spec.State A) : spec.toSpec.Step ρ σ ↔ spec.Step ρ σ := by
+private theorem toSpec_step_iff (ρ σ : spec.State A) : spec.toSpec.Step ρ σ ↔ spec.Step ρ σ := by
   let := spec.B.structure₂ (L := L) ρ σ
   let := @SOBlock.structure₂ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ σ
   have := addOrderTwo_isExpansionOn (L := L) (B := spec.B) ρ σ
   exact LHom.realize_onSentence (M := A) (addOrderTwo L spec.B) spec.step
 
-theorem toSpec_isSrc_iff (ρ : spec.State A) : spec.toSpec.IsSrc ρ ↔ spec.IsSrc ρ := by
+private theorem toSpec_isSrc_iff (ρ : spec.State A) : spec.toSpec.IsSrc ρ ↔ spec.IsSrc ρ := by
   let := spec.B.structure₁ (L := L) ρ
   let := @SOBlock.structure₁ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ
   have := addOrderOne_isExpansionOn (L := L) (B := spec.B) ρ
   exact LHom.realize_onSentence (M := A) (addOrderOne L spec.B) spec.src
 
-theorem toSpec_isTgt_iff (ρ : spec.State A) : spec.toSpec.IsTgt ρ ↔ spec.IsTgt ρ := by
+private theorem toSpec_isTgt_iff (ρ : spec.State A) : spec.toSpec.IsTgt ρ ↔ spec.IsTgt ρ := by
   let := spec.B.structure₁ (L := L) ρ
   let := @SOBlock.structure₁ (L.sum Language.order) spec.B A (@sumOrderStructure L A instL _) ρ
   have := addOrderOne_isExpansionOn (L := L) (B := spec.B) ρ
@@ -306,7 +308,7 @@ private theorem vec_eta₂ (w : Fin 2 → A) : ![w 0, w 1] = w := by
 
 /-- Realization of `DescriptiveComplexity.fixedOrdS`: the two copies assign the
 same relation to the order variable. -/
-theorem realize_fixedOrdS (instA : L.Structure A) (ρ σ : B.withOrder.Assignment A) :
+private theorem realize_fixedOrdS (instA : L.Structure A) (ρ σ : B.withOrder.Assignment A) :
     @Sentence.Realize _ A (@SOBlock.structure₂ L B.withOrder A instA ρ σ) (fixedOrdS L B) ↔
       ∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ σ (Sum.inl ()) w := by
   let := instA
@@ -333,7 +335,7 @@ theorem realize_fixedOrdS (instA : L.Structure A) (ρ σ : B.withOrder.Assignmen
 assigns the linear order of the structure to the order variable, the two-copy
 block expansion is an expansion along `DescriptiveComplexity.orderElimTwoLHom`
 of the ordered one. -/
-theorem orderElimTwoLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type)
+private theorem orderElimTwoLHom_isExpansionOn (L : Language.{0, 0}) (B : SOBlock) (A : Type)
     (instA : L.Structure A) (lo : LinearOrder A) (ρ σ : B.withOrder.Assignment A)
     (hord : ∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ w 0 ≤ w 1) :
     @LHom.IsExpansionOn _ _ (orderElimTwoLHom L B) A
@@ -403,7 +405,8 @@ theorem realize_orderElim_one (φ : ((L.sum Language.order).sum B.lang).Sentence
 
 /-- The two-copy analogue of `DescriptiveComplexity.realize_orderElim_one`: the
 order is read in the copy holding the current state. -/
-theorem realize_orderElim_two (φ : (((L.sum Language.order).sum B.lang).sum B.lang).Sentence) :
+private theorem realize_orderElim_two
+    (φ : (((L.sum Language.order).sum B.lang).sum B.lang).Sentence) :
     @Sentence.Realize _ A (@SOBlock.structure₂ L B.withOrder A instL ρ σ)
         ((orderElimTwoLHom L B).onSentence φ) ↔
       @Sentence.Realize _ A
@@ -435,7 +438,7 @@ private theorem hord_pair (a b : A) : ρ (Sum.inl ()) ![a, b] ↔ a ≤ b := by
 
 /-- At a state whose order variable holds the order of the structure, the
 guard of `DescriptiveComplexity.SOTCSpec.orderFree` is satisfied. -/
-theorem realize_linearGuard_of_hord :
+private theorem realize_linearGuard_of_hord :
     @Sentence.Realize _ A (@SOBlock.structure₁ L spec.B.withOrder A instL ρ)
       (linearGuard L spec.B) :=
   (realize_linearGuard L spec.B instL ρ).mpr
@@ -462,11 +465,11 @@ theorem SOTCSpec.orderFree_isSrc_iff :
   · intro h
     exact ⟨realize_linearGuard_of_hord hord, (realize_orderElim_one ρ hord spec.src).mpr h⟩
 
-theorem SOTCSpec.orderFree_isTgt_iff :
+private theorem SOTCSpec.orderFree_isTgt_iff :
     spec.orderFree.IsTgt ρ ↔ spec.IsTgt (spec.B.restPart ρ) :=
   realize_orderElim_one ρ hord spec.tgt
 
-theorem SOTCSpec.orderFree_step_iff :
+private theorem SOTCSpec.orderFree_step_iff :
     spec.orderFree.Step ρ σ ↔
       ((∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ σ (Sum.inl ()) w) ∧
         spec.Step (spec.B.restPart ρ) (spec.B.restPart σ)) := by
@@ -481,7 +484,7 @@ theorem SOTCSpec.orderFree_step_iff :
 
 /-- **The guessed order is the same all along a walk**, and the rest of the
 state walks in the original specification. -/
-theorem SOTCSpec.orderFree_reach (h : spec.orderFree.Reach ρ σ) :
+private theorem SOTCSpec.orderFree_reach (h : spec.orderFree.Reach ρ σ) :
     (∀ w : Fin 2 → A, ρ (Sum.inl ()) w ↔ σ (Sum.inl ()) w) ∧
       spec.Reach (spec.B.restPart ρ) (spec.B.restPart σ) := by
   induction h with
@@ -497,7 +500,7 @@ end Semantics
 
 /-- The converse walk: a walk of the original specification, run with the order
 of the structure guessed into every state. -/
-theorem SOTCSpec.orderFree_reach_of [LinearOrder A] {ρ₁ σ₁ : spec.B.Assignment A}
+private theorem SOTCSpec.orderFree_reach_of [LinearOrder A] {ρ₁ σ₁ : spec.B.Assignment A}
     (h : spec.Reach ρ₁ σ₁) :
     spec.orderFree.Reach (spec.B.joinOrder (fun w => w 0 ≤ w 1) ρ₁)
       (spec.B.joinOrder (fun w => w 0 ≤ w 1) σ₁) := by

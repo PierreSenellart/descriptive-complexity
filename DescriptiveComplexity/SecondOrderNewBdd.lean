@@ -7,6 +7,7 @@ module
 
 public import Mathlib.SetTheory.Cardinal.Finite
 public import DescriptiveComplexity.SecondOrderNew
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Value invention, bounded
@@ -66,7 +67,7 @@ def SigmaSONewBddDefinable [L.IsRelational] (d : ℕ) (P : DecisionProblem L) : 
 
 /-- **`∃SO[new, d]`-definability only depends on the finite instances** of a
 problem, as `∃SO[new]`-definability does. -/
-theorem sigmaSONewBddDefinable_congr [L.IsRelational] {d : ℕ} {P Q : DecisionProblem L}
+private theorem sigmaSONewBddDefinable_congr [L.IsRelational] {d : ℕ} {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SigmaSONewBddDefinable d P ↔ SigmaSONewBddDefinable d Q := by
   constructor <;> rintro ⟨B, φ, hφ⟩ <;> refine ⟨B, φ, ?_⟩ <;> intro A _ _ _
@@ -112,7 +113,7 @@ def SigmaSONewExpDefinable [L.IsRelational] (c d : ℕ) (P : DecisionProblem L) 
 
 /-- **`∃SO[new, exp d]`-definability only depends on the finite instances** of a
 problem. -/
-theorem sigmaSONewExpDefinable_congr [L.IsRelational] {c d : ℕ} {P Q : DecisionProblem L}
+private theorem sigmaSONewExpDefinable_congr [L.IsRelational] {c d : ℕ} {P Q : DecisionProblem L}
     (h : ∀ (A : Type) [L.Structure A] [Finite A], P A ↔ Q A) :
     SigmaSONewExpDefinable c d P ↔ SigmaSONewExpDefinable c d Q := by
   constructor <;> rintro ⟨B, φ, hφ⟩ <;> refine ⟨B, φ, ?_⟩ <;> intro A _ _ _

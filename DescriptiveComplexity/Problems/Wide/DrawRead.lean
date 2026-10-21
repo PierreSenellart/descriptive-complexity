@@ -7,6 +7,12 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawScan
 import DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawScan
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # Reading one named register bit
@@ -164,7 +170,7 @@ include F hR hlin hix hnewk hbot hv hwkS hname huniq hturn hup in
 include F hR hlin hix hnewk hbot hv hwkS hname huniq hturn hup in
 /-- **Writing one named register bit**: the same trip, with the walked track
 updated at the named cell on the way back down. -/
-theorem reachesIn_writeBit {b : Prop} {pW : P}
+private theorem reachesIn_writeBit {b : Prop} {pW : P}
     (hwr : PR.HasLeft pUp fc (PR.passTracksAt F.cell t rest m (F.cell x₀)) pW fc
       (Function.update (PR.passTracksAt F.cell t rest m (F.cell x₀)) t (bitVal PR.zero PR.one b)))
     (hbackW : ∀ g : W → A, g wk ≠ PR.one → PR.HasLeft pW fc g pW fc g) :
@@ -257,7 +263,7 @@ variable (hbackN : ∀ g : W → A, g wk ≠ PR.one → PR.HasLeft pRn fc g pRn 
 include F hR hlin hix hnewk hbot hv hwkS hname huniq hturn hup hrd1 hbackY in
 /-- **Reading a set bit**: the trip ends at the marker in the positive
 phase. -/
-theorem reachesIn_readBit_pos (hm : m x₀) :
+private theorem reachesIn_readBit_pos (hm : m x₀) :
     (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt pStart fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩
@@ -281,7 +287,7 @@ theorem reaches_readBit_pos (hm : m x₀) :
 include F hR hlin hix hnewk hbot hv hwkS hname huniq hturn hup hrd0 hbackN in
 /-- **Reading a clear bit**: the trip ends at the marker in the negative
 phase. -/
-theorem reachesIn_readBit_neg (hm : ¬m x₀) :
+private theorem reachesIn_readBit_neg (hm : ¬m x₀) :
     (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt pStart fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell t rest m) (PR.syElt PR.blank)⟩

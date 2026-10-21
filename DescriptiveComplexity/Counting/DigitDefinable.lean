@@ -89,7 +89,7 @@ theorem finsum_digits_eq {X P : Type} [LinearOrder P] [Finite P] (Out Bit : X �
 
 /-- **Marked elements enumerated by a linear order are linearly ordered**:
 the four clauses of a linear order among the marked elements. -/
-theorem enum_linear {X P : Type} [LinearOrder P] (Out : X → Prop) (Below : X → X → Prop)
+private theorem enum_linear {X P : Type} [LinearOrder P] (Out : X → Prop) (Below : X → X → Prop)
     (φ : P → X) (hout : ∀ x, Out x ↔ ∃ q, x = φ q)
     (hbelow : ∀ q' q, Below (φ q') (φ q) ↔ q' ≤ q) :
     (∀ p, Out p → Below p p) ∧

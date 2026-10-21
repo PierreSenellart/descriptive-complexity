@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.CycleCover.Formulas
 public import DescriptiveComplexity.Problems.CycleCover.Defs
 import DescriptiveComplexity.Counting.Post
 import DescriptiveComplexity.Numbers.DigitExtract
+import all DescriptiveComplexity.Permanent.Ladder
+import all DescriptiveComplexity.Problems.CycleCover.Formulas
 
 /-!
 # The drawing of the reduction of #1-in-SAT to #Cycle Cover
@@ -68,14 +70,14 @@ noncomputable def occInterpEquiv : occInterp.MapRel A ≃ Occ A where
     change occOf (occTag o).1 (occTag o).2 _ _ _ = o
     exact occOf_occTag o
 
-theorem card_occInterp : Nat.card (occInterp.MapRel A) = Nat.card (Occ A) :=
+private theorem card_occInterp : Nat.card (occInterp.MapRel A) = Nat.card (Occ A) :=
   Nat.card_congr occInterpEquiv
 
 /-- The level of an occurrence and an index. -/
-noncomputable def levelOfPos (q : Occ A × Fin 3) : Level A :=
+private noncomputable def levelOfPos (q : Occ A × Fin 3) : Level A :=
   mkLevel (LevelTag.pos (occTag q.1) q.2) (occPair q.1).1 (occPair q.1).2 (occDom_occTag q.1)
 
-theorem levelOfPos_injective : Function.Injective (levelOfPos (A := A)) := by
+private theorem levelOfPos_injective : Function.Injective (levelOfPos (A := A)) := by
   rintro ⟨o, k⟩ ⟨o', k'⟩ h
   have h1 := congrArg (fun ℓ : Level A => ℓ.1.1) h
   have h2 := congrArg (fun ℓ : Level A => ℓ.1.2) h
@@ -88,7 +90,7 @@ theorem levelOfPos_injective : Function.Injective (levelOfPos (A := A)) := by
   exact Prod.ext (by simp only [ht, hp]) hk
 
 /-- There are at least three levels per occurrence. -/
-theorem three_mul_card_occ_le [Finite A] :
+private theorem three_mul_card_occ_le [Finite A] :
     3 * Nat.card (Occ A) ≤ Nat.card (Level A) := by
   have := Nat.card_le_card_of_injective _ (levelOfPos_injective (A := A))
   rwa [Nat.card_prod, Nat.card_eq_fintype_card (α := Fin 3), Fintype.card_fin, mul_comm] at this
@@ -142,7 +144,7 @@ section Draw
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem realize_pinF {w : Fin 6 → A} :
+private theorem realize_pinF {w : Fin 6 → A} :
     pinF.Realize w ↔ w 2 = w 0 ∧ w 3 = w 0 ∧ w 4 = w 0 ∧ w 5 = w 0 := by
   simp only [pinF, Formula.realize_inf, realize_eqF]
 
@@ -273,7 +275,7 @@ noncomputable def drawEquiv : drawInterp.MapRel A ≃ (V A ⊕ RungA A) ⊕ Unit
 
 omit [LinearOrder A] [Fintype A] [Nonempty A] in
 /-- A node of the attached graph is determined by its tag and its pair. -/
-theorem vOf_eq_iff {t t' : VTag} {c x c' x' : A} (h : VDom t c x) (h' : VDom t' c' x') :
+private theorem vOf_eq_iff {t t' : VTag} {c x c' x' : A} (h : VDom t c x) (h' : VDom t' c' x') :
     vOf t c x h = vOf t' c' x' h' ↔ t = t' ∧ (c, x) = (c', x') := by
   constructor
   · intro he
@@ -286,7 +288,7 @@ theorem vOf_eq_iff {t t' : VTag} {c x c' x' : A} (h : VDom t c x) (h' : VDom t' 
 
 omit [Fintype A] [Nonempty A] in
 /-- A level is determined by its tag and its pair. -/
-theorem mkLevel_eq_iff {t t' : LevelTag} {c x c' x' : A} (h : LevelDom t c x)
+private theorem mkLevel_eq_iff {t t' : LevelTag} {c x c' x' : A} (h : LevelDom t c x)
     (h' : LevelDom t' c' x') :
     mkLevel t c x h = mkLevel t' c' x' h' ↔ t = t' ∧ (c, x) = (c', x') := by
   constructor
@@ -300,7 +302,7 @@ theorem mkLevel_eq_iff {t t' : LevelTag} {c x c' x' : A} (h : LevelDom t c x)
 
 omit [LinearOrder A] [Fintype A] [Nonempty A] in
 /-- A node of the attached graph is determined by its tag and its pair. -/
-theorem v_eq_iff (n n' : V A) : n = n' ↔ vTag n = vTag n' ∧ vPair n = vPair n' := by
+private theorem v_eq_iff (n n' : V A) : n = n' ↔ vTag n = vTag n' ∧ vPair n = vPair n' := by
   constructor
   · rintro rfl
     exact ⟨rfl, rfl⟩
@@ -315,12 +317,12 @@ def DrawEdge (y y' : (V A ⊕ RungA A) ⊕ Unit) : Prop :=
   | Sum.inr (), Sum.inr () => True
   | _, _ => False
 
-theorem drawEquiv_symm_node (n : V A) :
+private theorem drawEquiv_symm_node (n : V A) :
     (drawEquiv.symm (Sum.inl (Sum.inl n)) : drawInterp.MapRel A).1 =
       (Sum.inl (Sum.inl (vTag n)), pin (vPair n)) :=
   rfl
 
-theorem drawEquiv_symm_rung (q : RungA A) :
+private theorem drawEquiv_symm_rung (q : RungA A) :
     (drawEquiv.symm (Sum.inl (Sum.inr q)) : drawInterp.MapRel A).1 =
       (Sum.inl (Sum.inr (vTag q.src, vTag q.tgt, q.lvl.1.1, q.idx)), rungTuple q) :=
   rfl

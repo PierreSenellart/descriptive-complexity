@@ -38,7 +38,7 @@ variable {A : Type} [LinearOrder A] [Finite A]
 
 /-- In a finite linear order, an element that is not a maximum is covered by
 some element. -/
-theorem exists_covBy_of_not_max {z : A} (hz : ¬∀ a : A, a ≤ z) : ∃ w : A, z ⋖ w := by
+private theorem exists_covBy_of_not_max {z : A} (hz : ¬∀ a : A, a ≤ z) : ∃ w : A, z ⋖ w := by
   classical
   have := Fintype.ofFinite A
   have hne : (Finset.univ.filter fun a : A => z < a).Nonempty := by
@@ -64,7 +64,7 @@ omit [Finite V] in
 
 /-- A counter whose value is still below the number of nodes can be
 incremented. -/
-theorem exists_covBy_of_orank_lt {r : WithBot V} (h : orank r < Nat.card V) :
+private theorem exists_covBy_of_orank_lt {r : WithBot V} (h : orank r < Nat.card V) :
     ∃ r' : WithBot V, r ⋖ r' := by
   by_cases hmax : ∀ a : WithBot V, a ≤ r
   · have : orank r = Nat.card (WithBot V) - 1 := orank_isTop hmax
@@ -87,20 +87,20 @@ def predSet (r : WithBot V) : Set V := {y : V | (↑y : WithBot V) < r}
 @[simp] theorem predSet_bot : predSet (⊥ : WithBot V) = ∅ := by
   ext y; simp [predSet]
 
-theorem mem_predSet_coe {x y : V} : y ∈ predSet (↑x : WithBot V) ↔ y < x := by
+private theorem mem_predSet_coe {x y : V} : y ∈ predSet (↑x : WithBot V) ↔ y < x := by
   simp [predSet]
 
-theorem notMem_predSet_self (x : V) : x ∉ predSet (↑x : WithBot V) := by
+private theorem notMem_predSet_self (x : V) : x ∉ predSet (↑x : WithBot V) := by
   simp [predSet]
 
 /-- At the least node, nothing has been scanned. -/
-theorem predSet_of_isMin {x : V} (h : ∀ z : V, x ≤ z) : predSet (↑x : WithBot V) = ∅ := by
+private theorem predSet_of_isMin {x : V} (h : ∀ z : V, x ≤ z) : predSet (↑x : WithBot V) = ∅ := by
   ext y
   simp only [predSet, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_lt]
   exact_mod_cast h y
 
 /-- Past the greatest node, everything has been scanned. -/
-theorem insert_predSet_of_isMax {x : V} (h : ∀ z : V, z ≤ x) :
+private theorem insert_predSet_of_isMax {x : V} (h : ∀ z : V, z ≤ x) :
     insert x (predSet (↑x : WithBot V)) = Set.univ := by
   ext y
   simp only [Set.mem_insert_iff, mem_predSet_coe, Set.mem_univ, iff_true]
@@ -110,7 +110,7 @@ theorem insert_predSet_of_isMax {x : V} (h : ∀ z : V, z ≤ x) :
 
 /-- A cover of a register value holding a node advances the scan past exactly
 that node. -/
-theorem predSet_of_covBy {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r) :
+private theorem predSet_of_covBy {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r) :
     predSet r = insert x (predSet (↑x : WithBot V)) := by
   obtain ⟨x', rfl⟩ : ∃ x' : V, r = ↑x' := by
     cases r with
@@ -123,7 +123,7 @@ theorem predSet_of_covBy {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r) 
   exact le_iff_eq_or_lt
 
 /-- A cover of a register value holding a node holds a node again. -/
-theorem exists_coe_of_covBy {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r) :
+private theorem exists_coe_of_covBy {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r) :
     ∃ x' : V, r = ↑x' ∧ x ⋖ x' := by
   cases r with
   | bot => exact absurd h.lt (by simp)
@@ -144,32 +144,33 @@ theorem ncard_le_card (P : Set V) : P.ncard ≤ Nat.card V := by
 
 omit [LinearOrder V] in
 /-- Scanning one more node, of the set: its scanned count goes up by one. -/
-theorem ncard_inter_insert_of_mem {Q P : Set V} {uu : V} (huP : uu ∉ P) (h : uu ∈ Q) :
+private theorem ncard_inter_insert_of_mem {Q P : Set V} {uu : V} (huP : uu ∉ P) (h : uu ∈ Q) :
     (Q ∩ insert uu P).ncard = (Q ∩ P).ncard + 1 := by
   rw [Set.inter_insert_of_mem h,
     Set.ncard_insert_of_notMem (fun hm => huP hm.2) (Set.toFinite _)]
 
 omit [LinearOrder V] in
 /-- Scanning one more node can only grow the scanned part of a set. -/
-theorem ncard_inter_insert_le {Q P : Set V} {uu : V} :
+private theorem ncard_inter_insert_le {Q P : Set V} {uu : V} :
     (Q ∩ P).ncard ≤ (Q ∩ insert uu P).ncard :=
   Set.ncard_le_ncard (Set.inter_subset_inter_right _ (Set.subset_insert _ _)) (Set.toFinite _)
 
 /-- Scanning past a node of the set increases its scanned count by one. -/
-theorem ncard_inter_predSet_covBy_of_mem {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r)
+private theorem ncard_inter_predSet_covBy_of_mem {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r)
     (hx : x ∈ P) : (P ∩ predSet r).ncard = (P ∩ predSet (↑x : WithBot V)).ncard + 1 := by
   rw [predSet_of_covBy h, Set.inter_insert_of_mem hx,
     Set.ncard_insert_of_notMem (fun hmem => notMem_predSet_self x hmem.2) (Set.toFinite _)]
 
 omit [Finite V] in
 /-- Scanning past a node outside the set leaves its scanned count alone. -/
-theorem ncard_inter_predSet_covBy_of_notMem {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r)
+private theorem ncard_inter_predSet_covBy_of_notMem
+    {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r)
     (hx : x ∉ P) : (P ∩ predSet r).ncard = (P ∩ predSet (↑x : WithBot V)).ncard := by
   rw [predSet_of_covBy h, Set.inter_insert_of_notMem hx]
 
 /-- At the greatest node, the scanned count of the set is one short of its
 total, if the node belongs to it. -/
-theorem ncard_inter_predSet_isMax_of_mem {x : V} (h : ∀ z : V, z ≤ x) (hx : x ∈ P) :
+private theorem ncard_inter_predSet_isMax_of_mem {x : V} (h : ∀ z : V, z ≤ x) (hx : x ∈ P) :
     (P ∩ predSet (↑x : WithBot V)).ncard + 1 = P.ncard := by
   have hP : P = insert x (P ∩ predSet (↑x : WithBot V)) := by
     conv_lhs => rw [← Set.inter_univ P, ← insert_predSet_of_isMax h]
@@ -180,7 +181,7 @@ theorem ncard_inter_predSet_isMax_of_mem {x : V} (h : ∀ z : V, z ≤ x) (hx : 
 omit [Finite V] in
 /-- At the greatest node, the scanned count of the set is its total, if the
 node lies outside it. -/
-theorem ncard_inter_predSet_isMax_of_notMem {x : V} (h : ∀ z : V, z ≤ x) (hx : x ∉ P) :
+private theorem ncard_inter_predSet_isMax_of_notMem {x : V} (h : ∀ z : V, z ≤ x) (hx : x ∉ P) :
     (P ∩ predSet (↑x : WithBot V)).ncard = P.ncard := by
   conv_rhs => rw [← Set.inter_univ P, ← insert_predSet_of_isMax h,
     Set.inter_insert_of_notMem hx]

@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.FixedPointStepRel
 import DescriptiveComplexity.Problems.Machine.SpaceHard
 public import DescriptiveComplexity.Problems.Machine.Space
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Space
 
 /-!
 # PSPACE is contained in FO(≤, PFP)
@@ -300,14 +306,14 @@ assignment, which no configuration resembles. -/
 def StateEmptyOn (ρ : mBlock.Assignment A) : Prop := ¬∃ q : A, mState ρ q
 
 /-- The transition applies in the marked state, reading the marked cell. -/
-def ApplOn (ρ : mBlock.Assignment A) (τ : A) : Prop :=
+private def ApplOn (ρ : mBlock.Assignment A) (τ : A) : Prop :=
   TMTr τ ∧ ((∀ q : A, mState ρ q → TMSrc τ q) ∧
     ∀ p a : A, mHead ρ p → mTape ρ p a → TMRead τ a)
 
 /-- The machine takes a step from this assignment: no accepting mark, and
 some applicable transition with a destination, a written symbol and a
 position to move to. -/
-def GoOn (ρ : mBlock.Assignment A) : Prop :=
+private def GoOn (ρ : mBlock.Assignment A) : Prop :=
   (¬∃ q : A, mState ρ q ∧ TMAcc q) ∧
     ∃ τ p' : A, ApplOn ρ τ ∧
       ((∃ b : A, TMDst τ b) ∧ ((∃ b : A, TMWrite τ b) ∧
@@ -318,7 +324,7 @@ variable (A) in
 /-- The initial assignment: start states, lowest positions, the initial
 tape. On a well-formed deterministic instance with a start state this is a
 configuration – the initial one. -/
-def mInitAssign : mBlock.Assignment A
+private def mInitAssign : mBlock.Assignment A
   | none => fun x => (tmData A).InitTape (x 0) (x 1)
   | some false => fun x => TMStart (x 0)
   | some true => fun x => MinPos TMLe TMPosn (x 0)
@@ -326,7 +332,7 @@ def mInitAssign : mBlock.Assignment A
 /-- One application of the step formulas, semantically: load the initial
 configuration from the empty assignment, take the machine step when one is
 available and the state is not accepting, stutter otherwise. -/
-def mNextAssign (ρ : mBlock.Assignment A) : mBlock.Assignment A
+private def mNextAssign (ρ : mBlock.Assignment A) : mBlock.Assignment A
   | none => fun x =>
       (StateEmptyOn ρ ∧ (tmData A).InitTape (x 0) (x 1)) ∨
         (¬StateEmptyOn ρ ∧
@@ -361,7 +367,7 @@ noncomputable def mGoF {γ : Type} : mLang₁.Formula γ :=
     (mIn₁ tmAcc) (mIn₁ tmRight) (mIn₁ tmLe) (mIn₁ tmPosn)
 
 /-- The step formula of the tape variable. -/
-noncomputable def stepTapeF : mLang₁.Formula (Fin 2) :=
+private noncomputable def stepTapeF : mLang₁.Formula (Fin 2) :=
   (emptyF ⊓ initTapeAtF (mIn₁ tmInp) (mIn₁ tmBlank) 0 1) ⊔
     (∼emptyF ⊓
       ((∼mGoF ⊓ Relations.formula₂ mT₁ (Term.var 0) (Term.var 1)) ⊔
@@ -372,7 +378,7 @@ noncomputable def stepTapeF : mLang₁.Formula (Fin 2) :=
               (mIn₁ tmWrite) 1)))))
 
 /-- The step formula of the state variable. -/
-noncomputable def stepStateF : mLang₁.Formula (Fin 1) :=
+private noncomputable def stepStateF : mLang₁.Formula (Fin 1) :=
   (emptyF ⊓ Relations.formula₁ (mIn₁ tmStart) (Term.var 0)) ⊔
     (∼emptyF ⊓
       ((∼mGoF ⊓ Relations.formula₁ mS₁ (Term.var 0)) ⊔
@@ -380,7 +386,7 @@ noncomputable def stepStateF : mLang₁.Formula (Fin 1) :=
           (mIn₁ tmDst) 0)))
 
 /-- The step formula of the head variable. -/
-noncomputable def stepHeadF : mLang₁.Formula (Fin 1) :=
+private noncomputable def stepHeadF : mLang₁.Formula (Fin 1) :=
   (emptyF ⊓ minPosAtF (mIn₁ tmLe) (mIn₁ tmPosn) 0) ⊔
     (∼emptyF ⊓
       ((∼mGoF ⊓ Relations.formula₁ mH₁ (Term.var 0)) ⊔
@@ -390,7 +396,7 @@ noncomputable def stepHeadF : mLang₁.Formula (Fin 1) :=
 /-- **The machine iteration**: one configuration in the block, one machine
 step per stage, stuttering on halting configurations; the output checks the
 instance and reads acceptance off the stable configuration. -/
-noncomputable def mPfp : StepDef mBase where
+private noncomputable def mPfp : StepDef mBase where
   B := mBlock
   step := fun i => match i with
     | none => stepTapeF
@@ -409,21 +415,21 @@ section Master
 
 variable {A : Type} [Language.turing.Structure A] [LinearOrder A]
 
-theorem realize_emptyF (ρ : mBlock.Assignment A) {γ : Type} (v : γ → A) :
+private theorem realize_emptyF (ρ : mBlock.Assignment A) {γ : Type} (v : γ → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ (emptyF (γ := γ)) v) ↔
       StateEmptyOn ρ := by
   let := mBlock.structure₁ (L := mBase) ρ
   rw [emptyF, Formula.realize_not, realize_someF]
   exact Iff.rfl
 
-theorem realize_mGoF (ρ : mBlock.Assignment A) {γ : Type} (v : γ → A) :
+private theorem realize_mGoF (ρ : mBlock.Assignment A) {γ : Type} (v : γ → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ (mGoF (γ := γ)) v) ↔
       GoOn ρ := by
   let := mBlock.structure₁ (L := mBase) ρ
   rw [mGoF, realize_goF]
   exact Iff.rfl
 
-theorem realize_stepTapeF (ρ : mBlock.Assignment A) (x : Fin 2 → A) :
+private theorem realize_stepTapeF (ρ : mBlock.Assignment A) (x : Fin 2 → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ stepTapeF x) ↔
       mNextAssign ρ none x := by
   let := mBlock.structure₁ (L := mBase) ρ
@@ -433,7 +439,7 @@ theorem realize_stepTapeF (ρ : mBlock.Assignment A) (x : Fin 2 → A) :
     Formula.realize_rel₂, Formula.realize_rel₁, Term.realize_var]
   exact Iff.rfl
 
-theorem realize_stepStateF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
+private theorem realize_stepStateF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ stepStateF x) ↔
       mNextAssign ρ (some false) x := by
   let := mBlock.structure₁ (L := mBase) ρ
@@ -443,7 +449,7 @@ theorem realize_stepStateF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
     Term.realize_var]
   exact Iff.rfl
 
-theorem realize_stepHeadF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
+private theorem realize_stepHeadF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
     (@Formula.Realize _ A (mBlock.structure₁ (L := mBase) ρ) _ stepHeadF x) ↔
       mNextAssign ρ (some true) x := by
   let := mBlock.structure₁ (L := mBase) ρ
@@ -454,7 +460,7 @@ theorem realize_stepHeadF (ρ : mBlock.Assignment A) (x : Fin 1 → A) :
   exact Iff.rfl
 
 /-- **One application of the step formulas is the semantic step.** -/
-theorem next_mPfp (ρ : mBlock.Assignment A) : mPfp.next ρ = mNextAssign ρ := by
+private theorem next_mPfp (ρ : mBlock.Assignment A) : mPfp.next ρ = mNextAssign ρ := by
   funext i x
   match i with
   | none => exact propext (realize_stepTapeF ρ x)
@@ -479,7 +485,7 @@ theorem stateEmptyOn_botAssign : StateEmptyOn (mBlock.botAssign A) :=
 
 omit [LinearOrder A] in
 /-- From an empty state mark, one step loads the initial assignment. -/
-theorem mNextAssign_of_stateEmpty {ρ : mBlock.Assignment A} (h : StateEmptyOn ρ) :
+private theorem mNextAssign_of_stateEmpty {ρ : mBlock.Assignment A} (h : StateEmptyOn ρ) :
     mNextAssign ρ = mInitAssign A := by
   funext i x
   match i with
@@ -502,7 +508,7 @@ theorem mNextAssign_of_stateEmpty {ρ : mBlock.Assignment A} (h : StateEmptyOn �
 omit [LinearOrder A] in
 /-- On a configuration from which the machine takes no step, the iteration
 stutters. -/
-theorem mNextAssign_cfgAssign_of_not_goOn {c : Config A} (hng : ¬GoOn (cfgAssign c)) :
+private theorem mNextAssign_cfgAssign_of_not_goOn {c : Config A} (hng : ¬GoOn (cfgAssign c)) :
     mNextAssign (cfgAssign c) = cfgAssign c := by
   have hne := not_stateEmptyOn_cfgAssign c
   funext i x
@@ -528,13 +534,13 @@ theorem mNextAssign_cfgAssign_of_not_goOn {c : Config A} (hng : ¬GoOn (cfgAssig
 
 omit [LinearOrder A] in
 /-- On an accepting configuration, the iteration stutters. -/
-theorem mNextAssign_cfgAssign_of_acc {c : Config A} (hacc : (tmData A).Acc c.state) :
+private theorem mNextAssign_cfgAssign_of_acc {c : Config A} (hacc : (tmData A).Acc c.state) :
     mNextAssign (cfgAssign c) = cfgAssign c :=
   mNextAssign_cfgAssign_of_not_goOn fun hgo => hgo.1 ⟨c.state, rfl, hacc⟩
 
 /-- A configuration from which the step condition fires can take a machine
 step. -/
-theorem step_of_goOn {c : Config A} (hgo : GoOn (cfgAssign c)) :
+private theorem step_of_goOn {c : Config A} (hgo : GoOn (cfgAssign c)) :
     ∃ d, (tmData A).Step c d := by
   classical
   obtain ⟨-, τ, p', ⟨htr, hsrcs, hreads⟩, ⟨q₀, hq₀⟩, ⟨a₀, ha₀⟩, p, hp, hmv⟩ := hgo
@@ -551,7 +557,7 @@ theorem step_of_goOn {c : Config A} (hgo : GoOn (cfgAssign c)) :
 omit [LinearOrder A] in
 /-- On a non-accepting configuration that steps, the iteration takes **the**
 machine step. -/
-theorem mNextAssign_cfgAssign_of_step (hwf : (tmData A).WellFormed)
+private theorem mNextAssign_cfgAssign_of_step (hwf : (tmData A).WellFormed)
     (hdet : (tmData A).Deterministic) {c d : Config A}
     (hnacc : ¬(tmData A).Acc c.state) (hstep : (tmData A).Step c d) :
     mNextAssign (cfgAssign c) = cfgAssign d := by
@@ -623,7 +629,7 @@ theorem mNextAssign_cfgAssign_of_step (hwf : (tmData A).WellFormed)
 omit [LinearOrder A] in
 /-- The initial assignment of a well-formed deterministic instance with an
 initial configuration is that configuration. -/
-theorem mInitAssign_eq_cfgAssign (hwf : (tmData A).WellFormed)
+private theorem mInitAssign_eq_cfgAssign (hwf : (tmData A).WellFormed)
     (hdet : (tmData A).Deterministic) {c₀ : Config A}
     (hinit : (tmData A).IsInit c₀) : mInitAssign A = cfgAssign c₀ := by
   funext i x
@@ -646,13 +652,13 @@ theorem mInitAssign_eq_cfgAssign (hwf : (tmData A).WellFormed)
         (show (x 0) = c₀.head from hh) ▸ hinit.2.1
 
 /-- The first stage of the iteration is the initial assignment. -/
-theorem partStage_one : mPfp.partStage A 1 = mInitAssign A :=
+private theorem partStage_one : mPfp.partStage A 1 = mInitAssign A :=
   (mPfp.partStage_succ 0).trans ((next_mPfp _).trans
     (mNextAssign_of_stateEmpty stateEmptyOn_botAssign))
 
 /-- **The stages follow the run**: as long as no accepting configuration has
 been reached, stage `n + 1` is the `n`-th configuration of the run. -/
-theorem partStage_run (hwf : (tmData A).WellFormed) (hdet : (tmData A).Deterministic)
+private theorem partStage_run (hwf : (tmData A).WellFormed) (hdet : (tmData A).Deterministic)
     {c₀ : Config A} (hinit : (tmData A).IsInit c₀) :
     ∀ n c, (tmData A).StepsIn n c₀ c →
       (∀ k, k < n → ∀ e, (tmData A).StepsIn k c₀ e → ¬(tmData A).Acc e.state) →
@@ -672,7 +678,7 @@ theorem partStage_run (hwf : (tmData A).WellFormed) (hdet : (tmData A).Determini
 
 omit [LinearOrder A] in
 /-- The run reaches a configuration in some number of steps. -/
-theorem stepsIn_of_reflTransGen {c d : Config A}
+private theorem stepsIn_of_reflTransGen {c d : Config A}
     (h : Relation.ReflTransGen (tmData A).Step c d) :
     ∃ n, (tmData A).StepsIn n c d := by
   induction h with
@@ -682,7 +688,7 @@ theorem stepsIn_of_reflTransGen {c d : Config A}
     exact ⟨n + 1, hn.trans_step hstep⟩
 
 /-- The semantics of the output sentence. -/
-theorem realize_mOut (ρ : mBlock.Assignment A) :
+private theorem realize_mOut (ρ : mBlock.Assignment A) :
     (@Sentence.Realize _ A (mBlock.structure₁ (L := mBase) ρ) mPfp.out) ↔
       ((tmData A).WellFormed ∧ ((tmData A).Deterministic ∧
         ∃ q : A, mState ρ q ∧ TMAcc q)) := by
@@ -694,7 +700,7 @@ theorem realize_mOut (ρ : mBlock.Assignment A) :
 /-- **A well-formed deterministic accepting instance makes the iteration
 converge with an accepting output**: run to the first accepting configuration
 and stutter there. -/
-theorem pfpHolds_mPfp_of_acceptsSpace (hwf : (tmData A).WellFormed)
+private theorem pfpHolds_mPfp_of_acceptsSpace (hwf : (tmData A).WellFormed)
     (hdet : (tmData A).Deterministic) (hacc : (tmData A).AcceptsSpace) :
     mPfp.PFPHolds A := by
   obtain ⟨c₀, c, hinit, hreach, haccst⟩ := hacc
@@ -728,7 +734,7 @@ theorem pfpHolds_mPfp_of_acceptsSpace (hwf : (tmData A).WellFormed)
 /-- **A converging accepting iteration means the instance is well-formed,
 deterministic and accepting**: the stages only ever hold the empty
 assignment, the initial assignment, or a configuration of the run. -/
-theorem acceptsSpace_of_pfpHolds_mPfp [Finite A] (h : mPfp.PFPHolds A) :
+private theorem acceptsSpace_of_pfpHolds_mPfp [Finite A] (h : mPfp.PFPHolds A) :
     ((tmData A).WellFormed ∧ ((tmData A).Deterministic ∧
       (tmData A).AcceptsSpace)) := by
   obtain ⟨n, -, hout⟩ := h

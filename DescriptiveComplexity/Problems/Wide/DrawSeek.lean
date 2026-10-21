@@ -8,6 +8,15 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawAdv
 import DescriptiveComplexity.Problems.Wide.DrawTrip
 public import DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawAdv
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawSub
+import all DescriptiveComplexity.Problems.Wide.DrawTrip
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # Random access: seeking the working cell to a target address

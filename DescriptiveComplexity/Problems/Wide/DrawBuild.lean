@@ -7,6 +7,8 @@ module
 
 import DescriptiveComplexity.Problems.Wide.DrawSweep
 public import DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # A program builds its own register file, and guesses its certificate

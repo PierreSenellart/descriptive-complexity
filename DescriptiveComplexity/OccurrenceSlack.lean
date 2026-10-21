@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.OccurrenceFormulas
 public import Mathlib.Data.Set.Card
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # Slack occurrences of a clause
@@ -79,7 +80,7 @@ theorem midSet_subset : MidSet c ⊆ OccSet c := fun _ hp => hp.occIn
 
 omit [Finite A] in
 /-- The first occurrence of a clause is unique. -/
-theorem minOcc_unique {x y : A} {s t : Bool} (h : MinOcc c x s) (h' : MinOcc c y t) :
+private theorem minOcc_unique {x y : A} {s t : Bool} (h : MinOcc c x s) (h' : MinOcc c y t) :
     (x, s) = (y, t) := by
   rcases occLt_trichotomy x s y t with hlt | ⟨hx, hs⟩ | hlt
   · exact absurd hlt (h'.2 x s h.1)
@@ -88,7 +89,7 @@ theorem minOcc_unique {x y : A} {s t : Bool} (h : MinOcc c x s) (h' : MinOcc c y
 
 omit [Finite A] in
 /-- The last occurrence of a clause is unique. -/
-theorem maxOcc_unique {x y : A} {s t : Bool} (h : MaxOcc c x s) (h' : MaxOcc c y t) :
+private theorem maxOcc_unique {x y : A} {s t : Bool} (h : MaxOcc c x s) (h' : MaxOcc c y t) :
     (x, s) = (y, t) := by
   rcases occLt_trichotomy x s y t with hlt | ⟨hx, hs⟩ | hlt
   · exact absurd hlt (h.2 y t h'.1)

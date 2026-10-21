@@ -9,6 +9,8 @@ import DescriptiveComplexity.TransitiveClosureCompl
 import DescriptiveComplexity.KromTransitiveClosure
 public import DescriptiveComplexity.Problems.Reachability
 public import Mathlib.SetTheory.Cardinal.NatCard
+import all DescriptiveComplexity.Complexity
+import all DescriptiveComplexity.TransitiveClosureCompl
 
 /-!
 # Immerman–Szelepcsényi: `NL = coNL`
@@ -68,7 +70,7 @@ theorem TCDefinable.compl [L.IsRelational] {P : DecisionProblem L} (h : TCDefina
   exact not_congr ((hspec A).trans (spec.pad_accepts_iff A).symm)
 
 /-- Complementation is a bijection of the FO(TC) definable problems. -/
-theorem tcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
+private theorem tcDefinable_compl_iff [L.IsRelational] (P : DecisionProblem L) :
     TCDefinable Pᶜ ↔ TCDefinable P := by
   refine ⟨fun h => ?_, TCDefinable.compl⟩
   have h2 := h.compl
@@ -106,7 +108,7 @@ theorem NL_eq_coNL : NL = coNL := by
     exact h S hS Q ((sigmaSOKromDefinable_compl_iff Q).mpr hQ)
 
 /-- Membership in NL is closed under complement. -/
-theorem mem_NL_compl_iff [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ NL ↔ P ∈ NL :=
+private theorem mem_NL_compl_iff [L.IsRelational] (P : DecisionProblem L) : Pᶜ ∈ NL ↔ P ∈ NL :=
   sigmaSOKromDefinable_compl_iff P
 
 /-! ### REACH is in NL -/

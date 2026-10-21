@@ -102,19 +102,19 @@ theorem efStage.partialIso : ∀ {n : ℕ}, efStage L n a b → PartialIso L a b
 
 /-- **The spoiler moves on the left**: from a position surviving `n + 1`
 rounds, an element appended on the left is answered on the right. -/
-theorem efStage.forth (h : efStage L (n + 1) a b) (c : M) :
+private theorem efStage.forth (h : efStage L (n + 1) a b) (c : M) :
     ∃ d : N, efStage L n (Fin.snoc a c) (Fin.snoc b d) :=
   h.2.1 c
 
 /-- **The spoiler moves on the right**: from a position surviving `n + 1`
 rounds, an element appended on the right is answered on the left. -/
-theorem efStage.back (h : efStage L (n + 1) a b) (d : N) :
+private theorem efStage.back (h : efStage L (n + 1) a b) (d : N) :
     ∃ c : M, efStage L n (Fin.snoc a c) (Fin.snoc b d) :=
   h.2.2 d
 
 /-- The refinement chain descends: surviving one more round is a stronger
 requirement. -/
-theorem efStage_succ_le : ∀ (n : ℕ) {j : ℕ} {a : Fin j → M} {b : Fin j → N},
+private theorem efStage_succ_le : ∀ (n : ℕ) {j : ℕ} {a : Fin j → M} {b : Fin j → N},
     efStage L (n + 1) a b → efStage L n a b
   | 0, _, _, _, h => h.1
   | n + 1, _, _, _, h =>
@@ -122,7 +122,7 @@ theorem efStage_succ_le : ∀ (n : ℕ) {j : ℕ} {a : Fin j → M} {b : Fin j �
         fun d => (h.back d).imp fun _ hc => efStage_succ_le n hc⟩
 
 /-- The refinement chain descends, monotonically. -/
-theorem efStage_le {m : ℕ} (hmn : m ≤ n) (h : efStage L n a b) : efStage L m a b := by
+private theorem efStage_le {m : ℕ} (hmn : m ≤ n) (h : efStage L n a b) : efStage L m a b := by
   induction n with
   | zero => rwa [Nat.le_zero.mp hmn]
   | succ n ih =>
@@ -131,7 +131,7 @@ theorem efStage_le {m : ℕ} (hmn : m ≤ n) (h : efStage L n a b) : efStage L m
     · exact heq ▸ h
 
 /-- Positions surviving `n` rounds, read from the other side. -/
-theorem efStage.symm : ∀ {n : ℕ} {j : ℕ} {a : Fin j → M} {b : Fin j → N},
+private theorem efStage.symm : ∀ {n : ℕ} {j : ℕ} {a : Fin j → M} {b : Fin j → N},
     efStage L n a b → efStage L n b a := by
   intro n
   induction n with
@@ -153,7 +153,7 @@ theorem EFEquiv.symm (h : EFEquiv L M N n) : EFEquiv L N M n :=
   efStage.symm h
 
 /-- `n`-round equivalence is antitone in the number of rounds. -/
-theorem EFEquiv.mono {m : ℕ} (hmn : m ≤ n) (h : EFEquiv L M N n) : EFEquiv L M N m :=
+private theorem EFEquiv.mono {m : ℕ} (hmn : m ≤ n) (h : EFEquiv L M N n) : EFEquiv L M N m :=
   efStage_le hmn h
 
 /-! ### The methodology lemma -/

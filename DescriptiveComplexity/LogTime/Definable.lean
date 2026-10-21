@@ -102,7 +102,7 @@ theorem relabel {R : ArithRel L α} (h : ArithDef R) (f : α → β) :
 /-! ### Connectives -/
 
 /-- The negation of a definable relation is definable. -/
-theorem not {R : ArithRel L α} (h : ArithDef R) :
+private theorem not {R : ArithRel L α} (h : ArithDef R) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => ¬ R A v) := by
   obtain ⟨φ, hφ⟩ := h
   refine ⟨∼φ, fun A _ _ _ _ v => ?_⟩
@@ -110,7 +110,7 @@ theorem not {R : ArithRel L α} (h : ArithDef R) :
   exact not_congr (hφ A v)
 
 /-- The conjunction of two definable relations is definable. -/
-theorem and {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
+private theorem and {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => R A v ∧ S A v) := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨ψ, hψ⟩ := h'
@@ -119,7 +119,7 @@ theorem and {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
   exact and_congr (hφ A v) (hψ A v)
 
 /-- The disjunction of two definable relations is definable. -/
-theorem or {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
+private theorem or {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => R A v ∨ S A v) := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨ψ, hψ⟩ := h'
@@ -128,7 +128,7 @@ theorem or {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
   exact or_congr (hφ A v) (hψ A v)
 
 /-- An implication between definable relations is definable. -/
-theorem imp {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
+private theorem imp {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => R A v → S A v) := by
   obtain ⟨φ, hφ⟩ := h
   obtain ⟨ψ, hψ⟩ := h'
@@ -137,22 +137,23 @@ theorem imp {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
   exact imp_congr (hφ A v) (hψ A v)
 
 /-- An equivalence between definable relations is definable. -/
-theorem iff {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
+private theorem iff {R S : ArithRel L α} (h : ArithDef R) (h' : ArithDef S) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => (R A v ↔ S A v)) :=
   ((h.imp h').and (h'.imp h)).congr fun _A _ _ _ _ _v =>
     ⟨fun hc => ⟨hc.1, hc.2⟩, fun hc => ⟨hc.mp, hc.mpr⟩⟩
 
 /-- The always-true relation is definable. -/
-theorem top : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => True) :=
+private theorem top : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => True) :=
   ⟨⊤, fun A _ _ _ _ v => by simp⟩
 
 /-- The always-false relation is definable. -/
-theorem bot : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => False) :=
+private theorem bot : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => False) :=
   ⟨⊥, fun A _ _ _ _ v => by simp⟩
 
 /-- A case distinction made outside the structure – a condition on the
 *machine*, not on the instance – is definable when both branches are. -/
-theorem ite {R S : ArithRel L α} (c : Prop) [Decidable c] (h : ArithDef R) (h' : ArithDef S) :
+private theorem ite
+    {R S : ArithRel L α} (c : Prop) [Decidable c] (h : ArithDef R) (h' : ArithDef S) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => if c then R A v else S A v) := by
   by_cases hc : c
   · simpa [hc] using h
@@ -161,7 +162,7 @@ theorem ite {R S : ArithRel L α} (c : Prop) [Decidable c] (h : ArithDef R) (h' 
 /-- **A finite conjunction** of definable relations is definable: the index
 ranges over a `Fin k` of the *machine*, not of the instance, so the conjunction
 is unfolded rather than quantified. -/
-theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, ArithDef (R j)) →
+private theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, ArithDef (R j)) →
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => ∀ j, R j A v) := by
   intro k
   induction k with
@@ -177,7 +178,8 @@ theorem forallFin : ∀ {k : ℕ} {R : Fin k → ArithRel L α}, (∀ j, ArithDe
 /-- **A conjunction over a finite index** of the *machine*, not of the instance:
 the index type is any finite type, and the conjunction is unfolded rather than
 quantified. -/
-theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, ArithDef (R j)) :
+private theorem forallFinite
+    {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, ArithDef (R j)) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => ∀ j, R j A v) := by
   obtain ⟨m, ⟨e⟩⟩ := Finite.exists_equiv_fin ι
   refine (forallFin (R := fun j => R (e.symm j)) fun j => h _).congr fun A _ _ _ _ v => ?_
@@ -186,13 +188,14 @@ theorem forallFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀
   rwa [Equiv.symm_apply_apply] at this
 
 /-- **A disjunction over a finite index** of the machine, by De Morgan. -/
-theorem existsFinite {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, ArithDef (R j)) :
+private theorem existsFinite
+    {ι : Type} [Finite ι] {R : ι → ArithRel L α} (h : ∀ j, ArithDef (R j)) :
     ArithDef (L := L) (α := α) (fun A _ _ _ _ v => ∃ j, R j A v) :=
   (forallFinite (R := fun j A _ _ _ _ v => ¬ R j A v) fun j => (h j).not).not.congr
     fun _A _ _ _ _ _v => not_forall_not
 
 /-- A truth value fixed outside the structure is definable. -/
-theorem prop (c : Prop) : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => c) := by
+private theorem prop (c : Prop) : ArithDef (L := L) (α := α) (fun _ _ _ _ _ _ => c) := by
   by_cases hc : c
   · exact top.congr fun A _ _ _ _ v => by simp [hc]
   · exact bot.congr fun A _ _ _ _ v => by simp [hc]
@@ -209,18 +212,18 @@ theorem arithDef_le (x y : α) :
   ⟨aLeF x y, fun A _ _ _ _ v => by rw [realize_aLeF]⟩
 
 /-- Equality between two variables is definable. -/
-theorem arithDef_eq (x y : α) :
+private theorem arithDef_eq (x y : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => v x = v y) :=
   ⟨Term.equal (Term.var x) (Term.var y), fun A _ _ _ _ v => by
     rw [Formula.realize_equal]; exact Iff.rfl⟩
 
 /-- Addition of the ranks of three variables is definable. -/
-theorem arithDef_plus (x y z : α) :
+private theorem arithDef_plus (x y z : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => orank (v x) + orank (v y) = orank (v z)) :=
   ⟨aPlusF x y z, fun A _ _ _ _ v => by rw [realize_aPlusF]⟩
 
 /-- Multiplication of the ranks of three variables is definable. -/
-theorem arithDef_times (x y z : α) :
+private theorem arithDef_times (x y z : α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => orank (v x) * orank (v y) = orank (v z)) :=
   ⟨aTimesF x y z, fun A _ _ _ _ v => by rw [realize_aTimesF]⟩
 
@@ -232,7 +235,7 @@ abbrev inSym {a : ℕ} (R : L.Relations a) : (L.sum Language.arith).Relations a 
 /-- **Reading the input**: an atom of the input vocabulary, at a tuple of
 variables, is definable. This is the only place the instance is looked at – in
 the machine reading of this logic it is the query instruction. -/
-theorem arithDef_rel {a : ℕ} (R : L.Relations a) (arg : Fin a → α) :
+private theorem arithDef_rel {a : ℕ} (R : L.Relations a) (arg : Fin a → α) :
     ArithDef (L := L) (fun _ _ _ _ _ v => RelMap R fun t => v (arg t)) :=
   ⟨Relations.formula (inSym R) fun t => Term.var (arg t), fun A _ _ _ _ v => by
     rw [Formula.realize_rel]

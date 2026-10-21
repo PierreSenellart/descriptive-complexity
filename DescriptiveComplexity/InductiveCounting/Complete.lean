@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.InductiveCounting.Sound
+import all DescriptiveComplexity.InductiveCounting.Machine
+import all DescriptiveComplexity.InductiveCounting.Order
+import all DescriptiveComplexity.InductiveCounting.Sound
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Completeness of the inductive-counting machine
@@ -31,7 +35,7 @@ variable {V : Type} [LinearOrder V] [Finite V] {E : V → V → Prop} {S T : V �
 /-! ### Walking a finite linear order downwards -/
 
 /-- Induction from the greatest element downwards, one cover at a time. -/
-theorem order_induction_down {A : Type} [LinearOrder A] [Finite A] {P : A → Prop}
+private theorem order_induction_down {A : Type} [LinearOrder A] [Finite A] {P : A → Prop}
     (hmax : ∀ z : A, (∀ a : A, a ≤ z) → P z)
     (hstep : ∀ w z : A, w ⋖ z → P z → P w) (z : A) : P z := by
   induction z using (Finite.to_wellFoundedGT (α := A)).induction with
@@ -42,7 +46,7 @@ theorem order_induction_down {A : Type} [LinearOrder A] [Finite A] {P : A → Pr
       exact hstep z w hw (ih w hw.lt)
 
 /-- A nonzero counter has a predecessor. -/
-theorem exists_covBy_of_orank_pos {r : WithBot V} (h : 0 < orank r) :
+private theorem exists_covBy_of_orank_pos {r : WithBot V} (h : 0 < orank r) :
     ∃ r' : WithBot V, r' ⋖ r := by
   have hne : ¬∀ a : WithBot V, r ≤ a := by
     intro hmin
@@ -53,7 +57,7 @@ theorem exists_covBy_of_orank_pos {r : WithBot V} (h : 0 < orank r) :
 
 variable (V) in
 /-- A finite nonempty linear order has a least element. -/
-theorem exists_isMin [Nonempty V] : ∃ x : V, ∀ z : V, x ≤ z := by
+private theorem exists_isMin [Nonempty V] : ∃ x : V, ∀ z : V, x ≤ z := by
   classical
   have := Fintype.ofFinite V
   exact ⟨Finset.univ.min' Finset.univ_nonempty,
@@ -104,7 +108,7 @@ variable {fl fl' : Bool} {rd rd' rc rc' rc2 rc2' rv rv' rcnt rcnt' ru ru' rw rw'
 open VAtom
 
 /-- Counting a source and moving on. -/
-theorem step_init_src (hsrc : PW S rv) (hc : rc ⋖ rc') (hv : rv ⋖ rv') :
+private theorem step_init_src (hsrc : PW S rv) (hc : rc ⋖ rc') (hv : rv ⋖ rv') :
     CfgStep E S T (mkCfg Phase.initCount fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.initCount fl rd rc' rc2 rv' rcnt ru rw rj) := by
   refine ⟨[srcR (old Reg.v), succR (old Reg.c) (nxt Reg.c), succR (old Reg.v) (nxt Reg.v)],
@@ -112,7 +116,7 @@ theorem step_init_src (hsrc : PW S rv) (hc : rc ⋖ rc') (hv : rv ⋖ rv') :
   simp [VAtom.Holds, slotVal, hsrc, hc, hv]
 
 /-- Skipping a non-source and moving on. -/
-theorem step_init_nsrc (hsrc : ¬PW S rv) (hv : rv ⋖ rv') :
+private theorem step_init_nsrc (hsrc : ¬PW S rv) (hv : rv ⋖ rv') :
     CfgStep E S T (mkCfg Phase.initCount fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.initCount fl rd rc rc2 rv' rcnt ru rw rj) := by
   refine ⟨[nsrcR (old Reg.v), eqR (old Reg.c) (nxt Reg.c), succR (old Reg.v) (nxt Reg.v)],
@@ -120,7 +124,7 @@ theorem step_init_nsrc (hsrc : ¬PW S rv) (hv : rv ⋖ rv') :
   simp [VAtom.Holds, slotVal, hsrc, hv]
 
 /-- The last node of the source scan is a source: the first stage begins. -/
-theorem step_init_last_src (hsrc : PW S rv) (hc : rc ⋖ rc')
+private theorem step_init_last_src (hsrc : PW S rv) (hc : rc ⋖ rc')
     (htop : PW (fun p : V => ∀ z : V, z ≤ p) rv)
     (hv' : PW (fun p : V => ∀ z : V, p ≤ z) rv')
     (hu' : PW (fun p : V => ∀ z : V, p ≤ z) ru') :
@@ -132,7 +136,7 @@ theorem step_init_last_src (hsrc : PW S rv) (hc : rc ⋖ rc')
   simp [VAtom.Holds, slotVal, hsrc, hc, htop, hv', hu']
 
 /-- The last node of the source scan is not a source: the first stage begins. -/
-theorem step_init_last_nsrc (hsrc : ¬PW S rv)
+private theorem step_init_last_nsrc (hsrc : ¬PW S rv)
     (htop : PW (fun p : V => ∀ z : V, z ≤ p) rv)
     (hv' : PW (fun p : V => ∀ z : V, p ≤ z) rv')
     (hu' : PW (fun p : V => ∀ z : V, p ≤ z) ru') :
@@ -144,7 +148,7 @@ theorem step_init_last_nsrc (hsrc : ¬PW S rv)
   simp [VAtom.Holds, slotVal, hsrc, htop, hv', hu']
 
 /-- Skipping a node of the inner scan. -/
-theorem step_skip (hu : ru ⋖ ru') :
+private theorem step_skip (hu : ru ⋖ ru') :
     CfgStep E S T (mkCfg Phase.inner fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.inner fl rd rc rc2 rv rcnt ru' rw' rj') := by
   refine ⟨[succR (old Reg.u) (nxt Reg.u), eqR (old Reg.d) (nxt Reg.d),
@@ -153,7 +157,7 @@ theorem step_skip (hu : ru ⋖ ru') :
   simp [VAtom.Holds, slotVal, hu]
 
 /-- Skipping the last node of the inner scan. -/
-theorem step_skip_last (hu : PW (fun p : V => ∀ z : V, z ≤ p) ru) :
+private theorem step_skip_last (hu : PW (fun p : V => ∀ z : V, z ≤ p) ru) :
     CfgStep E S T (mkCfg Phase.inner fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.check fl rd rc rc2 rv rcnt ru' rw' rj') := by
   refine ⟨[topNode (old Reg.u), eqR (old Reg.d) (nxt Reg.d), eqR (old Reg.c) (nxt Reg.c),
@@ -162,7 +166,7 @@ theorem step_skip_last (hu : PW (fun p : V => ∀ z : V, z ≤ p) ru) :
   simp [VAtom.Holds, slotVal, hu]
 
 /-- Starting to certify the current node of the inner scan. -/
-theorem step_certify (hu : ¬PW T ru) :
+private theorem step_certify (hu : ¬PW T ru) :
     CfgStep E S T (mkCfg Phase.inner fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.walk fl rd rc rc2 rv rcnt ru ru rd) := by
   refine ⟨[ntgtR (old Reg.u), eqR (old Reg.u) (nxt Reg.w), eqR (old Reg.d) (nxt Reg.j),
@@ -172,7 +176,7 @@ theorem step_certify (hu : ¬PW T ru) :
   simp [VAtom.Holds, slotVal, hu]
 
 /-- One edge backwards along the certifying path. -/
-theorem step_walk (hj : rj' ⋖ rj) (hw : EW E rw' rw) :
+private theorem step_walk (hj : rj' ⋖ rj) (hw : EW E rw' rw) :
     CfgStep E S T (mkCfg Phase.walk fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.walk fl rd rc rc2 rv rcnt ru rw' rj') := by
   refine ⟨[succR (nxt Reg.j) (old Reg.j), edge (nxt Reg.w) (old Reg.w),
@@ -182,7 +186,7 @@ theorem step_walk (hj : rj' ⋖ rj) (hw : EW E rw' rw) :
   simp [VAtom.Holds, slotVal, hj, hw]
 
 /-- The certifying path has reached a source. -/
-theorem step_walk_done (hw : PW S rw) :
+private theorem step_walk_done (hw : PW S rw) :
     CfgStep E S T (mkCfg Phase.walk fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj) := by
   refine ⟨[srcR (old Reg.w), eqR (old Reg.d) (nxt Reg.d), eqR (old Reg.c) (nxt Reg.c),
@@ -191,7 +195,7 @@ theorem step_walk_done (hw : PW S rw) :
   simp [VAtom.Holds, slotVal, hw]
 
 /-- Counting in a certified node equal to the outer one. -/
-theorem step_count_eq (heq : ru = rv) (hcnt : rcnt ⋖ rcnt') (hu : ru ⋖ ru') :
+private theorem step_count_eq (heq : ru = rv) (hcnt : rcnt ⋖ rcnt') (hu : ru ⋖ ru') :
     CfgStep E S T (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.inner true rd rc rc2 rv rcnt' ru' rw rj) := by
   subst heq
@@ -201,7 +205,7 @@ theorem step_count_eq (heq : ru = rv) (hcnt : rcnt ⋖ rcnt') (hu : ru ⋖ ru') 
   simp [VAtom.Holds, slotVal, hcnt, hu]
 
 /-- Counting in a certified node with an edge to the outer one. -/
-theorem step_count_edge (hedge : EW E ru rv) (hcnt : rcnt ⋖ rcnt') (hu : ru ⋖ ru') :
+private theorem step_count_edge (hedge : EW E ru rv) (hcnt : rcnt ⋖ rcnt') (hu : ru ⋖ ru') :
     CfgStep E S T (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.inner true rd rc rc2 rv rcnt' ru' rw rj) := by
   refine ⟨edge (old Reg.u) (old Reg.v) :: [succR (old Reg.cnt) (nxt Reg.cnt),
@@ -210,7 +214,7 @@ theorem step_count_edge (hedge : EW E ru rv) (hcnt : rcnt ⋖ rcnt') (hu : ru �
   simp [VAtom.Holds, slotVal, hedge, hcnt, hu]
 
 /-- Counting in a certified node unrelated to the outer one. -/
-theorem step_count_none (hne : ru ≠ rv) (hnedge : ¬EW E ru rv) (hcnt : rcnt ⋖ rcnt')
+private theorem step_count_none (hne : ru ≠ rv) (hnedge : ¬EW E ru rv) (hcnt : rcnt ⋖ rcnt')
     (hu : ru ⋖ ru') :
     CfgStep E S T (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.inner fl rd rc rc2 rv rcnt' ru' rw rj) := by
@@ -221,7 +225,7 @@ theorem step_count_none (hne : ru ≠ rv) (hnedge : ¬EW E ru rv) (hcnt : rcnt �
   simp [VAtom.Holds, slotVal, hne, hnedge, hcnt, hu]
 
 /-- Counting in the last certified node, equal to the outer one. -/
-theorem step_count_last_eq (heq : ru = rv) (hcnt : rcnt ⋖ rcnt')
+private theorem step_count_last_eq (heq : ru = rv) (hcnt : rcnt ⋖ rcnt')
     (hu : PW (fun p : V => ∀ z : V, z ≤ p) ru) :
     CfgStep E S T (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.check true rd rc rc2 rv rcnt' ru' rw rj) := by
@@ -232,7 +236,7 @@ theorem step_count_last_eq (heq : ru = rv) (hcnt : rcnt ⋖ rcnt')
   simp [VAtom.Holds, slotVal, hcnt, hu]
 
 /-- Counting in the last certified node, with an edge to the outer one. -/
-theorem step_count_last_edge (hedge : EW E ru rv) (hcnt : rcnt ⋖ rcnt')
+private theorem step_count_last_edge (hedge : EW E ru rv) (hcnt : rcnt ⋖ rcnt')
     (hu : PW (fun p : V => ∀ z : V, z ≤ p) ru) :
     CfgStep E S T (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.check true rd rc rc2 rv rcnt' ru' rw rj) := by
@@ -242,7 +246,7 @@ theorem step_count_last_edge (hedge : EW E ru rv) (hcnt : rcnt ⋖ rcnt')
   simp [VAtom.Holds, slotVal, hedge, hcnt, hu]
 
 /-- Counting in the last certified node, unrelated to the outer one. -/
-theorem step_count_last_none (hne : ru ≠ rv) (hnedge : ¬EW E ru rv) (hcnt : rcnt ⋖ rcnt')
+private theorem step_count_last_none (hne : ru ≠ rv) (hnedge : ¬EW E ru rv) (hcnt : rcnt ⋖ rcnt')
     (hu : PW (fun p : V => ∀ z : V, z ≤ p) ru) :
     CfgStep E S T (mkCfg Phase.certDone fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.check fl rd rc rc2 rv rcnt' ru' rw rj) := by
@@ -253,7 +257,7 @@ theorem step_count_last_none (hne : ru ≠ rv) (hnedge : ¬EW E ru rv) (hcnt : r
   simp [VAtom.Holds, slotVal, hne, hnedge, hcnt, hu]
 
 /-- The count checks out and the outer node was in the next layer. -/
-theorem step_check_true (hc2 : rc2 ⋖ rc2') (hcnt : rcnt = rc) (hv : rv ⋖ rv')
+private theorem step_check_true (hc2 : rc2 ⋖ rc2') (hcnt : rcnt = rc) (hv : rv ⋖ rv')
     (hu' : PW (fun p : V => ∀ z : V, p ≤ z) ru') :
     CfgStep E S T (mkCfg Phase.check true rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.inner false rd rc rc2' rv' ⊥ ru' rw' rj') := by
@@ -263,7 +267,7 @@ theorem step_check_true (hc2 : rc2 ⋖ rc2') (hcnt : rcnt = rc) (hv : rv ⋖ rv'
   simp [VAtom.Holds, slotVal, hc2, hcnt, hv, hu']
 
 /-- The count checks out and the outer node was not in the next layer. -/
-theorem step_check_false (hcnt : rcnt = rc) (hv : rv ⋖ rv')
+private theorem step_check_false (hcnt : rcnt = rc) (hv : rv ⋖ rv')
     (hu' : PW (fun p : V => ∀ z : V, p ≤ z) ru') :
     CfgStep E S T (mkCfg Phase.check false rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.inner false rd rc rc2 rv' ⊥ ru' rw' rj') := by
@@ -273,7 +277,7 @@ theorem step_check_false (hcnt : rcnt = rc) (hv : rv ⋖ rv')
   simp [VAtom.Holds, slotVal, hcnt, hv, hu']
 
 /-- The last outer node was in the next layer: the stage ends. -/
-theorem step_check_last_true (hc2 : rc2 ⋖ rc2') (hcnt : rcnt = rc)
+private theorem step_check_last_true (hc2 : rc2 ⋖ rc2') (hcnt : rcnt = rc)
     (hv : PW (fun p : V => ∀ z : V, z ≤ p) rv) :
     CfgStep E S T (mkCfg Phase.check true rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.stageEnd false rd rc rc2' rv' rcnt' ru' rw' rj') := by
@@ -283,7 +287,7 @@ theorem step_check_last_true (hc2 : rc2 ⋖ rc2') (hcnt : rcnt = rc)
   simp [VAtom.Holds, slotVal, hc2, hcnt, hv]
 
 /-- The last outer node was not in the next layer: the stage ends. -/
-theorem step_check_last_false (hcnt : rcnt = rc)
+private theorem step_check_last_false (hcnt : rcnt = rc)
     (hv : PW (fun p : V => ∀ z : V, z ≤ p) rv) :
     CfgStep E S T (mkCfg Phase.check false rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.stageEnd false rd rc rc2 rv' rcnt' ru' rw' rj') := by
@@ -293,14 +297,14 @@ theorem step_check_last_false (hcnt : rcnt = rc)
   simp [VAtom.Holds, slotVal, hcnt, hv]
 
 /-- The two counts agree: the machine accepts. -/
-theorem step_accept (hc2 : rc2 = rc) :
+private theorem step_accept (hc2 : rc2 = rc) :
     CfgStep E S T (mkCfg Phase.stageEnd fl rd rc rc2 rv rcnt ru rw rj)
       (mkCfg Phase.accept fl' rd' rc' rc2' rv' rcnt' ru' rw' rj') := by
   refine ⟨[eqR (old Reg.c2) (old Reg.c)], by simp [table], ?_⟩
   simp [VAtom.Holds, slotVal, hc2]
 
 /-- On to the next stage. -/
-theorem step_nextStage (hd : rd ⋖ rd')
+private theorem step_nextStage (hd : rd ⋖ rd')
     (hv' : PW (fun p : V => ∀ z : V, p ≤ z) rv')
     (hu' : PW (fun p : V => ∀ z : V, p ≤ z) ru') :
     CfgStep E S T (mkCfg Phase.stageEnd fl rd rc rc2 rv rcnt ru rw rj)
@@ -320,7 +324,7 @@ variable {V : Type} [LinearOrder V] [Finite V] {E : V → V → Prop} {S T : V �
 
 /-- A node of the current layer can be certified: the machine walks backwards
 along a witnessing path until it meets a source. -/
-theorem reach_certDone {fl : Bool} {rd rc rc2 rv rcnt : WithBot V} {uu : V} :
+private theorem reach_certDone {fl : Bool} {rd rc rc2 rv rcnt : WithBot V} {uu : V} :
     ∀ (n : ℕ) (ww : V) (rj : WithBot V), n ≤ orank rj → (∃ s0 : V, S s0 ∧ RInLe E n s0 ww) →
       ∃ rw' rj', CfgReach E S T
         (mkCfg Phase.walk fl rd rc rc2 rv rcnt ↑uu ↑ww rj)
@@ -347,7 +351,7 @@ theorem reach_certDone {fl : Bool} {rd rc rc2 rv rcnt : WithBot V} {uu : V} :
 omit [LinearOrder V] [Finite V] in
 /-- Rewriting the witnesses of the outer node when the scan passes a node that
 is not one. -/
-theorem exists_wit_insert {D : ℕ} {rv : WithBot V} {x : V} {P : Set V}
+private theorem exists_wit_insert {D : ℕ} {rv : WithBot V} {x : V} {P : Set V}
     (hnw : ¬Wit E rv x ∨ x ∉ Rset E S D) :
     (∃ y ∈ Rset E S D ∩ insert x P, Wit E rv y) ↔ ∃ y ∈ Rset E S D ∩ P, Wit E rv y := by
   constructor
@@ -365,7 +369,7 @@ theorem exists_wit_insert {D : ℕ} {rv : WithBot V} {x : V} {P : Set V}
 flag, the machine reaches the count check with the exact count of the current
 layer and with the flag telling whether the outer node has entered the next
 layer. -/
-theorem reach_check {rd rc rc2 : WithBot V} {vv : V}
+private theorem reach_check {rd rc rc2 : WithBot V} {vv : V}
     (hnoT : ∀ y ∈ Rset E S (orank rd), ¬T y) (x : V) :
     ∀ (rcnt rw rj : WithBot V) (fl : Bool),
       orank rcnt = (Rset E S (orank rd) ∩ predSet (↑x : WithBot V)).ncard →
@@ -475,7 +479,7 @@ theorem reach_check {rd rc rc2 : WithBot V} {vv : V}
 /-- **The outer scan**: with the layer count in hand, the machine runs over
 every node and reaches the end of the stage with the exact count of the next
 layer. -/
-theorem reach_stageEnd [Nonempty V] {rd rc : WithBot V}
+private theorem reach_stageEnd [Nonempty V] {rd rc : WithBot V}
     (hnoT : ∀ y ∈ Rset E S (orank rd), ¬T y)
     (hc : orank rc = (Rset E S (orank rd)).ncard) (x : V) :
     ∀ (rc2 rw rj : WithBot V) (u0 : V), (∀ z : V, u0 ≤ z) →
@@ -548,7 +552,7 @@ theorem reach_stageEnd [Nonempty V] {rd rc : WithBot V}
 
 /-- **The source scan**: the machine counts the sources and enters the first
 stage. -/
-theorem reach_firstStage [Nonempty V] (x : V) :
+private theorem reach_firstStage [Nonempty V] (x : V) :
     ∀ (fl : Bool) (rd rc rc2 rcnt ru rw rj : WithBot V),
       orank rc = ({y : V | S y} ∩ predSet (↑x : WithBot V)).ncard →
       ∃ (rc' rw' rj' : WithBot V) (v0 u0 : V), (∀ z : V, v0 ≤ z) ∧ (∀ z : V, u0 ≤ z) ∧
@@ -595,7 +599,7 @@ theorem reach_firstStage [Nonempty V] (x : V) :
 
 /-- **The stages**: as long as the layer keeps growing the machine starts a new
 stage; when it stops growing the two counts agree and the machine accepts. -/
-theorem reach_accept [Nonempty V]
+private theorem reach_accept [Nonempty V]
     (hno : ¬∃ a b : V, S a ∧ T b ∧ Relation.ReflTransGen E a b) :
     ∀ (m : ℕ) (rd rc : WithBot V) (v0 u0 : V) (rw rj : WithBot V),
       (∀ z : V, v0 ≤ z) → (∀ z : V, u0 ≤ z) →
@@ -654,7 +658,7 @@ theorem reach_accept [Nonempty V]
 
 /-- **Completeness**: if no target is reachable from a source, the machine has
 an accepting run. -/
-theorem machineAccepts_of_not_reach [Nonempty V]
+private theorem machineAccepts_of_not_reach [Nonempty V]
     (hno : ¬∃ a b : V, S a ∧ T b ∧ Relation.ReflTransGen E a b) : MachineAccepts E S T := by
   obtain ⟨m0, hm0⟩ := exists_isMin V
   obtain ⟨rc', rw', rj', v0, u0, hv0, hu0, hinit, hcrank⟩ :=
@@ -668,7 +672,7 @@ theorem machineAccepts_of_not_reach [Nonempty V]
 
 /-- **The machine is correct**: it accepts exactly when no target is reachable
 from a source. -/
-theorem machineAccepts_iff [Nonempty V] :
+private theorem machineAccepts_iff [Nonempty V] :
     MachineAccepts E S T ↔ ¬∃ a b : V, S a ∧ T b ∧ Relation.ReflTransGen E a b :=
   ⟨not_reach_of_machineAccepts, machineAccepts_of_not_reach⟩
 

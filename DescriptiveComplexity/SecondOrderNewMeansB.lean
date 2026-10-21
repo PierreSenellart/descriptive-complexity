@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.SecondOrderNewMeans
 public import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.SecondOrderNewCount
+import all DescriptiveComplexity.SecondOrderMerge
+import all DescriptiveComplexity.SecondOrderNewMeans
 
 /-!
 # Meanings for a whole block
@@ -215,12 +217,12 @@ noncomputable def meanStrucB : (meanHostB L B).Structure (A ⊕ Fin m) :=
   @sumStructure (newLang L) (meanBlockB B).lang (A ⊕ Fin m) (extStructure L A m)
     ((meanBlockB B).structure ρ)
 
-theorem realize_oldAtomB {α : Type} (x : α) (v : α → A ⊕ Fin m) :
+private theorem realize_oldAtomB {α : Type} (x : α) (v : α → A ⊕ Fin m) :
     letI := meanStrucB (L := L) ρ
     (oldAtomB L B x).Realize v ↔ IsOld (v x) :=
   Iff.rfl
 
-theorem realize_meanAtomB (i : B.ι) {α : Type} (x : α) (w : Fin (B.arity i) → α)
+private theorem realize_meanAtomB (i : B.ι) {α : Type} (x : α) (w : Fin (B.arity i) → α)
     (v : α → A ⊕ Fin m) :
     letI := meanStrucB (L := L) ρ
     (meanAtomB L B i x w).Realize v ↔ meaningOfB ρ i (v x) fun j => v (w j) := by
@@ -228,7 +230,7 @@ theorem realize_meanAtomB (i : B.ι) {α : Type} (x : α) (w : Fin (B.arity i) �
   refine iff_of_eq (congrArg (ρ i) (funext fun j => ?_))
   induction j using Fin.cases <;> rfl
 
-theorem realize_meanShapedB :
+private theorem realize_meanShapedB :
     letI := meanStrucB (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanShapedB L B) ↔
       ∀ (i : B.ι) (v : A ⊕ Fin m) (w : Fin (B.arity i) → A ⊕ Fin m),
@@ -240,7 +242,7 @@ theorem realize_meanShapedB :
   exact ⟨fun h i v w hM => h i (fun o => o.elim v w) hM,
     fun h i u hM => h i (u none) (fun j => u (some j)) hM⟩
 
-theorem realize_meanEmptyB :
+private theorem realize_meanEmptyB :
     letI := meanStrucB (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanEmptyB L B) ↔
       ∃ v : A ⊕ Fin m, ¬IsOld v ∧
@@ -251,7 +253,7 @@ theorem realize_meanEmptyB :
     Formula.realize_iAlls, realize_oldAtomB, realize_meanAtomB]
   exact ⟨fun ⟨u, hu⟩ => ⟨u 0, hu⟩, fun ⟨v, hv⟩ => ⟨fun _ => v, hv⟩⟩
 
-theorem realize_meanInjB :
+private theorem realize_meanInjB :
     letI := meanStrucB (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanInjB L B) ↔
       ∀ v u : A ⊕ Fin m, ¬IsOld v → ¬IsOld u →
@@ -266,7 +268,7 @@ theorem realize_meanInjB :
     fun h i hg => h (i 0) (i 1) hg.1.1 hg.1.2 hg.2⟩
 
 open Classical in
-theorem realize_meanFlipB :
+private theorem realize_meanFlipB :
     letI := meanStrucB (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanFlipB L B) ↔
       ∀ (i : B.ι) (v : A ⊕ Fin m) (y : Fin (B.arity i) → A ⊕ Fin m),

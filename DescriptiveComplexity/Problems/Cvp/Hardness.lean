@@ -10,6 +10,9 @@ public import DescriptiveComplexity.OrderedComposition
 public import DescriptiveComplexity.Problems.HornSat.Hardness
 public import Mathlib.Data.Fintype.Lattice
 import DescriptiveComplexity.FixedPointHorn
+import all DescriptiveComplexity.Problems.Cvp.Hardness.Interp
+import all DescriptiveComplexity.Problems.Cvp.Hardness.Value
+import all DescriptiveComplexity.Problems.Cvp.Hardness.Wiring
 
 /-!
 # CVP is `PTIME`-hard
@@ -74,7 +77,7 @@ theorem not_hornSatisfiable_iff_glVal {M : A} (hM : ∀ a : A, a ≤ M) :
 /-- **The drawn circuit accepts exactly the failures of Horn satisfiability.**
 The output gate is the top of the goal chain, so this is the two halves of the
 evaluation read at that gate, against the certificate above. -/
-theorem circuitAccepts_iff :
+private theorem circuitAccepts_iff :
     CircuitAccepts (cvpInterp.Map A) ↔ ¬HornSatisfiable A := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := by
     obtain ⟨m, hm⟩ := Finite.exists_min (id : A → A)
@@ -99,7 +102,7 @@ end CvpVal
 
 /-- **The reduction**: the complement of HORN-SAT ordered-FO-reduces to CVP,
 by drawing the unit-propagation circuit inside the instance. -/
-noncomputable def hornSatCompl_ordered_fo_reduction_cvp : HORNSATᶜ ≤ᶠᵒ[≤] CVP where
+private noncomputable def hornSatCompl_ordered_fo_reduction_cvp : HORNSATᶜ ≤ᶠᵒ[≤] CVP where
   Tag := CvpTag
   dim := 3
   toInterpretation := cvpInterp

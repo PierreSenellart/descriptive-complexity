@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTuple
+import all DescriptiveComplexity.Problems.Wide.DrawKit
 
 /-!
 # The element loop: a sub-fold over control-held tuples
@@ -156,7 +157,7 @@ trips stay inside the loop's phases (`DescriptiveComplexity.Draw.ReadKit.dstPh_e
 the dispatches land at the next read or the fold checkpoint, and the last one
 leaves. This is what a caller reads off a stage to know the phases the machine
 can be in. -/
-theorem elemRule_dstPh (i : ElemSite nr) (ρ : ElemSh nr i) :
+private theorem elemRule_dstPh (i : ElemSite nr) (ρ : ElemSh nr i) :
     (∃ p : ElemPh nr,
       (elemRule one wk rg emb rdTrack MatchOf setFlag initEl advEl exitSt IsMaxEl
         exitPh i ρ).dstPh = emb p) ∨
@@ -187,7 +188,7 @@ theorem elemRule_dstPh (i : ElemSite nr) (ρ : ElemSh nr i) :
 /-- **A property of a loop's phases and its exit holds of every phase it can
 move to.** This is the form a caller uses: give the property, check it of the
 loop's own phases and of the exit, and every rule respects it. -/
-theorem elemRule_dstIn {S : P → Prop} (hemb : ∀ p : ElemPh nr, S (emb p))
+private theorem elemRule_dstIn {S : P → Prop} (hemb : ∀ p : ElemPh nr, S (emb p))
     (hexit : S exitPh) (i : ElemSite nr) (ρ : ElemSh nr i) :
     S (elemRule one wk rg emb rdTrack MatchOf setFlag initEl advEl exitSt IsMaxEl
       exitPh i ρ).dstPh := by
@@ -217,7 +218,7 @@ variable (hemb : Function.Injective emb)
 
 include hemb in
 /-- **An element loop separates in-shape.** -/
-theorem elemSep :
+private theorem elemSep :
     ∀ (i : ElemSite nr) (ρ ρ' : ElemSh nr i) (f : Q → A) (g : W → A),
       (elemRule one wk rg emb rdTrack MatchOf setFlag initEl advEl exitSt
         IsMaxEl exitPh i ρ).guard f g →

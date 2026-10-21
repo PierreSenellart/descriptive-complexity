@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.Composition
 
 /-!
 # Counting problems and parsimonious reductions

@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameNodes
+import all DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.GameNodes
+import all DescriptiveComplexity.Exponential.GameSpec
 
 /-!
 # EXPTIME is second-order alternating reachability

@@ -8,6 +8,21 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawIxMat
 public import DescriptiveComplexity.Problems.Wide.DrawInstSeq
 public import DescriptiveComplexity.Problems.Wide.DrawRunSeq
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawInstCmp
+import all DescriptiveComplexity.Problems.Wide.DrawInstSeq
+import all DescriptiveComplexity.Problems.Wide.DrawIxExp
+import all DescriptiveComplexity.Problems.Wide.DrawIxGate
+import all DescriptiveComplexity.Problems.Wide.DrawIxMat
+import all DescriptiveComplexity.Problems.Wide.DrawIxStage
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunSeq
 
 /-!
 # The matrix's sequencer at an arbitrary file
@@ -105,7 +120,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 /-- **A round trip of transports is the identity** – the shape the VAL
 loop's bridge closes with: the pack leaves the round state, travels to the
 round's own state and to the state its matrix threads, and comes back. -/
-theorem ixKindSemCast_triple (zero one : A) (vi : dt.VarIx)
+private theorem ixKindSemCast_triple (zero one : A) (vi : dt.VarIx)
     {st₁ st₂ st₃ : TapeSt dt A R P I}
     (h1 : st₁.mir = st₂.mir) (h2 : st₁.val = st₂.val)
     (h3 : st₂.mir = st₃.mir) (h4 : st₂.val = st₃.val)
@@ -183,7 +198,7 @@ siblings). The pack travels by
 `DescriptiveComplexity.Draw.Data.kindSemCast`, which keeps its points.
 This is the brick the whole threaded-versus-unthreaded bridge is built
 from. -/
-theorem ixKindExitCtl_congr_scratch {st' : TapeSt dt A R P I}
+private theorem ixKindExitCtl_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st')
     (hreg : ¬∃ u : I, v = F.cell u)
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi)) (sem : dt.IxKindSem (elt := elt) zero one vi st κ)
@@ -320,7 +335,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 /-- **The uniform stage discharge, threaded, on a clock**: as
 `DescriptiveComplexity.Draw.Data.ixKind_hStage_thread` with the atom's cost
 counted – `DescriptiveComplexity.Draw.Data.ixKindCost`, whatever the kind. -/
-theorem ixKind_hStage_thread_reachesIn
+private theorem ixKind_hStage_thread_reachesIn
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
@@ -402,7 +417,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 discipline assumed – the atom's exit state is
 `DescriptiveComplexity.Draw.Data.kindEndSt`, which normalizes SAV and
 TARGET exactly when the atom is a stage atom. -/
-theorem ixKind_hStage_thread
+private theorem ixKind_hStage_thread
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
@@ -438,7 +453,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 /-- **The uniform stage discharge, on a clock**: as
 `DescriptiveComplexity.Draw.Data.ixKind_hStage` with the atom's cost counted –
 `DescriptiveComplexity.Draw.Data.ixKindCost`, whatever the kind. -/
-theorem ixKind_hStage_reachesIn
+private theorem ixKind_hStage_reachesIn
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
@@ -518,7 +533,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 runs from its entry phase one cell right of the marker to the exit phase
 back there, leaving `DescriptiveComplexity.Draw.Data.kindExitCtl` in the
 control and the tape untouched. -/
-theorem ixKind_hStage
+private theorem ixKind_hStage
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
     (hnd : dt.kindDepth κ ≤ dt.eDim) (hrd : dt.kindReads κ ≤ dt.nfDim)
@@ -593,7 +608,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [L.Structure A] in
 /-- An atom's exit state keeps the marker, the mirror, the bottom mark and
 the VAL register: only SAV and TARGET can move. -/
-theorem ixKindEndSt_fields (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
+private theorem ixKindEndSt_fields (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (st : TapeSt dt A R P I) :
     (dt.ixKindEndSt (elt := elt) vi v κ st).wk = st.wk ∧
       (dt.ixKindEndSt (elt := elt) vi v κ st).mir = st.mir ∧
@@ -646,7 +661,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **A tape state is determined by its two scratch registers**, given the
 other seven – the shape every threaded state of the machinery has against
 the state it started from. -/
-theorem ixTapeSt_eq_savTgt {X Y : TapeSt dt A R P I} (hmir : X.mir = Y.mir)
+private theorem ixTapeSt_eq_savTgt {X Y : TapeSt dt A R P I} (hmir : X.mir = Y.mir)
     (hval : X.val = Y.val) (hold : X.old = Y.old) (hnew : X.new = Y.new)
     (hwk : X.wk = Y.wk) (hbot : X.bot = Y.bot) (hltp : X.ltp = Y.ltp) :
     X = { Y with sav := X.sav, tgt := X.tgt } := by
@@ -665,7 +680,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **The remaining registers an atom leaves alone** – the three
 `DescriptiveComplexity.Draw.Data.kindEndSt_fields` does not list, so
 that the seven together pin the state down to its SAV and TARGET. -/
-theorem ixKindEndSt_fields' (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
+private theorem ixKindEndSt_fields' (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (st : TapeSt dt A R P I) :
     (dt.ixKindEndSt (elt := elt) vi v κ st).new = st.new ∧
       (dt.ixKindEndSt (elt := elt) vi v κ st).ltp = st.ltp := by
@@ -701,7 +716,7 @@ registers rewritten** – the sharpening of
 `DescriptiveComplexity.Draw.Data.matSt_fields` that lets the loop above
 thread the two registers instead of the whole state, and with them keep
 every semantic pack at the state it was built for. -/
-theorem ixMatSt_eq (n : ℕ) :
+private theorem ixMatSt_eq (n : ℕ) :
     dt.ixMatSt (elt := elt) vi st v n =
       { st with
         sav := (dt.ixMatSt (elt := elt) vi st v n).sav
@@ -721,7 +736,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **A foreign verdict slot survives one atom's machinery**: whatever the
 kind, its exit control writes its own verdict slot and scratch, never
 another atom's. -/
-theorem ixKindExitCtl_apply_avC
+private theorem ixKindExitCtl_apply_avC
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (sem : dt.IxKindSem (elt := elt) zero one vi st κ)
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
@@ -889,7 +904,7 @@ omit [Finite I] in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An accumulator slot survives one atom's machinery**: no atom's exit
 control ever writes the inner fold's vector. -/
-theorem ixKindExitCtl_apply_accC
+private theorem ixKindExitCtl_apply_accC
     (κ : MatAtom dt.X dt.d.B (dt.nOf vi))
     (sem : dt.IxKindSem (elt := elt) zero one vi st κ)
     (hk : dt.kindArgs κ * Fintype.card dt.X.Tag ≤ dt.ntgDim)
@@ -1082,7 +1097,7 @@ omit [Finite I] in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **The inner fold's vector survives the whole matrix**: no atom writes
 it, so the thread's accumulators after all atoms are the entry's. -/
-theorem ixMatFs_apply_accC
+private theorem ixMatFs_apply_accC
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
       dt.CtlIx → A)
     (hEnterAcc : ∀ (b : Fin (dt.natOf vi)) (f : dt.CtlIx → A)
@@ -1124,7 +1139,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] in
 /-- **An atom's verdict bit survives the rest of the matrix**: the thread's
 value at atom `a`'s slot after all atoms is what atom `a`'s own machinery
 wrote. -/
-theorem ixMatFs_apply_avC
+private theorem ixMatFs_apply_avC
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
       dt.CtlIx → A)
     (hEnterAv : ∀ (b : Fin (dt.natOf vi)) (f : dt.CtlIx → A)
@@ -1213,7 +1228,7 @@ omit [Fintype dt.SlotIx] [LinearOrder R] [LinearOrder P]
 /-- **The transport of a built pack is the built pack**: `mkKindSem` puts
 the valuation's points in and nothing else, and the proof components are
 irrelevant. -/
-theorem ixKindSemCast_ixMkKindSem (zero one : A) (vi : dt.VarIx)
+private theorem ixKindSemCast_ixMkKindSem (zero one : A) (vi : dt.VarIx)
     {st st' : TapeSt dt A R P I}
     (hmir : st.mir = st'.mir) (hval : st.val = st'.val)
     {w w' : Fin (dt.nOf vi) → dt.X.Map A} (hww : w = w')
@@ -1238,7 +1253,7 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
 include hinj helt in
 /-- **One round's agreement is the padded bits'**: given the two registers
 hold encodings, the machine's per-tuple question is the encodings'. -/
-theorem ixCmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
+private theorem ixCmpAgr_iff_padBits {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (ixAddr elt (dt.lvSet st vi j₁))
       (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
       encMap dt.ly zero one p)
@@ -1267,7 +1282,7 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
 include hinj helt in
 /-- **The equality atom's verdict is point equality**: agreement at every
 tuple decides the two encoded points. -/
-theorem ixCmpAgr_all_iff (hzo : zero ≠ one)
+private theorem ixCmpAgr_all_iff (hzo : zero ≠ one)
     {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (ixAddr elt (dt.lvSet st vi j₁))
       (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
@@ -1291,7 +1306,7 @@ include hinj helt in
 or a first difference with the second block holding the cell, is exactly
 the binary order of the two encodings – the order the reduction puts on the
 points. -/
-theorem ixCmp_ord_iff (hzo : zero ≠ one)
+private theorem ixCmp_ord_iff (hzo : zero ≠ one)
     {j₁ j₂ : Fin (dt.nOf vi)} {p q : dt.X.Map A}
     (h1 : wmBlk (ixAddr elt (dt.lvSet st vi j₁))
       (Tag.arg (toLex (dt.lvBlk vi j₁)) : Tag R P dt.KIx) =
@@ -1340,7 +1355,7 @@ include hinj helt in
 /-- **One atom's own verdict bit is its truth**: whatever the kind, the bit
 the exit control writes in the atom's slot is `MatAtom.holds` at the
 encoded valuation. -/
-theorem ctlBit_ixKindExitCtl_self (hzo : zero ≠ one)
+private theorem ctlBit_ixKindExitCtl_self (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (w : Fin (dt.nOf vi) → dt.X.Map A)
@@ -1419,7 +1434,7 @@ include hinj helt in
 `a`'s slot holds `MatAtom.holds` of its kind at the encoded valuation –
 the `hav` input of `DescriptiveComplexity.Draw.Data.postLeaf_iff_qfValue`,
 verbatim. -/
-theorem ctlBit_avC_ixMatFs_holds (hzo : zero ≠ one)
+private theorem ctlBit_avC_ixMatFs_holds (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (σ : dt.d.B.Assignment (dt.X.Map A))
     (w : Fin (dt.nOf vi) → dt.X.Map A)
@@ -1572,7 +1587,7 @@ omit [Finite I] in
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The matrix is blind to the two scratch registers**: atom by atom,
 `kindExitCtl_congr_scratch`. -/
-theorem ixMatFs_congr_scratch {st' : TapeSt dt A R P I} (h : dt.ScratchEq st st')
+private theorem ixMatFs_congr_scratch {st' : TapeSt dt A R P I} (h : dt.ScratchEq st st')
     (hreg : ¬∃ u : I, v = F.cell u)
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
       dt.CtlIx → A)
@@ -1600,7 +1615,7 @@ reads the levels' registers and its background at the working cell
 (`kindExitCtl_congr_scratch`), and the threading rewrites SAV and TARGET
 alone. This is the bridge between the control the *run* produces and the
 control the *semantics* is stated at. -/
-theorem ixMatFsT_eq_ixMatFs (hreg : ¬∃ u : I, v = F.cell u)
+private theorem ixMatFsT_eq_ixMatFs (hreg : ¬∃ u : I, v = F.cell u)
     (enterSt : Fin (dt.natOf vi) → (dt.CtlIx → A) → (dt.SlotIx → A) →
       dt.CtlIx → A)
     (semT : ∀ a : Fin (dt.natOf vi),
@@ -1632,7 +1647,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 `DescriptiveComplexity.Draw.Data.ixMatrix_run_thread` with the atoms
 counted – one atom's width, one dispatch and one step back per atom, and one
 step to leave. -/
-theorem ixMatrix_run_thread_reachesIn
+private theorem ixMatrix_run_thread_reachesIn
     (semT : ∀ a : Fin (dt.natOf vi),
       dt.IxKindSem (elt := elt) PR.zero PR.one vi (dt.ixMatSt (elt := elt) vi st v (a : ℕ))
         (dt.kindOf vi a))
@@ -1715,7 +1730,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 assumed – the tape ends in the threaded state
 `DescriptiveComplexity.Draw.Data.ixMatSt`, which differs from the entry
 state in SAV and TARGET alone, and only if the matrix has a stage atom. -/
-theorem ixMatrix_run_thread
+private theorem ixMatrix_run_thread
     (semT : ∀ a : Fin (dt.natOf vi),
       dt.IxKindSem (elt := elt) PR.zero PR.one vi (dt.ixMatSt (elt := elt) vi st v (a : ℕ))
         (dt.kindOf vi a))
@@ -1751,7 +1766,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 `DescriptiveComplexity.Draw.Data.ixMatrix_run` with the atoms counted – one
 atom's width, one dispatch and one step back per atom, and one step to
 leave. -/
-theorem ixMatrix_reachesIn (f₀ : dt.CtlIx → A) :
+private theorem ixMatrix_reachesIn (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn ((wA + 2) * dt.natOf vi + 1)
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell Slot.val
@@ -1814,7 +1829,7 @@ include hR hlin hix hsepP hhasP hinj heltP hord htop hbot hwork hv hvi hwkSt hmi
 /-- **The matrix's run**: from the checkpoint before the first atom at the
 marker to the exit phase one cell to its right after the last, the verdict
 slots holding each atom's fold, the tape untouched. -/
-theorem ixMatrix_run (f₀ : dt.CtlIx → A) :
+private theorem ixMatrix_run (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell Slot.val
@@ -1935,7 +1950,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
 `DescriptiveComplexity.Draw.Data.ixGates_run` with the blocks counted – one
 block's width, its dispatch and the step back per block, and one step to
 leave. -/
-theorem ixGates_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
+private theorem ixGates_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       ((dt.ixGateCost A w wP + 2) * dt.arOf vi + 1)
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
@@ -2011,7 +2026,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
 /-- **The gates' run at a gated address**: every block passes its shape
 test, every domain evaluation runs on its block's decoded tag, and the
 sequence exits with the conjoined verdict in the flag. -/
-theorem ixGates_run (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
+private theorem ixGates_run (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     Relation.ReflTransGen (wideData (Univ A R P dt.KIx dt.dd)).Step
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) f₀), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell Slot.val
@@ -2034,7 +2049,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
 /-- **The gates' run at a junk address, on a clock**: as
 `DescriptiveComplexity.Draw.Data.ixGates_run_fail` with the passing prefix
 counted, the failing dispatch and the failing block's sweep on top. -/
-theorem ixGates_reachesIn_fail (ℓ₀ : Fin (dt.arOf vi))
+private theorem ixGates_reachesIn_fail (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : I} (hfail : ¬TestOf ℓ₀ u₀)
     (f₀ : dt.CtlIx → A) :
@@ -2191,7 +2206,7 @@ include hrules hR hlin hix hsepP hhasP hinj heltP htop hbot hv hvi hwkSt
 /-- **The gates' run at a junk address**: the blocks below `ℓ₀` pass, block
 `ℓ₀`'s shape test fails, and the run leaves the whole gate sequence through
 the failing exit with the fail store applied. -/
-theorem ixGates_run_fail (ℓ₀ : Fin (dt.arOf vi))
+private theorem ixGates_run_fail (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : I} (hfail : ¬TestOf ℓ₀ u₀)
     (f₀ : dt.CtlIx → A) :
@@ -2221,7 +2236,7 @@ include hinj heltP in
 /-- **The gates' verdict, characterized**: after the first `n` blocks of
 the all-pass path, the flag holds exactly when it held at entry and every
 gated block's decoded assignment satisfies its tag's domain sentence. -/
-theorem ctlBit_gateFlagC_ixGatesFs (hzo : PR.zero ≠ PR.one)
+private theorem ctlBit_gateFlagC_ixGatesFs (hzo : PR.zero ≠ PR.one)
     (hEnter : ∀ (ℓ : Fin (dt.arOf vi)) (f : dt.CtlIx → A)
       (g : dt.SlotIx → A),
       dt.ctlBit PR.one (enterSt ℓ f g) dt.gateFlagC ↔

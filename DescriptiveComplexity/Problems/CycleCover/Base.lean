@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.OneInSat.Counting
 public import DescriptiveComplexity.Permanent.CycNext
 public import DescriptiveComplexity.Permanent.Flat
 import DescriptiveComplexity.Permanent.Minor
+import all DescriptiveComplexity.Permanent.Minor
 
 /-!
 # The base graph of a #1-in-SAT instance
@@ -84,7 +85,7 @@ abbrev x : A := o.1.2.1
 /-- The sign of an occurrence. -/
 abbrev s : Bool := o.1.2.2
 
-theorem ext {o o' : Occ A} (hc : o.c = o'.c) (hx : o.x = o'.x) (hs : o.s = o'.s) : o = o' :=
+private theorem ext {o o' : Occ A} (hc : o.c = o'.c) (hx : o.x = o'.x) (hs : o.s = o'.s) : o = o' :=
   Subtype.ext (Prod.ext hc (Prod.ext hx hs))
 
 /-- The variable of an occurrence is a variable of the formula. -/
@@ -102,11 +103,11 @@ theorem occIn_of_coe {c : A} (h : o.c = c) : OccIn c o.x o.s := by
   · exact WithBot.coe_injective (hc'.symm.trans h) ▸ h'
 
 /-- The dummy occurrence of a variable. -/
-def dummy (x : A) (hx : SatOccurs A x) (s : Bool) : Occ A :=
+private def dummy (x : A) (hx : SatOccurs A x) (s : Bool) : Occ A :=
   ⟨(⊥, x, s), Or.inl ⟨rfl, hx⟩⟩
 
 /-- A real occurrence. -/
-def real (c x : A) (s : Bool) (h : OccIn c x s) : Occ A :=
+private def real (c x : A) (s : Bool) (h : OccIn c x s) : Occ A :=
   ⟨(c, x, s), Or.inr ⟨c, rfl, h⟩⟩
 
 end Occ
@@ -136,10 +137,10 @@ noncomputable def hubOf (o : Occ A) : Hub A :=
   if h : o.c = ⊥ then Sum.inr ⟨o.x, o.satOccurs⟩
   else Sum.inl ⟨o.c.unbot h, (o.occIn_of_coe (WithBot.coe_unbot _ h).symm).isCl⟩
 
-theorem hubOf_of_bot {o : Occ A} (h : o.c = ⊥) : hubOf o = Sum.inr ⟨o.x, o.satOccurs⟩ := by
+private theorem hubOf_of_bot {o : Occ A} (h : o.c = ⊥) : hubOf o = Sum.inr ⟨o.x, o.satOccurs⟩ := by
   rw [hubOf, dite_eq_left h]
 
-theorem hubOf_of_coe {o : Occ A} {c : A} (h : o.c = c) :
+private theorem hubOf_of_coe {o : Occ A} {c : A} (h : o.c = c) :
     hubOf o = Sum.inl ⟨c, (o.occIn_of_coe h).isCl⟩ := by
   have h' : o.c ≠ ⊥ := h ▸ WithBot.coe_ne_bot
   rw [hubOf, dite_eq_right h']
@@ -149,7 +150,8 @@ theorem hubOf_of_coe {o : Occ A} {c : A} (h : o.c = c) :
 
 /-- The hub of an occurrence is that of a clause iff the occurrence is in
 the clause. -/
-theorem hubOf_eq_inl_iff (o : Occ A) (c : {c : A // IsCl c}) : hubOf o = Sum.inl c ↔ o.c = c.1 := by
+private theorem hubOf_eq_inl_iff
+    (o : Occ A) (c : {c : A // IsCl c}) : hubOf o = Sum.inl c ↔ o.c = c.1 := by
   constructor
   · intro h
     by_cases hb : o.c = ⊥
@@ -164,7 +166,7 @@ theorem hubOf_eq_inl_iff (o : Occ A) (c : {c : A // IsCl c}) : hubOf o = Sum.inl
 
 /-- The hub of an occurrence is that of a variable iff the occurrence is the
 dummy one of the variable. -/
-theorem hubOf_eq_inr_iff (o : Occ A) (x : {x : A // SatOccurs A x}) :
+private theorem hubOf_eq_inr_iff (o : Occ A) (x : {x : A // SatOccurs A x}) :
     hubOf o = Sum.inr x ↔ o.c = ⊥ ∧ o.x = x.1 := by
   constructor
   · intro h
@@ -194,7 +196,7 @@ theorem mem_chain {x : A} {s : Bool} {c : WithBot A} :
   simp only [chain, mem_insert, mem_image, mem_filter, mem_univ, true_and]
   exact or_congr_right (exists_congr fun c' => ⟨fun h => ⟨h.2.symm, h.1⟩, fun h => ⟨h.2, h.1.symm⟩⟩)
 
-theorem c_mem_chain (o : Occ A) : o.c ∈ chain o.x o.s := by
+private theorem c_mem_chain (o : Occ A) : o.c ∈ chain o.x o.s := by
   rw [mem_chain]
   rcases o.2 with ⟨h, _⟩ | ⟨c, hc, h⟩
   · exact Or.inl h
@@ -216,7 +218,7 @@ noncomputable def nextOcc (o : Occ A) : Occ A :=
 
 @[simp] theorem nextOcc_s (o : Occ A) : (nextOcc o).s = o.s := rfl
 
-theorem nextOcc_injective : Function.Injective (nextOcc (A := A)) := by
+private theorem nextOcc_injective : Function.Injective (nextOcc (A := A)) := by
   intro o o' h
   have hx : o.x = o'.x := by simpa only [nextOcc_x] using congrArg Occ.x h
   have hs : o.s = o'.s := by simpa only [nextOcc_s] using congrArg Occ.s h
@@ -236,7 +238,7 @@ inductive BaseEdge : Node A → Node A → Prop
   /-- From a hub to each of its spokes. -/
   | hub (o : Occ A) : BaseEdge (hub (hubOf o)) (spk o)
 
-theorem baseEdge_trk_iff {o : Occ A} {n : Node A} :
+private theorem baseEdge_trk_iff {o : Occ A} {n : Node A} :
     BaseEdge (trk o) n ↔ n = trk (nextOcc o) := by
   constructor
   · intro h
@@ -245,7 +247,8 @@ theorem baseEdge_trk_iff {o : Occ A} {n : Node A} :
   · rintro rfl
     exact .track o
 
-theorem baseEdge_spk_iff {o : Occ A} {n : Node A} : BaseEdge (spk o) n ↔ n = hub (hubOf o) := by
+private theorem baseEdge_spk_iff
+    {o : Occ A} {n : Node A} : BaseEdge (spk o) n ↔ n = hub (hubOf o) := by
   constructor
   · intro h
     cases h
@@ -253,7 +256,7 @@ theorem baseEdge_spk_iff {o : Occ A} {n : Node A} : BaseEdge (spk o) n ↔ n = h
   · rintro rfl
     exact .spoke o
 
-theorem baseEdge_hub_iff {h : Hub A} {n : Node A} :
+private theorem baseEdge_hub_iff {h : Hub A} {n : Node A} :
     BaseEdge (hub h) n ↔ ∃ o, n = spk o ∧ hubOf o = h := by
   constructor
   · intro h'
@@ -262,7 +265,7 @@ theorem baseEdge_hub_iff {h : Hub A} {n : Node A} :
   · rintro ⟨o, rfl, rfl⟩
     exact .hub o
 
-theorem baseEdge_to_trk_iff {n : Node A} {o' : Occ A} :
+private theorem baseEdge_to_trk_iff {n : Node A} {o' : Occ A} :
     BaseEdge n (trk o') ↔ ∃ o, n = trk o ∧ nextOcc o = o' := by
   constructor
   · intro h
@@ -271,7 +274,8 @@ theorem baseEdge_to_trk_iff {n : Node A} {o' : Occ A} :
   · rintro ⟨o, rfl, rfl⟩
     exact .track o
 
-theorem baseEdge_to_spk_iff {n : Node A} {o : Occ A} : BaseEdge n (spk o) ↔ n = hub (hubOf o) := by
+private theorem baseEdge_to_spk_iff
+    {n : Node A} {o : Occ A} : BaseEdge n (spk o) ↔ n = hub (hubOf o) := by
   constructor
   · intro h
     cases h
@@ -279,7 +283,7 @@ theorem baseEdge_to_spk_iff {n : Node A} {o : Occ A} : BaseEdge n (spk o) ↔ n 
   · rintro rfl
     exact .hub o
 
-theorem baseEdge_to_hub_iff {n : Node A} {h : Hub A} :
+private theorem baseEdge_to_hub_iff {n : Node A} {h : Hub A} :
     BaseEdge n (hub h) ↔ ∃ o, n = spk o ∧ hubOf o = h := by
   constructor
   · intro h'
@@ -327,13 +331,13 @@ used: their track nodes, and the spokes of the other occurrences. -/
 noncomputable def del (U : Finset (Occ A)) : Finset (Node A) :=
   U.image trk ∪ Uᶜ.image spk
 
-theorem trk_mem_del {U : Finset (Occ A)} {o : Occ A} : trk o ∈ del U ↔ o ∈ U := by
+private theorem trk_mem_del {U : Finset (Occ A)} {o : Occ A} : trk o ∈ del U ↔ o ∈ U := by
   simp [del]
 
-theorem spk_mem_del {U : Finset (Occ A)} {o : Occ A} : spk o ∈ del U ↔ o ∉ U := by
+private theorem spk_mem_del {U : Finset (Occ A)} {o : Occ A} : spk o ∈ del U ↔ o ∉ U := by
   simp [del]
 
-theorem hub_notMem_del {U : Finset (Occ A)} {h : Hub A} : hub h ∉ del U := by
+private theorem hub_notMem_del {U : Finset (Occ A)} {h : Hub A} : hub h ∉ del U := by
   simp [del]
 
 /-- **A consistent choice**: the track loops of a literal are all chosen or
@@ -348,11 +352,11 @@ abbrev Rem (U : Finset (Occ A)) : Type := {n : Node A // n ∉ del U}
 
 /-- A cycle cover of the base graph with the chosen loops forced: a
 permutation of the remaining nodes along the base edges. -/
-def Valid (U : Finset (Occ A)) (e : Rem U ≃ Rem U) : Prop :=
+private def Valid (U : Finset (Occ A)) (e : Rem U ≃ Rem U) : Prop :=
   ∀ n, BaseEdge n.1 (e n).1
 
 /-- **A forced cover exists only for a consistent choice.** -/
-theorem consistent_of_valid {U : Finset (Occ A)} {e : Rem U ≃ Rem U} (he : Valid U e) :
+private theorem consistent_of_valid {U : Finset (Occ A)} {e : Rem U ≃ Rem U} (he : Valid U e) :
     Consistent U := by
   refine ⟨fun o ho => ?_, fun o ho => ?_, fun h => ?_⟩
   · by_contra hn
@@ -380,13 +384,13 @@ theorem consistent_of_valid {U : Finset (Occ A)} {e : Rem U ≃ Rem U} (he : Val
 
 /-- **The forced cover of a consistent choice**, as a map: along the tracks,
 from each spoke to its hub, from each hub to its one free spoke. -/
-noncomputable def forced {U : Finset (Occ A)} (hU : Consistent U) : Rem U → Rem U
+private noncomputable def forced {U : Finset (Occ A)} (hU : Consistent U) : Rem U → Rem U
   | ⟨Sum.inl o, h⟩ => ⟨trk (nextOcc o), trk_mem_del.not.mpr (hU.2.1 o (trk_mem_del.not.mp h))⟩
   | ⟨Sum.inr (Sum.inl o), _⟩ => ⟨hub (hubOf o), hub_notMem_del⟩
   | ⟨Sum.inr (Sum.inr h), _⟩ => ⟨spk (Classical.choose (hU.2.2 h).exists),
       spk_mem_del.not.mpr (not_not.mpr (Classical.choose_spec (hU.2.2 h).exists).2)⟩
 
-theorem forced_injective {U : Finset (Occ A)} (hU : Consistent U) :
+private theorem forced_injective {U : Finset (Occ A)} (hU : Consistent U) :
     Function.Injective (forced hU) := by
   rintro ⟨n, hn⟩ ⟨n', hn'⟩ h
   rcases n with o | o | k <;> rcases n' with o' | o' | k' <;>
@@ -400,10 +404,11 @@ theorem forced_injective {U : Finset (Occ A)} (hU : Consistent U) :
       (congrArg hubOf h)).trans (Classical.choose_spec (hU.2.2 k').exists).1))
 
 /-- The forced cover of a consistent choice. -/
-noncomputable def forcedEquiv {U : Finset (Occ A)} (hU : Consistent U) : Rem U ≃ Rem U :=
+private noncomputable def forcedEquiv {U : Finset (Occ A)} (hU : Consistent U) : Rem U ≃ Rem U :=
   Equiv.ofBijective (forced hU) (Finite.injective_iff_bijective.mp (forced_injective hU))
 
-theorem valid_forcedEquiv {U : Finset (Occ A)} (hU : Consistent U) : Valid U (forcedEquiv hU) := by
+private theorem valid_forcedEquiv
+    {U : Finset (Occ A)} (hU : Consistent U) : Valid U (forcedEquiv hU) := by
   rintro ⟨n, hn⟩
   rcases n with o | o | h
   · exact .track o
@@ -411,7 +416,7 @@ theorem valid_forcedEquiv {U : Finset (Occ A)} (hU : Consistent U) : Valid U (fo
   · exact baseEdge_hub_iff.mpr ⟨_, rfl, (Classical.choose_spec (hU.2.2 h).exists).1⟩
 
 /-- **The forced cover is unique.** -/
-theorem valid_unique {U : Finset (Occ A)} {e e' : Rem U ≃ Rem U} (he : Valid U e)
+private theorem valid_unique {U : Finset (Occ A)} {e e' : Rem U ≃ Rem U} (he : Valid U e)
     (he' : Valid U e') : e = e' := by
   have hU := consistent_of_valid he
   refine Equiv.ext fun ⟨n, hn⟩ => Subtype.ext ?_
@@ -485,13 +490,13 @@ theorem cols_map_site_nodup {l : List (Occ A)} (hl : l.Nodup) : (cols (l.map sit
 noncomputable def sites : List (Site (Node A)) :=
   univ.toList.map site
 
-theorem sites_toFinset : (sites (A := A)).toFinset = univ.image site := by
+private theorem sites_toFinset : (sites (A := A)).toFinset = univ.image site := by
   ext s
   simp only [sites, List.mem_toFinset, List.mem_map, Finset.mem_toList, mem_univ, true_and,
     mem_image]
 
 /-- The rows deleted by a choice, as the sites read them. -/
-theorem delRows_sites (U : Finset (Occ A)) : delRows sites (U.image site) = del U := by
+private theorem delRows_sites (U : Finset (Occ A)) : delRows sites (U.image site) = del U := by
   have hmem : ∀ o, (∃ a ∈ U, site a = site o) ↔ o ∈ U := fun o =>
     ⟨fun ⟨o', ho', h'⟩ => site_injective h' ▸ ho', fun h => ⟨o, h, rfl⟩⟩
   ext n
@@ -511,7 +516,7 @@ theorem delRows_sites (U : Finset (Occ A)) : delRows sites (U.image site) = del 
 open Classical in
 /-- **The permanent of the base graph with the gadgets attached**: `4` to the
 number of sites, times the number of consistent choices. -/
-theorem bperm_attachAll_sites :
+private theorem bperm_attachAll_sites :
     bperm (attachAll baseM (sites (A := A))) =
       4 ^ Fintype.card (Occ A) * ((univ : Finset (Finset (Occ A))).filter Consistent).card := by
   have hu : ∀ s ∈ sites (A := A), s.u ≠ s.u' := by

@@ -9,6 +9,8 @@ import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.ClauseDischarge
 public import DescriptiveComplexity.Problems.HornSat.Defs
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.ClauseDischarge
+import all DescriptiveComplexity.Padding
 
 /-!
 # Hardness of HORN-SAT: the Horn discharge
@@ -106,7 +108,7 @@ noncomputable def bodyOccF (c : HornClause (L.sum Language.order) B k) (i : B.ι
 
 variable {A : Type} [L.Structure A] [LinearOrder A] {v : γ → A}
 
-theorem realize_headOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
+private theorem realize_headOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
     {u x : Fin (clauseDim B k) → γ} :
     (headOccF c i u x).Realize v ↔
       ∃ a ∈ c.head, a.idx = i ∧
@@ -137,7 +139,7 @@ theorem realize_headOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
       subst hae
       exact hi hi'
 
-theorem realize_bodyOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
+private theorem realize_bodyOccF {c : HornClause (L.sum Language.order) B k} {i : B.ι}
     {u x : Fin (clauseDim B k) → γ} :
     (bodyOccF c i u x).Realize v ↔
       ∃ a ∈ c.body, a.idx = i ∧
@@ -195,26 +197,26 @@ variable {prog : HornProgram (L.sum Language.order) B k}
 
 /-- **The clause elements**: one per clause of the program and per canonically
 padded tuple satisfying that clause's guard. -/
-theorem horn_isClause_cl (c : Fin prog.length) (w : Fin (clauseDim B k) → A) :
+private theorem horn_isClause_cl (c : Fin prog.length) (w : Fin (clauseDim B k) → A) :
     RelMap (M := (hornInterp prog).Map A) satIsClause ![(clTag c, w)] ↔
       (clauseAt prog c).guard.Realize (fun j => w (Fin.castLE le_clauseDim j)) ∧ Canon k w := by
   rw [FOInterpretation.relMap_map]
   exact Formula.realize_inf.trans (and_congr realize_guardF realize_canonF)
 
 /-- Elements carrying a variable tag are not clauses. -/
-theorem horn_not_isClause_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
+private theorem horn_not_isClause_var (i : B.ι) (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (hornInterp prog).Map A) satIsClause ![(varTag i, w)] :=
   id
 
 /-- Elements carrying the junk tag are not clauses. -/
-theorem horn_not_isClause_junk (w : Fin (clauseDim B k) → A) :
+private theorem horn_not_isClause_junk (w : Fin (clauseDim B k) → A) :
     ¬RelMap (M := (hornInterp prog).Map A) satIsClause
       ![((Sum.inr () : HornTag prog), w)] :=
   id
 
 /-- **The positive literals**: the head atom of the clause, at the canonically
 padded tuple of its arguments. -/
-theorem horn_posIn_cl_var (c : Fin prog.length) (i : B.ι)
+private theorem horn_posIn_cl_var (c : Fin prog.length) (i : B.ι)
     (u x : Fin (clauseDim B k) → A) :
     RelMap (M := (hornInterp prog).Map A) satPosIn ![(clTag c, u), (varTag i, x)] ↔
       ∃ a ∈ (clauseAt prog c).head, a.idx = i ∧ PadTup (atomIdx a) u x := by
@@ -223,7 +225,7 @@ theorem horn_posIn_cl_var (c : Fin prog.length) (i : B.ι)
 
 /-- **The negative literals**: any body atom of the clause, at the canonically
 padded tuple of its arguments. -/
-theorem horn_negIn_cl_var (c : Fin prog.length) (i : B.ι)
+private theorem horn_negIn_cl_var (c : Fin prog.length) (i : B.ι)
     (u x : Fin (clauseDim B k) → A) :
     RelMap (M := (hornInterp prog).Map A) satNegIn ![(clTag c, u), (varTag i, x)] ↔
       ∃ a ∈ (clauseAt prog c).body, a.idx = i ∧ PadTup (atomIdx a) u x := by

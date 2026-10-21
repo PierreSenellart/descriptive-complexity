@@ -9,6 +9,7 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Machine.AltMatrix
 public import DescriptiveComplexity.Problems.Machine.AltDefs
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Machine.AltDefs
 
 /-!
 # The `Σₖ` kernel of alternating acceptance
@@ -269,12 +270,12 @@ theorem relMap_akSt (i : Fin k) (v : Fin 2 → A) :
   let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact relMap_repSym tmGuessBlock TMIdx.state rfl k ρs i v
 
-theorem relMap_akHd (i : Fin k) (v : Fin 2 → A) :
+private theorem relMap_akHd (i : Fin k) (v : Fin 2 → A) :
     @RelMap (akLang k) A (akStructure ρs) 2 (akHd i) v ↔ ρs i .head v := by
   let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact relMap_repSym tmGuessBlock TMIdx.head rfl k ρs i v
 
-theorem relMap_akTp (i : Fin k) (v : Fin 3 → A) :
+private theorem relMap_akTp (i : Fin k) (v : Fin 3 → A) :
     @RelMap (akLang k) A (akStructure ρs) 3 (akTp i) v ↔ ρs i .tape v := by
   let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact relMap_repSym tmGuessBlock TMIdx.tape rfl k ρs i v
@@ -702,7 +703,7 @@ private theorem realize_inf_sentence (φ ψ : (akLang k).Sentence) :
   let := (repMerged tmGuessBlock k).structure (repBlockAssign tmGuessBlock A k ρs)
   exact Formula.realize_inf
 
-theorem realize_akStateExClause (i : Fin k) :
+private theorem realize_akStateExClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akStateExClause i)) ↔
       ∀ t, ∃ q, runQ (ρs i) t q := by
   simp only [akStateExClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
@@ -710,7 +711,7 @@ theorem realize_akStateExClause (i : Fin k) :
   exact ⟨fun h t => let ⟨j, hj⟩ := h fun _ => t; ⟨j 0, hj⟩,
     fun h j => let ⟨q, hq⟩ := h (j 0); ⟨fun _ => q, hq⟩⟩
 
-theorem realize_akStateUniqClause (i : Fin k) :
+private theorem realize_akStateUniqClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akStateUniqClause i)) ↔
       ∀ t q q', runQ (ρs i) t q → runQ (ρs i) t q' → q = q' := by
   simp only [akStateUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -718,7 +719,7 @@ theorem realize_akStateUniqClause (i : Fin k) :
   exact ⟨fun h t q q' h₁ h₂ => h ![t, q, q'] ⟨h₁, h₂⟩,
     fun h j hj => h (j 0) (j 1) (j 2) hj.1 hj.2⟩
 
-theorem realize_akHeadExClause (i : Fin k) :
+private theorem realize_akHeadExClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akHeadExClause i)) ↔
       ∀ t, ∃ p, runH (ρs i) t p := by
   simp only [akHeadExClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
@@ -726,7 +727,7 @@ theorem realize_akHeadExClause (i : Fin k) :
   exact ⟨fun h t => let ⟨j, hj⟩ := h fun _ => t; ⟨j 0, hj⟩,
     fun h j => let ⟨p, hp⟩ := h (j 0); ⟨fun _ => p, hp⟩⟩
 
-theorem realize_akHeadUniqClause (i : Fin k) :
+private theorem realize_akHeadUniqClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akHeadUniqClause i)) ↔
       ∀ t p p', runH (ρs i) t p → runH (ρs i) t p' → p = p' := by
   simp only [akHeadUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -734,7 +735,7 @@ theorem realize_akHeadUniqClause (i : Fin k) :
   exact ⟨fun h t p p' h₁ h₂ => h ![t, p, p'] ⟨h₁, h₂⟩,
     fun h j hj => h (j 0) (j 1) (j 2) hj.1 hj.2⟩
 
-theorem realize_akTapeExClause (i : Fin k) :
+private theorem realize_akTapeExClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akTapeExClause i)) ↔
       ∀ t p, ∃ a, runT (ρs i) t p a := by
   simp only [akTapeExClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_iExs,
@@ -742,7 +743,7 @@ theorem realize_akTapeExClause (i : Fin k) :
   exact ⟨fun h t p => let ⟨j, hj⟩ := h ![t, p]; ⟨j 0, hj⟩,
     fun h j => let ⟨a, ha⟩ := h (j 0) (j 1); ⟨fun _ => a, ha⟩⟩
 
-theorem realize_akTapeUniqClause (i : Fin k) :
+private theorem realize_akTapeUniqClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akTapeUniqClause i)) ↔
       ∀ t p a a', runT (ρs i) t p a → runT (ρs i) t p a' → a = a' := by
   simp only [akTapeUniqClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -750,21 +751,21 @@ theorem realize_akTapeUniqClause (i : Fin k) :
   exact ⟨fun h t p a a' h₁ h₂ => h ![t, p, a, a'] ⟨h₁, h₂⟩,
     fun h j hj => h (j 0) (j 1) (j 2) (j 3) hj.1 hj.2⟩
 
-theorem realize_akFunClause (i : Fin k) :
+private theorem realize_akFunClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akFunClause i)) ↔ RunFun (ρs i) := by
   simp only [akFunClause, realize_inf_sentence, realize_akStateExClause,
     realize_akStateUniqClause, realize_akHeadExClause, realize_akHeadUniqClause,
     realize_akTapeExClause, realize_akTapeUniqClause]
   exact Iff.rfl
 
-theorem realize_akInitClause (i : Fin k) :
+private theorem realize_akInitClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akInitClause i)) ↔
       ∀ p, MinPos (atmData k A).Le (atmData k A).Posn p → (atmData k A).RunInit (ρs i) p := by
   simp only [akInitClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     realize_akMinPosF, realize_akInitAtF, Sum.elim_inr]
   exact ⟨fun h p hp => h (fun _ => p) hp, fun h j hj => h (j 0) hj⟩
 
-theorem realize_akBlkMonoClause (i : Fin k) :
+private theorem realize_akBlkMonoClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akBlkMonoClause i)) ↔
       (atmData k A).RunBlkMono (ρs i) := by
   simp only [akBlkMonoClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
@@ -777,7 +778,7 @@ theorem realize_akBlkMonoClause (i : Fin k) :
   · rintro h j hj a b hab ⟨hx, hy⟩
     exact hab (h (j 0) (j 1) hj.1 (j 2) (j 3) hj.2.1 hj.2.2 a b hx hy)
 
-theorem realize_akStepClause (i : Fin k) :
+private theorem realize_akStepClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akStepClause i)) ↔
       ∀ p q, SuccPos (atmData k A).Le (atmData k A).Posn p q →
         (atmData k A).RunBlkLt (ρs i) ((i : ℕ) + 1) p →
@@ -790,14 +791,14 @@ theorem realize_akStepClause (i : Fin k) :
     Sum.elim_inr]
   exact ⟨fun h p q h₁ h₂ => h ![p, q] ⟨h₁, h₂⟩, fun h j hj => h (j 0) (j 1) hj.1 hj.2⟩
 
-theorem realize_akLegalClause (i : Fin k) :
+private theorem realize_akLegalClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akLegalClause i)) ↔
       (atmData k A).RunLegalBelow (ρs i) ((i : ℕ) + 1) := by
   simp only [akLegalClause, realize_inf_sentence, realize_akInitClause, realize_akBlkMonoClause,
     realize_akStepClause]
   exact Iff.rfl
 
-theorem realize_akAgreeClause (j i : Fin k) :
+private theorem realize_akAgreeClause (j i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akAgreeClause j i)) ↔
       (atmData k A).RunAgreeBelow (ρs j) (ρs i) ((j : ℕ) + 1) := by
   simp only [akAgreeClause, Sentence.Realize, Formula.realize_iAlls,
@@ -806,14 +807,14 @@ theorem realize_akAgreeClause (j i : Fin k) :
   exact and_congr ⟨fun h t h₁ h₂ => h (fun _ => t) ⟨h₁, h₂⟩, fun h l hl => h (l 0) hl.1 hl.2⟩
     ⟨fun h t t' h₁ h₂ => h ![t, t'] ⟨h₁, h₂⟩, fun h l hl => h (l 0) (l 1) hl.1 hl.2⟩
 
-theorem realize_akAccClause (i : Fin k) :
+private theorem realize_akAccClause (i : Fin k) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akAccClause i)) ↔
       (atmData k A).RunAccAt (ρs i) := by
   simp only [akAccClause, Sentence.Realize, Formula.realize_iAlls, Formula.realize_imp,
     realize_akMaxPosF, realize_akAccAtF, Sum.elim_inr]
   exact ⟨fun h p hp => h (fun _ => p) hp, fun h l hl => h (l 0) hl⟩
 
-theorem realize_akWfClause :
+private theorem realize_akWfClause :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akWfClause k)) ↔
       (atmData k A).toTMData.WellFormed := by
   simp only [akWfClause, akReflClause, akTransClause, akAntisymClause,
@@ -837,7 +838,7 @@ theorem realize_akWfClause :
     · exact let ⟨b, hb⟩ := h7; ⟨fun _ => b, hb⟩
     · exact fun l hl => h8 (l 0) (l 1) hl.1 hl.2
 
-theorem realize_akBwfClause :
+private theorem realize_akBwfClause :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akBwfClause k)) ↔
       (atmData k A).BlocksWellFormed k := by
   simp only [akBwfClause, akOneBlkClause, akStepBlkClause,
@@ -869,7 +870,7 @@ theorem realize_akBwfClause :
     · intro h l hl
       exact ⟨⟨0, lt_of_atmBlk (h (l 0) hl)⟩, rfl, h (l 0) hl⟩
 
-theorem realize_akStartExClause :
+private theorem realize_akStartExClause :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akStartExClause k)) ↔
       ∃ q, (atmData k A).Start q := by
   simp only [akStartExClause, Sentence.Realize, Formula.realize_iExs, realize_akStartF,
@@ -913,7 +914,7 @@ noncomputable def akKernel (start : Bool) (k : ℕ) : (akLang k).Sentence :=
   akWfClause k ⊓ (akBwfClause k ⊓ (akStartExClause k ⊓ akLadderF start k k 0 (by omega) none))
 
 /-- The round before round `i`, where there is one, is round `i - 1`. -/
-def PrevOk {k : ℕ} (i : ℕ) : Option (Fin k) → Prop
+private def PrevOk {k : ℕ} (i : ℕ) : Option (Fin k) → Prop
   | none => i = 0
   | some j => (j : ℕ) + 1 = i
 
@@ -922,7 +923,7 @@ section RealizeLadder
 variable {k : ℕ} {A : Type} [instA : (Language.turingAlt k).Structure A]
   (ρs : Fin k → tmGuessBlock.Assignment A)
 
-theorem realize_polForm (pol : Bool) (φ ψ : (akLang k).Sentence) :
+private theorem realize_polForm (pol : Bool) (φ ψ : (akLang k).Sentence) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (polForm pol φ ψ)) ↔
       polConn pol (@Sentence.Realize (akLang k) A (akStructure ρs) φ)
         (@Sentence.Realize (akLang k) A (akStructure ρs) ψ) := by
@@ -931,7 +932,7 @@ theorem realize_polForm (pol : Bool) (φ ψ : (akLang k).Sentence) :
   · exact Formula.realize_imp
   · exact Formula.realize_inf
 
-theorem realize_akRoundF (i : Fin k) (prev : Option (Fin k)) (hprev : PrevOk (i : ℕ) prev) :
+private theorem realize_akRoundF (i : Fin k) (prev : Option (Fin k)) (hprev : PrevOk (i : ℕ) prev) :
     (@Sentence.Realize (akLang k) A (akStructure ρs) (akRoundF i prev)) ↔
       RunFun (ρs i) ∧ (atmData k A).RunGuard (i : ℕ) (prev.map ρs) (ρs i) := by
   cases prev with
@@ -945,7 +946,7 @@ theorem realize_akRoundF (i : Fin k) (prev : Option (Fin k)) (hprev : PrevOk (i 
       realize_akAgreeClause, Option.map_some, ATMData.RunGuard, ATMData.RunRoundCond]
     rw [show (j : ℕ) + 1 = (i : ℕ) from hprev]
 
-theorem realize_akLadderF (start : Bool) :
+private theorem realize_akLadderF (start : Bool) :
     ∀ (m i : ℕ) (h : i + m = k) (prev : Option (Fin k)) (_ : PrevOk i prev)
       (νs : Fin m → tmGuessBlock.Assignment A) (_ : ∀ j : Fin m, νs j = ρs ⟨i + j, by omega⟩),
       (@Sentence.Realize (akLang k) A (akStructure ρs) (akLadderF start k m i h prev)) ↔

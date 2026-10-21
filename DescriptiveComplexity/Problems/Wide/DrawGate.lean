@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawEnc
+import all DescriptiveComplexity.Problems.Wide.DrawEnc
 
 /-!
 # The gate, decomposed the way the machine checks it
@@ -57,7 +58,7 @@ def decRho (S : (Fin dd → A) → Prop) : X.B.Assignment A :=
 variable {zero one}
 
 /-- On an encoding, the decoded assignment is the encoded one. -/
-theorem decRho_encPt (hne : zero ≠ one) (p : X.Point A) :
+private theorem decRho_encPt (hne : zero ≠ one) (p : X.Point A) :
     decRho ly zero one (encPt ly zero one p) = p.2 := by
   funext i w
   exact propext (mem_encPt_asg ly hne p i w)

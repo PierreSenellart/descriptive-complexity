@@ -8,6 +8,16 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawVerdict
 public import DescriptiveComplexity.Problems.Wide.DrawInstEval
 public import DescriptiveComplexity.Problems.Wide.DrawRun
+import all DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Problems.Wide.DrawGateFacts
+import all DescriptiveComplexity.Problems.Wide.DrawInstEval
+import all DescriptiveComplexity.Problems.Wide.DrawInstSeq
+import all DescriptiveComplexity.Problems.Wide.DrawInstVar
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
+import all DescriptiveComplexity.Problems.Wide.DrawVerdict
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # What the spine does to the tape at one address
@@ -116,7 +126,7 @@ noncomputable def wmNext (h : IsLinOrd Le) (w : α → Prop) : α → Prop :=
 
 /-- At an address with an increment, `wmNext` is it – the increment being
 unique. -/
-theorem wmNext_eq (h : IsLinOrd Le) {w w' : α → Prop} (hi : WMIncr Le w w') :
+private theorem wmNext_eq (h : IsLinOrd Le) {w w' : α → Prop} (hi : WMIncr Le w w') :
     wmNext h w = w' := by
   classical
   have hx : ∃ x, ¬w x := by
@@ -133,7 +143,7 @@ noncomputable def addrIter (h : IsLinOrd (WMSetLe Le)) (init : Q')
   iterOrd init step w
 
 /-- At the empty address the iteration is the base. -/
-theorem addrIter_bot (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
+private theorem addrIter_bot (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
     (init : Q') (step : (α → Prop) → Q' → Q') :
     addrIter h init step (fun _ => False) = init := by
   let := h.toLinearOrder
@@ -142,7 +152,7 @@ theorem addrIter_bot (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
 
 /-- **Across an increment the iteration steps once**, at the address it
 leaves. -/
-theorem addrIter_incr (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
+private theorem addrIter_incr (hL : IsLinOrd Le) (h : IsLinOrd (WMSetLe Le))
     {w w' : α → Prop} (hi : WMIncr Le w w') (init : Q')
     (step : (α → Prop) → Q' → Q') :
     addrIter h init step w' = step w (addrIter h init step w) := by
@@ -164,7 +174,7 @@ variable {L : Language.{0, 0}} (dt : Data L)
 /-! ### The enumeration of the variables -/
 
 /-- The enumeration lists every variable. -/
-theorem exists_varList_get (i : dt.d.B.ι) :
+private theorem exists_varList_get (i : dt.d.B.ι) :
     ∃ j : Fin dt.nv, dt.varList.get j = i := by
   let := Fintype.ofFinite dt.d.B.ι
   have hmem : i ∈ dt.varList := by
@@ -174,14 +184,14 @@ theorem exists_varList_get (i : dt.d.B.ι) :
   exact ⟨⟨(j : ℕ), j.isLt⟩, hj⟩
 
 /-- The enumeration lists each variable once. -/
-theorem varList_nodup : dt.varList.Nodup := by
+private theorem varList_nodup : dt.varList.Nodup := by
   let := Fintype.ofFinite dt.d.B.ι
   rw [varList]
   exact Finset.nodup_toList _
 
 variable {dt} in
 /-- Two positions carrying the same variable are the same position. -/
-theorem varList_get_inj {j j' : Fin dt.nv}
+private theorem varList_get_inj {j j' : Fin dt.nv}
     (h : dt.varList.get j = dt.varList.get j') : j = j' :=
   List.nodup_iff_injective_get.mp dt.varList_nodup h
 
@@ -215,7 +225,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 open Classical in
 /-- **What a position writes**: the variable's cell at the marker, nothing
 else. -/
-theorem new_postVarSt (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
+private theorem new_postVarSt (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (m : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (i' i : dt.d.B.ι) (b : Prop)
     (r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
@@ -263,7 +273,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 include hst in
 /-- **Anything a position's write leaves alone rides the whole spine**: the
 induction along the positions, once, for every field but `val` and `new`. -/
-theorem spineRide {β : Sort _}
+private theorem spineRide {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
     (hF : ∀ st m i b, F (dt.postVarSt v st m i b) = F st)
     (k : Fin (dt.nv + 1)) :
@@ -284,7 +294,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [Nonempty A] [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 include hst in
 /-- The working address rides the spine. -/
-theorem spine_mir (k : Fin (dt.nv + 1)) : (stOf k).mir = (stOf 0).mir :=
+private theorem spine_mir (k : Fin (dt.nv + 1)) : (stOf k).mir = (stOf 0).mir :=
   dt.spineRide hst (fun st => st.mir) (fun _ _ _ _ => rfl) k
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
@@ -296,7 +306,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
 include hstN in
 /-- **Off the marker, the `new` tracks ride the spine**: a position writes
 its own cell only. -/
-theorem spine_new_off (k : Fin (dt.nv + 1)) (i : dt.d.B.ι)
+private theorem spine_new_off (k : Fin (dt.nv + 1)) (i : dt.d.B.ι)
     {r : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hr : r ≠ v) : (stOf k).new i r ↔ (stOf 0).new i r := by
   classical
@@ -324,7 +334,7 @@ include hstN in
 /-- **At the marker, a variable's `new` cell is the verdict of its own
 position**: it is written there, and no later position writes it, the
 enumeration being duplicate-free. -/
-theorem new_last_get (j : Fin dt.nv) :
+private theorem new_last_get (j : Fin dt.nv) :
     (stOf (Fin.last dt.nv)).new (dt.varList.get j) v ↔ bOf j := by
   classical
   have key : ∀ (n : ℕ) (hn : n < dt.nv + 1) (j : Fin dt.nv), (j : ℕ) < n →
@@ -368,7 +378,7 @@ all clear** – the junk legs
 (`DescriptiveComplexity.Draw.Data.varLegFail_run`,
 `DescriptiveComplexity.Draw.Data.varLegUngated_run`) store `False`, which
 is what the stage dictionary holds at an address that encodes no tuple. -/
-theorem new_last_of_false (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
+private theorem new_last_of_false (hbOf : ∀ j : Fin dt.nv, ¬bOf j)
     (i : dt.d.B.ι) : ¬(stOf (Fin.last dt.nv)).new i v := by
   obtain ⟨j, hj⟩ := dt.exists_varList_get i
   subst hj
@@ -482,7 +492,7 @@ address's points.** The position of a variable writes its verdict, which
 `DescriptiveComplexity.StepDef.next`; the mirror and the dictionary ride
 the spine, so the semantic hypotheses need only be given at the entry
 state. -/
-theorem new_last_next
+private theorem new_last_next
     (hlin : IsLinOrd (WMLe (A := Univ A R (OuterPh (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
@@ -585,7 +595,7 @@ Below the address reached, the tracks are the target; elsewhere they are
 still the sweep's initial ones. Stated for an arbitrary target family `N`,
 so the same lemma serves the stage sweep (`N` the dictionary of
 `d.next σ`) and any other. -/
-theorem sweep_new
+private theorem sweep_new
     (hlin : IsLinOrd (WMLe (A := Univ A R (OuterPh (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd)))
     {s₀ s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
@@ -677,7 +687,7 @@ legs store `False` (`new_last_of_false`) and a track holds nothing where a
 block below the variable's arity encodes no point
 (`DescriptiveComplexity.Draw.not_trackOf_of_notEnc`), so the two readings
 agree there too. -/
-theorem new_last_trackOf_of_junk
+private theorem new_last_trackOf_of_junk
     {stOf : Fin (dt.nv + 1) →
       TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF))}
     {bOf : Fin dt.nv → Prop}
@@ -701,7 +711,7 @@ stage**: `new_last_next` read through
 invariant (`hmir`) turning the address's blocks into the ones the
 machinery read. This is the form the sweep's induction
 (`sweep_new`) consumes, and the form the *next* sweep's `hdict` is in. -/
-theorem new_last_trackOf
+private theorem new_last_trackOf
     (hlin : IsLinOrd (WMLe (A := Univ A R (OuterPh (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
@@ -795,7 +805,7 @@ omit [Fintype dt.SlotIx] [L.IsRelational] [Finite dt.KIx] [LinearOrder (dt.X.Map
 /-- **A passing round's valuation depends on the registers alone**: both
 states' choices encode the same block value, and the encoding is
 injective. -/
-theorem passW_congr {zero one : A} (hzo : zero ≠ one)
+private theorem passW_congr {zero one : A} (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R (OuterPh (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd)))
     (vi : dt.VarIx)
@@ -829,7 +839,7 @@ omit [Fintype dt.SlotIx] [L.IsRelational] [Finite dt.KIx] [LinearOrder (dt.X.Map
 /-- **The pass's pack transports to the pass's pack**: what a spine
 position's `hsem` is discharged by, when its pack is the entry state's
 carried forward by `kindSemCast`. -/
-theorem kindSemCast_passSem {zero one : A} (hzo : zero ≠ one)
+private theorem kindSemCast_passSem {zero one : A} (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R (OuterPh (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd)))
     (vi : dt.VarIx)
@@ -892,7 +902,7 @@ own thread produces. Those differ from the position's entry state in the
 two scratch registers and the register they enumerate, and a pack reads
 the state through the mirror and VAL alone, so the entry state's pack
 transports to all of them. -/
-noncomputable def spineSemT (zero one : A) (vi : dt.VarIx)
+private noncomputable def spineSemT (zero one : A) (vi : dt.VarIx)
     {st₀ st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF))}
     {v : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (mV : ιV → Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
@@ -927,7 +937,7 @@ omit [Fintype dt.SlotIx] [L.IsRelational] [Finite dt.KIx] [LinearOrder (dt.X.Map
 /-- **A carried pack is the pass's pack**: so a family defined by
 `spineSem` discharges every position's `hsem`
 (`new_last_next`, `new_last_trackOf`). -/
-theorem spineSem_passSem {zero one : A} (hzo : zero ≠ one)
+private theorem spineSem_passSem {zero one : A} (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R (OuterPh (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd)))
     (vi : dt.VarIx)
@@ -1223,12 +1233,12 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The mirror rides the built family** – by construction, not by the
 after-the-fact induction of `spine_mir`. -/
-theorem spineStOf_mir (k : Fin (dt.nv + 1)) :
+private theorem spineStOf_mir (k : Fin (dt.nv + 1)) :
     (dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
   (dt.spineNode (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf (k : ℕ)).2.1
 
 /-- The packs of the built family: the entry state's, carried. -/
-noncomputable def spineSemOf (j : Fin dt.nv) (a : ιV)
+private noncomputable def spineSemOf (j : Fin dt.nv) (a : ιV)
     (hp : ∀ ℓ : Fin (dt.nIn (dt.varAt j)),
       dt.igPassP RF PR.zero PR.one (dt.varAt j)
         (dt.roundSt (dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf
@@ -1244,7 +1254,7 @@ noncomputable def spineSemOf (j : Fin dt.nv) (a : ιV)
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The control's cover equation** – `evalSpine_run`'s `hfs`. -/
-theorem spineFsOf_succ (j : Fin dt.nv) :
+private theorem spineFsOf_succ (j : Fin dt.nv) :
     dt.spineFsOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
       dt.legCtl (v := v) (aT := aT) RF hord mV j
         (dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc)
@@ -1259,7 +1269,7 @@ theorem spineFsOf_succ (j : Fin dt.nv) :
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The tape's cover equation** – `evalSpine_run`'s `hst`. -/
-theorem spineStOf_succ (j : Fin dt.nv) :
+private theorem spineStOf_succ (j : Fin dt.nv) :
     dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.succ =
       dt.postVarSt v
         (dt.spineStOf (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf j.castSucc)
@@ -1283,7 +1293,7 @@ theorem spineStOf_succ (j : Fin dt.nv) :
 state – SAV and TARGET as its VAL loop left them – instead of the
 normalized one. The mirror still rides, which is what makes the next
 position's pack exist. -/
-noncomputable def spineNodeT :
+private noncomputable def spineNodeT :
     ℕ → Σ' st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)),
       PProd (st.mir = st₀.mir) (dt.CtlIx → A)
   | 0 => ⟨st₀, rfl, f₀⟩
@@ -1302,24 +1312,24 @@ noncomputable def spineNodeT :
     else prev
 
 /-- The threaded tape family of the spine. -/
-noncomputable def spineStOfT (k : Fin (dt.nv + 1)) :
+private noncomputable def spineStOfT (k : Fin (dt.nv + 1)) :
     TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
   (dt.spineNodeT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf (k : ℕ)).1
 
 /-- The threaded control family of the spine. -/
-noncomputable def spineFsOfT (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
+private noncomputable def spineFsOfT (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
   (dt.spineNodeT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf (k : ℕ)).2.2
 
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The mirror rides the threaded family too** – by construction. -/
-theorem spineStOfT_mir (k : Fin (dt.nv + 1)) :
+private theorem spineStOfT_mir (k : Fin (dt.nv + 1)) :
     (dt.spineStOfT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf k).mir = st₀.mir :=
   (dt.spineNodeT (v := v) (aT := aT) RF hord mV st₀ f₀ sem₀ tOf (k : ℕ)).2.1
 
 /-- The packs of the threaded family: the address's entry state's,
 transported to the loop's own states. -/
-noncomputable def spineSemOfT (j : Fin dt.nv)
+private noncomputable def spineSemOfT (j : Fin dt.nv)
     (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV)
     (hp : ∀ ℓ : Fin (dt.nIn (dt.varAt j)),
       dt.igPassP RF PR.zero PR.one (dt.varAt j)
@@ -1394,13 +1404,13 @@ noncomputable def spineFsOfB (k : Fin (dt.nv + 1)) : dt.CtlIx → A :=
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The mirror rides the branched family** – by construction. -/
-theorem spineStOfB_mir (k : Fin (dt.nv + 1)) :
+private theorem spineStOfB_mir (k : Fin (dt.nv + 1)) :
     (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB k).mir = st₀.mir :=
   (dt.spineNodeB (v := v) (aT := aT) RF hord mV st₀ f₀ semB (k : ℕ)).2.1
 
 /-- The packs of the branched family: the parameter's own, at the position's
 state – the gate being what makes them exist. -/
-noncomputable def spineSemOfB (j : Fin dt.nv)
+private noncomputable def spineSemOfB (j : Fin dt.nv)
     (hg : dt.gatedAt (PR := PR) RF j
       (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc))
     (p : Scratch dt A R (OuterPh (EvalPh dt.nv dt.PMF))) (a : ιV)
@@ -1421,7 +1431,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The branched control's cover equation** – `evalSpineB_run`'s
 `hfs`. -/
-theorem spineFsOfB_succ (j : Fin dt.nv) :
+private theorem spineFsOfB_succ (j : Fin dt.nv) :
     dt.spineFsOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.succ =
       dt.legCtlB (v := v) (aT := aT) RF hord mV j
         (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc)
@@ -1434,7 +1444,7 @@ theorem spineFsOfB_succ (j : Fin dt.nv) :
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The branched tape's cover equation** – `evalSpineB_run`'s `hst`. -/
-theorem spineStOfB_succ (j : Fin dt.nv) :
+private theorem spineStOfB_succ (j : Fin dt.nv) :
     dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.succ =
       dt.legStB (v := v) (aT := aT) RF hord mV j
         (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc)
@@ -1446,7 +1456,7 @@ theorem spineStOfB_succ (j : Fin dt.nv) :
 
 /-- **The verdicts of the branched family**: at each position, the stage
 bit its own leg writes. -/
-noncomputable def spineBitOfB (j : Fin dt.nv) : Prop :=
+private noncomputable def spineBitOfB (j : Fin dt.nv) : Prop :=
   dt.legBitB (v := v) (aT := aT) RF hord mV j
     (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j.castSucc)
     (dt.spineSemOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB j)
@@ -1457,7 +1467,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
 /-- **The branched family writes what a spine writes** – the projection of
 the cover equation the `new` tracks read, which is all the dictionary
 lemmas ask of a leg (`DescriptiveComplexity.Draw.Data.legStB_new`). -/
-theorem spineStOfB_writesNew :
+private theorem spineStOfB_writesNew :
     dt.WritesNew (v := v) (dt.spineStOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB)
       (dt.spineBitOfB (v := v) (aT := aT) RF hord mV st₀ f₀ semB) := by
   intro j i' r
@@ -1468,7 +1478,7 @@ theorem spineStOfB_writesNew :
 omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **A field no leg writes rides the branched spine.** -/
-theorem spineRideB {β : Sort _}
+private theorem spineRideB {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
     (hF : ∀ (j : Fin dt.nv)
       (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
@@ -1664,14 +1674,14 @@ noncomputable def sweepFsEG
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
-theorem sweepSWG_bot :
+private theorem sweepSWG_bot :
     dt.sweepSWG stE fsE hlin st₀ f₀ (fun _ => False) = st₀ :=
   congrArg Prod.fst (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
 
 omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
-theorem sweepFSG_bot :
+private theorem sweepFSG_bot :
     dt.sweepFSG stE fsE hlin st₀ f₀ (fun _ => False) = f₀ :=
   congrArg Prod.snd (addrIter_bot hlin (isLinOrd_wmSetLe hlin) (st₀, f₀) _)
 
@@ -1679,7 +1689,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **The tape's cover equation** – `reaches_sweep`'s `hSW`, verbatim. -/
-theorem sweepSWG_incr
+private theorem sweepSWG_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
     dt.sweepSWG stE fsE hlin st₀ f₀ w' =
@@ -1696,7 +1706,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **The control's cover equation** – `reaches_sweep`'s `hFS`. -/
-theorem sweepFSG_incr
+private theorem sweepFSG_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
     dt.sweepFSG stE fsE hlin st₀ f₀ w' =
@@ -1712,7 +1722,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [L.IsRelational] [L.Structure A] in
 /-- **A field neither an address's evaluation nor the advance writes rides
 the whole sweep.** -/
-theorem sweepSWG_ride {β : Sort _}
+private theorem sweepSWG_ride {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
     (hFE : ∀ u st f, F (stE u st f) = F st)
     (hFa : ∀ st u, F { dt.atSt st u with mir := u } = F st)
@@ -1732,7 +1742,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **The marker is at the address**, at every entry state of the sweep. -/
-theorem sweepSWG_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
+private theorem sweepSWG_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -1750,7 +1760,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **The mirror is at the address**, at every entry state of the sweep. -/
-theorem sweepSWG_mir (hmir₀ : st₀.mir = fun _ => False)
+private theorem sweepSWG_mir (hmir₀ : st₀.mir = fun _ => False)
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -1768,7 +1778,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [L.IsRelational] [L.Structure A] in
 /-- **`reaches_sweep`'s `hwkE`**: the marker is still at the address when
 the address's evaluation ends. -/
-theorem sweepStEG_wk (hFE : ∀ u st f, (stE u st f).wk = st.wk)
+private theorem sweepStEG_wk (hFE : ∀ u st f, (stE u st f).wk = st.wk)
     (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
@@ -1781,7 +1791,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [LinearOrder (OuterPh (EvalPh dt.nv dt.PMF))] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- **`reaches_sweep`'s `hmirE`**: so is the mirror. -/
-theorem sweepStEG_mir (hFE : ∀ u st f, (stE u st f).mir = st.mir)
+private theorem sweepStEG_mir (hFE : ∀ u st f, (stE u st f).mir = st.mir)
     (hmir₀ : st₀.mir = fun _ => False)
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
@@ -1795,7 +1805,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R]
   [L.IsRelational] [L.Structure A] in
 /-- **`reaches_sweep`'s `hltpE`**: the address is not the marked end, the
 mark being where the reduction planted it. -/
-theorem sweepStEG_ltp (hFE : ∀ u st f, (stE u st f).ltp = st.ltp)
+private theorem sweepStEG_ltp (hFE : ∀ u st f, (stE u st f).ltp = st.ltp)
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁)
@@ -1813,7 +1823,7 @@ itself**: the variant of
 `DescriptiveComplexity.Draw.Data.sweepStEG_mir` for an evaluation that
 normalizes the mirror to the address it is run at, which makes the
 invariant definitional instead of inductive. -/
-theorem sweepStEG_mir' (hFE : ∀ u st f, (stE u st f).mir = u)
+private theorem sweepStEG_mir' (hFE : ∀ u st f, (stE u st f).mir = u)
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     (dt.sweepStEG stE fsE hlin st₀ f₀ w).mir = w :=
   hFE w _ _
@@ -1919,7 +1929,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **`reaches_sweep`'s `hmirE`** for the branched evaluation, by
 construction – through `sweepStEG_mir'`. -/
-theorem stEndB_mir
+private theorem stEndB_mir
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (f : dt.CtlIx → A) :
@@ -1931,7 +1941,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
   [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **What the branched evaluation leaves alone** – `reaches_sweep`'s
 `hwkE` and `hltpE` through `sweepStEG_wk` and `sweepStEG_ltp`. -/
-theorem stEndB_ride {β : Sort _}
+private theorem stEndB_ride {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
     (hFmir : ∀ (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF))) m,
       F { st with mir := m } = F st)
@@ -1962,7 +1972,7 @@ omit [Finite R] [Finite (OuterPh (EvalPh dt.nv dt.PMF))] [Finite dt.KIx]
 /-- **Off the address it is run at, the branched evaluation leaves the stage
 tracks alone** – a position writes its own cell only
 (`spine_new_off`). -/
-theorem stEndB_new_off
+private theorem stEndB_new_off
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (st : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)))
     (f : dt.CtlIx → A) (i : dt.d.B.ι)
@@ -1997,14 +2007,14 @@ noncomputable def sweepSW
   (dt.sweepPair (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w).1
 
 /-- The sweep's control family – `reaches_sweep`'s `FS`. -/
-noncomputable def sweepFS
+private noncomputable def sweepFS
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     dt.CtlIx → A :=
   (dt.sweepPair (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w).2
 
 /-- The state the sweep leaves each address in – `reaches_sweep`'s
 `stE`. -/
-noncomputable def sweepStE
+private noncomputable def sweepStE
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) :=
   dt.stEnd (aT := aT) RF hord mV semOf tOf w
@@ -2013,7 +2023,7 @@ noncomputable def sweepStE
 
 /-- The control the sweep leaves each address in – `reaches_sweep`'s
 `fsE`. -/
-noncomputable def sweepFsE
+private noncomputable def sweepFsE
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop) :
     dt.CtlIx → A :=
   dt.fsEnd (aT := aT) RF hord mV semOf tOf w
@@ -2030,7 +2040,7 @@ omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The tape's cover equation** – `reaches_sweep`'s `hSW`, verbatim:
 the next address's entry state is this one's spine exit, its marker moved
 on and its mirror at the new address. -/
-theorem sweepSW_incr
+private theorem sweepSW_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
     dt.sweepSW (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w' =
@@ -2048,7 +2058,7 @@ theorem sweepSW_incr
 omit [LinearOrder (dt.X.Map A)] [Finite ιV] in
 /-- **The control's cover equation** – `reaches_sweep`'s `hFS`: the next
 address's entry control is this one's spine exit control. -/
-theorem sweepFS_incr
+private theorem sweepFS_incr
     {w w' : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hi : WMIncr WMLe w w') :
     dt.sweepFS (aT := aT) RF hord mV semOf tOf hlin st₀ f₀ w' =
@@ -2064,7 +2074,7 @@ theorem sweepFS_incr
 
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **A field a leg's write leaves alone rides one address's spine.** -/
-theorem sweepStE_ride {β : Sort _}
+private theorem sweepStE_ride {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
     (hF : ∀ (u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
       st m i b, F (dt.postVarSt u st m i b) = F st)
@@ -2082,7 +2092,7 @@ theorem sweepStE_ride {β : Sort _}
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **A field neither a leg nor the advance writes rides the whole
 sweep.** -/
-theorem sweepSW_ride {β : Sort _}
+private theorem sweepSW_ride {β : Sort _}
     (F : TapeStD dt A R (OuterPh (EvalPh dt.nv dt.PMF)) → β)
     (hF : ∀ (u : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
       st m i b, F (dt.postVarSt u st m i b) = F st)
@@ -2102,7 +2112,7 @@ theorem sweepSW_ride {β : Sort _}
 
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **The marker is at the address**, at every entry state of the sweep. -/
-theorem sweepSW_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
+private theorem sweepSW_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -2118,7 +2128,7 @@ theorem sweepSW_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
 
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **The mirror is at the address**, at every entry state of the sweep. -/
-theorem sweepSW_mir (hmir₀ : st₀.mir = fun _ => False)
+private theorem sweepSW_mir (hmir₀ : st₀.mir = fun _ => False)
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -2134,7 +2144,7 @@ theorem sweepSW_mir (hmir₀ : st₀.mir = fun _ => False)
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **`DescriptiveComplexity.Draw.Data.reaches_sweep`'s `hwkE`**: the
 marker is still at the address when the address's spine ends. -/
-theorem sweepStE_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
+private theorem sweepStE_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -2145,7 +2155,7 @@ theorem sweepStE_wk (hwk₀ : st₀.wk = fun r => r = (fun _ => False))
 
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **`reaches_sweep`'s `hmirE`**: so is the mirror. -/
-theorem sweepStE_mir (hmir₀ : st₀.mir = fun _ => False)
+private theorem sweepStE_mir (hmir₀ : st₀.mir = fun _ => False)
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -2157,7 +2167,7 @@ theorem sweepStE_mir (hmir₀ : st₀.mir = fun _ => False)
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **The permanent `ltp` mark rides the sweep**: neither a leg nor the
 advance writes it. -/
-theorem sweepStE_ltp_eq
+private theorem sweepStE_ltp_eq
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -2170,7 +2180,7 @@ theorem sweepStE_ltp_eq
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **`reaches_sweep`'s `hltpE`**: the address is not the marked end, the
 mark being where the reduction planted it. -/
-theorem sweepStE_ltp
+private theorem sweepStE_ltp
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁)
@@ -2195,7 +2205,7 @@ the fix is in the *program*, not here. -/
 
 omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **SAV rides the sweep.** -/
-theorem sweepSW_sav
+private theorem sweepSW_sav
     {s₁ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (w : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop)
     (hlb : WMSetLe WMLe (fun _ => False) w) (hub : WMSetLe WMLe w s₁) :
@@ -2207,7 +2217,7 @@ omit [Finite ιV] [LinearOrder (dt.X.Map A)] in
 /-- **So SAV can hold the address at one address only**: the spine's
 requirement `(SW w).sav = w` forces the sweep's range to be a single
 cell. -/
-theorem eq_of_sweepSW_sav
+private theorem eq_of_sweepSW_sav
     {s₁ w₁ w₂ : Univ A R (OuterPh (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd → Prop}
     (hlb₁ : WMSetLe WMLe (fun _ => False) w₁) (hub₁ : WMSetLe WMLe w₁ s₁)
     (hlb₂ : WMSetLe WMLe (fun _ => False) w₂) (hub₂ : WMSetLe WMLe w₂ s₁)
@@ -2358,7 +2368,7 @@ include hlin in
 /-- **`DescriptiveComplexity.Draw.Data.reaches_sweep`'s `hspine`, at one
 address**: the whole per-address evaluation runs, whichever legs each
 position's gates call for. -/
-theorem reaches_spineB
+private theorem reaches_spineB
     (hrules : ∀ (i : dt.SEF) (ρ : dt.SESh i),
       PR.rules (rEmb i ρ) =
         dt.evalRuleF PR.zero PR.one

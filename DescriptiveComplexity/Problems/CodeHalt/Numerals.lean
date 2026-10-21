@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # The numeral segment of a certificate
@@ -40,7 +41,7 @@ variable {D : Type} {Le : D → D → Prop}
 
 /-- **The number a value of the numeral segment stands for**: how many values
 lie strictly below it. -/
-noncomputable def numOf (Le : D → D → Prop) (d : D) : ℕ :=
+private noncomputable def numOf (Le : D → D → Prop) (d : D) : ℕ :=
   bitRank Le (fun _ => True) d
 
 /-- `d` is the least value of the segment, i.e., the numeral `0`. -/
@@ -53,23 +54,23 @@ def IsS (Le : D → D → Prop) (d d' : D) : Prop :=
 variable [Finite D] (hlin : IsLinOrd Le)
 include hlin
 
-theorem numOf_lt {x y : D} (hle : Le x y) (hne : x ≠ y) : numOf Le x < numOf Le y :=
+private theorem numOf_lt {x y : D} (hle : Le x y) (hne : x ≠ y) : numOf Le x < numOf Le y :=
   bitRank_lt hlin trivial hle hne
 
-theorem le_of_numOf_lt {x y : D} (h : numOf Le x < numOf Le y) : Le x y ∧ x ≠ y := by
+private theorem le_of_numOf_lt {x y : D} (h : numOf Le x < numOf Le y) : Le x y ∧ x ≠ y := by
   have hne : x ≠ y := fun hxy => absurd h (by rw [hxy]; omega)
   refine ⟨?_, hne⟩
   rcases hlin.2.2.2 x y with hxy | hyx
   · exact hxy
   · exact absurd (numOf_lt hlin hyx fun h' => hne h'.symm) (by omega)
 
-theorem numOf_injective {x y : D} (h : numOf Le x = numOf Le y) : x = y := by
+private theorem numOf_injective {x y : D} (h : numOf Le x = numOf Le y) : x = y := by
   by_contra hne
   rcases hlin.2.2.2 x y with hxy | hyx
   · exact absurd (numOf_lt hlin hxy hne) (by omega)
   · exact absurd (numOf_lt hlin hyx fun h' => hne h'.symm) (by omega)
 
-theorem le_iff_numOf_le {x y : D} : Le x y ↔ numOf Le x ≤ numOf Le y := by
+private theorem le_iff_numOf_le {x y : D} : Le x y ↔ numOf Le x ≤ numOf Le y := by
   constructor
   · intro hxy
     rcases eq_or_ne x y with rfl | hne
@@ -80,7 +81,7 @@ theorem le_iff_numOf_le {x y : D} : Le x y ↔ numOf Le x ≤ numOf Le y := by
     · exact (numOf_injective hlin heq) ▸ hlin.1 x
     · exact (le_of_numOf_lt hlin hlt).1
 
-theorem isZ_iff {d : D} : IsZ Le d ↔ numOf Le d = 0 := by
+private theorem isZ_iff {d : D} : IsZ Le d ↔ numOf Le d = 0 := by
   constructor
   · intro h
     have hset : {q : D | (fun _ => True) q ∧ Le q d ∧ q ≠ d} = ∅ := by
@@ -94,7 +95,7 @@ theorem isZ_iff {d : D} : IsZ Le d ↔ numOf Le d = 0 := by
     have hne : e ≠ d := fun hh => hde (hh ▸ hlin.1 e)
     exact absurd (numOf_lt hlin hed hne) (by omega)
 
-theorem isS_iff {d d' : D} : IsS Le d d' ↔ numOf Le d' = numOf Le d + 1 := by
+private theorem isS_iff {d d' : D} : IsS Le d d' ↔ numOf Le d' = numOf Le d + 1 := by
   constructor
   · rintro ⟨hle, hne, hbtw⟩
     have hset : {q : D | (fun _ => True) q ∧ Le q d' ∧ q ≠ d'} =
@@ -136,7 +137,7 @@ theorem isS_iff_succPos {d d' : D} : IsS Le d d' ↔ SuccPos Le (fun _ => True) 
 /-- **Every number below a reached one is reached**: the values of the segment
 are an initial segment of `ℕ`. This is what lets a bounded universal over the
 segment be read as a bounded universal over `ℕ`. -/
-theorem exists_numOf :
+private theorem exists_numOf :
     ∀ (Y : ℕ) (y : D), numOf Le y = Y → ∀ w, w ≤ Y → ∃ x : D, numOf Le x = w := by
   intro Y
   induction Y using Nat.strong_induction_on with
@@ -159,7 +160,7 @@ section Fin
 
 variable {N : ℕ}
 
-theorem isZ_fin {i : Fin (N + 1)} : IsZ (· ≤ ·) i ↔ (i : ℕ) = 0 := by
+private theorem isZ_fin {i : Fin (N + 1)} : IsZ (· ≤ ·) i ↔ (i : ℕ) = 0 := by
   constructor
   · intro h
     simpa [Fin.le_def] using (h 0 : i ≤ 0)
@@ -168,7 +169,7 @@ theorem isZ_fin {i : Fin (N + 1)} : IsZ (· ≤ ·) i ↔ (i : ℕ) = 0 := by
     rw [Fin.le_def]
     omega
 
-theorem isS_fin {i j : Fin (N + 1)} : IsS (· ≤ ·) i j ↔ (j : ℕ) = (i : ℕ) + 1 := by
+private theorem isS_fin {i j : Fin (N + 1)} : IsS (· ≤ ·) i j ↔ (j : ℕ) = (i : ℕ) + 1 := by
   constructor
   · rintro ⟨hle, hne, hbtw⟩
     have hle' : (i : ℕ) ≤ (j : ℕ) := by rwa [← Fin.le_def]

@@ -147,25 +147,27 @@ def midPt (u v : A) : incInterp.Map A := (.arcMid, ![u, v])
 /-- The end node of an arc. -/
 def endPt (u v : A) : incInterp.Map A := (.arcEnd, ![u, v])
 
-theorem two_eta (w : Fin 2 → A) : w = ![w 0, w 1] := by
+private theorem two_eta (w : Fin 2 → A) : w = ![w 0, w 1] := by
   funext i; fin_cases i <;> rfl
 
 /-- A point of the vertex level, in named form. -/
-theorem vtx_eta (w : Fin 2 → A) : ((NodeTag.vtx, w) : incInterp.Map A) = vPt2 (w 0) (w 1) :=
+private theorem vtx_eta (w : Fin 2 → A) : ((NodeTag.vtx, w) : incInterp.Map A) = vPt2 (w 0) (w 1) :=
   Prod.ext_iff.mpr ⟨rfl, two_eta w⟩
 
 /-- A point of the middle level, in named form. -/
-theorem mid_eta (w : Fin 2 → A) : ((NodeTag.arcMid, w) : incInterp.Map A) = midPt (w 0) (w 1) :=
+private theorem mid_eta
+    (w : Fin 2 → A) : ((NodeTag.arcMid, w) : incInterp.Map A) = midPt (w 0) (w 1) :=
   Prod.ext_iff.mpr ⟨rfl, two_eta w⟩
 
 /-- A point of the end level, in named form. -/
-theorem end_eta (w : Fin 2 → A) : ((NodeTag.arcEnd, w) : incInterp.Map A) = endPt (w 0) (w 1) :=
+private theorem end_eta
+    (w : Fin 2 → A) : ((NodeTag.arcEnd, w) : incInterp.Map A) = endPt (w 0) (w 1) :=
   Prod.ext_iff.mpr ⟨rfl, two_eta w⟩
 
-theorem vPt_injective : Function.Injective (vPt (A := A)) := fun _ _ h =>
+private theorem vPt_injective : Function.Injective (vPt (A := A)) := fun _ _ h =>
   congrArg (fun p : incInterp.Map A => p.2 0) h
 
-theorem midPt_inj {u v u' v' : A} (h : midPt u v = midPt u' v') : u = u' ∧ v = v' :=
+private theorem midPt_inj {u v u' v' : A} (h : midPt u v = midPt u' v') : u = u' ∧ v = v' :=
   ⟨congrArg (fun p : incInterp.Map A => p.2 0) h, congrArg (fun p : incInterp.Map A => p.2 1) h⟩
 
 end Points
@@ -204,7 +206,7 @@ theorem pat_endPt (u v : A) :
 hypothesis is unfolded by `rcases` rather than by `rw`: the defining formula's
 realization is definitionally a conjunction, and a pair literal at
 `FOInterpretation.Map` type does not match at rewriting transparency. -/
-theorem patV_cases {p : incInterp.Map A} (h : TDPatV p) :
+private theorem patV_cases {p : incInterp.Map A} (h : TDPatV p) :
     (∃ v, TGPatV v ∧ p = vPt v) ∨
       (∃ u v, (TGPatV u ∧ TGPatV v ∧ TGPatE u v) ∧ p = midPt u v) ∨
       ∃ u v, (TGPatV u ∧ TGPatV v ∧ TGPatE u v) ∧ p = endPt u v := by
@@ -220,7 +222,7 @@ theorem patV_cases {p : incInterp.Map A} (h : TDPatV p) :
 /-- The only arcs are the three of the gadget: the tags of an arc's endpoints
 climb the three levels. The six forbidden tag combinations need no argument –
 their defining formula is `⊥`, so the hypothesis *is* `False`. -/
-theorem pat_arc_tag {p q : incInterp.Map A} (h : TDPatArc p q) :
+private theorem pat_arc_tag {p q : incInterp.Map A} (h : TDPatArc p q) :
     (p.1 = .vtx ∧ q.1 = .arcMid) ∨ (p.1 = .vtx ∧ q.1 = .arcEnd) ∨
       (p.1 = .arcMid ∧ q.1 = .arcEnd) := by
   obtain ⟨t, w⟩ := p
@@ -237,11 +239,13 @@ theorem pat_no_in_vPt (q : incInterp.Map A) (v : A) : ¬TDPatArc q (vPt v) := fu
   rcases pat_arc_tag h with ⟨-, h'⟩ | ⟨-, h'⟩ | ⟨-, h'⟩ <;> exact absurd h' (by simp [vPt, vPt2])
 
 /-- An end node points at nothing: level 2 is the top. -/
-theorem pat_no_out_endPt (u v : A) (q : incInterp.Map A) : ¬TDPatArc (endPt u v) q := fun h => by
+private theorem pat_no_out_endPt
+    (u v : A) (q : incInterp.Map A) : ¬TDPatArc (endPt u v) q := fun h => by
   rcases pat_arc_tag h with ⟨h', -⟩ | ⟨h', -⟩ | ⟨h', -⟩ <;> exact absurd h' (by simp [endPt])
 
 /-- Two middle nodes are never joined: they sit at the same level. -/
-theorem pat_no_arc_mid_mid (u v u' v' : A) : ¬TDPatArc (midPt u v) (midPt u' v') := fun h => by
+private theorem pat_no_arc_mid_mid
+    (u v u' v' : A) : ¬TDPatArc (midPt u v) (midPt u' v') := fun h => by
   rcases pat_arc_tag h with ⟨h', -⟩ | ⟨h', -⟩ | ⟨-, h'⟩ <;> exact absurd h' (by simp [midPt])
 
 @[simp]
@@ -303,7 +307,7 @@ theorem host_endPt (u v : A) :
 hypothesis is unfolded by `rcases` rather than by `rw`: the defining formula's
 realization is definitionally a conjunction, and a pair literal at
 `FOInterpretation.Map` type does not match at rewriting transparency. -/
-theorem hostV_cases {p : incInterp.Map A} (h : TDHostV p) :
+private theorem hostV_cases {p : incInterp.Map A} (h : TDHostV p) :
     (∃ v, TGHostV v ∧ p = vPt v) ∨
       (∃ u v, (TGHostV u ∧ TGHostV v ∧ TGHostE u v) ∧ p = midPt u v) ∨
       ∃ u v, (TGHostV u ∧ TGHostV v ∧ TGHostE u v) ∧ p = endPt u v := by
@@ -319,7 +323,7 @@ theorem hostV_cases {p : incInterp.Map A} (h : TDHostV p) :
 /-- The only arcs are the three of the gadget: the tags of an arc's endpoints
 climb the three levels. The six forbidden tag combinations need no argument –
 their defining formula is `⊥`, so the hypothesis *is* `False`. -/
-theorem host_arc_tag {p q : incInterp.Map A} (h : TDHostArc p q) :
+private theorem host_arc_tag {p q : incInterp.Map A} (h : TDHostArc p q) :
     (p.1 = .vtx ∧ q.1 = .arcMid) ∨ (p.1 = .vtx ∧ q.1 = .arcEnd) ∨
       (p.1 = .arcMid ∧ q.1 = .arcEnd) := by
   obtain ⟨t, w⟩ := p
@@ -332,15 +336,17 @@ theorem host_arc_tag {p q : incInterp.Map A} (h : TDHostArc p q) :
       | exact Or.inr (Or.inr ⟨rfl, rfl⟩)
 
 /-- Nothing points at a vertex node: level 0 is the bottom. -/
-theorem host_no_in_vPt (q : incInterp.Map A) (v : A) : ¬TDHostArc q (vPt v) := fun h => by
+private theorem host_no_in_vPt (q : incInterp.Map A) (v : A) : ¬TDHostArc q (vPt v) := fun h => by
   rcases host_arc_tag h with ⟨-, h'⟩ | ⟨-, h'⟩ | ⟨-, h'⟩ <;> exact absurd h' (by simp [vPt, vPt2])
 
 /-- An end node points at nothing: level 2 is the top. -/
-theorem host_no_out_endPt (u v : A) (q : incInterp.Map A) : ¬TDHostArc (endPt u v) q := fun h => by
+private theorem host_no_out_endPt
+    (u v : A) (q : incInterp.Map A) : ¬TDHostArc (endPt u v) q := fun h => by
   rcases host_arc_tag h with ⟨h', -⟩ | ⟨h', -⟩ | ⟨h', -⟩ <;> exact absurd h' (by simp [endPt])
 
 /-- Two middle nodes are never joined: they sit at the same level. -/
-theorem host_no_arc_mid_mid (u v u' v' : A) : ¬TDHostArc (midPt u v) (midPt u' v') := fun h => by
+private theorem host_no_arc_mid_mid
+    (u v u' v' : A) : ¬TDHostArc (midPt u v) (midPt u' v') := fun h => by
   rcases host_arc_tag h with ⟨h', -⟩ | ⟨h', -⟩ | ⟨-, h'⟩ <;> exact absurd h' (by simp [midPt])
 
 @[simp]
@@ -400,26 +406,26 @@ theorem hostLt_iff (p q : incInterp.Map A) : TDHostLt p q ↔ level p.1 < level 
       | exact ⟨fun _ => by simp [level], fun _ => id⟩
 
 /-- Arcs climb the levels, on the pattern side. -/
-theorem patLt_of_patArc {p q : incInterp.Map A} (h : TDPatArc p q) : TDPatLt p q := by
+private theorem patLt_of_patArc {p q : incInterp.Map A} (h : TDPatArc p q) : TDPatLt p q := by
   rcases pat_arc_tag h with ⟨h₁, h₂⟩ | ⟨h₁, h₂⟩ | ⟨h₁, h₂⟩ <;>
     exact (patLt_iff p q).mpr (by rw [h₁, h₂]; decide)
 
 /-- Arcs climb the levels, on the host side. -/
-theorem hostLt_of_hostArc {p q : incInterp.Map A} (h : TDHostArc p q) : TDHostLt p q := by
+private theorem hostLt_of_hostArc {p q : incInterp.Map A} (h : TDHostArc p q) : TDHostLt p q := by
   rcases host_arc_tag h with ⟨h₁, h₂⟩ | ⟨h₁, h₂⟩ | ⟨h₁, h₂⟩ <;>
     exact (hostLt_iff p q).mpr (by rw [h₁, h₂]; decide)
 
 /-- **The pattern side of the image is a DAG**, with the carried order as
 witness: the order is the level comparison, so irreflexivity and transitivity
 are those of `<` on `ℕ`, and every arc climbs a level. -/
-theorem topoOn_pat : TopoOn (TDPatV (A := incInterp.Map A)) TDPatLt TDPatArc :=
+private theorem topoOn_pat : TopoOn (TDPatV (A := incInterp.Map A)) TDPatLt TDPatArc :=
   ⟨fun p _ h => absurd ((patLt_iff p p).mp h) (lt_irrefl _),
     fun p q r _ _ _ h₁ h₂ =>
       (patLt_iff p r).mpr (((patLt_iff p q).mp h₁).trans ((patLt_iff q r).mp h₂)),
     fun _ _ _ _ h => patLt_of_patArc h⟩
 
 /-- **The host side of the image is a DAG**, likewise. -/
-theorem topoOn_host : TopoOn (TDHostV (A := incInterp.Map A)) TDHostLt TDHostArc :=
+private theorem topoOn_host : TopoOn (TDHostV (A := incInterp.Map A)) TDHostLt TDHostArc :=
   ⟨fun p _ h => absurd ((hostLt_iff p p).mp h) (lt_irrefl _),
     fun p q r _ _ _ h₁ h₂ =>
       (hostLt_iff p r).mpr (((hostLt_iff p q).mp h₁).trans ((hostLt_iff q r).mp h₂)),
@@ -449,7 +455,7 @@ theorem liftMap_midPt (g : A → A) (u v : A) : liftMap g (midPt u v) = midPt (g
 theorem liftMap_endPt (g : A → A) (u v : A) : liftMap g (endPt u v) = endPt (g u) (g v) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => by fin_cases i <;> rfl⟩
 
-theorem liftMap_tag (g : A → A) (p : incInterp.Map A) : (liftMap g p).1 = p.1 := rfl
+private theorem liftMap_tag (g : A → A) (p : incInterp.Map A) : (liftMap g p).1 = p.1 := rfl
 
 end Lift
 
@@ -458,7 +464,8 @@ section Forward
 variable {A : Type} [Language.twoGraphs.Structure A]
 
 /-- Both coordinates of a pattern node are marked vertices. -/
-theorem patV_coords {p : incInterp.Map A} (h : TDPatV p) : TGPatV (p.2 0) ∧ TGPatV (p.2 1) := by
+private theorem patV_coords
+    {p : incInterp.Map A} (h : TDPatV p) : TGPatV (p.2 0) ∧ TGPatV (p.2 1) := by
   rcases patV_cases h with ⟨v, hv, rfl⟩ | ⟨u, v, ⟨hu, hv, -⟩, rfl⟩ | ⟨u, v, ⟨hu, hv, -⟩, rfl⟩
   · exact ⟨hv, hv⟩
   · exact ⟨hu, hv⟩
@@ -468,7 +475,7 @@ theorem patV_coords {p : incInterp.Map A} (h : TDPatV p) : TGPatV (p.2 0) ∧ TG
 graphs lifts, level by level, to an isomorphism of the two DAGs. The six
 combinations of levels that carry no arc are dispatched by the level lemmas,
 the three that do by the corresponding characterizations. -/
-theorem relIsoOn_map (g : A → A)
+private theorem relIsoOn_map (g : A → A)
     (hmaps : ∀ x, TGPatV x → TGHostV (g x))
     (hinj : ∀ x y, TGPatV x → TGPatV y → g x = g y → x = y)
     (hsurj : ∀ y, TGHostV y → ∃ x, TGPatV x ∧ g x = y)
@@ -546,7 +553,7 @@ include hmaps hsurj hedge
 /-- An isomorphism of the DAGs sends vertex nodes to vertex nodes: they are the
 nodes nothing points at, and that is preserved because every host node is the
 image of a pattern node. -/
-theorem image_vPt {v : A} (hv : TGPatV v) : ∃ w, TGHostV w ∧ F (vPt v) = vPt w := by
+private theorem image_vPt {v : A} (hv : TGPatV v) : ∃ w, TGHostV w ∧ F (vPt v) = vPt w := by
   have hpv : TDPatV (vPt v) := (pat_vPt v).mpr hv
   have hnoin : ∀ q, TDHostV q → ¬TDHostArc q (F (vPt v)) := by
     intro q hq harc
@@ -563,7 +570,7 @@ theorem image_vPt {v : A} (hv : TGPatV v) : ∃ w, TGHostV w ∧ F (vPt v) = vPt
 omit hmaps in
 /-- Nothing follows the image of an end node: end nodes are the nodes with no
 outgoing arc, and that too is preserved. -/
-theorem image_endPt_no_out {x y : A} (he : TDPatV (endPt x y)) (q : incInterp.Map A)
+private theorem image_endPt_no_out {x y : A} (he : TDPatV (endPt x y)) (q : incInterp.Map A)
     (hq : TDHostV q) : ¬TDHostArc (F (endPt x y)) q := by
   intro harc
   obtain ⟨p, hp, rfl⟩ := hsurj q hq
@@ -572,7 +579,7 @@ theorem image_endPt_no_out {x y : A} (he : TDPatV (endPt x y)) (q : incInterp.Ma
 omit hsurj in
 /-- The image of a middle node is a middle node: it has both an incoming and an
 outgoing arc, which no other level has. -/
-theorem image_midPt_shape {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPatE x y) :
+private theorem image_midPt_shape {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPatE x y) :
     ∃ x' y', (TGHostV x' ∧ TGHostV y' ∧ TGHostE x' y') ∧ F (midPt x y) = midPt x' y' := by
   have hmid : TDPatV (midPt x y) := (pat_midPt x y).mpr ⟨hx, hy, hxy⟩
   have hend : TDPatV (endPt x y) := (pat_endPt x y).mpr ⟨hx, hy, hxy⟩
@@ -587,7 +594,7 @@ theorem image_midPt_shape {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPat
   · exact absurd (hFw ▸ hout) (host_no_out_endPt x' y' _)
 
 /-- The image of an end node is an end node. -/
-theorem image_endPt_shape {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPatE x y) :
+private theorem image_endPt_shape {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPatE x y) :
     ∃ x' y', (TGHostV x' ∧ TGHostV y' ∧ TGHostE x' y') ∧ F (endPt x y) = endPt x' y' := by
   have hmid : TDPatV (midPt x y) := (pat_midPt x y).mpr ⟨hx, hy, hxy⟩
   have hend : TDPatV (endPt x y) := (pat_endPt x y).mpr ⟨hx, hy, hxy⟩
@@ -607,7 +614,7 @@ include hg
 /-- The image of the middle node of an arc is the middle node of the image
 arc: the tail is pinned by the arc from the tail's vertex node, the head by the
 arc from the head's vertex node through the end node. -/
-theorem image_midPt_eq {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPatE x y) :
+private theorem image_midPt_eq {x y : A} (hx : TGPatV x) (hy : TGPatV y) (hxy : TGPatE x y) :
     F (midPt x y) = midPt (g x) (g y) ∧ F (endPt x y) = endPt (g x) (g y) := by
   obtain ⟨x', y', hnode', hmid'⟩ := image_midPt_shape F hmaps hedge hx hy hxy
   obtain ⟨x'', y'', hnode'', hend'⟩ := image_endPt_shape F hmaps hsurj hedge hx hy hxy
@@ -646,7 +653,7 @@ variable {A : Type} [Language.twoGraphs.Structure A]
 vertex nodes, so it restricts to a bijection of the marked vertices, and the
 arcs of the graphs are recovered from the arcs of the gadget through the middle
 and end nodes. -/
-theorem relIsoOn_of_dagIso
+private theorem relIsoOn_of_dagIso
     (h : RelIsoOn (TDPatV (A := incInterp.Map A)) TDHostV TDPatArc TDHostArc) :
     RelIsoOn (TGPatV (A := A)) TGHostV TGPatE TGHostE := by
   classical
@@ -700,7 +707,8 @@ theorem relIsoOn_of_dagIso
 
 /-- **Correctness of the reduction**: the two graphs are isomorphic exactly
 when the two DAGs built from them are. -/
-theorem hasDigraphIso_iff_hasDagIso_map (A : Type) [Language.twoGraphs.Structure A] [Finite A] :
+private theorem hasDigraphIso_iff_hasDagIso_map
+    (A : Type) [Language.twoGraphs.Structure A] [Finite A] :
     HasDigraphIso A ↔ HasDagIso (incInterp.Map A) := by
   constructor
   · rintro ⟨-, g, hmaps, hinj, hsurj, hedge⟩
@@ -717,7 +725,7 @@ end DagIso
 twice, and carry the level comparison as the topological order. Two dimensions,
 three tags, and no order on the input – the reduction is order-free, as every
 reduction between isomorphism problems must be. -/
-def digraphIso_fo_reduction_dagIso : DigraphIso ≤ᶠᵒ DagIso where
+private def digraphIso_fo_reduction_dagIso : DigraphIso ≤ᶠᵒ DagIso where
   Tag := DagIso.NodeTag
   dim := 2
   toInterpretation := DagIso.incInterp

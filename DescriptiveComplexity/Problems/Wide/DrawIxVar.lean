@@ -7,6 +7,24 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawIxRound
 public import DescriptiveComplexity.Problems.Wide.DrawInstVar
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Wide.Blocks
+import all DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawInner
+import all DescriptiveComplexity.Problems.Wide.DrawInstVar
+import all DescriptiveComplexity.Problems.Wide.DrawIxRound
+import all DescriptiveComplexity.Problems.Wide.DrawIxSeq
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
+import all DescriptiveComplexity.Problems.Wide.DrawRunVar
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # One variable's machinery at an arbitrary file
@@ -133,7 +151,7 @@ omit hord in
 landing one cell right of the marker, the walk-back, the whole gate
 sequence at a gated address, and the walk-back at the verdict
 checkpoint. -/
-theorem ixVarGates_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
+private theorem ixVarGates_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u) (f₀ : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn (dt.ixVarGatesCost A vi w wP)
       ⟨Sum.inr (PR.stElt (emb (.gatesP (.chk 0))) f₀), Sum.inl v',
         wideTape (PR.trackTapeAt F.cell Slot.val
@@ -247,7 +265,7 @@ omit hord in
 /-- **The gates' leg at a junk address**: the walk-back, the passing
 prefix, the failing block, and the walk-back at the verdict checkpoint –
 the fail store applied, the flag clear. -/
-theorem ixVarGatesFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
+private theorem ixVarGatesFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : I} (hfail : ¬TestOf ℓ₀ u₀)
     (f₀ : dt.CtlIx → A) :
@@ -347,7 +365,7 @@ include hix htop in
 slot equations `DescriptiveComplexity.Draw.Data.var_run`'s kits read are
 definitional in `DescriptiveComplexity.Draw.Data.back`, given the marker
 and the order facts. -/
-theorem ixVarBg_back (stV : TapeSt dt A R P I)
+private theorem ixVarBg_back (stV : TapeSt dt A R P I)
     (hwkV : stV.wk = fun r => r = v) :
     dt.VarBg F PR.zero PR.one v gtop
       (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le stV) stV.val := by
@@ -362,7 +380,7 @@ omit hord in
 /-- **The whole machinery at a junk address**: entry, the failing gates,
 and the verdict checkpoint's clear flag routing straight to the exit with
 the stage slot erased – the VAL loop never entered. -/
-theorem ixVarMachineFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
+private theorem ixVarMachineFail_reachesIn (ℓ₀ : Fin (dt.arOf vi))
     (hTestLt : ∀ ℓ : Fin (dt.arOf vi), (ℓ : ℕ) < (ℓ₀ : ℕ) → ∀ u, TestOf ℓ u)
     {u₀ : I} (hfail : ¬TestOf ℓ₀ u₀)
     (f₀ : dt.CtlIx → A)
@@ -451,7 +469,7 @@ dispatched tag or its domain sentence failing. The gates complete with the
 flag clear, and the verdict checkpoint routes straight to the exit with
 the stage slot erased – the VAL loop never entered. The third landing an
 arbitrary address makes, beside the gated and the shape-failing ones. -/
-theorem ixVarMachineUngated_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u)
+private theorem ixVarMachineUngated_reachesIn (hTestOf : ∀ ℓ u, TestOf ℓ u)
     (ℓ₀ : Fin (dt.arOf vi))
     (hbad : ¬((∀ t' : dt.X.Tag,
         wmBlk (ixAddr elt st.mir)
@@ -559,7 +577,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] [L.IsRelational]
   [Finite dt.KIx] in
 omit [Finite I] in
 /-- **Two round states at the same register ask the same pass.** -/
-theorem ixIGPassP_roundSt (zero one : A) (vi : dt.VarIx)
+private theorem ixIGPassP_roundSt (zero one : A) (vi : dt.VarIx)
     (st st' : TapeSt dt A R P I)
     (m : I → Prop)
     (ℓ : Fin (dt.nIn vi)) :
@@ -575,14 +593,14 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 omit [Finite I] in
 /-- A state written with the register it already holds is itself. -/
-theorem ixRoundSt_val (stV : TapeSt dt A R P I) : dt.ixRoundSt stV stV.val = stV :=
+private theorem ixRoundSt_val (stV : TapeSt dt A R P I) : dt.ixRoundSt stV stV.val = stV :=
   rfl
 
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 omit [Finite I] in
 /-- Two round states' backgrounds agree off the VAL slot. -/
-theorem ixBack_roundSt_off {zero one : A}
+private theorem ixBack_roundSt_off {zero one : A}
     (m₁ m₂ : I → Prop)
     (r : Univ A R P dt.KIx dt.dd → Prop) (s : dt.SlotIx)
     (hs : s ≠ Slot.val) :
@@ -612,7 +630,7 @@ omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P]
   [L.IsRelational] [L.Structure A] [Finite dt.KIx] in
 omit [Finite I] [Nonempty A] in
 /-- The carry is unique, so the chosen one is the hypothesis's. -/
-theorem ixValCarry_eq (hix : IsLinOrd F.le)
+private theorem ixValCarry_eq (hix : IsLinOrd F.le)
     {m : I → Prop} {u₀ : I} (h1 : ¬m u₀) (h2 : ∀ w, WMLt F.le u₀ w → m w) :
     dt.ixValCarry F m = some u₀ := by
   classical
@@ -696,7 +714,7 @@ the enumeration, the accumulator vector of the control thread reads the
 `accCVal` contributions of the inner quantifier prefix at the blocks of the
 register's **address** – the invariant that turns the machinery's exit
 verdict into the prefix's value. -/
-theorem ixReadAcc_varFM
+private theorem ixReadAcc_varFM
     {a₀ : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
@@ -963,7 +981,7 @@ include hlin hord hinj hix hmono hup hblkP in
 exhausted register – every inner block full – the exit fold's bit is the
 alternating quantifier prefix over the inner blocks, applied to the
 matrix's value. -/
-theorem ixAccVerdict_varFM
+private theorem ixAccVerdict_varFM
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
@@ -1034,7 +1052,7 @@ include hlin hinj heltP in
 semantic pack built by `ixMkKindSem` from the encoded valuation, the fold's
 leaf after the matrix pass is the quantifier-free matrix's value at that
 valuation – the concrete form of the invariant's `hleaf` hypothesis. -/
-theorem ixPostLeaf_roundFX [LinearOrder (dt.X.Map A)]
+private theorem ixPostLeaf_roundFX [LinearOrder (dt.X.Map A)]
     (σ : dt.d.B.Assignment (dt.X.Map A)) (a : ιV)
     (wa : Fin (dt.nOf vi) → dt.X.Map A)
     (hENCa : ∀ j : Fin (dt.nOf vi),
@@ -1070,7 +1088,7 @@ exhausted register is the alternating quantifier prefix over the inner
 blocks, applied to the quantifier-free matrix's realization. The remaining
 interface (`hPs`) is the well-definedness of the matrix's value as a
 function of the blocks alone – the encoding layer's obligation. -/
-theorem ixAccVerdict_varFM_qfValue [LinearOrder (dt.X.Map A)]
+private theorem ixAccVerdict_varFM_qfValue [LinearOrder (dt.X.Map A)]
     {a₀ aT : ιV} (hbotV : ∀ a, a₀ ≤ a) (hmV0 : mV a₀ = fun _ => False)
     (hUse : ∀ (a : ιV) (u : I), mV a u → Use u)
     (hIncr : ∀ a a' : ιV, a < a' → (∀ b, ¬(a < b ∧ b < a')) →
@@ -1358,7 +1376,7 @@ noncomputable def ixVarFXT (fG : dt.CtlIx → A) (a : ιV) : dt.CtlIx → A :=
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **The registers a round leaves alone ride the whole loop** – by
 construction now, since only the two scratch ones are threaded. -/
-theorem ixVarStT_fields (fG : dt.CtlIx → A) (a : ιV) :
+private theorem ixVarStT_fields (fG : dt.CtlIx → A) (a : ιV) :
     (dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).wk = st.wk ∧
       (dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).mir = st.mir ∧
       (dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).bot = st.bot ∧
@@ -1368,7 +1386,7 @@ theorem ixVarStT_fields (fG : dt.CtlIx → A) (a : ιV) :
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- A round leaves the register it was entered with. -/
-theorem ixVarStE_val (fG : dt.CtlIx → A) (a : ιV) :
+private theorem ixVarStE_val (fG : dt.CtlIx → A) (a : ιV) :
     (dt.ixVarStE (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).val = mV a :=
   (dt.ixRoundEndSt_fields (elt := elt) F (zero := PR.zero) (one := PR.one)
     (hhas := hhasP) vi (dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a) v
@@ -1378,7 +1396,7 @@ omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **The VAL loop never touches a stage track**: only the two scratch
 registers are threaded, so the `new` tracks the spine writes ride the
 whole loop. -/
-theorem ixVarStE_new (fG : dt.CtlIx → A) (a : ιV) :
+private theorem ixVarStE_new (fG : dt.CtlIx → A) (a : ιV) :
     (dt.ixVarStE (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).new = st.new := by
   rw [ixVarStE, dt.ixRoundEndSt_eq (elt := elt) F (zero := PR.zero) (one := PR.one)
     (hhas := hhasP) vi (dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a) v
@@ -1388,7 +1406,7 @@ theorem ixVarStE_new (fG : dt.CtlIx → A) (a : ιV) :
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **A round's exit state is the next round's entry state**, once the
 next round's register is written over it. -/
-theorem ixVarRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
+private theorem ixVarRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
     (m : I → Prop) :
     dt.ixVarRdSt st ((dt.ixVarStE (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).sav,
         (dt.ixVarStE (elt := elt) F hinj hhasP heltP vi st v mV semT fG a).tgt) m =
@@ -1400,14 +1418,14 @@ theorem ixVarRdSt_varStE (fG : dt.CtlIx → A) (a : ιV)
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- The thread starts at the entry state. -/
-theorem ixVarSTT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
+private theorem ixVarSTT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
     (fG : dt.CtlIx → A) :
     dt.ixVarSTT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a₀ = (st.sav, st.tgt) :=
   congrArg Prod.fst (iterOrd_bot hbotV)
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- The thread starts at the entry state. -/
-theorem ixVarStT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
+private theorem ixVarStT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
     (fG : dt.CtlIx → A) :
     dt.ixVarStT (elt := elt) F hinj hhasP heltP
       vi st v mV semT fG a₀ = dt.ixRoundSt st (mV a₀) := by
@@ -1416,7 +1434,7 @@ theorem ixVarStT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
 
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- The control thread starts at the fold's start. -/
-theorem ixVarFMT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
+private theorem ixVarFMT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
     (fG : dt.CtlIx → A) :
     dt.ixVarFMT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a₀ =
       (dt.varArgsOf PR.zero PR.one vi).initSt fG
@@ -1427,7 +1445,7 @@ theorem ixVarFMT_bot {a₀ : ιV} (hbotV : ∀ a : ιV, a₀ ≤ a)
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The tape's cover equation**: the next round is entered in this
 round's exit state, its own register written over it. -/
-theorem ixVarStT_covers {a a' : ιV} (hlt : a < a')
+private theorem ixVarStT_covers {a a' : ιV} (hlt : a < a')
     (hnb : ∀ b, ¬(a < b ∧ b < a')) (fG : dt.CtlIx → A) :
     dt.ixVarStT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a' =
       dt.ixRoundSt (dt.ixVarStE (elt := elt) F hinj hhasP heltP vi st v mV semT fG a) (mV a') := by
@@ -1438,7 +1456,7 @@ theorem ixVarStT_covers {a a' : ιV} (hlt : a < a')
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- **The control's cover equation**: the round's exit control, folded and
 stored at the block its increment carried. -/
-theorem ixVarFMT_covers {a a' : ιV} (hlt : a < a')
+private theorem ixVarFMT_covers {a a' : ιV} (hlt : a < a')
     (hnb : ∀ b, ¬(a < b ∧ b < a')) (fG : dt.CtlIx → A) :
     dt.ixVarFMT (elt := elt) F hinj hhasP heltP vi st v mV semT fG a' =
       (dt.varArgsOf PR.zero PR.one vi).storeCarry
@@ -1480,7 +1498,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 omit [Finite I] in
 /-- **A round's entry state is the round state up to the two scratch
 registers.** -/
-theorem ixScratchEq_varRdSt (p : IxScratch dt A R P I)
+private theorem ixScratchEq_varRdSt (p : IxScratch dt A R P I)
     (m : I → Prop) :
     dt.ScratchEq (dt.ixVarRdSt st p m) (dt.ixRoundSt st m) :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
@@ -1489,7 +1507,7 @@ variable (v) in
 /-- **One unthreaded pack, at every state a round reaches**: the round's own
 state and the states its matrix threads all share the mirror and VAL of the
 round state, so `ixKindSemCast` carries the pack to each of them. -/
-noncomputable def ixSemCastT (p : IxScratch dt A R P I) (a : ιV)
+private noncomputable def ixSemCastT (p : IxScratch dt A R P I) (a : ιV)
     (hp : ∀ ℓ : Fin (dt.nIn vi),
       dt.ixIGPassP (elt := elt) F PR.zero PR.one vi (dt.ixVarRdSt st p (mV a)) ℓ)
     (b : Fin (dt.natOf vi)) :
@@ -1508,7 +1526,7 @@ omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [LinearOrder ιV] [Finite 
 /-- **One threaded round is the unthreaded round**: a round's own state is
 the round state up to SAV and TARGET, its matrix threads those two further,
 and the pack rides along – three transports that compose to none. -/
-theorem ixRoundCtlT_semCastT (hreg : ¬∃ u : I, v = F.cell u)
+private theorem ixRoundCtlT_semCastT (hreg : ¬∃ u : I, v = F.cell u)
     (p : IxScratch dt A R P I) (a : ιV) (q : dt.CtlIx → A) :
     dt.ixRoundCtlT (elt := elt) F (hinj := hinj) (hhas := hhasP) (helt := heltP)
     (hzo := PR.zero_ne_one) vi (dt.ixVarRdSt st p (mV a)) v
@@ -1529,7 +1547,7 @@ theorem ixRoundCtlT_semCastT (hreg : ¬∃ u : I, v = F.cell u)
 omit [Finite I] [Finite R] [Finite P] [Finite dt.KIx] [Finite ιV] in
 /-- **The threaded round of the VAL loop is the unthreaded one**, at the
 state the loop's own thread produced. -/
-theorem ixVarFXT_eq_roundFX
+private theorem ixVarFXT_eq_roundFX
     (hreg : ¬∃ u : I, v = F.cell u)
     (fG : dt.CtlIx → A) (a : ιV) :
     dt.ixVarFXT (elt := elt) F hinj hhasP heltP vi st v mV (dt.ixSemCastT F vi st v mV sem₀) fG a =
@@ -1547,7 +1565,7 @@ round, `ixVarFXT_eq_roundFX`, the backgrounds agreeing because a round's exit
 state is the round state up to SAV and TARGET. This is the bridge between
 the control the machine's run produces and the control
 `DescriptiveComplexity.Draw.Data.accVerdict_leafP` reads. -/
-theorem ixVarFMT_eq_varFM
+private theorem ixVarFMT_eq_varFM
     (hreg : ¬∃ u : I, v = F.cell u)
     (fG : dt.CtlIx → A) (a : ιV) :
     dt.ixVarFMT (elt := elt) F hinj hhasP heltP vi st v mV (dt.ixSemCastT F vi st v mV sem₀) fG a =
@@ -1640,7 +1658,7 @@ checkpoint at the marker, through the gates at a gated address, the VAL
 clear and the rounds of matrix pass, exhaustion test and block-indexed
 increment, to the exit checkpoint – the fold spelled by the concrete
 threads, every leg the assembled runs of the layers below. -/
-theorem ixVarMachine_reachesIn
+private theorem ixVarMachine_reachesIn
     (hwitOf : ∀ (ℓ : Fin (dt.arOf vi)) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
         (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :
@@ -1800,7 +1818,7 @@ only at the one whose SAV and TARGET the advance happens to have left
 behind. The rounds run at the states the thread produces, and the loop
 ends in `DescriptiveComplexity.Draw.Data.ixVarStE` at the top, which
 differs from the entry state in SAV and TARGET alone. -/
-theorem ixVarMachine_run_thread_reachesIn
+private theorem ixVarMachine_run_thread_reachesIn
     (hwitOf : ∀ (ℓ : Fin (dt.arOf vi)) (t' : dt.X.Tag),
       wmBlk (ixAddr elt st.mir)
         (Tag.arg (toLex ((Sum.inl (Fin.castLE (dt.arOf_le_ko vi) ℓ) :

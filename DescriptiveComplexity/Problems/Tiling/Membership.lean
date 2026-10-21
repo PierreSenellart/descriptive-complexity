@@ -334,51 +334,51 @@ section Clauses
 
 /-- The order is linear and there is a position: the well-formedness the
 yes-instances fold in. -/
-noncomputable def tileWfC : tileSOLang.Sentence :=
+private noncomputable def tileWfC : tileSOLang.Sentence :=
   fo% ((∀ x, tlLeF⟨x, x⟩) ∧ (∀ x y z, tlLeF⟨x, y⟩ ∧ tlLeF⟨y, z⟩ → tlLeF⟨x, z⟩) ∧
       (∀ x y, tlLeF⟨x, y⟩ ∧ tlLeF⟨y, x⟩ → tlEqF⟨x, y⟩) ∧ ∀ x y, tlLeF⟨x, y⟩ ∨ tlLeF⟨y, x⟩) ∧
     ∃ x, tlPosnF⟨x⟩
 
 /-- Every cell of the grid carries a tile of the instance. -/
-noncomputable def tileTotalC : tileSOLang.Sentence :=
+private noncomputable def tileTotalC : tileSOLang.Sentence :=
   fo% ∀ x y, tlPosnF⟨x⟩ ∧ tlPosnF⟨y⟩ → ∃ t, tlRelF⟨x, y, t⟩ ∧ tlTileF⟨t⟩
 
 /-- A cell carries at most one tile. -/
-noncomputable def tileFuncC : tileSOLang.Sentence :=
+private noncomputable def tileFuncC : tileSOLang.Sentence :=
   fo% ∀ x y t t', tlRelF⟨x, y, t⟩ ∧ tlRelF⟨x, y, t'⟩ → tlEqF⟨t, t'⟩
 
 /-- The bottom row is one the description allows: the tiles it names in that
 column, or a base tile where it names none. -/
-noncomputable def tileFirstC : tileSOLang.Sentence :=
+private noncomputable def tileFirstC : tileSOLang.Sentence :=
   fo% ∀ x y t, tlPosnF⟨x⟩ ∧ tlMinPosF⟨y⟩ ∧ tlRelF⟨x, y, t⟩ →
     (tlMinPosF⟨x⟩ → tlStartF⟨t⟩) ∧
       (¬ tlMinPosF⟨x⟩ → tlFirstF⟨x, t⟩ ∨ (∀ t', ¬ tlFirstF⟨x, t'⟩) ∧ tlBaseF⟨t⟩)
 
 /-- The leftmost column carries tiles allowed there. -/
-noncomputable def tileEdgeLC : tileSOLang.Sentence :=
+private noncomputable def tileEdgeLC : tileSOLang.Sentence :=
   fo% ∀ x y t, tlPosnF⟨y⟩ ∧ tlMinPosF⟨x⟩ ∧ tlRelF⟨x, y, t⟩ → tlEdgeLF⟨t⟩
 
 /-- And the rightmost column those allowed there. -/
-noncomputable def tileEdgeRC : tileSOLang.Sentence :=
+private noncomputable def tileEdgeRC : tileSOLang.Sentence :=
   fo% ∀ x y t, tlPosnF⟨y⟩ ∧ tlMaxPosF⟨x⟩ ∧ tlRelF⟨x, y, t⟩ → tlEdgeRF⟨t⟩
 
 /-- Horizontal neighbors are compatible. -/
-noncomputable def tileHorizC : tileSOLang.Sentence :=
+private noncomputable def tileHorizC : tileSOLang.Sentence :=
   fo% ∀ x x' y t t',
     tlSuccPosF⟨x, x'⟩ ∧ tlPosnF⟨y⟩ ∧ tlRelF⟨x, y, t⟩ ∧ tlRelF⟨x', y, t'⟩ → tlHorizF⟨t, t'⟩
 
 /-- Vertical neighbors are compatible. -/
-noncomputable def tileVertC : tileSOLang.Sentence :=
+private noncomputable def tileVertC : tileSOLang.Sentence :=
   fo% ∀ x y y' t t',
     tlPosnF⟨x⟩ ∧ tlSuccPosF⟨y, y'⟩ ∧ tlRelF⟨x, y, t⟩ ∧ tlRelF⟨x, y', t'⟩ → tlVertF⟨t, t'⟩
 
 /-- Some cell of the grid carries an accepting tile. -/
-noncomputable def tileAccC : tileSOLang.Sentence :=
+private noncomputable def tileAccC : tileSOLang.Sentence :=
   fo% ∃ x y t, tlPosnF⟨x⟩ ∧ tlPosnF⟨y⟩ ∧ tlRelF⟨x, y, t⟩ ∧ tlAccF⟨t⟩
 
 /-- **The first-order kernel of the `Σ₁` definition**: the tiling the block
 guesses is a tiling of the square, and the instance is well-formed. -/
-noncomputable def tileKernel : tileSOLang.Sentence :=
+private noncomputable def tileKernel : tileSOLang.Sentence :=
   tileWfC ⊓ (tileTotalC ⊓ (tileFuncC ⊓ (tileFirstC ⊓ (tileEdgeLC ⊓ (tileEdgeRC ⊓
     (tileHorizC ⊓ (tileVertC ⊓ tileAccC)))))))
 
@@ -390,7 +390,7 @@ section ClauseRealize
 
 variable {A : Type} [Language.tiling.Structure A] (ρ : tileGuessBlock.Assignment A)
 
-theorem realize_tileWfC :
+private theorem realize_tileWfC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileWfC ↔ (tileData A).WellFormed) := by
   let := tileGuessBlock.structure ρ
@@ -406,7 +406,7 @@ theorem realize_tileWfC :
           ⟨fun h a b => h ![a, b], fun h w => h (w 0) (w 1)⟩))) ?_
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, hw⟩, fun ⟨p, hp⟩ => ⟨fun _ => p, hp⟩⟩
 
-theorem realize_tileTotalC :
+private theorem realize_tileTotalC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileTotalC ↔
       ∀ x y : A, TLPosn x → TLPosn y → ∃ t, ρ () ![x, y, t] ∧ TLTile t) := by
@@ -421,7 +421,7 @@ theorem realize_tileTotalC :
   · obtain ⟨t, ht⟩ := h (w 0) (w 1) hw.1 hw.2
     exact ⟨fun _ => t, ht⟩
 
-theorem realize_tlTileFuncC :
+private theorem realize_tlTileFuncC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileFuncC ↔
       ∀ x y t t' : A, ρ () ![x, y, t] → ρ () ![x, y, t'] → t = t') := by
@@ -432,7 +432,7 @@ theorem realize_tlTileFuncC :
   exact ⟨fun h x y t t' h1 h2 => h ![x, y, t, t'] ⟨h1, h2⟩,
     fun h w hw => h (w 0) (w 1) (w 2) (w 3) hw.1 hw.2⟩
 
-theorem realize_tlTileFirstC :
+private theorem realize_tlTileFirstC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileFirstC ↔
       ∀ x y t : A, TLPosn x → MinPos (tileData A).Le (tileData A).Posn y →
@@ -460,7 +460,7 @@ theorem realize_tlTileFirstC :
     · exact Or.inl hf
     · exact Or.inr ⟨fun u hu => hno (u 0) hu, hb⟩
 
-theorem realize_tileEdgeLC :
+private theorem realize_tileEdgeLC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileEdgeLC ↔
       ∀ x y t : A, TLPosn y → MinPos (tileData A).Le (tileData A).Posn x →
@@ -473,7 +473,7 @@ theorem realize_tileEdgeLC :
   exact ⟨fun h x y t h1 h2 h3 => h ![x, y, t] ⟨h1, h2, h3⟩,
     fun h w hw => h (w 0) (w 1) (w 2) hw.1 hw.2.1 hw.2.2⟩
 
-theorem realize_tileEdgeRC :
+private theorem realize_tileEdgeRC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileEdgeRC ↔
       ∀ x y t : A, TLPosn y → MaxPos (tileData A).Le (tileData A).Posn x →
@@ -486,7 +486,7 @@ theorem realize_tileEdgeRC :
   exact ⟨fun h x y t h1 h2 h3 => h ![x, y, t] ⟨h1, h2, h3⟩,
     fun h w hw => h (w 0) (w 1) (w 2) hw.1 hw.2.1 hw.2.2⟩
 
-theorem realize_tileHorizC :
+private theorem realize_tileHorizC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileHorizC ↔
       ∀ x x' y t t' : A, SuccPos (tileData A).Le (tileData A).Posn x x' → TLPosn y →
@@ -499,7 +499,7 @@ theorem realize_tileHorizC :
   exact ⟨fun h x x' y t t' h1 h2 h3 h4 => h ![x, x', y, t, t'] ⟨h1, h2, h3, h4⟩,
     fun h w hw => h (w 0) (w 1) (w 2) (w 3) (w 4) hw.1 hw.2.1 hw.2.2.1 hw.2.2.2⟩
 
-theorem realize_tileVertC :
+private theorem realize_tileVertC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileVertC ↔
       ∀ x y y' t t' : A, TLPosn x → SuccPos (tileData A).Le (tileData A).Posn y y' →
@@ -512,7 +512,7 @@ theorem realize_tileVertC :
   exact ⟨fun h x y y' t t' h1 h2 h3 h4 => h ![x, y, y', t, t'] ⟨h1, h2, h3, h4⟩,
     fun h w hw => h (w 0) (w 1) (w 2) (w 3) (w 4) hw.1 hw.2.1 hw.2.2.1 hw.2.2.2⟩
 
-theorem realize_tileAccC :
+private theorem realize_tileAccC :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileAccC ↔
       ∃ x y t : A, TLPosn x ∧ TLPosn y ∧ ρ () ![x, y, t] ∧ TLAcc t) := by
@@ -533,7 +533,7 @@ variable {A : Type} [Language.tiling.Structure A]
 /-- **What the kernel says**, at an assignment of the guessed tiling: the
 instance is well-formed and the guess is a tiling of the square, read as a
 relation. -/
-theorem realize_tileKernel (ρ : tileGuessBlock.Assignment A) :
+private theorem realize_tileKernel (ρ : tileGuessBlock.Assignment A) :
     (@Sentence.Realize tileSOLang A (@sumStructure _ _ A _ (tileGuessBlock.structure ρ))
       tileKernel ↔
       (tileData A).WellFormed ∧
@@ -565,7 +565,7 @@ theorem realize_tileKernel (ρ : tileGuessBlock.Assignment A) :
 /-- **Tiling a square is `Σ₁`-definable**: guess the tiling as one ternary
 relation, and check first-order that it is one. Since NP is `Σ₁`-definability,
 this is the membership half of the problem's completeness. -/
-theorem tiling_sigmaSODefinable : SigmaSODefinable 1 TILING := by
+private theorem tiling_sigmaSODefinable : SigmaSODefinable 1 TILING := by
   refine ⟨[tileGuessBlock], rfl, tileKernel, ?_⟩
   intro A _ _ _
   constructor

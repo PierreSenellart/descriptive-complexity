@@ -73,7 +73,7 @@ private theorem widthAtMostThree_of_iso {A B : Type} [Language.sat.Structure A]
   simpa using this
 
 /-- The width bound is isomorphism-invariant. -/
-theorem widthAtMostThree_iso {A B : Type} [Language.sat.Structure A]
+private theorem widthAtMostThree_iso {A B : Type} [Language.sat.Structure A]
     [Language.sat.Structure B] (e : A ≃[Language.sat] B) :
     WidthAtMostThree A ↔ WidthAtMostThree B :=
   ⟨widthAtMostThree_of_iso e, widthAtMostThree_of_iso e.symm⟩

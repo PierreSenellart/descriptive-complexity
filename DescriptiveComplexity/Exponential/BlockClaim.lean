@@ -134,11 +134,11 @@ def twoRealize (mat : ((K.sum B.lang).sum B.lang).BoundedFormula Empty n)
 
 variable (ρ σ : B.Assignment A) (v : Fin n → A)
 
-theorem twoRealize_bot :
+private theorem twoRealize_bot :
     ¬ twoRealize (⊥ : ((K.sum B.lang).sum B.lang).BoundedFormula Empty n) ρ σ v :=
   id
 
-theorem twoRealize_imp (φ₁ φ₂ : ((K.sum B.lang).sum B.lang).BoundedFormula Empty n) :
+private theorem twoRealize_imp (φ₁ φ₂ : ((K.sum B.lang).sum B.lang).BoundedFormula Empty n) :
     twoRealize (φ₁.imp φ₂) ρ σ v ↔ (twoRealize φ₁ ρ σ v → twoRealize φ₂ ρ σ v) :=
   letI := B.structure₂ (L := K) ρ σ
   realize_imp
@@ -154,9 +154,9 @@ variable {K : Language.{0, 0}} [K.IsRelational] {B : SOBlock} {n : ℕ} {A : Typ
 
 /-- The bound variable a term of a relational language over `Empty ⊕ Fin n`
 reads. -/
-def bvarOf (x : Empty ⊕ Fin n) : Fin n := Sum.elim (fun e => e.elim) id x
+private def bvarOf (x : Empty ⊕ Fin n) : Fin n := Sum.elim (fun e => e.elim) id x
 
-theorem elim_bvarOf (v : Fin n → A) (d : Empty → A) (x : Empty ⊕ Fin n) :
+private theorem elim_bvarOf (v : Fin n → A) (d : Empty → A) (x : Empty ⊕ Fin n) :
     Sum.elim d v x = v (bvarOf x) := by
   cases x with
   | inl e => exact e.elim
@@ -165,7 +165,7 @@ theorem elim_bvarOf (v : Fin n → A) (d : Empty → A) (x : Empty ⊕ Fin n) :
 variable {v : Fin n → A}
 
 /-- An equality of the matrix is an equality of two of its variables. -/
-theorem twoRealize_bdEqual (t₁ t₂ : ((K.sum B.lang).sum B.lang).Term (Empty ⊕ Fin n)) :
+private theorem twoRealize_bdEqual (t₁ t₂ : ((K.sum B.lang).sum B.lang).Term (Empty ⊕ Fin n)) :
     twoRealize (t₁.bdEqual t₂) ρ σ v ↔ v (bvarOf t₁.varOf) = v (bvarOf t₂.varOf) := by
   let := B.structure₂ (L := K) ρ σ
   change (t₁.bdEqual t₂).Realize default v ↔ _
@@ -181,7 +181,7 @@ private theorem args_eq {l : ℕ}
   exact funext fun q => by rw [Term.realize_varOf, elim_bvarOf]
 
 /-- A base atom of the matrix is the same atom of the base structure. -/
-theorem twoRealize_base {l : ℕ} (r : K.Relations l)
+private theorem twoRealize_base {l : ℕ} (r : K.Relations l)
     (ts : Fin l → ((K.sum B.lang).sum B.lang).Term (Empty ⊕ Fin n)) :
     twoRealize (Relations.boundedFormula (twoBaseSym (B := B) r) ts) ρ σ v ↔
       Structure.RelMap r fun q => v (bvarOf (ts q).varOf) := by
@@ -192,7 +192,7 @@ theorem twoRealize_base {l : ℕ} (r : K.Relations l)
 
 /-- An atom of the first copy is the first assignment, read at the addresses
 its arguments name. -/
-theorem twoRealize_fst {l : ℕ} (s : B.lang.Relations l)
+private theorem twoRealize_fst {l : ℕ} (s : B.lang.Relations l)
     (ts : Fin l → ((K.sum B.lang).sum B.lang).Term (Empty ⊕ Fin n)) :
     twoRealize (Relations.boundedFormula (twoFstSym (K := K) s) ts) ρ σ v ↔
       ρ s.1 fun j => v (bvarOf (ts (Fin.cast s.2 j)).varOf) := by
@@ -203,7 +203,7 @@ theorem twoRealize_fst {l : ℕ} (s : B.lang.Relations l)
 
 /-- An atom of the second copy is the second assignment, read at the addresses
 its arguments name. -/
-theorem twoRealize_snd {l : ℕ} (s : B.lang.Relations l)
+private theorem twoRealize_snd {l : ℕ} (s : B.lang.Relations l)
     (ts : Fin l → ((K.sum B.lang).sum B.lang).Term (Empty ⊕ Fin n)) :
     twoRealize (Relations.boundedFormula (twoSndSym (K := K) s) ts) ρ σ v ↔
       σ s.1 fun j => v (bvarOf (ts (Fin.cast s.2 j)).varOf) := by

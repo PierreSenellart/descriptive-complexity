@@ -7,6 +7,7 @@ module
 
 import Mathlib.Data.List.Forall2
 public import DescriptiveComplexity.Interpretation
+import all DescriptiveComplexity.Interpretation
 
 /-!
 # PCP: Post's correspondence problem
@@ -230,24 +231,24 @@ section Iso
 variable {A B : Type} [Language.pcp.Structure A] [Language.pcp.Structure B]
 variable (e : A ≃[Language.pcp] B)
 
-theorem ord_equiv (x y : A) : Ord x y ↔ Ord (e x) (e y) := relMap_equiv₂ e _ x y
+private theorem ord_equiv (x y : A) : Ord x y ↔ Ord (e x) (e y) := relMap_equiv₂ e _ x y
 
-theorem ordLt_equiv (x y : A) : OrdLt x y ↔ OrdLt (e x) (e y) :=
+private theorem ordLt_equiv (x y : A) : OrdLt x y ↔ OrdLt (e x) (e y) :=
   and_congr (ord_equiv e x y)
     (not_congr ⟨fun h => h ▸ rfl, fun h => EmbeddingLike.injective e h⟩)
 
-theorem domG_equiv (d : A) : DomG d ↔ DomG (e d) := relMap_equiv₁ e _ d
+private theorem domG_equiv (d : A) : DomG d ↔ DomG (e d) := relMap_equiv₁ e _ d
 
-theorem uAt_equiv (d p c : A) : UAt d p c ↔ UAt (e d) (e p) (e c) := relMap_equiv₃ e _ d p c
+private theorem uAt_equiv (d p c : A) : UAt d p c ↔ UAt (e d) (e p) (e c) := relMap_equiv₃ e _ d p c
 
-theorem vAt_equiv (d p c : A) : VAt d p c ↔ VAt (e d) (e p) (e c) := relMap_equiv₃ e _ d p c
+private theorem vAt_equiv (d p c : A) : VAt d p c ↔ VAt (e d) (e p) (e c) := relMap_equiv₃ e _ d p c
 
-theorem usedU_equiv (d p : A) : UsedU d p ↔ UsedU (e d) (e p) := by
+private theorem usedU_equiv (d p : A) : UsedU d p ↔ UsedU (e d) (e p) := by
   refine ⟨fun ⟨c, hc⟩ => ⟨e c, (uAt_equiv e d p c).mp hc⟩, fun ⟨c, hc⟩ => ⟨e.symm c, ?_⟩⟩
   refine (uAt_equiv e d p (e.symm c)).mpr ?_
   rwa [e.apply_symm_apply]
 
-theorem usedV_equiv (d p : A) : UsedV d p ↔ UsedV (e d) (e p) := by
+private theorem usedV_equiv (d p : A) : UsedV d p ↔ UsedV (e d) (e p) := by
   refine ⟨fun ⟨c, hc⟩ => ⟨e c, (vAt_equiv e d p c).mp hc⟩, fun ⟨c, hc⟩ => ⟨e.symm c, ?_⟩⟩
   refine (vAt_equiv e d p (e.symm c)).mpr ?_
   rwa [e.apply_symm_apply]
@@ -255,15 +256,15 @@ theorem usedV_equiv (d p : A) : UsedV d p ↔ UsedV (e d) (e p) := by
 /-! The same transports read backwards, at the inverse isomorphism: the shape
 every field of `DescriptiveComplexity.Pcp.isWF_map` needs. -/
 
-theorem ord_equiv' (x y : B) : Ord x y ↔ Ord (e.symm x) (e.symm y) := by
+private theorem ord_equiv' (x y : B) : Ord x y ↔ Ord (e.symm x) (e.symm y) := by
   have h := (ord_equiv e (e.symm x) (e.symm y)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem uAt_equiv' (d p c : B) : UAt d p c ↔ UAt (e.symm d) (e.symm p) (e.symm c) := by
+private theorem uAt_equiv' (d p c : B) : UAt d p c ↔ UAt (e.symm d) (e.symm p) (e.symm c) := by
   have h := (uAt_equiv e (e.symm d) (e.symm p) (e.symm c)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply, e.apply_symm_apply] at h
 
-theorem vAt_equiv' (d p c : B) : VAt d p c ↔ VAt (e.symm d) (e.symm p) (e.symm c) := by
+private theorem vAt_equiv' (d p c : B) : VAt d p c ↔ VAt (e.symm d) (e.symm p) (e.symm c) := by
   have h := (vAt_equiv e (e.symm d) (e.symm p) (e.symm c)).symm
   rwa [e.apply_symm_apply, e.apply_symm_apply, e.apply_symm_apply] at h
 
@@ -298,7 +299,7 @@ section ListTransport
 
 variable {α β γ δ : Type}
 
-theorem pairwise_map_of {R : α → α → Prop} {S : β → β → Prop} (f : α → β)
+private theorem pairwise_map_of {R : α → α → Prop} {S : β → β → Prop} (f : α → β)
     (hf : ∀ a b, R a b → S (f a) (f b)) :
     ∀ {l : List α}, l.Pairwise R → (l.map f).Pairwise S
   | [], _ => by simp
@@ -309,7 +310,7 @@ theorem pairwise_map_of {R : α → α → Prop} {S : β → β → Prop} (f : �
     obtain ⟨b', hb', rfl⟩ := List.mem_map.mp hb
     exact hf _ _ (hl.1 b' hb')
 
-theorem forall₂_map_map {R : α → β → Prop} {S : γ → δ → Prop} (f : α → γ) (g : β → δ)
+private theorem forall₂_map_map {R : α → β → Prop} {S : γ → δ → Prop} (f : α → γ) (g : β → δ)
     (hfg : ∀ a b, R a b → S (f a) (g b)) :
     ∀ {l₁ : List α} {l₂ : List β}, List.Forall₂ R l₁ l₂ → List.Forall₂ S (l₁.map f) (l₂.map g)
   | [], [], _ => List.Forall₂.nil
@@ -325,7 +326,7 @@ variable {A B : Type} [Language.pcp.Structure A] [Language.pcp.Structure B]
 variable (e : A ≃[Language.pcp] B)
 
 /-- The top word of a domino transports along an isomorphism. -/
-theorem isWordU_map {d : A} {w : List A} (h : IsWordU d w) : IsWordU (e d) (w.map e) := by
+private theorem isWordU_map {d : A} {w : List A} (h : IsWordU d w) : IsWordU (e d) (w.map e) := by
   obtain ⟨ps, hsort, hmem, hall⟩ := h
   refine ⟨ps.map e, pairwise_map_of e (fun a b hab => (ordLt_equiv e a b).mp hab) hsort,
     fun q => ?_, ?_⟩
@@ -340,7 +341,7 @@ theorem isWordU_map {d : A} {w : List A} (h : IsWordU d w) : IsWordU (e d) (w.ma
   · exact forall₂_map_map e e (fun a b hab => (uAt_equiv e d a b).mp hab) hall
 
 /-- The bottom word of a domino transports along an isomorphism. -/
-theorem isWordV_map {d : A} {w : List A} (h : IsWordV d w) : IsWordV (e d) (w.map e) := by
+private theorem isWordV_map {d : A} {w : List A} (h : IsWordV d w) : IsWordV (e d) (w.map e) := by
   obtain ⟨ps, hsort, hmem, hall⟩ := h
   refine ⟨ps.map e, pairwise_map_of e (fun a b hab => (ordLt_equiv e a b).mp hab) hsort,
     fun q => ?_, ?_⟩

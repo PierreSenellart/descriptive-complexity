@@ -33,17 +33,17 @@ open Finset
 def xorGadget : Fin 4 → Fin 4 → ℤ :=
   ![![0, 1, -1, -1], ![1, -1, 1, 1], ![0, 1, 1, 2], ![0, 1, 3, 0]]
 
-theorem xorGadget_internal : pdel xorGadget ∅ ∅ = 0 := by decide
+private theorem xorGadget_internal : pdel xorGadget ∅ ∅ = 0 := by decide
 
-theorem xorGadget_first : pdel xorGadget {3} {0} = 4 := by decide
+private theorem xorGadget_first : pdel xorGadget {3} {0} = 4 := by decide
 
-theorem xorGadget_second : pdel xorGadget {0} {3} = 4 := by decide
+private theorem xorGadget_second : pdel xorGadget {0} {3} = 4 := by decide
 
-theorem xorGadget_cross₁ : pdel xorGadget {3} {3} = 0 := by decide
+private theorem xorGadget_cross₁ : pdel xorGadget {3} {3} = 0 := by decide
 
-theorem xorGadget_cross₂ : pdel xorGadget {0} {0} = 0 := by decide
+private theorem xorGadget_cross₂ : pdel xorGadget {0} {0} = 0 := by decide
 
-theorem xorGadget_both : pdel xorGadget {3, 0} {0, 3} = 0 := by decide
+private theorem xorGadget_both : pdel xorGadget {3, 0} {0, 3} = 0 := by decide
 
 section Attach
 

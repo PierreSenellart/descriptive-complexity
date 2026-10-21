@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.SecondOrderNewPull
 public import DescriptiveComplexity.SecondOrderOrdered
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.SecondOrderNew
+import all DescriptiveComplexity.SecondOrderNewPull
+import all DescriptiveComplexity.SecondOrderOrdered
 
 /-!
 # Closure of `∃SO[new]` definability under ordered FO reductions
@@ -59,7 +62,7 @@ def extLeRel : (Fin 2 → A ⊕ Fin n) → Prop :=
 
 variable {A n}
 
-theorem extLeRel_isOld {w : Fin 2 → A ⊕ Fin n} (h : extLeRel A n w) :
+private theorem extLeRel_isOld {w : Fin 2 → A ⊕ Fin n} (h : extLeRel A n w) :
     IsOld (w 0) ∧ IsOld (w 1) := by
   obtain ⟨y, hy, -⟩ := h
   exact ⟨(hy 0).symm ▸ isOld_inl (y 0), (hy 1).symm ▸ isOld_inl (y 1)⟩
@@ -108,7 +111,7 @@ variable {L C} [L.IsRelational] {A : Type} [L.Structure A] {n : ℕ}
 extended universe, the extended structure over the bare vocabulary is an
 expansion along `DescriptiveComplexity.extOrderElim` of the extended structure
 over the ordered one. -/
-theorem extOrderElim_isExpansionOn [lo : LinearOrder A]
+private theorem extOrderElim_isExpansionOn [lo : LinearOrder A]
     (ρ : C.withOrder.Assignment (A ⊕ Fin n)) (ρ' : C.Assignment (A ⊕ Fin n))
     (hrest : C.restPart ρ = ρ')
     (hord : ∀ w : Fin 2 → A ⊕ Fin n, ρ (Sum.inl ()) w ↔ extLeRel A n w) :
@@ -149,28 +152,28 @@ def oldEF {α : Type} (x : α) : ((newLang L).sum C.withOrder.lang).Formula α :
   Relations.formula₁ (extOldSym L C) (Term.var x)
 
 /-- The order variable relates original elements only. -/
-noncomputable def oldOnlyS : ((newLang L).sum C.withOrder.lang).Sentence :=
+private noncomputable def oldOnlyS : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⟹ (oldEF L C (Sum.inr 0) ⊓ oldEF L C (Sum.inr 1)))
 
 /-- The order variable is reflexive on the original elements. -/
-noncomputable def reflES : ((newLang L).sum C.withOrder.lang).Sentence :=
+private noncomputable def reflES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 1) (oldEF L C (Sum.inr 0) ⟹ leEF L C (Sum.inr 0) (Sum.inr 0))
 
 /-- The order variable is transitive. -/
-noncomputable def transES : ((newLang L).sum C.withOrder.lang).Sentence :=
+private noncomputable def transES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 3)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⊓ leEF L C (Sum.inr 1) (Sum.inr 2) ⟹
       leEF L C (Sum.inr 0) (Sum.inr 2))
 
 /-- The order variable is antisymmetric. -/
-noncomputable def antisymmES : ((newLang L).sum C.withOrder.lang).Sentence :=
+private noncomputable def antisymmES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (leEF L C (Sum.inr 0) (Sum.inr 1) ⊓ leEF L C (Sum.inr 1) (Sum.inr 0) ⟹
       Term.equal (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1)))
 
 /-- The order variable is total on the original elements. -/
-noncomputable def totalES : ((newLang L).sum C.withOrder.lang).Sentence :=
+private noncomputable def totalES : ((newLang L).sum C.withOrder.lang).Sentence :=
   Formula.iAlls (Fin 2)
     (oldEF L C (Sum.inr 0) ⊓ oldEF L C (Sum.inr 1) ⟹
       (leEF L C (Sum.inr 0) (Sum.inr 1) ⊔ leEF L C (Sum.inr 1) (Sum.inr 0)))
@@ -180,12 +183,12 @@ only, and is a linear order on them. Relativization is forced by value
 invention: the order symbol of an extended structure relates original elements
 only, so an unrelativized guard would be unsatisfiable as soon as something is
 invented. -/
-noncomputable def extLinearGuard : ((newLang L).sum C.withOrder.lang).Sentence :=
+private noncomputable def extLinearGuard : ((newLang L).sum C.withOrder.lang).Sentence :=
   oldOnlyS L C ⊓ (reflES L C ⊓ (transES L C ⊓ (antisymmES L C ⊓ totalES L C)))
 
 variable {L C} [L.IsRelational] (A : Type) [L.Structure A] (n : ℕ)
 
-theorem realize_extLinearGuard (ρ : C.withOrder.Assignment (A ⊕ Fin n)) :
+private theorem realize_extLinearGuard (ρ : C.withOrder.Assignment (A ⊕ Fin n)) :
     letI := C.withOrder.structure ρ
     ((A ⊕ Fin n) ⊨ extLinearGuard L C) ↔
       ((∀ x y : A ⊕ Fin n, ρ (Sum.inl ()) ![x, y] → IsOld x ∧ IsOld y) ∧
@@ -232,7 +235,7 @@ sentence over the ordered expansion – correct for *some* linear order on each
 instance – is `∃SO[new]`-definable. The order becomes one more relation
 variable of the block, guarded by
 `DescriptiveComplexity.extLinearGuard`. -/
-theorem sigmaSONewDefinable_of_orderPull (C : SOBlock)
+private theorem sigmaSONewDefinable_of_orderPull (C : SOBlock)
     (ψ : (soLang (newLang (L.sum Language.order)) [C]).Sentence)
     (h : ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A],
       P A ↔ ∃ lo : LinearOrder A,

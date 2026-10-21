@@ -63,22 +63,22 @@ theorem encodeCode_dec (e : ℕ) : encodeCode (dec e) = e := by
   rw [dec, ← encodeCode_eq]
   exact Denumerable.encode_ofNat e
 
-theorem encodeCode_pair (cf cg : Nat.Partrec.Code) :
+private theorem encodeCode_pair (cf cg : Nat.Partrec.Code) :
     encodeCode (.pair cf cg) = 4 * Nat.pair (encodeCode cf) (encodeCode cg) + 4 := by
   simp only [encodeCode]
   omega
 
-theorem encodeCode_comp (cf cg : Nat.Partrec.Code) :
+private theorem encodeCode_comp (cf cg : Nat.Partrec.Code) :
     encodeCode (.comp cf cg) = 4 * Nat.pair (encodeCode cf) (encodeCode cg) + 6 := by
   simp only [encodeCode]
   omega
 
-theorem encodeCode_prec (cf cg : Nat.Partrec.Code) :
+private theorem encodeCode_prec (cf cg : Nat.Partrec.Code) :
     encodeCode (.prec cf cg) = 4 * Nat.pair (encodeCode cf) (encodeCode cg) + 5 := by
   simp only [encodeCode]
   omega
 
-theorem encodeCode_rfind' (cf : Nat.Partrec.Code) :
+private theorem encodeCode_rfind' (cf : Nat.Partrec.Code) :
     encodeCode (.rfind' cf) = 4 * encodeCode cf + 7 := by
   simp only [encodeCode]
   omega
@@ -94,19 +94,19 @@ theorem dec_pair (a b : ℕ) : dec (4 * Nat.pair a b + 4) = .pair (dec a) (dec b
       rw [encodeCode_pair, encodeCode_dec, encodeCode_dec]]
   exact dec_encodeCode _
 
-theorem dec_comp (a b : ℕ) : dec (4 * Nat.pair a b + 6) = .comp (dec a) (dec b) := by
+private theorem dec_comp (a b : ℕ) : dec (4 * Nat.pair a b + 6) = .comp (dec a) (dec b) := by
   conv_lhs =>
     rw [show 4 * Nat.pair a b + 6 = encodeCode (.comp (dec a) (dec b)) by
       rw [encodeCode_comp, encodeCode_dec, encodeCode_dec]]
   exact dec_encodeCode _
 
-theorem dec_prec (a b : ℕ) : dec (4 * Nat.pair a b + 5) = .prec (dec a) (dec b) := by
+private theorem dec_prec (a b : ℕ) : dec (4 * Nat.pair a b + 5) = .prec (dec a) (dec b) := by
   conv_lhs =>
     rw [show 4 * Nat.pair a b + 5 = encodeCode (.prec (dec a) (dec b)) by
       rw [encodeCode_prec, encodeCode_dec, encodeCode_dec]]
   exact dec_encodeCode _
 
-theorem dec_rfind (a : ℕ) : dec (4 * a + 7) = .rfind' (dec a) := by
+private theorem dec_rfind (a : ℕ) : dec (4 * a + 7) = .rfind' (dec a) := by
   conv_lhs =>
     rw [show 4 * a + 7 = encodeCode (.rfind' (dec a)) by
       rw [encodeCode_rfind', encodeCode_dec]]
@@ -114,7 +114,8 @@ theorem dec_rfind (a : ℕ) : dec (4 * a + 7) = .rfind' (dec a) := by
 
 /-- The number of a proper subcode is smaller: this is the well-founded measure
 the soundness of a certificate runs on. -/
-theorem lt_of_pair_encode (a b : ℕ) : a < 4 * Nat.pair a b + 4 ∧ b < 4 * Nat.pair a b + 4 := by
+private theorem lt_of_pair_encode
+    (a b : ℕ) : a < 4 * Nat.pair a b + 4 ∧ b < 4 * Nat.pair a b + 4 := by
   have h1 := Nat.left_le_pair a b
   have h2 := Nat.right_le_pair a b
   omega
@@ -152,13 +153,13 @@ theorem exists_next (a' b' : ℕ) : ∃ a b, NextP a' b' a b := by
     · exact ⟨a', b' + 1, Or.inr (Or.inr (Or.inl ⟨h, rfl, by omega, rfl⟩))⟩
     · exact ⟨0, b' + 1, Or.inr (Or.inr (Or.inr ⟨by omega, rfl, rfl⟩))⟩
 
-theorem pair_eq_zero {a b : ℕ} (h : Nat.pair a b = 0) : a = 0 ∧ b = 0 := by
+private theorem pair_eq_zero {a b : ℕ} (h : Nat.pair a b = 0) : a = 0 ∧ b = 0 := by
   have h0 : Nat.pair 0 0 = 0 := by simp [Nat.pair]
   exact Nat.pair_eq_pair.mp (h.trans h0.symm)
 
 /-- The predecessor of a nonzero pair, together with the step relating them:
 the completeness half of the recurrence. -/
-theorem exists_pred_pair {a b : ℕ} (h : Nat.pair a b ≠ 0) :
+private theorem exists_pred_pair {a b : ℕ} (h : Nat.pair a b ≠ 0) :
     ∃ a' b', Nat.pair a' b' + 1 = Nat.pair a b ∧ NextP a' b' a b := by
   set a' := (Nat.unpair (Nat.pair a b - 1)).1 with ha'
   set b' := (Nat.unpair (Nat.pair a b - 1)).2 with hb'
@@ -175,42 +176,43 @@ section Evaln
 
 variable {k n v : ℕ} {cf cg : Nat.Partrec.Code}
 
-theorem mem_evaln_zero_iff : v ∈ evaln (k + 1) .zero n ↔ n ≤ k ∧ v = 0 := by
+private theorem mem_evaln_zero_iff : v ∈ evaln (k + 1) .zero n ↔ n ≤ k ∧ v = 0 := by
   by_cases h : n ≤ k <;> simp [evaln, guard, h, eq_comm]
 
-theorem mem_evaln_succ_iff : v ∈ evaln (k + 1) .succ n ↔ n ≤ k ∧ v = n + 1 := by
+private theorem mem_evaln_succ_iff : v ∈ evaln (k + 1) .succ n ↔ n ≤ k ∧ v = n + 1 := by
   by_cases h : n ≤ k <;> simp [evaln, guard, h, eq_comm]
 
-theorem mem_evaln_left_iff : v ∈ evaln (k + 1) .left n ↔ n ≤ k ∧ v = (Nat.unpair n).1 := by
+private theorem mem_evaln_left_iff : v ∈ evaln (k + 1) .left n ↔ n ≤ k ∧ v = (Nat.unpair n).1 := by
   by_cases h : n ≤ k <;> simp [evaln, guard, h, eq_comm]
 
-theorem mem_evaln_right_iff : v ∈ evaln (k + 1) .right n ↔ n ≤ k ∧ v = (Nat.unpair n).2 := by
+private theorem mem_evaln_right_iff
+    : v ∈ evaln (k + 1) .right n ↔ n ≤ k ∧ v = (Nat.unpair n).2 := by
   by_cases h : n ≤ k <;> simp [evaln, guard, h, eq_comm]
 
-theorem mem_evaln_pair_iff :
+private theorem mem_evaln_pair_iff :
     v ∈ evaln (k + 1) (.pair cf cg) n ↔
       n ≤ k ∧ ∃ x y, x ∈ evaln (k + 1) cf n ∧ y ∈ evaln (k + 1) cg n ∧ Nat.pair x y = v := by
   by_cases h : n ≤ k <;>
     simp [evaln, guard, h, Seq.seq, Option.bind_eq_some_iff, Option.map_eq_some_iff]
 
-theorem mem_evaln_comp_iff :
+private theorem mem_evaln_comp_iff :
     v ∈ evaln (k + 1) (.comp cf cg) n ↔
       n ≤ k ∧ ∃ y, y ∈ evaln (k + 1) cg n ∧ v ∈ evaln (k + 1) cf y := by
   by_cases h : n ≤ k <;> simp [evaln, guard, h, Option.bind_eq_some_iff]
 
-theorem mem_evaln_prec_zero_iff {a : ℕ} :
+private theorem mem_evaln_prec_zero_iff {a : ℕ} :
     v ∈ evaln (k + 1) (.prec cf cg) (Nat.pair a 0) ↔
       Nat.pair a 0 ≤ k ∧ v ∈ evaln (k + 1) cf a := by
   by_cases h : Nat.pair a 0 ≤ k <;> simp [evaln, guard, h, Nat.unpaired]
 
-theorem mem_evaln_prec_succ_iff {a j : ℕ} :
+private theorem mem_evaln_prec_succ_iff {a j : ℕ} :
     v ∈ evaln (k + 1) (.prec cf cg) (Nat.pair a (j + 1)) ↔
       Nat.pair a (j + 1) ≤ k ∧ ∃ i, i ∈ evaln k (.prec cf cg) (Nat.pair a j) ∧
         v ∈ evaln (k + 1) cg (Nat.pair a (Nat.pair j i)) := by
   by_cases h : Nat.pair a (j + 1) ≤ k <;>
     simp [evaln, guard, h, Nat.unpaired, Option.bind_eq_some_iff]
 
-theorem mem_evaln_rfind'_iff {a m : ℕ} :
+private theorem mem_evaln_rfind'_iff {a m : ℕ} :
     v ∈ evaln (k + 1) (.rfind' cf) (Nat.pair a m) ↔
       Nat.pair a m ≤ k ∧ ∃ x, x ∈ evaln (k + 1) cf (Nat.pair a m) ∧
         (if x = 0 then v = m else v ∈ evaln k (.rfind' cf) (Nat.pair a (m + 1))) := by
@@ -262,33 +264,33 @@ section EvalIntro
 
 variable {cf cg : Nat.Partrec.Code} {n : ℕ}
 
-theorem mem_eval_zero : (0 : ℕ) ∈ eval .zero n := by
+private theorem mem_eval_zero : (0 : ℕ) ∈ eval .zero n := by
   rw [eval]; exact Part.mem_some 0
 
-theorem mem_eval_succ : n + 1 ∈ eval .succ n := by
+private theorem mem_eval_succ : n + 1 ∈ eval .succ n := by
   rw [eval]; exact Part.mem_some _
 
-theorem mem_eval_left : (Nat.unpair n).1 ∈ eval .left n := by
+private theorem mem_eval_left : (Nat.unpair n).1 ∈ eval .left n := by
   rw [eval]; exact Part.mem_some _
 
-theorem mem_eval_right : (Nat.unpair n).2 ∈ eval .right n := by
+private theorem mem_eval_right : (Nat.unpair n).2 ∈ eval .right n := by
   rw [eval]; exact Part.mem_some _
 
-theorem mem_eval_pair {a b : ℕ} (ha : a ∈ eval cf n) (hb : b ∈ eval cg n) :
+private theorem mem_eval_pair {a b : ℕ} (ha : a ∈ eval cf n) (hb : b ∈ eval cg n) :
     Nat.pair a b ∈ eval (.pair cf cg) n := by
   change Nat.pair a b ∈ (Nat.pair <$> eval cf n <*> eval cg n)
   rw [seq_eq_bind_map]
   exact Part.mem_bind (Part.mem_map _ ha) (Part.mem_map _ hb)
 
-theorem mem_eval_comp {y v : ℕ} (hy : y ∈ eval cg n) (hv : v ∈ eval cf y) :
+private theorem mem_eval_comp {y v : ℕ} (hy : y ∈ eval cg n) (hv : v ∈ eval cf y) :
     v ∈ eval (.comp cf cg) n := by
   rw [eval]; exact Part.mem_bind hy hv
 
-theorem mem_eval_prec_zero {a v : ℕ} (h : v ∈ eval cf a) :
+private theorem mem_eval_prec_zero {a v : ℕ} (h : v ∈ eval cf a) :
     v ∈ eval (.prec cf cg) (Nat.pair a 0) := by
   rw [eval_prec_zero]; exact h
 
-theorem mem_eval_prec_succ {a j i v : ℕ} (hi : i ∈ eval (.prec cf cg) (Nat.pair a j))
+private theorem mem_eval_prec_succ {a j i v : ℕ} (hi : i ∈ eval (.prec cf cg) (Nat.pair a j))
     (hv : v ∈ eval cg (Nat.pair a (Nat.pair j i))) :
     v ∈ eval (.prec cf cg) (Nat.pair a (j + 1)) := by
   rw [eval_prec_succ]; exact Part.mem_bind hi hv
@@ -296,7 +298,7 @@ theorem mem_eval_prec_succ {a j i v : ℕ} (hi : i ∈ eval (.prec cf cg) (Nat.p
 /-- The evaluation of an `rfind'`, from the *bounded universal* shape of the
 search: `v` is a place at or above `m` where `cf` returns `0`, and every place
 in between returns something nonzero. -/
-theorem mem_eval_rfind' {a m v : ℕ} (hmv : m ≤ v) (h0 : 0 ∈ eval cf (Nat.pair a v))
+private theorem mem_eval_rfind' {a m v : ℕ} (hmv : m ≤ v) (h0 : 0 ∈ eval cf (Nat.pair a v))
     (hlt : ∀ w, m ≤ w → w < v → ∃ u, u ≠ 0 ∧ u ∈ eval cf (Nat.pair a w)) :
     v ∈ eval (.rfind' cf) (Nat.pair a m) := by
   change v ∈ (Nat.unpaired fun a m =>
@@ -318,11 +320,11 @@ end EvalIntro
 /-- Every value a bounded evaluation with budget `k` of a code numbered at most
 `E` can produce. The numeral segment of a certificate is an initial segment of
 `ℕ` reaching this far, which is what makes it finite. -/
-def valBound (E k : ℕ) : ℕ :=
+private def valBound (E k : ℕ) : ℕ :=
   (Finset.range (E + 1)).sup fun e =>
     (Finset.range (k + 1)).sup fun x => (evaln k (dec e) x).getD 0
 
-theorem le_valBound {E k e x v : ℕ} (he : e ≤ E) (hv : v ∈ evaln k (dec e) x) :
+private theorem le_valBound {E k e x v : ℕ} (he : e ≤ E) (hv : v ∈ evaln k (dec e) x) :
     v ≤ valBound E k := by
   have hx : x < k := evaln_bound hv
   have hinner : v ≤ (Finset.range (k + 1)).sup fun x => (evaln k (dec e) x).getD 0 := by

@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.CliqueFamily.Defs
+import all DescriptiveComplexity.Problems.CliqueFamily.Defs
 
 /-!
 # Reductions between Clique, Independent Set and Vertex Cover
@@ -51,7 +52,7 @@ section Complement
 variable {A : Type}
 
 /-- A clique is an independent set of the complement graph (loops removed). -/
-theorem cliqueOn_iff_indepOn_compl (Adjp : A → A → Prop) (Kp : A → Prop) :
+private theorem cliqueOn_iff_indepOn_compl (Adjp : A → A → Prop) (Kp : A → Prop) :
     CliqueOn Adjp Kp ↔ IndepOn (fun x y => x ≠ y ∧ ¬Adjp x y) Kp := by
   rw [IndepOn]
   refine cliqueOn_congr (fun x y hxy => ?_) fun x => Iff.rfl
@@ -62,7 +63,7 @@ theorem cliqueOn_iff_indepOn_compl (Adjp : A → A → Prop) (Kp : A → Prop) :
     exact h ⟨hxy, hn⟩
 
 /-- An independent set is a clique of the complement graph (loops removed). -/
-theorem indepOn_iff_cliqueOn_compl (Adjp : A → A → Prop) (Kp : A → Prop) :
+private theorem indepOn_iff_cliqueOn_compl (Adjp : A → A → Prop) (Kp : A → Prop) :
     IndepOn Adjp Kp ↔ CliqueOn (fun x y => x ≠ y ∧ ¬Adjp x y) Kp := by
   rw [IndepOn]
   exact cliqueOn_congr (fun x y hxy => (iff_of_eq (by simp [hxy])).symm) fun x => Iff.rfl
@@ -88,7 +89,7 @@ theorem coverOn_iff_indepOn_not [Finite A] (Adjp : A → A → Prop) (Kp : A →
 /-- On a finite universe, an independent set at least as large as the marked
 set exists iff a vertex cover at most as large as the *complement* of the
 marked set does. -/
-theorem indepOn_iff_coverOn_not [Finite A] (Adjp : A → A → Prop) (Kp : A → Prop) :
+private theorem indepOn_iff_coverOn_not [Finite A] (Adjp : A → A → Prop) (Kp : A → Prop) :
     IndepOn Adjp Kp ↔ CoverOn Adjp fun x => ¬Kp x := by
   rw [coverOn_iff_indepOn_not]
   exact indepOn_congr (fun x y hxy => Iff.rfl) fun x => (not_not).symm
@@ -116,7 +117,7 @@ def complMarkInterp :
     | _, .marked => fun _ => fo%⟨u⟩ ¬ mgMarked(u)
 
 /-- Both interpretations are quantifier-free. -/
-theorem complEdgeInterp_isQuantifierFree : complEdgeInterp.IsQuantifierFree := by
+private theorem complEdgeInterp_isQuantifierFree : complEdgeInterp.IsQuantifierFree := by
   intro n R t
   cases R with
   | adj =>
@@ -124,7 +125,7 @@ theorem complEdgeInterp_isQuantifierFree : complEdgeInterp.IsQuantifierFree := b
   | marked => exact (IsAtomic.rel _ _).isQF
 
 @[inherit_doc complEdgeInterp_isQuantifierFree]
-theorem complMarkInterp_isQuantifierFree : complMarkInterp.IsQuantifierFree := by
+private theorem complMarkInterp_isQuantifierFree : complMarkInterp.IsQuantifierFree := by
   intro n R t
   cases R with
   | adj => exact (IsAtomic.rel _ _).isQF
@@ -199,7 +200,7 @@ private theorem complMark_hK :
 
 /-- Correctness of the edge complementation, independent-set-to-clique
 direction. -/
-theorem hasLargeIndependentSet_iff_map :
+private theorem hasLargeIndependentSet_iff_map :
     HasLargeIndependentSet A ↔ HasLargeClique (complEdgeInterp.Map A) := by
   refine and_congr ((complEdgeInterp.mapEquivSelf A).finite_iff).symm ?_
   rw [indepOn_iff_cliqueOn_compl]
@@ -208,7 +209,7 @@ theorem hasLargeIndependentSet_iff_map :
 
 /-- Correctness of the edge complementation, clique-to-independent-set
 direction. -/
-theorem hasLargeClique_iff_map :
+private theorem hasLargeClique_iff_map :
     HasLargeClique A ↔ HasLargeIndependentSet (complEdgeInterp.Map A) := by
   refine and_congr ((complEdgeInterp.mapEquivSelf A).finite_iff).symm ?_
   rw [cliqueOn_iff_indepOn_compl]
@@ -217,7 +218,7 @@ theorem hasLargeClique_iff_map :
 
 /-- Correctness of the mark complementation, vertex-cover-to-independent-set
 direction. -/
-theorem hasSmallVertexCover_iff_map :
+private theorem hasSmallVertexCover_iff_map :
     HasSmallVertexCover A ↔ HasLargeIndependentSet (complMarkInterp.Map A) := by
   constructor
   · rintro ⟨hfin, hcov⟩
@@ -236,7 +237,7 @@ theorem hasSmallVertexCover_iff_map :
 
 /-- Correctness of the mark complementation, independent-set-to-vertex-cover
 direction. -/
-theorem hasLargeIndependentSet_iff_cover_map :
+private theorem hasLargeIndependentSet_iff_cover_map :
     HasLargeIndependentSet A ↔ HasSmallVertexCover (complMarkInterp.Map A) := by
   constructor
   · rintro ⟨hfin, hind⟩
@@ -258,14 +259,14 @@ end Correctness
 /-! ### The reductions -/
 
 /-- **Independent Set FO-reduces to Clique**, by complementing the edges. -/
-def indSet_fo_reduction_clique : IndependentSet ≤ᶠᵒ Clique where
+private def indSet_fo_reduction_clique : IndependentSet ≤ᶠᵒ Clique where
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
   correct A _ _ _ := hasLargeIndependentSet_iff_map A
 
 /-- **Clique FO-reduces to Independent Set**, by complementing the edges. -/
-def clique_fo_reduction_indSet : Clique ≤ᶠᵒ IndependentSet where
+private def clique_fo_reduction_indSet : Clique ≤ᶠᵒ IndependentSet where
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
@@ -273,7 +274,7 @@ def clique_fo_reduction_indSet : Clique ≤ᶠᵒ IndependentSet where
 
 /-- **Vertex Cover FO-reduces to Independent Set**, by complementing the
 marked set. -/
-def vertexCover_fo_reduction_indSet : VertexCover ≤ᶠᵒ IndependentSet where
+private def vertexCover_fo_reduction_indSet : VertexCover ≤ᶠᵒ IndependentSet where
   Tag := Unit
   dim := 1
   toInterpretation := complMarkInterp
@@ -281,7 +282,7 @@ def vertexCover_fo_reduction_indSet : VertexCover ≤ᶠᵒ IndependentSet where
 
 /-- **Independent Set FO-reduces to Vertex Cover**, by complementing the
 marked set. -/
-def indSet_fo_reduction_vertexCover : IndependentSet ≤ᶠᵒ VertexCover where
+private def indSet_fo_reduction_vertexCover : IndependentSet ≤ᶠᵒ VertexCover where
   Tag := Unit
   dim := 1
   toInterpretation := complMarkInterp

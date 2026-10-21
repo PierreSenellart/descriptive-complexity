@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawSpec
 public import DescriptiveComplexity.Problems.Wide.DrawInner
 public import DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.DrawInner
+import all DescriptiveComplexity.Problems.Wide.DrawTags
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The argument blocks, concretely: outer arguments first, inner variables last
@@ -64,7 +67,7 @@ prefix. -/
 def argIn (ko : ℕ) (j : Fin ki) : Tag R P (Fin ko ⊕ₗ Fin ki) :=
   .arg (Sum.inrₗ j)
 
-theorem argOut_injective : Function.Injective (argOut (R := R) (P := P) (ko := ko) ki) := by
+private theorem argOut_injective : Function.Injective (argOut (R := R) (P := P) (ko := ko) ki) := by
   intro k k' h
   simp only [argOut, Tag.arg.injEq] at h
   exact Sum.inl.inj (toLex.injective h)
@@ -72,12 +75,12 @@ theorem argOut_injective : Function.Injective (argOut (R := R) (P := P) (ko := k
 variable [LinearOrder R] [LinearOrder P]
 
 /-- The strict tag order through the key. -/
-theorem lt_iff_tagKey {K : Type} [LinearOrder K] (σ τ : Tag R P K) :
+private theorem lt_iff_tagKey {K : Type} [LinearOrder K] (σ τ : Tag R P K) :
     σ < τ ↔ tagKey σ < tagKey τ := by
   rw [lt_iff_le_not_ge, lt_iff_le_not_ge, le_iff_tagKey, le_iff_tagKey]
 
 /-- Argument tags compare by their block index. -/
-theorem arg_lt_arg_iff {K : Type} [LinearOrder K] (i i' : K) :
+private theorem arg_lt_arg_iff {K : Type} [LinearOrder K] (i i' : K) :
     (Tag.arg i : Tag R P K) < .arg i' ↔ i < i' := by
   rw [lt_iff_tagKey]
   simp [tagKey]
@@ -125,7 +128,7 @@ def outAddr (V : Fin ko → (Fin dd → A) → Prop) :
   fun u => ∃ k : Fin ko, u.1 = argOut ki k ∧ V k u.2
 
 /-- The outer blocks of `outAddr` are the given family. -/
-theorem wmBlk_outAddr (V : Fin ko → (Fin dd → A) → Prop) (k : Fin ko) :
+private theorem wmBlk_outAddr (V : Fin ko → (Fin dd → A) → Prop) (k : Fin ko) :
     wmBlk (outAddr (R := R) (P := P) (ki := ki) V) (argOut ki k) = V k := by
   refine funext fun v => propext ?_
   constructor
@@ -137,7 +140,7 @@ theorem wmBlk_outAddr (V : Fin ko → (Fin dd → A) → Prop) (k : Fin ko) :
 /-- **An address that marks outer argument blocks alone is `outAddr` of its
 blocks.** This is the uniqueness that turns a reading of the blocks into a
 reading of the address, and with it a set of marked addresses into a stage. -/
-theorem outAddr_of_blocks {V : Fin ko → (Fin dd → A) → Prop}
+private theorem outAddr_of_blocks {V : Fin ko → (Fin dd → A) → Prop}
     {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop}
     (hblk : ∀ k : Fin ko, wmBlk s (argOut ki k) = V k)
     (hsupp : ∀ u, s u → ∃ k : Fin ko, u.1 = argOut ki k) :
@@ -160,7 +163,7 @@ theorem outAddr_of_blocks {V : Fin ko → (Fin dd → A) → Prop}
 
 /-- The non-argument blocks of `outAddr` are empty, which is what puts the
 working cell in the logical interval. -/
-theorem outAddr_junk (V : Fin ko → (Fin dd → A) → Prop)
+private theorem outAddr_junk (V : Fin ko → (Fin dd → A) → Prop)
     {t : Tag R P (Fin ko ⊕ₗ Fin ki)} (ht : ∀ i, t ≠ Tag.arg i) :
     ∀ v : Fin dd → A, ¬outAddr V (t, v) := by
   rintro v ⟨k, hk, -⟩
@@ -211,7 +214,7 @@ theorem trackOf_of_blocks (hne : zero ≠ one) {i : d.B.ι} (ha : d.B.arity i �
 the variable's arity holding no point is enough, whatever the stage. This is
 what the junk addresses of a sweep write, and it is why a program may leave
 them alone. -/
-theorem not_trackOf_of_notEnc {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+private theorem not_trackOf_of_notEnc {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     (σ : d.B.Assignment (X.Map A))
     {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop} {ℓ₀ : Fin (d.B.arity i)}
     (hℓ : ∀ p : X.Map A,
@@ -225,7 +228,7 @@ block below its arity encoding a point, and an encoding always holds its tag's
 own tuple, so an address the track marks has an element in that block. This is
 what puts a dictionary entry inside a clocked program's *guessed* stretch, whose
 bottom is the file's first register and not the empty address. -/
-theorem nonempty_of_trackOf {i : d.B.ι} (ha : d.B.arity i ≤ ko)
+private theorem nonempty_of_trackOf {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     {σ : d.B.Assignment (X.Map A)}
     {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop} (ℓ₀ : Fin (d.B.arity i))
     (h : trackOf ly zero one ha σ s) : ∃ y, s y := by
@@ -247,7 +250,7 @@ def tupAddr {i : d.B.ι} (_ha : d.B.arity i ≤ ko)
     else fun _ => False
 
 /-- Its blocks below the variable's arity are the tuple's encodings. -/
-theorem wmBlk_tupAddr {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
+private theorem wmBlk_tupAddr {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
     {zero one : A} {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     (x : Fin (d.B.arity i) → X.Map A) (ℓ : Fin (d.B.arity i)) :
     wmBlk (tupAddr ly zero one (R := R) (P := P) (ki := ki) ha x)
@@ -260,7 +263,7 @@ marks nothing else, *is* the tuple's address.** The addresses a stage atom
 builds are of that kind – written block by block from named registers – so the
 dictionary a backward reading needs is asked exactly where
 `trackOf_assignOfTrack` answers it. -/
-theorem tupAddr_of_blocks {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
+private theorem tupAddr_of_blocks {ly : EncLayout (PtCode X) (blockArityBound X.B) dd}
     {zero one : A} {i : d.B.ι} (ha : d.B.arity i ≤ ko)
     {s : Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop}
     {x : Fin (d.B.arity i) → X.Map A}
@@ -285,7 +288,7 @@ variable (ly zero one) in
 the address that names it is marked. This is the inverse the forward direction
 never needs – it *writes* `trackOf` of an assignment – and the one a backward
 reading is built on. -/
-def assignOfTrack (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
+private def assignOfTrack (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
     (T : d.B.ι → (Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop) → Prop) :
     d.B.Assignment (X.Map A) :=
   fun i x => T i (tupAddr (R := R) (P := P) (ki := ki) ly zero one (ha i) x)
@@ -294,7 +297,7 @@ def assignOfTrack (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
 assignment a track carries is that track. So a run that left an arbitrary set
 of addresses marked has left the stage of a definite assignment, as far as the
 evaluation ever looks. -/
-theorem trackOf_assignOfTrack (hne : zero ≠ one)
+private theorem trackOf_assignOfTrack (hne : zero ≠ one)
     (ha : ∀ i : d.B.ι, d.B.arity i ≤ ko)
     (T : d.B.ι → (Univ A R P (Fin ko ⊕ₗ Fin ki) dd → Prop) → Prop)
     {i : d.B.ι} (x : Fin (d.B.arity i) → X.Map A) :
@@ -308,7 +311,7 @@ theorem trackOf_assignOfTrack (hne : zero ≠ one)
 blocks are empty, which is exactly `wmSetLe_logicalTop`'s hypothesis. What is
 *not* automatic is that it lies strictly below the top – the reduction owes
 that where it plants the end marker. -/
-theorem wmSetLe_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
+private theorem wmSetLe_tupAddr_logicalTop [LinearOrder R] [LinearOrder P]
     [Finite R] [Finite P] [Finite A]
     (hV : IsLinOrd (tupLeLex (A := A) (d := dd)))
     {i : d.B.ι} (ha : d.B.arity i ≤ ko)

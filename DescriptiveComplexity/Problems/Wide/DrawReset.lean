@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTrip
 import DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawScan
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # Resetting the working cell to the bottom
@@ -52,7 +56,7 @@ write the marker there stepping right, and bounce back onto it. The empty
 address is identified by the permanent `bot` mark, and no leftward step is ever
 taken at it. The scan is a walk down the whole order below the marker, so the
 cost is the marker's rank and the three steps around it. -/
-theorem reachesIn_reset (hR : PR.table.Reads)
+private theorem reachesIn_reset (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t bt wk : W} (hnebt : bt ≠ t) (hnewk : wk ≠ t)
     {v : Univ A R P K dd → Prop} (hv : ∃ x : Univ A R P K dd, ¬v x)
@@ -241,12 +245,12 @@ noncomputable def rule : ResetRule → Rule A Q W P
 
 /-- **A reset stays inside its own phases**: every rule of the kit lands in one
 of the three the kit was given. -/
-theorem dstPh_emb (ρ : ResetRule) :
+private theorem dstPh_emb (ρ : ResetRule) :
     ∃ p : ResetPh, (κ.rule (Q := Q) one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **In-shape separation.** -/
-theorem sep (hemb : Function.Injective κ.emb) :
+private theorem sep (hemb : Function.Injective κ.emb) :
     ∀ (ρ ρ' : ResetRule) (f : Q → A) (g : W → A),
       (κ.rule one ρ).guard f g → (κ.rule one ρ').guard f g →
       (κ.rule one ρ).srcPh = (κ.rule one ρ').srcPh → ρ = ρ' := by
@@ -259,7 +263,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
 
 /-- **Exit disjointness** at the landing phase: no kit rule fires from it at
 all. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : ResetRule) (f : Q → A) (g : W → A), (κ.rule one ρ).guard f g →
       (κ.rule one ρ).srcPh = κ.emb .done → False := by
   intro ρ f g _hg hph
@@ -318,7 +322,7 @@ include hrules hR hlin hnebt hnewk hv hAN hNB hbtN hwkB hNBslot in
 phase at the marker – whose erasing step is the caller's rule, the one
 hypothesis beyond the slot equations – to the landing phase on the empty
 address, down the whole order below the marker. -/
-theorem reachesIn
+private theorem reachesIn
     (h₀ : PR.HasRight p₀ fc (PR.passTracksAt RF.cell κ.t restA m v) (κ.emb .scan) fc
       (PR.passTracksAt RF.cell κ.t restN m v)) :
     (wideData (Univ A R P K dd)).ReachesIn (wideRank v + 4)
@@ -335,7 +339,7 @@ theorem reachesIn
 
 include hrules hR hlin hnebt hnewk hv hAN hNB hbtN hwkB hNBslot in
 /-- **The kit resets the marker to the bottom**, the budget forgotten. -/
-theorem reaches
+private theorem reaches
     (h₀ : PR.HasRight p₀ fc (PR.passTracksAt RF.cell κ.t restA m v) (κ.emb .scan) fc
       (PR.passTracksAt RF.cell κ.t restN m v)) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
@@ -369,7 +373,7 @@ variable (RF : IxFile (Univ A R P K dd) I ile)
 /-- **The walk home, on a budget**: from anywhere at or above the marker, scan
 left to it, in the difference of the two ranks. The marker's cell is identified
 by its own slot, and nothing on the way is rewritten. -/
-theorem reachesIn_home (hR : PR.table.Reads)
+private theorem reachesIn_home (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t wk : W} (hnewk : wk ≠ t)
     {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
@@ -401,7 +405,7 @@ theorem reachesIn_home (hR : PR.table.Reads)
 /-- **The walk home**: from anywhere at or above the marker, scan left to
 it. The marker's cell is identified by its own slot, and nothing on the way
 is rewritten. -/
-theorem reaches_home (hR : PR.table.Reads)
+private theorem reaches_home (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t wk : W} (hnewk : wk ≠ t)
     {rest : (Univ A R P K dd → Prop) → W → A} {m : I → Prop}
@@ -467,14 +471,14 @@ def rule : HomeRule → Rule A Q W P
       moveRight := False }
 
 /-- **In-shape separation**: one rule, nothing to separate. -/
-theorem sep : ∀ (ρ ρ' : HomeRule) (f : Q → A) (g : W → A),
+private theorem sep : ∀ (ρ ρ' : HomeRule) (f : Q → A) (g : W → A),
     (κ.rule one ρ).guard f g → (κ.rule one ρ').guard f g →
     (κ.rule one ρ).srcPh = (κ.rule one ρ').srcPh → ρ = ρ' := by
   intro ρ ρ' _f _g _hg _hg' _hph
   cases ρ; cases ρ'; rfl
 
 /-- **Exit disjointness**: the rule never fires at the marker. -/
-theorem exit_disjoint : ∀ (ρ : HomeRule) (f : Q → A) (g : W → A),
+private theorem exit_disjoint : ∀ (ρ : HomeRule) (f : Q → A) (g : W → A),
     (κ.rule one ρ).guard f g → g κ.wk = one → False := by
   intro ρ f g hg hwk
   cases ρ
@@ -502,7 +506,7 @@ variable {fc : Q → A}
 include hrules hR hlin hnewk hwkS in
 /-- **The kit walks home, on a budget**: from anywhere at or above the marker,
 down to it, in the difference of the two ranks. -/
-theorem reachesIn {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe v s) :
+private theorem reachesIn {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe v s) :
     (wideData (Univ A R P K dd)).ReachesIn (wideRank s - wideRank v)
       ⟨Sum.inr (PR.stElt κ.ph fc), Sum.inl s,
         wideTape (PR.trackTapeAt RF.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -519,7 +523,7 @@ theorem reachesIn {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe v s) :
 include hrules hR hlin hnewk hwkS in
 /-- **The kit walks home**: from anywhere at or above the marker, down to
 it. -/
-theorem reaches {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe v s) :
+private theorem reaches {s : Univ A R P K dd → Prop} (hle : WMSetLe WMLe v s) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt κ.ph fc), Sum.inl s,
         wideTape (PR.trackTapeAt RF.cell κ.t rest m) (PR.syElt PR.blank)⟩

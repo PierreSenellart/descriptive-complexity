@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.Tape
 
 /-!
 # Scanning to a cell recognized by its tracks
@@ -54,7 +57,8 @@ variable {I : Type} {cell : I → (Univ A R P K dd → Prop)}
 program supplies one rightward rule per unsatisfying symbol; the machine
 arrives at the first satisfying cell at or above its position, and learns on
 arrival that nothing it passed satisfied the guard. -/
-theorem reachesIn_scanStop (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem reachesIn_scanStop
+    (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, ¬StopG g → PR.HasRight p f g p f g)
@@ -98,7 +102,7 @@ theorem reaches_scanStop (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ
 
 /-- **Scanning left to the first cell whose tracks satisfy a guard**, the same
 reading downwards. -/
-theorem reachesIn_scanStopBack (hR : PR.table.Reads)
+private theorem reachesIn_scanStopBack (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}
@@ -123,7 +127,7 @@ theorem reachesIn_scanStopBack (hR : PR.table.Reads)
 
 /-- **Scanning right to the first cell whose tracks satisfy a guard**, the budget
 forgotten. -/
-theorem reaches_scanStopBack (hR : PR.table.Reads)
+private theorem reaches_scanStopBack (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}
@@ -147,7 +151,8 @@ knows the one cell at or above its position whose tracks satisfy the guard, the
 scan arrives exactly there. This is the navigation of the atom subroutines –
 the guard compares a cell's name slots with a tuple held in the control, and
 the marks make the match unique. -/
-theorem reachesIn_toCell (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
+private theorem reachesIn_toCell
+    (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}
     (hgo : ∀ g : W → A, ¬StopG g → PR.HasRight p f g p f g)
@@ -181,7 +186,7 @@ theorem reaches_toCell (hR : PR.table.Reads) (hlin : IsLinOrd (WMLe (A := Univ A
   (reachesIn_toCell hR hlin hgo hstop hle huniq).reflTransGen
 
 /-- **Scanning left to a cell the guard identifies uniquely.** -/
-theorem reachesIn_toCellBack (hR : PR.table.Reads)
+private theorem reachesIn_toCellBack (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}
@@ -200,7 +205,7 @@ theorem reachesIn_toCellBack (hR : PR.table.Reads)
 
 /-- **Scanning right to a cell the guard identifies uniquely**, the budget
 forgotten. -/
-theorem reaches_toCellBack (hR : PR.table.Reads)
+private theorem reaches_toCellBack (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}
@@ -221,7 +226,7 @@ cell-coupled**: the supplier of the walking rules sees the cell, its position
 at or below the start, and the guard's failure there. A verdict phase that
 also hosts register rules can only discharge this form – the coupled facts are
 what make its guards disjoint from theirs. -/
-theorem reachesIn_toCellBackC (hR : PR.table.Reads)
+private theorem reachesIn_toCellBackC (hR : PR.table.Reads)
     (hlin : IsLinOrd (WMLe (A := Univ A R P K dd)))
     {t : W} {rest : (Univ A R P K dd → Prop) → W → A} {StopG : (W → A) → Prop}
     {p : P} {f : Q → A} {m : I → Prop}

@@ -6,6 +6,11 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefCtl
+import all DescriptiveComplexity.Problems.Wide.DrawAcc
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawDefCtl
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The folds are definable
@@ -45,7 +50,7 @@ variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 /-- **A fold, read back, is definable**: the recursion down the levels is
 finite, so recursing the same way builds the formula. The leaf it closes with
 is the caller's – a flag of the control, or a bit it is about to store. -/
-theorem uGDefinable_chainFrom {m : ℕ} (accs : Fin m → dt.CtlIx)
+private theorem uGDefinable_chainFrom {m : ℕ} (accs : Fin m → dt.CtlIx)
     {leaf : ∀ e : Env L, (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Prop}
     (hleaf : UGDefinable leaf) (pol : ℕ → Bool) (n : ℕ) :
     ∀ j : ℕ, UGDefinable (L := L) (W := dt.SlotIx)
@@ -71,14 +76,14 @@ theorem uGDefinable_chainFrom {m : ℕ} (accs : Fin m → dt.CtlIx)
   exact fun j => key (n - j) j le_rfl
 
 /-- **The inner fold's verdict is definable.** -/
-theorem uGDefinable_accVerdict (pol : ℕ → Bool) :
+private theorem uGDefinable_accVerdict (pol : ℕ → Bool) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.accVerdict e.one pol f :=
   (uGDefinable_chainFrom dt.accC (uGDefinable_ctlBit dt.leafC) pol dt.ki 0).congr
     fun _ _ _ => Iff.rfl
 
 /-- **A sub-fold's verdict is definable.** -/
-theorem uGDefinable_sacVerdict (pol : ℕ → Bool) :
+private theorem uGDefinable_sacVerdict (pol : ℕ → Bool) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.sacVerdict e.one pol f :=
   (uGDefinable_chainFrom dt.sacC (uGDefinable_ctlBit dt.subLeafC) pol dt.eDim 0).congr
@@ -89,7 +94,7 @@ theorem uGDefinable_sacVerdict (pol : ℕ → Bool) :
 /-- **A fold at a tuple successor is definable**: below the carry each level
 keeps its bit, the carry absorbs the chain below it, and the levels above it
 reset – three branches decided when the formula is built. -/
-theorem uStDefinable_carryVec {m : ℕ} {accs : Fin m → dt.CtlIx}
+private theorem uStDefinable_carryVec {m : ℕ} {accs : Fin m → dt.CtlIx}
     (hinj : Function.Injective accs) (leafSlot : dt.CtlIx) (pol : ℕ → Bool)
     (n c : ℕ) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
@@ -116,28 +121,28 @@ theorem uStDefinable_carryVec {m : ℕ} {accs : Fin m → dt.CtlIx}
         (uGDefinable_const (pol (j : ℕ) = false)))
 
 /-- **The inner fold at a carry.** -/
-theorem uStDefinable_carryAcc (pol : ℕ → Bool) (c : ℕ) :
+private theorem uStDefinable_carryAcc (pol : ℕ → Bool) (c : ℕ) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.carryAcc e.zero e.one pol c f :=
   (uStDefinable_carryVec dt.accC_injective dt.leafC pol dt.ki c).congr
     fun _ _ _ _ => rfl
 
 /-- **A sub-fold at a carry.** -/
-theorem uStDefinable_carrySac (pol : ℕ → Bool) (c : ℕ) :
+private theorem uStDefinable_carrySac (pol : ℕ → Bool) (c : ℕ) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.carrySac e.zero e.one pol c f :=
   (uStDefinable_carryVec dt.sacC_injective dt.subLeafC pol dt.eDim c).congr
     fun _ _ _ _ => rfl
 
 /-- **A sub-fold at its first tuple.** -/
-theorem uStDefinable_initSac (pol : ℕ → Bool) :
+private theorem uStDefinable_initSac (pol : ℕ → Bool) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.initSac e.zero e.one pol f :=
   uStDefinable_putVec dt.sacC_injective fun j =>
     uGDefinable_const (pol (j : ℕ) = false)
 
 /-- **Storing a sub-fold's leaf.** -/
-theorem uStDefinable_setSubLeaf
+private theorem uStDefinable_setSubLeaf
     {b : ∀ e : Env L, (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Prop}
     (hb : UGDefinable b) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e f g =>
@@ -152,7 +157,7 @@ most another, and a relation of the **source vocabulary** holds of a tuple of
 them – the last two being exactly what an equality pattern cannot say. The
 fourth, a relation variable of the block, is a read leaf and never evaluated
 here. -/
-theorem uGDefinable_blkAtomHolds {B : SOBlock} {n : ℕ} (v : Fin n → dt.CtlIx)
+private theorem uGDefinable_blkAtomHolds {B : SOBlock} {n : ℕ} (v : Fin n → dt.CtlIx)
     (κ : BlkAtom L B n) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       BlkAtom.holds (L := L) (B := B) (fun _ _ => False) (fun j => f (v j)) κ := by
@@ -174,7 +179,7 @@ theorem uGDefinable_blkAtomHolds {B : SOBlock} {n : ℕ} (v : Fin n → dt.CtlIx
 
 /-- **A quantifier-free formula's value at a definable reading of its atoms is
 definable**: a recursion over the syntax, the atoms being the caller's. -/
-theorem uGDefinable_qfValue {L' : Language.{0, 0}} {α : Type} :
+private theorem uGDefinable_qfValue {L' : Language.{0, 0}} {α : Type} :
     ∀ {n : ℕ} (φ : L'.BoundedFormula α n)
       (val : ∀ e : Env L,
         (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → L'.BoundedFormula α n → Prop),
@@ -192,7 +197,7 @@ theorem uGDefinable_qfValue {L' : Language.{0, 0}} {α : Type} :
 
 /-- **The matrix's value at the atoms' verdicts is definable**: each atom's
 verdict is one of finitely many control flags. -/
-theorem uGDefinable_postLeaf (v : dt.VarIx) :
+private theorem uGDefinable_postLeaf (v : dt.VarIx) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.postLeaf e.one v f :=
   uGDefinable_qfValue (dt.matOf v) _ fun a =>

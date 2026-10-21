@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Problems.Hamilton.CountingUndirected
 public import DescriptiveComplexity.Problems.Hamilton.CountingHardness
 public import DescriptiveComplexity.Counting.Subtractive
 public import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Problems.Hamilton.CircuitPerm
+import all DescriptiveComplexity.Problems.Hamilton.Counting
+import all DescriptiveComplexity.Problems.Hamilton.CountingHardness
+import all DescriptiveComplexity.Problems.Hamilton.CountingUndirected
 
 /-!
 # #Hamilton Circuit is parsimoniously `#P`-complete
@@ -78,24 +82,24 @@ def SArc (R : A → A → Prop) : T3 × A → T3 × A → Prop
 /-- The edges of the split graph. -/
 def SEdge (R : A → A → Prop) (p q : T3 × A) : Prop := SArc R p q ∨ SArc R q p
 
-theorem sedge_symm {R : A → A → Prop} {p q : T3 × A} (h : SEdge R p q) : SEdge R q p :=
+private theorem sedge_symm {R : A → A → Prop} {p q : T3 × A} (h : SEdge R p q) : SEdge R q p :=
   h.symm
 
-theorem sedge_m {R : A → A → Prop} {x : A} {q : T3 × A} (h : SEdge R (.m, x) q) :
+private theorem sedge_m {R : A → A → Prop} {x : A} {q : T3 × A} (h : SEdge R (.m, x) q) :
     q = (.i, x) ∨ q = (.o, x) := by
   obtain ⟨t, y⟩ := q
   rcases h with h | h <;> cases t <;> simp only [SArc] at h
   · exact Or.inr (by rw [h])
   · exact Or.inl (by rw [h])
 
-theorem sedge_o {R : A → A → Prop} {x : A} {q : T3 × A} (h : SEdge R (.o, x) q) :
+private theorem sedge_o {R : A → A → Prop} {x : A} {q : T3 × A} (h : SEdge R (.o, x) q) :
     q = (.m, x) ∨ ∃ y, q = (.i, y) ∧ R x y := by
   obtain ⟨t, y⟩ := q
   rcases h with h | h <;> cases t <;> simp only [SArc] at h
   · exact Or.inr ⟨y, rfl, h⟩
   · exact Or.inl (by rw [h])
 
-theorem sedge_i {R : A → A → Prop} {y : A} {q : T3 × A} (h : SEdge R (.i, y) q) :
+private theorem sedge_i {R : A → A → Prop} {y : A} {q : T3 × A} (h : SEdge R (.i, y) q) :
     q = (.m, y) ∨ ∃ x, q = (.o, x) ∧ R x y := by
   obtain ⟨t, x⟩ := q
   rcases h with h | h <;> cases t <;> simp only [SArc] at h
@@ -107,7 +111,7 @@ variable [Finite A]
 /-! ### From a directed circuit to a circuit of the split graph -/
 
 /-- **A directed circuit, split, is a circuit of the split graph.** -/
-theorem isCircuit_sarc [Nonempty A] {R Nxt : A → A → Prop} (h : IsCircuit R Nxt) :
+private theorem isCircuit_sarc [Nonempty A] {R Nxt : A → A → Prop} (h : IsCircuit R Nxt) :
     IsCircuit (SEdge R) (SArc Nxt) := by
   classical
   obtain ⟨htot, hfun, hsurj, -, hR, -⟩ := h.local
@@ -165,7 +169,7 @@ variable {R : A → A → Prop} {N : T3 × A → T3 × A → Prop}
 
 /-- A circuit of the split graph does not go back and forth: the graph has
 more than two vertices. -/
-theorem no2 (hN : IsCircuit (SEdge R) N) (a : A) {u v : T3 × A} (h : N u v) (h' : N v u) :
+private theorem no2 (hN : IsCircuit (SEdge R) N) (a : A) {u v : T3 × A} (h : N u v) (h' : N v u) :
     False := by
   have htwo := hN.local.2.2.2.2.2 u v h h'
   rcases htwo (.i, a) with h₁ | h₁ <;> rcases htwo (.m, a) with h₂ | h₂ <;>
@@ -177,7 +181,7 @@ theorem no2 (hN : IsCircuit (SEdge R) N) (a : A) {u v : T3 × A} (h : N u v) (h'
 
 /-- The circuit passes through the middle copy of a vertex, one way or the
 other. -/
-theorem through_m (hN : IsCircuit (SEdge R) N) (x : A) :
+private theorem through_m (hN : IsCircuit (SEdge R) N) (x : A) :
     (N (.i, x) (.m, x) ∧ N (.m, x) (.o, x)) ∨ (N (.o, x) (.m, x) ∧ N (.m, x) (.i, x)) := by
   obtain ⟨htot, -, hsurj, -, hR, -⟩ := hN.local
   obtain ⟨v, hv⟩ := htot (.m, x)
@@ -190,7 +194,7 @@ theorem through_m (hN : IsCircuit (SEdge R) N) (x : A) :
   · exact (no2 hN x hv hv').elim
 
 /-- A vertex traversed forward is left for the entry of another vertex. -/
-theorem exit_of_forward (hN : IsCircuit (SEdge R) N) {x : A} (hx : N (.m, x) (.o, x)) :
+private theorem exit_of_forward (hN : IsCircuit (SEdge R) N) {x : A} (hx : N (.m, x) (.o, x)) :
     ∃ y, N (.o, x) (.i, y) ∧ R x y := by
   obtain ⟨htot, -, -, -, hR, -⟩ := hN.local
   obtain ⟨v, hv⟩ := htot (.o, x)
@@ -220,7 +224,7 @@ theorem forward_all (hN : IsCircuit (SEdge R) N) {x₀ : A} (h₀ : N (.i, x₀)
   exact fun x => key (.i, x)
 
 /-- **A forward circuit of the split graph is a split directed circuit.** -/
-theorem exists_circuit_of_forward [Nonempty A] (hN : IsCircuit (SEdge R) N)
+private theorem exists_circuit_of_forward [Nonempty A] (hN : IsCircuit (SEdge R) N)
     (hfwd : ∀ x, N (.i, x) (.m, x)) :
     IsCircuit R (fun x y => N (.o, x) (.i, y)) ∧
       ∀ p q, N p q ↔ SArc (fun x y => N (.o, x) (.i, y)) p q := by
@@ -278,13 +282,13 @@ end Reverse
 
 omit [Finite A] in
 /-- A split relation is read back on its exit-to-entry arcs. -/
-theorem sarc_sym_iff {Nxt : A → A → Prop} (x y : A) :
+private theorem sarc_sym_iff {Nxt : A → A → Prop} (x y : A) :
     (SArc Nxt (.o, x) (.i, y) ∨ SArc Nxt (.i, y) (.o, x)) ↔ Nxt x y :=
   ⟨fun h => h.elim id fun h => (h : False).elim, Or.inl⟩
 
 /-- **The undirected circuits of the split graph are the directed circuits of
 the graph**, bijectively. -/
-noncomputable def splitEquiv [Nonempty A] (R : A → A → Prop) :
+private noncomputable def splitEquiv [Nonempty A] (R : A → A → Prop) :
     {Nxt : A → A → Prop // IsCircuit R Nxt} ≃
       {E : T3 × A → T3 × A → Prop // IsUCircuit (SEdge R) E} :=
   Equiv.ofBijective
@@ -336,14 +340,14 @@ def splitPts (A : Type) : splitInterp.Map A ≃ T3 × A where
   left_inv p := Prod.ext rfl (funext fun j => congrArg p.2 (Subsingleton.elim 0 j))
   right_inv _ := rfl
 
-theorem split_arc (t t' : T3) (w w' : Fin 1 → A) :
+private theorem split_arc (t t' : T3) (w w' : Fin 1 → A) :
     RelMap (M := splitInterp.Map A) dgArc ![(t, w), (t', w')] ↔
       SArc (fun x y : A => DGArc x y) (t, w 0) (t', w' 0) := by
   rw [FOInterpretation.relMap_map]
   cases t <;> cases t' <;>
     simp [splitInterp, splitF, SArc, DGArc, Formula.realize_rel₂]
 
-theorem dgArc_split (p q : splitInterp.Map A) :
+private theorem dgArc_split (p q : splitInterp.Map A) :
     DGArc p q ↔ SArc (fun x y : A => DGArc x y) (splitPts A p) (splitPts A q) := by
   obtain ⟨t, w⟩ := p
   obtain ⟨t', w'⟩ := q
@@ -352,7 +356,7 @@ theorem dgArc_split (p q : splitInterp.Map A) :
 variable (A) [Finite A] [Nonempty A]
 
 /-- **Correctness of the interpretation, for counting.** -/
-theorem sharpHamCircuit_split :
+private theorem sharpHamCircuit_split :
     SharpHamCircuit (splitInterp.Map A) = SharpDirHamCircuit A := by
   have := splitInterp.map_finite A
   have hW : Finite (T3 × A) := inferInstance
@@ -372,7 +376,7 @@ open Split in
 /-- **#Directed Hamilton Circuit reduces parsimoniously to #Hamilton Circuit**,
 by splitting each vertex in three; no order and no domain formula are
 needed. -/
-def sharpDirHamCircuit_parsimonious_sharpHamCircuit :
+private def sharpDirHamCircuit_parsimonious_sharpHamCircuit :
     SharpDirHamCircuit ≤ᵖ SharpHamCircuit where
   Tag := T3
   dim := 1

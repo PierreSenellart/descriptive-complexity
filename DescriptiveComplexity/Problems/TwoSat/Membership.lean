@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.LogSpace
 public import DescriptiveComplexity.Problems.TwoSat.Defs
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.Problems.TwoSat.Defs
 
 /-!
 # 2SAT is SO-Krom definable, hence in NL
@@ -82,7 +84,7 @@ section Realize
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {v : Fin 3 → A}
 
-theorem realize_coverF {s u : Bool} :
+private theorem realize_coverF {s u : Bool} :
     (coverF s u).Realize v ↔
       ∀ z t, OccIn (v 0) z t → (z = v 1 ∧ t = s) ∨ (z = v 2 ∧ t = u) := by
   simp only [coverF, Formula.realize_iAlls, Formula.realize_iInf, Formula.realize_imp,
@@ -103,7 +105,7 @@ theorem realize_coverF {s u : Bool} :
       subst h2
       simpa using h1
 
-theorem realize_pairGuard {s u : Bool} :
+private theorem realize_pairGuard {s u : Bool} :
     (pairGuard s u).Realize v ↔
       IsCl (v 0) ∧ OccIn (v 0) (v 1) s ∧ OccIn (v 0) (v 2) u ∧
         ∀ z t, OccIn (v 0) z t → (z = v 1 ∧ t = s) ∨ (z = v 2 ∧ t = u) := by
@@ -115,36 +117,36 @@ end Realize
 /-! ### The program -/
 
 /-- The two-literal clause of the program, for a pair of signs. -/
-noncomputable def pairClause (s u : Bool) : KromClause satOrd satAssignBlock 3 where
+private noncomputable def pairClause (s u : Bool) : KromClause satOrd satAssignBlock 3 where
   guard := pairGuard s u
   lit₁ := some (nuLit 1 s)
   lit₂ := some (nuLit 2 u)
 
 /-- The goal clause firing on an empty clause of the input. -/
-noncomputable def emptyClause : KromClause satOrd satAssignBlock 3 where
+private noncomputable def emptyClause : KromClause satOrd satAssignBlock 3 where
   guard := emptyClF 0
   lit₁ := none
   lit₂ := none
 
 /-- The goal clause firing when the width promise of 2SAT is violated. -/
-noncomputable def wideClause : KromClause satOrd satAssignBlock 3 where
+private noncomputable def wideClause : KromClause satOrd satAssignBlock 3 where
   guard := wideTwoOrdF
   lit₁ := none
   lit₂ := none
 
 /-- The Krom program defining 2SAT: one two-literal clause per pair of signs,
 plus the two goal clauses for the empty clause and for the width promise. -/
-noncomputable def twoSatProgram : KromProgram satOrd satAssignBlock 3 :=
+private noncomputable def twoSatProgram : KromProgram satOrd satAssignBlock 3 :=
   [pairClause true true, pairClause true false, pairClause false true,
     pairClause false false, emptyClause, wideClause]
 
-theorem pairClause_mem (s u : Bool) : pairClause s u ∈ twoSatProgram := by
+private theorem pairClause_mem (s u : Bool) : pairClause s u ∈ twoSatProgram := by
   cases s <;> cases u <;> simp [twoSatProgram]
 
-theorem emptyClause_mem : emptyClause ∈ twoSatProgram := by
+private theorem emptyClause_mem : emptyClause ∈ twoSatProgram := by
   simp [twoSatProgram]
 
-theorem wideClause_mem : wideClause ∈ twoSatProgram := by
+private theorem wideClause_mem : wideClause ∈ twoSatProgram := by
   simp [twoSatProgram]
 
 /-! ### Assignments on both sides -/
@@ -181,7 +183,7 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] {ν : A → Prop}
 
 /-- A two-literal clause holds: the input clause has a true occurrence, and the
 guard says that every occurrence of it is one of the clause's two literals. -/
-theorem pairClause_holds (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s)
+private theorem pairClause_holds (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s)
     (s u : Bool) (v : Fin 3 → A) :
     (pairClause s u).Holds (ofTruth ν) v := by
   intro hguard
@@ -193,7 +195,7 @@ theorem pairClause_holds (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ L
 
 /-- The empty-clause goal clause holds: a satisfied structure has no empty
 clause, so its guard is false. -/
-theorem emptyClause_holds (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s)
+private theorem emptyClause_holds (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s)
     (v : Fin 3 → A) : emptyClause.Holds (ofTruth ν) v := by
   intro hguard
   have hempty : EmptyCl (v 0) := realize_emptyClF.mp hguard
@@ -201,7 +203,7 @@ theorem emptyClause_holds (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ 
   exact absurd hzt (hempty.2 z t)
 
 /-- The width goal clause holds: under the promise, its guard is false. -/
-theorem wideClause_holds (hw : WidthAtMostTwo A) (ν : A → Prop) (v : Fin 3 → A) :
+private theorem wideClause_holds (hw : WidthAtMostTwo A) (ν : A → Prop) (v : Fin 3 → A) :
     wideClause.Holds (ofTruth ν) v := by
   intro hguard
   exact absurd hw (wideTwo_iff_not_widthAtMostTwo.mp (realize_wideTwoOrdF.mp hguard))

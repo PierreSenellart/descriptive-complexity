@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Qsat.Matrix
+import all DescriptiveComplexity.Problems.Qsat.Levels
+import all DescriptiveComplexity.Problems.Qsat.Matrix
 
 /-!
 # The blocks of the prefix, and what the matrix says
@@ -107,10 +109,10 @@ end Over
 
 section Pairs
 
-theorem iff_of_or_not {P Q : Prop} (h0 : ¬P ∨ Q) (h1 : P ∨ ¬Q) : P ↔ Q :=
+private theorem iff_of_or_not {P Q : Prop} (h0 : ¬P ∨ Q) (h1 : P ∨ ¬Q) : P ↔ Q :=
   ⟨fun hp => h0.resolve_left (not_not_intro hp), fun hq => h1.resolve_right (not_not_intro hq)⟩
 
-theorem or_forall_of_forall_or {ι : Sort*} {R : Prop} {P : ι → Prop} (h : ∀ i, R ∨ P i) :
+private theorem or_forall_of_forall_or {ι : Sort*} {R : Prop} {P : ι → Prop} (h : ∀ i, R ∨ P i) :
     R ∨ ∀ i, P i := by
   classical
   by_cases hR : R
@@ -149,17 +151,17 @@ def StepPart : Prop :=
 def LevPart : Prop :=
   ∀ (b w s : Bool) (ℓ x : A), IsSV ℓ → IsSV x → LevSat σ b w s ℓ x
 
-theorem matrix_cSrc_iff :
+private theorem matrix_cSrc_iff :
     (∀ p q : A, QClOn .cSrc p q → ClSat σ .cSrc p q) ↔ ClausesHold A (valS σ) tsSrcCl :=
   ⟨fun h c hc => (clSat_cSrc σ c (qBot A)).mp (h c (qBot A) ⟨hc, isBot_qBot A⟩),
     fun h p q hg => (clSat_cSrc σ p q).mpr (h p hg.1)⟩
 
-theorem matrix_cTgt_iff :
+private theorem matrix_cTgt_iff :
     (∀ p q : A, QClOn .cTgt p q → ClSat σ .cTgt p q) ↔ ClausesHold A (valT σ) tsTgtCl :=
   ⟨fun h c hc => (clSat_cTgt σ c (qBot A)).mp (h c (qBot A) ⟨hc, isBot_qBot A⟩),
     fun h p q hg => (clSat_cTgt σ p q).mpr (h p hg.1)⟩
 
-theorem matrix_cStep_iff :
+private theorem matrix_cStep_iff :
     (∀ p q : A, QClOn .cStep p q → ClSat σ .cStep p q) ↔
       (bitE σ ∨ ClausesHold A (valP σ) tsStepCl) := by
   constructor
@@ -170,7 +172,7 @@ theorem matrix_cStep_iff :
     · exact (clSat_cStep σ p q).mpr (Or.inl hb)
     · exact (clSat_cStep σ p q).mpr (Or.inr (h p hg.1))
 
-theorem matrix_lS_iff :
+private theorem matrix_lS_iff :
     (∀ (s : Bool) (p q : A), QClOn (.lS s) p q → ClSat σ (.lS s) p q) ↔
       ReadsCur A (valS σ) (stS σ) := by
   classical
@@ -191,7 +193,7 @@ theorem matrix_lS_iff :
       · exact Or.inl hv
       · exact Or.inr fun hs => hv (hp.mpr hs)
 
-theorem matrix_lT_iff :
+private theorem matrix_lT_iff :
     (∀ (s : Bool) (p q : A), QClOn (.lT s) p q → ClSat σ (.lT s) p q) ↔
       ReadsCur A (valT σ) (stT σ) := by
   classical
@@ -212,7 +214,7 @@ theorem matrix_lT_iff :
       · exact Or.inl hv
       · exact Or.inr fun hs => hv (hp.mpr hs)
 
-theorem matrix_lU_iff :
+private theorem matrix_lU_iff :
     (∀ (s : Bool) (p q : A), QClOn (.lU s) p q → ClSat σ (.lU s) p q) ↔
       ∀ m : A, IsMaxSV m → (bitE σ ∨ ReadsCur A (valP σ) (stU σ m)) := by
   classical
@@ -248,7 +250,7 @@ theorem matrix_lU_iff :
       · exact Or.inl hv
       · exact Or.inr ⟨m, hm, fun hu => hv (hp.mpr hu)⟩
 
-theorem matrix_lV_iff :
+private theorem matrix_lV_iff :
     (∀ (s : Bool) (p q : A), QClOn (.lV s) p q → ClSat σ (.lV s) p q) ↔
       ∀ m : A, IsMaxSV m → (bitE σ ∨ WritesNext A (valP σ) (stV σ m)) := by
   classical
@@ -285,7 +287,7 @@ theorem matrix_lV_iff :
       · exact Or.inl hv
       · exact Or.inr ⟨m, hm, fun hu => hv (hp.mpr hu)⟩
 
-theorem matrix_bE_iff :
+private theorem matrix_bE_iff :
     (∀ (s : Bool) (p q : A), QClOn (.bE s) p q → ClSat σ (.bE s) p q) ↔
       ∀ m : A, IsMaxSV m → (¬bitE σ ∨ ∀ x : A, IsSV x → (stU σ m x ↔ stV σ m x)) := by
   classical
@@ -321,7 +323,7 @@ theorem matrix_bE_iff :
       · exact Or.inl ⟨m, hm, hv⟩
       · exact Or.inr ⟨m, hm, fun hw => hv (hp.mpr hw)⟩
 
-theorem matrix_lev_iff :
+private theorem matrix_lev_iff :
     (∀ (b w s : Bool) (ℓ x : A), QClOn (.lev b w s) ℓ x → ClSat σ (.lev b w s) ℓ x) ↔
       LevPart σ :=
   ⟨fun h b w s ℓ x hl hx => (clSat_lev σ b w s ⟨hl, hx⟩).mp (h b w s ℓ x ⟨hl, hx⟩),

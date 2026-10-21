@@ -6,6 +6,9 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Peel
+import all DescriptiveComplexity.Exponential.Peel
+import all DescriptiveComplexity.Exponential.PointAtoms
+import all DescriptiveComplexity.SecondOrderReplicate
 
 /-!
 # The translation lemma
@@ -80,7 +83,7 @@ noncomputable def roundStructure {n : ℕ} {A : Type} [L.Structure A] [LinearOrd
 
 /-- Turning the bound variables of a quantifier-free formula into free ones
 keeps it quantifier-free. -/
-theorem isQF_toFormula {L' : Language.{0, 0}} {α : Type} {k : ℕ}
+private theorem isQF_toFormula {L' : Language.{0, 0}} {α : Type} {k : ℕ}
     {ψ : L'.BoundedFormula α k} (hψ : ψ.IsQF) : ψ.toFormula.IsQF := by
   induction hψ with
   | falsum => exact BoundedFormula.isQF_bot
@@ -103,7 +106,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 /-- **The matrix says what it should**: read against the rounds, it holds
 exactly when the formula holds of the points they carry. -/
-theorem realize_matrixF {n j : ℕ} (pts : Fin n → X.Map A) (hv : Fin j → Fin n)
+private theorem realize_matrixF {n j : ℕ} (pts : Fin n → X.Map A) (hv : Fin j → Fin n)
     {ψ : (X.E.sum Language.order).BoundedFormula Empty j} (hqf : ψ.IsQF) :
     letI := X.mapLinearOrder A
     (@Sentence.Realize _ A (roundStructure X (roundAssign pts)) (matrixF X hv ψ) ↔
@@ -180,7 +183,7 @@ theorem altBlockQuant_peel_step {n r : ℕ} (i₀ i₁ : Fin n)
 a quantifier have been peeled into the points `p` and `q`, the induction
 hypothesis applies at the round `c + 2`, its variables read at the family of
 points updated at those two rounds. -/
-theorem transl_step {n j c d : ℕ} (hc0 : c < n) (hc1 : c + 1 < n)
+private theorem transl_step {n j c d : ℕ} (hc0 : c < n) (hc1 : c + 1 < n)
     {hv : Fin j → Fin n} (hlt : ∀ i, (hv i : ℕ) < c) (iv : Fin n)
     {K : ((L.sum Language.order).sum (repMerged X.pointBlock n).lang).Sentence}
     {ψ : (X.E.sum Language.order).BoundedFormula Empty (j + 1)}

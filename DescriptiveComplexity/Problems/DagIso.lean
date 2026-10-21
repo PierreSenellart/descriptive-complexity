@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.DagIso.ToDigraphIso
 import DescriptiveComplexity.Problems.DagIso.FromDigraphIso
+import all DescriptiveComplexity.Problems.DagIso.ToDigraphIso
 
 /-!
 # DAG Isomorphism is GI-complete

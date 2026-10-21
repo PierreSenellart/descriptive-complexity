@@ -9,6 +9,7 @@ import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Steiner.Defs
 public import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Problems.Steiner.Defs
 
 /-!
 # Steiner Tree is existential second-order definable
@@ -54,42 +55,42 @@ fo_block steinerGuessBlock over Language.steinerGraph st into steinerSOLang with
 /-! ### The clauses -/
 
 /-- Kernel clause: every terminal is chosen. -/
-noncomputable def stTermClause : steinerSOLang.Sentence :=
+private noncomputable def stTermClause : steinerSOLang.Sentence :=
   fo% ∀ x, kStTerminalSym(x) → kStSetSym(x)
 
 /-- Kernel clause: the root is chosen. -/
-noncomputable def stRootInClause : steinerSOLang.Sentence :=
+private noncomputable def stRootInClause : steinerSOLang.Sentence :=
   fo% ∀ x, kStRootSym(x) → kStSetSym(x)
 
 /-- Kernel clause: there is at most one root. -/
-noncomputable def stRootUniqueClause : steinerSOLang.Sentence :=
+private noncomputable def stRootUniqueClause : steinerSOLang.Sentence :=
   fo% ∀ x y, kStRootSym(x) ∧ kStRootSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
-noncomputable def stTransClause : steinerSOLang.Sentence :=
+private noncomputable def stTransClause : steinerSOLang.Sentence :=
   fo% ∀ x y z, kStOrderSym(x, y) ∧ kStOrderSym(y, z) → kStOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
-noncomputable def stIrreflClause : steinerSOLang.Sentence :=
+private noncomputable def stIrreflClause : steinerSOLang.Sentence :=
   fo% ∀ x, ¬ kStOrderSym(x, x)
 
 /-- Kernel clause: every chosen non-root has a chosen neighbor strictly below
 it. -/
-noncomputable def stStepClause : steinerSOLang.Sentence :=
+private noncomputable def stStepClause : steinerSOLang.Sentence :=
   fo% ∀ x, kStSetSym(x) ∧ ¬ kStRootSym(x) →
     ∃ y, (kStSetSym(y) ∧ (kStAdjSym(x, y) ∨ kStAdjSym(y, x))) ∧ kStOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every chosen non-terminal to a
 marked element. -/
-noncomputable def stTotalClause : steinerSOLang.Sentence :=
+private noncomputable def stTotalClause : steinerSOLang.Sentence :=
   fo% ∀ x, kStSetSym(x) ∧ ¬ kStTerminalSym(x) → ∃ y, kStInjSym(x, y) ∧ kStMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
-noncomputable def stInjClause : steinerSOLang.Sentence :=
+private noncomputable def stInjClause : steinerSOLang.Sentence :=
   fo% ∀ x x' y, kStInjSym(x, y) ∧ kStInjSym(x', y) → x ≐ x'
 
 /-- The first-order kernel of the `Σ₁` definition of Steiner Tree. -/
-noncomputable def steinerKernel : steinerSOLang.Sentence :=
+private noncomputable def steinerKernel : steinerSOLang.Sentence :=
   stTermClause ⊓ (stRootInClause ⊓ (stRootUniqueClause ⊓ (stTransClause ⊓
     (stIrreflClause ⊓ (stStepClause ⊓ (stTotalClause ⊓ stInjClause))))))
 
@@ -303,46 +304,46 @@ fo_block edgeSteinerGuessBlock over Language.steinerGraph st into edgeSteinerSOL
   inj : 3
 
 /-- Kernel clause: the chosen pairs are edges. -/
-noncomputable def esAdjClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esAdjClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ a b, kEsTreeSym(a, b) → kEsAdjSym(a, b)
 
 /-- Kernel clause: every terminal is spanned. -/
-noncomputable def esTermClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esTermClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ x, kEsTerminalSym(x) → kEsSetSym(x)
 
 /-- Kernel clause: the root is spanned. -/
-noncomputable def esRootInClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esRootInClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ x, kEsRootSym(x) → kEsSetSym(x)
 
 /-- Kernel clause: there is at most one root. -/
-noncomputable def esRootUniqueClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esRootUniqueClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ x y, kEsRootSym(x) ∧ kEsRootSym(y) → x ≐ y
 
 /-- Kernel clause: the guessed order is transitive. -/
-noncomputable def esTransClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esTransClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ x y z, kEsOrderSym(x, y) ∧ kEsOrderSym(y, z) → kEsOrderSym(x, z)
 
 /-- Kernel clause: the guessed order is irreflexive. -/
-noncomputable def esIrreflClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esIrreflClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ x, ¬ kEsOrderSym(x, x)
 
 /-- Kernel clause: every spanned non-root steps down along a chosen edge. -/
-noncomputable def esStepClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esStepClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ x, kEsSetSym(x) ∧ ¬ kEsRootSym(x) →
     ∃ y, (kEsSetSym(y) ∧ (kEsTreeSym(x, y) ∨ kEsTreeSym(y, x))) ∧ kEsOrderSym(y, x)
 
 /-- Kernel clause: the guessed injection maps every chosen edge to a marked
 element. -/
-noncomputable def esTotalClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esTotalClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ a b, kEsTreeSym(a, b) → ∃ y, kEsInjSym(a, b, y) ∧ kEsMarkedSym(y)
 
 /-- Kernel clause: the guessed injection is injective. -/
-noncomputable def esInjClause : edgeSteinerSOLang.Sentence :=
+private noncomputable def esInjClause : edgeSteinerSOLang.Sentence :=
   fo% ∀ a b a' b' y, kEsInjSym(a, b, y) ∧ kEsInjSym(a', b', y) → a ≐ a' ∧ b ≐ b'
 
 /-- The first-order kernel of the `Σ₁` definition of the edge-weighted Steiner
 tree. -/
-noncomputable def edgeSteinerKernel : edgeSteinerSOLang.Sentence :=
+private noncomputable def edgeSteinerKernel : edgeSteinerSOLang.Sentence :=
   esAdjClause ⊓ (esTermClause ⊓ (esRootInClause ⊓ (esRootUniqueClause ⊓ (esTransClause ⊓
     (esIrreflClause ⊓ (esStepClause ⊓ (esTotalClause ⊓ esInjClause)))))))
 
@@ -414,7 +415,7 @@ private theorem realize_edgeSteinerKernel {A : Type} [Language.steinerGraph.Stru
 /-- **The edge-weighted Steiner Tree is `Σ₁`-definable**: guess the edge set,
 the vertices it spans, a root, an order certifying connectivity, and an
 injection of the chosen edges into the marked set. -/
-theorem edgeSteinerTree_sigmaSODefinable : SigmaSODefinable 1 EdgeSteinerTree := by
+private theorem edgeSteinerTree_sigmaSODefinable : SigmaSODefinable 1 EdgeSteinerTree := by
   refine ⟨[edgeSteinerGuessBlock], rfl, edgeSteinerKernel, ?_⟩
   intro A _ _ _
   constructor

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Bits
 
 /-!
 # The three sizes of the Bit Sum Lemma, and that they fit
@@ -68,14 +69,14 @@ namespace BitSum
 /-! ### Two facts about `Nat.size` -/
 
 /-- The width of a number is at most the number. -/
-theorem size_le_self (m : ℕ) : Nat.size m ≤ m := Nat.size_le.mpr Nat.lt_two_pow_self
+private theorem size_le_self (m : ℕ) : Nat.size m ≤ m := Nat.size_le.mpr Nat.lt_two_pow_self
 
 /-- A number of `k` bits is at least `2 ^ (k - 1)`. -/
-theorem two_pow_size_pred_le {m : ℕ} (hm : 0 < m) : 2 ^ (Nat.size m - 1) ≤ m :=
+private theorem two_pow_size_pred_le {m : ℕ} (hm : 0 < m) : 2 ^ (Nat.size m - 1) ≤ m :=
   Nat.lt_size.mp (by have := Nat.size_pos.mpr hm; omega)
 
 /-- …and less than twice itself. -/
-theorem two_pow_size_le {m : ℕ} (hm : 0 < m) : 2 ^ Nat.size m ≤ 2 * m := by
+private theorem two_pow_size_le {m : ℕ} (hm : 0 < m) : 2 ^ Nat.size m ≤ 2 * m := by
   have hpos : 0 < Nat.size m := Nat.size_pos.mpr hm
   have h := two_pow_size_pred_le hm
   have hsplit : (2 : ℕ) ^ Nat.size m = 2 * 2 ^ (Nat.size m - 1) := by
@@ -113,7 +114,7 @@ theorem lvl1Block_lt_two_pow_lvl2Width (P : ℕ) : lvl1Block P < 2 ^ lvl2Width P
 
 /-- One doubling swallows the growth of a cube, from `21` on: the arithmetic
 core of the induction below. -/
-theorem cubic_step {t : ℕ} (ht : 21 ≤ t) : 240 * t ^ 2 + 240 * t + 79 ≤ 80 * t ^ 3 := by
+private theorem cubic_step {t : ℕ} (ht : 21 ≤ t) : 240 * t ^ 2 + 240 * t + 79 ≤ 80 * t ^ 3 := by
   have hsq : t ≤ t ^ 2 := by
     rw [pow_two]
     exact Nat.le_mul_of_pos_left t (by omega)
@@ -127,7 +128,7 @@ theorem cubic_step {t : ℕ} (ht : 21 ≤ t) : 240 * t ^ 2 + 240 * t + 79 ≤ 80
 /-- The growth fact the three sizes rest on: a cube is eventually far below a
 power of two. `21` is where `80 s³ + 1 < 2 ^ (s - 1)` starts to hold, and it is
 the only place a concrete number is chosen. -/
-theorem cube_lt_two_pow : ∀ {s : ℕ}, 21 ≤ s → 80 * s ^ 3 + 1 < 2 ^ (s - 1) := by
+private theorem cube_lt_two_pow : ∀ {s : ℕ}, 21 ≤ s → 80 * s ^ 3 + 1 < 2 ^ (s - 1) := by
   have key : ∀ k : ℕ, 80 * (k + 21) ^ 3 + 1 < 2 ^ (k + 20) := by
     intro k
     induction k with
@@ -149,7 +150,7 @@ theorem cube_lt_two_pow : ∀ {s : ℕ}, 21 ≤ s → 80 * s ^ 3 + 1 < 2 ^ (s - 
 
 /-- Above the threshold, a level-1 block is a negligible part of the tape – the
 form in which the growth fact is used three times below. -/
-theorem lvl1Block_lt_two_pow_pred {P : ℕ} (hP : 2 ^ 20 ≤ P) :
+private theorem lvl1Block_lt_two_pow_pred {P : ℕ} (hP : 2 ^ 20 ≤ P) :
     lvl1Block P < 2 ^ (Nat.size P - 1) := by
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
   have hcube := cube_lt_two_pow hs
@@ -158,12 +159,12 @@ theorem lvl1Block_lt_two_pow_pred {P : ℕ} (hP : 2 ^ 20 ≤ P) :
   omega
 
 /-- **A level-1 block fits on the tape**, with room to spare. -/
-theorem lvl1Block_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl1Block P < P :=
+private theorem lvl1Block_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl1Block P < P :=
   lt_of_lt_of_le (lvl1Block_lt_two_pow_pred hP) (two_pow_size_pred_le (by omega))
 
 /-- **A level-2 sub-block is shorter than a level-1 block**, so the second
 packing really does sit inside the first. -/
-theorem lvl2Block_lt_lvl1Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl2Block P < lvl1Block P := by
+private theorem lvl2Block_lt_lvl1Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl2Block P < lvl1Block P := by
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
   have hsize : lvl2Width P ≤ Nat.size P - 1 :=
     Nat.size_le.mpr (lvl1Block_lt_two_pow_pred hP)
@@ -206,7 +207,7 @@ theorem table_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) :
   omega
 
 /-- A sub-block is at least two positions long. -/
-theorem two_le_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : 2 ≤ lvl2Block P := by
+private theorem two_le_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : 2 ≤ lvl2Block P := by
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
   have hpos : 0 < lvl2Width P := by
     rw [lvl2Width]
@@ -219,7 +220,7 @@ theorem two_le_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : 2 ≤ lvl2Block P := by
 /-- **A sub-block's worth of values outnumbers the positions' own width**: what
 the level-3 table's capacity condition needs on top of
 `DescriptiveComplexity.BitSum.table_lt`. -/
-theorem size_le_two_pow_lvl2Block (P : ℕ) : Nat.size P ≤ 2 ^ lvl2Block P := by
+private theorem size_le_two_pow_lvl2Block (P : ℕ) : Nat.size P ≤ 2 ^ lvl2Block P := by
   have h1 : lvl1Block P < 2 ^ lvl2Width P := lvl1Block_lt_two_pow_lvl2Width P
   have h2 : (2 : ℕ) ^ lvl2Width P ≤ 2 ^ lvl2Block P :=
     Nat.pow_le_pow_right (by norm_num) (by rw [lvl2Block]; omega)
@@ -227,13 +228,13 @@ theorem size_le_two_pow_lvl2Block (P : ℕ) : Nat.size P ≤ 2 ^ lvl2Block P := 
   omega
 
 /-- A block is at least two positions long. -/
-theorem two_le_lvl1Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : 2 ≤ lvl1Block P := by
+private theorem two_le_lvl1Block {P : ℕ} (hP : 2 ^ 20 ≤ P) : 2 ≤ lvl1Block P := by
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
   rw [lvl1Block, lvl1Width]
   omega
 
 /-- A block, and the position after it, leave room below the top. -/
-theorem lvl1Block_succ_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl1Block P + 1 < P := by
+private theorem lvl1Block_succ_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl1Block P + 1 < P := by
   have h1 := lvl1Block_lt_two_pow_pred hP
   have h2 := two_pow_size_pred_le (m := P) (by omega)
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
@@ -244,12 +245,12 @@ theorem lvl1Block_succ_lt {P : ℕ} (hP : 2 ^ 20 ≤ P) : lvl1Block P + 1 < P :=
 
 /-- **A level-1 field holds a count of ones**, in the form the running sum wants:
 the number of positions is below a block's worth of values. -/
-theorem lt_two_pow_lvl1Block (P : ℕ) : P < 2 ^ lvl1Block P :=
+private theorem lt_two_pow_lvl1Block (P : ℕ) : P < 2 ^ lvl1Block P :=
   lt_of_lt_of_le (lt_two_pow_lvl1Width P)
     (Nat.pow_le_pow_right (by norm_num) (by rw [lvl1Block]; omega))
 
 /-- …and so is a tail of two blocks, which is what level 1 hands to level 2. -/
-theorem two_lvl1Block_lt_two_pow_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) :
+private theorem two_lvl1Block_lt_two_pow_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) :
     2 * lvl1Block P + 2 < 2 ^ lvl2Block P := by
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
   have hL : 42 ≤ lvl1Block P := by rw [lvl1Block, lvl1Width]; omega
@@ -263,7 +264,7 @@ theorem two_lvl1Block_lt_two_pow_lvl2Block {P : ℕ} (hP : 2 ^ 20 ≤ P) :
 
 /-- **There is room for a tail**: three blocks and two sub-blocks fit below the
 top position with room to spare, which is what level 1's last chunk needs. -/
-theorem lvl1_room {P : ℕ} (hP : 2 ^ 20 ≤ P) :
+private theorem lvl1_room {P : ℕ} (hP : 2 ^ 20 ≤ P) :
     3 * lvl1Block P + 2 * lvl2Block P + 4 < P := by
   have hs : 21 ≤ Nat.size P := Nat.lt_size.mpr hP
   have hcube := cube_lt_two_pow hs

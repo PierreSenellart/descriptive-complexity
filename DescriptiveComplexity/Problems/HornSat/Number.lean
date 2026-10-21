@@ -10,6 +10,7 @@ import DescriptiveComplexity.FixedPointOrderTransfer
 public import DescriptiveComplexity.Counting
 import DescriptiveComplexity.Vocabulary
 public import Mathlib.Algebra.BigOperators.Finprod
+import all DescriptiveComplexity.FixedPointOrderTransfer
 
 /-!
 # The number written by unit propagation: definition
@@ -79,7 +80,7 @@ section ForcedIso
 
 variable {A B : Type} [Language.sat.Structure A] [Language.sat.Structure B]
 
-theorem forcedIn_map (e : A ≃[Language.sat] B) :
+private theorem forcedIn_map (e : A ≃[Language.sat] B) :
     ∀ (n : ℕ) (x : A), ForcedIn n x → ForcedIn n (e x) := by
   intro n
   induction n with
@@ -94,7 +95,7 @@ theorem forcedIn_map (e : A ≃[Language.sat] B) :
     have := ih (e.symm y) (hneg _ hy')
     rwa [show (e (e.symm y) : B) = y from e.toEquiv.apply_symm_apply y] at this
 
-theorem forced_equiv (e : A ≃[Language.sat] B) (x : A) : Forced (e x) ↔ Forced x := by
+private theorem forced_equiv (e : A ≃[Language.sat] B) (x : A) : Forced (e x) ↔ Forced x := by
   constructor
   · rintro ⟨n, hn⟩
     have := forcedIn_map e.symm n (e x) hn
@@ -152,19 +153,19 @@ section Iso
 
 variable {A B : Type} [Language.satOut.Structure A] [Language.satOut.Structure B]
 
-theorem forcedDigit_equiv (e : A ≃[Language.satOut] B) (x : A) :
+private theorem forcedDigit_equiv (e : A ≃[Language.satOut] B) (x : A) :
     ForcedDigit (e x) ↔ ForcedDigit x :=
   and_congr (relMap_equiv₁ e hnOut x).symm (forced_equiv (reductSumInlEquiv e) x)
 
-theorem lowerVar_equiv (e : A ≃[Language.satOut] B) (x y : A) :
+private theorem lowerVar_equiv (e : A ≃[Language.satOut] B) (x y : A) :
     LowerVar (e x) (e y) ↔ LowerVar x y :=
   and_congr (relMap_equiv₁ e hnOut y).symm
     (and_congr e.toEquiv.injective.ne_iff (relMap_equiv₂ e hnBelow y x).symm)
 
-theorem varRank_equiv (e : A ≃[Language.satOut] B) (x : A) : varRank (e x) = varRank x :=
+private theorem varRank_equiv (e : A ≃[Language.satOut] B) (x : A) : varRank (e x) = varRank x :=
   (Nat.card_congr (e.toEquiv.subtypeEquiv fun y => (lowerVar_equiv e x y).symm)).symm
 
-theorem varOrder_equiv (e : A ≃[Language.satOut] B) : VarOrder A ↔ VarOrder B := by
+private theorem varOrder_equiv (e : A ≃[Language.satOut] B) : VarOrder A ↔ VarOrder B := by
   have h1 : ∀ p, (RelMap hnOut ![e p] : Prop) ↔ RelMap hnOut ![p] :=
     fun p => (relMap_equiv₁ e hnOut p).symm
   have h2 : ∀ p q, (RelMap hnBelow ![e p, e q] : Prop) ↔ RelMap hnBelow ![p, q] :=

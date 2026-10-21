@@ -9,6 +9,7 @@ import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Coloring.Defs
 import DescriptiveComplexity.SecondOrder
+import all DescriptiveComplexity.Problems.Coloring.Defs
 
 /-!
 # The coloring family is existential second-order definable
@@ -132,19 +133,19 @@ fo_block paletteGuessBlock over Language.markedGraph mg into paletteSOLang with 
 
 /-- Kernel clause: every vertex gets a color, and colors are marked
 elements. -/
-noncomputable def paletteTotalClause : paletteSOLang.Sentence :=
+private noncomputable def paletteTotalClause : paletteSOLang.Sentence :=
   fo% ∀ x, ∃ y, pcColSym(x, y) ∧ pcMarkedSym(y)
 
 /-- Kernel clause: two conflicting vertices never share a color. The flag
 selects the conflict relation: adjacency for Chromatic Number,
 non-adjacency for Clique Cover. -/
-noncomputable def paletteProperClause (positive : Bool) : paletteSOLang.Sentence :=
+private noncomputable def paletteProperClause (positive : Bool) : paletteSOLang.Sentence :=
   fo% ∀ x x' y,
     ((¬ x ≐ x' ∧ (if positive then pcAdjSym(x, x') else ¬ pcAdjSym(x, x'))) ∧
       pcColSym(x, y)) ∧ pcColSym(x', y) → ⊥ᶠ
 
 /-- The kernel of the `Σ₁` definition of a threshold coloring problem. -/
-noncomputable def paletteKernel (positive : Bool) : paletteSOLang.Sentence :=
+private noncomputable def paletteKernel (positive : Bool) : paletteSOLang.Sentence :=
   paletteTotalClause ⊓ paletteProperClause positive
 
 /-- Realization of the kernel under an assignment of the coloring. -/
@@ -214,7 +215,7 @@ private theorem palette_sigmaSODefinable (positive : Bool)
 /-- **Chromatic Number is `Σ₁`-definable**: guess a coloring of the vertices
 by the marked elements, and check first-order that every vertex has a marked
 color and that no two adjacent vertices share one. -/
-theorem chromaticNumber_sigmaSODefinable : SigmaSODefinable 1 ChromaticNumber :=
+private theorem chromaticNumber_sigmaSODefinable : SigmaSODefinable 1 ChromaticNumber :=
   palette_sigmaSODefinable true ChromaticNumber fun A _ _ => by
     rw [show ChromaticNumber A ↔ HasSmallChromaticNumber A from Iff.rfl, HasSmallChromaticNumber,
       ← paletteColorableOn_iff]
@@ -222,7 +223,7 @@ theorem chromaticNumber_sigmaSODefinable : SigmaSODefinable 1 ChromaticNumber :=
 
 /-- **Clique Cover is `Σ₁`-definable**: the same definition with the
 adjacency atom negated – covering by cliques is coloring the complement. -/
-theorem cliqueCover_sigmaSODefinable : SigmaSODefinable 1 CliqueCover :=
+private theorem cliqueCover_sigmaSODefinable : SigmaSODefinable 1 CliqueCover :=
   palette_sigmaSODefinable false CliqueCover fun A _ _ => by
     rw [show CliqueCover A ↔ HasSmallCliqueCover A from Iff.rfl, HasSmallCliqueCover,
       ← paletteColorableOn_iff]

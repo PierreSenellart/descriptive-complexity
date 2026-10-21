@@ -119,13 +119,13 @@ the positions. -/
 noncomputable def posRank (p : P) : ℕ :=
   ((monoEquivOfFin P rfl).symm p : ℕ)
 
-theorem posRank_lt (p : P) : posRank P p < Fintype.card P :=
+private theorem posRank_lt (p : P) : posRank P p < Fintype.card P :=
   ((monoEquivOfFin P rfl).symm p).2
 
-theorem posRank_lt_posRank_iff {p q : P} : posRank P p < posRank P q ↔ p < q := by
+private theorem posRank_lt_posRank_iff {p q : P} : posRank P p < posRank P q ↔ p < q := by
   rw [posRank, posRank, ← Fin.lt_def, OrderIso.lt_iff_lt]
 
-theorem posRank_injective : Function.Injective (posRank P) := by
+private theorem posRank_injective : Function.Injective (posRank P) := by
   intro p q h
   exact (monoEquivOfFin P rfl).symm.injective (Fin.val_injective h)
 
@@ -149,17 +149,18 @@ def binEncode (k : ℕ) : P → Prop :=
 
 open Classical in
 /-- The bits of a set of positions, as a function of the rank. -/
-noncomputable def posBits (b : P → Prop) : ℕ → Bool :=
+private noncomputable def posBits (b : P → Prop) : ℕ → Bool :=
   fun i => decide (∃ p, posRank P p = i ∧ b p)
 
 variable {P}
 
-theorem posBits_posRank (b : P → Prop) (p : P) : posBits P b (posRank P p) = true ↔ b p := by
+private theorem posBits_posRank
+    (b : P → Prop) (p : P) : posBits P b (posRank P p) = true ↔ b p := by
   simp only [posBits, decide_eq_true_eq]
   exact ⟨fun ⟨q, hq, hb⟩ => posRank_injective P hq ▸ hb, fun hb => ⟨p, rfl, hb⟩⟩
 
 open Classical in
-theorem binValue_eq_sum_range (b : P → Prop) :
+private theorem binValue_eq_sum_range (b : P → Prop) :
     binValue P b = ∑ i ∈ range (Fintype.card P), if posBits P b i then 2 ^ i else 0 := by
   rw [← Fin.sum_univ_eq_sum_range, binValue,
     ← Equiv.sum_comp (monoEquivOfFin P rfl).toEquiv
@@ -232,7 +233,7 @@ theorem binValue_orderIso {Q : Type} [Fintype Q] [LinearOrder Q] (e : P ≃o Q)
   rfl
 
 /-- `binValue` only depends on the extension of the bit predicate. -/
-theorem binValue_congr {b b' : P → Prop} (h : ∀ p, b p ↔ b' p) :
+private theorem binValue_congr {b b' : P → Prop} (h : ∀ p, b p ↔ b' p) :
     binValue P b = binValue P b' := by
   classical
   rw [binValue, binValue]

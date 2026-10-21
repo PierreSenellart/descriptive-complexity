@@ -13,6 +13,13 @@ public import DescriptiveComplexity.Numbers.Digits
 import DescriptiveComplexity.Padding
 import Mathlib.Tactic.FinCases
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.Digits
+import all DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrenceSlack
+import all DescriptiveComplexity.Problems.NaeSat
+import all DescriptiveComplexity.Problems.NaeThreeSat
+import all DescriptiveComplexity.Problems.ThreeSat.ToSat
 
 /-!
 # Job sequencing is NP-hard
@@ -103,7 +110,7 @@ def Deg : Prop := ThreeSatToSat.Wide A ∨ ∃ c : A, Short c
 
 /-- A short clause is not-all-equal unsatisfiable: its true and its false
 literal would be one and the same occurrence. -/
-theorem not_naeProper_of_short {c : A} (hc : Short c) (ν : A → Prop) : ¬NAEProper ν := by
+private theorem not_naeProper_of_short {c : A} (hc : Short c) (ν : A → Prop) : ¬NAEProper ν := by
   intro hν
   obtain ⟨⟨x, s, hx, hxT⟩, ⟨y, t, hy, hyT⟩⟩ := naeProper_occ hν c hc.1
   rcases occLt_trichotomy x s y t with hlt | ⟨rfl, rfl⟩ | hlt
@@ -113,7 +120,8 @@ theorem not_naeProper_of_short {c : A} (hc : Short c) (ν : A → Prop) : ¬NAEP
 
 /-- **A clause has at most one slack occurrence under the width bound**: its
 first occurrence, its last one and two distinct slack ones would be four. -/
-theorem midSet_subsingleton [Finite A] (hwidth : WidthAtMostThree A) {c x y : A} {s t : Bool}
+private theorem midSet_subsingleton
+    [Finite A] (hwidth : WidthAtMostThree A) {c x y : A} {s t : Bool}
     (hx : Mid c x s) (hy : Mid c y t) : x = y ∧ s = t := by
   by_contra hne
   obtain ⟨m, ms, hmin⟩ := exists_minOcc ⟨x, s, hx.occIn⟩
@@ -144,7 +152,7 @@ theorem midSet_subsingleton [Finite A] (hwidth : WidthAtMostThree A) {c x y : A}
 
 /-- A clause of a non-degenerate input has an occurrence which is not the
 first one, hence at least two occurrences. -/
-theorem exists_chained_of_not_deg (hd : ¬Deg A) {c : A} (hc : IsCl c) :
+private theorem exists_chained_of_not_deg (hd : ¬Deg A) {c : A} (hc : IsCl c) :
     ∃ x s, Chained c x s := by
   by_contra h
   exact hd (Or.inr ⟨c, hc, fun x s hx => h ⟨x, s, hx⟩⟩)
@@ -200,7 +208,8 @@ def subRk : JTag → ℕ
   | _ => 0
 
 /-- The two ranks together determine the tag. -/
-theorem tag_ext {t t' : JTag} (h₁ : tagRk t = tagRk t') (h₂ : subRk t = subRk t') : t = t' := by
+private theorem tag_ext
+    {t t' : JTag} (h₁ : tagRk t = tagRk t') (h₂ : subRk t = subRk t') : t = t' := by
   revert h₁ h₂
   revert t t'
   decide
@@ -365,9 +374,9 @@ variable {A : Type}
 /-- The point of tag `t` over the pair `w`. -/
 def jPt (t : JTag) (w : Fin 2 → A) : jInterp.Map A := (t, w)
 
-theorem jPt_surj (q : jInterp.Map A) : ∃ t w, q = jPt t w := ⟨q.1, q.2, rfl⟩
+private theorem jPt_surj (q : jInterp.Map A) : ∃ t w, q = jPt t w := ⟨q.1, q.2, rfl⟩
 
-theorem jPt_eq_iff {t t' : JTag} {w w' : Fin 2 → A} :
+private theorem jPt_eq_iff {t t' : JTag} {w w' : Fin 2 → A} :
     jPt t w = jPt t' w' ↔ t = t' ∧ w = w' := by
   constructor
   · intro h
@@ -380,7 +389,7 @@ theorem jPt_eq_iff {t t' : JTag} {w w' : Fin 2 → A} :
 theorem jPt_snd (t : JTag) (w : Fin 2 → A) (j : Fin 2) : (jPt t w).2 j = w j := rfl
 
 /-- Two `2`-tuples with the same coordinates are equal. -/
-theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
+private theorem tuple₂_ext {w w' : Fin 2 → A} (h0 : w 0 = w' 0) (h1 : w 1 = w' 1) : w = w' := by
   funext j
   fin_cases j
   · exact h0
@@ -398,23 +407,25 @@ def jPos (f : Fin 3) (b : Bool × A) (y : A) : jInterp.Map A := jPt (.pos b.1 f)
 /-- The lowest position of the block `b`. -/
 def jLow (a₀ : A) (b : Bool × A) : jInterp.Map A := jPos 0 b a₀
 
-theorem jPos_eq (f : Fin 3) (k : Bool) (e y : A) : jPos f (k, e) y = jPt (.pos k f) ![e, y] := rfl
+private theorem jPos_eq
+    (f : Fin 3) (k : Bool) (e y : A) : jPos f (k, e) y = jPt (.pos k f) ![e, y] := rfl
 
-theorem jLit_injective (a₀ : A) : Function.Injective fun p : A × Bool => jLit a₀ p.2 p.1 := by
+private theorem jLit_injective
+    (a₀ : A) : Function.Injective fun p : A × Bool => jLit a₀ p.2 p.1 := by
   rintro ⟨x, s⟩ ⟨x', s'⟩ h
   obtain ⟨ht, hw⟩ := jPt_eq_iff.mp h
   refine Prod.ext ?_ ?_
   · simpa using congrArg (fun u : Fin 2 → A => u 0) hw
   · cases s <;> cases s' <;> simp_all
 
-theorem jSlk_injective (c : A) : Function.Injective fun p : A × Bool => jSlk p.2 c p.1 := by
+private theorem jSlk_injective (c : A) : Function.Injective fun p : A × Bool => jSlk p.2 c p.1 := by
   rintro ⟨x, s⟩ ⟨x', s'⟩ h
   obtain ⟨ht, hw⟩ := jPt_eq_iff.mp h
   refine Prod.ext ?_ ?_
   · simpa using congrArg (fun u : Fin 2 → A => u 1) hw
   · cases s <;> cases s' <;> simp_all
 
-theorem jPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
+private theorem jPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
     jPos u.2.1 u.1 u.2.2 := by
   rintro ⟨⟨k, e⟩, f, y⟩ ⟨⟨k', e'⟩, f', y'⟩ h
   obtain ⟨ht, hw⟩ := jPt_eq_iff.mp h
@@ -426,12 +437,12 @@ theorem jPos_injective : Function.Injective fun u : (Bool × A) × Fin 3 × A =>
   subst h0; subst h1; subst hk₁; subst hk₂
   rfl
 
-theorem jLit_ne_jSlk (a₀ : A) (s s' : Bool) (x c y : A) : jLit a₀ s x ≠ jSlk s' c y := by
+private theorem jLit_ne_jSlk (a₀ : A) (s s' : Bool) (x c y : A) : jLit a₀ s x ≠ jSlk s' c y := by
   intro h
   rw [jLit, jSlk] at h
   exact absurd (jPt_eq_iff.mp h).1 (by simp)
 
-theorem jLit_eq_iff {a₀ : A} {s s' : Bool} {x x' : A} :
+private theorem jLit_eq_iff {a₀ : A} {s s' : Bool} {x x' : A} :
     jLit a₀ s x = jLit a₀ s' x' ↔ s = s' ∧ x = x' := by
   rw [jLit, jLit, jPt_eq_iff]
   constructor
@@ -440,7 +451,7 @@ theorem jLit_eq_iff {a₀ : A} {s s' : Bool} {x x' : A} :
   · rintro ⟨rfl, rfl⟩
     exact ⟨rfl, rfl⟩
 
-theorem jSlk_eq_iff {s s' : Bool} {c c' x x' : A} :
+private theorem jSlk_eq_iff {s s' : Bool} {c c' x x' : A} :
     jSlk s c x = jSlk s' c' x' ↔ s = s' ∧ c = c' ∧ x = x' := by
   rw [jSlk, jSlk, jPt_eq_iff]
   constructor
@@ -492,7 +503,7 @@ theorem jsPosn_slk (s : Bool) (w : Fin 2 → A) : ¬JSPosn (jPt (.slk s) w) := b
 
 /-- The penalty of a job is its execution time: the two are defined by the
 same formula. -/
-theorem jsPen_iff_jsTime (i q : jInterp.Map A) : JSPen i q ↔ JSTime i q := by
+private theorem jsPen_iff_jsTime (i q : jInterp.Map A) : JSPen i q ↔ JSTime i q := by
   obtain ⟨t, w, rfl⟩ := jPt_surj i
   obtain ⟨t', w', rfl⟩ := jPt_surj q
   rw [JSPen, JSTime, jPt, jPt, FOInterpretation.relMap_map, FOInterpretation.relMap_map]
@@ -505,10 +516,10 @@ def jKey (q : jInterp.Map A) : ℕ × A × A × ℕ :=
 
 /-- The order of the interpreted structure, read lexicographically on the
 keys. -/
-def keyLe : ℕ × A × A × ℕ → ℕ × A × A × ℕ → Prop :=
+private def keyLe : ℕ × A × A × ℕ → ℕ × A × A × ℕ → Prop :=
   lexRel (· ≤ ·) (lexRel (· ≤ ·) (lexRel (· ≤ ·) (· ≤ ·)))
 
-theorem jsLe_iff (t t' : JTag) (w w' : Fin 2 → A) :
+private theorem jsLe_iff (t t' : JTag) (w w' : Fin 2 → A) :
     JSLe (jPt t w) (jPt t' w') ↔ keyLe (jKey (jPt t w)) (jKey (jPt t' w')) := by
   rw [JSLe, jPt, jPt, FOInterpretation.relMap_map]
   simp only [jInterp, leKF, keyLe, jKey, lexRel]
@@ -557,7 +568,7 @@ theorem jKey_injective : Function.Injective (jKey (A := A)) := by
 
 /-- The interpreted order is a linear order: the lexicographic order of the
 keys, which are pairwise distinct. -/
-theorem isLinOrd_jsLe : IsLinOrd (JSLe (A := jInterp.Map A)) := by
+private theorem isLinOrd_jsLe : IsLinOrd (JSLe (A := jInterp.Map A)) := by
   refine isLinOrd_of_key (isLinOrd_lexRel isLinOrd_le
     (isLinOrd_lexRel isLinOrd_le (isLinOrd_lexRel isLinOrd_le isLinOrd_le)))
     jKey jKey_injective fun q q' => ?_
@@ -577,10 +588,11 @@ variable {A : Type} [LinearOrder A]
 blocks, each group in the order of the input. -/
 def blkLe : Bool × A → Bool × A → Prop := lexRel (· ≤ ·) (· ≤ ·)
 
-theorem isLinOrd_blkLe : IsLinOrd (blkLe (A := A)) := isLinOrd_lexRel isLinOrd_le isLinOrd_le
+private theorem isLinOrd_blkLe
+    : IsLinOrd (blkLe (A := A)) := isLinOrd_lexRel isLinOrd_le isLinOrd_le
 
 /-- Being strictly below a block. -/
-theorem blkLt_iff {k k' : Bool} {x e : A} :
+private theorem blkLt_iff {k k' : Bool} {x e : A} :
     (blkLe (k, x) (k', e) ∧ (k, x) ≠ (k', e)) ↔
       (k = k' ∧ x < e) ∨ (k = false ∧ k' = true) := by
   cases k <;> cases k' <;> simp [blkLe, lexRel, lt_iff_le_and_ne]
@@ -596,7 +608,7 @@ section Bits
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem jsTime_lit_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
+private theorem jsTime_lit_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
     JSTime (jPt (.lit s) w) (jPt (.pos k f) w') ↔
       f = 0 ∧ IsBot (w 1) ∧ IsBot (w' 1) ∧ (if k then OccIn (w' 0) (w 0) s else w' 0 = w 0) := by
   rw [JSTime, jPt, jPt, FOInterpretation.relMap_map]
@@ -605,7 +617,7 @@ theorem jsTime_lit_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' :
     cases k <;> simp [jInterp, bitF, and_assoc]
   · simp [jInterp, bitF, hf]
 
-theorem jsTime_slk_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
+private theorem jsTime_slk_pos (s : Bool) (w : Fin 2 → A) (k : Bool) (f : Fin 3) (w' : Fin 2 → A) :
     JSTime (jPt (.slk s) w) (jPt (.pos k f) w') ↔
       f = 0 ∧ k = true ∧ Mid (w 0) (w 1) s ∧ IsBot (w' 1) ∧ w' 0 = w 0 := by
   rw [JSTime, jPt, jPt, FOInterpretation.relMap_map]
@@ -631,7 +643,7 @@ theorem jsTime_job_right (t : JTag) (w : Fin 2 → A) (s : Bool) (w' : Fin 2 →
 
 /-- Only the lowest position of a block ever carries a bit of an execution
 time. -/
-theorem eq_jLow_of_time {a₀ : A} (ha₀ : IsBot a₀) {i q : jInterp.Map A} (h : JSTime i q)
+private theorem eq_jLow_of_time {a₀ : A} (ha₀ : IsBot a₀) {i q : jInterp.Map A} (h : JSTime i q)
     (hq : JSPosn q) : ∃ b, q = jLow a₀ b := by
   obtain ⟨t, w, rfl⟩ := jPt_surj i
   obtain ⟨t', w', rfl⟩ := jPt_surj q
@@ -664,11 +676,11 @@ section Places
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 omit [Language.sat.Structure A] [LinearOrder A] in
-private theorem key_pos (k : Bool) (f : Fin 3) (w : Fin 2 → A) :
+theorem key_pos (k : Bool) (f : Fin 3) (w : Fin 2 → A) :
     jKey (jPt (.pos k f) w) = (if k then 5 else 4, w 0, w 1, (f : ℕ)) := by
   cases k <;> rfl
 
-theorem jsLe_pos_pos (k k' : Bool) (f f' : Fin 3) (w w' : Fin 2 → A) :
+private theorem jsLe_pos_pos (k k' : Bool) (f f' : Fin 3) (w w' : Fin 2 → A) :
     JSLe (jPt (.pos k f) w) (jPt (.pos k' f') w') ↔
       (k = false ∧ k' = true) ∨
         (k = k' ∧ (w 0 < w' 0 ∨
@@ -835,7 +847,7 @@ open Classical in
 /-- **A number written by one bit per block**, the bit of a block sitting at
 the height `g b` inside it, is the base-`2 ^ (3 |A|)` number with digit
 `2 ^ g b` there. -/
-theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : jInterp.Map A → Prop}
+private theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : jInterp.Map A → Prop}
     {sub : Bool × A → Prop} {g : Bool × A → Fin 3}
     (hp : ∀ q : jInterp.Map A, (JSPosn q ∧ p q) ↔ ∃ b, sub b ∧ q = jPos (g b) b a₀) :
     binNum (JSLe (A := jInterp.Map A)) JSPosn p =
@@ -861,7 +873,7 @@ theorem binNum_eq_digit {a₀ : A} (ha₀ : IsBot a₀) {p : jInterp.Map A → P
 open Classical in
 /-- **Every execution time is read digit by digit**: the digit of a block is
 `1` when the job carries a bit at its lowest position, and `0` otherwise. -/
-theorem jsTimeVal_eq {a₀ : A} (ha₀ : IsBot a₀) (i : jInterp.Map A) :
+private theorem jsTimeVal_eq {a₀ : A} (ha₀ : IsBot a₀) (i : jInterp.Map A) :
     JSTimeVal i = digitNum (blkLe (A := A)) (fun _ => True) (jbase A)
       (fun b => if JSTime i (jLow a₀ b) then 1 else 0) := by
   classical
@@ -879,7 +891,7 @@ theorem jsTimeVal_eq {a₀ : A} (ha₀ : IsBot a₀) (i : jInterp.Map A) :
 open Classical in
 /-- **The total execution time of a set of jobs**, read digit by digit: the
 digit of a block is the number of selected jobs carrying a bit there. -/
-theorem sum_times_eq {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) :
+private theorem sum_times_eq {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) :
     (∑ᶠ i ∈ {i | S i}, JSTimeVal i) =
       digitNum (blkLe (A := A)) (fun _ => True) (jbase A)
         (fun b => ({i : jInterp.Map A | S i ∧ JSTime i (jLow a₀ b)} : Set _).ncard) := by
@@ -904,16 +916,16 @@ variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A]
 
 /-- The number of selected jobs carrying a bit in a block: the digit that
 block contributes to the total execution time of the selection. -/
-noncomputable def cnt (a₀ : A) (S : jInterp.Map A → Prop) (b : Bool × A) : ℕ :=
+private noncomputable def cnt (a₀ : A) (S : jInterp.Map A → Prop) (b : Bool × A) : ℕ :=
   ({i : jInterp.Map A | S i ∧ JSTime i (jLow a₀ b)} : Set _).ncard
 
-theorem sum_times_eq_cnt {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) :
+private theorem sum_times_eq_cnt {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) :
     (∑ᶠ i ∈ {i | S i}, JSTimeVal i) =
       digitNum (blkLe (A := A)) (fun _ => True) (jbase A) (cnt a₀ S) :=
   sum_times_eq ha₀ S
 
 /-- A selection and the jobs it leaves out split every digit. -/
-theorem cnt_add_cnt (a₀ : A) {S : jInterp.Map A → Prop} (hS : ∀ i, S i → JSJob i)
+private theorem cnt_add_cnt (a₀ : A) {S : jInterp.Map A → Prop} (hS : ∀ i, S i → JSJob i)
     (b : Bool × A) :
     cnt a₀ S b + cnt a₀ (fun i => JSJob i ∧ ¬S i) b = cnt a₀ JSJob b := by
   have : Finite (jInterp.Map A) := jInterp.map_finite A
@@ -941,7 +953,7 @@ theorem jLow_eq (a₀ : A) (k : Bool) (e : A) : jLow a₀ (k, e) = jPt (.pos k 0
 omit [Finite A] in
 /-- The jobs carrying a bit in a variable block are the two literals of that
 variable. -/
-theorem time_jLow_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) (i : jInterp.Map A) :
+private theorem time_jLow_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) (i : jInterp.Map A) :
     JSTime i (jLow a₀ (false, x)) ↔ ∃ s, i = jLit a₀ s x := by
   have hbot : ∀ y : A, IsBot y → y = a₀ := fun y hy => le_antisymm (hy a₀) (ha₀ y)
   obtain ⟨t, w, rfl⟩ := jPt_surj i
@@ -978,7 +990,7 @@ theorem time_jLow_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) (i : jInterp.Map A
 omit [Finite A] in
 /-- The jobs carrying a bit in a clause block are the literals occurring in
 the clause and its slack jobs. -/
-theorem time_jLow_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) (i : jInterp.Map A) :
+private theorem time_jLow_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) (i : jInterp.Map A) :
     JSTime i (jLow a₀ (true, c)) ↔
       (∃ p : A × Bool, OccIn c p.1 p.2 ∧ i = jLit a₀ p.2 p.1) ∨
         (∃ p : A × Bool, Mid c p.1 p.2 ∧ i = jSlk p.2 c p.1) := by
@@ -1029,7 +1041,7 @@ theorem time_jLow_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) (i : jInterp.Map A
 omit [Finite A] in
 /-- The digit of a variable block counts the selected literals of that
 variable. -/
-theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (x : A) :
+private theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (x : A) :
     cnt a₀ S (false, x) = ({s : Bool | S (jLit a₀ s x)} : Set Bool).ncard := by
   have hinj : Set.InjOn (fun s : Bool => jLit a₀ s x) {s | S (jLit a₀ s x)} := by
     intro s _ s' _ h
@@ -1050,7 +1062,7 @@ theorem cnt_var {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (x 
 open Classical in
 /-- The digit of a clause block counts the selected literals occurring in the
 clause and its selected slack jobs. -/
-theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (c : A) :
+private theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (c : A) :
     cnt a₀ S (true, c) =
       ({p ∈ OccSet c | S (jLit a₀ p.2 p.1)} : Set (A × Bool)).ncard +
         ({p ∈ MidSet c | S (jSlk p.2 c p.1)} : Set (A × Bool)).ncard := by
@@ -1081,7 +1093,7 @@ theorem cnt_cls {a₀ : A} (ha₀ : IsBot a₀) (S : jInterp.Map A → Prop) (c 
 omit [Finite A] in
 /-- Every variable block totals two: a balanced split takes exactly one of the
 two literals of the variable. -/
-theorem cnt_job_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) : cnt a₀ JSJob (false, x) = 2 := by
+private theorem cnt_job_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) : cnt a₀ JSJob (false, x) = 2 := by
   rw [cnt_var ha₀]
   have hset : {s : Bool | JSJob (jLit a₀ s x)} = Set.univ := by
     ext s
@@ -1090,7 +1102,7 @@ theorem cnt_job_var {a₀ : A} (ha₀ : IsBot a₀) (x : A) : cnt a₀ JSJob (fa
   simp
 
 /-- A clause block totals its occurrences plus its slack occurrences. -/
-theorem cnt_job_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) :
+private theorem cnt_job_cls {a₀ : A} (ha₀ : IsBot a₀) (c : A) :
     cnt a₀ JSJob (true, c) = (OccSet c).ncard + (MidSet c).ncard := by
   have h₁ : {p ∈ OccSet c | JSJob (jLit a₀ p.2 p.1)} = OccSet c := by
     ext p
@@ -1120,7 +1132,8 @@ theorem ncard_le_two_card (X : Set (A × Bool)) : X.ncard ≤ 2 * Nat.card A := 
   omega
 
 /-- A selection weighs at most as much as all the jobs, digit by digit. -/
-theorem cnt_le (a₀ : A) {S : jInterp.Map A → Prop} (hS : ∀ i, S i → JSJob i) (b : Bool × A) :
+private theorem cnt_le
+    (a₀ : A) {S : jInterp.Map A → Prop} (hS : ∀ i, S i → JSJob i) (b : Bool × A) :
     cnt a₀ S b ≤ cnt a₀ JSJob b := by
   have : Finite (jInterp.Map A) := jInterp.map_finite A
   exact Set.ncard_le_ncard (fun i hi => ⟨hS i hi.1, hi.2⟩) (Set.toFinite _)
@@ -1129,7 +1142,7 @@ variable [Nonempty A]
 
 /-- **No carry**: every digit the gadget writes stays below the base, `3 |A|`
 bits being more than the `4 |A|` jobs a block can hold. -/
-theorem cnt_job_lt_jbase {a₀ : A} (ha₀ : IsBot a₀) (b : Bool × A) :
+private theorem cnt_job_lt_jbase {a₀ : A} (ha₀ : IsBot a₀) (b : Bool × A) :
     cnt a₀ JSJob b < jbase A := by
   classical
   have hn : 1 ≤ Nat.card A := Nat.card_pos
@@ -1207,7 +1220,7 @@ theorem dd_le_two (b : Bool × A) : dd b ≤ 2 := by
   rw [dd]
   split_ifs <;> omega
 
-theorem dd_lt_jbase [Nonempty A] (b : Bool × A) : dd b < jbase A := by
+private theorem dd_lt_jbase [Nonempty A] (b : Bool × A) : dd b < jbase A := by
   have h1 := dd_le_two b
   have hn : 1 ≤ Nat.card A := Nat.card_pos
   have h2 : (2 : ℕ) ^ 2 ≤ 2 ^ (3 * Nat.card A) :=
@@ -1243,7 +1256,7 @@ theorem dbit_pos {a₀ : A} (ha₀ : IsBot a₀) (k : Bool) (f : Fin 3) (w : Fin
 
 omit [Finite A] in
 /-- What the deadline's bit pattern says, formula-free. -/
-theorem realize_dbitF {α : Type} {v : α → A} (k : Bool) (f : Fin 3) (e y : α) :
+private theorem realize_dbitF {α : Type} {v : α → A} (k : Bool) (f : Fin 3) (e y : α) :
     (dbitF k f e y).Realize v ↔
       IsBot (v y) ∧
         ((k = false ∧ f = 0) ∨ (k = true ∧ f = 0 ∧ IsCl (v e) ∧ ¬∃ x s, Mid (v e) x s) ∨
@@ -1293,7 +1306,7 @@ theorem jsBnd_slk (s : Bool) (w : Fin 2 → A) : ¬JSBnd (jPt (.slk s) w) := by
 
 /-- **The bound is the digit-wise half**: it carries one bit per block, at the
 height its digit asks for. -/
-theorem jsBound_eq {a₀ : A} (ha₀ : IsBot a₀) : JSBound (jInterp.Map A) = dval A := by
+private theorem jsBound_eq {a₀ : A} (ha₀ : IsBot a₀) : JSBound (jInterp.Map A) = dval A := by
   classical
   rw [JSBound, dval]
   refine (binNum_eq_digit (sub := fun b => dd b ≠ 0) (g := dht) ha₀ fun q => ?_).trans
@@ -1325,7 +1338,7 @@ theorem jsBound_eq {a₀ : A} (ha₀ : IsBot a₀) : JSBound (jInterp.Map A) = d
 omit [Finite A] in
 /-- The deadline of a job is the bound: the two are defined by the same bit
 pattern. -/
-theorem jsDline_iff (i q : jInterp.Map A) : JSDline i q ↔ JSJob i ∧ JSBnd q := by
+private theorem jsDline_iff (i q : jInterp.Map A) : JSDline i q ↔ JSJob i ∧ JSBnd q := by
   obtain ⟨t, w, rfl⟩ := jPt_surj i
   obtain ⟨t', w', rfl⟩ := jPt_surj q
   rw [JSDline, JSJob, JSBnd, jPt, jPt, FOInterpretation.relMap_map,
@@ -1352,7 +1365,7 @@ section Half
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A] [Finite A]
 
 /-- A clause of a non-degenerate input has at least two occurrences. -/
-theorem two_le_ncard_occSet (hd : ¬Deg A) {c : A} (hc : IsCl c) : 2 ≤ (OccSet c).ncard := by
+private theorem two_le_ncard_occSet (hd : ¬Deg A) {c : A} (hc : IsCl c) : 2 ≤ (OccSet c).ncard := by
   obtain ⟨x, s, hch⟩ := exists_chained_of_not_deg hd hc
   have hex : ∃ y t, OccIn c y t ∧ occLt y t x s := by
     by_contra h
@@ -1372,7 +1385,8 @@ theorem two_le_ncard_occSet (hd : ¬Deg A) {c : A} (hc : IsCl c) : 2 ≤ (OccSet
   rwa [Set.ncard_pair hne] at hcard
 
 /-- Under the width bound a clause has at most one slack occurrence. -/
-theorem ncard_midSet_le_one (hwidth : WidthAtMostThree A) (c : A) : (MidSet c).ncard ≤ 1 := by
+private theorem ncard_midSet_le_one
+    (hwidth : WidthAtMostThree A) (c : A) : (MidSet c).ncard ≤ 1 := by
   rw [Set.ncard_le_one (Set.toFinite _)]
   intro p hp q hq
   obtain ⟨h1, h2⟩ := midSet_subsingleton hwidth hp hq
@@ -1381,7 +1395,7 @@ theorem ncard_midSet_le_one (hwidth : WidthAtMostThree A) (c : A) : (MidSet c).n
 /-- **The deadline is the digit-wise half**: every block totals twice the
 digit the deadline writes there – `2` in a variable block, `2 (w − 1)` in the
 block of a clause of width `w ∈ {2, 3}`. -/
-theorem two_mul_dd {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) (hwidth : WidthAtMostThree A)
+private theorem two_mul_dd {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) (hwidth : WidthAtMostThree A)
     (b : Bool × A) : 2 * dd b = cnt a₀ JSJob b := by
   classical
   obtain ⟨k, c⟩ := b
@@ -1420,7 +1434,7 @@ variable [Nonempty A]
 omit [Language.sat.Structure A] [Nonempty A] in
 /-- A number written by digits below the base is zero only if all its digits
 are. -/
-theorem digits_eq_zero {c : Bool × A → ℕ} (hc : ∀ b, c b < jbase A)
+private theorem digits_eq_zero {c : Bool × A → ℕ} (hc : ∀ b, c b < jbase A)
     (h : digitNum (blkLe (A := A)) (fun _ => True) (jbase A) c = 0) (b : Bool × A) : c b = 0 := by
   have hz : digitNum (blkLe (A := A)) (fun _ => True) (jbase A) (fun _ => 0) = 0 := by
     rw [digitNum]
@@ -1431,7 +1445,7 @@ theorem digits_eq_zero {c : Bool × A → ℕ} (hc : ∀ b, c b < jbase A)
 
 /-- **A selection weighs the deadline exactly when it takes half of every
 digit**, the digits of both staying below the base. -/
-theorem sum_eq_dval_iff {a₀ : A} (ha₀ : IsBot a₀) {S : jInterp.Map A → Prop}
+private theorem sum_eq_dval_iff {a₀ : A} (ha₀ : IsBot a₀) {S : jInterp.Map A → Prop}
     (hS : ∀ i, S i → JSJob i) :
     ((∑ᶠ i ∈ {i | S i}, JSTimeVal i) = dval A) ↔ ∀ b, cnt a₀ S b = dd b := by
   rw [sum_times_eq_cnt ha₀, dval]
@@ -1486,7 +1500,7 @@ theorem splitSet_jSlk (s : Bool) (c x : A) :
     exact Or.inr ⟨c, (x, s), h, rfl⟩
 
 /-- The true occurrences of a clause under an assignment. -/
-def TrueSet (ν : A → Prop) (c : A) : Set (A × Bool) := {p ∈ OccSet c | LitTrue ν p.1 p.2}
+private def TrueSet (ν : A → Prop) (c : A) : Set (A × Bool) := {p ∈ OccSet c | LitTrue ν p.1 p.2}
 
 end Correctness
 
@@ -1518,7 +1532,7 @@ private theorem ncard_bool_eq_one {P : Bool → Prop} (h : ({s | P s} : Set Bool
 omit [Finite A] [Nonempty A] in
 /-- **A balanced split is an assignment**: the two literals of a variable
 split its block, so exactly one of them is selected. -/
-theorem litTrue_iff_sel {a₀ : A} (ha₀ : IsBot a₀) {S : jInterp.Map A → Prop}
+private theorem litTrue_iff_sel {a₀ : A} (ha₀ : IsBot a₀) {S : jInterp.Map A → Prop}
     (hbal : ∀ b, 2 * cnt a₀ S b = cnt a₀ JSJob b) (x : A) (s : Bool) :
     S (jLit a₀ s x) ↔ LitTrue (fun y => S (jLit a₀ true y)) x s := by
   have h := hbal (false, x)
@@ -1534,7 +1548,8 @@ omit [Nonempty A] in
 /-- **A balanced split satisfies every clause, not all equal**: if no
 occurrence of a clause were selected, its slack – strictly fewer jobs than it
 has occurrences – would have to make up for all of them. -/
-theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) {S T : jInterp.Map A → Prop}
+private theorem exists_occ_selected
+    {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) {S T : jInterp.Map A → Prop}
     (hcompl : ∀ i, JSJob i → (S i ↔ ¬T i))
     (hbal : ∀ b, cnt a₀ S b = cnt a₀ T b) {c : A} (hc : IsCl c) :
     ∃ p : A × Bool, p ∈ OccSet c ∧ S (jLit a₀ p.2 p.1) := by
@@ -1568,7 +1583,7 @@ theorem exists_occ_selected {a₀ : A} (ha₀ : IsBot a₀) (hd : ¬Deg A) {S T 
 
 /-- **Correctness of the reduction**: a CNF structure is a yes-instance of
 NAE-3SAT iff the interpreted job-sequencing instance has a good schedule. -/
-theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structure A]
+private theorem naeThreeSatisfiable_iff_hasGoodSchedule (A : Type) [Language.sat.Structure A]
     [LinearOrder A] [Finite A] [Nonempty A] :
     NAEThreeSatisfiable A ↔ HasGoodSchedule (jInterp.Map A) := by
   classical
@@ -1749,7 +1764,8 @@ digit-wise half of the total execution time. A variable block totals `2` and
 the block of a clause of width `w` totals `2 (w − 1)`, so a schedule whose
 late jobs stay within the bound is a balanced split of the blocks, that is, a
 not-all-equal satisfying assignment. -/
-noncomputable def nae3Sat_ordered_fo_reduction_jobSequencing : NAE3SAT ≤ᶠᵒ[≤] JobSequencing where
+private noncomputable def nae3Sat_ordered_fo_reduction_jobSequencing
+    : NAE3SAT ≤ᶠᵒ[≤] JobSequencing where
   Tag := JTag
   dim := 2
   toInterpretation := jInterp

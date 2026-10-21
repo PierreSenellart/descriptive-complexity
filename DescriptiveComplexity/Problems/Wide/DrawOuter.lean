@@ -8,6 +8,11 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawSites
 public import DescriptiveComplexity.Problems.Wide.DrawReset
 public import DescriptiveComplexity.Problems.Wide.DrawAsm
+import all DescriptiveComplexity.Problems.Wide.DrawAdvKit
+import all DescriptiveComplexity.Problems.Wide.DrawReset
+import all DescriptiveComplexity.Problems.Wide.DrawSeekKit
+import all DescriptiveComplexity.Problems.Wide.DrawSweepKit
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
 
 /-!
 # The outer program: every call site but the evaluation

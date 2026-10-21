@@ -9,6 +9,8 @@ import DescriptiveComplexity.Problems.Wide.Defs
 public import DescriptiveComplexity.Problems.Wide.Marks
 import DescriptiveComplexity.Problems.Wide.Roam
 import DescriptiveComplexity.Problems.Wide.RegFile
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The wide machine with a register channel
@@ -69,11 +71,11 @@ def wmRegSeg (x : A) : A → Prop := fun y => WMLe y x ∧ WMHasInp y
 it off an address. -/
 def WMRegSeg (s : A → Prop) (x : A) : Prop := ∀ y, s y ↔ (WMLe y x ∧ WMHasInp y)
 
-theorem wmRegSeg_self (x : A) : WMRegSeg (wmRegSeg x) x := fun _ => Iff.rfl
+private theorem wmRegSeg_self (x : A) : WMRegSeg (wmRegSeg x) x := fun _ => Iff.rfl
 
 /-- **An address is a cell exactly when it is that segment**, so `WMRegSeg`
 never has to be unfolded again. -/
-theorem wmRegSeg_iff_eq (s : A → Prop) (x : A) : WMRegSeg s x ↔ s = wmRegSeg x :=
+private theorem wmRegSeg_iff_eq (s : A → Prop) (x : A) : WMRegSeg s x ↔ s = wmRegSeg x :=
   ⟨fun h => funext fun y => propext (h y), fun h y => by rw [h]; exact Iff.rfl⟩
 
 /-- **The cell of an element the channel writes for is not empty**: the element
@@ -95,7 +97,7 @@ theorem wmSetLt_wmRegSeg (h : IsLinOrd (WMLe (A := A))) [Finite A] {x y : A}
   exact hw.2 (hmin w ⟨hwy, hwx⟩)
 
 /-- **Distinct elements the channel writes for have distinct cells.** -/
-theorem wmRegSeg_injOn (h : IsLinOrd (WMLe (A := A))) [Finite A] {x y : A}
+private theorem wmRegSeg_injOn (h : IsLinOrd (WMLe (A := A))) [Finite A] {x y : A}
     (hx : WMHasInp x) (hy : WMHasInp y) (hxy : wmRegSeg x = wmRegSeg y) : x = y := by
   by_contra hne
   rcases h.2.2.2 x y with hle | hle
@@ -138,7 +140,7 @@ logical address reaches down to it, every cell does, and the file sits in a band
 of its own directly above the working area – while staying inside `2 ^` the
 number of marks, which is what
 `DescriptiveComplexity.wideRank_wmRegSeg_lt` bounds. -/
-theorem wmSetLt_wmRegSeg_of_above (h : IsLinOrd (WMLe (A := A))) {bot : A}
+private theorem wmSetLt_wmRegSeg_of_above (h : IsLinOrd (WMLe (A := A))) {bot : A}
     (hbot : WMHasInp bot) (hleast : ∀ y, WMHasInp y → WMLe bot y)
     {r : A → Prop} (hr : ∀ y, r y → WMLt WMLe bot y) {x : A} (hx : WMHasInp x) :
     WMSetLt WMLe r (wmRegSeg x) := by
@@ -197,7 +199,7 @@ section Transport
 variable {A B : Type} [Language.wide.Structure A] [Language.wide.Structure B]
 
 /-- The cell of an element transports along an equivalence of instances. -/
-theorem wmRegSeg_congr (e : A ≃[Language.wide] B) (s : A → Prop) (x : A) :
+private theorem wmRegSeg_congr (e : A ≃[Language.wide] B) (s : A → Prop) (x : A) :
     WMRegSeg s x ↔ WMRegSeg (fun y => s (e.symm y)) (e x) := by
   have hle : ∀ x y : A, WMLe x y ↔ WMLe (e x) (e y) := fun x y => relMap_equiv₂ e wmLe x y
   have hinp : ∀ x y : A, WMInp x y ↔ WMInp (e x) (e y) := fun x y =>

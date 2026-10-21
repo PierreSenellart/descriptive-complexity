@@ -88,7 +88,7 @@ section Characterization
 
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
-theorem realize_edgeF {t₁ t₂ : SatTag} {v : Fin 2 × Fin 2 → A} :
+private theorem realize_edgeF {t₁ t₂ : SatTag} {v : Fin 2 × Fin 2 → A} :
     (edgeF t₁ t₂).Realize v ↔
       Core t₁ (v (0, 0)) (v (0, 1)) t₂ (v (1, 0)) (v (1, 1)) := by
   cases t₁ <;> cases t₂
@@ -116,7 +116,7 @@ theorem realize_edgeF {t₁ t₂ : SatTag} {v : Fin 2 × Fin 2 → A} :
 
 /-- Characterization of the interpreted adjacency relation: it is the
 symmetrization of `Core`. -/
-theorem relMap_adj_iff {t₁ t₂ : SatTag} {w₁ w₂ : Fin 2 → A} :
+private theorem relMap_adj_iff {t₁ t₂ : SatTag} {w₁ w₂ : Fin 2 → A} :
     RelMap (M := satToCol.Map A) adj ![(t₁, w₁), (t₂, w₂)] ↔
       Core t₁ (w₁ 0) (w₁ 1) t₂ (w₂ 0) (w₂ 1) ∨
         Core t₂ (w₂ 0) (w₂ 1) t₁ (w₁ 0) (w₁ 1) := by
@@ -133,7 +133,7 @@ variable (A : Type) [Language.sat.Structure A] [LinearOrder A]
 
 /-- Correctness of the reduction: an ordered CNF structure is satisfiable iff
 its interpreted gadget graph is 3-colorable. -/
-theorem satisfiable_iff_threeColorable [Finite A] :
+private theorem satisfiable_iff_threeColorable [Finite A] :
     Satisfiable A ↔ ThreeColorable (satToCol.Map A) := by
   rw [satisfiable_iff_gadColoring A]
   unfold ThreeColorable
@@ -160,7 +160,7 @@ open SatToCol in
 over the ordered expansion of the language of CNF instances, maps a finite
 CNF structure to a 3-colorable graph iff it is satisfiable. Together with
 `threeCol_fo_reduction_sat`, SAT and 3-colorability are FO-interreducible. -/
-noncomputable def sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol where
+private noncomputable def sat_ordered_fo_reduction_threeCol : SAT ≤ᶠᵒ[≤] ThreeCol where
   Tag := SatTag
   dim := 2
   toInterpretation := satToCol

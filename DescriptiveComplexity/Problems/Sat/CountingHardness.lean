@@ -10,6 +10,12 @@ public import DescriptiveComplexity.Problems.Sat.Hardness
 public import DescriptiveComplexity.Problems.Sat.TseitinUnique
 public import DescriptiveComplexity.Counting.Subtractive
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.Class
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Sat.Counting
+import all DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Problems.Sat.Tseitin
 
 /-!
 # #SAT is parsimoniously `#P`-complete
@@ -94,7 +100,7 @@ def sharpOldPt (e : (tseitinInterp B φ).Map A) : (sharpTseitinInterp B φ).Map 
   (Sum.inl e.1, e.2)
 
 /-- The tautological clause of the block variable `i` at the tuple `u`. -/
-def sharpTautPt (i : B.ι) (u : Fin (tseitinDim B φ) → A) : (sharpTseitinInterp B φ).Map A :=
+private def sharpTautPt (i : B.ι) (u : Fin (tseitinDim B φ) → A) : (sharpTseitinInterp B φ).Map A :=
   (Sum.inr i, u)
 
 /-- The propositional variable indexed by `vt` at the tuple `x`, as a point of
@@ -103,20 +109,21 @@ def tseitinVarPt (vt : B.ι ⊕ Σ m, NodeAt φ m) (x : Fin (tseitinDim B φ) �
     (tseitinInterp B φ).Map A :=
   (Sum.inr vt, x)
 
-theorem sharpPt_cases (e : (sharpTseitinInterp B φ).Map A) :
+private theorem sharpPt_cases (e : (sharpTseitinInterp B φ).Map A) :
     (∃ x, e = sharpOldPt x) ∨ ∃ i u, e = sharpTautPt i u := by
   obtain ⟨t, u⟩ := e
   rcases t with t | i
   · exact Or.inl ⟨(t, u), rfl⟩
   · exact Or.inr ⟨i, u, rfl⟩
 
-theorem oldPt_injective {e e' : (tseitinInterp B φ).Map A} (h : sharpOldPt e = sharpOldPt e') :
+private theorem oldPt_injective
+    {e e' : (tseitinInterp B φ).Map A} (h : sharpOldPt e = sharpOldPt e') :
     e = e' := by
   have h1 : (sharpOldPt e).1 = (sharpOldPt e').1 := congrArg Prod.fst h
   have h2 : (sharpOldPt e).2 = (sharpOldPt e').2 := congrArg Prod.snd h
   exact Prod.ext (Sum.inl.inj h1) h2
 
-theorem oldPt_ne_tautPt (e : (tseitinInterp B φ).Map A) (i : B.ι)
+private theorem oldPt_ne_tautPt (e : (tseitinInterp B φ).Map A) (i : B.ι)
     (u : Fin (tseitinDim B φ) → A) : sharpOldPt e ≠ sharpTautPt i u :=
   fun h => Sum.inl_ne_inr (congrArg Prod.fst h)
 
@@ -130,7 +137,7 @@ variable {B φ} {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- On the points of the Tseitin instance, the clauses are those of the Tseitin
 instance. -/
-theorem sharp_isClause_old (e : (tseitinInterp B φ).Map A) :
+private theorem sharp_isClause_old (e : (tseitinInterp B φ).Map A) :
     RelMap (M := (sharpTseitinInterp B φ).Map A) satIsClause ![sharpOldPt e] ↔
       RelMap (M := (tseitinInterp B φ).Map A) satIsClause ![e] := by
   refine iff_of_eq (congrArg (Formula.Realize _) (funext fun p => ?_))
@@ -140,7 +147,7 @@ theorem sharp_isClause_old (e : (tseitinInterp B φ).Map A) :
 
 /-- On the points of the Tseitin instance, the literals are those of the
 Tseitin instance. -/
-theorem sharp_lit_old (R : Language.sat.Relations 2) (c x : (tseitinInterp B φ).Map A) :
+private theorem sharp_lit_old (R : Language.sat.Relations 2) (c x : (tseitinInterp B φ).Map A) :
     RelMap (M := (sharpTseitinInterp B φ).Map A) R ![sharpOldPt c, sharpOldPt x] ↔
       RelMap (M := (tseitinInterp B φ).Map A) R ![c, x] := by
   cases R <;>
@@ -150,14 +157,14 @@ theorem sharp_lit_old (R : Language.sat.Relations 2) (c x : (tseitinInterp B φ)
 
 /-- A clause of the Tseitin instance has no literal at a tautological
 clause. -/
-theorem sharp_lit_old_taut (R : Language.sat.Relations 2) (c : (tseitinInterp B φ).Map A)
+private theorem sharp_lit_old_taut (R : Language.sat.Relations 2) (c : (tseitinInterp B φ).Map A)
     (i : B.ι) (u : Fin (tseitinDim B φ) → A) :
     ¬RelMap (M := (sharpTseitinInterp B φ).Map A) R ![sharpOldPt c, sharpTautPt i u] := by
   cases R <;> exact fun h => h
 
 /-- The literals of a clause of the Tseitin instance are points of the Tseitin
 instance, and are its literals there. -/
-theorem sharp_lit_old_iff (R : Language.sat.Relations 2) (c : (tseitinInterp B φ).Map A)
+private theorem sharp_lit_old_iff (R : Language.sat.Relations 2) (c : (tseitinInterp B φ).Map A)
     (e : (sharpTseitinInterp B φ).Map A) :
     RelMap (M := (sharpTseitinInterp B φ).Map A) R ![sharpOldPt c, e] ↔
       ∃ x, e = sharpOldPt x ∧ RelMap (M := (tseitinInterp B φ).Map A) R ![c, x] := by
@@ -170,7 +177,7 @@ theorem sharp_lit_old_iff (R : Language.sat.Relations 2) (c : (tseitinInterp B �
     exact oldPt_ne_tautPt x i u hx.symm
 
 /-- The tautological clauses sit at the canonically padded tuples. -/
-theorem sharp_isClause_taut (i : B.ι) (u : Fin (tseitinDim B φ) → A) :
+private theorem sharp_isClause_taut (i : B.ι) (u : Fin (tseitinDim B φ) → A) :
     RelMap (M := (sharpTseitinInterp B φ).Map A) satIsClause ![sharpTautPt i u] ↔
       Canon (B.arity i) u := by
   rw [FOInterpretation.relMap_map]
@@ -178,7 +185,7 @@ theorem sharp_isClause_taut (i : B.ι) (u : Fin (tseitinDim B φ) → A) :
 
 /-- The one variable of a tautological clause, with either sign: the block
 variable of the clause at the tuple of the clause. -/
-theorem sharp_lit_taut_iff (R : Language.sat.Relations 2) (i : B.ι)
+private theorem sharp_lit_taut_iff (R : Language.sat.Relations 2) (i : B.ι)
     (u : Fin (tseitinDim B φ) → A) (e : (sharpTseitinInterp B φ).Map A) :
     RelMap (M := (sharpTseitinInterp B φ).Map A) R ![sharpTautPt i u, e] ↔
       Canon (B.arity i) u ∧ e = sharpOldPt (tseitinVarPt (Sum.inl i) u) := by
@@ -371,7 +378,7 @@ end Models
 
 /-- Realization of the kernel in the expansion by an assignment is
 `DescriptiveComplexity.Tseitin.RealizeWith`. -/
-theorem realize_iff_realizeWith {A : Type} [L.Structure A] (μ : B.Assignment A) :
+private theorem realize_iff_realizeWith {A : Type} [L.Structure A] (μ : B.Assignment A) :
     @Sentence.Realize (L.sum B.lang) A (@sumStructure L B.lang A _ (B.structure μ)) φ ↔
       RealizeWith μ φ finZeroElim :=
   iff_of_eq (congrArg₂

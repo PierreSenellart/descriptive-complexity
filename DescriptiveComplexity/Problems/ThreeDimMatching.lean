@@ -10,6 +10,8 @@ import DescriptiveComplexity.Problems.ThreeDimMatching.Membership
 public import DescriptiveComplexity.Problems.ThreeDimMatching.Hardness
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.Sat.Hardness
+import all DescriptiveComplexity.Problems.ThreeDimMatching.Hardness
 
 /-!
 # 3-dimensional matching

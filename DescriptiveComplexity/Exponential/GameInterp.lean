@@ -9,6 +9,9 @@ import DescriptiveComplexity.Exponential.GameExp
 public import DescriptiveComplexity.Exponential.GamePlayBack
 public import DescriptiveComplexity.Problems.MachineAltSpace.Membership
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Padding
 
 /-!
 # The machine, written in first-order logic
@@ -291,7 +294,7 @@ variable {L : Language.{0, 0}} {B : SOBlock} {V M : ℕ}
         tr.right = true := by
   rw [rightF, realize_sideF]
 
-theorem realize_blankF (h₀ : IsBot a₀) {t : GameTag B V M}
+private theorem realize_blankF (h₀ : IsBot a₀) {t : GameTag B V M}
     {v : Fin 1 × Fin (gameDim B V) → A} :
     (blankF (L := L) (V := V) (M := M) t).Realize v ↔
       ((t, fun j => v (0, j)) : GamePt B V M A) = markPt a₀ false := by
@@ -307,7 +310,7 @@ theorem realize_blankF (h₀ : IsBot a₀) {t : GameTag B V M}
     rw [hj]
     exact h₀
 
-theorem realize_startF (h₀ : IsBot a₀) {t : GameTag B V M}
+private theorem realize_startF (h₀ : IsBot a₀) {t : GameTag B V M}
     {v : Fin 1 × Fin (gameDim B V) → A} :
     (startF (L := L) (V := V) (M := M) t).Realize v ↔
       ((t, fun j => v (0, j)) : GamePt B V M A) = phasePt (startPh V M) (fun _ => a₀) := by
@@ -381,7 +384,7 @@ theorem realize_startF (h₀ : IsBot a₀) {t : GameTag B V M}
 
 /-- **A tag and a constant tuple**: the shape every mark and every phase of the
 game has. -/
-theorem realize_constF (h₀ : IsBot a₀) {n : ℕ} {i : Fin n} {t' τ : GameTag B V M}
+private theorem realize_constF (h₀ : IsBot a₀) {n : ℕ} {i : Fin n} {t' τ : GameTag B V M}
     {v : Fin n × Fin (gameDim B V) → A} :
     ((sideF (L := L) _ (t' = τ) ⊓ canonF 0 (argVar n i)).Realize v) ↔
       ((t', fun j => v (i, j)) : GamePt B V M A) = (τ, fun _ => a₀) := by
@@ -398,7 +401,7 @@ theorem realize_constF (h₀ : IsBot a₀) {n : ℕ} {i : Fin n} {t' τ : GameTa
 
 /-- A tuple satisfies `DescriptiveComplexity.PadTup` exactly when it is the
 padding it names. -/
-theorem padTup_iff_eq_pad (h₀ : IsBot a₀) {m D : ℕ} (f : Fin m → Fin D)
+private theorem padTup_iff_eq_pad (h₀ : IsBot a₀) {m D : ℕ} (f : Fin m → Fin D)
     (u x : Fin D → A) : PadTup f u x ↔ x = pad a₀ fun l => u (f l) := by
   constructor
   · rintro ⟨hc, he⟩
@@ -413,7 +416,7 @@ theorem padTup_iff_eq_pad (h₀ : IsBot a₀) {m D : ℕ} (f : Fin m → Fin D)
 
 omit [LinearOrder A] in
 /-- The address a symbol reads is the second half of a transition's tuple. -/
-theorem argsOf_addrIx (i : B.ι) (w : Fin (gameDim B V) → A) :
+private theorem argsOf_addrIx (i : B.ι) (w : Fin (gameDim B V) → A) :
     (fun l => w (addrIx i l)) = argsOf i (addrOf w) := by
   funext l
   rw [argsOf, addrOf]
@@ -421,11 +424,11 @@ theorem argsOf_addrIx (i : B.ι) (w : Fin (gameDim B V) → A) :
 
 omit [LinearOrder A] in
 /-- And a cell's own address is the first half of its tuple. -/
-theorem pref_cellIx (i : B.ι) (w : Fin (gameDim B V) → A) :
+private theorem pref_cellIx (i : B.ι) (w : Fin (gameDim B V) → A) :
     (fun l => w (cellIx i l)) =
       pref ((arity_le_blockArityBound B i).trans (blockArityBound_le_gameDim B V)) w := rfl
 
-theorem realize_symF (h₀ : IsBot a₀) {s : SymTag B} {t' : GameTag B V M}
+private theorem realize_symF (h₀ : IsBot a₀) {s : SymTag B} {t' : GameTag B V M}
     {v : Fin 2 × Fin (gameDim B V) → A} :
     ((match s with
       | SymTag.mark b => sideF (L := L) _ (t' = Sum.inl (TapeTag.mark b)) ⊓ canonF 0 (argVar 2 1)
@@ -528,7 +531,7 @@ theorem realize_symF (h₀ : IsBot a₀) {s : SymTag B} {t' : GameTag B V M}
       · rintro ⟨-, h⟩
         exact ⟨congrArg Prod.fst h, congrArg Prod.snd h⟩
 
-theorem realize_eqIxF {γ : Type} {m : ℕ} {f g : Fin m → Fin (gameDim B V)}
+private theorem realize_eqIxF {γ : Type} {m : ℕ} {f g : Fin m → Fin (gameDim B V)}
     {u : Fin (gameDim B V) → γ} {v : γ → A} :
     (eqIxF (L := L) f g u).Realize v ↔ (fun l => v (u (f l))) = fun l => v (u (g l)) := by
   rw [eqIxF, realize_listInf, funext_iff]
@@ -541,7 +544,7 @@ theorem realize_eqIxF {γ : Type} {m : ℕ} {f g : Fin m → Fin (gameDim B V)}
     rw [Formula.realize_equal, Term.realize_var, Term.realize_var]
     exact h l
 
-theorem realize_concOkF {p : MachPh V M} {v : Fin 1 × Fin (gameDim B V) → A} :
+private theorem realize_concOkF {p : MachPh V M} {v : Fin 1 × Fin (gameDim B V) → A} :
     (concOkF prog p).Realize v ↔ prog.concOk p (fun j => v (0, j)) := by
   rw [concOkF, Formula.realize_relabel, BoundedFormula.realize_toFormula, GameProg.concOk]
   exact iff_of_eq (congrArg
@@ -549,7 +552,7 @@ theorem realize_concOkF {p : MachPh V M} {v : Fin 1 × Fin (gameDim B V) → A} 
       ((prog.data p.q).sub fun j => p.claims (Fin.castLE (prog.natoms_le p.q) j)) d
       (prog.valOf p.q fun j => v (0, j))) (Subsingleton.elim _ _))
 
-theorem realize_isTargetF {p : MachPh V M} {s : SymTag B}
+private theorem realize_isTargetF {p : MachPh V M} {s : SymTag B}
     {v : Fin 1 × Fin (gameDim B V) → A} :
     (isTargetF prog p s).Realize v ↔ prog.isTarget p s (fun j => v (0, j)) := by
   classical
@@ -575,7 +578,7 @@ theorem realize_isTargetF {p : MachPh V M} {s : SymTag B}
     rintro ⟨h', -, -⟩
     exact h h'
 
-theorem realize_ruleF {tr : TrTag B V M} {v : Fin 1 × Fin (gameDim B V) → A} :
+private theorem realize_ruleF {tr : TrTag B V M} {v : Fin 1 × Fin (gameDim B V) → A} :
     (ruleF prog tr).Realize v ↔
       gameRule prog.vars prog.natoms prog.concOk prog.isTarget tr (fun j => v (0, j)) := by
   classical
@@ -692,7 +695,7 @@ omit [L.Structure A] [LinearOrder A] in
 @[simp] theorem gameMapEquiv_apply (p : GamePt B V M A) : gameMapEquiv prog p = p := rfl
 
 /-- The valuation a unary relation's argument supplies. -/
-theorem relMap_one {R : (Language.turingAlt 2).Relations 1} {p : GamePt B V M A}
+private theorem relMap_one {R : (Language.turingAlt 2).Relations 1} {p : GamePt B V M A}
     {φ : GameTag B V M → (L.sum Language.order).Formula (Fin 1 × Fin (gameDim B V))}
     (hR : (gameInterp prog).relFormula R = fun t => φ (t 0)) :
     RelMap R ![gameMapEquiv prog p] ↔ (φ p.1).Realize fun q => p.2 q.2 := by
@@ -701,7 +704,7 @@ theorem relMap_one {R : (Language.turingAlt 2).Relations 1} {p : GamePt B V M A}
   rfl
 
 /-- The valuation a binary relation's arguments supply. -/
-theorem relMap_two {R : (Language.turingAlt 2).Relations 2} {p q : GamePt B V M A}
+private theorem relMap_two {R : (Language.turingAlt 2).Relations 2} {p q : GamePt B V M A}
     {φ : GameTag B V M → GameTag B V M →
       (L.sum Language.order).Formula (Fin 2 × Fin (gameDim B V))}
     (hR : (gameInterp prog).relFormula R = fun t => φ (t 0) (t 1)) :
@@ -716,41 +719,41 @@ theorem relMap_two {R : (Language.turingAlt 2).Relations 2} {p q : GamePt B V M 
 
 variable {hdim : blockArityBound B ≤ gameDim B V}
 
-theorem relMap_posn (p : GamePt B V M A) :
+private theorem relMap_posn (p : GamePt B V M A) :
     ATMPosn (k := 2) (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Posn p := by
   rw [ATMPosn, relMap_one prog (φ := fun t => posnF prog t) rfl, realize_posnF]
   rfl
 
-theorem relMap_tr (p : GamePt B V M A) :
+private theorem relMap_tr (p : GamePt B V M A) :
     ATMTr (k := 2) (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Tr p := by
   rw [ATMTr, relMap_one prog (φ := fun t => trF prog t) rfl, realize_trF]
   rfl
 
-theorem relMap_start (h₀ : IsBot a₀) (p : GamePt B V M A) :
+private theorem relMap_start (h₀ : IsBot a₀) (p : GamePt B V M A) :
     ATMStart (k := 2) (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Start p := by
   rw [ATMStart, relMap_one prog (φ := fun t => startF (L := L) (V := V) (M := M) t) rfl,
     realize_startF h₀]
   rfl
 
-theorem relMap_acc (p : GamePt B V M A) :
+private theorem relMap_acc (p : GamePt B V M A) :
     ATMAcc (k := 2) (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Acc p := by
   rw [ATMAcc, relMap_one prog (φ := fun t => accF (L := L) (V := V) (M := M) t) rfl,
     realize_accF]
   rfl
 
-theorem relMap_blank (h₀ : IsBot a₀) (p : GamePt B V M A) :
+private theorem relMap_blank (h₀ : IsBot a₀) (p : GamePt B V M A) :
     ATMBlank (k := 2) (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Blank p := by
   rw [ATMBlank, relMap_one prog (φ := fun t => blankF (L := L) (V := V) (M := M) t) rfl,
     realize_blankF h₀]
   rfl
 
-theorem relMap_right (p : GamePt B V M A) :
+private theorem relMap_right (p : GamePt B V M A) :
     ATMRight (k := 2) (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Right p := by
   rw [ATMRight, relMap_one prog (φ := fun t => rightF (L := L) (V := V) (M := M) t) rfl,
     realize_rightF]
   rfl
 
-theorem relMap_le (p q : GamePt B V M A) :
+private theorem relMap_le (p q : GamePt B V M A) :
     ATMLe (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Le p q := by
   let := machTagOrder (B := B) (C := GameCtrlTag B V M)
@@ -759,40 +762,40 @@ theorem relMap_le (p q : GamePt B V M A) :
     realize_lexLeF (L := L) (A := A) (Tag := GameTag B V M) (d := gameDim B V)]
   rfl
 
-theorem relMap_tsrc (p q : GamePt B V M A) :
+private theorem relMap_tsrc (p q : GamePt B V M A) :
     ATMSrc (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Src p q := by
   rw [ATMSrc, relMap_two prog (φ := fun t t' => tsrcF prog t t') rfl, realize_tsrcF]
   rfl
 
-theorem relMap_tdst (p q : GamePt B V M A) :
+private theorem relMap_tdst (p q : GamePt B V M A) :
     ATMDst (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Dst p q := by
   rw [ATMDst, relMap_two prog (φ := fun t t' => tdstF prog t t') rfl, realize_tdstF]
   rfl
 
-theorem relMap_tread (h₀ : IsBot a₀) (p q : GamePt B V M A) :
+private theorem relMap_tread (h₀ : IsBot a₀) (p q : GamePt B V M A) :
     ATMRead (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Read p q := by
   rw [ATMRead, relMap_two prog (φ := fun t t' => treadF (L := L) (V := V) (M := M) t t') rfl,
     realize_treadF h₀]
   rfl
 
-theorem relMap_twrite (h₀ : IsBot a₀) (p q : GamePt B V M A) :
+private theorem relMap_twrite (h₀ : IsBot a₀) (p q : GamePt B V M A) :
     ATMWrite (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Write p q := by
   rw [ATMWrite, relMap_two prog (φ := fun t t' => twriteF (L := L) (V := V) (M := M) t t') rfl,
     realize_twriteF h₀]
   rfl
 
-theorem relMap_inp (h₀ : IsBot a₀) (p q : GamePt B V M A) :
+private theorem relMap_inp (h₀ : IsBot a₀) (p q : GamePt B V M A) :
     ATMInp (k := 2) (gameMapEquiv prog p) (gameMapEquiv prog q) ↔
       (prog.machine a₀ hdim).Inp p q := by
   rw [ATMInp, relMap_two prog (φ := fun t t' => inpF (L := L) (V := V) (M := M) t t') rfl,
     realize_inpF h₀ hdim]
   rfl
 
-theorem relMap_blk (j : ℕ) (p : GamePt B V M A) :
+private theorem relMap_blk (j : ℕ) (p : GamePt B V M A) :
     ATMBlk (k := 2) j (gameMapEquiv prog p) ↔ (prog.machine a₀ hdim).Blk j p := by
   rw [GameProg.machine]
   constructor
@@ -808,7 +811,7 @@ theorem relMap_blk (j : ℕ) (p : GamePt B V M A) :
 /-- **The interpreted structure describes the machine**: every field of
 `DescriptiveComplexity.atmData` on it agrees, along the identity, with the
 machine of the program. -/
-theorem altAgree_gameMachine (h₀ : IsBot a₀) :
+private theorem altAgree_gameMachine (h₀ : IsBot a₀) :
     ATMData.AltAgree (gameMapEquiv (A := A) prog) (prog.machine a₀ hdim)
       (atmData 2 ((gameInterp prog).Map A)) where
   base :=
@@ -827,7 +830,7 @@ theorem altAgree_gameMachine (h₀ : IsBot a₀) :
   blk := fun j p => (relMap_blk prog j p).symm
 
 /-- The agreement in the other direction, along the same identity. -/
-theorem altAgree_gameMachine' (h₀ : IsBot a₀) :
+private theorem altAgree_gameMachine' (h₀ : IsBot a₀) :
     ATMData.AltAgree (gameMapEquiv (A := A) prog).symm
       (atmData 2 ((gameInterp prog).Map A)) (prog.machine a₀ hdim) where
   base :=

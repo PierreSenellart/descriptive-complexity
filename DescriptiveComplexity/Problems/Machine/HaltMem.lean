@@ -10,6 +10,8 @@ public import DescriptiveComplexity.Problems.Machine.HaltFin
 import DescriptiveComplexity.RecursivelyEnumerable
 public import DescriptiveComplexity.Problems.FinSat
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Machine.HaltFin
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # The halting problem is in RE
@@ -152,7 +154,7 @@ noncomputable def certStr (ρ : runBlock.Assignment (A ⊕ Fin m)) :
 
 /-! ### The instance, read on the extended universe -/
 
-theorem relMap_inl {k : ℕ} (R : Language.turing.Relations k) (y : Fin k → A) :
+private theorem relMap_inl {k : ℕ} (R : Language.turing.Relations k) (y : Fin k → A) :
     RelMap (L := Language.turing) (M := A ⊕ Fin m) R (fun i => Sum.inl (y i)) ↔ RelMap R y := by
   constructor
   · rintro ⟨y', hy', h⟩
@@ -612,41 +614,41 @@ no-instances: each conjunct of `DescriptiveComplexity.TMData.WellFormed` is one
 sentence, every quantifier ranging over the original elements. -/
 
 /-- The order on positions is reflexive. -/
-noncomputable def leReflS : runLang.Sentence := allOldF (leF vr0 vr0)
+private noncomputable def leReflS : runLang.Sentence := allOldF (leF vr0 vr0)
 
 /-- The order on positions is transitive. -/
-noncomputable def leTransS : runLang.Sentence :=
+private noncomputable def leTransS : runLang.Sentence :=
   allOldF (allOldF (allOldF (leF vr2 vr1 ⊓ leF vr1 vr0 ⟹ leF vr2 vr0)))
 
 /-- The order on positions is antisymmetric. -/
-noncomputable def leAntisymmS : runLang.Sentence :=
+private noncomputable def leAntisymmS : runLang.Sentence :=
   allOldF (allOldF (leF vr1 vr0 ⊓ leF vr0 vr1 ⟹ eqF vr1 vr0))
 
 /-- The order on positions is total. -/
-noncomputable def leTotalS : runLang.Sentence :=
+private noncomputable def leTotalS : runLang.Sentence :=
   allOldF (allOldF (leF vr1 vr0 ⊔ leF vr0 vr1))
 
 /-- There is a position. -/
-noncomputable def posnExS : runLang.Sentence := exOldF (posnF vr0)
+private noncomputable def posnExS : runLang.Sentence := exOldF (posnF vr0)
 
 /-- The input is functional. -/
-noncomputable def inpFunS : runLang.Sentence :=
+private noncomputable def inpFunS : runLang.Sentence :=
   allOldF (allOldF (allOldF (inpF vr2 vr1 ⊓ inpF vr2 vr0 ⟹ eqF vr1 vr0)))
 
 /-- There is a blank symbol. -/
-noncomputable def blankExS : runLang.Sentence := exOldF (blankF vr0)
+private noncomputable def blankExS : runLang.Sentence := exOldF (blankF vr0)
 
 /-- There is at most one blank symbol. -/
-noncomputable def blankUniqS : runLang.Sentence :=
+private noncomputable def blankUniqS : runLang.Sentence :=
   allOldF (allOldF (blankF vr1 ⊓ blankF vr0 ⟹ eqF vr1 vr0))
 
 /-- **The machine is well-formed**: the conjuncts of
 `DescriptiveComplexity.TMData.WellFormed`. -/
-noncomputable def wfS : runLang.Sentence :=
+private noncomputable def wfS : runLang.Sentence :=
   leReflS ⊓ (leTransS ⊓ (leAntisymmS ⊓ (leTotalS ⊓
     (posnExS ⊓ (inpFunS ⊓ (blankExS ⊓ blankUniqS))))))
 
-theorem realize_wfS :
+private theorem realize_wfS :
     @Sentence.Realize runLang (A ⊕ Fin m) (certStr ρ) wfS ↔ (tmData A).WellFormed := by
   let : runLang.Structure (A ⊕ Fin m) := certStr ρ
   simp only [wfS, leReflS, leTransS, leAntisymmS, leTotalS, posnExS, inpFunS, blankExS,
@@ -798,10 +800,10 @@ quantifier guarded by its sort, and one realization lemma each so that the
 assembly below is a conjunction and nothing more. -/
 
 /-- There is a time point. -/
-noncomputable def timeExS : runLang.Sentence := exNewF (timeF vr0)
+private noncomputable def timeExS : runLang.Sentence := exNewF (timeF vr0)
 
 /-- Time is linearly ordered. -/
-noncomputable def tleLinS : runLang.Sentence :=
+private noncomputable def tleLinS : runLang.Sentence :=
   allNewF (timeF vr0 ⟹ tleF vr0 vr0) ⊓
     (allNewF (allNewF (allNewF (timeF vr2 ⊓ timeF vr1 ⊓ timeF vr0 ⊓ tleF vr2 vr1 ⊓ tleF vr1 vr0 ⟹
       tleF vr2 vr0))) ⊓
@@ -809,10 +811,10 @@ noncomputable def tleLinS : runLang.Sentence :=
         allNewF (allNewF (timeF vr1 ⊓ timeF vr0 ⟹ tleF vr1 vr0 ⊔ tleF vr0 vr1))))
 
 /-- There is a page. -/
-noncomputable def pageExS : runLang.Sentence := exNewF (pageF vr0)
+private noncomputable def pageExS : runLang.Sentence := exNewF (pageF vr0)
 
 /-- The pages are linearly ordered. -/
-noncomputable def pleLinS : runLang.Sentence :=
+private noncomputable def pleLinS : runLang.Sentence :=
   allNewF (pageF vr0 ⟹ pleF vr0 vr0) ⊓
     (allNewF (allNewF (allNewF (pageF vr2 ⊓ pageF vr1 ⊓ pageF vr0 ⊓ pleF vr2 vr1 ⊓ pleF vr1 vr0 ⟹
       pleF vr2 vr0))) ⊓
@@ -820,43 +822,43 @@ noncomputable def pleLinS : runLang.Sentence :=
         allNewF (allNewF (pageF vr1 ⊓ pageF vr0 ⟹ pleF vr1 vr0 ⊔ pleF vr0 vr1))))
 
 /-- There is an input page. -/
-noncomputable def zeroExS : runLang.Sentence := exNewF (zeroF vr0)
+private noncomputable def zeroExS : runLang.Sentence := exNewF (zeroF vr0)
 
 /-- The input page is a page. -/
-noncomputable def zeroPageS : runLang.Sentence := allNewF (zeroF vr0 ⟹ pageF vr0)
+private noncomputable def zeroPageS : runLang.Sentence := allNewF (zeroF vr0 ⟹ pageF vr0)
 
 /-- There is at most one input page. -/
-noncomputable def zeroUniqS : runLang.Sentence :=
+private noncomputable def zeroUniqS : runLang.Sentence :=
   allNewF (allNewF (zeroF vr1 ⊓ zeroF vr0 ⟹ eqF vr1 vr0))
 
 /-- Every time point has a state. -/
-noncomputable def stTotS : runLang.Sentence := allNewF (timeF vr0 ⟹ exOldF (stF vr1 vr0))
+private noncomputable def stTotS : runLang.Sentence := allNewF (timeF vr0 ⟹ exOldF (stF vr1 vr0))
 
 /-- A time point has at most one state. -/
-noncomputable def stFunS : runLang.Sentence :=
+private noncomputable def stFunS : runLang.Sentence :=
   allNewF (allOldF (allOldF (stF vr2 vr1 ⊓ stF vr2 vr0 ⟹ eqF vr1 vr0)))
 
 /-- At every time point the head is on a page. -/
-noncomputable def hdPTotS : runLang.Sentence :=
+private noncomputable def hdPTotS : runLang.Sentence :=
   allNewF (timeF vr0 ⟹ exNewF (pageF vr0 ⊓ hdPF vr1 vr0))
 
 /-- The head is on at most one page. -/
-noncomputable def hdPFunS : runLang.Sentence :=
+private noncomputable def hdPFunS : runLang.Sentence :=
   allNewF (allNewF (allNewF (hdPF vr2 vr1 ⊓ hdPF vr2 vr0 ⟹ eqF vr1 vr0)))
 
 /-- At every time point the head is at a position. -/
-noncomputable def hdCTotS : runLang.Sentence := allNewF (timeF vr0 ⟹ exOldF (hdCF vr1 vr0))
+private noncomputable def hdCTotS : runLang.Sentence := allNewF (timeF vr0 ⟹ exOldF (hdCF vr1 vr0))
 
 /-- The head is at most at one position. -/
-noncomputable def hdCFunS : runLang.Sentence :=
+private noncomputable def hdCFunS : runLang.Sentence :=
   allNewF (allOldF (allOldF (hdCF vr2 vr1 ⊓ hdCF vr2 vr0 ⟹ eqF vr1 vr0)))
 
 /-- Every cell holds a symbol at every time point. -/
-noncomputable def symTotS : runLang.Sentence :=
+private noncomputable def symTotS : runLang.Sentence :=
   allNewF (allNewF (allOldF (timeF vr2 ⊓ pageF vr1 ⟹ exOldF (symF vr3 vr2 vr1 vr0))))
 
 /-- A cell holds at most one symbol. -/
-noncomputable def symFunS : runLang.Sentence :=
+private noncomputable def symFunS : runLang.Sentence :=
   allNewF (allNewF (allOldF (allOldF (allOldF
     (symF vr4 vr3 vr2 vr1 ⊓ symF vr4 vr3 vr2 vr0 ⟹ eqF vr1 vr0)))))
 
@@ -967,7 +969,7 @@ condition – thirteen in all, which is why the variables are named by their
 distance from their binder. -/
 
 /-- At the lowest time point the configuration is initial. -/
-noncomputable def initS : runLang.Sentence :=
+private noncomputable def initS : runLang.Sentence :=
   allNewF (allOldF (allNewF (allOldF (
     minTimeF vr3 ⊓ stF vr3 vr2 ⊓ hdPF vr3 vr1 ⊓ hdCF vr3 vr0 ⟹
       startF vr2 ⊓ zeroF vr1 ⊓ minPosOldF vr0 ⊓
@@ -976,7 +978,7 @@ noncomputable def initS : runLang.Sentence :=
             (zeroF vr2 ⟹ initTapeF vr1 vr0) ⊓ (∼(zeroF vr2) ⟹ blankF vr0))))))))
 
 /-- Along every step of the time order, one transition applies. -/
-noncomputable def stepS : runLang.Sentence :=
+private noncomputable def stepS : runLang.Sentence :=
   allNewF (allNewF (allOldF (allOldF (allNewF (allOldF (allOldF (allOldF (
     succTimeF vr7 vr6 ⊓ stF vr7 vr5 ⊓ stF vr6 vr4 ⊓ hdPF vr7 vr3 ⊓ hdCF vr7 vr2 ⊓
       symF vr7 vr3 vr2 vr1 ⊓ symF vr6 vr3 vr2 vr0 ⟹
@@ -990,7 +992,7 @@ noncomputable def stepS : runLang.Sentence :=
               (∼(rightF vr2) ⊓ succCellF vr1 vr0 vr6 vr5))))))))))))
 
 /-- At the highest time point the state is accepting. -/
-noncomputable def accS : runLang.Sentence :=
+private noncomputable def accS : runLang.Sentence :=
   allNewF (allOldF (maxTimeF vr1 ⊓ stF vr1 vr0 ⟹ accF vr0))
 
 section RunRealize
@@ -1052,16 +1054,16 @@ end RunRealize
 
 /-- **The certificate**: the eighteen conditions of
 `DescriptiveComplexity.TMData.RunRelOK`, conjoined. -/
-noncomputable def certS : runLang.Sentence :=
+private noncomputable def certS : runLang.Sentence :=
   timeExS ⊓ (tleLinS ⊓ (pageExS ⊓ (pleLinS ⊓ (zeroExS ⊓ (zeroPageS ⊓ (zeroUniqS ⊓
     (stTotS ⊓ (stFunS ⊓ (hdPTotS ⊓ (hdPFunS ⊓ (hdCTotS ⊓ (hdCFunS ⊓ (symTotS ⊓
       (symFunS ⊓ (initS ⊓ (stepS ⊓ accS))))))))))))))))
 
 /-- **The kernel**: the machine is well-formed and the invented values carry a
 run of it. -/
-noncomputable def kernelS : runLang.Sentence := wfS ⊓ certS
+private noncomputable def kernelS : runLang.Sentence := wfS ⊓ certS
 
-theorem realize_certS :
+private theorem realize_certS :
     @Sentence.Realize runLang (A ⊕ Fin m) (certStr ρ) certS ↔
       TMData.RunRelOK (tmData A) (certRun ρ) := by
   let : runLang.Structure (A ⊕ Fin m) := certStr ρ
@@ -1085,7 +1087,7 @@ theorem realize_certS :
       (realize_symFunS ρ).mpr h.sym_fun, (realize_initS ρ).mpr h.init,
       (realize_stepS ρ).mpr h.step, (realize_accS ρ).mpr h.acc⟩
 
-theorem realize_kernelS :
+private theorem realize_kernelS :
     @Sentence.Realize runLang (A ⊕ Fin m) (certStr ρ) kernelS ↔
       (tmData A).WellFormed ∧ TMData.RunRelOK (tmData A) (certRun ρ) := by
   let : runLang.Structure (A ⊕ Fin m) := certStr ρ

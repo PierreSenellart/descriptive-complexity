@@ -10,6 +10,13 @@ public import DescriptiveComplexity.Problems.Machine.Hardness
 import DescriptiveComplexity.Problems.HornSat
 public import DescriptiveComplexity.Problems.HornSat.Unsat
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.HornSat.Unsat
+import all DescriptiveComplexity.Problems.Machine.Hardness
+import all DescriptiveComplexity.Problems.Machine.HornTape
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # The unit-propagation machine of a Horn formula
@@ -278,7 +285,7 @@ def hornMachine (A : Type) [Language.sat.Structure A] [LinearOrder A] [Finite A]
 
 /-- **The machine is well formed**: every conjunct comes from the tape
 layer. -/
-theorem hornMachine_wellFormed : (hornMachine A).WellFormed :=
+private theorem hornMachine_wellFormed : (hornMachine A).WellFormed :=
   ⟨isLinOrd_hTagTupleLe, exists_hPosn, fun _ _ _ ha hb => hInp_functional ha hb,
     exists_hBlank, fun _ _ ha hb => hBlank_unique ha hb⟩
 
@@ -295,7 +302,7 @@ section Deterministic
 
 omit [Language.sat.Structure A] [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Two elements agree when their tag and all three coordinates do. -/
-theorem hV_ext {τ τ' : HV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0)
+private theorem hV_ext {τ τ' : HV A} (ht : τ.1 = τ'.1) (h0 : τ.2 0 = τ'.2 0)
     (h1 : τ.2 1 = τ'.2 1) (h2 : τ.2 2 = τ'.2 2) : τ = τ' := by
   refine Prod.ext ht (funext fun i => ?_)
   fin_cases i
@@ -326,7 +333,7 @@ theorem twoH_eq_twoH_iff {t t' : UPTag} {a a' b b' : A} :
   · rintro ⟨rfl, rfl, rfl⟩; rfl
 
 /-- The tag of the state a transition applies in. -/
-def hStateTag : UPTag → UPTag
+private def hStateTag : UPTag → UPTag
   | .tInitChk => .qInit
   | .tInitAcc => .qInit
   | .tChk _ f => .qChk f
@@ -341,7 +348,7 @@ def hStateTag : UPTag → UPTag
   | t => t
 
 /-- The tag of the symbol a transition reads. -/
-def hReadTag : UPTag → UPTag
+private def hReadTag : UPTag → UPTag
   | .tInitChk => .sStart
   | .tInitAcc => .sStart
   | .tChk m _ => if m then .sM else .sU
@@ -356,7 +363,7 @@ def hReadTag : UPTag → UPTag
   | t => t
 
 /-- Being the tag of a transition. -/
-def isHTrTag : UPTag → Bool
+private def isHTrTag : UPTag → Bool
   | .tInitChk | .tInitAcc | .tChk _ _ | .tChkEnd _ | .tMark _ _
   | .tMarkEndNext _ | .tMarkEndRound _ | .tMarkEndVer _
   | .tVer _ _ _ | .tVerNext _ | .tVerAcc _ => true
@@ -364,20 +371,20 @@ def isHTrTag : UPTag → Bool
 
 omit [Finite A] [Nonempty A] in
 /-- Only transitions have transition tags. -/
-theorem hTr_isHTrTag {τ : HV A} (hτ : HTr τ) : isHTrTag τ.1 := by
+private theorem hTr_isHTrTag {τ : HV A} (hτ : HTr τ) : isHTrTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> first | exact False.elim hτ | rfl
 
 omit [Language.sat.Structure A] in
 /-- **The state pins the transition's tag.** -/
-theorem hSrc_tag {τ q : HV A} (hs : HSrc τ q) : q.1 = hStateTag τ.1 := by
+private theorem hSrc_tag {τ q : HV A} (hs : HSrc τ q) : q.1 = hStateTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [HSrc] at hs <;>
     (rw [hs]; rfl)
 
 omit [Language.sat.Structure A] in
 /-- **The symbol read pins the transition's tag.** -/
-theorem hRead_tag {τ a : HV A} (hr : HRead τ a) : a.1 = hReadTag τ.1 := by
+private theorem hRead_tag {τ a : HV A} (hr : HRead τ a) : a.1 = hReadTag τ.1 := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [HRead] at hr <;>
     first
@@ -385,29 +392,29 @@ theorem hRead_tag {τ a : HV A} (hr : HRead τ a) : a.1 = hReadTag τ.1 := by
       | (rename_i b; cases b <;> (rw [hr]; rfl))
 
 /-- Tag classes for the promise-exclusive alternatives. -/
-def isInitChk : UPTag → Bool | .tInitChk => true | _ => false
+private def isInitChk : UPTag → Bool | .tInitChk => true | _ => false
 
-@[inherit_doc isInitChk] def isInitAcc : UPTag → Bool | .tInitAcc => true | _ => false
+@[inherit_doc isInitChk] private def isInitAcc : UPTag → Bool | .tInitAcc => true | _ => false
 
-@[inherit_doc isInitChk] def isMarkEndNext : UPTag → Bool
+@[inherit_doc isInitChk] private def isMarkEndNext : UPTag → Bool
   | .tMarkEndNext _ => true | _ => false
 
-@[inherit_doc isInitChk] def isMarkEndRound : UPTag → Bool
+@[inherit_doc isInitChk] private def isMarkEndRound : UPTag → Bool
   | .tMarkEndRound _ => true | _ => false
 
-@[inherit_doc isInitChk] def isMarkEndVer : UPTag → Bool
+@[inherit_doc isInitChk] private def isMarkEndVer : UPTag → Bool
   | .tMarkEndVer _ => true | _ => false
 
-@[inherit_doc isInitChk] def isVerNext : UPTag → Bool | .tVerNext _ => true | _ => false
+@[inherit_doc isInitChk] private def isVerNext : UPTag → Bool | .tVerNext _ => true | _ => false
 
-@[inherit_doc isInitChk] def isVerAcc : UPTag → Bool | .tVerAcc _ => true | _ => false
+@[inherit_doc isInitChk] private def isVerAcc : UPTag → Bool | .tVerAcc _ => true | _ => false
 
 set_option maxRecDepth 8000 in
 /-- **The state and the symbol determine the transition's tag**, up to the
 promise-exclusive alternatives: the two dispatches, the three ends of a return
 sweep, and the two ends of a verification sweep. A finite check over the
 tags. -/
-theorem hTag_cases : ∀ t t' : UPTag, isHTrTag t → isHTrTag t' →
+private theorem hTag_cases : ∀ t t' : UPTag, isHTrTag t → isHTrTag t' →
     hStateTag t = hStateTag t' → hReadTag t = hReadTag t' →
     t = t' ∨
       ((isInitChk t ∨ isInitAcc t) ∧ (isInitChk t' ∨ isInitAcc t')) ∨
@@ -418,28 +425,28 @@ theorem hTag_cases : ∀ t t' : UPTag, isHTrTag t → isHTrTag t' →
 
 omit [Finite A] [Nonempty A] in
 /-- The lowest clause is unique. -/
-theorem satMinCl_unique {c c' : A} (h : SatMinCl c) (h' : SatMinCl c') : c = c' :=
+private theorem satMinCl_unique {c c' : A} (h : SatMinCl c) (h' : SatMinCl c') : c = c' :=
   le_antisymm (h.2 c' h'.1) (h'.2 c h.1)
 
 omit [Finite A] [Nonempty A] in
 /-- The next clause is unique. -/
-theorem satNextCl_unique {c c' c'' : A} (h : SatNextCl c c') (h' : SatNextCl c c'') :
+private theorem satNextCl_unique {c c' c'' : A} (h : SatNextCl c c') (h' : SatNextCl c c'') :
     c' = c'' :=
   le_antisymm (h.2.2.2 c'' h'.2.1 h'.2.2.1) (h'.2.2.2 c' h.2.1 h.2.2.1)
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- The least element is unique. -/
-theorem minElt_unique {a a' : A} (h : MinElt a) (h' : MinElt a') : a = a' :=
+private theorem minElt_unique {a a' : A} (h : MinElt a) (h' : MinElt a') : a = a' :=
   le_antisymm (h a') (h' a)
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- The successor of an element is unique. -/
-theorem succElt_unique {a b b' : A} (h : SuccElt a b) (h' : SuccElt a b') : b = b' :=
+private theorem succElt_unique {a b b' : A} (h : SuccElt a b) (h' : SuccElt a b') : b = b' :=
   le_antisymm (h.2 b' h'.1) (h'.2 b h.1)
 
 /-- **Equal tags force equal payloads**: the source state and the symbol read
 pin two coordinates, the promises the rest. -/
-theorem hTr_payload {τ τ' q a : HV A} (hτ : HTr τ) (hτ' : HTr τ')
+private theorem hTr_payload {τ τ' q a : HV A} (hτ : HTr τ) (hτ' : HTr τ')
     (hs : HSrc τ q) (hs' : HSrc τ' q) (hr : HRead τ a) (hr' : HRead τ' a)
     (ht : τ.1 = τ'.1) : τ = τ' := by
   have hmin : ∀ u v : A, (∀ b : A, u ≤ b) → (∀ b : A, v ≤ b) → u = v :=
@@ -494,7 +501,7 @@ theorem hTr_payload {τ τ' q a : HV A} (hτ : HTr τ) (hτ' : HTr τ')
 
 omit [Finite A] [Nonempty A] in
 /-- The two dispatches exclude each other. -/
-theorem hTr_init_excl {τ τ' : HV A} (h : HTr τ) (h' : HTr τ')
+private theorem hTr_init_excl {τ τ' : HV A} (h : HTr τ) (h' : HTr τ')
     (hτ : τ.1 = UPTag.tInitChk) (hτ' : τ'.1 = UPTag.tInitAcc) : False := by
   unfold HTr at h h'
   rw [hτ] at h
@@ -503,43 +510,44 @@ theorem hTr_init_excl {τ τ' : HV A} (h : HTr τ) (h' : HTr τ')
 
 omit [Finite A] [Nonempty A] in
 /-- A clause with a next one is not the last. -/
-theorem hTr_next_max_excl {c c' cm : A} (hnext : SatNextCl c c') (hmax : SatMaxCl cm)
+private theorem hTr_next_max_excl {c c' cm : A} (hnext : SatNextCl c c') (hmax : SatMaxCl cm)
     (hc : c = cm) : False := by
   subst hc
   exact absurd (hmax.2 _ hnext.2.1) (not_le.mpr hnext.2.2.1)
 
 omit [Language.sat.Structure A] [Finite A] [Nonempty A] in
 /-- An element with a successor is not the greatest. -/
-theorem succElt_maxElt_excl {r r' rm : A} (hsucc : SuccElt r r') (hmax : MaxElt rm)
+private theorem succElt_maxElt_excl {r r' rm : A} (hsucc : SuccElt r r') (hmax : MaxElt rm)
     (hr : r = rm) : False := by
   subst hr
   exact absurd (hmax r') (not_le.mpr hsucc.1)
 
-theorem isInitChk_iff {t : UPTag} : isInitChk t ↔ t = .tInitChk := by
+private theorem isInitChk_iff {t : UPTag} : isInitChk t ↔ t = .tInitChk := by
   cases t <;> simp [isInitChk]
 
-theorem isInitAcc_iff {t : UPTag} : isInitAcc t ↔ t = .tInitAcc := by
+private theorem isInitAcc_iff {t : UPTag} : isInitAcc t ↔ t = .tInitAcc := by
   cases t <;> simp [isInitAcc]
 
-theorem isMarkEndNext_iff {t : UPTag} : isMarkEndNext t ↔ ∃ mrk, t = .tMarkEndNext mrk := by
+private theorem isMarkEndNext_iff {t : UPTag} : isMarkEndNext t ↔ ∃ mrk, t = .tMarkEndNext mrk := by
   cases t <;> simp [isMarkEndNext]
 
-theorem isMarkEndRound_iff {t : UPTag} : isMarkEndRound t ↔ ∃ mrk, t = .tMarkEndRound mrk := by
+private theorem isMarkEndRound_iff
+    {t : UPTag} : isMarkEndRound t ↔ ∃ mrk, t = .tMarkEndRound mrk := by
   cases t <;> simp [isMarkEndRound]
 
-theorem isMarkEndVer_iff {t : UPTag} : isMarkEndVer t ↔ ∃ mrk, t = .tMarkEndVer mrk := by
+private theorem isMarkEndVer_iff {t : UPTag} : isMarkEndVer t ↔ ∃ mrk, t = .tMarkEndVer mrk := by
   cases t <;> simp [isMarkEndVer]
 
-theorem isVerNext_iff {t : UPTag} : isVerNext t ↔ ∃ d, t = .tVerNext d := by
+private theorem isVerNext_iff {t : UPTag} : isVerNext t ↔ ∃ d, t = .tVerNext d := by
   cases t <;> simp [isVerNext]
 
-theorem isVerAcc_iff {t : UPTag} : isVerAcc t ↔ ∃ d, t = .tVerAcc d := by
+private theorem isVerAcc_iff {t : UPTag} : isVerAcc t ↔ ∃ d, t = .tVerAcc d := by
   cases t <;> simp [isVerAcc]
 
 omit [Language.sat.Structure A] in
 /-- Reading `DescriptiveComplexity.HSrc` off a concrete tag: the payload equations
 all flow through this. -/
-theorem hSrc_eq {τ q : HV A} (hs : HSrc τ q) :
+private theorem hSrc_eq {τ q : HV A} (hs : HSrc τ q) :
     ∀ t', τ.1 = t' →
       (match t' with
         | .tInitChk => q = stHInit
@@ -560,7 +568,7 @@ theorem hSrc_eq {τ q : HV A} (hs : HSrc τ q) :
 
 omit [Finite A] [Nonempty A] in
 /-- Reading `DescriptiveComplexity.HTr` off a concrete tag. -/
-theorem hTr_at {τ : HV A} (hτ : HTr τ) :
+private theorem hTr_at {τ : HV A} (hτ : HTr τ) :
     ∀ t', τ.1 = t' →
       (match t' with
         | .tInitChk => MinElt (τ.2 0) ∧ SatMinCl (τ.2 1) ∧ (∀ a : A, τ.2 2 ≤ a)
@@ -586,7 +594,7 @@ ambiguity classes left by `DescriptiveComplexity.hTag_cases` are separated by th
 promises: a clause with a next one is not the last, an element with a
 successor is not the greatest, and an instance either has a clause or has
 none. -/
-theorem hTr_unique {τ τ' q a : HV A} (hτ : HTr τ) (hτ' : HTr τ')
+private theorem hTr_unique {τ τ' q a : HV A} (hτ : HTr τ) (hτ' : HTr τ')
     (hs : HSrc τ q) (hs' : HSrc τ' q) (hr : HRead τ a) (hr' : HRead τ' a) : τ = τ' := by
   have hst : hStateTag τ.1 = hStateTag τ'.1 := (hSrc_tag hs).symm.trans (hSrc_tag hs')
   have hrd : hReadTag τ.1 = hReadTag τ'.1 := (hRead_tag hr).symm.trans (hRead_tag hr')
@@ -671,7 +679,7 @@ theorem hTr_unique {τ τ' q a : HV A} (hτ : HTr τ) (hτ' : HTr τ')
 /-- A transition moves to exactly one state: the branching destinations are
 separated by their flags and their first-order tests, and the two relational
 destinations are pinned by uniqueness of the lowest clause. -/
-theorem hDst_functional {τ q q' : HV A} (h : HDst τ q) (h' : HDst τ q') : q = q' := by
+private theorem hDst_functional {τ q q' : HV A} (h : HDst τ q) (h' : HDst τ q') : q = q' := by
   unfold HDst at h h'
   cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h'
   case tChk m f =>
@@ -710,7 +718,7 @@ theorem hDst_functional {τ q q' : HV A} (h : HDst τ q) (h' : HDst τ q') : q =
 
 /-- A transition writes exactly one symbol: the marking write's two branches
 are separated by the marking bit and the positive-literal test. -/
-theorem hWrite_functional {τ a a' : HV A} (h : HWrite τ a) (h' : HWrite τ a') : a = a' := by
+private theorem hWrite_functional {τ a a' : HV A} (h : HWrite τ a) (h' : HWrite τ a') : a = a' := by
   unfold HWrite at h h'
   cases hτ : τ.1 <;> rw [hτ] at h h' <;> simp only at h h'
   case tMark m mrk =>
@@ -729,7 +737,7 @@ theorem hWrite_functional {τ a a' : HV A} (h : HWrite τ a) (h' : HWrite τ a')
 /-- **The machine is deterministic** – the promise
 `DescriptiveComplexity.DTMAccept` folds into its yes-instances, discharged here for
 every image of the reduction, Horn or not. -/
-theorem hornMachine_deterministic : (hornMachine A).Deterministic := by
+private theorem hornMachine_deterministic : (hornMachine A).Deterministic := by
   refine ⟨?_, ?_, ?_, ?_⟩
   · rintro q q' ⟨ht, hw⟩ ⟨ht', hw'⟩
     exact Prod.ext (ht.trans ht'.symm) (isMinTup3_unique hw hw')
@@ -772,12 +780,12 @@ theorem hTagTupleLe_tag_le {p q : HV A} (h : tagTupleLe p q) : p.1 ≤ q.1 := by
   · exact le_of_eq h
 
 /-- Every tag other than the left marker's is above it. -/
-theorem hpStart_lt {t : UPTag} (h : t ≠ UPTag.pStart) : UPTag.pStart < t := by
+private theorem hpStart_lt {t : UPTag} (h : t ≠ UPTag.pStart) : UPTag.pStart < t := by
   revert h; revert t; decide
 
 omit [Language.sat.Structure A] in
 /-- There is only one left marker. -/
-theorem eq_posHStart_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pStart) :
+private theorem eq_posHStart_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pStart) :
     p = posHStart := by
   obtain ⟨t, w⟩ := p
   cases h
@@ -785,7 +793,7 @@ theorem eq_posHStart_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pStart) 
 
 omit [Language.sat.Structure A] in
 /-- There is only one right marker. -/
-theorem eq_posHEnd_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pEnd) :
+private theorem eq_posHEnd_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pEnd) :
     p = posHEnd := by
   obtain ⟨t, w⟩ := p
   cases h
@@ -793,7 +801,7 @@ theorem eq_posHEnd_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pEnd) :
 
 omit [Language.sat.Structure A] in
 /-- A cell is the cell of the element it carries. -/
-theorem eq_posHCell_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pCell) :
+private theorem eq_posHCell_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pCell) :
     p = posHCell (p.2 0) := by
   obtain ⟨t, w⟩ := p
   cases h
@@ -805,7 +813,7 @@ theorem eq_posHCell_of_posn {p : HV A} (hp : HPosn p) (h : p.1 = UPTag.pCell) :
 
 omit [Language.sat.Structure A] in
 /-- **The left marker is the lowest position.** -/
-theorem minPos_posHStart : MinPos tagTupleLe HPosn (posHStart : HV A) := by
+private theorem minPos_posHStart : MinPos tagTupleLe HPosn (posHStart : HV A) := by
   refine ⟨hPosn_posHStart, fun q hq => ?_⟩
   rcases eq_or_ne q.1 UPTag.pStart with h | h
   · rw [eq_posHStart_of_posn hq h]
@@ -822,7 +830,8 @@ theorem posHCell_le_posHEnd (x : A) : tagTupleLe (posHCell x : HV A) posHEnd :=
 
 omit [Language.sat.Structure A] in
 /-- **Cells are ordered as their elements are.** -/
-theorem posHCell_le_iff {x y : A} : tagTupleLe (posHCell x : HV A) (posHCell y) ↔ x ≤ y := by
+private theorem posHCell_le_iff
+    {x y : A} : tagTupleLe (posHCell x : HV A) (posHCell y) ↔ x ≤ y := by
   constructor
   · rintro (h | ⟨-, h | ⟨j, hlt, hj⟩⟩)
     · exact absurd h (lt_irrefl _)
@@ -838,24 +847,24 @@ theorem posHCell_le_iff {x y : A} : tagTupleLe (posHCell x : HV A) (posHCell y) 
     · exact Or.inr ⟨0, fun i hi => absurd hi (by omega), by simpa [oneH] using hlt⟩
 
 /-- Only the two lowest tags are at or below a cell's. -/
-theorem htag_le_pCell {t : UPTag} (h : t ≤ UPTag.pCell) :
+private theorem htag_le_pCell {t : UPTag} (h : t ≤ UPTag.pCell) :
     t = UPTag.pStart ∨ t = UPTag.pCell := by
   revert h; revert t; decide
 
 /-- Only the three bracketing tags are at or below the right marker's. -/
-theorem htag_le_pEnd {t : UPTag} (h : t ≤ UPTag.pEnd) :
+private theorem htag_le_pEnd {t : UPTag} (h : t ≤ UPTag.pEnd) :
     t = UPTag.pStart ∨ t = UPTag.pCell ∨ t = UPTag.pEnd := by
   revert h; revert t; decide
 
 /-- Only the two highest bracketing tags lie between a cell's and the right
 marker's. -/
-theorem htag_between {t : UPTag} (h₁ : UPTag.pCell ≤ t) (h₂ : t ≤ UPTag.pEnd) :
+private theorem htag_between {t : UPTag} (h₁ : UPTag.pCell ≤ t) (h₂ : t ≤ UPTag.pEnd) :
     t = UPTag.pCell ∨ t = UPTag.pEnd := by
   revert h₁ h₂; revert t; decide
 
 omit [Language.sat.Structure A] in
 /-- The head's first move: the cell of the least element follows `⊢`. -/
-theorem succPos_posHStart_posHCell :
+private theorem succPos_posHStart_posHCell :
     SuccPos tagTupleLe HPosn (posHStart : HV A) (posHCell botA) := by
   refine ⟨hPosn_posHStart, hPosn_posHCell _, posHStart_le_posHCell _, ?_, ?_⟩
   · intro h
@@ -870,7 +879,7 @@ theorem succPos_posHStart_posHCell :
 
 omit [Language.sat.Structure A] in
 /-- The head's last move of a sweep: `⊣` follows the last cell. -/
-theorem succPos_posHCell_posHEnd :
+private theorem succPos_posHCell_posHEnd :
     SuccPos tagTupleLe HPosn (posHCell (topA (A := A)) : HV A) posHEnd := by
   refine ⟨hPosn_posHCell _, hPosn_posHEnd, posHCell_le_posHEnd _, ?_, ?_⟩
   · intro h
@@ -903,7 +912,7 @@ noncomputable def procB (M : A → Bool) (c : A) : A → Bool := fun x =>
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- Processing a clause only adds marks. -/
-theorem le_procB (M : A → Bool) (c : A) {x : A} (h : M x = true) : procB M c x = true := by
+private theorem le_procB (M : A → Bool) (c : A) {x : A} (h : M x = true) : procB M c x = true := by
   simp [procB, h]
 
 open Classical in
@@ -921,7 +930,7 @@ noncomputable def hTape (M : A → Bool) : HV A → HV A := fun r =>
 
 omit [Language.sat.Structure A] in
 /-- A real cell reads its element's mark. -/
-theorem hTape_posHCell (M : A → Bool) (y : A) :
+private theorem hTape_posHCell (M : A → Bool) (y : A) :
     hTape M (posHCell y : HV A) = symCell (M y) y := by
   classical
   simp only [hTape]
@@ -930,7 +939,7 @@ theorem hTape_posHCell (M : A → Bool) (y : A) :
 omit [Language.sat.Structure A] in
 /-- Marked tapes agree wherever the marks do – in particular junk cells never
 notice a change of marks. -/
-theorem hTape_congr {M M' : A → Bool} (p : HV A)
+private theorem hTape_congr {M M' : A → Bool} (p : HV A)
     (h : ∀ y : A, M y = M' y) : hTape M p = hTape M' p := by
   classical
   obtain ⟨t, w⟩ := p
@@ -960,18 +969,18 @@ noncomputable def markTape (M : A → Bool) (c : A) (p : HV A) : HV A → HV A :
 open Classical in
 /-- The flag of a check sweep with the head at `p`: every negative literal of
 `c` strictly below the head is marked. -/
-noncomputable def chkFlag (M : A → Bool) (c : A) (p : HV A) : Bool :=
+private noncomputable def chkFlag (M : A → Bool) (c : A) (p : HV A) : Bool :=
   decide (∀ y : A, tagTupleLe (posHCell y) p → posHCell y ≠ p → SatNeg c y → M y = true)
 
 /-- The configuration during the check sweep of clause `c` in round `r`. -/
-noncomputable def confHChk (M : A → Bool) (r c : A) (p : HV A) : Config (HV A) where
+private noncomputable def confHChk (M : A → Bool) (r c : A) (p : HV A) : Config (HV A) where
   state := stHChk (chkFlag M c p) r c
   head := p
   tape := hTape M
 
 /-- The configuration during the return sweep of clause `c` in round `r`,
 with marking bit `m`. -/
-noncomputable def confHMark (M : A → Bool) (m : Bool) (r c : A) (p : HV A) :
+private noncomputable def confHMark (M : A → Bool) (m : Bool) (r c : A) (p : HV A) :
     Config (HV A) where
   state := stHMark m r c
   head := p
@@ -981,22 +990,22 @@ open Classical in
 /-- The flag of a verification sweep, leftwards, with the head at `p`: some
 cell strictly above the head satisfies `c` under the marks – the SAT machine's
 `DescriptiveComplexity.chkFlagL` with the marks as valuation. -/
-noncomputable def verFlagL (M : A → Bool) (c : A) (p : HV A) : Bool :=
+private noncomputable def verFlagL (M : A → Bool) (c : A) (p : HV A) : Bool :=
   decide (∃ y : A, tagTupleLe p (posHCell y) ∧ p ≠ posHCell y ∧ MLit c y (M y))
 
 open Classical in
 /-- The flag of a verification sweep, rightwards. -/
-noncomputable def verFlagR (M : A → Bool) (c : A) (p : HV A) : Bool :=
+private noncomputable def verFlagR (M : A → Bool) (c : A) (p : HV A) : Bool :=
   decide (∃ y : A, tagTupleLe (posHCell y) p ∧ posHCell y ≠ p ∧ MLit c y (M y))
 
 /-- The configuration during a leftward verification sweep. -/
-noncomputable def confHVerL (M : A → Bool) (c : A) (p : HV A) : Config (HV A) where
+private noncomputable def confHVerL (M : A → Bool) (c : A) (p : HV A) : Config (HV A) where
   state := stHVer (verFlagL M c p) false c
   head := p
   tape := hTape M
 
 /-- The configuration during a rightward verification sweep. -/
-noncomputable def confHVerR (M : A → Bool) (c : A) (p : HV A) : Config (HV A) where
+private noncomputable def confHVerR (M : A → Bool) (c : A) (p : HV A) : Config (HV A) where
   state := stHVer (verFlagR M c p) true c
   head := p
   tape := hTape M
@@ -1010,7 +1019,7 @@ noncomputable def confHInit : Config (HV A) where
 
 /-- **The machine starts at the dispatch configuration**: the unmarked tape is
 the initial tape. -/
-theorem isInit_confHInit : (hornMachine A).IsInit (confHInit (A := A)) := by
+private theorem isInit_confHInit : (hornMachine A).IsInit (confHInit (A := A)) := by
   refine ⟨⟨rfl, isMinTup3_bot⟩, minPos_posHStart, fun q => ?_⟩
   change (hornMachine A).InitTape q (hTape (fun _ => false) q)
   cases hq : q.1 <;> simp only [hTape, hq]
@@ -1027,7 +1036,7 @@ theorem isInit_confHInit : (hornMachine A).IsInit (confHInit (A := A)) := by
 
 /-- A check sweep starts with a vacuously true flag: no cell lies strictly
 below the first one. -/
-theorem chkFlag_botA (M : A → Bool) (c : A) :
+private theorem chkFlag_botA (M : A → Bool) (c : A) :
     chkFlag M c (posHCell (botA (A := A))) = true := by
   classical
   simp only [chkFlag, decide_eq_true_eq]
@@ -1035,7 +1044,7 @@ theorem chkFlag_botA (M : A → Bool) (c : A) :
   exact absurd (congrArg posHCell (le_antisymm (posHCell_le_iff.mp hle) (botA_le y))) hne
 
 /-- **Stepping right folds one cell into the check flag.** -/
-theorem chkFlag_succ (M : A → Bool) (c : A) {p q : HV A}
+private theorem chkFlag_succ (M : A → Bool) (c : A) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn p q) (hp : p.1 = UPTag.pCell) :
     chkFlag M c q = true ↔
       (chkFlag M c p = true ∧ (SatNeg c (p.2 0) → M (p.2 0) = true)) := by
@@ -1065,7 +1074,7 @@ theorem chkFlag_succ (M : A → Bool) (c : A) {p q : HV A}
 
 /-- **A completed check sweep has seen every cell**: at the right marker the
 flag says every negative literal of the clause is marked. -/
-theorem chkFlag_posHEnd (M : A → Bool) (c : A) :
+private theorem chkFlag_posHEnd (M : A → Bool) (c : A) :
     chkFlag M c (posHEnd : HV A) = true ↔ ∀ y : A, SatNeg c y → M y = true := by
   classical
   simp only [chkFlag, decide_eq_true_eq]
@@ -1077,7 +1086,7 @@ theorem chkFlag_posHEnd (M : A → Bool) (c : A) :
   · exact fun h y _ _ hy => h y hy
 
 /-- A leftward verification sweep starts with an empty flag. -/
-theorem verFlagL_topA (M : A → Bool) (c : A) :
+private theorem verFlagL_topA (M : A → Bool) (c : A) :
     verFlagL M c (posHCell (topA (A := A))) = false := by
   classical
   simp only [verFlagL, decide_eq_false_iff_not]
@@ -1085,7 +1094,7 @@ theorem verFlagL_topA (M : A → Bool) (c : A) :
   exact hne (congrArg _ (le_antisymm (le_topA y) (posHCell_le_iff.mp hle))).symm
 
 /-- A rightward verification sweep starts with an empty flag. -/
-theorem verFlagR_botA (M : A → Bool) (c : A) :
+private theorem verFlagR_botA (M : A → Bool) (c : A) :
     verFlagR M c (posHCell (botA (A := A))) = false := by
   classical
   simp only [verFlagR, decide_eq_false_iff_not]
@@ -1093,7 +1102,7 @@ theorem verFlagR_botA (M : A → Bool) (c : A) :
   exact hne (congrArg _ (le_antisymm (posHCell_le_iff.mp hle) (botA_le y)))
 
 /-- **Stepping down folds one cell into the leftward verification flag.** -/
-theorem verFlagL_succ (M : A → Bool) (c : A) {p q : HV A}
+private theorem verFlagL_succ (M : A → Bool) (c : A) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn p q) (hq : q.1 = UPTag.pCell) :
     verFlagL M c p = true ↔
       (verFlagL M c q = true ∨ MLit c (q.2 0) (M (q.2 0))) := by
@@ -1123,7 +1132,7 @@ theorem verFlagL_succ (M : A → Bool) (c : A) {p q : HV A}
     · exact ⟨q.2 0, hqc ▸ hsucc.2.2.1, hqc ▸ hsucc.2.2.2.1, hlit⟩
 
 /-- **Stepping up folds one cell into the rightward verification flag.** -/
-theorem verFlagR_succ (M : A → Bool) (c : A) {p q : HV A}
+private theorem verFlagR_succ (M : A → Bool) (c : A) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn p q) (hp : p.1 = UPTag.pCell) :
     verFlagR M c q = true ↔
       (verFlagR M c p = true ∨ MLit c (p.2 0) (M (p.2 0))) := by
@@ -1153,7 +1162,7 @@ theorem verFlagR_succ (M : A → Bool) (c : A) {p q : HV A}
     · exact ⟨p.2 0, hpc ▸ hsucc.2.2.1, hpc ▸ hsucc.2.2.2.1, hlit⟩
 
 /-- **A completed leftward verification sweep has seen every cell.** -/
-theorem verFlagL_posHStart (M : A → Bool) (c : A) :
+private theorem verFlagL_posHStart (M : A → Bool) (c : A) :
     verFlagL M c (posHStart : HV A) = true ↔ ∃ y : A, MLit c y (M y) := by
   classical
   simp only [verFlagL, decide_eq_true_eq]
@@ -1166,7 +1175,7 @@ theorem verFlagL_posHStart (M : A → Bool) (c : A) :
     exact absurd (congrArg Prod.fst h) (show ¬(UPTag.pStart = UPTag.pCell) by decide)
 
 /-- **A completed rightward verification sweep has seen every cell.** -/
-theorem verFlagR_posHEnd (M : A → Bool) (c : A) :
+private theorem verFlagR_posHEnd (M : A → Bool) (c : A) :
     verFlagR M c (posHEnd : HV A) = true ↔ ∃ y : A, MLit c y (M y) := by
   classical
   simp only [verFlagR, decide_eq_true_eq]
@@ -1180,7 +1189,7 @@ theorem verFlagR_posHEnd (M : A → Bool) (c : A) :
 
 /-- At the top of the return sweep nothing has been processed: the tape still
 carries the old marks. -/
-theorem markTape_topA (M : A → Bool) (c : A) (r : HV A) :
+private theorem markTape_topA (M : A → Bool) (c : A) (r : HV A) :
     markTape M c (posHCell (topA (A := A))) r = hTape M r := by
   classical
   obtain ⟨t, w⟩ := r
@@ -1200,7 +1209,7 @@ theorem markTape_topA (M : A → Bool) (c : A) (r : HV A) :
 
 /-- At the bottom of the return sweep everything has been processed: the tape
 carries the new marks. -/
-theorem markTape_posHStart_eq (M : A → Bool) (c : A) (r : HV A) :
+private theorem markTape_posHStart_eq (M : A → Bool) (c : A) (r : HV A) :
     markTape M c (posHStart : HV A) r = hTape (procB M c) r := by
   classical
   obtain ⟨t, w⟩ := r
@@ -1216,7 +1225,7 @@ theorem markTape_posHStart_eq (M : A → Bool) (c : A) (r : HV A) :
 /-- **The return sweep only ever changes the cell under the head**, exactly as
 the SAT machine's guess sweep: moving the head down brings its own cell into the
 processed region and nothing else. -/
-theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
+private theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
     (hsucc : SuccPos tagTupleLe HPosn q p) (hrne : r ≠ p) :
     markTape M c q r = markTape M c p r := by
   classical
@@ -1244,7 +1253,7 @@ theorem markTape_frame' (M : A → Bool) (c : A) {p q r : HV A}
     · rw [ite_eq_right hcond, ite_eq_right hcond]
 
 /-- What the return sweep reads at its own head: the old mark. -/
-theorem markTape_at_head (M : A → Bool) (c : A) {p : HV A} (hp : HPosn p)
+private theorem markTape_at_head (M : A → Bool) (c : A) {p : HV A} (hp : HPosn p)
     (hcell : p.1 = UPTag.pCell) :
     markTape M c p p = symCell (M (p.2 0)) (p.2 0) := by
   classical
@@ -1258,7 +1267,7 @@ theorem markTape_at_head (M : A → Bool) (c : A) {p : HV A} (hp : HPosn p)
 
 /-- **The dispatch**, when a clause exists: into the first check sweep of the
 lowest round and clause, with everything unmarked. -/
-theorem step_hInitChk {c₀ : A} (hc₀ : SatMinCl c₀) :
+private theorem step_hInitChk {c₀ : A} (hc₀ : SatMinCl c₀) :
     (hornMachine A).Step confHInit (confHChk (fun _ => false) botA c₀ (posHCell botA)) := by
   refine ⟨twoH .tInitChk botA c₀, ⟨fun b => botA_le b, hc₀, fun b => botA_le b⟩, rfl, rfl,
     ?_, rfl, fun r _ => rfl, Or.inl ⟨trivial, succPos_posHStart_posHCell⟩⟩
@@ -1266,7 +1275,7 @@ theorem step_hInitChk {c₀ : A} (hc₀ : SatMinCl c₀) :
   rw [chkFlag_botA]
 
 /-- **The dispatch**, when there is no clause at all: accept. -/
-theorem step_hInitAcc (hno : ∀ e : A, ¬ SatCl e) :
+private theorem step_hInitAcc (hno : ∀ e : A, ¬ SatCl e) :
     (hornMachine A).Step confHInit
       ⟨stHAcc, posHCell botA, hTape (fun _ => false)⟩ := by
   exact ⟨cstH .tInitAcc, ⟨isMinTup3_bot, hno⟩, rfl, rfl, rfl, rfl, fun r _ => rfl,
@@ -1274,7 +1283,7 @@ theorem step_hInitAcc (hno : ∀ e : A, ¬ SatCl e) :
 
 /-- **One step of a check sweep**: fold the cell under the head into the flag
 and move right. -/
-theorem step_hChk (M : A → Bool) {r c : A} (hc : SatCl c) {p q : HV A}
+private theorem step_hChk (M : A → Bool) {r c : A} (hc : SatCl c) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn p q) (hp : p.1 = UPTag.pCell) :
     (hornMachine A).Step (confHChk M r c p) (confHChk M r c q) := by
   classical
@@ -1306,7 +1315,7 @@ theorem step_hChk (M : A → Bool) {r c : A} (hc : SatCl c) {p q : HV A}
 
 /-- **The turn at the right marker**: the check sweep is over, the return
 sweep begins with the accumulated verdict as its marking bit. -/
-theorem step_hChkEnd (M : A → Bool) {r c : A} (hc : SatCl c) :
+private theorem step_hChkEnd (M : A → Bool) {r c : A} (hc : SatCl c) :
     (hornMachine A).Step (confHChk M r c posHEnd)
       (confHMark M (chkFlag M c posHEnd) r c (posHCell topA)) := by
   refine ⟨(UPTag.tChkEnd (chkFlag M c posHEnd), ![r, c, botA]), ⟨hc, fun b => botA_le b⟩,
@@ -1316,7 +1325,7 @@ theorem step_hChkEnd (M : A → Bool) {r c : A} (hc : SatCl c) :
 /-- **One step of a return sweep**: process the cell under the head – marking
 it if it is the positive literal of a successfully checked clause – and move
 left. -/
-theorem step_hMark (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
+private theorem step_hMark (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
     (hm : m = true ↔ ∀ y : A, SatNeg c y → M y = true) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn q p) (hp : p.1 = UPTag.pCell) :
     (hornMachine A).Step (confHMark M m r c p) (confHMark M m r c q) := by
@@ -1360,7 +1369,7 @@ theorem step_hMark (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
 
 /-- **The turn at the left marker, next clause**: the processed marks become
 the working marks, and the next check sweep starts. -/
-theorem step_hMarkEndNext (M : A → Bool) {m : Bool} {r c c' : A}
+private theorem step_hMarkEndNext (M : A → Bool) {m : Bool} {r c c' : A}
     (hnext : SatNextCl c c') :
     (hornMachine A).Step (confHMark M m r c posHStart)
       (confHChk (procB M c) r c' (posHCell botA)) := by
@@ -1371,7 +1380,7 @@ theorem step_hMarkEndNext (M : A → Bool) {m : Bool} {r c c' : A}
 
 /-- **The turn at the left marker, next round**: last clause processed, the
 round counter advances and the checks restart at the lowest clause. -/
-theorem step_hMarkEndRound (M : A → Bool) {m : Bool} {r r' c c₀ : A}
+private theorem step_hMarkEndRound (M : A → Bool) {m : Bool} {r r' c c₀ : A}
     (hsucc : SuccElt r r') (hmax : SatMaxCl c) (hmin : SatMinCl c₀) :
     (hornMachine A).Step (confHMark M m r c posHStart)
       (confHChk (procB M c) r' c₀ (posHCell botA)) := by
@@ -1386,7 +1395,7 @@ theorem step_hMarkEndRound (M : A → Bool) {m : Bool} {r r' c c₀ : A}
 /-- **The turn at the left marker, into verification**: the last clause of the
 last round is processed, and the final marks are verified clause by clause,
 starting rightwards at the lowest clause. -/
-theorem step_hMarkEndVer (M : A → Bool) {m : Bool} {r c c₀ : A}
+private theorem step_hMarkEndVer (M : A → Bool) {m : Bool} {r c c₀ : A}
     (hmaxr : MaxElt r) (hmax : SatMaxCl c) (hmin : SatMinCl c₀) :
     (hornMachine A).Step (confHMark M m r c posHStart)
       (confHVerR (procB M c) c₀ (posHCell botA)) := by
@@ -1399,7 +1408,7 @@ theorem step_hMarkEndVer (M : A → Bool) {m : Bool} {r c c₀ : A}
   exact rfl
 
 /-- **One step of a rightward verification sweep.** -/
-theorem step_hVerR (M : A → Bool) {c : A} (hc : SatCl c) {p q : HV A}
+private theorem step_hVerR (M : A → Bool) {c : A} (hc : SatCl c) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn p q) (hp : p.1 = UPTag.pCell) :
     (hornMachine A).Step (confHVerR M c p) (confHVerR M c q) := by
   classical
@@ -1423,7 +1432,7 @@ theorem step_hVerR (M : A → Bool) {c : A} (hc : SatCl c) {p q : HV A}
     · exact fun hlit => hflag ((verFlagR_succ M c hsucc hp).mpr (Or.inr hlit))
 
 /-- **One step of a leftward verification sweep.** -/
-theorem step_hVerL (M : A → Bool) {c : A} (hc : SatCl c) {p q : HV A}
+private theorem step_hVerL (M : A → Bool) {c : A} (hc : SatCl c) {p q : HV A}
     (hsucc : SuccPos tagTupleLe HPosn p q) (hq : q.1 = UPTag.pCell) :
     (hornMachine A).Step (confHVerL M c q) (confHVerL M c p) := by
   classical
@@ -1448,7 +1457,7 @@ theorem step_hVerL (M : A → Bool) {c : A} (hc : SatCl c) {p q : HV A}
 
 /-- **The verification turn at the right marker**, another clause following:
 reverse into a leftward sweep of the next clause. -/
-theorem step_hVerNextR (M : A → Bool) {c c' : A} (hnext : SatNextCl c c')
+private theorem step_hVerNextR (M : A → Bool) {c c' : A} (hnext : SatNextCl c c')
     (hflag : verFlagR M c (posHEnd : HV A) = true) :
     (hornMachine A).Step (confHVerR M c posHEnd) (confHVerL M c' (posHCell topA)) := by
   refine ⟨(UPTag.tVerNext true, ![c, c', botA]), ⟨hnext, fun a => botA_le a⟩, ?_, rfl, ?_,
@@ -1459,7 +1468,7 @@ theorem step_hVerNextR (M : A → Bool) {c c' : A} (hnext : SatNextCl c c')
     rw [verFlagL_topA]
 
 /-- **The verification turn at the left marker** – the mirror. -/
-theorem step_hVerNextL (M : A → Bool) {c c' : A} (hnext : SatNextCl c c')
+private theorem step_hVerNextL (M : A → Bool) {c c' : A} (hnext : SatNextCl c c')
     (hflag : verFlagL M c (posHStart : HV A) = true) :
     (hornMachine A).Step (confHVerL M c posHStart) (confHVerR M c' (posHCell botA)) := by
   refine ⟨(UPTag.tVerNext false, ![c, c', botA]), ⟨hnext, fun a => botA_le a⟩, ?_, rfl, ?_,
@@ -1471,7 +1480,7 @@ theorem step_hVerNextL (M : A → Bool) {c c' : A} (hnext : SatNextCl c c')
 
 /-- **Accepting at the right marker**: the last clause is verified, and the
 instance is Horn – the gate. -/
-theorem step_hVerAccR (M : A → Bool) {c : A} (hmax : SatMaxCl c)
+private theorem step_hVerAccR (M : A → Bool) {c : A} (hmax : SatMaxCl c)
     (hhorn : AtMostOnePositive A) (hflag : verFlagR M c (posHEnd : HV A) = true) :
     (hornMachine A).Step (confHVerR M c posHEnd)
       ⟨stHAcc, posHCell topA, hTape M⟩ := by
@@ -1482,7 +1491,7 @@ theorem step_hVerAccR (M : A → Bool) {c : A} (hmax : SatMaxCl c)
   rw [hflag]
 
 /-- **Accepting at the left marker** – the mirror. -/
-theorem step_hVerAccL (M : A → Bool) {c : A} (hmax : SatMaxCl c)
+private theorem step_hVerAccL (M : A → Bool) {c : A} (hmax : SatMaxCl c)
     (hhorn : AtMostOnePositive A) (hflag : verFlagL M c (posHStart : HV A) = true) :
     (hornMachine A).Step (confHVerL M c posHStart)
       ⟨stHAcc, posHCell botA, hTape M⟩ := by
@@ -1496,26 +1505,26 @@ theorem step_hVerAccL (M : A → Bool) {c : A} (hmax : SatMaxCl c)
 
 omit [Language.sat.Structure A] in
 /-- The left marker has rank `0`. -/
-theorem bitRank_posHStart : bitRank tagTupleLe HPosn (posHStart : HV A) = 0 :=
+private theorem bitRank_posHStart : bitRank tagTupleLe HPosn (posHStart : HV A) = 0 :=
   bitRank_eq_zero_of_minPos isLinOrd_hTagTupleLe minPos_posHStart
 
 omit [Language.sat.Structure A] in
 /-- The right marker sits one step above the last cell. -/
-theorem bitRank_posHEnd_eq :
+private theorem bitRank_posHEnd_eq :
     bitRank tagTupleLe HPosn (posHEnd : HV A) =
       bitRank tagTupleLe HPosn (posHCell (topA (A := A))) + 1 :=
   bitRank_succPos isLinOrd_hTagTupleLe succPos_posHCell_posHEnd
 
 omit [Language.sat.Structure A] in
 /-- The first cell has rank `1`. -/
-theorem bitRank_posHCell_botA :
+private theorem bitRank_posHCell_botA :
     bitRank tagTupleLe HPosn (posHCell (botA (A := A)) : HV A) = 1 := by
   rw [bitRank_succPos isLinOrd_hTagTupleLe succPos_posHStart_posHCell, bitRank_posHStart]
 
 omit [Language.sat.Structure A] in
 /-- **A sweep is short**: only the left marker and the cells lie below the
 right marker, by injection into `Option A`. -/
-theorem bitRank_posHEnd_le :
+private theorem bitRank_posHEnd_le :
     bitRank tagTupleLe HPosn (posHEnd : HV A) ≤ Nat.card A + 1 := by
   classical
   have hcell : ∀ r : HV A, HPosn r → tagTupleLe r posHEnd → r ≠ posHEnd →
@@ -1552,7 +1561,7 @@ private theorem cell_of_between {p q : HV A} (hsucc : SuccPos tagTupleLe HPosn p
       ((eq_posHEnd_of_posn hsucc.1 h) ▸ hub)) hsucc.2.2.2.1
 
 /-- **A whole check sweep**, from the first cell to the right marker. -/
-theorem steps_hChkAll (M : A → Bool) {r c : A} (hc : SatCl c) :
+private theorem steps_hChkAll (M : A → Bool) {r c : A} (hc : SatCl c) :
     (hornMachine A).StepsIn
       (bitRank tagTupleLe HPosn (posHEnd : HV A) -
         bitRank tagTupleLe HPosn (posHCell (botA (A := A))))
@@ -1562,7 +1571,7 @@ theorem steps_hChkAll (M : A → Bool) {r c : A} (hc : SatCl c) :
     posHEnd hPosn_posHEnd (posHCell_le_posHEnd _) (hTagTupleLe_refl _)
 
 /-- **A whole return sweep**, from the last cell down to the left marker. -/
-theorem steps_hMarkAll (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
+private theorem steps_hMarkAll (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
     (hm : m = true ↔ ∀ y : A, SatNeg c y → M y = true) :
     (hornMachine A).StepsIn
       (bitRank tagTupleLe HPosn (posHCell (topA (A := A))) -
@@ -1578,7 +1587,7 @@ theorem steps_hMarkAll (M : A → Bool) {m : Bool} {r c : A} (hc : SatCl c)
   · exact h
 
 /-- **A whole rightward verification sweep.** -/
-theorem steps_hVerRAll (M : A → Bool) {c : A} (hc : SatCl c) :
+private theorem steps_hVerRAll (M : A → Bool) {c : A} (hc : SatCl c) :
     (hornMachine A).StepsIn
       (bitRank tagTupleLe HPosn (posHEnd : HV A) -
         bitRank tagTupleLe HPosn (posHCell (botA (A := A))))
@@ -1588,7 +1597,7 @@ theorem steps_hVerRAll (M : A → Bool) {c : A} (hc : SatCl c) :
     posHEnd hPosn_posHEnd (posHCell_le_posHEnd _) (hTagTupleLe_refl _)
 
 /-- **A whole leftward verification sweep.** -/
-theorem steps_hVerLAll (M : A → Bool) {c : A} (hc : SatCl c) :
+private theorem steps_hVerLAll (M : A → Bool) {c : A} (hc : SatCl c) :
     (hornMachine A).StepsIn
       (bitRank tagTupleLe HPosn (posHCell (topA (A := A))) -
         bitRank tagTupleLe HPosn (posHStart : HV A))
@@ -1605,7 +1614,7 @@ theorem steps_hVerLAll (M : A → Bool) {c : A} (hc : SatCl c) :
 /-- **One whole clause**: check sweep, turn, return sweep, back at the left
 marker with the processed marks, in exactly `2 R` steps for `R` the right
 marker's rank. -/
-theorem steps_hOneClause (M : A → Bool) {r c : A} (hc : SatCl c) :
+private theorem steps_hOneClause (M : A → Bool) {r c : A} (hc : SatCl c) :
     ∃ k ≤ 2 * bitRank tagTupleLe HPosn (posHEnd : HV A),
       (hornMachine A).StepsIn k (confHChk M r c (posHCell botA))
         (confHMark M (chkFlag M c (posHEnd : HV A)) r c posHStart) := by
@@ -1638,7 +1647,7 @@ inductive RoundFold (c₀ : A) : A → (A → Bool) → (A → Bool) → Prop
 
 omit [Finite A] [Nonempty A] in
 /-- The clause fold only adds marks. -/
-theorem ClauseFold.mono {c : A} {M M' : A → Bool} (h : ClauseFold c M M') {x : A}
+private theorem ClauseFold.mono {c : A} {M M' : A → Bool} (h : ClauseFold c M M') {x : A}
     (hx : M x = true) : M' x = true := by
   induction h generalizing x with
   | last _ => exact le_procB _ _ hx
@@ -1646,7 +1655,7 @@ theorem ClauseFold.mono {c : A} {M M' : A → Bool} (h : ClauseFold c M M') {x :
 
 omit [Finite A] [Nonempty A] in
 /-- The round fold only adds marks. -/
-theorem RoundFold.mono {c₀ r : A} {M M' : A → Bool} (h : RoundFold c₀ r M M') {x : A}
+private theorem RoundFold.mono {c₀ r : A} {M M' : A → Bool} (h : RoundFold c₀ r M M') {x : A}
     (hx : M x = true) : M' x = true := by
   induction h generalizing x with
   | last _ hcf => exact hcf.mono hx
@@ -1654,7 +1663,7 @@ theorem RoundFold.mono {c₀ r : A} {M M' : A → Bool} (h : RoundFold c₀ r M 
 
 omit [Nonempty A] in
 /-- **Soundness of the fold**: marks stay inside the propagation closure. -/
-theorem ClauseFold.subset_forced {c : A} {M M' : A → Bool} (h : ClauseFold c M M')
+private theorem ClauseFold.subset_forced {c : A} {M M' : A → Bool} (h : ClauseFold c M M')
     (hM : ∀ x : A, M x = true → Forced x) : ∀ x : A, M' x = true → Forced x := by
   classical
   induction h with
@@ -1673,7 +1682,7 @@ theorem ClauseFold.subset_forced {c : A} {M M' : A → Bool} (h : ClauseFold c M
 
 omit [Nonempty A] in
 /-- Soundness for the rounds. -/
-theorem RoundFold.subset_forced {c₀ r : A} {M M' : A → Bool} (h : RoundFold c₀ r M M')
+private theorem RoundFold.subset_forced {c₀ r : A} {M M' : A → Bool} (h : RoundFold c₀ r M M')
     (hM : ∀ x : A, M x = true → Forced x) : ∀ x : A, M' x = true → Forced x := by
   induction h with
   | last _ hcf => exact hcf.subset_forced hM
@@ -1683,7 +1692,7 @@ omit [Finite A] [Nonempty A] in
 /-- **One round dominates one propagation step**: a clause whose negative
 literals are all marked at the start of the round has its positive literals
 marked at its end – the marks only grow until the clause's turn comes. -/
-theorem ClauseFold.dominates {c₀ : A} {M M' : A → Bool} (h : ClauseFold c₀ M M')
+private theorem ClauseFold.dominates {c₀ : A} {M M' : A → Bool} (h : ClauseFold c₀ M M')
     {c x : A} (hc : SatCl c) (hpos : SatPos c x) :
     c₀ ≤ c → (∀ y : A, SatNeg c y → M y = true) → M' x = true := by
   classical
@@ -1706,7 +1715,7 @@ omit [Nonempty A] in
 /-- **The rounds reach every propagation stage**: seed marks containing stage
 `j` become, after the remaining rounds, marks containing stage `j + #rounds`.
 Each round dominates one step because its marks only grow. -/
-theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
+private theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
     {M M' : A → Bool} (h : RoundFold c₀ r M M') :
     ∀ j : ℕ, (∀ y : A, ForcedIn j y → M y = true) →
       ∀ x : A, ForcedIn (j + {e : A | r ≤ e}.ncard) x → M' x = true := by
@@ -1751,7 +1760,7 @@ theorem RoundFold.forcedIn_subset {c₀ : A} (hmin : SatMinCl c₀) {r : A}
 
 omit [Language.sat.Structure A] [Nonempty A] in
 /-- Every element that is not the greatest has a successor. -/
-theorem exists_succElt {r : A} (hnmax : ¬ MaxElt r) : ∃ r' : A, SuccElt r r' := by
+private theorem exists_succElt {r : A} (hnmax : ¬ MaxElt r) : ∃ r' : A, SuccElt r r' := by
   have hne : ∃ z : A, r < z := by
     by_contra hcon
     push Not at hcon
@@ -1763,7 +1772,7 @@ theorem exists_succElt {r : A} (hnmax : ¬ MaxElt r) : ∃ r' : A, SuccElt r r' 
 
 omit [Language.sat.Structure A] [Nonempty A] in
 /-- Passing to the next round removes exactly one round from those left. -/
-theorem ncard_ge_succElt {r r' : A} (hsucc : SuccElt r r') :
+private theorem ncard_ge_succElt {r r' : A} (hsucc : SuccElt r r') :
     {e : A | r ≤ e}.ncard = {e : A | r' ≤ e}.ncard + 1 := by
   have hset : {e : A | r ≤ e} = insert r {e : A | r' ≤ e} := by
     ext e
@@ -1782,7 +1791,7 @@ theorem ncard_ge_succElt {r r' : A} (hsucc : SuccElt r r') :
 /-- **The machine processes the clauses from `c` to the last one**: it
 computes the clause fold, and then turns – to the next round if one follows,
 into verification otherwise – in at most `2R + 1` steps per clause. -/
-theorem steps_hClauses {c₀ : A} (hmin : SatMinCl c₀) (r : A) :
+private theorem steps_hClauses {c₀ : A} (hmin : SatMinCl c₀) (r : A) :
     ∀ (c : A), SatCl c → ∀ M : A → Bool,
       ∃ M', ClauseFold c M M' ∧
         (∀ r', SuccElt r r' →
@@ -1833,7 +1842,7 @@ theorem steps_hClauses {c₀ : A} (hmin : SatMinCl c₀) (r : A) :
 
 /-- **The machine runs all the rounds**: from any round to the start of the
 verification phase, computing the round fold. -/
-theorem steps_hRounds {c₀ : A} (hmin : SatMinCl c₀) :
+private theorem steps_hRounds {c₀ : A} (hmin : SatMinCl c₀) :
     ∀ (r : A) (M : A → Bool),
       ∃ M', RoundFold c₀ r M M' ∧
         ∃ k ≤ {e : A | r ≤ e}.ncard * ({e : A | SatCl e ∧ c₀ ≤ e}.ncard *
@@ -1862,7 +1871,7 @@ theorem steps_hRounds {c₀ : A} (hmin : SatMinCl c₀) :
 /-! ### The verification phase -/
 
 /-- Verifying `c` rightwards and moving on to the next clause. -/
-theorem steps_hVerClauseR (M : A → Bool) {c c' : A} (hc : SatCl c)
+private theorem steps_hVerClauseR (M : A → Bool) {c c' : A} (hc : SatCl c)
     (hnext : SatNextCl c c') (hsat : ∃ y : A, MLit c y (M y)) :
     ∃ k ≤ bitRank tagTupleLe HPosn (posHEnd : HV A),
       (hornMachine A).StepsIn k (confHVerR M c (posHCell botA))
@@ -1874,7 +1883,7 @@ theorem steps_hVerClauseR (M : A → Bool) {c c' : A} (hc : SatCl c)
   omega
 
 /-- Verifying `c` leftwards and moving on to the next clause. -/
-theorem steps_hVerClauseL (M : A → Bool) {c c' : A} (hc : SatCl c)
+private theorem steps_hVerClauseL (M : A → Bool) {c c' : A} (hc : SatCl c)
     (hnext : SatNextCl c c') (hsat : ∃ y : A, MLit c y (M y)) :
     ∃ k ≤ bitRank tagTupleLe HPosn (posHEnd : HV A),
       (hornMachine A).StepsIn k (confHVerL M c (posHCell topA))
@@ -1886,7 +1895,7 @@ theorem steps_hVerClauseL (M : A → Bool) {c c' : A} (hc : SatCl c)
   omega
 
 /-- Verifying the last clause rightwards, and accepting. -/
-theorem steps_hVerClauseAccR (M : A → Bool) {c : A} (hc : SatCl c)
+private theorem steps_hVerClauseAccR (M : A → Bool) {c : A} (hc : SatCl c)
     (hmax : SatMaxCl c) (hhorn : AtMostOnePositive A) (hsat : ∃ y : A, MLit c y (M y)) :
     ∃ k ≤ bitRank tagTupleLe HPosn (posHEnd : HV A), ∃ cfin : Config (HV A),
       (hornMachine A).StepsIn k (confHVerR M c (posHCell botA)) cfin ∧
@@ -1898,7 +1907,7 @@ theorem steps_hVerClauseAccR (M : A → Bool) {c : A} (hc : SatCl c)
   omega
 
 /-- Verifying the last clause leftwards, and accepting. -/
-theorem steps_hVerClauseAccL (M : A → Bool) {c : A} (hc : SatCl c)
+private theorem steps_hVerClauseAccL (M : A → Bool) {c : A} (hc : SatCl c)
     (hmax : SatMaxCl c) (hhorn : AtMostOnePositive A) (hsat : ∃ y : A, MLit c y (M y)) :
     ∃ k ≤ bitRank tagTupleLe HPosn (posHEnd : HV A), ∃ cfin : Config (HV A),
       (hornMachine A).StepsIn k (confHVerL M c (posHCell topA)) cfin ∧
@@ -1913,7 +1922,7 @@ theorem steps_hVerClauseAccL (M : A → Bool) {c : A} (hc : SatCl c)
 the marks, so the sweeps run through and the machine accepts after the last
 one – the SAT machine's clause induction, verbatim, with the marks as
 valuation. -/
-theorem hVer_accepts (M : A → Bool) (hhorn : AtMostOnePositive A)
+private theorem hVer_accepts (M : A → Bool) (hhorn : AtMostOnePositive A)
     (hsat : ∀ e : A, SatCl e → ∃ y : A, MLit e y (M y)) :
     ∀ c : A, SatCl c →
       (∃ (n : ℕ) (cfin : Config (HV A)),
@@ -1952,7 +1961,7 @@ theorem hVer_accepts (M : A → Bool) (hhorn : AtMostOnePositive A)
 /-! ### The machine accepts every Horn-satisfiable instance -/
 
 /-- The final marks are exactly the propagation closure. -/
-theorem roundFold_marks_eq_forced {c₀ : A} (hmin : SatMinCl c₀) {M' : A → Bool}
+private theorem roundFold_marks_eq_forced {c₀ : A} (hmin : SatMinCl c₀) {M' : A → Bool}
     (h : RoundFold c₀ botA (fun _ => false) M') :
     ∀ x : A, M' x = true ↔ Forced x := by
   classical
@@ -2051,7 +2060,7 @@ theorem hornMachine_final (hhorn : AtMostOnePositive A) (hsat : Satisfiable A) :
 
 /-- **The machine accepts every yes-instance of HORN-SAT**, within the
 budget. -/
-theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable A) :
+private theorem hornMachine_accepts_of (hhorn : AtMostOnePositive A) (hsat : Satisfiable A) :
     (hornMachine A).Accepts := by
   obtain ⟨cfin, n, -, hn, hs, hacc, -⟩ := hornMachine_final hhorn hsat
   exact ⟨confHInit, cfin, n, isInit_confHInit, hn, hs, hacc⟩
@@ -2066,19 +2075,19 @@ because the trajectory gets stuck at the first failing verification sweep. -/
 
 /-- No transition applies in an accepting state: once accepted, the machine
 halts, so an accepting run cannot be a strict prefix of another. -/
-theorem hTag_no_stateTag_qAcc : ∀ t : UPTag, isHTrTag t → hStateTag t ≠ UPTag.qAcc := by
+private theorem hTag_no_stateTag_qAcc : ∀ t : UPTag, isHTrTag t → hStateTag t ≠ UPTag.qAcc := by
   decide
 
 /-- No transition applies in a failed verification state on a marker: the run
 dies there. -/
-theorem hTag_verFalse_no_marker : ∀ (t : UPTag) (d : Bool), isHTrTag t →
+private theorem hTag_verFalse_no_marker : ∀ (t : UPTag) (d : Bool), isHTrTag t →
     hStateTag t = UPTag.qVer false d →
     hReadTag t ≠ UPTag.sStart ∧ hReadTag t ≠ UPTag.sEnd := by
   decide
 
 /-- The only transitions into an accepting state are the two accept
 transitions. -/
-theorem hDst_acc_cases {τ q : HV A} (hd : HDst τ q) (hq : q.1 = UPTag.qAcc) :
+private theorem hDst_acc_cases {τ q : HV A} (hd : HDst τ q) (hq : q.1 = UPTag.qAcc) :
     τ.1 = UPTag.tInitAcc ∨ ∃ d : Bool, τ.1 = UPTag.tVerAcc d := by
   obtain ⟨t, w⟩ := τ
   cases t <;> dsimp only [HDst] at hd
@@ -2109,7 +2118,7 @@ theorem hDst_acc_cases {τ q : HV A} (hd : HDst τ q) (hq : q.1 = UPTag.qAcc) :
     exact UPTag.noConfusion hq
 
 /-- **A failed rightward verification sweep is stuck** at the right marker. -/
-theorem no_step_verR_false (M : A → Bool) {c : A}
+private theorem no_step_verR_false (M : A → Bool) {c : A}
     (hflag : verFlagR M c (posHEnd : HV A) = false) (d : Config (HV A)) :
     ¬ (hornMachine A).Step (confHVerR M c posHEnd) d := by
   rintro ⟨τ, hτ, hsrc, hread, -, -, -, -⟩
@@ -2120,7 +2129,7 @@ theorem no_step_verR_false (M : A → Bool) {c : A}
   exact (hTag_verFalse_no_marker τ.1 true (hTr_isHTrTag hτ) hst).2 (hRead_tag hread).symm
 
 /-- **A failed leftward verification sweep is stuck** at the left marker. -/
-theorem no_step_verL_false (M : A → Bool) {c : A}
+private theorem no_step_verL_false (M : A → Bool) {c : A}
     (hflag : verFlagL M c (posHStart : HV A) = false) (d : Config (HV A)) :
     ¬ (hornMachine A).Step (confHVerL M c posHStart) d := by
   rintro ⟨τ, hτ, hsrc, hread, -, -, -, -⟩
@@ -2133,7 +2142,7 @@ theorem no_step_verL_false (M : A → Bool) {c : A}
 /-- **The trajectory of an unsatisfiable Horn instance gets stuck**: the
 verification sweeps run through the satisfied clauses and die at the first
 failing one, in a configuration that is not accepting and admits no step. -/
-theorem hVer_stuck (M : A → Bool) {cf : A} (hcf : SatCl cf)
+private theorem hVer_stuck (M : A → Bool) {cf : A} (hcf : SatCl cf)
     (hfail : ¬ ∃ y : A, MLit cf y (M y)) :
     ∀ c : A, SatCl c → c ≤ cf →
       (∀ e : A, SatCl e → c ≤ e → e < cf → ∃ y : A, MLit e y (M y)) →
@@ -2177,7 +2186,7 @@ theorem hVer_stuck (M : A → Bool) {cf : A} (hcf : SatCl cf)
 
 /-- **Correctness of the unit-propagation machine**: it accepts exactly the
 yes-instances of HORN-SAT. -/
-theorem hornMachine_accepts_iff :
+private theorem hornMachine_accepts_iff :
     (hornMachine A).Accepts ↔ HornSatisfiable A := by
   classical
   constructor

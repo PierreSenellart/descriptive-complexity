@@ -11,6 +11,9 @@ import DescriptiveComplexity.FixedPointOrderTransfer
 public import DescriptiveComplexity.Counting
 import DescriptiveComplexity.Vocabulary
 import Mathlib.Algebra.BigOperators.Finprod
+import all DescriptiveComplexity.FixedPointOrderTransfer
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Machine.DetRun
 
 /-!
 # The number written by a machine: definition
@@ -92,7 +95,7 @@ open Classical in
 /-- **A step is possible** exactly when some transition applies in the
 current state to the symbol under the head, and can fire: it has a
 destination, a written symbol, and a neighbor in its direction. -/
-theorem exists_step_iff (c : Config A) :
+private theorem exists_step_iff (c : Config A) :
     (∃ e, M.Step c e) ↔ ∃ τ, M.Tr τ ∧ M.Src τ c.state ∧ M.Read τ (c.tape c.head) ∧
       (∃ q, M.Dst τ q) ∧ (∃ a, M.Write τ a) ∧
         ((M.Right τ ∧ ∃ p, SuccPos M.Le M.Posn c.head p) ∨
@@ -114,7 +117,7 @@ theorem exists_step_iff (c : Config A) :
     · exact ⟨_, key p (Or.inr ⟨hr, hp⟩)⟩
 
 /-- Halting transports along an equivalence. -/
-theorem Agree.halts {B : Type} {u : B ≃ A} {N : TMData B} (h : Agree u N M) (c : Config B) :
+private theorem Agree.halts {B : Type} {u : B ≃ A} {N : TMData B} (h : Agree u N M) (c : Config B) :
     N.Halts c ↔ M.Halts (c.map u) := by
   have hcard : Nat.card {b : B // N.Posn b} = Nat.card {a : A // M.Posn a} :=
     Nat.card_congr (u.subtypeEquiv fun b => h.posn b)
@@ -129,7 +132,7 @@ theorem Agree.halts {B : Type} {u : B ≃ A} {N : TMData B} (h : Agree u N M) (c
       fun e he => hstuck (e.map u) (h.step.mp he)⟩
 
 /-- Agreements compose. -/
-theorem Agree.trans {B C : Type} {u : B ≃ A} {v : C ≃ B} {N : TMData B} {K : TMData C}
+private theorem Agree.trans {B C : Type} {u : B ≃ A} {v : C ≃ B} {N : TMData B} {K : TMData C}
     (h₁ : Agree v K N) (h₂ : Agree u N M) : Agree (v.trans u) K M where
   posn b := (h₁.posn b).trans (h₂.posn _)
   le b b' := (h₁.le b b').trans (h₂.le _ _)
@@ -201,7 +204,8 @@ section Iso
 
 variable {A B : Type} [Language.turingOut.Structure A] [Language.turingOut.Structure B]
 
-theorem outDigit_equiv (e : A ≃[Language.turingOut] B) (p : A) : OutDigit (e p) ↔ OutDigit p := by
+private theorem outDigit_equiv
+    (e : A ≃[Language.turingOut] B) (p : A) : OutDigit (e p) ↔ OutDigit p := by
   have hag := agree_of_equiv (reductSumInlEquiv e)
   have hone : ∀ (c : Config B), (RelMap mnOne ![c.tape (e p)] : Prop) ↔
       RelMap mnOne ![(c.map (reductSumInlEquiv e).symm.toEquiv).tape p] := by
@@ -217,12 +221,12 @@ theorem outDigit_equiv (e : A ≃[Language.turingOut] B) (p : A) : OutDigit (e p
     obtain ⟨d, rfl⟩ := Config.map_surjective (reductSumInlEquiv e).symm.toEquiv c
     exact ⟨d, (hag.halts d).mpr hc, (hag.acc _).mpr ha, (hone d).mpr h1⟩
 
-theorem lowerCell_equiv (e : A ≃[Language.turingOut] B) (p q : A) :
+private theorem lowerCell_equiv (e : A ≃[Language.turingOut] B) (p q : A) :
     LowerCell (e p) (e q) ↔ LowerCell p q :=
   and_congr (relMap_equiv₁ e mnOut q).symm
     (and_congr e.toEquiv.injective.ne_iff (relMap_equiv₂ e mnLe q p).symm)
 
-theorem cellRank_equiv (e : A ≃[Language.turingOut] B) (p : A) :
+private theorem cellRank_equiv (e : A ≃[Language.turingOut] B) (p : A) :
     cellRank (e p) = cellRank p :=
   (Nat.card_congr (e.toEquiv.subtypeEquiv fun q => (lowerCell_equiv e p q).symm)).symm
 

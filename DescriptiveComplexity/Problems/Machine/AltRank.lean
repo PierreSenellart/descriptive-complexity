@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Machine.AltGame
 import DescriptiveComplexity.Problems.Machine.Program
 import DescriptiveComplexity.Problems.Machine.Walk
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Machine.AltGame
+import all DescriptiveComplexity.Problems.Machine.Program
 
 /-!
 # Walking the positions, and reading a play off a walk
@@ -113,7 +116,7 @@ theorem posSeq_spec {t p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁
     omega
 
 /-- Consecutive positions of the enumeration are immediate successors. -/
-theorem posSeq_succPos {t p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁) {j : ℕ}
+private theorem posSeq_succPos {t p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁) {j : ℕ}
     (hj : j < bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn t) :
     SuccPos M.Le M.Posn (M.posSeq t j) (M.posSeq t (j + 1)) := by
   obtain ⟨hp, hr⟩ := posSeq_spec hlin ht hmax j (by omega)
@@ -123,7 +126,7 @@ theorem posSeq_succPos {t p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p
 
 /-- The enumeration reaches the highest position exactly at the end of the
 budget. -/
-theorem posSeq_budget {t p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁) :
+private theorem posSeq_budget {t p₁ : A} (ht : M.Posn t) (hmax : MaxPos M.Le M.Posn p₁) :
     M.posSeq t (bitRank M.Le M.Posn p₁ - bitRank M.Le M.Posn t) = p₁ := by
   have hrp₁ : bitRank M.Le M.Posn t ≤ bitRank M.Le M.Posn p₁ :=
     TMData.bitRank_le_of_le (M := M.toTMData) hlin ht (hmax.2 t ht)
@@ -142,7 +145,7 @@ sequence leaves the block, it accepts, it gets stuck – and up to there it is a
 is that it takes a genuine step whenever none of the four has happened, which
 is what both a legal walk and the greedy continuation of
 `DescriptiveComplexity.ATMData.greedy` provide. -/
-theorem exists_play_of_seq {i : ℕ} {c : Config A} {g : ℕ → Config A} (n : ℕ)
+private theorem exists_play_of_seq {i : ℕ} {c : Config A} {g : ℕ → Config A} (n : ℕ)
     (hg0 : g 0 = c)
     (hgstep : ∀ j, j < n → M.Blk i (g j).state → ¬M.Acc (g j).state → ¬M.Stuck (g j) →
       M.Step (g j) (g (j + 1))) :
@@ -180,7 +183,7 @@ theorem exists_play_of_seq {i : ℕ} {c : Config A} {g : ℕ → Config A} (n : 
 
 omit [Finite A] in
 /-- **A play depends only on its first `ℓ + 1` configurations.** -/
-theorem BlockPlay.congr {i : ℕ} {c : Config A} {ℓ : ℕ} {f g : ℕ → Config A}
+private theorem BlockPlay.congr {i : ℕ} {c : Config A} {ℓ : ℕ} {f g : ℕ → Config A}
     (h : ∀ j, j ≤ ℓ → f j = g j) (hf : M.BlockPlay i c ℓ f) : M.BlockPlay i c ℓ g := by
   refine ⟨by rw [← h 0 (Nat.zero_le _)]; exact hf.1, fun j hj => ?_, fun j hj => ?_⟩
   · rw [← h j (Nat.le_of_lt hj), ← h (j + 1) hj]

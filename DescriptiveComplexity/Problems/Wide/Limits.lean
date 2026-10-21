@@ -64,7 +64,7 @@ its input channel or not at all (stated in
 `DescriptiveComplexity.Problems.Wide`): a program that lays a register file has
 to write, at each register, a name that separates it from the others, and the
 only place a name can come from is the control. -/
-theorem card_ctl_lt_card_univ [Nonempty W]
+private theorem card_ctl_lt_card_univ [Nonempty W]
     (hpl : Nat.card Q + Nat.card W ≤ dd) (hA : 2 ≤ Nat.card A) :
     Nat.card (Q → A) < Nat.card (Univ A R P K dd) := by
   have hQW : Nat.card Q < dd := by

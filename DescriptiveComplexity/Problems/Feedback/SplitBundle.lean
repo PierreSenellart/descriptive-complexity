@@ -98,7 +98,7 @@ def FS (S : A → Prop) : SB A → SB A → Prop
   | _, _ => False
 
 /-- The internal arcs of a set of vertices are as many as the set. -/
-theorem ncard_internal (P : A → Prop) :
+private theorem ncard_internal (P : A → Prop) :
     {p : SB A × SB A | ∃ a, P a ∧ p = (.vin a, .vout a)}.ncard = {a | P a}.ncard := by
   have h : {p : SB A × SB A | ∃ a, P a ∧ p = (.vin a, .vout a)} =
       (fun a => ((SB.vin a, SB.vout a) : SB A × SB A)) '' {a | P a} := by
@@ -110,7 +110,7 @@ theorem ncard_internal (P : A → Prop) :
       exact ⟨a, ha, rfl⟩
   rw [h, Set.ncard_image_of_injective _ fun a b hab => SB.vin.inj (congrArg Prod.fst hab)]
 
-theorem fs_iff (S : A → Prop) (p : SB A × SB A) :
+private theorem fs_iff (S : A → Prop) (p : SB A × SB A) :
     FS S p.1 p.2 ↔ ∃ a, ¬S a ∧ p = (.vin a, .vout a) := by
   obtain ⟨u, v⟩ := p
   constructor
@@ -124,7 +124,7 @@ theorem fs_iff (S : A → Prop) (p : SB A × SB A) :
     rw [hp.1, hp.2]
     exact ⟨rfl, ha⟩
 
-theorem smark_iff (hK : ∃ z, K z) (p : SB A × SB A) :
+private theorem smark_iff (hK : ∃ z, K z) (p : SB A × SB A) :
     SMark K p.1 p.2 ↔ ∃ a, ¬K a ∧ p = (.vin a, .vout a) := by
   obtain ⟨u, v⟩ := p
   constructor
@@ -138,7 +138,7 @@ theorem smark_iff (hK : ∃ z, K z) (p : SB A × SB A) :
     rw [hp.1, hp.2]
     exact ⟨hK, rfl, ha⟩
 
-theorem ncard_smark (hK : ∃ z, K z) :
+private theorem ncard_smark (hK : ∃ z, K z) :
     {p : SB A × SB A | SMark K p.1 p.2}.ncard = {a | ¬K a}.ncard := by
   rw [← ncard_internal fun a => ¬K a]
   exact congrArg Set.ncard (Set.ext fun p => smark_iff K hK p)
@@ -150,14 +150,14 @@ variable [Finite A]
 open Classical in
 /-- The rank certifying that cutting the internal arcs outside a clique leaves
 an acyclic graph. -/
-noncomputable def rk (S : A → Prop) : SB A → ℤ
+private noncomputable def rk (S : A → Prop) : SB A → ℤ
   | .vin a => if S a then 0 else 3
   | .vout a => if S a then 1 else -2
   | .mid _ a _ => if S a then 2 else -1
 
 /-- **The internal arcs outside a clique of the threshold size are a feedback
 arc set of the threshold size.** -/
-theorem fas_of_clique (hK : ∃ z, K z) {S : A → Prop} (hS : CliqueOfSizeOn Adj K S) :
+private theorem fas_of_clique (hK : ∃ z, K z) {S : A → Prop} (hS : CliqueOfSizeOn Adj K S) :
     FasOfSizeOn (SArc Adj K) (SMark K) (FS S) := by
   classical
   refine ⟨fun u v h => ?_, ?_, ?_⟩
@@ -194,7 +194,7 @@ theorem fas_of_clique (hK : ∃ z, K z) {S : A → Prop} (hS : CliqueOfSizeOn Ad
 /-! ### From a feedback arc set to a clique -/
 
 /-- The vertex and the path an arc of a bundle belongs to. -/
-def bundleOf : SB A × SB A → Option (A × Bool)
+private def bundleOf : SB A × SB A → Option (A × Bool)
   | (.mid j a _, _) => some (a, j)
   | (_, .mid j a _) => some (a, j)
   | _ => none

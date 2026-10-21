@@ -83,14 +83,14 @@ def ForcedIn : ℕ → A → Prop
 is the least model of the implications. -/
 def Forced (x : A) : Prop := ∃ n, ForcedIn n x
 
-theorem forcedIn_succ {n : ℕ} {x : A} (h : ForcedIn n x) : ForcedIn (n + 1) x := by
+private theorem forcedIn_succ {n : ℕ} {x : A} (h : ForcedIn n x) : ForcedIn (n + 1) x := by
   induction n generalizing x with
   | zero => exact h.elim
   | succ n ih =>
     obtain ⟨c, hc, hp, hneg⟩ := h
     exact ⟨c, hc, hp, fun y hy => ih (hneg y hy)⟩
 
-theorem forcedIn_le {m n : ℕ} (hmn : m ≤ n) {x : A} (h : ForcedIn m x) : ForcedIn n x := by
+private theorem forcedIn_le {m n : ℕ} (hmn : m ≤ n) {x : A} (h : ForcedIn m x) : ForcedIn n x := by
   induction n with
   | zero => rwa [Nat.le_zero.mp hmn] at h
   | succ n ih =>
@@ -99,18 +99,18 @@ theorem forcedIn_le {m n : ℕ} (hmn : m ≤ n) {x : A} (h : ForcedIn m x) : For
     · rwa [heq] at h
 
 /-- The stage at which a variable becomes forced. -/
-noncomputable def dep (x : A) : ℕ := sInf {n | ForcedIn n x}
+private noncomputable def dep (x : A) : ℕ := sInf {n | ForcedIn n x}
 
-theorem forcedIn_dep {x : A} (h : Forced x) : ForcedIn (dep x) x :=
+private theorem forcedIn_dep {x : A} (h : Forced x) : ForcedIn (dep x) x :=
   Nat.sInf_mem h
 
-theorem dep_le {n : ℕ} {x : A} (h : ForcedIn n x) : dep x ≤ n :=
+private theorem dep_le {n : ℕ} {x : A} (h : ForcedIn n x) : dep x ≤ n :=
   Nat.sInf_le h
 
 /-- Every forced variable is forced by a clause whose negative literals are
 forced *strictly earlier*: the propagation closure is derivation-closed along
 the stage order. -/
-theorem derivClosed_forced (x : A) (hx : Forced x) :
+private theorem derivClosed_forced (x : A) (hx : Forced x) :
     ∃ c : A, RelMap satIsClause ![c] ∧ RelMap satPosIn ![c, x] ∧
       ∀ y : A, RelMap satNegIn ![c, y] → Forced y ∧ dep y < dep x := by
   have h := forcedIn_dep hx
@@ -127,7 +127,7 @@ theorem derivClosed_forced (x : A) (hx : Forced x) :
 
 /-- On a finite structure the stages stabilize: one stage forces everything
 that is forced at all. -/
-theorem exists_forcedIn_bound [Finite A] :
+private theorem exists_forcedIn_bound [Finite A] :
     ∃ N : ℕ, ∀ x : A, Forced x → ForcedIn N x := by
   classical
   have := Fintype.ofFinite A
@@ -189,7 +189,7 @@ theorem forced_subset_model [Finite A] (hhorn : AtMostOnePositive A) {ν : A →
 
 /-- A clause whose negative literals are all forced forces its positive
 literal. -/
-theorem forced_of_allNeg [Finite A] {c x : A} (hc : RelMap satIsClause ![c])
+private theorem forced_of_allNeg [Finite A] {c x : A} (hc : RelMap satIsClause ![c])
     (hp : RelMap satPosIn ![c, x]) (hall : ∀ y : A, RelMap satNegIn ![c, y] → Forced y) :
     Forced x := by
   obtain ⟨N, hN⟩ := exists_forcedIn_bound (A := A)
@@ -197,7 +197,7 @@ theorem forced_of_allNeg [Finite A] {c x : A} (hc : RelMap satIsClause ![c])
 
 /-- The certificate exists exactly for the formulas that are not
 yes-instances of HORN-SAT. -/
-theorem not_hornSatisfiable_iff [Finite A] :
+private theorem not_hornSatisfiable_iff [Finite A] :
     ¬HornSatisfiable A ↔
       ¬AtMostOnePositive A ∨
         ∃ R : A → A → Prop, ∃ T : A → Prop,
@@ -224,7 +224,7 @@ theorem not_hornSatisfiable_iff [Finite A] :
 
 /-- The Horn condition fails exactly when some clause has two distinct
 positive literals. -/
-theorem not_atMostOnePositive_iff :
+private theorem not_atMostOnePositive_iff :
     ¬AtMostOnePositive A ↔ ∃ c x y : A, RelMap satIsClause ![c] ∧
       RelMap satPosIn ![c, x] ∧ RelMap satPosIn ![c, y] ∧ x ≠ y := by
   rw [AtMostOnePositive]
@@ -337,28 +337,28 @@ abbrev uRSym : unsatSOLang.Relations 2 := Sum.inr ubRSym
 
 /-- Failure of the Horn condition: some clause has two distinct positive
 literals. -/
-noncomputable def notHornF : unsatSOLang.Sentence :=
+private noncomputable def notHornF : unsatSOLang.Sentence :=
   fo% ∃ c x y, ((uIsClSym(c) ∧ uPosSym(c, x)) ∧ uPosSym(c, y)) ∧ ¬ x ≐ y
 
 /-- The guessed order is irreflexive and transitive – on a finite structure,
 enough to make it well-founded. -/
-noncomputable def strictF : unsatSOLang.Sentence :=
+private noncomputable def strictF : unsatSOLang.Sentence :=
   fo% (∀ x, ¬ uRSym(x, x)) ∧ ∀ x y z, uRSym(x, y) ∧ uRSym(y, z) → uRSym(x, z)
 
 /-- Every element of the guessed set is derived by a clause whose negative
 literals lie in the set and are strictly earlier. -/
-noncomputable def derivF : unsatSOLang.Sentence :=
+private noncomputable def derivF : unsatSOLang.Sentence :=
   fo% ∀ x, uTSym(x) → ∃ c, (uIsClSym(c) ∧ uPosSym(c, x)) ∧
     ∀ y, uNegSym(c, y) → uTSym(y) ∧ uRSym(y, x)
 
 /-- Some clause has no positive literal and all its negative literals in the
 guessed set. -/
-noncomputable def goalF : unsatSOLang.Sentence :=
+private noncomputable def goalF : unsatSOLang.Sentence :=
   fo% ∃ c, (uIsClSym(c) ∧ ∀ y, uNegSym(c, y) → uTSym(y)) ∧ ∀ x, ¬ uPosSym(c, x)
 
 /-- The first-order kernel of the `Σ₁` definition of Horn unsatisfiability:
 either the Horn condition fails, or the guessed pair is a certificate. -/
-noncomputable def unsatKernel : unsatSOLang.Sentence :=
+private noncomputable def unsatKernel : unsatSOLang.Sentence :=
   notHornF ⊔ (strictF ⊓ derivF ⊓ goalF)
 
 /-! #### Realization of the kernel -/
@@ -473,7 +473,7 @@ end Realize
 
 /-- **The complement of HORN-SAT is `Σ₁`-definable**: guess the derivation
 order and the derived set, and check the certificate first-order. -/
-theorem hornSat_compl_sigmaSODefinable : SigmaSODefinable 1 HORNSATᶜ := by
+private theorem hornSat_compl_sigmaSODefinable : SigmaSODefinable 1 HORNSATᶜ := by
   refine ⟨[unsatBlock], rfl, unsatKernel, ?_⟩
   intro A _ _ _
   refine Iff.trans (not_hornSatisfiable_iff (A := A)) ?_
@@ -499,7 +499,7 @@ theorem hornSat_compl_mem_NP : HORNSATᶜ ∈ NP :=
 
 /-- **HORN-SAT is in coNP**: Horn unsatisfiability has a first-order checkable
 certificate. -/
-theorem hornSat_mem_coNP : HORNSAT ∈ coNP :=
+private theorem hornSat_mem_coNP : HORNSAT ∈ coNP :=
   (mem_piP_iff 1 HORNSAT).mpr hornSat_compl_mem_NP
 
 end SigmaOne

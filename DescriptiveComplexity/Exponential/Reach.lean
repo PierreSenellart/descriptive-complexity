@@ -9,6 +9,10 @@ public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.Exponential.Class
 public import DescriptiveComplexity.ImmermanSzelepcsenyi
 public import DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.Exponential.Copies
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.PSpace
+import all DescriptiveComplexity.Problems.Reachability
 
 /-!
 # An SO(TC) walk is reachability on an exponential expansion
@@ -84,12 +88,12 @@ def toExpStructure : Language.stGraph.Structure (spec.toExp.Map A) :=
 
 /-- The domain of `DescriptiveComplexity.SOTCSpec.toExp` is the whole space of
 tagged assignments: its domain sentence is `⊤`. -/
-theorem domHolds_toExp (p : spec.toExp.Point A) : ExpExpansion.DomHolds p := by
+private theorem domHolds_toExp (p : spec.toExp.Point A) : ExpExpansion.DomHolds p := by
   let := spec.toExp.B.structure₁ (L := L.sum Language.order) p.2
   exact Formula.realize_top.mpr trivial
 
 /-- **The points of the expansion are the states of the walk.** -/
-def toExpEquiv : spec.toExp.Map A ≃ spec.State A where
+private def toExpEquiv : spec.toExp.Map A ≃ spec.State A where
   toFun x := x.1.2
   invFun ρ := ⟨((), ρ), spec.domHolds_toExp A ((), ρ)⟩
   left_inv _ := ExpExpansion.map_ext rfl rfl
@@ -100,21 +104,21 @@ def toExpEquiv : spec.toExp.Map A ≃ spec.State A where
 variable {A}
 
 /-- **The edge symbol is the transition sentence.** -/
-theorem sgEdge_toExp (x y : spec.toExp.Map A) :
+private theorem sgEdge_toExp (x y : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     SGEdge x y ↔ spec.Step x.1.2 y.1.2 :=
   SOBlock.realize_twoLHom (L := L.sum Language.order) spec.B
     (fun i => ((![x, y] : Fin 2 → spec.toExp.Map A) i).1.2) spec.step
 
 /-- **The marked sources are the starting states.** -/
-theorem sgSource_toExp (x : spec.toExp.Map A) :
+private theorem sgSource_toExp (x : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     SGSource x ↔ spec.IsSrc x.1.2 :=
   SOBlock.realize_oneLHom (L := L.sum Language.order) spec.B
     (fun i => ((![x] : Fin 1 → spec.toExp.Map A) i).1.2) spec.src
 
 /-- **The marked targets are the accepting states.** -/
-theorem sgTarget_toExp (x : spec.toExp.Map A) :
+private theorem sgTarget_toExp (x : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     SGTarget x ↔ spec.IsTgt x.1.2 :=
   SOBlock.realize_oneLHom (L := L.sum Language.order) spec.B

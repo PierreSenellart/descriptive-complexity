@@ -117,7 +117,7 @@ inductive QClTag where
 /-- The tags of the interpretation: a variable tag or a clause tag. -/
 abbrev QTag : Type := QVarTag ⊕ QClTag
 
-def varIdx : QVarTag → Fin 10
+private def varIdx : QVarTag → Fin 10
   | .sS => 0
   | .sT => 1
   | .sZ => 2
@@ -132,7 +132,7 @@ def varIdx : QVarTag → Fin 10
 instance : Finite QVarTag :=
   Finite.of_injective varIdx (by intro x y h; cases x <;> cases y <;> simp_all [varIdx])
 
-def clIdx : QClTag → Fin 8 × Bool × Bool × Bool
+private def clIdx : QClTag → Fin 8 × Bool × Bool × Bool
   | .cSrc => (0, false, false, false)
   | .cTgt => (1, false, false, false)
   | .cStep => (2, false, false, false)
@@ -295,7 +295,7 @@ def levFst : QVarTag → Bool
 /-- **The key of a variable tag is injective**: the triples
 `(keyGrp, keySlot, keyOrd)` are pairwise distinct, which is what makes the
 prefix a linear order. -/
-theorem qKey_inj {v v' : QVarTag} (hg : keyGrp v = keyGrp v') (hs : keySlot v = keySlot v')
+private theorem qKey_inj {v v' : QVarTag} (hg : keyGrp v = keyGrp v') (hs : keySlot v = keySlot v')
     (ho : keyOrd v = keyOrd v') : v = v' := by
   revert hg hs ho
   cases v <;> cases v' <;> simp_all [keyGrp, keySlot, keyOrd]
@@ -329,10 +329,10 @@ def KeyLt (v : QVarTag) (p q : A) (v' : QVarTag) (p' q' : A) : Prop :=
 
 /-! #### The prefix is a strict linear order -/
 
-theorem tripleLt_irrefl (t : ℕ × A × ℕ) : ¬TripleLt t t := by
+private theorem tripleLt_irrefl (t : ℕ × A × ℕ) : ¬TripleLt t t := by
   rintro (h | ⟨-, h | ⟨-, h⟩⟩) <;> exact absurd h (lt_irrefl _)
 
-theorem tripleLt_trans {t t' t'' : ℕ × A × ℕ} (h : TripleLt t t') (h' : TripleLt t' t'') :
+private theorem tripleLt_trans {t t' t'' : ℕ × A × ℕ} (h : TripleLt t t') (h' : TripleLt t' t'') :
     TripleLt t t'' := by
   rcases h with h1 | ⟨he1, h2⟩ <;> rcases h' with h1' | ⟨he1', h2'⟩
   · exact Or.inl (h1.trans h1')
@@ -345,7 +345,8 @@ theorem tripleLt_trans {t t' t'' : ℕ × A × ℕ} (h : TripleLt t t') (h' : Tr
     · exact Or.inl (he3 ▸ h3')
     · exact Or.inr ⟨he3.trans he3', h4.trans h4'⟩
 
-theorem tripleLt_total {t t' : ℕ × A × ℕ} (hne : t ≠ t') : TripleLt t t' ∨ TripleLt t' t := by
+private theorem tripleLt_total
+    {t t' : ℕ × A × ℕ} (hne : t ≠ t') : TripleLt t t' ∨ TripleLt t' t := by
   rcases lt_trichotomy t.1 t'.1 with h | h | h
   · exact Or.inl (Or.inl h)
   · rcases lt_trichotomy t.2.1 t'.2.1 with h2 | h2 | h2
@@ -357,13 +358,13 @@ theorem tripleLt_total {t t' : ℕ × A × ℕ} (hne : t ≠ t') : TripleLt t t'
     · exact Or.inr (Or.inr ⟨h.symm, Or.inl h2⟩)
   · exact Or.inr (Or.inl h)
 
-theorem keyLt_irrefl (v : QVarTag) (p q : A) : ¬KeyLt v p q v p q := by
+private theorem keyLt_irrefl (v : QVarTag) (p q : A) : ¬KeyLt v p q v p q := by
   rintro (h | ⟨-, h | ⟨-, h⟩⟩)
   · exact tripleLt_irrefl _ h
   · exact absurd h (lt_irrefl _)
   · exact absurd h (lt_irrefl _)
 
-theorem keyLt_trans {v v' v'' : QVarTag} {p q p' q' p'' q'' : A}
+private theorem keyLt_trans {v v' v'' : QVarTag} {p q p' q' p'' q'' : A}
     (h : KeyLt v p q v' p' q') (h' : KeyLt v' p' q' v'' p'' q'') : KeyLt v p q v'' p'' q'' := by
   rcases h with h1 | ⟨he1, h2⟩ <;> rcases h' with h1' | ⟨he1', h2'⟩
   · exact Or.inl (tripleLt_trans h1 h1')
@@ -379,7 +380,7 @@ theorem keyLt_trans {v v' v'' : QVarTag} {p q p' q' p'' q'' : A}
 omit [LinearOrder A] in
 /-- **A variable is determined by its key together with its coordinates**: this
 is what makes distinct variables comparable. -/
-theorem eq_of_key_eq {v v' : QVarTag} {p q p' q' : A}
+private theorem eq_of_key_eq {v v' : QVarTag} {p q p' q' : A}
     (htr : keyTriple v p q = keyTriple v' p' q') (hs : keySec v p q = keySec v' p' q')
     (ho : keyOrd v = keyOrd v') : v = v' ∧ p = p' ∧ q = q' := by
   have hg : keyGrp v = keyGrp v' := congrArg Prod.fst htr
@@ -393,7 +394,7 @@ theorem eq_of_key_eq {v v' : QVarTag} {p q p' q' : A}
 
 /-- **The prefix is total on the variables**: two distinct variables are
 comparable. -/
-theorem keyLt_total {v v' : QVarTag} {p q p' q' : A} (hne : ¬(v = v' ∧ p = p' ∧ q = q')) :
+private theorem keyLt_total {v v' : QVarTag} {p q p' q' : A} (hne : ¬(v = v' ∧ p = p' ∧ q = q')) :
     KeyLt v p q v' p' q' ∨ KeyLt v' p' q' v p q := by
   by_cases htr : keyTriple v p q = keyTriple v' p' q'
   · rcases lt_trichotomy (keySec v p q) (keySec v' p' q') with h | h | h
@@ -406,12 +407,12 @@ theorem keyLt_total {v v' : QVarTag} {p q p' q' : A} (hne : ¬(v = v' ∧ p = p'
   · exact (tripleLt_total htr).imp Or.inl Or.inl
 
 /-- A variable of a block precedes every variable of a later block. -/
-theorem keyLt_of_tripleLt {v v' : QVarTag} {p q p' q' : A}
+private theorem keyLt_of_tripleLt {v v' : QVarTag} {p q p' q' : A}
     (h : TripleLt (keyTriple v p q) (keyTriple v' p' q')) : KeyLt v p q v' p' q' :=
   Or.inl h
 
 /-- Comparable variables have comparable block coordinates. -/
-theorem tripleLt_or_eq_of_keyLt {v v' : QVarTag} {p q p' q' : A}
+private theorem tripleLt_or_eq_of_keyLt {v v' : QVarTag} {p q p' q' : A}
     (h : KeyLt v p q v' p' q') :
     TripleLt (keyTriple v p q) (keyTriple v' p' q') ∨ keyTriple v p q = keyTriple v' p' q' :=
   h.imp id And.left

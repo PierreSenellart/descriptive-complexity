@@ -7,6 +7,12 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.NexEval
 public import DescriptiveComplexity.Problems.Wide.DrawIxEval
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawIxEval
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.NexEval
 
 /-!
 # The clocked spine at an arbitrary file
@@ -127,7 +133,7 @@ its own gates call for, and what the caller owes is only the marker, the
 mirror and the bottom mark – all of which the advance sets and every leg
 leaves alone. This is the form a sweep can use, since it visits junk
 addresses and gated ones alike. -/
-theorem nexIxSpineB_reachesIn
+private theorem nexIxSpineB_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (NexPh B (EvalPh dt.nv dt.PMF)) I)
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
     (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)
@@ -195,7 +201,7 @@ the accepting predicate reads is that machinery's, so the run has to reach
 it). This is the middle leg of
 `DescriptiveComplexity.Draw.Data.nexProg_wideAccept_of_legs`, at an arbitrary
 file and on a clock. -/
-theorem nexIxEvalB_reachesIn
+private theorem nexIxEvalB_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (NexPh B (EvalPh dt.nv dt.PMF)) I)
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
     (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)
@@ -271,7 +277,7 @@ above, and then the **output's** machinery – the one whose verdict bit the
 accepting predicate reads. What it asks for is what the output leg asks: the
 shape of the argument blocks at the state the spine leaves, the tags they
 name, the packs, and the verdict itself. -/
-theorem nexIxEvalOutB_reachesIn
+private theorem nexIxEvalOutB_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (NexPh B (EvalPh dt.nv dt.PMF)) I)
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
     (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)
@@ -387,7 +393,7 @@ open Classical in
 `nexIxEvalOutB_reachesIn` with the verdict not assumed – the run is the same and
 what changes is the bit the exit writes at the marker (`ixOutLeg_run_any`). This
 is the shape a backward reading uses. -/
-theorem nexIxEvalOutB_any_reachesIn
+private theorem nexIxEvalOutB_any_reachesIn
     (stOf : Fin (dt.nv + 1) → TapeSt dt A R (NexPh B (EvalPh dt.nv dt.PMF)) I)
     (fsOf : Fin (dt.nv + 1) → dt.CtlIx → A)
     (hwkOf : ∀ k, (stOf k).wk = fun r => r = v)

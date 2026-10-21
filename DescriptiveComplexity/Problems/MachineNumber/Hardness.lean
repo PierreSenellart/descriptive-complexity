@@ -10,6 +10,13 @@ public import DescriptiveComplexity.Problems.HornSat.Number
 public import DescriptiveComplexity.Problems.Machine.HornInterp
 public import DescriptiveComplexity.OrderedReorder
 import DescriptiveComplexity.Syntax
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.OrderedReorder
+import all DescriptiveComplexity.Problems.Machine.Hardness
+import all DescriptiveComplexity.Problems.Machine.HornHardness
+import all DescriptiveComplexity.Problems.Machine.HornInterp
+import all DescriptiveComplexity.Problems.MachineNumber.Defs
 
 /-!
 # The number written by unit propagation reduces to the number written by a machine
@@ -85,7 +92,7 @@ section VarOrd
 
 variable {A : Type} [Language.satOut.Structure A] [LinearOrder A]
 
-theorem realize_varOrdS : A ⊨ varOrdS ↔ VarOrder A := by
+private theorem realize_varOrdS : A ⊨ varOrdS ↔ VarOrder A := by
   rw [varOrdS, VarOrder, Sentence.Realize]
   simp only [Formula.realize_inf, Formula.realize_iAlls, Formula.realize_imp,
     Formula.realize_sup, Formula.realize_rel₁, Formula.realize_rel₂, Formula.realize_equal,
@@ -96,7 +103,7 @@ theorem realize_varOrdS : A ⊨ varOrdS ↔ VarOrder A := by
       (and_congr ⟨fun h a b => h (fun _ => a) fun _ => b, fun h i j => h (i 0) (j 0)⟩
         ⟨fun h a b => h (fun _ => a) fun _ => b, fun h i j => h (i 0) (j 0)⟩)))
 
-theorem realize_varOrdF {α : Type} (v : α → A) : (varOrdF α).Realize v ↔ VarOrder A := by
+private theorem realize_varOrdF {α : Type} (v : α → A) : (varOrdF α).Realize v ↔ VarOrder A := by
   rw [varOrdF, Formula.realize_relabel]
   exact (iff_of_eq (congrArg _ (Subsingleton.elim _ default))).trans realize_varOrdS
 
@@ -121,14 +128,14 @@ variable {A : Type} [Language.satOut.Structure A] [LinearOrder A]
 variable (A) in
 open Classical in
 /-- The new order, as a relation. -/
-def NewLe (x y : A) : Prop :=
+private def NewLe (x y : A) : Prop :=
   if VarOrder A then
     (RelMap hnOut ![x] ∧ RelMap hnOut ![y] ∧ RelMap hnBelow ![x, y]) ∨
       (RelMap hnOut ![x] ∧ ¬RelMap hnOut ![y]) ∨
         (¬RelMap hnOut ![x] ∧ ¬RelMap hnOut ![y] ∧ x ≤ y)
   else x ≤ y
 
-theorem realize_reordF (v : Fin 2 × Fin 1 → A) :
+private theorem realize_reordF (v : Fin 2 × Fin 1 → A) :
     reordF.Realize v ↔ NewLe A (v (0, 0)) (v (1, 0)) := by
   classical
   rw [reordF, NewLe]
@@ -141,7 +148,7 @@ theorem realize_reordF (v : Fin 2 × Fin 1 → A) :
     exact Iff.rfl
 
 variable (A) in
-theorem isLinOrd_newLe : IsLinOrd (NewLe A) := by
+private theorem isLinOrd_newLe : IsLinOrd (NewLe A) := by
   classical
   unfold IsLinOrd NewLe
   by_cases hv : VarOrder A
@@ -185,12 +192,13 @@ theorem isLinOrd_newLe : IsLinOrd (NewLe A) := by
 variable (A) in
 /-- **The new order of the instance.** -/
 @[instance_reducible]
-noncomputable def newOrder : LinearOrder A :=
+private noncomputable def newOrder : LinearOrder A :=
   (isLinOrd_newLe A).toLinearOrder
 
 /-- Under the new order, the output variables compare as `below` says, when
 `below` linearly orders them. -/
-theorem newLe_out (hv : VarOrder A) {x y : A} (hx : RelMap hnOut ![x]) (hy : RelMap hnOut ![y]) :
+private theorem newLe_out
+    (hv : VarOrder A) {x y : A} (hx : RelMap hnOut ![x]) (hy : RelMap hnOut ![y]) :
     NewLe A y x ↔ RelMap hnBelow ![y, x] := by
   classical
   simp only [NewLe, hv, ite_true, hx, hy, true_and, not_true_eq_false, and_false, false_and,
@@ -231,7 +239,7 @@ variable {A : Type} [Language.satOut.Structure A] [LinearOrder A] [Finite A] [No
 omit [Finite A] [Nonempty A] in
 /-- The machine part of the interpreted structure is the unit-propagation
 machine's. -/
-theorem relMap_inl {n : ℕ} (r : Language.turing.Relations n) (xs : Fin n → HV A) :
+private theorem relMap_inl {n : ℕ} (r : Language.turing.Relations n) (xs : Fin n → HV A) :
     RelMap (M := numTuringInterp.Map A) (L := Language.turing) r xs ↔
       RelMap (M := hornTuringInterp.Map A) r xs :=
   LHom.realize_onFormula satOutHom _
@@ -240,7 +248,7 @@ theorem relMap_inl {n : ℕ} (r : Language.turing.Relations n) (xs : Fin n → H
 def numMapEquiv : HV A ≃ numTuringInterp.Map A := Equiv.refl (HV A)
 
 /-- **The interpreted structure describes the unit-propagation machine.** -/
-theorem agree_num :
+private theorem agree_num :
     TMData.Agree (numMapEquiv (A := A)) (hornMachine A) (tmData (numTuringInterp.Map A)) := by
   have h : TMData.Agree (Equiv.refl (HV A)) (tmData (hornTuringInterp.Map A))
       (tmData (numTuringInterp.Map A)) :=
@@ -287,13 +295,13 @@ theorem relMap_one (a : HV A) :
       | exact iff_of_true (Formula.realize_top.mpr trivial) rfl
 
 /-- The cells of the variables are in the order of the variables. -/
-theorem relMap_le_cell (y x : A) :
+private theorem relMap_le_cell (y x : A) :
     RelMap (M := numTuringInterp.Map A) mnLe ![cellPt y, cellPt x] ↔ y ≤ x :=
   ((agree_num (A := A)).le (posHCell y) (posHCell x)).symm.trans posHCell_le_iff
 
 /-- The output cells are the cells of the output variables, when these are
 linearly ordered. -/
-theorem out_iff (p : numTuringInterp.Map A) :
+private theorem out_iff (p : numTuringInterp.Map A) :
     RelMap (M := numTuringInterp.Map A) mnOut ![p] ↔
       VarOrder A ∧ ∃ x : A, p = cellPt x ∧ RelMap hnOut ![x] := by
   refine (relMap_out (A := A) p).trans ⟨?_, ?_⟩
@@ -307,7 +315,7 @@ theorem out_iff (p : numTuringInterp.Map A) :
 
 /-- A machine with an output cell has its output variables linearly
 ordered. -/
-theorem varOrder_of_out {p : numTuringInterp.Map A}
+private theorem varOrder_of_out {p : numTuringInterp.Map A}
     (h : RelMap (M := numTuringInterp.Map A) mnOut ![p]) : VarOrder A :=
   ((out_iff p).mp h).1
 
@@ -317,7 +325,8 @@ theorem cellPt_injective : Function.Injective (cellPt (A := A)) := fun _ _ h =>
 
 /-- **The digits of the machine are the forced output variables** of a
 satisfiable Horn formula whose output variables are linearly ordered. -/
-theorem outDigit_iff (hs : HornSatisfiable A) (hv : VarOrder A) (p : numTuringInterp.Map A) :
+private theorem outDigit_iff
+    (hs : HornSatisfiable A) (hv : VarOrder A) (p : numTuringInterp.Map A) :
     OutDigit p ↔ ∃ x : A, p = cellPt x ∧ ForcedDigit x := by
   have hag := agree_num (A := A)
   obtain ⟨cfin, n, M', hn, hrun, hacc, htape, hM'⟩ := hornMachine_final hs.1 hs.2
@@ -342,7 +351,7 @@ theorem outDigit_iff (hs : HornSatisfiable A) (hv : VarOrder A) (p : numTuringIn
       (hag.acc _).mp hacc, (hone x).mpr hf⟩
 
 /-- A machine that writes a digit accepts. -/
-theorem hornSatisfiable_of_outDigit {p : numTuringInterp.Map A} (h : OutDigit p) :
+private theorem hornSatisfiable_of_outDigit {p : numTuringInterp.Map A} (h : OutDigit p) :
     HornSatisfiable A := by
   have hag := agree_num (A := A)
   obtain ⟨-, c, hc, hacc, -⟩ := h
@@ -353,7 +362,7 @@ theorem hornSatisfiable_of_outDigit {p : numTuringInterp.Map A} (h : OutDigit p)
 /-- The output cells before the cell of a variable are the cells of the
 output variables before it, when the output variables are linearly
 ordered. -/
-theorem lowerCell_iff (hv : VarOrder A) (x : A) (q : numTuringInterp.Map A) :
+private theorem lowerCell_iff (hv : VarOrder A) (x : A) (q : numTuringInterp.Map A) :
     LowerCell (cellPt x) q ↔ ∃ y : A, q = cellPt y ∧ RelMap hnOut ![y] ∧ y ≠ x ∧ y ≤ x := by
   constructor
   · rintro ⟨ho, hne, hb⟩
@@ -366,7 +375,7 @@ theorem lowerCell_iff (hv : VarOrder A) (x : A) (q : numTuringInterp.Map A) :
 /-- **The rank of the cell of an output variable is the rank of the
 variable**, when the order of the instance compares the output variables as
 `below` does. -/
-theorem cellRank_cellPt (hv : VarOrder A)
+private theorem cellRank_cellPt (hv : VarOrder A)
     (hB : ∀ x y : A, RelMap hnOut ![x] → RelMap hnOut ![y] → (RelMap hnBelow ![y, x] ↔ y ≤ x))
     {x : A} (hx : RelMap hnOut ![x]) : cellRank (cellPt x) = varRank x := by
   rw [cellRank, varRank]
@@ -383,7 +392,7 @@ theorem cellRank_cellPt (hv : VarOrder A)
 open Classical in
 /-- **The machine writes the number written by unit propagation**, when the
 order of the instance compares the output variables as `below` does. -/
-theorem machineNumber_numTuringInterp
+private theorem machineNumber_numTuringInterp
     (hB : VarOrder A → ∀ x y : A, RelMap hnOut ![x] → RelMap hnOut ![y] →
       (RelMap hnBelow ![y, x] ↔ y ≤ x)) :
     machineNumber (numTuringInterp.Map A) = hornNumber A := by
@@ -425,7 +434,8 @@ end Correct
 a machine**: the instance reordered so that its output variables come first,
 in the order of significance, then the unit-propagation machine with the
 cells of the output variables as its output. -/
-noncomputable def hornNumber_ordered_parsimonious_dtmNumber : HornNumber ≤ᵖ[≤] DTMNumber where
+private noncomputable def hornNumber_ordered_parsimonious_dtmNumber
+    : HornNumber ≤ᵖ[≤] DTMNumber where
   Tag := UPTag × (Fin 3 → Unit)
   dim := 3 * 1
   toInterpretation := numTuringInterp.comp (FOInterpretation.reorder reordF)

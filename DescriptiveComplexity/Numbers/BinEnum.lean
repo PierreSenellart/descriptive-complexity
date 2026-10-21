@@ -95,7 +95,7 @@ theorem binNum_eq_of_testBit (h : BinEnum Le Posn e) (w : ℕ) (hw : w < 2 ^ N) 
   by_cases hp : w.testBit (p : ℕ) <;> simp [binEncode, hb p, hp]
 
 /-- The universe `Fin N`, every element a position, in its own order. -/
-theorem fin {Le : Fin N → Fin N → Prop} (hle : ∀ a b, Le a b ↔ a ≤ b) :
+private theorem fin {Le : Fin N → Fin N → Prop} (hle : ∀ a b, Le a b ↔ a ≤ b) :
     BinEnum Le (fun _ => True) (id : Fin N → Fin N) where
   injective := Function.injective_id
   posn_iff q := ⟨fun _ => ⟨q, rfl⟩, fun _ => trivial⟩

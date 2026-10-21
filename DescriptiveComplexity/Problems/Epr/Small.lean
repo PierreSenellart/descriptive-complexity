@@ -58,10 +58,10 @@ open Classical in
 /-- **The instance, mapped into a model**: the witness of an existential
 variable, and a fixed element elsewhere. Its image is the subuniverse the
 sentence can speak of. -/
-noncomputable def collapse (ε : A → M) (m₀ : M) : A → M :=
+private noncomputable def collapse (ε : A → M) (m₀ : M) : A → M :=
   fun x => if EVarG x then ε x else m₀
 
-theorem collapse_eVar {ε : A → M} {m₀ : M} {x : A} (h : EVarG x) :
+private theorem collapse_eVar {ε : A → M} {m₀ : M} {x : A} (h : EVarG x) :
     collapse ε m₀ x = ε x := by
   classical
   rw [collapse, ite_eq_left h]
@@ -69,7 +69,7 @@ theorem collapse_eVar {ε : A → M} {m₀ : M} {x : A} (h : EVarG x) :
 /-- **The collapse commutes with the two environments**: the value a variable
 takes when it stands for itself, mapped into the model, is the value it takes
 in the model. -/
-theorem collapse_val (ε : A → M) (m₀ : M) (u : A → A) (x : A) :
+private theorem collapse_val (ε : A → M) (m₀ : M) (u : A → A) (x : A) :
     collapse ε m₀ (eprVal (fun y => y) u x) =
       eprVal ε (fun y => collapse ε m₀ (u y)) x := by
   classical
@@ -82,10 +82,10 @@ open Classical in
 /-- **The arguments of a literal, as an assignment of its positions**: the
 value of the variable the encoding names there, when every variable stands for
 itself. Well-formedness makes the choice unambiguous. -/
-noncomputable def argAssign (u : A → A) (l : A) : A → A :=
+private noncomputable def argAssign (u : A → A) (l : A) : A → A :=
   fun p => if h : ∃ x, ArgG l p x then eprVal (fun y : A => y) u h.choose else u p
 
-theorem argAssign_eq (hwf : IsWF A) (u : A → A) {l p x : A} (h : ArgG l p x) :
+private theorem argAssign_eq (hwf : IsWF A) (u : A → A) {l p x : A} (h : ArgG l p x) :
     argAssign u l p = eprVal (fun y : A => y) u x := by
   classical
   have hex : ∃ x, ArgG l p x := ⟨x, h⟩
@@ -122,13 +122,13 @@ theorem selfModel_of_eprSatOn (hwf : IsWF A) (h : EprSatOn A) : SelfModel A := b
 
 /-- **And a model on the instance is a model**: the instance is a finite
 nonempty universe like any other. -/
-theorem eprSatOn_of_selfModel [Finite A] [Nonempty A] (h : SelfModel A) : EprSatOn A := by
+private theorem eprSatOn_of_selfModel [Finite A] [Nonempty A] (h : SelfModel A) : EprSatOn A := by
   obtain ⟨I, ε, hlocal, hsat⟩ := h
   exact ⟨A, inferInstance, inferInstance, I, ε, hlocal, hsat⟩
 
 /-- **The small-model property**: a well-formed instance is satisfiable exactly
 when it is satisfiable on its own universe. -/
-theorem eprSatOn_iff_selfModel [Finite A] [Nonempty A] (hwf : IsWF A) :
+private theorem eprSatOn_iff_selfModel [Finite A] [Nonempty A] (hwf : IsWF A) :
     EprSatOn A ↔ SelfModel A :=
   ⟨selfModel_of_eprSatOn hwf, eprSatOn_of_selfModel⟩
 

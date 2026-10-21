@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Exponential.Translate
 public import DescriptiveComplexity.PSpaceHierarchy
+import all DescriptiveComplexity.Hierarchy
 
 /-!
 # Every first-order property of an expansion is in the polynomial hierarchy
@@ -50,7 +51,7 @@ variable (φ : (X.E.sum Language.order).Sentence) (P : DecisionProblem L)
 quantifiers of the sentence become second-order quantifier blocks over the base
 (`DescriptiveComplexity.ExpExpansion.exists_translate`), two per quantifier, and
 the order the expansion's sentences read is guessed inside the first block. -/
-theorem mem_PH_of_fo_on_expansion
+private theorem mem_PH_of_fo_on_expansion
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       letI := X.mapLinearOrder A
       (P A ↔ @Sentence.Realize _ (X.Map A) _ φ)) :

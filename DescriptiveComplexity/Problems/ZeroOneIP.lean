@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Problems.ZeroOneIP.Membership
 import DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 public import DescriptiveComplexity.Problems.Knapsack
 import DescriptiveComplexity.Hierarchy
+import all DescriptiveComplexity.Problems.ZeroOneIP.Hardness
 
 /-!
 # 0-1 integer programming

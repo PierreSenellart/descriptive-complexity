@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Invariant.Pebble
 public import Mathlib.ModelTheory.Semantics
+import all DescriptiveComplexity.Invariant.Pebble
 
 /-!
 # `k`-variable equivalence over a structure
@@ -86,7 +87,7 @@ abbrev atomicAgree (L : Language.{0, 0}) (A : Type) [L.Structure A] (k : ℕ) :
   atomicAgreeOn (Set.univ : Set (Σ n, L.Relations n)) A k
 
 /-- Agreement on the atomic type is an equivalence. -/
-theorem atomicAgreeOn_equivalence [L.Structure A] {S : Set (Σ n, L.Relations n)} :
+private theorem atomicAgreeOn_equivalence [L.Structure A] {S : Set (Σ n, L.Relations n)} :
     Equivalence (atomicAgreeOn S A k) where
   refl _ := ⟨fun _ _ => Iff.rfl, fun _ _ _ => Iff.rfl⟩
   symm h := ⟨fun i j => (h.1 i j).symm, fun R hR g => (h.2 R hR g).symm⟩
@@ -101,7 +102,7 @@ theorem equivK_atomicAgreeOn_equivalence [L.Structure A]
 
 /-- Agreement on the atomic type passes to pair substructures: selecting,
 permuting and repeating coordinate pairs preserves it. -/
-theorem atomicAgreeOn_of_pairSub [L.Structure A] {S : Set (Σ n, L.Relations n)}
+private theorem atomicAgreeOn_of_pairSub [L.Structure A] {S : Set (Σ n, L.Relations n)}
     {x y u v : Fin k → A} (hsub : ∀ j, ∃ i, x j = u i ∧ y j = v i)
     (h : atomicAgreeOn S A k u v) : atomicAgreeOn S A k x y := by
   choose I hI using hsub
@@ -167,7 +168,7 @@ def relsOf {α : Type*} : ∀ {n : ℕ}, L.BoundedFormula α n → Set (Σ n, L.
   | _, .all f => relsOf f
 
 /-- A formula mentions finitely many relation symbols. -/
-theorem relsOf_finite {α : Type*} :
+private theorem relsOf_finite {α : Type*} :
     ∀ {n : ℕ} (φ : L.BoundedFormula α n), (relsOf φ).Finite
   | _, .falsum => Set.finite_empty
   | _, .equal _ _ => Set.finite_empty
@@ -176,7 +177,7 @@ theorem relsOf_finite {α : Type*} :
   | _, .all f => relsOf_finite f
 
 /-- A formula's relation symbols lie in the set of its relation symbols. -/
-theorem relsIn_relsOf {α : Type*} :
+private theorem relsIn_relsOf {α : Type*} :
     ∀ {n : ℕ} (φ : L.BoundedFormula α n), RelsIn (relsOf φ) φ
   | _, .falsum => trivial
   | _, .equal _ _ => trivial
@@ -200,7 +201,7 @@ section Snoc
 
 variable {n : ℕ} {h : Fin n → Fin k} {p : Fin k}
 
-theorem snoc_injective (hinj : Function.Injective h)
+private theorem snoc_injective (hinj : Function.Injective h)
     (hp : ∀ j, h j ≠ p) : Function.Injective (Fin.snoc h p : Fin (n + 1) → Fin k) := by
   intro j₁ j₂ heq
   induction j₁ using Fin.lastCases with
@@ -219,7 +220,7 @@ theorem snoc_injective (hinj : Function.Injective h)
       rw [Fin.snoc_castSucc, Fin.snoc_castSucc] at heq
       exact congrArg Fin.castSucc (hinj heq)
 
-theorem image_snoc_subset :
+private theorem image_snoc_subset :
     Finset.image (Fin.snoc h p : Fin (n + 1) → Fin k) Finset.univ ⊆
       insert p (Finset.image h Finset.univ) := by
   intro y hy

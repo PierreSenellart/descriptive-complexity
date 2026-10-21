@@ -51,7 +51,7 @@ fo_block cliqueGuessBlock over Language.markedGraph mg into cliqueSOLang with k 
 unary relation is a clique – any two distinct members are adjacent – and the
 guessed binary relation maps every marked element to some clique member,
 injectively. -/
-noncomputable def cliqueKernel : cliqueSOLang.Sentence :=
+private noncomputable def cliqueKernel : cliqueSOLang.Sentence :=
   fo% (∀ x y, (kCliqueSym(x) ∧ kCliqueSym(y)) ∧ ¬ x ≐ y → kAdjSym(x, y)) ∧
     (∀ x, kMarkedSym(x) → ∃ y, kInjSym(x, y) ∧ kCliqueSym(y)) ∧
     ∀ x x' y, kInjSym(x, y) ∧ kInjSym(x', y) → x ≐ x'

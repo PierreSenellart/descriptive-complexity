@@ -11,6 +11,8 @@ public import DescriptiveComplexity.Problems.Machine.HaltHard.Bridge
 public import DescriptiveComplexity.Computability.Eval
 public import Mathlib.Tactic.Ring.RingNF
 public import Mathlib.Data.List.GetD
+import all DescriptiveComplexity.Computability.Eval
+import all DescriptiveComplexity.Computability.FinStruct
 
 /-!
 # The input chain: getting the instance into the machine
@@ -62,7 +64,7 @@ def natOfBits : List Bool → ℕ
   | b :: l => b.toNat + 2 * natOfBits l
 
 /-- The digits of `natOfBits` are the listed bits. -/
-theorem digitAt_natOfBits : ∀ (l : List Bool) (j : ℕ),
+private theorem digitAt_natOfBits : ∀ (l : List Bool) (j : ℕ),
     digitAt 2 (natOfBits l) j = (l.getD j false).toNat := by
   intro l
   induction l with
@@ -100,7 +102,7 @@ theorem foldl_two_reverse : ∀ (l : List Bool) (acc : ℕ),
 
 /-- Reading a flattened list of rows at a prefix-sum offset reads inside the
 row. -/
-theorem flatten_getD {α : Type} (d : α) : ∀ (l : List (List α)) (i : ℕ)
+private theorem flatten_getD {α : Type} (d : α) : ∀ (l : List (List α)) (i : ℕ)
     (_ : i < l.length) {t : ℕ}, t < (l.getD i []).length →
     l.flatten.getD ((((l.take i).map List.length).sum) + t) d = (l.getD i []).getD t d := by
   intro l
@@ -121,7 +123,7 @@ theorem flatten_getD {α : Type} (d : α) : ∀ (l : List (List α)) (i : ℕ)
       exact ih i (by simpa using hi) ht
 
 /-- Reading every position of a list back through `getD` is the list. -/
-theorem range_map_getD {α : Type} (l : List α) (d : α) :
+private theorem range_map_getD {α : Type} (l : List α) (d : α) :
     (List.range l.length).map (fun t => l.getD t d) = l := by
   refine List.ext_getElem (by simp) ?_
   intro j h1 h2
@@ -139,7 +141,7 @@ def offB (c : ℕ) : ℕ → ℕ
   | i + 1 => offB c i + (if h : i < V.numSyms then c ^ V.arity ⟨i, h⟩ else 0)
 
 /-- The offsets are the prefix sums of the row lengths. -/
-theorem offB_eq_sum (c : ℕ) : ∀ i : ℕ, i ≤ V.numSyms →
+private theorem offB_eq_sum (c : ℕ) : ∀ i : ℕ, i ≤ V.numSyms →
     offB V c i = (((List.finRange V.numSyms).take i).map fun i' => c ^ V.arity i').sum := by
   intro i
   induction i with
@@ -163,7 +165,7 @@ def structOfBits (k N : ℕ) : FinStruct V :=
       decide (digitAt 2 N (offB V (k + 1) i + t) = 1)⟩
 
 /-- Reading a Boolean digit back. -/
-theorem decide_toNat_eq_one (b : Bool) : decide (b.toNat = 1) = b := by
+private theorem decide_toNat_eq_one (b : Bool) : decide (b.toNat = 1) = b := by
   cases b <;> rfl
 
 /-- **The roundtrip**: decoding the number of the flattened table of a
@@ -210,7 +212,7 @@ theorem structOfBits_flatten (s : FinStruct V)
 
 /-- The tables of `FirstOrder.Language.FinStruct.ofEquiv` are well-shaped:
 one row per symbol. -/
-theorem length_table_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
+private theorem length_table_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
     [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)]
     (k : ℕ) (e : Fin (k + 1) ≃ A) :
     (FinStruct.ofEquiv V k e).table.length = V.numSyms := by
@@ -218,7 +220,7 @@ theorem length_table_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
 
 /-- The rows of `FirstOrder.Language.FinStruct.ofEquiv` have the lengths the
 offsets expect. -/
-theorem length_row_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
+private theorem length_row_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
     [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)]
     (k : ℕ) (e : Fin (k + 1) ≃ A) (i : Fin V.numSyms) :
     ((FinStruct.ofEquiv V k e).table.getD i []).length =
@@ -235,7 +237,7 @@ theorem length_row_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
 
 /-- **Decoding the folded table of an instance gives the instance's concrete
 presentation.** -/
-theorem structOfBits_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
+private theorem structOfBits_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
     [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)]
     (k : ℕ) (e : Fin (k + 1) ≃ A) :
     structOfBits V k (natOfBits (FinStruct.ofEquiv V k e).table.flatten) =
@@ -244,7 +246,7 @@ theorem structOfBits_ofEquiv [L.IsRelational] {A : Type} [L.Structure A]
 
 /-! ### The decoder is primitive recursive -/
 
-theorem primrec_offB (i : ℕ) : Primrec fun c : ℕ => offB V c i := by
+private theorem primrec_offB (i : ℕ) : Primrec fun c : ℕ => offB V c i := by
   induction i with
   | zero => exact Primrec.const 0
   | succ i ih =>
@@ -263,7 +265,7 @@ theorem primrec_offB (i : ℕ) : Primrec fun c : ℕ => offB V c i := by
       exact ih
 
 /-- Powers of two are primitive recursive in the exponent. -/
-theorem primrec_two_pow : Primrec fun x : ℕ => 2 ^ x := by
+private theorem primrec_two_pow : Primrec fun x : ℕ => 2 ^ x := by
   have h : Primrec fun x : ℕ => (fun y : ℕ => 2 * y)^[x] 1 :=
     Primrec.nat_iterate Primrec.id (Primrec.const 1)
       ((Primrec.nat_mul.comp (Primrec.const 2) Primrec.snd).to₂)
@@ -300,13 +302,14 @@ theorem primrec_structOfBits : Primrec fun p : ℕ × ℕ => structOfBits V p.1 
 /-- The code pushing a `1` in front of the value: `v ↦ 1 :: v`. -/
 def pushOne : Code := .cons (.comp .succ .zero') Code.id
 
-theorem eval_pushOne (v : List ℕ) : pushOne.eval v = pure (1 :: v) := by
+private theorem eval_pushOne (v : List ℕ) : pushOne.eval v = pure (1 :: v) := by
   simp [pushOne, Code.eval]
 
 /-- The code pushing a bit. -/
 def pushBit (b : Bool) : Code := if b then pushOne else .zero'
 
-theorem eval_pushBit (b : Bool) (v : List ℕ) : (pushBit b).eval v = pure (b.toNat :: v) := by
+private theorem eval_pushBit
+    (b : Bool) (v : List ℕ) : (pushBit b).eval v = pure (b.toNat :: v) := by
   cases b
   · simp [pushBit]
   · rw [pushBit, ite_eq_left rfl, eval_pushOne]
@@ -384,7 +387,7 @@ def inputChain : List Bool → PCont (allCode cF cP)
   | b :: bits => .comp (posBit cF cP b) (.comp (posFold cF cP) (inputChain bits))
 
 /-- Evaluating a pending composition is composing the evaluations. -/
-theorem cont_eval_comp (f : Code) (k : Cont) (v : List ℕ) :
+private theorem cont_eval_comp (f : Code) (k : Cont) (v : List ℕ) :
     (Cont.comp f k).eval v = f.eval v >>= fun w => k.eval w := rfl
 
 /-- The frame region of the chain: a run of bare `comp` headers. -/
@@ -400,7 +403,7 @@ theorem frameSeg_inputChain : ∀ bits : List Bool,
 include hF in
 /-- Evaluating the chain folds the bits and hands the result to the
 procedure. -/
-theorem cont_eval_inputChain : ∀ (bits : List Bool) (acc n : ℕ),
+private theorem cont_eval_inputChain : ∀ (bits : List Bool) (acc n : ℕ),
     (inputChain cF cP bits).toCont.eval [acc, n] =
       cP.eval [bits.foldl (fun a b => 2 * a + b.toNat) acc, n] := by
   intro bits
@@ -434,7 +437,7 @@ variable {V}
 open Nat.Partrec' in
 /-- **The two codes of the chain exist**: a fold code, and a code whose
 halting on the folded number and the size decides the problem. -/
-theorem exists_chain_codes [L.IsRelational] (P : DecisionProblem L)
+private theorem exists_chain_codes [L.IsRelational] (P : DecisionProblem L)
     (h : REPred (P.toPred V)) :
     ∃ cF cP : Code, (∀ v : List.Vector ℕ 3, cF.eval v.1 = pure <$> foldSpec v) ∧
       ∀ N n : ℕ, ((cP.eval [N, n]).Dom ↔ P.toPred V (structOfBits V (n - 1) N)) := by

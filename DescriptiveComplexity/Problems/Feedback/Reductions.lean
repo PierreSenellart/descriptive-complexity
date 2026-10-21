@@ -7,6 +7,7 @@ module
 
 import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Feedback.Defs
+import all DescriptiveComplexity.Problems.Feedback.Defs
 
 /-!
 # Hardness of the feedback problems
@@ -110,7 +111,7 @@ private theorem symmetrize_hK :
   exact symmetrize_marked w
 
 /-- Correctness of the symmetrizing interpretation. -/
-theorem hasSmallVertexCover_iff_feedback_map :
+private theorem hasSmallVertexCover_iff_feedback_map :
     HasSmallVertexCover A ↔ HasSmallFeedbackSet (symmetrizeInterp.Map A) := by
   refine and_congr ((symmetrizeInterp.mapEquivSelf A).finite_iff).symm ?_
   rw [coverOn_iff_feedbackOn]
@@ -122,7 +123,7 @@ end SymmetrizeCorrectness
 /-- **Vertex Cover FO-reduces to Feedback Vertex Set**, by symmetrizing the
 adjacency relation: every edge becomes a 2-cycle, so the feedback vertex sets
 are exactly the vertex covers. -/
-def vertexCover_fo_reduction_feedbackVertexSet : VertexCover ≤ᶠᵒ FeedbackVertexSet where
+private def vertexCover_fo_reduction_feedbackVertexSet : VertexCover ≤ᶠᵒ FeedbackVertexSet where
   Tag := Unit
   dim := 1
   toInterpretation := symmetrizeInterp
@@ -158,19 +159,19 @@ section Copies
 variable {A : Type}
 
 /-- The in-copy of a vertex in the split digraph. -/
-def inPt (v : A) : splitInterp.Map A := (true, fun _ => v)
+private def inPt (v : A) : splitInterp.Map A := (true, fun _ => v)
 
 /-- The out-copy of a vertex in the split digraph. -/
-def outPt (v : A) : splitInterp.Map A := (false, fun _ => v)
+private def outPt (v : A) : splitInterp.Map A := (false, fun _ => v)
 
-theorem inPt_injective : Function.Injective (inPt (A := A)) := by
+private theorem inPt_injective : Function.Injective (inPt (A := A)) := by
   intro v v' h
   exact congrArg (fun p : Bool × (Fin 1 → A) => p.2 0) h
 
-theorem inPt_eta (w : Fin 1 → A) : ((true, w) : splitInterp.Map A) = inPt (w 0) :=
+private theorem inPt_eta (w : Fin 1 → A) : ((true, w) : splitInterp.Map A) = inPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
-theorem outPt_eta (w : Fin 1 → A) : ((false, w) : splitInterp.Map A) = outPt (w 0) :=
+private theorem outPt_eta (w : Fin 1 → A) : ((false, w) : splitInterp.Map A) = outPt (w 0) :=
   Prod.ext_iff.mpr ⟨rfl, funext fun i => congrArg w (Subsingleton.elim i 0)⟩
 
 end Copies
@@ -238,15 +239,15 @@ constructors and the two “only these” lemmas, which never mention the shape 
 an element of the interpreted universe. -/
 
 /-- The internal arc of a vertex. -/
-theorem split_adj_internal (v : A) : MAGAdj (inPt v) (outPt v) :=
+private theorem split_adj_internal (v : A) : MAGAdj (inPt v) (outPt v) :=
   (split_adj_in_out (A := A) (fun _ => v) fun _ => v).mpr rfl
 
 /-- The crossing arc attached to an arc of the input. -/
-theorem split_adj_crossing {u v : A} (h : MGAdj u v) : MAGAdj (outPt u) (inPt v) :=
+private theorem split_adj_crossing {u v : A} (h : MGAdj u v) : MAGAdj (outPt u) (inPt v) :=
   (split_adj_out_in (A := A) (fun _ => u) fun _ => v).mpr h
 
 /-- The arcs of the split digraph are the internal and the crossing ones. -/
-theorem split_adj_cases {p q : splitInterp.Map A} (h : MAGAdj p q) :
+private theorem split_adj_cases {p q : splitInterp.Map A} (h : MAGAdj p q) :
     (∃ v, p = inPt v ∧ q = outPt v) ∨ ∃ u v, p = outPt u ∧ q = inPt v ∧ MGAdj u v := by
   rcases p with ⟨(_ | _), w⟩ <;> rcases q with ⟨(_ | _), w'⟩
   · exact absurd h (split_adj_out_out w w')
@@ -257,7 +258,7 @@ theorem split_adj_cases {p q : splitInterp.Map A} (h : MAGAdj p q) :
 
 /-- The marked arcs of the split digraph are the internal arcs of the marked
 vertices. -/
-theorem split_marked_cases {p q : splitInterp.Map A} (h : MAGMarked p q) :
+private theorem split_marked_cases {p q : splitInterp.Map A} (h : MAGMarked p q) :
     ∃ v, MGMarked v ∧ p = inPt v ∧ q = outPt v := by
   rcases p with ⟨(_ | _), w⟩ <;> rcases q with ⟨(_ | _), w'⟩
   · exact absurd h (split_marked_out_out w w')
@@ -267,7 +268,7 @@ theorem split_marked_cases {p q : splitInterp.Map A} (h : MAGMarked p q) :
   · exact absurd h (split_marked_in_in w w')
 
 /-- The internal arc of a marked vertex is marked. -/
-theorem split_marked_internal {v : A} (h : MGMarked v) : MAGMarked (inPt v) (outPt v) :=
+private theorem split_marked_internal {v : A} (h : MGMarked v) : MAGMarked (inPt v) (outPt v) :=
   (split_marked_in_out (A := A) (fun _ => v) fun _ => v).mpr ⟨rfl, h⟩
 
 end SplitCharacterizations
@@ -280,7 +281,7 @@ variable {A : Type}
 
 /-- A relation on the split universe that only holds of internal arcs encodes
 the same number as the set of vertices whose internal arc it holds of. -/
-theorem ncard_internal_eq (P : A → Prop)
+private theorem ncard_internal_eq (P : A → Prop)
     (Q : splitInterp.Map A × splitInterp.Map A → Prop)
     (hshape : ∀ pq, Q pq → ∃ v, pq = (inPt v, outPt v))
     (hP : ∀ v : A, Q (inPt v, outPt v) ↔ P v) :
@@ -307,20 +308,20 @@ variable {A : Type}
 
 /-- The arcs cut by the interpretation for a set `C` of vertices: the internal
 arcs of the members of `C`. -/
-def cutArcs (C : A → Prop) (p q : splitInterp.Map A) : Prop :=
+private def cutArcs (C : A → Prop) (p q : splitInterp.Map A) : Prop :=
   ∃ v, C v ∧ p = inPt v ∧ q = outPt v
 
 open Classical in
 /-- The level of a copy in the order built from a feedback vertex set: the
 out-copies of removed vertices go to the bottom, their in-copies to the top,
 everything else in between. -/
-noncomputable def splitLvl (C : A → Prop) (p : splitInterp.Map A) : ℕ :=
+private noncomputable def splitLvl (C : A → Prop) (p : splitInterp.Map A) : ℕ :=
   if C (p.2 0) then (if p.1 then 2 else 0) else 1
 
 /-- The order on the split digraph built from a certificate order of the
 input: levels first, then the input order, with the in-copy of a vertex just
 below its out-copy. -/
-noncomputable def splitLt (C : A → Prop) (Lt : A → A → Prop)
+private noncomputable def splitLt (C : A → Prop) (Lt : A → A → Prop)
     (p q : splitInterp.Map A) : Prop :=
   splitLvl C p < splitLvl C q ∨
     (splitLvl C p = 1 ∧ splitLvl C q = 1 ∧
@@ -370,7 +371,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 /-- Correctness of the vertex splitting: a graph has a feedback vertex set at
 most as large as its marked set iff the split digraph has a feedback arc set
 at most as large as its marked relation. -/
-theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
+private theorem hasSmallFeedbackSet_iff_feedbackArc_map (A : Type)
     [Language.markedGraph.Structure A] :
     HasSmallFeedbackSet A ↔ HasSmallFeedbackArcSet (splitInterp.Map A) := by
   have hmarked : ∀ [Finite A],
@@ -453,7 +454,7 @@ end SplitCorrectness
 
 /-- **Feedback Vertex Set FO-reduces to Feedback Arc Set**, by vertex
 splitting: deleting a vertex becomes cutting its internal arc. -/
-def feedbackVertexSet_fo_reduction_feedbackArcSet :
+private def feedbackVertexSet_fo_reduction_feedbackArcSet :
     FeedbackVertexSet ≤ᶠᵒ FeedbackArcSet where
   Tag := Bool
   dim := 1

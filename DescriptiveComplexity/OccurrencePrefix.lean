@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # Prefix valuations: the chain of a clause, with determined links
@@ -45,7 +46,7 @@ open Language Structure
 variable {A : Type} [Language.sat.Structure A] [LinearOrder A]
 
 /-- An occurrence has at most one immediate predecessor. -/
-theorem succOcc_left_unique {c y₁ y₂ x : A} {t₁ t₂ s : Bool}
+private theorem succOcc_left_unique {c y₁ y₂ x : A} {t₁ t₂ s : Bool}
     (h₁ : SuccOcc c y₁ t₁ x s) (h₂ : SuccOcc c y₂ t₂ x s) : y₁ = y₂ ∧ t₁ = t₂ := by
   rcases occLt_trichotomy y₁ t₁ y₂ t₂ with h | h | h
   · exact absurd ⟨h, h₂.2.2.1⟩ (h₁.2.2.2 y₂ t₂ h₂.1)

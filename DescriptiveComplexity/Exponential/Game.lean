@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.Exponential.Classes
 public import DescriptiveComplexity.Problems.Game
+import all DescriptiveComplexity.Exponential.Copies
+import all DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # A second-order alternating game is GAME on an exponential expansion
@@ -166,12 +168,12 @@ def toExpStructure : Language.andOrGraph.Structure (spec.toExp.Map A) :=
 
 /-- The domain of `DescriptiveComplexity.SOGameSpec.toExp` is the whole space of
 tagged assignments: its domain sentence is `⊤`. -/
-theorem domHolds_toExp (p : spec.toExp.Point A) : ExpExpansion.DomHolds p := by
+private theorem domHolds_toExp (p : spec.toExp.Point A) : ExpExpansion.DomHolds p := by
   let := spec.toExp.B.structure₁ (L := L.sum Language.order) p.2
   exact Formula.realize_top.mpr trivial
 
 /-- **The points of the expansion are the states of the game.** -/
-def toExpEquiv : spec.toExp.Map A ≃ spec.State A where
+private def toExpEquiv : spec.toExp.Map A ≃ spec.State A where
   toFun x := x.1.2
   invFun ρ := ⟨((), ρ), spec.domHolds_toExp A ((), ρ)⟩
   left_inv _ := ExpExpansion.map_ext rfl rfl
@@ -182,28 +184,28 @@ def toExpEquiv : spec.toExp.Map A ≃ spec.State A where
 variable {A}
 
 /-- **The move symbol is the move sentence.** -/
-theorem agMove_toExp (x y : spec.toExp.Map A) :
+private theorem agMove_toExp (x y : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     AGMove x y ↔ spec.Move x.1.2 y.1.2 :=
   SOBlock.realize_twoLHom (L := L.sum Language.order) spec.B
     (fun i => ((![x, y] : Fin 2 → spec.toExp.Map A) i).1.2) spec.move
 
 /-- **The universal nodes are the universal states.** -/
-theorem agUniv_toExp (x : spec.toExp.Map A) :
+private theorem agUniv_toExp (x : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     AGUniv x ↔ spec.IsUniv x.1.2 :=
   SOBlock.realize_oneLHom (L := L.sum Language.order) spec.B
     (fun i => ((![x] : Fin 1 → spec.toExp.Map A) i).1.2) spec.univ
 
 /-- **The nodes that win outright are the states that do.** -/
-theorem agWon_toExp (x : spec.toExp.Map A) :
+private theorem agWon_toExp (x : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     AGWon x ↔ spec.IsWon x.1.2 :=
   SOBlock.realize_oneLHom (L := L.sum Language.order) spec.B
     (fun i => ((![x] : Fin 1 → spec.toExp.Map A) i).1.2) spec.won
 
 /-- **The marked starts are the starting states.** -/
-theorem agStart_toExp (x : spec.toExp.Map A) :
+private theorem agStart_toExp (x : spec.toExp.Map A) :
     letI := spec.toExpStructure A
     AGStart x ↔ spec.IsStart x.1.2 :=
   SOBlock.realize_oneLHom (L := L.sum Language.order) spec.B

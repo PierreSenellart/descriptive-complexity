@@ -145,7 +145,7 @@ theorem relMap_equiv₂ (e : A ≃[L] B) (r : L.Relations 2) (a b : A) :
   exact h.symm
 
 /-- A ternary relation transports along an `L`-isomorphism. -/
-theorem relMap_equiv₃ (e : A ≃[L] B) (r : L.Relations 3) (a b c : A) :
+private theorem relMap_equiv₃ (e : A ≃[L] B) (r : L.Relations 3) (a b c : A) :
     RelMap r ![a, b, c] ↔ RelMap r ![e a, e b, e c] := by
   have h := StrongHomClass.map_rel e r ![a, b, c]
   have hv : e ∘ ![a, b, c] = ![e a, e b, e c] := by

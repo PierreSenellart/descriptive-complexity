@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Invariant.Structure
 public import DescriptiveComplexity.FixedPointPartial
 import DescriptiveComplexity.Composition
+import all DescriptiveComplexity.FixedPointStep
+import all DescriptiveComplexity.Invariant.EquivK
+import all DescriptiveComplexity.Invariant.Structure
 
 /-!
 # Simulating a `k`-variable induction on the invariant structure
@@ -73,7 +76,7 @@ all `k` pebbles (fixing the pebbles beyond the atom's arity). -/
 def blockSel {l : ℕ} (sel : Fin l → Fin k) : Fin k → Fin k :=
   fun q => if hq : (q : ℕ) < l then sel ⟨q.1, hq⟩ else q
 
-theorem blockSel_castLE {l : ℕ} (sel : Fin l → Fin k) {a : ℕ} (ha : a ≤ k)
+private theorem blockSel_castLE {l : ℕ} (sel : Fin l → Fin k) {a : ℕ} (ha : a ≤ k)
     (hal : a = l) (j : Fin a) :
     blockSel sel (Fin.castLE ha j) = sel (Fin.cast hal j) := by
   rw [blockSel, dite_eq_left (show ((Fin.castLE ha j : Fin k) : ℕ) < l from hal ▸ j.isLt)]
@@ -130,7 +133,7 @@ variable [L.Structure A] [Finite A]
 variable {X : (classBlock B).Assignment (InvMap S k A)}
 
 omit [L.IsRelational] in
-private theorem realize_rearrBody (σ : Fin k → Fin k) (i : B.ι)
+theorem realize_rearrBody (σ : Fin k → Fin k) (i : B.ι)
     (val c : Fin 1 → InvMap S k A) :
     (@Formula.Realize _ (InvMap S k A)
       ((classBlock B).structure₁ (L := invLang L k) X) _
@@ -145,7 +148,7 @@ private theorem realize_rearrBody (σ : Fin k → Fin k) (i : B.ι)
   exact Iff.rfl
 
 omit [L.IsRelational] in
-private theorem realize_subAtom (p : Fin k) (val c : Fin 1 → InvMap S k A) :
+theorem realize_subAtom (p : Fin k) (val c : Fin 1 → InvMap S k A) :
     (@Formula.Realize _ (InvMap S k A)
       ((classBlock B).structure₁ (L := invLang L k) X) _
       (Relations.formula (invRelSym L k B (.sub p))
@@ -451,7 +454,7 @@ private theorem qdepth_mapTermRelFin0 {L' : Language.{0, 0}} :
   | all ψ ih =>
     simp only [BoundedFormula.mapTermRel, qdepth, id_eq, ih]
 
-theorem qdepth_sentenceFin0 {L' : Language.{0, 0}} (φ : L'.Sentence) :
+private theorem qdepth_sentenceFin0 {L' : Language.{0, 0}} (φ : L'.Sentence) :
     qdepth (sentenceFin0 φ) = qdepth φ :=
   qdepth_mapTermRelFin0 φ
 
@@ -469,12 +472,12 @@ private theorem relsIn_mapTermRelFin0 {L' : Language.{0, 0}}
   | imp f₁ f₂ ih₁ ih₂ => exact ⟨ih₁ h.1, ih₂ h.2⟩
   | all ψ ih => exact ih h
 
-theorem relsIn_sentenceFin0 {L' : Language.{0, 0}}
+private theorem relsIn_sentenceFin0 {L' : Language.{0, 0}}
     {S' : Set (Σ n, L'.Relations n)} {φ : L'.Sentence} (h : RelsIn S' φ) :
     RelsIn S' (sentenceFin0 φ) :=
   relsIn_mapTermRelFin0 h
 
-theorem realize_sentenceFin0 {L' : Language.{0, 0}} {M : Type}
+private theorem realize_sentenceFin0 {L' : Language.{0, 0}} {M : Type}
     {instM : L'.Structure M} (φ : L'.Sentence) (v : Fin 0 → M) :
     (@Formula.Realize L' M instM _ (sentenceFin0 φ) v) ↔
       @Sentence.Realize L' M instM φ := by
@@ -506,7 +509,7 @@ def invAssign {B : SOBlock} (S : Set (Σ n, L.Relations n)) {A : Type}
   fun i x => ∃ w : Fin k → A, x 0 = InvMap.mk S w ∧
     ρ i fun p => w (Fin.castLE (harity i) p)
 
-theorem invAssign_mk {B : SOBlock} {S : Set (Σ n, L.Relations n)} {A : Type}
+private theorem invAssign_mk {B : SOBlock} {S : Set (Σ n, L.Relations n)} {A : Type}
     [L.Structure A] {harity : ∀ i, B.arity i ≤ k} {ρ : B.Assignment A}
     (hρ : AssignInvariant S A k ρ) (i : B.ι) (w : Fin k → A) :
     invAssign S harity ρ i (fun _ => InvMap.mk S w) ↔
@@ -519,7 +522,7 @@ theorem invAssign_mk {B : SOBlock} {S : Set (Σ n, L.Relations n)} {A : Type}
 
 /-- The unary image determines an invariant assignment: read any tuple at an
 extension of its arguments. -/
-theorem invAssign_injOn {B : SOBlock} {S : Set (Σ n, L.Relations n)} {A : Type}
+private theorem invAssign_injOn {B : SOBlock} {S : Set (Σ n, L.Relations n)} {A : Type}
     [L.Structure A] [Nonempty A] {harity : ∀ i, B.arity i ≤ k}
     {ρ₁ ρ₂ : B.Assignment A}
     (h₁ : AssignInvariant S A k ρ₁) (h₂ : AssignInvariant S A k ρ₂)
@@ -551,7 +554,7 @@ variable [L.IsRelational] (d : StepDef L)
 
 omit [L.IsRelational] in
 /-- The arity part of the variable budget. -/
-theorem VarBound.arity_le {d : StepDef L} {k : ℕ} (h : d.VarBound k) (i : d.B.ι) :
+private theorem VarBound.arity_le {d : StepDef L} {k : ℕ} (h : d.VarBound k) (i : d.B.ι) :
     d.B.arity i ≤ k :=
   le_trans (Nat.le_add_right _ _) (h i)
 
@@ -571,7 +574,7 @@ variable {S : Set (Σ n, L.Relations n)} {A : Type} [L.Structure A] [Finite A]
 variable {harity : ∀ i, d.B.arity i ≤ k}
 
 omit [L.IsRelational] in
-private theorem budget_step (hbound : d.VarBound k) (i : d.B.ι) :
+theorem budget_step (hbound : d.VarBound k) (i : d.B.ι) :
     (Finset.image (Fin.castLE (harity i)) Finset.univ ∪
       Finset.image (Fin.elim0 : Fin 0 → Fin k) Finset.univ).card +
         qdepth (d.step i) ≤ k := by
@@ -586,7 +589,7 @@ private theorem budget_step (hbound : d.VarBound k) (i : d.B.ι) :
 
 /-- **The partial stages of the induced induction are the images of the
 original ones**: the pebble compiler tracks the iteration stage by stage. -/
-theorem partStage_invStepDef (hbound : d.VarBound k) (hrels : d.UsesRels S)
+private theorem partStage_invStepDef (hbound : d.VarBound k) (hrels : d.UsesRels S)
     (n : ℕ) :
     ((d.invStepDef k harity).partStage (InvMap S k A) n :
         (classBlock d.B).Assignment (InvMap S k A)) =
@@ -633,7 +636,7 @@ theorem partStage_invStepDef (hbound : d.VarBound k) (hrels : d.UsesRels S)
 
 /-- Convergence transfers between the induction and its image on the
 invariant structure. -/
-theorem isFixedPt_invStepDef_iff [Nonempty A] (hbound : d.VarBound k)
+private theorem isFixedPt_invStepDef_iff [Nonempty A] (hbound : d.VarBound k)
     (hrels : d.UsesRels S) (n : ℕ) :
     IsFixedPt (d.invStepDef k harity).next
         ((d.invStepDef k harity).partStage (InvMap S k A) n) ↔
@@ -658,7 +661,7 @@ theorem isFixedPt_invStepDef_iff [Nonempty A] (hbound : d.VarBound k)
     rw [h]
 
 omit [L.IsRelational] in
-private theorem budget_out (houtd : qdepth d.out ≤ k) :
+theorem budget_out (houtd : qdepth d.out ≤ k) :
     (Finset.image (Fin.elim0 : Fin 0 → Fin k) Finset.univ ∪
       Finset.image (Fin.elim0 : Fin 0 → Fin k) Finset.univ).card +
         qdepth (sentenceFin0 d.out) ≤ k := by

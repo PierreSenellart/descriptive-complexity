@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawRead
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawRead
 
 /-!
 # Composite kits: how the program instantiates its subroutines
@@ -214,12 +216,12 @@ of the four the kit was given, so a caller that knows a property of those
 knows it of every phase the trip can be in. This is what a determinism-after-
 the-guess argument needs of a sub-machinery
 (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
-theorem dstPh_emb (ρ : ReadRule) : ∃ p : ReadPh, (κ.rule one ρ).dstPh = κ.emb p := by
+private theorem dstPh_emb (ρ : ReadRule) : ∃ p : ReadPh, (κ.rule one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
 /-- **Exit disjointness** at the kit's two verdict phases: no kit rule fires
 there on a symbol with the marker set. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : ReadRule) (f : Q → A) (g : W → A), (κ.rule one ρ).guard f g →
       g κ.wk = one →
       ((κ.rule one ρ).srcPh = κ.emb .ry ∨ (κ.rule one ρ).srcPh = κ.emb .rn) →
@@ -282,7 +284,7 @@ variable (huniq : ∀ r : Univ A R P K dd → Prop,
 include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit reads a set bit**: the composite's run theorem, with every rule
 hypothesis discharged from the kit's rules. -/
-theorem reachesIn_pos (hm : m x₀) :
+private theorem reachesIn_pos (hm : m x₀) :
     (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -308,7 +310,7 @@ theorem reaches_pos (hm : m x₀) :
 
 include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit reads a clear bit.** -/
-theorem reachesIn_neg (hm : ¬m x₀) :
+private theorem reachesIn_neg (hm : ¬m x₀) :
     (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -324,7 +326,7 @@ theorem reachesIn_neg (hm : ¬m x₀) :
 
 include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit reads a clear bit**, the budget forgotten. -/
-theorem reaches_neg (hm : ¬m x₀) :
+private theorem reaches_neg (hm : ¬m x₀) :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -435,7 +437,7 @@ noncomputable def rule : WriteRule → Rule A Q W P
 in one of the phases the kit was given, which is what a
 determinism-after-the-guess argument needs of a sub-machinery
 (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
-theorem dstPh_emb (ρ : WriteRule) :
+private theorem dstPh_emb (ρ : WriteRule) :
     ∃ p : WritePh, (κ.rule zero one ρ).dstPh = κ.emb p := by
   cases ρ <;> exact ⟨_, rfl⟩
 
@@ -453,7 +455,7 @@ theorem sep (hemb : Function.Injective κ.emb) :
 
 /-- **Exit disjointness** at the kit's return phase: no kit rule fires there
 on a symbol with the marker set. -/
-theorem exit_disjoint (hemb : Function.Injective κ.emb) :
+private theorem exit_disjoint (hemb : Function.Injective κ.emb) :
     ∀ (ρ : WriteRule) (f : Q → A) (g : W → A), (κ.rule zero one ρ).guard f g →
       g κ.wk = one → (κ.rule zero one ρ).srcPh = κ.emb .back → False := by
   intro ρ f g hg hwk hph
@@ -487,7 +489,7 @@ variable (huniq : ∀ r : Univ A R P K dd → Prop,
 
 include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit writes its bit at the named cell** and returns to the marker. -/
-theorem reachesIn :
+private theorem reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn (2 * (wideRank (F.cell x₀) - wideRank v) + 2)
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩
@@ -510,7 +512,7 @@ theorem reachesIn :
 
 include hrules hR hlin hix hnewk hbot hv hwkS hname huniq in
 /-- **The kit writes a named bit**, the budget forgotten. -/
-theorem reaches :
+private theorem reaches :
     Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
       ⟨Sum.inr (PR.stElt (κ.emb .start) fc), Sum.inl v,
         wideTape (PR.trackTapeAt F.cell κ.t rest m) (PR.syElt PR.blank)⟩

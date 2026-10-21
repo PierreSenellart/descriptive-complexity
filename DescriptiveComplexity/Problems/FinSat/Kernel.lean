@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.FinSat.Nodes
 public import DescriptiveComplexity.SecondOrderNew
+import all DescriptiveComplexity.Problems.FinSat.Nodes
+import all DescriptiveComplexity.Problems.Sat.Tseitin
 
 /-!
 # Reading the kernel of an `∃SO[new]` definition, position by position
@@ -81,21 +83,21 @@ def kidOf : ∀ {n : ℕ} (f : L'.BoundedFormula Empty n) {m : ℕ}, Tseitin.Nod
 
 /-! The three children the translation actually uses. -/
 
-theorem kidOf_imp_left {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) :
+private theorem kidOf_imp_left {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) :
     kidOf (f₁.imp f₂) (Sum.inl ⟨rfl⟩) (Sum.inr (Sum.inl (Tseitin.rootAt f₁))) = some true := by
   have h : Tseitin.isRootB f₁ (Tseitin.rootAt f₁) = true :=
     (Tseitin.isRootB_iff f₁ _).mpr rfl
   change (if Tseitin.isRootB f₁ (Tseitin.rootAt f₁) then some true else none) = some true
   rw [h, ite_eq_left rfl]
 
-theorem kidOf_imp_right {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) :
+private theorem kidOf_imp_right {n : ℕ} (f₁ f₂ : L'.BoundedFormula Empty n) :
     kidOf (f₁.imp f₂) (Sum.inl ⟨rfl⟩) (Sum.inr (Sum.inr (Tseitin.rootAt f₂))) = some false := by
   have h : Tseitin.isRootB f₂ (Tseitin.rootAt f₂) = true :=
     (Tseitin.isRootB_iff f₂ _).mpr rfl
   change (if Tseitin.isRootB f₂ (Tseitin.rootAt f₂) then some false else none) = some false
   rw [h, ite_eq_left rfl]
 
-theorem kidOf_all_body {n : ℕ} (f : L'.BoundedFormula Empty (n + 1)) :
+private theorem kidOf_all_body {n : ℕ} (f : L'.BoundedFormula Empty (n + 1)) :
     kidOf f.all (Sum.inl ⟨rfl⟩) (Sum.inr (Tseitin.rootAt f)) = some false := by
   have h : Tseitin.isRootB f (Tseitin.rootAt f) = true :=
     (Tseitin.isRootB_iff f _).mpr rfl
@@ -106,7 +108,7 @@ theorem kidOf_all_body {n : ℕ} (f : L'.BoundedFormula Empty (n + 1)) :
 lets an induction over subformulas see all the children a node of the *whole*
 kernel has. -/
 
-theorem kidOf_imp_left_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {m : ℕ}
+private theorem kidOf_imp_left_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {m : ℕ}
     {p₁ : Tseitin.NodeAt f₁ m} {m' : ℕ} {q : Tseitin.NodeAt (f₁.imp f₂) m'} {b : Bool}
     (h : kidOf (f₁.imp f₂) (Sum.inr (Sum.inl p₁)) q = some b) :
     ∃ q₁ : Tseitin.NodeAt f₁ m', q = Sum.inr (Sum.inl q₁) := by
@@ -115,7 +117,7 @@ theorem kidOf_imp_left_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {
   · exact ⟨q₁, rfl⟩
   · exact absurd h (by simp [kidOf])
 
-theorem kidOf_imp_right_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {m : ℕ}
+private theorem kidOf_imp_right_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {m : ℕ}
     {p₂ : Tseitin.NodeAt f₂ m} {m' : ℕ} {q : Tseitin.NodeAt (f₁.imp f₂) m'} {b : Bool}
     (h : kidOf (f₁.imp f₂) (Sum.inr (Sum.inr p₂)) q = some b) :
     ∃ q₂ : Tseitin.NodeAt f₂ m', q = Sum.inr (Sum.inr q₂) := by
@@ -124,7 +126,7 @@ theorem kidOf_imp_right_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} 
   · exact absurd h (by simp [kidOf])
   · exact ⟨q₂, rfl⟩
 
-theorem kidOf_all_range {n : ℕ} {f : L'.BoundedFormula Empty (n + 1)} {m : ℕ}
+private theorem kidOf_all_range {n : ℕ} {f : L'.BoundedFormula Empty (n + 1)} {m : ℕ}
     {p : Tseitin.NodeAt f m} {m' : ℕ} {q : Tseitin.NodeAt f.all m'} {b : Bool}
     (h : kidOf f.all (Sum.inr p) q = some b) :
     ∃ q' : Tseitin.NodeAt f m', q = Sum.inr q' := by
@@ -135,7 +137,7 @@ theorem kidOf_all_range {n : ℕ} {f : L'.BoundedFormula Empty (n + 1)} {m : ℕ
 /-- The children of the root of an implication are the roots of its two sides,
 and the children of the root of a quantifier the root of its body: what an
 induction over subformulas descends along. -/
-theorem kidOf_imp_root_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {m' : ℕ}
+private theorem kidOf_imp_root_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {m' : ℕ}
     {q : Tseitin.NodeAt (f₁.imp f₂) m'} {b : Bool}
     (h : kidOf (f₁.imp f₂) (Sum.inl ⟨rfl⟩) q = some b) :
     (∃ q₁ : Tseitin.NodeAt f₁ m', q = Sum.inr (Sum.inl q₁)) ∨
@@ -145,7 +147,7 @@ theorem kidOf_imp_root_range {n : ℕ} {f₁ f₂ : L'.BoundedFormula Empty n} {
   · exact Or.inl ⟨q₁, rfl⟩
   · exact Or.inr ⟨q₂, rfl⟩
 
-theorem kidOf_all_root_range {n : ℕ} {f : L'.BoundedFormula Empty (n + 1)} {m' : ℕ}
+private theorem kidOf_all_root_range {n : ℕ} {f : L'.BoundedFormula Empty (n + 1)} {m' : ℕ}
     {q : Tseitin.NodeAt f.all m'} {b : Bool} (h : kidOf f.all (Sum.inl ⟨rfl⟩) q = some b) :
     ∃ q' : Tseitin.NodeAt f m', q = Sum.inr q' := by
   obtain ⟨⟨rfl⟩⟩ | q' := q
@@ -240,10 +242,10 @@ def kernelNode : ∀ {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empt
       | Sum.inl _ => .quant n
       | Sum.inr q => kernelNode f q
 
-theorem kernelNode_imp {n : ℕ} (f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n) :
+private theorem kernelNode_imp {n : ℕ} (f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n) :
     kernelNode (f₁.imp f₂) (Sum.inl ⟨rfl⟩) = .impl := rfl
 
-theorem kernelNode_all {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty (n + 1)) :
+private theorem kernelNode_all {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty (n + 1)) :
     kernelNode f.all (Sum.inl ⟨rfl⟩) = .quant n := rfl
 
 /-! ### The atoms of the relation variables
@@ -277,7 +279,7 @@ def argOf {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty n) {m : �
 
 /-- **The arity is the one the block declares**: the relation symbols of the
 block are its indices, tagged by their arity. -/
-theorem arityOf_eq {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormula Empty n} {m : ℕ}
+private theorem arityOf_eq {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormula Empty n} {m : ℕ}
     {q : Tseitin.NodeAt f m} {i : B.ι} (h : symOf f q = some i) :
     arityOf f q = B.arity i := by
   rw [symOf] at h
@@ -288,7 +290,7 @@ theorem arityOf_eq {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormula Empty 
 
 /-- **The dimension is wide enough for an atom of a relation variable too**: its
 arity is one of the arities occurring in the kernel. -/
-theorem arityOf_le :
+private theorem arityOf_le :
     ∀ {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty n) {m : ℕ}
       (q : Tseitin.NodeAt f m), arityOf f q ≤ maxArity f
   | _, .falsum, _, _ => by simp [arityOf, kernelNode, maxArity]
@@ -310,7 +312,8 @@ theorem arityOf_le :
       · exact arityOf_le f q'
 
 /-- **An argument sits below the arity**. -/
-theorem lt_arityOf_of_argOf {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormula Empty n} {m : ℕ}
+private theorem lt_arityOf_of_argOf
+    {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormula Empty n} {m : ℕ}
     {q : Tseitin.NodeAt f m} {j l : ℕ} (h : argOf f q j = some l) : j < arityOf f q := by
   rw [argOf] at h
   rw [arityOf]
@@ -322,7 +325,7 @@ theorem lt_arityOf_of_argOf {n : ℕ} {f : ((newLang L).sum B.lang).BoundedFormu
 
 /-- The de Bruijn level a term denotes is one of the context: in a relational
 vocabulary every term is a variable. -/
-theorem termLevel_some [L.IsRelational] {m : ℕ}
+private theorem termLevel_some [L.IsRelational] {m : ℕ}
     (t : ((newLang L).sum B.lang).Term (Empty ⊕ Fin m)) :
     ∃ l : ℕ, termLevel t = some l ∧ l < m := by
   cases t with
@@ -343,7 +346,7 @@ def inArityOf {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty n) {m
 
 /-- **The dimension of the reduction is wide enough for such an atom**: its
 arity is one of the arities occurring in the kernel. -/
-theorem inArityOf_le :
+private theorem inArityOf_le :
     ∀ {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty n) {m : ℕ}
       (q : Tseitin.NodeAt f m), inArityOf f q ≤ maxArity f
   | _, .falsum, _, _ => by simp [inArityOf, kernelNode, maxArity]
@@ -368,7 +371,7 @@ theorem inArityOf_le :
 vocabulary – and the level is one of the de Bruijn levels of the kernel. This is
 what lets the image of the reduction give an atom an argument at each position
 of its signature (`DescriptiveComplexity.FinSat.IsWF.arg_tot`). -/
-theorem argOf_some [L.IsRelational] :
+private theorem argOf_some [L.IsRelational] :
     ∀ {n : ℕ} (f : ((newLang L).sum B.lang).BoundedFormula Empty n) {m : ℕ}
       (q : Tseitin.NodeAt f m) (j : ℕ), j < arityOf f q →
       ∃ l : ℕ, argOf f q j = some l ∧ l < Tseitin.maxCtx f
@@ -399,7 +402,7 @@ theorem argOf_some [L.IsRelational] :
 
 /-- The value of a term of the kernel, when it is a variable: the context tuple
 at its de Bruijn level. -/
-theorem realize_of_termLevel [L.IsRelational] {M : Type} [(newLang L).Structure M] {m : ℕ}
+private theorem realize_of_termLevel [L.IsRelational] {M : Type} [(newLang L).Structure M] {m : ℕ}
     {t : ((newLang L).sum B.lang).Term (Empty ⊕ Fin m)} {l : ℕ}
     (h : termLevel t = some l) (hl : l < m) (w : Fin m → M) :
     (Tseitin.termToL t).realize (Sum.elim isEmptyElim w) = w ⟨l, hl⟩ := by
@@ -449,7 +452,7 @@ namespace SubEmb
 variable {n₀ : ℕ} {φ : ((newLang L).sum B.lang).BoundedFormula Empty n₀}
 
 /-- The kernel is a subformula of itself. -/
-def refl (φ : ((newLang L).sum B.lang).BoundedFormula Empty n₀) : SubEmb φ φ where
+private def refl (φ : ((newLang L).sum B.lang).BoundedFormula Empty n₀) : SubEmb φ φ where
   emb := fun {_} q => q
   node := fun {_} _ => rfl
   kid := fun {_} _ {_} _ => rfl
@@ -458,7 +461,7 @@ def refl (φ : ((newLang L).sum B.lang).BoundedFormula Empty n₀) : SubEmb φ �
 variable {n : ℕ}
 
 /-- The premise of an implication. -/
-def impL {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
+private def impL {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
     (E : SubEmb φ (f₁.imp f₂)) : SubEmb φ f₁ where
   emb := fun {_} q => E.emb (Sum.inr (Sum.inl q))
   node := fun {_} _ => E.node _
@@ -469,7 +472,7 @@ def impL {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
     exact ⟨q₁, rfl⟩
 
 /-- The conclusion of an implication. -/
-def impR {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
+private def impR {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
     (E : SubEmb φ (f₁.imp f₂)) : SubEmb φ f₂ where
   emb := fun {_} q => E.emb (Sum.inr (Sum.inr q))
   node := fun {_} _ => E.node _
@@ -480,7 +483,7 @@ def impR {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
     exact ⟨q₂, rfl⟩
 
 /-- The body of a quantifier. -/
-def allB {f : ((newLang L).sum B.lang).BoundedFormula Empty (n + 1)}
+private def allB {f : ((newLang L).sum B.lang).BoundedFormula Empty (n + 1)}
     (E : SubEmb φ f.all) : SubEmb φ f where
   emb := fun {_} q => E.emb (Sum.inr q)
   node := fun {_} _ => E.node _
@@ -497,7 +500,7 @@ variable {n : ℕ}
 
 /-- The root of an embedded leaf – falsity, an equality or an atom – has no
 children in the kernel. -/
-theorem no_children {f : ((newLang L).sum B.lang).BoundedFormula Empty n} (E : SubEmb φ f)
+private theorem no_children {f : ((newLang L).sum B.lang).BoundedFormula Empty n} (E : SubEmb φ f)
     (hnk : ∀ {m' : ℕ} (q' : Tseitin.NodeAt f m') {b : Bool},
       kidOf f (Tseitin.rootAt f) q' ≠ some b)
     {m' : ℕ} {q : Tseitin.NodeAt φ m'} {b : Bool}
@@ -508,7 +511,7 @@ theorem no_children {f : ((newLang L).sum B.lang).BoundedFormula Empty n} (E : S
 /-- The children of the root of an embedded implication are the roots of its two
 sides, the premise at `some true` – where negation normal form flips the
 polarity – and the conclusion at `some false`. -/
-theorem imp_children {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
+private theorem imp_children {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty n}
     (E : SubEmb φ (f₁.imp f₂)) {m' : ℕ} {q : Tseitin.NodeAt φ m'} {b : Bool}
     (h : kidOf φ (E.emb (Tseitin.rootAt (f₁.imp f₂))) q = some b) :
     (b = true ∧ (⟨m', q⟩ : Σ m, Tseitin.NodeAt φ m) =
@@ -546,7 +549,7 @@ theorem imp_children {f₁ f₂ : ((newLang L).sum B.lang).BoundedFormula Empty 
 
 /-- The only child of the root of an embedded quantifier is the root of its
 body. -/
-theorem all_children {f : ((newLang L).sum B.lang).BoundedFormula Empty (n + 1)}
+private theorem all_children {f : ((newLang L).sum B.lang).BoundedFormula Empty (n + 1)}
     (E : SubEmb φ f.all) {m' : ℕ} {q : Tseitin.NodeAt φ m'} {b : Bool}
     (h : kidOf φ (E.emb (Tseitin.rootAt f.all)) q = some b) :
     b = false ∧ (⟨m', q⟩ : Σ m, Tseitin.NodeAt φ m) = ⟨n + 1, E.allB.emb (Tseitin.rootAt f)⟩ := by

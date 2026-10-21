@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Counting.PossibleWorlds
 public import DescriptiveComplexity.Numbers.BinCount
 public import DescriptiveComplexity.Counting.Probability
 import Mathlib.Algebra.BigOperators.Finprod
+import all DescriptiveComplexity.Counting.SharpP
 
 /-!
 # Counting weighted possible worlds
@@ -164,11 +165,11 @@ def bitAtom (S : L'.Relations (n + 1)) (e : Fin n → α) (i : α) : L'.Formula 
 
 variable {M : Type} [L'.Structure M]
 
-theorem realize_factAtom (S : L'.Relations n) (e : Fin n → α) (v : α → M) :
+private theorem realize_factAtom (S : L'.Relations n) (e : Fin n → α) (v : α → M) :
     (factAtom S e).Realize v ↔ RelMap S fun m => v (e m) :=
   Formula.realize_rel
 
-theorem realize_bitAtom (S : L'.Relations (n + 1)) (e : Fin n → α) (i : α) (v : α → M) :
+private theorem realize_bitAtom (S : L'.Relations (n + 1)) (e : Fin n → α) (i : α) (v : α → M) :
     (bitAtom S e i).Realize v ↔
       RelMap S (Fin.snoc (α := fun _ => M) (fun m => v (e m)) (v i)) := by
   rw [bitAtom, Formula.realize_rel]
@@ -208,7 +209,7 @@ noncomputable def numZeroFormula : L'.Formula (Fin n) :=
 
 variable {M : Type} [L'.Structure M]
 
-theorem realize_numLtFormula (x : Fin n → M) :
+private theorem realize_numLtFormula (x : Fin n → M) :
     (numLtFormula N W Le).Realize x ↔
       ∃ i : M, RelMap W (Fin.snoc (α := fun _ => M) x i) ∧
         ¬RelMap N (Fin.snoc (α := fun _ => M) x i) ∧
@@ -236,7 +237,7 @@ theorem realize_linOrdSentence :
   · exact ⟨fun h a b => h ![a, b], fun h i => h (i 0) (i 1)⟩
   · exact ⟨fun h a b => h ![a, b], fun h i => h (i 0) (i 1)⟩
 
-theorem realize_numZeroFormula (x : Fin n → M) :
+private theorem realize_numZeroFormula (x : Fin n → M) :
     (numZeroFormula N).Realize x ↔ ∀ i : M, ¬RelMap N (Fin.snoc (α := fun _ => M) x i) := by
   rw [numZeroFormula, Formula.realize_iAlls]
   simp only [Formula.realize_not, realize_bitAtom, Sum.elim_inl, Sum.elim_inr]
@@ -305,7 +306,7 @@ noncomputable def weightFormulaAt (p : Σ n, L.Relations n) :
       ((∼((factAtom (wkUnc p) id) ⊓ ∼(factAtom (wkCert p) id))).imp
         (numZeroFormula (wkNum p))))
 
-theorem realize_weightFormulaAt (σ : (weightBlock L).Assignment A) (p : Σ n, L.Relations n)
+private theorem realize_weightFormulaAt (σ : (weightBlock L).Assignment A) (p : Σ n, L.Relations n)
     (x : Fin p.1 → A) :
     @Formula.Realize (weightKernelLang L) A
         (@sumStructure (weightedLang L) (weightBlock L).lang A _ ((weightBlock L).structure σ))
@@ -328,7 +329,7 @@ noncomputable def weightSentence (L : Language.{0, 0}) [Finite (Σ n, L.Relation
   Formula.iInf fun p : Σ n, L.Relations n =>
     Formula.iAlls (Fin p.1) ((weightFormulaAt p).relabel Sum.inr)
 
-theorem realize_weightSentence (σ : (weightBlock L).Assignment A) :
+private theorem realize_weightSentence (σ : (weightBlock L).Assignment A) :
     @Sentence.Realize (weightKernelLang L) A
         (@sumStructure (weightedLang L) (weightBlock L).lang A _ ((weightBlock L).structure σ))
         (weightSentence L) ↔ ∀ (p : Σ n, L.Relations n) (x : Fin p.1 → A), WeightCond σ p x := by
@@ -347,7 +348,7 @@ def toWeightWorld (L : Language.{0, 0}) [Finite (Σ n, L.Relations n)] [L.IsRela
   onFunction := fun {_} f => isEmptyElim f
   onRelation := fun {n} R => wkWorld ⟨n, R⟩
 
-theorem realize_toWeightWorld [L.IsRelational] (σ : (weightBlock L).Assignment A)
+private theorem realize_toWeightWorld [L.IsRelational] (σ : (weightBlock L).Assignment A)
     (φ : L.Sentence) :
     @Sentence.Realize (weightKernelLang L) A
         (@sumStructure (weightedLang L) (weightBlock L).lang A _ ((weightBlock L).structure σ))
@@ -366,7 +367,7 @@ noncomputable def weightKernel [L.IsRelational] (φ : L.Sentence) :
     (weightKernelLang L).Sentence :=
   linOrdSentence (wkLe L) ⊓ (weightSentence L ⊓ (toWeightWorld L).onSentence φ)
 
-theorem realize_weightKernel [L.IsRelational] (σ : (weightBlock L).Assignment A)
+private theorem realize_weightKernel [L.IsRelational] (σ : (weightBlock L).Assignment A)
     (φ : L.Sentence) :
     @Sentence.Realize (weightKernelLang L) A
         (@sumStructure (weightedLang L) (weightBlock L).lang A _ ((weightBlock L).structure σ))
@@ -397,7 +398,7 @@ on any other instance it is zero. -/
 noncomputable def WeightedWorlds (φ : L.Sentence) : CountingProblem (weightedLang L) :=
   CountingProblem.ofKernel (weightBlock L) (weightKernel φ)
 
-theorem weightedWorlds_apply (φ : L.Sentence) (A : Type) [(weightedLang L).Structure A] :
+private theorem weightedWorlds_apply (φ : L.Sentence) (A : Type) [(weightedLang L).Structure A] :
     WeightedWorlds φ A =
       Nat.card {σ : (weightBlock L).Assignment A //
         IsLinOrd (WLe L A) ∧
@@ -522,7 +523,7 @@ noncomputable def factWeight (ρ : (worldBlock L).Assignment A) (q : Fact L A) :
 
 /-- Over a linear order, the first-order comparison of two sets of bits is
 the comparison of the numbers they encode. -/
-theorem bitLt_iff_binNum_lt [Finite A] {Le : A → A → Prop} (hlin : IsLinOrd Le)
+private theorem bitLt_iff_binNum_lt [Finite A] {Le : A → A → Prop} (hlin : IsLinOrd Le)
     (b w : A → Prop) :
     BitLt Le b w ↔ binNum Le (fun _ => True) b < binNum Le (fun _ => True) w := by
   have hcard : ({p : A | True} : Set A).ncard = Nat.card A := by
@@ -607,7 +608,7 @@ theorem isWeightedWorld_worldOfVal (v : {q : Fact L A // IsOpen q} → Bool) :
 open Classical in
 omit [L.IsRelational] in
 /-- A world is the world of its valuation. -/
-theorem worldOfVal_decide {ρ : (worldBlock L).Assignment A} (hρ : IsWeightedWorld ρ) :
+private theorem worldOfVal_decide {ρ : (worldBlock L).Assignment A} (hρ : IsWeightedWorld ρ) :
     worldOfVal (fun x : {q : Fact L A // IsOpen q} => decide (ρ x.1.1 x.1.2)) = ρ := by
   funext p x
   refine propext ⟨fun h => ?_, fun h => ?_⟩
@@ -621,7 +622,7 @@ theorem worldOfVal_decide {ρ : (worldBlock L).Assignment A} (hρ : IsWeightedWo
 open Classical in
 omit [L.IsRelational] in
 /-- A valuation is the valuation of its world. -/
-theorem decide_worldOfVal (v : {q : Fact L A // IsOpen q} → Bool) :
+private theorem decide_worldOfVal (v : {q : Fact L A // IsOpen q} → Bool) :
     (fun x : {q : Fact L A // IsOpen q} => decide (worldOfVal v x.1.1 x.1.2)) = v := by
   funext x
   have h : worldOfVal v x.1.1 x.1.2 ↔ v x = true :=
@@ -634,7 +635,7 @@ open Classical in
 omit [L.IsRelational] in
 /-- The product of the weights of the facts in a world is the weight of its
 valuation: the facts that are not open contribute nothing. -/
-theorem finprod_factWeight [Finite A] (ρ : (worldBlock L).Assignment A) :
+private theorem finprod_factWeight [Finite A] (ρ : (worldBlock L).Assignment A) :
     ∏ᶠ q : Fact L A, factWeight ρ q =
       valWeight presWeight absWeight
         fun x : {q : Fact L A // IsOpen q} => decide (ρ x.1.1 x.1.2) := by
@@ -708,7 +709,7 @@ noncomputable def worldProb [Finite A] (φ : L.Sentence)
 /-- The probability of a first-order sentence is a ratio of two `#P` numbers:
 `DescriptiveComplexity.funcProb_holdsEvent_eq_ratio`, for the packaged
 probability. -/
-theorem worldProb_eq_ratio [Finite A] (hlin : IsLinOrd (WLe L A)) (φ : L.Sentence)
+private theorem worldProb_eq_ratio [Finite A] (hlin : IsLinOrd (WLe L A)) (φ : L.Sentence)
     (hpos : ∀ x : {q : Fact L A // IsOpen q}, 0 < presWeight x + absWeight x) :
     worldProb φ hpos = (WeightedWorlds φ A : ℚ) / (WeightedWorlds (⊤ : L.Sentence) A : ℚ) :=
   funcProb_holdsEvent_eq_ratio hlin hpos φ

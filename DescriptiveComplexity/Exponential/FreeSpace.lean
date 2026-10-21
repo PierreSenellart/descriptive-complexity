@@ -11,6 +11,9 @@ import DescriptiveComplexity.FixedPointStepRel
 import DescriptiveComplexity.PSpaceHierarchy
 public import DescriptiveComplexity.Exponential.Classes
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Exponential.FreeCopy
+import all DescriptiveComplexity.PSpace
 
 /-!
 # “Some copy answers yes” stays in polynomial space
@@ -119,16 +122,16 @@ theorem effSet_nonempty [Nonempty M] : (effSet F M).Nonempty := by
   · obtain ⟨x⟩ := ‹Nonempty M›
     exact ⟨x, Or.inr fun y hy => h ⟨y, hy⟩⟩
 
-theorem effSet_eq_markSet {x : M} (hx : x ∈ markSet F M) : effSet F M = markSet F M := by
+private theorem effSet_eq_markSet {x : M} (hx : x ∈ markSet F M) : effSet F M = markSet F M := by
   ext y
   exact ⟨fun h => h.elim id fun h' => (h' x hx).elim, Or.inl⟩
 
 variable {N : Type} [(F.sum markBlock.lang).Structure N] (e : M ≃[F.sum markBlock.lang] N)
 
-theorem mem_markSet_equiv (x : M) : x ∈ markSet F M ↔ e x ∈ markSet F N :=
+private theorem mem_markSet_equiv (x : M) : x ∈ markSet F M ↔ e x ∈ markSet F N :=
   relMap_equiv₁ e (markSym F) x
 
-theorem image_markSet : e '' markSet F M = markSet F N := by
+private theorem image_markSet : e '' markSet F M = markSet F N := by
   ext y
   constructor
   · rintro ⟨x, hx, rfl⟩
@@ -184,7 +187,7 @@ def effProblem (Q : DecisionProblem X.E) : DecisionProblem X.markLangOf where
     exact himg ▸ Iff.rfl
 
 /-- **The guessed copy is a copy, and the inner problem holds in it.** -/
-def clsProblem (Q : DecisionProblem X.E) : DecisionProblem X.markLangOf where
+private def clsProblem (Q : DecisionProblem X.E) : DecisionProblem X.markLangOf where
   Holds M _ :=
     (letI := X.markReduct M; IsCls X (markSet X.orderFree.E M)) ∧ X.effProblem Q M
   iso_invariant := by
@@ -236,7 +239,7 @@ noncomputable def effF {α : Type} (x : α) : (X.markLangOf.sum Language.order).
 
 variable {X} {M : Type} [X.markLangOf.Structure M] [LinearOrder M]
 
-theorem realize_noMarkF {α : Type} (v : α → M) :
+private theorem realize_noMarkF {α : Type} (v : α → M) :
     (X.noMarkF (α := α)).Realize v ↔ ∀ y : M, y ∉ markSet X.orderFree.E M := by
   simp only [noMarkF, Formula.realize_iAlls, Formula.realize_not, Formula.realize_rel₁,
     Term.realize_var, Sum.elim_inr]
@@ -320,7 +323,7 @@ noncomputable def effReduction (Q : DecisionProblem X.E) : X.effProblem Q ≤ʳ�
     exact Q.iso_invariant (effInterpEquiv (X := X) (M := A))
 
 /-- **The inner problem read in the marked part stays in polynomial space.** -/
-theorem mem_PSPACE_effProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
+private theorem mem_PSPACE_effProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
     X.effProblem Q ∈ PSPACE :=
   (pfpDefinable_iff_mem_PSPACE _).mp
     (PFPDefinable.of_relOrderedReduction (X.effReduction Q)
@@ -341,7 +344,7 @@ noncomputable def isClsS : (X.markLangOf.sum Language.order).Sentence :=
         (Relations.formula₁ X.markSymO (Term.var (Sum.inr 1)) ⇔
           Relations.formula₂ X.sameSymO (Term.var (Sum.inr 0)) (Term.var (Sum.inr 1))))
 
-theorem realize_isClsS :
+private theorem realize_isClsS :
     @Sentence.Realize _ M (sumOrderStructure X.markLangOf M) X.isClsS ↔
       letI := X.markReduct M
       IsCls X (markSet X.orderFree.E M) := by
@@ -375,7 +378,7 @@ theorem realize_isClsS :
 variable (X)
 
 /-- **Guessing a copy and checking it stays in polynomial space.** -/
-theorem mem_PSPACE_clsProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
+private theorem mem_PSPACE_clsProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
     X.clsProblem Q ∈ PSPACE := by
   refine (mem_PSPACE_iff _).mpr (SOTCDefinable.and_sentence
     ((mem_PSPACE_iff _).mp (X.mem_PSPACE_effProblem hQ)) X.isClsS ?_)
@@ -386,7 +389,7 @@ theorem mem_PSPACE_clsProblem {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
 
 /-- **The copy, guessed as a relation variable**: a copy of the expansion is
 exactly a marked part that the guard accepts. -/
-theorem someCls_iff_exists_mark {Q : DecisionProblem X.E} (N : Type)
+private theorem someCls_iff_exists_mark {Q : DecisionProblem X.E} (N : Type)
     [X.orderFree.E.Structure N] :
     someCls X Q N ↔ ∃ ρ : markBlock.Assignment N,
       @DecisionProblem.Holds _ _ (X.clsProblem Q) N (markBlock.structure₁ ρ) := by
@@ -410,7 +413,7 @@ theorem someCls_iff_exists_mark {Q : DecisionProblem X.E} (N : Type)
 /-- **“Some copy answers yes” stays in polynomial space**: the copy is guessed
 into the state of the walk, the guard is a first-order condition on the source
 state, and the inner problem is read in the copy by a relativized reduction. -/
-theorem mem_PSPACE_someCls {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
+private theorem mem_PSPACE_someCls {Q : DecisionProblem X.E} (hQ : Q ∈ PSPACE) :
     someCls X Q ∈ PSPACE :=
   (mem_PSPACE_iff _).mpr
     (SOTCDefinable.exBlock ((mem_PSPACE_iff _).mp (X.mem_PSPACE_clsProblem hQ))
@@ -430,7 +433,7 @@ is guessed into the block of the expansion
 replaced by “some copy answers yes”
 (`DescriptiveComplexity.ExpExpansion.someCls`), which is again in `PSPACE`; right
 to left an expansion that never mentions the order is one that ignores it. -/
-theorem expDefinable_PSPACE_iff_free (P : DecisionProblem L) :
+private theorem expDefinable_PSPACE_iff_free (P : DecisionProblem L) :
     ExpDefinable PSPACE P ↔ ExpDefinableFree PSPACE P := by
   constructor
   · rintro ⟨X, Q, hQ, hX⟩
@@ -453,7 +456,7 @@ def SOPFPDefinableFree (P : DecisionProblem L) : Prop :=
   ∃ (X : ExpExpansionFree L) (Q : DecisionProblem X.E), PFPDefinable Q ∧
     ∀ (A : Type) [L.Structure A] [Finite A] [Nonempty A], P A ↔ Q (X.Map A)
 
-theorem sopfpDefinableFree_iff_expDefinableFree (P : DecisionProblem L) :
+private theorem sopfpDefinableFree_iff_expDefinableFree (P : DecisionProblem L) :
     SOPFPDefinableFree P ↔ ExpDefinableFree PSPACE P :=
   exists_congr fun _X => exists_congr fun Q =>
     and_congr_left' (pfpDefinable_iff_mem_PSPACE Q)

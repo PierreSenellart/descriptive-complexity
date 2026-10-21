@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Exponential.Copies
 public import DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.Exponential.Copies
+import all DescriptiveComplexity.Exponential.Expansion
 
 /-!
 # Reading a structure over its subsets: the address expansion
@@ -85,7 +87,7 @@ def WMFileSeg (Le : α → α → Prop) (Has : α → Prop) (s : α → Prop) (x
   ∀ y, s y ↔ (Le y x ∧ Has y)
 
 /-- The order on addresses transports along an equivalence of the index type. -/
-theorem wmSetLe_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {LeB : β → β → Prop}
+private theorem wmSetLe_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {LeB : β → β → Prop}
     (hle : ∀ x y, LeA x y ↔ LeB (u x) (u y)) (s t : α → Prop) :
     WMSetLe LeA s t ↔
       WMSetLe LeB (fun y => s (u.symm y)) (fun y => t (u.symm y)) := by
@@ -109,7 +111,7 @@ theorem wmSetLe_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {Le
     simpa using hbelow (u y) ⟨h1, h2⟩
 
 /-- The initial segment of an element transports along an equivalence. -/
-theorem wmDown_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {LeB : β → β → Prop}
+private theorem wmDown_congr {β : Type} (u : α ≃ β) {LeA : α → α → Prop} {LeB : β → β → Prop}
     (hle : ∀ x y, LeA x y ↔ LeB (u x) (u y)) (s : α → Prop) (x : α) :
     WMDown LeA s x ↔ WMDown LeB (fun y => s (u.symm y)) (u x) := by
   refine ⟨fun h y => ?_, fun h y => ?_⟩
@@ -180,7 +182,7 @@ def aeAssign (s : A → Prop) : addrBlock.Assignment A := fun _ v => s (v 0)
 theorem aeBits_aeAssign (s : A → Prop) : aeBits (aeAssign s) = s := rfl
 
 /-- A unary relation variable is read at its only argument. -/
-theorem apply₁ (f : (Fin 1 → A) → Prop) (v : Fin 1 → A) : f v ↔ f fun _ => v 0 :=
+private theorem apply₁ (f : (Fin 1 → A) → Prop) (v : Fin 1 → A) : f v ↔ f fun _ => v 0 :=
   iff_of_eq (congrArg f (funext fun j => congrArg v (Subsingleton.elim j 0)))
 
 /-- **An assignment of the block is the assignment of its address**: the single
@@ -192,7 +194,7 @@ theorem aeAssign_aeBits (ρ : addrBlock.Assignment A) : aeAssign (aeBits ρ) = �
   | () => exact propext (apply₁ (ρ ()) v).symm
 
 /-- Two assignments of the block holding the same address are equal. -/
-theorem aeAssign_injective : Function.Injective (aeBits (A := A)) := fun ρ σ h => by
+private theorem aeAssign_injective : Function.Injective (aeBits (A := A)) := fun ρ σ h => by
   rw [← aeAssign_aeBits ρ, ← aeAssign_aeBits σ, h]
 
 end Bits
@@ -397,44 +399,44 @@ section Realize
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- An address is a singleton: it holds something, and at most one thing. -/
-def WMSingle (s : A → Prop) : Prop := (∃ x, s x) ∧ ∀ x y, s x → s y → x = y
+private def WMSingle (s : A → Prop) : Prop := (∃ x, s x) ∧ ∀ x y, s x → s y → x = y
 
 omit [L.Structure A] [LinearOrder A] in
 /-- A singleton address is the address of an element. -/
-theorem exists_eq_of_wmSingle {s : A → Prop} (h : WMSingle s) : ∃ x, ∀ y, s y ↔ y = x := by
+private theorem exists_eq_of_wmSingle {s : A → Prop} (h : WMSingle s) : ∃ x, ∀ y, s y ↔ y = x := by
   obtain ⟨⟨x, hx⟩, huniq⟩ := h
   exact ⟨x, fun y => ⟨fun hy => huniq y x hy hx, fun hy => hy ▸ hx⟩⟩
 
 omit [L.Structure A] [LinearOrder A] in
 /-- The address of an element is a singleton. -/
-theorem wmSingle_eq (x : A) : WMSingle (fun y => y = x) :=
+private theorem wmSingle_eq (x : A) : WMSingle (fun y => y = x) :=
   ⟨⟨x, rfl⟩, fun _ _ h1 h2 => h1.trans h2.symm⟩
 
 /-- The trivially true sentence, at one copy of the block. -/
-theorem realize_topS (ρ : addrBlock.Assignment A) :
+private theorem realize_topS (ρ : addrBlock.Assignment A) :
     @Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) ⊤ := by
   let := addrBlock.structure₁ (L := aeOrd L) ρ
   exact Formula.realize_top.mpr trivial
 
 /-- The trivially false sentence, at one copy of the block. -/
-theorem not_realize_botS (ρ : addrBlock.Assignment A) :
+private theorem not_realize_botS (ρ : addrBlock.Assignment A) :
     ¬@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) ⊥ := by
   let := addrBlock.structure₁ (L := aeOrd L) ρ
   exact fun h => Formula.realize_bot.mp h
 
 /-- The trivially true sentence, at two copies of the block. -/
-theorem realize_topS₂ (ρ σ : addrBlock.Assignment A) :
+private theorem realize_topS₂ (ρ σ : addrBlock.Assignment A) :
     @Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) ⊤ := by
   let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   exact Formula.realize_top.mpr trivial
 
 /-- The trivially false sentence, at two copies of the block. -/
-theorem not_realize_botS₂ (ρ σ : addrBlock.Assignment A) :
+private theorem not_realize_botS₂ (ρ σ : addrBlock.Assignment A) :
     ¬@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) ⊥ := by
   let := addrBlock.structure₂ (L := aeOrd L) ρ σ
   exact fun h => Formula.realize_bot.mp h
 
-theorem realize_markS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
+private theorem realize_markS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) (markS r) ↔
       ∃ x, aeBits ρ x ∧ RelMap r ![x]) := by
   let := addrBlock.structure₁ (L := aeOrd L) ρ
@@ -443,7 +445,7 @@ theorem realize_markS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
     realize_markG, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, hw⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
 
-theorem realize_binS (r : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
+private theorem realize_binS (r : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ) (binS r) ↔
       ∃ x y, aeBits ρ x ∧ aeBits σ y ∧ RelMap r ![x, y]) := by
   let := addrBlock.structure₂ (L := aeOrd L) ρ σ
@@ -453,7 +455,7 @@ theorem realize_binS (r : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
   exact ⟨fun ⟨w, h1, h2, h3⟩ => ⟨w 0, w 1, h1, h2, h3⟩,
     fun ⟨x, y, h1, h2, h3⟩ => ⟨![x, y], h1, h2, h3⟩⟩
 
-theorem realize_singleS (ρ : addrBlock.Assignment A) :
+private theorem realize_singleS (ρ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ) singleS ↔
       WMSingle (aeBits ρ)) := by
   let := addrBlock.structure₁ (L := aeOrd L) ρ
@@ -463,7 +465,7 @@ theorem realize_singleS (ρ : addrBlock.Assignment A) :
   exact and_congr ⟨fun ⟨w, hw⟩ => ⟨w 0, hw⟩, fun ⟨x, hx⟩ => ⟨fun _ => x, hx⟩⟩
     ⟨fun h x y h1 h2 => h ![x, y] ⟨h1, h2⟩, fun h w hw => h (w 0) (w 1) hw.1 hw.2⟩
 
-theorem realize_addrLeS (leSym : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
+private theorem realize_addrLeS (leSym : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ)
         (addrLeS leSym) ↔
       WMSetLe (aeRel₂ leSym) (aeBits ρ) (aeBits σ)) := by
@@ -476,7 +478,7 @@ theorem realize_addrLeS (leSym : L.Relations 2) (ρ σ : addrBlock.Assignment A)
   exact ⟨fun ⟨w, hb, hs, ht⟩ => ⟨w 0, fun y hy => hb (fun _ => y) hy, hs, ht⟩,
     fun ⟨x, hb, hs, ht⟩ => ⟨fun _ => x, fun w hw => hb (w 0) hw, hs, ht⟩⟩
 
-theorem realize_inpS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
+private theorem realize_inpS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ)
         (inpS leSym inpSym) ↔
       ∃ x y, WMDown (aeRel₂ leSym) (aeBits ρ) x ∧ aeBits σ y ∧
@@ -496,7 +498,7 @@ theorem realize_hasRelG {γ : Type} {v : γ → A} (r : L.Relations 2) (x : γ) 
   simp only [Formula.realize_iExs, realize_attrG, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun ⟨w, hw⟩ => ⟨w 0, hw⟩, fun ⟨a, ha⟩ => ⟨fun _ => a, ha⟩⟩
 
-theorem realize_subsetS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
+private theorem realize_subsetS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang1 L) A (addrBlock.structure₁ (L := aeOrd L) ρ)
         (subsetS r) ↔
       ∀ x, aeBits ρ x → aeRel₁ r x) := by
@@ -506,7 +508,7 @@ theorem realize_subsetS (r : L.Relations 1) (ρ : addrBlock.Assignment A) :
     realize_markG, Sum.elim_inr]
   exact ⟨fun h x hx => h (fun _ => x) hx, fun h w hw => h (w 0) hw⟩
 
-theorem realize_regS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
+private theorem realize_regS (leSym inpSym : L.Relations 2) (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize (aeLang2 L) A (addrBlock.structure₂ (L := aeOrd L) ρ σ)
         (regS leSym inpSym) ↔
       ∃ x y, WMFileSeg (aeRel₂ leSym) (fun z => ∃ w, aeRel₂ inpSym z w) (aeBits ρ) x ∧
@@ -666,7 +668,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- **Reading a one-copy sentence at a point**: the replicated assignment holds
 the point's address in its single copy. -/
-theorem realize_onS1 (φ : (aeLang1 L).Sentence) (x : (addrExp L E relS).Map A) :
+private theorem realize_onS1 (φ : (aeLang1 L).Sentence) (x : (addrExp L E relS).Map A) :
     (@Sentence.Realize _ A ((addrBlock.replicate 1).structure₁ (L := aeOrd L)
         (addrBlock.replicateAssign fun i =>
           ((![x] : Fin 1 → (addrExp L E relS).Map A) i).1.2))
@@ -676,7 +678,7 @@ theorem realize_onS1 (φ : (aeLang1 L).Sentence) (x : (addrExp L E relS).Map A) 
 
 /-- **Reading a two-copy sentence at two points**: the replicated assignment
 holds the first point's address in copy `0` and the second's in copy `1`. -/
-theorem realize_onS2 (φ : (aeLang2 L).Sentence) (x y : (addrExp L E relS).Map A) :
+private theorem realize_onS2 (φ : (aeLang2 L).Sentence) (x y : (addrExp L E relS).Map A) :
     (@Sentence.Realize _ A ((addrBlock.replicate 2).structure₁ (L := aeOrd L)
         (addrBlock.replicateAssign fun i =>
           ((![x, y] : Fin 2 → (addrExp L E relS).Map A) i).1.2))
@@ -694,7 +696,7 @@ noncomputable def addrStructure : E.Structure ((addrExp L E relS).Map A) :=
   (addrExp L E relS).mapStructure A
 
 /-- Reading a unary symbol of the expanded vocabulary at one point. -/
-theorem realize_one (rt : E.Relations 1) (φ : WTag → (aeLang1 L).Sentence)
+private theorem realize_one (rt : E.Relations 1) (φ : WTag → (aeLang1 L).Sentence)
     (h : ∀ τ : Fin 1 → WTag, relS rt τ = onS1 (φ (τ 0)))
     (x : (addrExp L E relS).Map A) :
     letI := addrStructure (L := L) (relS := relS) A
@@ -708,7 +710,7 @@ theorem realize_one (rt : E.Relations 1) (φ : WTag → (aeLang1 L).Sentence)
   exact h1.trans (realize_onS1 _ x)
 
 /-- Reading a binary symbol of the expanded vocabulary at two points. -/
-theorem realize_two (rt : E.Relations 2) (φ : WTag → WTag → (aeLang2 L).Sentence)
+private theorem realize_two (rt : E.Relations 2) (φ : WTag → WTag → (aeLang2 L).Sentence)
     (h : ∀ τ : Fin 2 → WTag, relS rt τ = onS2 (φ (τ 0) (τ 1)))
     (x y : (addrExp L E relS).Map A) :
     letI := addrStructure (L := L) (relS := relS) A

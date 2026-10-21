@@ -8,6 +8,11 @@ module
 public import DescriptiveComplexity.Problems.Wide.DrawTuple
 public import DescriptiveComplexity.Problems.Wide.DrawRunElem
 public import DescriptiveComplexity.Problems.Wide.DrawLoop
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawKit
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The tuple loop's run
@@ -334,7 +339,7 @@ marker to the exit phase one cell to its right, the destination track holding �
 round by round – the source track's bits at the enumerated cells, and the cost
 is one round's width once per element of the enumeration, plus the round that
 opens it and the step that leaves. -/
-theorem tuple_reachesIn {f₀ : Q → A} (w : ℕ)
+private theorem tuple_reachesIn {f₀ : Q → A} (w : ℕ)
     (hcost : ∀ a : ι, 2 * (wideRank (RF.cell (xS a)) - wideRank v) + 2 ≤ w ∧
       2 * (wideRank (RF.cell (xD a)) - wideRank v) + 2 ≤ w)
     (hinit : initLv f₀ (restOf a₀ v) = fs0 a₀) :

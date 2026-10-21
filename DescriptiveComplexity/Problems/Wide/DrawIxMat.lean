@@ -9,6 +9,15 @@ public import DescriptiveComplexity.Problems.Wide.DrawIxIGate
 public import DescriptiveComplexity.Problems.Wide.DrawIxStage
 import DescriptiveComplexity.Problems.Wide.DrawInstMat
 public import DescriptiveComplexity.Problems.Wide.DrawIxExp
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawInstCmp
+import all DescriptiveComplexity.Problems.Wide.DrawIxGate
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawTripKits
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The matrix's stages at an arbitrary file
@@ -55,7 +64,7 @@ omit [Finite I] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [L.IsRelational] [L.Structure A] in
 /-- The `val`-walked and the `mir`-walked presentations of one state
 coincide: both are the naked background. -/
-theorem trackTape_val_eq_ixMir (st : TapeSt dt A R P I) :
+private theorem trackTape_val_eq_ixMir (st : TapeSt dt A R P I) :
     PR.trackTapeAt F.cell Slot.val (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) st.val =
       PR.trackTapeAt F.cell Slot.mir (dt.ixBack F.toLayout PR.zero PR.one dt.dd0Le st) st.mir := by
   refine (trackTape_of_back (t := Slot.val)
@@ -104,7 +113,7 @@ include hrules hR hlin hix hbot hv hvi hwkSt hhasP hsepP in
 /-- **The comparison atom, entered by a dispatch**: from its entry
 checkpoint one cell to the marker's right, at the `Slot.val`-walked
 presentation, to the exit phase back at the same cell. -/
-theorem ixCmp_hStage (f : dt.CtlIx → A) (w : ℕ)
+private theorem ixCmp_hStage (f : dt.CtlIx → A) (w : ℕ)
     (hcost : ∀ (b : Lex (Fin dt.dd0 → A)) (k : Fin 2),
       2 * (wideRank (F.cell (dt.cmpCell F PR.zero hhasP vi j₁ j₂ b k)) -
         wideRank v) + 2 ≤ w) :
@@ -193,7 +202,7 @@ include hrules hR hlin hix hbot hv hvi hwkSt hinj helt hENC hhasP hsepP in
 /-- **The expansion atom, entered by a dispatch**: from its first phase one
 cell to the marker's right, at the `Slot.val`-walked presentation, to the
 exit phase back at the same cell. -/
-theorem ixExp_hStage (f : dt.CtlIx → A) (w : ℕ)
+private theorem ixExp_hStage (f : dt.CtlIx → A) (w : ℕ)
     (hcostT : ∀ i : Fin (k * Fintype.card dt.X.Tag),
       2 * (wideRank (F.cell (dt.ixExpTagCell F hhasP PR.one vi ts i)) -
         wideRank v) + 2 ≤ w)
@@ -288,7 +297,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **A stage atom entered at the boundary leaves the state unchanged**, at an
 arbitrary file: with SAV and TARGET already the marks of the home address, the
 restore restores what was there. -/
-theorem ixStageEndSt_eq {I : Type} {st : TapeSt dt A R P I}
+private theorem ixStageEndSt_eq {I : Type} {st : TapeSt dt A R P I}
     {elt : I → Univ A R P dt.KIx dt.dd} {v : Univ A R P dt.KIx dt.dd → Prop}
     (hs : st.sav = ixMark elt v) (ht : st.tgt = ixMark elt v) :
     dt.ixStageEndSt st elt v = st := by
@@ -316,7 +325,7 @@ include hrules hR hlin hix hhasP hsepP hinj hmono hup helt hord htop hbot he₀
 discipline assumed – the random access writes the home address into SAV and
 TARGET whatever they held, so its exit state is the normalized
 `DescriptiveComplexity.Draw.Data.ixStageEndSt`. -/
-theorem ixStage_hStage_thread (b : Bool) (w wG wP wR wK : ℕ)
+private theorem ixStage_hStage_thread (b : Bool) (w wG wP wR wK : ℕ)
     (hcost : ∀ (ℓ : Fin (dt.d.B.arity iv)) (a : Lex (Fin dt.dd0 → A)),
       2 * (wideRank (F.cell (dt.ixStageXS F hhasP vi ts ℓ a)) - wideRank v) + 2 ≤ w ∧
         2 * (wideRank (F.cell (dt.ixStageXD F hhasP ℓ a)) - wideRank v) + 2 ≤ w)
@@ -375,7 +384,7 @@ include hrules hR hlin hix hhasP hsepP hinj hmono hup helt hord htop hbot he₀
 /-- **The stage atom, entered by a dispatch**: at the boundary discipline – SAV
 and TARGET at the home address – the random access runs and restores the state,
 so the sequencer's background is untouched. -/
-theorem ixStage_hStage (b : Bool) (w wG wP wR wK : ℕ)
+private theorem ixStage_hStage (b : Bool) (w wG wP wR wK : ℕ)
     (hcost : ∀ (ℓ : Fin (dt.d.B.arity iv)) (a : Lex (Fin dt.dd0 → A)),
       2 * (wideRank (F.cell (dt.ixStageXS F hhasP vi ts ℓ a)) - wideRank v) + 2 ≤ w ∧
         2 * (wideRank (F.cell (dt.ixStageXD F hhasP ℓ a)) - wideRank v) + 2 ≤ w)
@@ -477,7 +486,7 @@ include hrules hR hlin hix htop hbot hv hvi hwkSt hcompat hgap hinj helt hhasP h
 /-- **A passing gate block, entered by a dispatch**: every register is
 well-shaped, so the file test passes, the domain evaluation runs on the
 block's decoded tag, and the block exits to the next checkpoint. -/
-theorem ixGateBlock_hStage_pos (t : dt.X.Tag)
+private theorem ixGateBlock_hStage_pos (t : dt.X.Tag)
     (htag : dt.dspTagOf PR.zero PR.one
       (wmBlk (ixAddr elt st.mir) (Tag.arg (toLex b) : Tag R P dt.KIx)) = t)
     (hTest : ∀ u, Test u) (f : dt.CtlIx → A) (w : ℕ)
@@ -587,7 +596,7 @@ include hrules hR hlin hix htop hbot hv hvi hwkSt hcompat hgap in
 /-- **A failing gate block**: some register is not well-shaped, so the file
 test fails and the block leaves the whole gate sequence through the failing
 exit, the fail store applied at the marker's symbol. -/
-theorem ixGateBlock_hStage_neg {u : I}
+private theorem ixGateBlock_hStage_neg {u : I}
     (hTest : ¬Test u) (f : dt.CtlIx → A) :
     (wideData (Univ A R P dt.KIx dt.dd)).ReachesIn
       ((wideRank (F.cell gtop) + 2 + ((ixRank F.le gtop - ixRank F.le gbot) * wG + 1) +

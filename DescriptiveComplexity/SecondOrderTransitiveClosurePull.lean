@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.SecondOrderTransitiveClosure
 public import DescriptiveComplexity.SecondOrderPull
 public import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.SecondOrderPull
+import all DescriptiveComplexity.SecondOrderTransitiveClosure
 
 /-!
 # Pulling SO(TC) definability back through an interpretation
@@ -114,7 +116,7 @@ theorem SOTCSpec.comap_isSrc_iff (ρ : spec.B.Assignment (I.Map A)) :
       (realize_sentence_of_equiv (spec.B.extendEquiv (I.ordExtendLEquiv A) ρ) spec.src)))
 
 /-- **Accepting states correspond.** -/
-theorem SOTCSpec.comap_isTgt_iff (ρ : spec.B.Assignment (I.Map A)) :
+private theorem SOTCSpec.comap_isTgt_iff (ρ : spec.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     spec.IsTgt ρ ↔ (spec.comap I).IsTgt (spec.B.pullAssign ρ) := by
   let := I.mapLinearOrder A
@@ -125,7 +127,7 @@ theorem SOTCSpec.comap_isTgt_iff (ρ : spec.B.Assignment (I.Map A)) :
 
 /-- **Steps correspond**: a step of the specification on the interpreted
 structure is a step of the pullback on the base structure. -/
-theorem SOTCSpec.comap_step_iff (ρ σ : spec.B.Assignment (I.Map A)) :
+private theorem SOTCSpec.comap_step_iff (ρ σ : spec.B.Assignment (I.Map A)) :
     letI := I.mapLinearOrder A
     spec.Step ρ σ ↔ (spec.comap I).Step (spec.B.pullAssign ρ) (spec.B.pullAssign σ) := by
   let := I.mapLinearOrder A
@@ -143,7 +145,7 @@ theorem SOTCSpec.comap_step_iff (ρ σ : spec.B.Assignment (I.Map A)) :
 
 /-- **The pullback is correct**: it accepts the base structure exactly when the
 specification accepts the interpreted one. -/
-theorem SOTCSpec.comap_accepts_iff :
+private theorem SOTCSpec.comap_accepts_iff :
     letI := I.mapLinearOrder A
     spec.Accepts (I.Map A) ↔ (spec.comap I).Accepts A := by
   let := I.mapLinearOrder A

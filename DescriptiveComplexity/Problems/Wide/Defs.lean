@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Machines
 import DescriptiveComplexity.Interpretation
 public import DescriptiveComplexity.Exponential.AddrExp
+import all DescriptiveComplexity.Exponential.AddrExp
 
 /-!
 # The wide machine: a machine addressed by the subsets of its instance

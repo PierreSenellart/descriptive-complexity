@@ -8,6 +8,13 @@ module
 public import DescriptiveComplexity.Problems.Machine.HaltHard.Interp
 public import DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
 public import DescriptiveComplexity.Problems.Machine.Halt
+import all DescriptiveComplexity.Computability.FinStruct
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.CodeHalt.Hardness.Draw
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Bridge
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Input
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Interp
 
 /-!
 # The drawn instance is a well-formed machine embedding the simulator
@@ -37,7 +44,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 
 omit [L.Structure A] in
 /-- A tuple canonical at `0` is the bottom tuple. -/
-theorem eq_botTup_of_canon0 {w : Fin (dimOf V) → A} (h : Canon 0 w) : w = botTup V A := by
+private theorem eq_botTup_of_canon0 {w : Fin (dimOf V) → A} (h : Canon 0 w) : w = botTup V A := by
   funext j
   exact le_antisymm (h j (Nat.zero_le _) _) (isBot_botA _)
 
@@ -48,7 +55,7 @@ noncomputable def mEl (u : SimU (allCode cF cP)) : (haltTuringInterp V cF cP).Ma
 
 /-! ### The embedding of the simulating machine -/
 
-theorem unary_embed_iff (Q : SimU (allCode cF cP) → Prop) (R : Language.turingRel 1)
+private theorem unary_embed_iff (Q : SimU (allCode cF cP) → Prop) (R : Language.turingRel 1)
     (hR : ∀ ts : Fin 1 → HTag V cF cP,
       (haltTuringInterp V cF cP).relFormula R ts = mUnaryF V cF cP Q (ts 0))
     (b : (haltTuringInterp V cF cP).Map A) :
@@ -64,7 +71,7 @@ theorem unary_embed_iff (Q : SimU (allCode cF cP) → Prop) (R : Language.turing
     have h2 : w = botTup V A := congrArg Prod.snd heq
     exact ⟨⟨u, h1, hu⟩, h2 ▸ canon_botTup 0⟩
 
-theorem binary_embed_iff (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Prop)
+private theorem binary_embed_iff (Q : SimU (allCode cF cP) → SimU (allCode cF cP) → Prop)
     (R : Language.turingRel 2)
     (hR : ∀ ts : Fin 2 → HTag V cF cP,
       (haltTuringInterp V cF cP).relFormula R ts = mBinaryF V cF cP Q (ts 0) (ts 1))
@@ -114,7 +121,7 @@ theorem tmEmbed_halt :
 omit [Finite A] [Nonempty A] in
 /-- The letter `DescriptiveComplexity.HaltHard.InpOn` relates to a cell is
 unique. -/
-theorem inpOn_functional {c : CellTag V} {u u' : SimU (allCode cF cP)}
+private theorem inpOn_functional {c : CellTag V} {u u' : SimU (allCode cF cP)}
     {w : Fin (dimOf V) → A} (h : InpOn V cF cP c u w) (h' : InpOn V cF cP c u' w) :
     u = u' := by
   rcases c with - | i | i | - | - | - | - | - | - | - <;>
@@ -173,7 +180,7 @@ section TupleNumbers
 variable (k : ℕ) (e : Fin (k + 1) ≃o A)
 
 /-- Splitting the number of a concatenation. -/
-theorem tupleIdx_append (c : ℕ) : ∀ l₁ l₂ : List ℕ,
+private theorem tupleIdx_append (c : ℕ) : ∀ l₁ l₂ : List ℕ,
     tupleIdx c (l₁ ++ l₂) = tupleIdx c l₁ + c ^ l₁.length * tupleIdx c l₂ := by
   intro l₁
   induction l₁ with
@@ -189,7 +196,7 @@ noncomputable def tupN (w : Fin (dimOf V) → A) : ℕ :=
 
 omit [L.Structure A] [Finite A] [Nonempty A] in
 /-- **Reversed lexicographic comparison is comparison of the numbers.** -/
-theorem tupN_lt_of_revLexLt {u w : Fin (dimOf V) → A} (h : RevLexLt u w) :
+private theorem tupN_lt_of_revLexLt {u w : Fin (dimOf V) → A} (h : RevLexLt u w) :
     tupN k e u < tupN k e w := by
   obtain ⟨j, hj, htl⟩ := h
   have hkey : ∀ P Tu Tw au aw X : ℕ, Tu < P → Tw < P → au < aw →
@@ -319,7 +326,7 @@ theorem canon_tupOf (i : Fin V.numSyms) (t : ℕ) : Canon (V.arity i) (tupOf V k
 
 omit [L.Structure A] in
 /-- The number of a bit cell's tuple is its index. -/
-theorem tupN_tupOf (i : Fin V.numSyms) {t : ℕ} (ht : t < (k + 1) ^ V.arity i) :
+private theorem tupN_tupOf (i : Fin V.numSyms) {t : ℕ} (ht : t < (k + 1) ^ V.arity i) :
     tupN k e (tupOf V k e i t) = t := by
   have harl : V.arity i ≤ dimOf V := arity_le_dimOf V i
   have hofn : (List.ofFn fun j => (e.symm (tupOf V k e i t j) : ℕ)) =
@@ -347,7 +354,7 @@ theorem tupleIdx_eq_zero {c : ℕ} : ∀ {l : List ℕ}, (∀ a ∈ l, a = 0) �
 
 omit [L.Structure A] in
 /-- The number of a tuple canonical at an arity stays below the block cap. -/
-theorem tupN_lt_cap_of_canon {i : Fin V.numSyms} {w : Fin (dimOf V) → A}
+private theorem tupN_lt_cap_of_canon {i : Fin V.numSyms} {w : Fin (dimOf V) → A}
     (hcan : Canon (V.arity i) w) : tupN k e w < (k + 1) ^ V.arity i := by
   have harl : V.arity i ≤ dimOf V := arity_le_dimOf V i
   have hsplit : tupN k e w =
@@ -386,7 +393,7 @@ theorem tupN_lt_cap_of_canon {i : Fin V.numSyms} {w : Fin (dimOf V) → A}
 
 omit [L.Structure A] in
 /-- A tuple canonical at an arity is the tuple of its number's bit cell. -/
-theorem eq_tupOf_of_canon {i : Fin V.numSyms} {w : Fin (dimOf V) → A}
+private theorem eq_tupOf_of_canon {i : Fin V.numSyms} {w : Fin (dimOf V) → A}
     (hcan : Canon (V.arity i) w) : w = tupOf V k e i (tupN k e w) :=
   (tupN_inj k e (by rw [tupN_tupOf V k e i (tupN_lt_cap_of_canon V k e hcan)])).symm
 
@@ -419,7 +426,7 @@ noncomputable def oneCells : List ((haltTuringInterp V cF cP).Map A) :=
     hPt (Sum.inr .cOne) (pad (botOrd A) fun _ : Fin 1 => e a)
 
 /-- **The cells of the drawn instance, in tape order.** -/
-noncomputable def psH : List ((haltTuringInterp V cF cP).Map A) :=
+private noncomputable def psH : List ((haltTuringInterp V cF cP).Map A) :=
   hPt (Sum.inr .cEndL) (botTup V A) ::
     (chainCells V cF cP k e ++
       hPt (Sum.inr .cProc) (botTup V A) :: hPt (Sum.inr .cMid) (botTup V A) ::
@@ -430,7 +437,7 @@ noncomputable def psH : List ((haltTuringInterp V cF cP).Map A) :=
 /-! ### Membership: the cells are exactly the positions -/
 
 /-- Every listed cell is a position. -/
-theorem posn_of_mem_psH {p : (haltTuringInterp V cF cP).Map A} (hp : p ∈ psH V cF cP k e) :
+private theorem posn_of_mem_psH {p : (haltTuringInterp V cF cP).Map A} (hp : p ∈ psH V cF cP k e) :
     (tmData ((haltTuringInterp V cF cP).Map A)).Posn p := by
   change TMPosn p
   simp only [psH, List.mem_cons, List.mem_append, List.mem_cons] at hp
@@ -460,7 +467,7 @@ theorem posn_of_mem_psH {p : (haltTuringInterp V cF cP).Map A} (hp : p ∈ psH V
   exact (relMap_posn _ _).mpr ⟨_, rfl, canon_botTup _⟩
 
 /-- Every position is a listed cell. -/
-theorem mem_psH_of_posn {p : (haltTuringInterp V cF cP).Map A}
+private theorem mem_psH_of_posn {p : (haltTuringInterp V cF cP).Map A}
     (hp : (tmData ((haltTuringInterp V cF cP).Map A)).Posn p) : p ∈ psH V cF cP k e := by
   obtain ⟨t, w, rfl⟩ := exists_hPt p
   obtain ⟨c, rfl, hcan⟩ := (relMap_posn t w).mp hp
@@ -516,12 +523,12 @@ theorem mem_psH_of_posn {p : (haltTuringInterp V cF cP).Map A}
 variable [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)]
 
 /-- The bit drawn at a bit cell: the table entry of the presentation. -/
-noncomputable def bitAt (i : Fin V.numSyms) (t : ℕ) : Bool :=
+private noncomputable def bitAt (i : Fin V.numSyms) (t : ℕ) : Bool :=
   decide (RelMap (V.sym i) fun j : Fin (V.arity i) =>
     e ⟨digitAt (k + 1) t (j : ℕ), digitAt_lt (Nat.succ_pos k) t _⟩)
 
 /-- The drawn bit reads the source relation at the cell's tuple. -/
-theorem bitAt_iff_bitOf (i : Fin V.numSyms) (t : ℕ) :
+private theorem bitAt_iff_bitOf (i : Fin V.numSyms) (t : ℕ) :
     bitAt V k e i t = true ↔ bitOf V i (tupOf V k e i t) := by
   rw [bitAt, decide_eq_true_iff, bitOf]
   refine iff_of_eq (congrArg _ (funext fun j => ?_))
@@ -530,7 +537,7 @@ theorem bitAt_iff_bitOf (i : Fin V.numSyms) (t : ℕ) :
   exact congrArg _ (Fin.ext rfl)
 
 /-- **The initial letters, cell by cell.** -/
-noncomputable def inpH : List ((haltTuringInterp V cF cP).Map A) :=
+private noncomputable def inpH : List ((haltTuringInterp V cF cP).Map A) :=
   mEl (sts .endL) ::
     ((bitIdx V k).flatMap (fun p =>
       [mEl (sts (.hComp (posBit cF cP (bitAt V k e p.1 p.2)))),
@@ -581,7 +588,7 @@ theorem sLt_bit_fold (i : Fin V.numSyms) (w : Fin (dimOf V) → A) :
     SLt V cF cP (hPt (Sum.inr (.cBit i)) w) (hPt (Sum.inr (.cFold i)) w) :=
   sLt_intro V cF cP (Or.inr ⟨rfl, Or.inr ⟨rfl, Nat.zero_le _⟩⟩) (Or.inl (by simp))
 
-theorem sLt_one {a a' : Fin (k + 1)} (h : a' < a) :
+private theorem sLt_one {a a' : Fin (k + 1)} (h : a' < a) :
     SLt V cF cP (hPt (Sum.inr .cOne) (pad (botOrd A) fun _ : Fin 1 => e a))
       (hPt (Sum.inr .cOne) (pad (botOrd A) fun _ : Fin 1 => e a')) := by
   refine sLt_of_revLex V cF cP rfl ⟨⟨0, dimOf_pos V⟩, ?_, ?_⟩
@@ -596,7 +603,7 @@ theorem sLt_one {a a' : Fin (k + 1)} (h : a' < a) :
 
 /-- Pairwise over a `flatMap`, from pairwise inside each image and pairwise
 across the images. -/
-theorem pairwise_flatMap {α β : Type} {R : β → β → Prop} {f : α → List β} :
+private theorem pairwise_flatMap {α β : Type} {R : β → β → Prop} {f : α → List β} :
     ∀ {l : List α}, (∀ a ∈ l, (f a).Pairwise R) →
       l.Pairwise (fun a b => ∀ x ∈ f a, ∀ y ∈ f b, R x y) →
       (l.flatMap f).Pairwise R
@@ -637,7 +644,7 @@ theorem pairwise_bitIdx : (bitIdx V k).Pairwise (BitLt V) := by
     obtain ⟨t', -, rfl⟩ := hq
     exact Or.inl h
 
-theorem pairwise_chainCells : (chainCells V cF cP k e).Pairwise (SLt V cF cP) := by
+private theorem pairwise_chainCells : (chainCells V cF cP k e).Pairwise (SLt V cF cP) := by
   rw [chainCells]
   refine pairwise_flatMap (fun p _ => ?_) ?_
   · rw [pairCells]
@@ -669,7 +676,7 @@ theorem pairwise_chainCells : (chainCells V cF cP k e).Pairwise (SLt V cF cP) :=
       rcases hx with rfl | rfl <;> rcases hy with rfl | rfl <;>
         exact sLt_of_revLex V cF cP (hbeq _ _ (by simp) (by simp)) hrev
 
-theorem pairwise_oneCells : (oneCells V cF cP k e).Pairwise (SLt V cF cP) := by
+private theorem pairwise_oneCells : (oneCells V cF cP k e).Pairwise (SLt V cF cP) := by
   rw [oneCells]
   rw [List.pairwise_map, List.pairwise_reverse]
   have hfin : (List.finRange (k + 1)).Pairwise (· < ·) := by
@@ -699,32 +706,32 @@ theorem tag_of_mem_oneCells {x : (haltTuringInterp V cF cP).Map A}
 
 section BlockIdxValues
 
-theorem blockIdx_cEndL : blockIdx V cF cP (Sum.inr .cEndL) = 0 := rfl
+private theorem blockIdx_cEndL : blockIdx V cF cP (Sum.inr .cEndL) = 0 := rfl
 
-theorem blockIdx_cBit (i : Fin V.numSyms) :
+private theorem blockIdx_cBit (i : Fin V.numSyms) :
     blockIdx V cF cP (Sum.inr (.cBit i)) = 1 + (V.numSyms - 1 - i) := rfl
 
-theorem blockIdx_cFold (i : Fin V.numSyms) :
+private theorem blockIdx_cFold (i : Fin V.numSyms) :
     blockIdx V cF cP (Sum.inr (.cFold i)) = 1 + (V.numSyms - 1 - i) := rfl
 
-theorem blockIdx_cProc : blockIdx V cF cP (Sum.inr .cProc) = V.numSyms + 1 := rfl
+private theorem blockIdx_cProc : blockIdx V cF cP (Sum.inr .cProc) = V.numSyms + 1 := rfl
 
-theorem blockIdx_cMid : blockIdx V cF cP (Sum.inr .cMid) = V.numSyms + 2 := rfl
+private theorem blockIdx_cMid : blockIdx V cF cP (Sum.inr .cMid) = V.numSyms + 2 := rfl
 
-theorem blockIdx_cGap : blockIdx V cF cP (Sum.inr .cGap) = V.numSyms + 3 := rfl
+private theorem blockIdx_cGap : blockIdx V cF cP (Sum.inr .cGap) = V.numSyms + 3 := rfl
 
-theorem blockIdx_cComL : blockIdx V cF cP (Sum.inr .cComL) = V.numSyms + 4 := rfl
+private theorem blockIdx_cComL : blockIdx V cF cP (Sum.inr .cComL) = V.numSyms + 4 := rfl
 
-theorem blockIdx_cOne : blockIdx V cF cP (Sum.inr .cOne) = V.numSyms + 5 := rfl
+private theorem blockIdx_cOne : blockIdx V cF cP (Sum.inr .cOne) = V.numSyms + 5 := rfl
 
-theorem blockIdx_cComR : blockIdx V cF cP (Sum.inr .cComR) = V.numSyms + 6 := rfl
+private theorem blockIdx_cComR : blockIdx V cF cP (Sum.inr .cComR) = V.numSyms + 6 := rfl
 
-theorem blockIdx_cEndR : blockIdx V cF cP (Sum.inr .cEndR) = V.numSyms + 7 := rfl
+private theorem blockIdx_cEndR : blockIdx V cF cP (Sum.inr .cEndR) = V.numSyms + 7 := rfl
 
 end BlockIdxValues
 
 /-- **The cells are strictly ordered as listed.** -/
-theorem pairwise_psH : (psH V cF cP k e).Pairwise (SLt V cF cP) := by
+private theorem pairwise_psH : (psH V cF cP k e).Pairwise (SLt V cF cP) := by
   have htail : ∀ y ∈ hPt (Sum.inr (CellTag.cProc (V := V))) (botTup V A) ::
       hPt (Sum.inr .cMid) (botTup V A) :: hPt (Sum.inr .cGap) (botTup V A) ::
       hPt (Sum.inr .cComL) (botTup V A) ::
@@ -846,7 +853,7 @@ variable (k : ℕ) (e : Fin (k + 1) ≃o A)
 omit [L.IsRelational]
   [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)] in
 /-- **The listed cells enumerate the positions in the machine's order.** -/
-theorem isPosEnum_psH :
+private theorem isPosEnum_psH :
     IsPosEnum (tmData ((haltTuringInterp V cF cP).Map A)) (psH V cF cP k e) := by
   refine ⟨(pairwise_psH V cF cP k e).imp fun h => h, fun p => ?_⟩
   exact ⟨fun hp => posn_of_mem_psH V cF cP k e hp, fun hp => mem_psH_of_posn V cF cP k e hp⟩
@@ -873,7 +880,7 @@ theorem forall₂_map_replicate {α β γ : Type} {R : β → γ → Prop} {F : 
 
 omit [L.IsRelational] in
 /-- **The listed letters are the initial tape of the listed cells.** -/
-theorem forall₂_initTape :
+private theorem forall₂_initTape :
     List.Forall₂ (tmData ((haltTuringInterp V cF cP).Map A)).InitTape
       (psH V cF cP k e) (inpH V cF cP k e) := by
   have hcell : ∀ (c : CellTag V) (w : Fin (dimOf V) → A) (u : SimU (allCode cF cP)),
@@ -913,7 +920,7 @@ theorem forall₂_initTape :
 
 omit [Finite A] [Nonempty A]
   [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)] in
-theorem reverse_flatMap {α β : Type} (f : α → List β) :
+private theorem reverse_flatMap {α β : Type} (f : α → List β) :
     ∀ l : List α, (l.flatMap f).reverse = l.reverse.flatMap fun a => (f a).reverse
   | [] => rfl
   | a :: l => by
@@ -923,7 +930,7 @@ theorem reverse_flatMap {α β : Type} (f : α → List β) :
 
 omit [Finite A] [Nonempty A] in
 /-- The reversed flattened table is the drawn bit sequence. -/
-theorem table_flatten_reverse_eq :
+private theorem table_flatten_reverse_eq :
     (FinStruct.ofEquiv V k e.toEquiv).table.flatten.reverse =
       (bitIdx V k).map fun p => bitAt V k e p.1 p.2 := by
   have htab : (FinStruct.ofEquiv V k e.toEquiv).table =
@@ -953,7 +960,7 @@ theorem replicate_rotate {α : Type} (a : α) (n : ℕ) (l : List α) :
 
 omit [L.IsRelational] in
 /-- **The listed letters are the image of the spelled initial word.** -/
-theorem inpH_eq :
+private theorem inpH_eq :
     inpH V cF cP k e =
       ((SimSym.endL :: ((((bitIdx V k).map fun p => bitAt V k e p.1 p.2).flatMap
             (fun b => [SimSym.hComp (posBit cF cP b), SimSym.hComp (posFold cF cP)]) ++
@@ -970,7 +977,7 @@ include k e in
 omit [∀ (n : ℕ) (R : L.Relations n) (x : Fin n → A), Decidable (RelMap R x)] in
 /-- **Correctness of the drawing**: the drawn instance is a yes-instance of
 the halting problem exactly when the source structure is one. -/
-theorem holds_haltMap_iff {P : DecisionProblem L}
+private theorem holds_haltMap_iff {P : DecisionProblem L}
     (hF : ∀ v : List.Vector ℕ 3, cF.eval v.1 = pure <$> foldSpec v)
     (hP : ∀ N n : ℕ, (cP.eval [N, n]).Dom ↔ P.toPred V (structOfBits V (n - 1) N)) :
     HALT ((haltTuringInterp V cF cP).Map A) ↔ P A := by

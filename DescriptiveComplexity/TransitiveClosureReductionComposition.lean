@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.TransitiveClosureReductionDet
 import DescriptiveComplexity.FixedPointReductionComposition
+import all DescriptiveComplexity.FixedPointReductionComposition
+import all DescriptiveComplexity.TransitiveClosureReduction
+import all DescriptiveComplexity.TransitiveClosureReductionDet
 
 /-!
 # Composing an FO(TC) reduction with a first-order one

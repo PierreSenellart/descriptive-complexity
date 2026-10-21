@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.Ordered
+import all DescriptiveComplexity.SecondOrder
 
 /-!
 # SO-Horn: existential second-order logic with a Horn kernel
@@ -131,7 +132,7 @@ theorem HornProgram.holds_equiv (e : M ≃[L] N) (prog : HornProgram L B k)
 /-- **Horn satisfiability is isomorphism-invariant**: a program has a
 satisfying assignment on one structure iff it has one on any isomorphic
 structure. -/
-theorem exists_holds_equiv (e : M ≃[L] N) (prog : HornProgram L B k) :
+private theorem exists_holds_equiv (e : M ≃[L] N) (prog : HornProgram L B k) :
     (∃ ρ : B.Assignment M, prog.Holds ρ) ↔ ∃ ρ : B.Assignment N, prog.Holds ρ := by
   constructor
   · rintro ⟨ρ, hρ⟩

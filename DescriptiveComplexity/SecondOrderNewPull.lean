@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.Relativize
 public import DescriptiveComplexity.RelComposition
 public import DescriptiveComplexity.SecondOrderPull
+import all DescriptiveComplexity.SecondOrderNew
 
 /-!
 # Pulling `∃SO[new]` definability back through an interpretation
@@ -213,7 +214,7 @@ noncomputable def newInterp (I : FOInterpretation L₁ L₂ Tag dim) :
   domFormula := newDom L₁ Tag dim B
 
 /-- The guard: the canonical-element variable holds of exactly one element. -/
-noncomputable def canonGuard : (newHost L₁ Tag dim B).Sentence :=
+private noncomputable def canonGuard : (newHost L₁ Tag dim B).Sentence :=
   (canonHostF L₁ Tag dim B (Sum.inr 0)).iExsUnique (Fin 1)
 
 end Interp
@@ -235,21 +236,21 @@ noncomputable def hostStruc : (newHost L₁ Tag dim B).Structure (A ⊕ Fin n) :
 
 variable {A n ρ}
 
-theorem realize_oldHostF {α : Type} (x : α) (v : α → A ⊕ Fin n) :
+private theorem realize_oldHostF {α : Type} (x : α) (v : α → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (oldHostF L₁ Tag dim B x).Realize v ↔ IsOld (v x) := by
   let := hostStruc (L₁ := L₁) A n ρ
   rw [oldHostF, Formula.realize_rel₁]
   exact Iff.rfl
 
-theorem realize_canonHostF {α : Type} (x : α) (v : α → A ⊕ Fin n) :
+private theorem realize_canonHostF {α : Type} (x : α) (v : α → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (canonHostF L₁ Tag dim B x).Realize v ↔ canonPart ρ (v x) := by
   let := hostStruc (L₁ := L₁) A n ρ
   rw [canonHostF, Formula.realize_rel₁]
   exact Iff.rfl
 
-theorem realize_newDom_inl (t : Tag) (w : Fin (dim + 1) → A ⊕ Fin n) :
+private theorem realize_newDom_inl (t : Tag) (w : Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newDom L₁ Tag dim B (Sum.inl t)).Realize w ↔
       (∀ j : Fin dim, IsOld (w (Fin.castSucc j))) ∧ canonPart ρ (w (Fin.last dim)) := by
@@ -257,7 +258,7 @@ theorem realize_newDom_inl (t : Tag) (w : Fin (dim + 1) → A ⊕ Fin n) :
   rw [newDom, Formula.realize_inf, Formula.realize_iInf]
   exact and_congr (forall_congr' fun j => realize_oldHostF _ w) (realize_canonHostF _ w)
 
-theorem realize_newDom_inr (u : Unit) (w : Fin (dim + 1) → A ⊕ Fin n) :
+private theorem realize_newDom_inr (u : Unit) (w : Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newDom L₁ Tag dim B (Sum.inr u)).Realize w ↔
       ¬IsOld (w (Fin.last dim)) ∧ ∀ j : Fin dim, w (Fin.castSucc j) = w (Fin.last dim) := by
@@ -267,7 +268,7 @@ theorem realize_newDom_inr (u : Unit) (w : Fin (dim + 1) → A ⊕ Fin n) :
   rw [Formula.realize_equal]
   exact Iff.rfl
 
-theorem realize_canonGuard :
+private theorem realize_canonGuard :
     letI := hostStruc (L₁ := L₁) A n ρ
     (A ⊕ Fin n) ⊨ canonGuard L₁ Tag dim B ↔ ∃! c : A ⊕ Fin n, canonPart ρ c := by
   let := hostStruc (L₁ := L₁) A n ρ
@@ -293,7 +294,7 @@ variable (I : FOInterpretation L₁ L₂ Tag dim)
 
 /-- A base symbol at a tuple of interpreted tags: the reduction's own defining
 formula, read among the original elements. -/
-theorem realize_newRelF_base {k : ℕ} (R : L₂.Relations k) (t : Fin k → Tag)
+private theorem realize_newRelF_base {k : ℕ} (R : L₂.Relations k) (t : Fin k → Tag)
     (a : Fin k → Fin dim → A) (w : Fin k × Fin (dim + 1) → A ⊕ Fin n)
     (hw : ∀ (i : Fin k) (j : Fin dim), w (i, Fin.castSucc j) = Sum.inl (a i j)) :
     letI := hostStruc (L₁ := L₁) A n ρ
@@ -314,13 +315,14 @@ theorem realize_newRelF_base {k : ℕ} (R : L₂.Relations k) (t : Fin k → Tag
 
 omit [L₁.IsRelational] in
 /-- A base symbol never holds of an invented point. -/
-theorem newRelF_base_eq_bot {k : ℕ} (R : L₂.Relations k) (τ : Fin k → Tag ⊕ Unit)
+private theorem newRelF_base_eq_bot {k : ℕ} (R : L₂.Relations k) (τ : Fin k → Tag ⊕ Unit)
     (h : ¬∃ t : Fin k → Tag, ∀ i, τ i = Sum.inl (t i)) :
     newRelF L₁ Tag dim B I (tgtBaseSym L₂ B R) τ = ⊥ := by
   rw [newRelF, dite_eq_right h]
 
 /-- The marker `old` holds exactly of the interpreted points. -/
-theorem realize_newRelF_old (τ : Fin 1 → Tag ⊕ Unit) (w : Fin 1 × Fin (dim + 1) → A ⊕ Fin n) :
+private theorem realize_newRelF_old
+    (τ : Fin 1 → Tag ⊕ Unit) (w : Fin 1 × Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newRelF L₁ Tag dim B I (tgtOldSym L₂ B) τ).Realize w ↔ (τ 0).isLeft = true := by
   let := hostStruc (L₁ := L₁) A n ρ
@@ -333,7 +335,7 @@ theorem realize_newRelF_old (τ : Fin 1 → Tag ⊕ Unit) (w : Fin 1 × Fin (dim
 
 /-- A relation variable of the target's block is read off the pulled variable
 selected by the tags. -/
-theorem realize_newRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k → Tag ⊕ Unit)
+private theorem realize_newRelF_block {k : ℕ} (r : B.lang.Relations k) (τ : Fin k → Tag ⊕ Unit)
     (w : Fin k × Fin (dim + 1) → A ⊕ Fin n) :
     letI := hostStruc (L₁ := L₁) A n ρ
     (newRelF L₁ Tag dim B I (tgtBlockSym L₂ B r) τ).Realize w ↔
@@ -407,7 +409,7 @@ omit [L₂.IsRelational] in
 /-- Every point of the interpreted universe is the image of a point of the
 target's extended universe: an interpreted tag carries a tuple of original
 elements, an invented tag a single invented value. -/
-theorem newPoint_surjective (hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c₀)
+private theorem newPoint_surjective (hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c₀)
     (z : (Tag ⊕ Unit) × (Fin (dim + 1) → A ⊕ Fin n))
     (hz : letI := hostStruc (L₁ := L₁) A n ρ
       (newDom L₁ Tag dim B z.1).Realize z.2) :
@@ -468,7 +470,7 @@ def targetAssign (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
 sending a point of `I.Map A ⊕ Fin n` to its tagged tuple is an isomorphism
 over the target's extended vocabulary, the target's block being interpreted by
 `DescriptiveComplexity.targetAssign`. -/
-noncomputable def newTargetEquiv (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
+private noncomputable def newTargetEquiv (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
     (ρ : (newBlock Tag dim B).Assignment (A ⊕ Fin n))
     (hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c₀) :
     letI := hostStruc (L₁ := L₁) A n ρ
@@ -562,7 +564,7 @@ noncomputable def newTargetEquiv (I : FOInterpretation L₁ L₂ Tag dim) (c₀ 
 omit [Nonempty Tag] [Nonempty A] in
 /-- Sentence transfer: what the target's kernel says in the target's extended
 universe, it says in the interpreted universe. -/
-theorem realize_transfer (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
+private theorem realize_transfer (I : FOInterpretation L₁ L₂ Tag dim) (c₀ : A ⊕ Fin n)
     (ρ : (newBlock Tag dim B).Assignment (A ⊕ Fin n))
     (hc : ∀ y : A ⊕ Fin n, canonPart ρ y ↔ y = c₀)
     (ρT : B.Assignment ((I.Map A) ⊕ Fin n)) (hT : targetAssign I c₀ ρ = ρT)
@@ -594,7 +596,7 @@ noncomputable def pullRelSentence (φ : L₄.Sentence) : L₃.Sentence :=
   (J.pullRel (φ : L₄.BoundedFormula Empty 0) (isEmptyElim : (Empty ⊕ Fin 0) → TagJ)).relabel
     fun p => (isEmptyElim p.1 : Empty)
 
-theorem realize_pullRelSentence (φ : L₄.Sentence) (A : Type) [L₃.Structure A] :
+private theorem realize_pullRelSentence (φ : L₄.Sentence) (A : Type) [L₃.Structure A] :
     A ⊨ J.pullRelSentence φ ↔ (J.MapRel A) ⊨ φ := by
   have h1 : A ⊨ J.pullRelSentence φ ↔
       (J.pullRel (φ : L₄.BoundedFormula Empty 0)
@@ -660,7 +662,7 @@ variable {L₁ L₂ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelational]
 the *same* number of invented values, the target's kernel holds in the
 target's extended universe exactly when its guarded pullback holds in the
 source's. -/
-theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
+private theorem sorealize_newPull {Tag : Type} [Finite Tag] [Nonempty Tag] {dim : ℕ}
     (I : FOInterpretation L₁ L₂ Tag dim) (B : SOBlock) (φ : (newTarget L₂ B).Sentence)
     (A : Type) [L₁.Structure A] [Nonempty A] (n : ℕ) :
     haveI := I.map_nonempty A

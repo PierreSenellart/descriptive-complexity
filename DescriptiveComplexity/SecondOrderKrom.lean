@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.SecondOrder
 import DescriptiveComplexity.Ordered
+import all DescriptiveComplexity.SecondOrder
 
 /-!
 # SO-Krom: existential second-order logic with a Krom kernel
@@ -144,7 +145,7 @@ section Iso
 variable {L : Language.{0, 0}} {B : SOBlock} {k : ℕ} {M N : Type}
 variable [L.Structure M] [L.Structure N]
 
-theorem KromLit.holds_equiv (e : M ≃[L] N) (l : KromLit B k) (ρ : B.Assignment M)
+private theorem KromLit.holds_equiv (e : M ≃[L] N) (l : KromLit B k) (ρ : B.Assignment M)
     (v : Fin k → M) :
     l.Holds (B.mapAssign e.toEquiv ρ) (fun j => e (v j)) ↔ l.Holds ρ v := by
   rw [KromLit.Holds, KromLit.Holds]
@@ -152,7 +153,7 @@ theorem KromLit.holds_equiv (e : M ≃[L] N) (l : KromLit B k) (ρ : B.Assignmen
   | false => exact not_congr (l.atom.holds_equiv e ρ v)
   | true => exact l.atom.holds_equiv e ρ v
 
-theorem KromLit.slotHolds_equiv (e : M ≃[L] N) (o : Option (KromLit B k))
+private theorem KromLit.slotHolds_equiv (e : M ≃[L] N) (o : Option (KromLit B k))
     (ρ : B.Assignment M) (v : Fin k → M) :
     KromLit.slotHolds o (B.mapAssign e.toEquiv ρ) (fun j => e (v j)) ↔
       KromLit.slotHolds o ρ v := by
@@ -180,7 +181,7 @@ theorem KromProgram.holds_equiv (e : M ≃[L] N) (prog : KromProgram L B k)
 /-- **Krom satisfiability is isomorphism-invariant**: a program has a
 satisfying assignment on one structure iff it has one on any isomorphic
 structure. -/
-theorem KromProgram.exists_holds_equiv (e : M ≃[L] N) (prog : KromProgram L B k) :
+private theorem KromProgram.exists_holds_equiv (e : M ≃[L] N) (prog : KromProgram L B k) :
     (∃ ρ : B.Assignment M, prog.Holds ρ) ↔ ∃ ρ : B.Assignment N, prog.Holds ρ := by
   constructor
   · rintro ⟨ρ, hρ⟩

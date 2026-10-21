@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.FinSat.Fixpoint
+import all DescriptiveComplexity.Problems.FinSat.Defs
+import all DescriptiveComplexity.Problems.FinSat.Fixpoint
 
 /-!
 # The certificate: a finite model, invented
@@ -130,7 +132,7 @@ clause of the truth definition needs. -/
 
 /-- Some assignment of the argument positions matches the arguments of an
 atom: they are functional. -/
-theorem matching_exists (hwf : IsWF A) (g : A) {M : Type} (v : A → M) :
+private theorem matching_exists (hwf : IsWF A) (g : A) {M : Type} (v : A → M) :
     ∃ w : A → M, ∀ p x, ArgG g p x → w p = v x := by
   classical
   refine ⟨fun p => if h : ∃ x, ArgG g p x then v h.choose else v p, fun p x hp => ?_⟩
@@ -141,7 +143,7 @@ theorem matching_exists (hwf : IsWF A) (g : A) {M : Type} (v : A → M) :
 
 /-- Two assignments matching the arguments of an atom agree on every position
 of its symbol's signature: the atom has an argument at each of them. -/
-theorem matching_agree (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {M : Type}
+private theorem matching_agree (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {M : Type}
     {v w w' : A → M} (hw : ∀ p x, ArgG g p x → w p = v x)
     (hw' : ∀ p x, ArgG g p x → w' p = v x) : ∀ p, SigG s p → w p = w' p := by
   intro p hp
@@ -162,26 +164,26 @@ def Represents (Val : D → A → D → Prop) {Elt : D → Prop} (e : D)
 /-- **The interpretation a certificate carries**: a symbol holds of an
 assignment of its argument positions when some atom of that symbol, whose
 arguments have those values under some environment, is guessed true. -/
-def CertI (Env : D → Prop) (Val : D → A → D → Prop) (H : A → D → Prop) {Elt : D → Prop}
+private def CertI (Env : D → Prop) (Val : D → A → D → Prop) (H : A → D → Prop) {Elt : D → Prop}
     (s : A) (w : A → {d : D // Elt d}) : Prop :=
   ∃ (g : A) (e : D), Env e ∧ (PosG g s ∨ NegG g s) ∧
     (∀ p x, ArgG g p x → Val e x (w p : D)) ∧ H g e
 
 /-- The valuation of the nodes a certificate carries. -/
-def CertV (Env : D → Prop) (Val : D → A → D → Prop) (G : A → D → Prop) {Elt : D → Prop}
+private def CertV (Env : D → Prop) (Val : D → A → D → Prop) (G : A → D → Prop) {Elt : D → Prop}
     (v : A → {d : D // Elt d}) (g : A) : Prop :=
   ∃ e, Env e ∧ Represents Val e v ∧ G g e
 
 variable (hc : CertOK Elt Env Val G H)
 include hc
 
-theorem val_iff_of_represents {e : D} (he : Env e) {v : A → {d : D // Elt d}}
+private theorem val_iff_of_represents {e : D} (he : Env e) {v : A → {d : D // Elt d}}
     (hv : Represents Val e v) (x : A) (d : D) : Val e x d ↔ d = (v x : D) :=
   ⟨fun h => hc.val_fun e he x d _ h (hv x), fun h => h ▸ hv x⟩
 
 /-- **Every assignment is represented**: the environments are closed under
 updating one variable, and the instance has finitely many of them. -/
-theorem represents_exists [Finite A] (v : A → {d : D // Elt d}) :
+private theorem represents_exists [Finite A] (v : A → {d : D // Elt d}) :
     ∃ e, Env e ∧ Represents Val e v := by
   classical
   let := Fintype.ofFinite A
@@ -202,7 +204,7 @@ theorem represents_exists [Finite A] (v : A → {d : D // Elt d}) :
       exact hu.1
     · exact (hu.2 x hxa _).mpr (hS x ((Finset.mem_insert.mp hx).resolve_left hxa))
 
-theorem certV_iff {e : D} (he : Env e) {v : A → {d : D // Elt d}}
+private theorem certV_iff {e : D} (he : Env e) {v : A → {d : D // Elt d}}
     (hv : Represents Val e v) (g : A) : CertV Env Val G v g ↔ G g e := by
   constructor
   · rintro ⟨e', he', hv', hg⟩
@@ -213,7 +215,7 @@ theorem certV_iff {e : D} (he : Env e) {v : A → {d : D // Elt d}}
 omit hc in
 /-- The interpretation a certificate carries is local: an atom only has
 arguments at the positions its symbol declares. -/
-theorem certI_local (hwf : IsWF A) : Local (CertI Env Val H (Elt := Elt)) := by
+private theorem certI_local (hwf : IsWF A) : Local (CertI Env Val H (Elt := Elt)) := by
   intro s w w' hww
   constructor <;> rintro ⟨g, e, he, hs, hargs, hH⟩ <;> refine ⟨g, e, he, hs, ?_, hH⟩ <;>
     intro p x hp
@@ -225,7 +227,7 @@ theorem certI_local (hwf : IsWF A) : Local (CertI Env Val H (Elt := Elt)) := by
 /-- **The guessed truth value of an atom is the truth of that atom** in the
 interpretation the certificate carries: coherence one way, the arguments of the
 atom the other. -/
-theorem certH_iff (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {e : D} (he : Env e)
+private theorem certH_iff (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {e : D} (he : Env e)
     {v : A → {d : D // Elt d}} (hv : Represents Val e v) :
     H g e ↔ ∃ w, (∀ p x, ArgG g p x → w p = v x) ∧ CertI Env Val H s w := by
   classical
@@ -250,7 +252,7 @@ theorem certH_iff (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {e : D} 
 /-- The same, read universally: all the assignments matching the arguments of
 an atom give it the same value, so “some matching assignment” and “every
 matching assignment” agree. -/
-theorem certH_iff_forall (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {e : D}
+private theorem certH_iff_forall (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) {e : D}
     (he : Env e) {v : A → {d : D // Elt d}} (hv : Represents Val e v) :
     H g e ↔ ∀ w, (∀ p x, ArgG g p x → w p = v x) → CertI Env Val H s w := by
   rw [certH_iff hc hwf hs he hv]
@@ -276,7 +278,7 @@ theorem represents_upd {e e' : D} {v : A → {d : D // Elt d}}
 /-- **The certificate's truth values obey the truth definition** of the model
 it carries: one clause at a time, the invented environments standing for the
 assignments they represent. -/
-theorem certStep_iff [Finite A] (hwf : IsWF A) {e : D} (he : Env e)
+private theorem certStep_iff [Finite A] (hwf : IsWF A) {e : D} (he : Env e)
     {v : A → {d : D // Elt d}} (hv : Represents Val e v) (g : A) :
     CertStep Elt Env Val G H g e ↔
       gstep (CertI Env Val H) (CertV Env Val G) v g := by
@@ -330,7 +332,7 @@ theorem certStep_iff [Finite A] (hwf : IsWF A) {e : D} (he : Env e)
     · rintro ⟨w, hw, hnI⟩ hall
       exact hnI (hall w hw)
 
-theorem certV_isEval [Finite A] (hwf : IsWF A) :
+private theorem certV_isEval [Finite A] (hwf : IsWF A) :
     IsEval (CertI Env Val H) (CertV Env Val G (Elt := Elt)) := by
   intro v g
   obtain ⟨e, he, hv⟩ := represents_exists hc v
@@ -340,7 +342,7 @@ theorem certV_isEval [Finite A] (hwf : IsWF A) :
 /-- **A certificate gives a finite model**: its marked values are the universe,
 its coherent atom values the interpretation, and its node values satisfaction –
 by uniqueness of the fixed point of the truth definition. -/
-theorem finSatOn_of_cert [Finite A] [Finite D] (hwf : IsWF A) : FinSatOn A := by
+private theorem finSatOn_of_cert [Finite A] [Finite D] (hwf : IsWF A) : FinSatOn A := by
   obtain ⟨d₀, hd₀⟩ := hc.elt_nonempty
   have : Nonempty {d : D // Elt d} := ⟨⟨d₀, hd₀⟩⟩
   refine ⟨hwf, {d : D // Elt d}, inferInstance, inferInstance, CertI Env Val H,
@@ -361,13 +363,13 @@ variable {M : Type}
 
 /-- The invented values standing for elements of the model: the constant
 assignments. -/
-def EnvElt (d : A → M) : Prop := ∃ z : M, d = fun _ => z
+private def EnvElt (d : A → M) : Prop := ∃ z : M, d = fun _ => z
 
 /-- The graph of an environment, when environments are assignments. -/
 def EnvVal (e : A → M) (x : A) (d : A → M) : Prop := d = fun _ => e x
 
 /-- The truth values of the nodes read off satisfaction. -/
-def EnvG (I : A → (A → M) → Prop) (g : A) (e : A → M) : Prop := Gval I e g
+private def EnvG (I : A → (A → M) → Prop) (g : A) (e : A → M) : Prop := Gval I e g
 
 /-- The truth values of the atoms read off the interpretation. -/
 def EnvH (I : A → (A → M) → Prop) (g : A) (e : A → M) : Prop :=
@@ -410,7 +412,7 @@ theorem envH_iff (hwf : IsWF A) {g s : A} (hs : PosG g s ∨ NegG g s) (e : A �
 omit [Nonempty A] in
 /-- The same, read universally: every assignment matching the arguments of an
 atom gives it the same value. -/
-theorem envH_iff_forall (hwf : IsWF A) (hloc : Local I) {g s : A}
+private theorem envH_iff_forall (hwf : IsWF A) (hloc : Local I) {g s : A}
     (hs : PosG g s ∨ NegG g s) (e : A → M) :
     EnvH I g e ↔ ∀ w, (∀ p x, ArgG g p x → w p = e x) → I s w := by
   rw [envH_iff hwf hs e]
@@ -424,7 +426,7 @@ theorem envH_iff_forall (hwf : IsWF A) (hloc : Local I) {g s : A}
 /-- The atom values read off a local interpretation cohere: an atom's arguments
 cover exactly the argument positions of its symbol, so two atoms of that symbol
 whose arguments have the same values are read at the same tuple. -/
-theorem envH_coh (hwf : IsWF A) (hloc : Local I) {g g' s : A} {e e' : A → M}
+private theorem envH_coh (hwf : IsWF A) (hloc : Local I) {g g' s : A} {e e' : A → M}
     (hs : PosG g s ∨ NegG g s) (hs' : PosG g' s ∨ NegG g' s)
     (hval : ∀ p x x', ArgG g p x → ArgG g' p x' → ∀ d, (EnvVal e x d ↔ EnvVal e' x' d)) :
     EnvH I g e → EnvH I g' e' := by
@@ -448,7 +450,7 @@ theorem envH_coh (hwf : IsWF A) (hloc : Local I) {g g' s : A} {e e' : A → M}
     exact (envVal_eq (hval p x x' hx hx')).symm
 
 /-- **A finite model gives a certificate**: invent the assignments. -/
-theorem cert_of_model [Finite A] [Finite M] [Nonempty M] (hwf : IsWF A) (hloc : Local I)
+private theorem cert_of_model [Finite A] [Finite M] [Nonempty M] (hwf : IsWF A) (hloc : Local I)
     (hroot : ∀ (v : A → M) (g : A), RootG g → Gval I v g) :
     CertOK (A := A) EnvElt (fun _ => True) EnvVal (EnvG I) (EnvH I) where
   elt_nonempty := ⟨fun _ => Classical.arbitrary M, ⟨Classical.arbitrary M, rfl⟩⟩
@@ -521,12 +523,12 @@ section Transport
 variable {D' : Type}
 
 omit [Language.finsat.Structure A] in
-private theorem forall_symm (σ : D ≃ D') (p : D → Prop) :
+theorem forall_symm (σ : D ≃ D') (p : D → Prop) :
     (∀ d : D', p (σ.symm d)) ↔ ∀ d : D, p d :=
   ⟨fun h d => by simpa using h (σ d), fun h d => h _⟩
 
 omit [Language.finsat.Structure A] in
-private theorem exists_symm (σ : D ≃ D') (p : D → Prop) :
+theorem exists_symm (σ : D ≃ D') (p : D → Prop) :
     (∃ d : D', p (σ.symm d)) ↔ ∃ d : D, p d :=
   ⟨fun ⟨_, hd⟩ => ⟨_, hd⟩, fun ⟨d, hd⟩ => ⟨σ d, by simpa using hd⟩⟩
 
@@ -543,7 +545,7 @@ theorem updAt_map (σ : D ≃ D') (Val : D → A → D → Prop) (e e' : D') (x 
   exact forall_symm σ fun c => Val (σ.symm e') y c ↔ Val (σ.symm e) y c
 
 /-- The truth definition, read on a relabeled certificate. -/
-theorem certStep_map (σ : D ≃ D') {Elt Env : D → Prop} {Val : D → A → D → Prop}
+private theorem certStep_map (σ : D ≃ D') {Elt Env : D → Prop} {Val : D → A → D → Prop}
     {G H : A → D → Prop} (g : A) (e : D') :
     CertStep (fun d => Elt (σ.symm d)) (fun e => Env (σ.symm e)) (mapVal σ Val)
         (fun g e => G g (σ.symm e)) (fun g e => H g (σ.symm e)) g e ↔
@@ -622,7 +624,8 @@ theorem finSatOn_iff_cert (A : Type) [Language.finsat.Structure A] [Finite A] [N
 /-- The same, with the invented values **indexed**: exactly the form the
 `∃SO[new]` sentence of `DescriptiveComplexity.Problems.FinSat.Membership` needs, its
 relation variables ranging over the extension `A ⊕ Fin m` of the universe. -/
-theorem finSatOn_iff_certFin (A : Type) [Language.finsat.Structure A] [Finite A] [Nonempty A] :
+private theorem finSatOn_iff_certFin
+    (A : Type) [Language.finsat.Structure A] [Finite A] [Nonempty A] :
     FinSatOn A ↔ IsWF A ∧ ∃ (m : ℕ) (Elt Env : Fin m → Prop)
       (Val : Fin m → A → Fin m → Prop) (G H : A → Fin m → Prop), CertOK Elt Env Val G H := by
   rw [finSatOn_iff_cert]

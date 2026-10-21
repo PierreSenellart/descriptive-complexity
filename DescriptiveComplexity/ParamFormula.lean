@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Composition
 public import DescriptiveComplexity.Relativize
+import all DescriptiveComplexity.Relativize
 
 /-!
 # Vocabulary maps with parameters
@@ -123,7 +124,7 @@ def struc [L₁.IsRelational] : L₁.Structure M where
 variable {M w}
 
 omit [L₂.Structure M] in
-private theorem realize_shift {n : ℕ} (v : β → M) (xs : Fin n → M) (x : β ⊕ Fin n) :
+theorem realize_shift {n : ℕ} (v : β → M) (xs : Fin n → M) (x : β ⊕ Fin n) :
     Sum.elim (Sum.elim v w) xs (shift x) = Sum.elim v xs x := by
   cases x <;> rfl
 
@@ -162,7 +163,7 @@ theorem realize_onBoundedFormula [L₁.IsRelational] {n : ℕ} (φ : L₁.Bounde
     exact forall_congr' fun a => ih _
 
 /-- The formula form of `DescriptiveComplexity.ParamHom.realize_onBoundedFormula`. -/
-theorem realize_onFormula [L₁.IsRelational] (φ : L₁.Formula β) (v : β → M) :
+private theorem realize_onFormula [L₁.IsRelational] (φ : L₁.Formula β) (v : β → M) :
     Formula.Realize (onBoundedFormula F φ) (Sum.elim v w) ↔
       @Formula.Realize _ M (F.struc M w) _ φ v :=
   realize_onBoundedFormula F φ v default
@@ -204,7 +205,7 @@ def strucOn (e : A → M) (w : α → M) : L₁.Structure A where
 /-- **The image, relativized, says of the marked part what the source said**:
 every quantifier is guarded by the marker, and every symbol is read through the
 parameters. -/
-theorem realize_relOnBoundedFormula (hinj : Function.Injective e)
+private theorem realize_relOnBoundedFormula (hinj : Function.Injective e)
     (hR : ∀ x : M, RelMap R ![x] ↔ ∃ a : A, e a = x) {n : ℕ}
     (φ : L₁.BoundedFormula β n) (v : β → A) (xs : Fin n → A) :
     (relativizeTo R (onBoundedFormula F φ)).Realize (Sum.elim (fun b => e (v b)) w)

@@ -9,6 +9,19 @@ public import DescriptiveComplexity.Problems.Wide.RegChannelAccept
 import DescriptiveComplexity.Problems.Wide.RegChannelWalk
 import DescriptiveComplexity.Problems.Wide.SpineSav
 import DescriptiveComplexity.Problems.Wide.DrawYes
+import all DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.Problems.Wide.DrawIxSpineSem
+import all DescriptiveComplexity.Problems.Wide.DrawIxStage
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.DrawYes
+import all DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.RegChannelAccept
+import all DescriptiveComplexity.Problems.Wide.RegChannelEnum
+import all DescriptiveComplexity.Problems.Wide.RegChannelLaid
+import all DescriptiveComplexity.Problems.Wide.RegChannelPad
+import all DescriptiveComplexity.Problems.Wide.RegChannelWalk
+import all DescriptiveComplexity.Problems.Wide.SpineSav
 
 /-!
 # The handed program accepts, from the sentence alone
@@ -67,7 +80,7 @@ omit [Fintype dt.SlotIx] [LinearOrder A] [Finite A] [Finite dt.KIx]
 /-- **An argument element**: the drawn universe has one, the argument blocks
 and the alphabet being nonempty. It is what puts an element above the one the
 channel marks below them, which is what the opening's walk needs. -/
-theorem exists_argElt :
+private theorem exists_argElt :
     ∃ x : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,
       ∃ i : dt.KIx, x.1 = Tag.arg i :=
@@ -83,7 +96,7 @@ omit [Finite dt.KIx] [LinearOrder (dt.X.Map A)] [Finite A] [L.IsRelational]
 /-- **An element above the one the channel marks below the argument tags**: any
 argument element is one, the argument tags being the greatest. This is what the
 opening's walk asks of the instance, and the drawing always has it. -/
-theorem exists_above_botElt (hR : PR.table.Reads)
+private theorem exists_above_botElt (hR : PR.table.Reads)
     {botE : Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd}
     (hbotarg : ∀ i : dt.KIx, botE.1 ≠ Tag.arg i) :
@@ -105,7 +118,7 @@ omit [LinearOrder (dt.X.Map A)] [L.IsRelational] [L.Structure A]
 file: `wmSetLt_ixStageTgt_logicalTop`, read against the machine's own order.
 This is the `hbelow` an evaluation asks for, and it asks nothing of the
 instance. -/
-theorem belowTop_regLaid (hlin : IsLinOrd (WMLe (A := Univ A (R')
+private theorem belowTop_regLaid (hlin : IsLinOrd (WMLe (A := Univ A (R')
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)))
     (hord : ∀ x y : Univ A (R')
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd,

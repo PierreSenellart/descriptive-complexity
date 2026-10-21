@@ -83,7 +83,7 @@ variable {Γ : Type}
 
 /-- Two different constructors of the alphabet are never equal; the shape in
 which the case analyses below need it. -/
-theorem absurd_of_ne {P : Prop} {a b : Letter Γ} (h : a = b)
+private theorem absurd_of_ne {P : Prop} {a b : Letter Γ} (h : a = b)
     (hne : a ≠ b := by simp) : P := absurd h hne
 
 /-- A word of the rewriting system, as a word of the alphabet above. -/
@@ -96,7 +96,7 @@ def symW (w : List Γ) : List (Letter Γ) := w.map Letter.sym
 @[simp] theorem symW_append (w w' : List Γ) : symW (w ++ w') = symW w ++ symW w' := by
   simp [symW]
 
-theorem sep_not_mem_symW (w : List Γ) : Letter.sep ∉ symW w := by
+private theorem sep_not_mem_symW (w : List Γ) : Letter.sep ∉ symW w := by
   induction w with
   | nil => simp
   | cons a w ih => simpa using fun h => ih h
@@ -136,7 +136,7 @@ def starR : List (Letter Γ) → List (Letter Γ)
 /-- **The half-letter offset**: decorating on the left and closing with a
 `star` is decorating on the right and opening with one. This one identity is
 what makes the top and the bottom words of a match spell the same word. -/
-theorem starL_star (w : List (Letter Γ)) :
+private theorem starL_star (w : List (Letter Γ)) :
     starL w ++ [Letter.star] = Letter.star :: starR w := by
   induction w with
   | nil => rfl
@@ -145,7 +145,7 @@ theorem starL_star (w : List (Letter Γ)) :
 /-- **One decorated word is a prefix of the other.** Two decorated words
 opening a common word are comparable, and the longer one continues with the
 decoration of the difference. -/
-theorem starL_prefix_cases : ∀ (y z S S' : List (Letter Γ)),
+private theorem starL_prefix_cases : ∀ (y z S S' : List (Letter Γ)),
     starL y ++ S = starL z ++ S' →
     (∃ t, z = y ++ t ∧ S = starL t ++ S') ∨ (∃ t, y = z ++ t ∧ starL t ++ S = S')
   | [], z, S, S', h => Or.inl ⟨z, by simp, by simpa using h⟩
@@ -195,7 +195,7 @@ inductive ParStep (Rule : List Γ → List Γ → Prop) : List Γ → List Γ �
   /-- A rule may be applied. -/
   | rule {l r u v : List Γ} : Rule l r → ParStep Rule u v → ParStep Rule (l ++ u) (r ++ v)
 
-theorem ParStep.derives {u v : List Γ} (h : ParStep Rule u v) : Derives Rule u v := by
+private theorem ParStep.derives {u v : List Γ} (h : ParStep Rule u v) : Derives Rule u v := by
   induction h with
   | nil => exact Relation.ReflTransGen.refl
   | keep a _ ih => simpa using ih.congr [a] []
@@ -203,14 +203,14 @@ theorem ParStep.derives {u v : List Γ} (h : ParStep Rule u v) : Derives Rule u 
     refine Relation.ReflTransGen.head (b := r ++ u) ⟨[], l, r, u, hr, by simp, by simp⟩ ?_
     simpa using ih.congr r []
 
-theorem ParStep.snoc_keep {u v : List Γ} (h : ParStep Rule u v) (a : Γ) :
+private theorem ParStep.snoc_keep {u v : List Γ} (h : ParStep Rule u v) (a : Γ) :
     ParStep Rule (u ++ [a]) (v ++ [a]) := by
   induction h with
   | nil => simpa using (ParStep.nil (Rule := Rule)).keep a
   | keep b _ ih => simpa using ih.keep b
   | rule hr _ ih => simpa using ih.rule hr
 
-theorem ParStep.snoc_rule {u v l r : List Γ} (h : ParStep Rule u v) (hr : Rule l r) :
+private theorem ParStep.snoc_rule {u v l r : List Γ} (h : ParStep Rule u v) (hr : Rule l r) :
     ParStep Rule (u ++ l) (v ++ r) := by
   induction h with
   | nil => simpa using (ParStep.nil (Rule := Rule)).rule hr
@@ -303,7 +303,7 @@ variable {C₀ : List Γ} {halt : Γ}
 /-- The dominoes copying a word letter by letter. -/
 def copies (w : List Γ) : List (Dom Γ) := w.map Dom.copy
 
-theorem ok_copies (w : List Γ) : ∀ d ∈ copies w, Ok Rule d := by
+private theorem ok_copies (w : List Γ) : ∀ d ∈ copies w, Ok Rule d := by
   intro d hd
   obtain ⟨a, _, rfl⟩ := List.mem_map.mp hd
   trivial
@@ -326,7 +326,8 @@ theorem ok_copies (w : List Γ) : ∀ d ∈ copies w, Ok Rule d := by
 
 /-- **The dominoes of one step**: they consume a configuration and its
 separator, and write the next configuration and its separator. -/
-theorem exists_block (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ []) {u v : List Γ} (h : Step Rule u v) :
+private theorem exists_block
+    (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ []) {u v : List Γ} (h : Step Rule u v) :
     ∃ ds : List (Dom Γ), (∀ d ∈ ds, Ok Rule d) ∧
       tops halt ds = starL (symW u ++ [Letter.sep]) ∧
       bots C₀ ds = starR (symW v ++ [Letter.sep]) := by
@@ -348,7 +349,8 @@ theorem exists_block (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ []) {u v : 
 /-- **The dominoes of a derivation**: they consume every configuration but the
 last, and write every configuration but the first, so the word they consume and
 the word they write are the same history read one configuration apart. -/
-theorem exists_run (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ []) {u v : List Γ} (h : Derives Rule u v) :
+private theorem exists_run
+    (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ []) {u v : List Γ} (h : Derives Rule u v) :
     ∃ (ds : List (Dom Γ)) (T B : List (Letter Γ)), (∀ d ∈ ds, Ok Rule d) ∧
       tops halt ds = starL T ∧ bots C₀ ds = starR B ∧
       symW u ++ [Letter.sep] ++ B = T ++ (symW v ++ [Letter.sep]) := by
@@ -368,7 +370,7 @@ theorem exists_run (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ []) {u v : Li
       rw [heq]
 
 /-- **A derivation gives a match.** -/
-theorem hasMatch_of_derives (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ [])
+private theorem hasMatch_of_derives (hne : ∀ l r, Rule l r → l ≠ [] ∧ r ≠ [])
     (h : Derives Rule C₀ [halt]) : HasMatch Rule C₀ halt := by
   obtain ⟨ds, T, B, hok, htop, hbot, heq⟩ :=
     exists_run (C₀ := C₀) (halt := halt) hne h
@@ -411,7 +413,7 @@ queue, followed by what it carries past the queue – nothing, except for the
 closing domino, which carries the two letters that end a match. -/
 
 /-- The undecorated word a domino takes off the queue. -/
-def topUW (halt : Γ) : Dom Γ → List (Letter Γ)
+private def topUW (halt : Γ) : Dom Γ → List (Letter Γ)
   | .start => [Letter.tri]
   | .copy a => [Letter.sym a]
   | .copySep => [Letter.sep]
@@ -419,11 +421,11 @@ def topUW (halt : Γ) : Dom Γ → List (Letter Γ)
   | .close => [Letter.sym halt, Letter.sep]
 
 /-- What a domino carries past the queue. -/
-def topRest : Dom Γ → List (Letter Γ)
+private def topRest : Dom Γ → List (Letter Γ)
   | .close => [Letter.star, Letter.dia]
   | _ => []
 
-theorem topW_eq (halt : Γ) (d : Dom Γ) :
+private theorem topW_eq (halt : Γ) (d : Dom Γ) :
     topW halt d = starL (topUW halt d) ++ topRest d := by
   cases d <;> simp [topW, topUW, topRest]
 
@@ -431,16 +433,16 @@ variable (Rule C₀) in
 /-- **The queue of a match belongs to a history**: it is a configuration
 reached from the start word, cut in two by the separator, with the part before
 the cut still to be consumed and the part after it already rewritten. -/
-def Inv (z : List (Letter Γ)) : Prop :=
+private def Inv (z : List (Letter Γ)) : Prop :=
   ∃ α β γ : List Γ, z = symW β ++ [Letter.sep] ++ symW γ ∧
     Derives Rule C₀ (α ++ β) ∧ ParStep Rule α γ
 
 /-- A queue carries a separator. -/
-theorem sep_mem_queue (β γ : List Γ) :
+private theorem sep_mem_queue (β γ : List Γ) :
     Letter.sep ∈ symW β ++ [Letter.sep] ++ symW γ := by simp
 
 /-- A queue carries nothing but letters of the system and the separator. -/
-theorem mem_queue {c : Letter Γ} {β γ : List Γ}
+private theorem mem_queue {c : Letter Γ} {β γ : List Γ}
     (h : c ∈ symW β ++ [Letter.sep] ++ symW γ) : c = Letter.sep ∨ ∃ a, c = Letter.sym a := by
   simp only [List.mem_append, List.mem_singleton] at h
   rcases h with (h | h) | h
@@ -453,7 +455,7 @@ theorem mem_queue {c : Letter Γ} {β γ : List Γ}
 /-- **The word a domino consumes is a prefix of the queue.** A top word cannot
 run past the separator: the only word of the system reaching it is the one the
 closing domino consumes, and the queue is then exactly that word. -/
-theorem prefix_of_align {z Y S S' : List (Letter Γ)} (h : starL z ++ S = starL Y ++ S')
+private theorem prefix_of_align {z Y S S' : List (Letter Γ)} (h : starL z ++ S = starL Y ++ S')
     (hY : ∀ t, Y = z ++ t → t = []) :
     ∃ t, z = Y ++ t ∧ starL t ++ S = S' := by
   rcases starL_prefix_cases z Y S S' h with ⟨t, hYt, hS⟩ | ⟨t, hzt, hS⟩
@@ -462,13 +464,13 @@ theorem prefix_of_align {z Y S S' : List (Letter Γ)} (h : starL z ++ S = starL 
   · exact ⟨t, hzt, hS⟩
 
 /-- A word without a separator is no extension of a queue. -/
-theorem no_ext_of_sep_notMem {Y z : List (Letter Γ)} (hsep : Letter.sep ∈ z)
+private theorem no_ext_of_sep_notMem {Y z : List (Letter Γ)} (hsep : Letter.sep ∈ z)
     (hY : Letter.sep ∉ Y) : ∀ t, Y = z ++ t → t = [] := by
   intro t ht
   exact absurd (ht ▸ List.mem_append_left t hsep) hY
 
 /-- No domino consumes more than the queue holds. -/
-theorem topUW_no_ext {d : Dom Γ} {z : List (Letter Γ)} (hsep : Letter.sep ∈ z) :
+private theorem topUW_no_ext {d : Dom Γ} {z : List (Letter Γ)} (hsep : Letter.sep ∈ z) :
     ∀ t, topUW halt d = z ++ t → t = [] := by
   cases d with
   | start => exact no_ext_of_sep_notMem hsep (by simp [topUW])
@@ -495,7 +497,7 @@ theorem topUW_no_ext {d : Dom Γ} {z : List (Letter Γ)} (hsep : Letter.sep ∈ 
       have h2 : z = [] ∧ t = [] := by simpa using ht.2
       exact h2.2
 
-theorem symW_prefix {l : List Γ} {t : List (Letter Γ)} {β γ : List Γ}
+private theorem symW_prefix {l : List Γ} {t : List (Letter Γ)} {β γ : List Γ}
     (h : symW l ++ t = symW β ++ [Letter.sep] ++ symW γ) :
     ∃ β', β = l ++ β' ∧ t = symW β' ++ [Letter.sep] ++ symW γ := by
   induction l generalizing β with
@@ -517,7 +519,7 @@ theorem symW_prefix {l : List Γ} {t : List (Letter Γ)} {β γ : List Γ}
 /-- **The queue lemma**: a list of dominoes whose bottom words, appended to the
 current overhang, spell what its top words spell, walks the queue from a
 history to the halting configuration. -/
-theorem derives_of_align : ∀ (l : List (Dom Γ)) (z : List (Letter Γ)),
+private theorem derives_of_align : ∀ (l : List (Dom Γ)) (z : List (Letter Γ)),
     (∀ d ∈ l, Ok Rule d) →
     (starL z ++ [Letter.star]) ++ bots C₀ l = tops halt l →
     Inv Rule C₀ z → Derives Rule C₀ [halt]
@@ -640,7 +642,7 @@ theorem derives_of_align : ∀ (l : List (Dom Γ)) (z : List (Letter Γ)),
 the one that opens a history, since every top word begins with the decoration
 and no other bottom word does; from there the queue lemma reads the match as a
 computation. -/
-theorem topW_head {d : Dom Γ} (halt : Γ) (hd : Ok Rule d) :
+private theorem topW_head {d : Dom Γ} (halt : Γ) (hd : Ok Rule d) :
     (topW halt d).head? = some Letter.star := by
   cases d with
   | rule l' r =>
@@ -650,13 +652,13 @@ theorem topW_head {d : Dom Γ} (halt : Γ) (hd : Ok Rule d) :
     · simp [topW, symW]
   | _ => simp [topW]
 
-theorem topW_ne_nil {d : Dom Γ} (halt : Γ) (hd : Ok Rule d) : topW halt d ≠ [] := by
+private theorem topW_ne_nil {d : Dom Γ} (halt : Γ) (hd : Ok Rule d) : topW halt d ≠ [] := by
   intro h
   have := topW_head (Rule := Rule) halt hd
   rw [h] at this
   simp at this
 
-theorem botW_ne_nil {d : Dom Γ} (C₀ : List Γ) (hd : Ok Rule d) : botW C₀ d ≠ [] := by
+private theorem botW_ne_nil {d : Dom Γ} (C₀ : List Γ) (hd : Ok Rule d) : botW C₀ d ≠ [] := by
   cases d with
   | rule l' r =>
     obtain ⟨_, _, hr⟩ := hd
@@ -667,7 +669,7 @@ theorem botW_ne_nil {d : Dom Γ} (C₀ : List Γ) (hd : Ok Rule d) : botW C₀ d
 
 /-- Only the domino opening a history has a bottom word beginning with the
 decoration; every other one begins with a letter. -/
-theorem botW_head_ne {d : Dom Γ} (C₀ : List Γ) (hd : Ok Rule d) (hne : d ≠ Dom.start) :
+private theorem botW_head_ne {d : Dom Γ} (C₀ : List Γ) (hd : Ok Rule d) (hne : d ≠ Dom.start) :
     (botW C₀ d).head? ≠ some Letter.star := by
   cases d with
   | start => exact absurd rfl hne
@@ -682,7 +684,7 @@ theorem botW_head_ne {d : Dom Γ} (C₀ : List Γ) (hd : Ok Rule d) (hne : d ≠
 the one that opens a history, since every top word begins with the decoration
 and no other bottom word does; from there the queue lemma reads the match as a
 computation. -/
-theorem derives_of_hasMatch (h : HasMatch Rule C₀ halt) : Derives Rule C₀ [halt] := by
+private theorem derives_of_hasMatch (h : HasMatch Rule C₀ halt) : Derives Rule C₀ [halt] := by
   obtain ⟨l, hlne, hok, heq⟩ := h
   rcases l with _ | ⟨d, l⟩
   · exact absurd rfl hlne

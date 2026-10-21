@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameRun
+import all DescriptiveComplexity.Exponential.GameMachine
+import all DescriptiveComplexity.Exponential.GameTape
 
 /-!
 # Asking a question of the machine
@@ -56,10 +58,10 @@ local notation "𝕄" => gameMachine prog.vars prog.pol a₀ hdim
 
 /-- **The claim vector a phase carries**, from the question's own: junk above
 the question's atoms, which no rule ever looks at. -/
-def claimsOf (q : GameQuestion) (b : Fin (prog.data q).natoms → Bool) : Fin M → Bool :=
+private def claimsOf (q : GameQuestion) (b : Fin (prog.data q).natoms → Bool) : Fin M → Bool :=
   fun k => if h : (k : ℕ) < (prog.data q).natoms then b ⟨k, h⟩ else false
 
-theorem claimsOf_apply (q : GameQuestion) (b : Fin (prog.data q).natoms → Bool)
+private theorem claimsOf_apply (q : GameQuestion) (b : Fin (prog.data q).natoms → Bool)
     (j : Fin (prog.data q).natoms) :
     prog.claimsOf q b (Fin.castLE (prog.natoms_le q) j) = b j := by
   rw [claimsOf, dite_eq_left (show ((Fin.castLE (prog.natoms_le q) j : Fin M) : ℕ) <
@@ -84,7 +86,7 @@ theorem cond_copy (r copy : Bool) (ρ σ : B.Assignment A) :
 omit [K.Structure A] [Finite A] in
 /-- **The cell a challenge addresses carries the bit that was claimed**, when
 the claim is right – so the seek finds it and the challenge is answered. -/
-theorem seekHit_of_claim (h₀ : IsBot a₀) (q : GameQuestion) (r par : Bool)
+private theorem seekHit_of_claim (h₀ : IsBot a₀) (q : GameQuestion) (r par : Bool)
     {b : Fin (prog.data q).natoms → Bool} {vv : Fin (gameDim B V) → A}
     (hb : ∀ j, b j = true ↔ ((prog.data q).atoms j).Holds (cond r σ ρ) (cond (!r) σ ρ)
       (prog.valOf q vv))
@@ -125,7 +127,7 @@ theorem seekHit_of_claim (h₀ : IsBot a₀) (q : GameQuestion) (r par : Bool)
 omit [LinearOrder A] [Finite A] in
 /-- **The concluding transition's guard is the residual formula**, read at the
 valuation the tuple carries. -/
-theorem concOk_of_sub (q : GameQuestion) (r par : Bool)
+private theorem concOk_of_sub (q : GameQuestion) (r par : Bool)
     {b : Fin (prog.data q).natoms → Bool} {vv : Fin (gameDim B V) → A}
     (hsub : ((prog.data q).sub b).Realize default (prog.valOf q vv)) :
     prog.concOk (MachPh.concPh q r (prog.claimsOf q b) par) vv := by
@@ -143,7 +145,7 @@ theorem concOk_of_sub (q : GameQuestion) (r par : Bool)
 /-- **The claim phase wins when the matrix holds.** The existential player
 claims the vector the matrix supplies; each challenge is answered because the
 claim is right, and the concluding transition is guarded by the residue. -/
-theorem altWin_matrix (h₀ : IsBot a₀) (q : GameQuestion) {r par : Bool}
+private theorem altWin_matrix (h₀ : IsBot a₀) (q : GameQuestion) {r par : Bool}
     {vv : Fin (gameDim B V) → A} {c : Config (GamePt B V M A)}
     (hmat : (prog.data q).MatrixHolds (cond r σ ρ) (cond (!r) σ ρ) (prog.valOf q vv))
     (h : CtrlCfg a₀ hdim prog.vars ρ σ (MachPh.claimPh q r par) vv c) :

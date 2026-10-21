@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Exponential.GameSO
 import DescriptiveComplexity.Exponential.Peel
 import DescriptiveComplexity.Problems.Game
+import all DescriptiveComplexity.Exponential.Peel
+import all DescriptiveComplexity.Exponential.PointGuard
+import all DescriptiveComplexity.Exponential.Rounds
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.Game.Hardness
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # The nodes of an interpreted AND/OR graph, as states of a game
@@ -64,7 +70,7 @@ theorem game_hard_ordered {L : Language.{0, 0}} [L.IsRelational] (Q : DecisionPr
 /-! ### Splitting a merged round assignment -/
 
 /-- **Every assignment of the merged rounds is one assignment per round.** -/
-theorem repBlockAssign_split (B : SOBlock) (A : Type) :
+private theorem repBlockAssign_split (B : SOBlock) (A : Type) :
     ∀ (k : ℕ) (ν : (repMerged B k).Assignment A),
       ∃ ρs : Fin k → B.Assignment A, ν = repBlockAssign B A k ρs := by
   intro k

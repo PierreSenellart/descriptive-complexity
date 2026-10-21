@@ -6,6 +6,10 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Definable
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Small universes are transparent: how to drop a size condition
@@ -84,7 +88,7 @@ theorem arithDef_orankEq : ∀ (j : ℕ) {α : Type} (x : α),
       rw [hy, hu, hx]
 
 /-- The same, in the bit logic. -/
-theorem bitDef_orankEq : ∀ (j : ℕ) {α : Type} (x : α),
+private theorem bitDef_orankEq : ∀ (j : ℕ) {α : Type} (x : α),
     BitDef (L := L) (α := α) fun _ _ _ _ _ v => orank (v x) = j := by
   intro j
   induction j with
@@ -110,14 +114,14 @@ theorem bitDef_orankEq : ∀ (j : ℕ) {α : Type} (x : α),
 
 /-- **The universe has more than `k` elements** exactly when a rank `k` is
 attained, which is first-order by the naming above. -/
-theorem arithDef_cardGt (k : ℕ) :
+private theorem arithDef_cardGt (k : ℕ) :
     ArithDef (L := L) (α := α) fun A _ _ _ _ _ => k < Nat.card A :=
   ((arithDef_orankEq k (Sum.inr 0 : α ⊕ Fin 1)).ex).congr fun A _ _ _ _ v => by
     simp only [Sum.elim_inr]
     exact ⟨fun ⟨y, hy⟩ => hy ▸ orank_lt_card y, fun h => exists_orank_eq h⟩
 
 /-- The same, in the bit logic. -/
-theorem bitDef_cardGt (k : ℕ) :
+private theorem bitDef_cardGt (k : ℕ) :
     BitDef (L := L) (α := α) fun A _ _ _ _ _ => k < Nat.card A :=
   ((bitDef_orankEq k (Sum.inr 0 : α ⊕ Fin 1)).ex).congr fun A _ _ _ _ v => by
     simp only [Sum.elim_inr]
@@ -134,7 +138,7 @@ theorem arithDef_cardEq (n : ℕ) :
       fun A _ _ _ _ v => by omega
 
 /-- The same, in the bit logic. -/
-theorem bitDef_cardEq (n : ℕ) :
+private theorem bitDef_cardEq (n : ℕ) :
     BitDef (L := L) (α := α) fun A _ _ _ _ _ => Nat.card A = n := by
   rcases n with _ | n
   · exact (BitDef.bot (L := L) (α := α)).congr fun A _ _ _ _ v =>
@@ -154,7 +158,7 @@ def IsNumeric {α : Type} (R : ArithRel L α) : Prop :=
 
 /-- The relations a construction actually meets are numeric by inspection; this
 is the one that says so for an arithmetic statement of three variables. -/
-theorem isNumeric_of_ranks {f : ℕ → (α → ℕ) → Prop} :
+private theorem isNumeric_of_ranks {f : ℕ → (α → ℕ) → Prop} :
     IsNumeric (L := L) (α := α) (fun A _ _ _ _ v => f (Nat.card A) fun a => orank (v a)) :=
   ⟨f, fun _ _ _ _ _ _ => Iff.rfl⟩
 

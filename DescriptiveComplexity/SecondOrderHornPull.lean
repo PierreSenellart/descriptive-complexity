@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.SecondOrderHorn
 public import DescriptiveComplexity.SecondOrderPull
 import DescriptiveComplexity.OrderedComposition
+import all DescriptiveComplexity.SecondOrderHorn
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Pulling SO-Horn definability back through an interpretation
@@ -100,7 +102,7 @@ theorem HornProgram.pull_mem (I : FOInterpretation L₁ L₂ Tag d)
   rw [HornProgram.pull, List.mem_flatMap]
   exact ⟨c, hc, List.mem_map.mpr ⟨t, mem_allTagAssign t, rfl⟩⟩
 
-theorem HornProgram.pull_cases (I : FOInterpretation L₁ L₂ Tag d)
+private theorem HornProgram.pull_cases (I : FOInterpretation L₁ L₂ Tag d)
     {prog : HornProgram L₂ B k} {c' : HornClause L₁ (B.pull Tag d) (k * d)}
     (hc' : c' ∈ prog.pull I) : ∃ c ∈ prog, ∃ t : Fin k → Tag, c' = c.pull I t := by
   rw [HornProgram.pull, List.mem_flatMap] at hc'
@@ -131,7 +133,7 @@ theorem HornProgram.pull_holds (ρ : B.Assignment (I.Map A)) :
 
 /-- **The pullback is correct**: the program is satisfiable on the interpreted
 structure iff its pullback is satisfiable on the base structure. -/
-theorem exists_holds_pull :
+private theorem exists_holds_pull :
     (∃ ρ : B.Assignment (I.Map A), prog.Holds ρ) ↔
       ∃ σ : (B.pull Tag d).Assignment A, (prog.pull I).Holds σ := by
   constructor

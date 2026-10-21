@@ -8,6 +8,20 @@ module
 import DescriptiveComplexity.Problems.Wide.RegChannelProg
 public import DescriptiveComplexity.Problems.Wide.PadRules
 public import DescriptiveComplexity.Problems.Wide.RegChannelEntry
+import all DescriptiveComplexity.Problems.Machine.DetRun
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawInit
+import all DescriptiveComplexity.Problems.Wide.DrawInterp
+import all DescriptiveComplexity.Problems.Wide.DrawRules
+import all DescriptiveComplexity.Problems.Wide.DrawTable
+import all DescriptiveComplexity.Problems.Wide.NexDef
+import all DescriptiveComplexity.Problems.Wide.NexDet
+import all DescriptiveComplexity.Problems.Wide.NexEval
+import all DescriptiveComplexity.Problems.Wide.NexInterp
+import all DescriptiveComplexity.Problems.Wide.NexRun
+import all DescriptiveComplexity.Problems.Wide.PadRules
+import all DescriptiveComplexity.Problems.Wide.RegChannelEntry
+import all DescriptiveComplexity.Problems.Wide.RegChannelProg
 
 /-!
 # The handed program, with room on its clock
@@ -62,7 +76,7 @@ omit [Fintype dt.SlotIx] [DecidableEq dt.SlotIx] [LinearOrder A] [Finite A]
   [Finite dt.KIx] [Nonempty A] in
 /-- **What the padding buys, at this program's rule names**: one name per junk
 site, and nothing else moves. -/
-theorem card_nexRIxPad [Finite G] [Finite dt.KIx] [Finite dt.SEF]
+private theorem card_nexRIxPad [Finite G] [Finite dt.KIx] [Finite dt.SEF]
     [∀ e : dt.SEF, Finite (dt.NexSESh e)] (n : ℕ) :
     Nat.card (dt.NexRIxPad (G := G) n) = Nat.card (dt.NexRIx (G := G)) + n :=
   card_rTagOf_pad (Sh := NexSh dt.SEF (Option dt.KIx) G dt.NexSESh) n
@@ -125,7 +139,7 @@ variable {args : ∀ (e : Env L) (v : dt.VarIx),
 
 omit [Finite dt.KIx] [Nonempty dt.KIx] in
 /-- **The padded program is the definability layer's**, at the padded rules. -/
-theorem nexProgHandedPad_eq_progFrom (e : Env L)
+private theorem nexProgHandedPad_eq_progFrom (e : Env L)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     (γ : GuessSpec e.α dt.CtlIx dt.SlotIx (Option dt.KIx) (dt.d.B.ι → Bool))
     (arg : ∀ v : dt.VarIx, dt.VarArgs (A := e.α) (Q := dt.CtlIx) v)
@@ -163,7 +177,7 @@ noncomputable def nexInterpHandedPad
 omit [Finite dt.KIx] [Nonempty dt.KIx] in
 /-- **The interpreted structure reads the padded program's table**: the same
 statement as at the unpadded program, at the wider rule names. -/
-theorem reads_nexProgHandedPad
+private theorem reads_nexProgHandedPad
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     (h : ∀ v : dt.VarIx, UVarArgsDef v fun e => args e v)
     (bot : Option dt.KIx) (n : ℕ) (e : Env L)
@@ -198,7 +212,7 @@ omit [Finite A] [Finite dt.KIx] [Nonempty A]
   [Finite (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))] in
 /-- **The padded program separates after its guess**: at the old rule names this
 is `nexProgHanded_sep_rules`, and a junk name fires on nothing. -/
-theorem nexProgHandedPad_sepOn (hzo : zero ≠ one)
+private theorem nexProgHandedPad_sepOn (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G}
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
@@ -221,7 +235,7 @@ omit [Finite A] [Finite dt.KIx] [Nonempty A]
 /-- **No rule of the padded program fires from its accepting phase**: at an old
 name that is `nexProgHanded_srcPh_ne_acceptP`, and a junk rule fires from the
 start phase. -/
-theorem nexProgHandedPad_srcPh_ne_acceptP (hzo : zero ≠ one)
+private theorem nexProgHandedPad_srcPh_ne_acceptP (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd)
     {γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G}
     {args : ∀ v : dt.VarIx, dt.VarArgs (A := A) (Q := dt.CtlIx) v}
@@ -279,7 +293,7 @@ omit [Nonempty dt.KIx] [L.IsRelational] [L.Structure A]
     (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)] in
 /-- **And so is the padded one**, its junk names carrying a rule that never
 fires. -/
-theorem nexCovered_nexProgHandedPad {G : Type} {one : A} (hzo : zero ≠ one)
+private theorem nexCovered_nexProgHandedPad {G : Type} {one : A} (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {n : ℕ}
     [LinearOrder (dt.NexRIxPad (G := G) n)]
     (γ : GuessSpec A dt.CtlIx dt.SlotIx (Option dt.KIx) G)
@@ -297,7 +311,7 @@ the seven facts the join asks about the channel and the file's ends. This is
 This is the marking's seven consequences with the program abstracted, so that a
 padded program
 gets them by the same statement. -/
-theorem regFacts_of_marked
+private theorem regFacts_of_marked
     (hR : PR.table.Reads)
     (hmk : ∀ x : Univ A R' (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
       dt.KIx dt.dd, PR.marked x ↔ ((∃ k, x.1 = Tag.arg k) ∨ IsTopNonArg x)) :
@@ -403,13 +417,13 @@ omit [Nonempty dt.KIx] [Finite dt.KIx] [Finite R']
   [Language.wide.Structure (Univ A R'
     (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)] in
 /-- **An accepting control is in the accepting phase.** -/
-theorem NexEmitted.acceptPh {bot : Option dt.KIx} (hE : NexEmitted PR bot)
+private theorem NexEmitted.acceptPh {bot : Option dt.KIx} (hE : NexEmitted PR bot)
     (p : NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) (f : dt.CtlIx → A)
     (h : PR.accept p f) : p = NexPh.acceptP := ((hE.accept_iff p f).mp h).1
 
 omit [Nonempty dt.KIx] [Finite dt.KIx] in
 /-- **And so does the padded one**, its junk names never firing. -/
-def nexEmitted_nexProgHandedPad {one : A} (hzo : zero ≠ one)
+private def nexEmitted_nexProgHandedPad {one : A} (hzo : zero ≠ one)
     (hpl : Fintype.card (dt.CtlIx ⊕ dt.SlotIx) ≤ dt.dd) {n : ℕ}
     [LinearOrder (dt.NexRIxPad (G := dt.d.B.ι → Bool) n)]
     [LinearOrder (dt.NexRIx (G := dt.d.B.ι → Bool))]
@@ -447,7 +461,7 @@ def nexEmitted_nexProgHandedPad {one : A} (hzo : zero ≠ one)
 omit [Nonempty dt.KIx] [L.IsRelational] [L.Structure A] [Nonempty A]
   [DecidableEq dt.SlotIx] [Finite A] [Finite dt.KIx] [Finite R'] in
 /-- **The accepting phase is stuck**, at any program no rule fires from it. -/
-theorem stuck_acceptP_of (hR : PR.table.Reads)
+private theorem stuck_acceptP_of (hR : PR.table.Reads)
     (hne : ∀ r : R', PR.table.srcPh r ≠ NexPh.acceptP)
     {x : Config (WPoint (Univ A R'
       (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd))}
@@ -462,7 +476,7 @@ omit [Nonempty dt.KIx] [L.IsRelational] [L.Structure A] [Nonempty A]
   [DecidableEq dt.SlotIx] [Finite A] [Finite dt.KIx] [Finite R'] in
 /-- **An accepting configuration is stuck**: it is in the accepting phase, and
 no rule fires from there. -/
-theorem stuck_of_acc_of (hR : PR.table.Reads)
+private theorem stuck_of_acc_of (hR : PR.table.Reads)
     (hne : ∀ r : R', PR.table.srcPh r ≠ NexPh.acceptP)
     (haccPh : ∀ (p : NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))
       (f : dt.CtlIx → A), PR.accept p f → p = NexPh.acceptP)
@@ -498,7 +512,7 @@ program that is deterministic after the guess: the run into the accepting phase
 with the bit clear is a dead end that does not accept, and there is only one run.
 What it reads of
 it is uniqueness after the guess and the accepting phase's two facts. -/
-theorem not_acc_of_verdict_false_of (hR : PR.table.Reads)
+private theorem not_acc_of_verdict_false_of (hR : PR.table.Reads)
     (huniq : ∀ cfg : Config (WPoint (Univ A R'
         (NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF)) dt.KIx dt.dd)),
       (∀ (p : NexPh (Option dt.KIx) (EvalPh dt.nv dt.PMF))

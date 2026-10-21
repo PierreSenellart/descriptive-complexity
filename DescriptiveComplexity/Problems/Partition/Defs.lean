@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Knapsack.Defs
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Partition: definition

@@ -7,6 +7,8 @@ module
 
 public import DescriptiveComplexity.Problems.Pcp.Defs
 public import DescriptiveComplexity.Problems.Pcp.Enum
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Pcp.Enum
 
 /-!
 # A match, read off as a finite certificate
@@ -139,11 +141,11 @@ section Order
 variable {A : Type} [Language.pcp.Structure A]
 
 /-- The order symbol of a well-formed instance is a linear order. -/
-theorem isLinOrd_ord (h : IsWF A) : IsLinOrd (Ord (A := A)) :=
+private theorem isLinOrd_ord (h : IsWF A) : IsLinOrd (Ord (A := A)) :=
   ⟨h.ord_refl, h.ord_trans, h.ord_antisymm, h.ord_total⟩
 
 /-- Strict precedence of positions is asymmetric. -/
-theorem asymm_ordLt (h : IsWF A) (a b : A) (hab : OrdLt a b) (hba : OrdLt b a) : False :=
+private theorem asymm_ordLt (h : IsWF A) (a b : A) (hab : OrdLt a b) (hba : OrdLt b a) : False :=
   asymm_strict (isLinOrd_ord h) a b hab hba
 
 end Order
@@ -157,7 +159,7 @@ variable {A D : Type} [Language.pcp.Structure A] [Finite A] [Finite D] {c : Cert
 /-- **A certificate exhibits a match.** The slots are enumerated in their
 order, the positions of each word in theirs, and the matching lemma turns the
 guessed relation into the equality of the two concatenations. -/
-theorem pcpOn_of_cert (h : CertOK c) : PcpOn A := by
+private theorem pcpOn_of_cert (h : CertOK c) : PcpOn A := by
   classical
   choose dm hdm using h.dm_tot
   obtain ⟨slots, hslotsp, hslotsm⟩ := exists_isEnum h.sle_lin fun _ : D => True
@@ -226,7 +228,7 @@ variable {A : Type} [Language.pcp.Structure A]
 dominoes, and the matching is the pairing of the two parses index by index,
 which is legitimate exactly because the two concatenations are the same
 word. -/
-theorem cert_of_pcpOn (h : PcpOn A) : ∃ (n : ℕ) (c : Cert A (Fin n)), CertOK c := by
+private theorem cert_of_pcpOn (h : PcpOn A) : ∃ (n : ℕ) (c : Cert A (Fin n)), CertOK c := by
   classical
   obtain ⟨hwf, l, us, vs, hne, hdom, hu, hv, hflat⟩ := h
   obtain ⟨uw, huwmap, huw⟩ := exists_fun_of_forall₂ hu

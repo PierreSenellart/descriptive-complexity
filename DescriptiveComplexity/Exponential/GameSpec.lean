@@ -6,6 +6,16 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.GameState
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.GameMove
+import all DescriptiveComplexity.Exponential.GameNode
+import all DescriptiveComplexity.Exponential.GamePhase
+import all DescriptiveComplexity.Exponential.GameState
+import all DescriptiveComplexity.Exponential.Peel
+import all DescriptiveComplexity.Exponential.PointAtoms
+import all DescriptiveComplexity.Exponential.PointGuard
+import all DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.Padding
 
 /-!
 # The graph game, as a second-order alternating game
@@ -75,7 +85,7 @@ def keepShift (h : 2 * d ≤ n) : List (Fin n × Fin n) :=
 
 variable {d n}
 
-theorem forall_keepAll {α : Type} (ρs σs : Fin n → α) :
+private theorem forall_keepAll {α : Type} (ρs σs : Fin n → α) :
     (∀ e ∈ keepAll n, ρs e.1 = σs e.2) ↔ ρs = σs := by
   constructor
   · intro h
@@ -85,7 +95,7 @@ theorem forall_keepAll {α : Type} (ρs σs : Fin n → α) :
     obtain ⟨i, -, rfl⟩ := List.mem_map.mp he
     rfl
 
-theorem forall_keepOff {α : Type} (S : Fin n → Bool) (ρs σs : Fin n → α) :
+private theorem forall_keepOff {α : Type} (S : Fin n → Bool) (ρs σs : Fin n → α) :
     (∀ e ∈ keepOff n S, ρs e.1 = σs e.2) ↔ ∀ i, S i = false → ρs i = σs i := by
   constructor
   · intro h i hi
@@ -96,7 +106,7 @@ theorem forall_keepOff {α : Type} (S : Fin n → Bool) (ρs σs : Fin n → α)
     obtain ⟨-, hS⟩ := List.mem_filter.mp hi
     exact h i (by simpa using hS)
 
-theorem forall_keepShift {α : Type} (h : 2 * d ≤ n) (ρs σs : Fin n → α) :
+private theorem forall_keepShift {α : Type} (h : 2 * d ≤ n) (ρs σs : Fin n → α) :
     (∀ e ∈ keepShift d n h, ρs e.1 = σs e.2) ↔ ∀ i, ρs (shiftIx d n h i) = σs i := by
   constructor
   · intro hh i
@@ -105,12 +115,13 @@ theorem forall_keepShift {α : Type} (h : 2 * d ≤ n) (ρs σs : Fin n → α) 
     obtain ⟨i, -, rfl⟩ := List.mem_map.mp he
     exact hh i
 
-theorem mem_midRounds (i : Fin n) :
+private theorem mem_midRounds (i : Fin n) :
     i ∈ midRounds d n ↔ d ≤ (i : ℕ) ∧ (i : ℕ) < 2 * d := by
   rw [midRounds, List.mem_filter]
   simp [isMid, List.mem_finRange]
 
-theorem isMid_eq_false (i : Fin n) : isMid d n i = false ↔ ¬(d ≤ (i : ℕ) ∧ (i : ℕ) < 2 * d) := by
+private theorem isMid_eq_false
+    (i : Fin n) : isMid d n i = false ↔ ¬(d ≤ (i : ℕ) ∧ (i : ℕ) < 2 * d) := by
   simp [isMid]
 
 end Rounds
@@ -205,7 +216,7 @@ variable {hn : n = 2 * d + Dm} {D : Sub → T → T → ℕ} {hD : ∀ s tx ty, 
 variable {K : ∀ (_s : Sub) (_tx _ty : T),
   ((L.sum Language.order).sum (repMerged X.pointBlock n).lang).Sentence}
 
-theorem realize_moveOf (p' p q : Ph T Dm) (m : MoveTo T Dm n)
+private theorem realize_moveOf (p' p q : Ph T Dm) (m : MoveTo T Dm n)
     (ρs σs : Fin n → X.pointBlock.Assignment A) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (gameBlock X n T Dm) A
@@ -252,7 +263,7 @@ private theorem realize_listSup_atTagF (p : Ph T Dm)
     exact ⟨_, List.mem_map.mpr ⟨p, hp, rfl⟩, (realize_atTagF p p _).mpr rfl⟩
 
 /-- **The universal positions are the phases `Ph.IsUniv` names.** -/
-theorem graphGame_isUniv (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A) :
+private theorem graphGame_isUniv (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A) :
     ((graphGame X hn D hD K).IsUniv (stateAssign p ρs) ↔ Ph.IsUniv p) := by
   have hrw : (graphGame X hn D hD K).IsUniv (stateAssign p ρs) ↔
       @Sentence.Realize _ A (stateStructure (stateAssign p ρs))
@@ -262,7 +273,7 @@ theorem graphGame_isUniv (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment 
   simp [mem_finEnum p]
 
 /-- **The positions that win outright are the leaves whose kernel holds.** -/
-theorem graphGame_isWon (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A) :
+private theorem graphGame_isWon (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A) :
     ((graphGame X hn D hD K).IsWon (stateAssign p ρs) ↔
       ∃ (s : Sub) (tx ty : T) (pol : Bool), p = .pre s tx ty ⟨0, Nat.succ_pos Dm⟩ pol ∧
         @Sentence.Realize _ A
@@ -290,7 +301,7 @@ theorem graphGame_isWon (p : Ph T Dm) (ρs : Fin n → X.pointBlock.Assignment A
 
 /-- **The starting positions are the `startPick` states whose rounds are all
 points.** -/
-theorem graphGame_isStart (τ : (gameBlock X n T Dm).Assignment A) :
+private theorem graphGame_isStart (τ : (gameBlock X n T Dm).Assignment A) :
     ((graphGame X hn D hD K).IsStart τ ↔
       ∃ (tx : T) (pts : Fin n → X.Map A),
         τ = stateAssign (.startPick tx) fun i => pointAssign (pts i)) := by
@@ -322,7 +333,7 @@ theorem graphGame_isStart (τ : (gameBlock X n T Dm).Assignment A) :
       ((realize_allRoundsPointF _).mpr fun i => isPointAssign_pointAssign _)
 
 /-- **The moves are the listed ones.** -/
-theorem graphGame_move (p q : Ph T Dm) (ρs σs : Fin n → X.pointBlock.Assignment A) :
+private theorem graphGame_move (p q : Ph T Dm) (ρs σs : Fin n → X.pointBlock.Assignment A) :
     ((graphGame X hn D hD K).Move (stateAssign p ρs) (stateAssign q σs) ↔
       ∃ m ∈ movesFrom hn D hD p, m.tgt = q ∧ (∀ e ∈ m.keep, ρs e.1 = σs e.2) ∧
         (∀ i ∈ m.guard, IsPointAssign (X := X) (σs i))) := by
@@ -348,7 +359,7 @@ theorem graphGame_move (p q : Ph T Dm) (ρs σs : Fin n → X.pointBlock.Assignm
 
 /-- **Every move lands on a state**: each disjunct pins the tag bits of the
 state it enters, so a junk assignment is never reachable. -/
-theorem graphGame_move_shape {p : Ph T Dm} {ρs : Fin n → X.pointBlock.Assignment A}
+private theorem graphGame_move_shape {p : Ph T Dm} {ρs : Fin n → X.pointBlock.Assignment A}
     {τ : (gameBlock X n T Dm).Assignment A}
     (h : (graphGame X hn D hD K).Move (stateAssign p ρs) τ) :
     ∃ (q : Ph T Dm) (σs : Fin n → X.pointBlock.Assignment A), τ = stateAssign q σs := by

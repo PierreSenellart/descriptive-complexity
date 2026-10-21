@@ -44,7 +44,7 @@ def StretchIndep (Adj : V → V → Prop) (T : V ⊕ EdgePair Adj × W → Prop)
 
 /-- An independent set of the stretched graph is a set of vertices, and middle
 vertices of edges with no endpoint in it. -/
-theorem stretchIndep_iff (Adj : V → V → Prop) (T : V ⊕ EdgePair Adj × W → Prop) :
+private theorem stretchIndep_iff (Adj : V → V → Prop) (T : V ⊕ EdgePair Adj × W → Prop) :
     StretchIndep Adj T ↔
       ∀ q : EdgePair Adj × W, T (.inr q) → ¬T (.inl q.1.1.1) ∧ ¬T (.inl q.1.1.2) := by
   constructor
@@ -55,14 +55,14 @@ theorem stretchIndep_iff (Adj : V → V → Prop) (T : V ⊕ EdgePair Adj × W �
     · exact (h q hq).2 ha
 
 /-- The edges of the stretched graph, from a middle vertex to an endpoint. -/
-def stretchEdge (Adj : V → V → Prop) :
+private def stretchEdge (Adj : V → V → Prop) :
     V ⊕ EdgePair Adj × W → V ⊕ EdgePair Adj × W → Prop
   | .inr q, .inl a => a = q.1.1.1 ∨ a = q.1.1.2
   | _, _ => False
 
 /-- Independence in a bipartite graph presented as the stretched graph, the
 middle vertices being its left side. -/
-theorem stretchIndep_equiv_iff {T : Type} {Adj : V → V → Prop}
+private theorem stretchIndep_equiv_iff {T : Type} {Adj : V → V → Prop}
     (E : T ≃ V ⊕ EdgePair Adj × W) {Left : T → Prop} {Edge : T → T → Prop}
     (hleft : ∀ x, Left x ↔ (E x).isRight = true)
     (hedge : ∀ x y, Edge x y ↔ stretchEdge Adj (E x) (E y)) (S : T → Prop) :

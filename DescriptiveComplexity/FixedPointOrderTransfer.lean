@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.FixedPointPartial
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.FixedPointPartial
+import all DescriptiveComplexity.FixedPointStep
 
 /-!
 # Order relativization: moving the order between the instance and the vocabulary
@@ -102,7 +105,7 @@ def leLinearS : (L.sum Language.order).Sentence :=
         (leSymb : (L.sum Language.order).Relations 2).total))
 
 /-- Realization of the guard sentence: the order symbol is a linear order. -/
-theorem realize_leLinearS (A : Type) [(L.sum Language.order).Structure A] :
+private theorem realize_leLinearS (A : Type) [(L.sum Language.order).Structure A] :
     A ⊨ leLinearS L ↔ LeLinearOn L A := by
   have hsplit : A ⊨ leLinearS L ↔
       (A ⊨ (leSymb : (L.sum Language.order).Relations 2).reflexive ∧
@@ -199,7 +202,7 @@ variable {L' : Language.{0, 0}} (d : StepDef L') (χ : L'.Sentence)
 /-- Guard the output of a simultaneous induction by a sentence over the base
 vocabulary: same block, same step formulas, the output conjoined with the
 guard. -/
-def guardOut : StepDef L' where
+private def guardOut : StepDef L' where
   B := d.B
   step := d.step
   out := LHom.sumInl.onSentence χ ⊓ d.out
@@ -216,13 +219,13 @@ private theorem realize_guardOut_out (ρ : d.B.Assignment A) :
 variable (A) in
 /-- The inflationary value of the guarded induction: the guard holds and the
 original value does. -/
-theorem ifpHolds_guardOut : (d.guardOut χ).IFPHolds A ↔ (A ⊨ χ ∧ d.IFPHolds A) :=
+private theorem ifpHolds_guardOut : (d.guardOut χ).IFPHolds A ↔ (A ⊨ χ ∧ d.IFPHolds A) :=
   realize_guardOut_out d χ (d.inflLimit A)
 
 variable (A) in
 /-- The partial value of the guarded induction: the guard holds and the
 original value does. -/
-theorem pfpHolds_guardOut : (d.guardOut χ).PFPHolds A ↔ (A ⊨ χ ∧ d.PFPHolds A) := by
+private theorem pfpHolds_guardOut : (d.guardOut χ).PFPHolds A ↔ (A ⊨ χ ∧ d.PFPHolds A) := by
   constructor
   · rintro ⟨n, hfix, hout⟩
     obtain ⟨hχ, hout'⟩ := (realize_guardOut_out d χ (d.partStage A n)).mp hout
@@ -388,7 +391,7 @@ private theorem partStage_liftOrder (n : ℕ) :
     exact d.next_liftOrder (d.partStage A n)
 
 /-- The inflationary value of the lifted induction is the original one. -/
-theorem ifpHolds_liftOrder :
+private theorem ifpHolds_liftOrder :
     (@StepDef.IFPHolds (L.sum Language.order) d.liftOrder A
         (sumOrderStructure L A)) ↔ d.IFPHolds A := by
   have hlim : @StepDef.inflLimit (L.sum Language.order) d.liftOrder A
@@ -400,7 +403,7 @@ theorem ifpHolds_liftOrder :
   exact d.realize_liftOrder (d.inflLimit A) d.out default
 
 /-- The partial value of the lifted induction is the original one. -/
-theorem pfpHolds_liftOrder :
+private theorem pfpHolds_liftOrder :
     (@StepDef.PFPHolds (L.sum Language.order) d.liftOrder A
         (sumOrderStructure L A)) ↔ d.PFPHolds A := by
   refine exists_congr fun n => ?_

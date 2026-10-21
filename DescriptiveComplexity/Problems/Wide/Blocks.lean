@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.Increment
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # An address, read block by block
@@ -66,7 +67,7 @@ theorem wmBlk_apply (s : T × V → Prop) (τ : T) (v : V) : wmBlk s τ v ↔ s 
 
 /-- **The strict order of a block-major product**: strictly earlier index, or the
 same index and a strictly earlier coordinate. -/
-theorem wmLt_lexRel_iff (hT : IsLinOrd LeT) (p q : T × V) :
+private theorem wmLt_lexRel_iff (hT : IsLinOrd LeT) (p q : T × V) :
     WMLt (lexRel LeT LeV) p q ↔ (WMLt LeT p.1 q.1 ∨ (p.1 = q.1 ∧ WMLt LeV p.2 q.2)) := by
   rcases eq_or_ne p.1 q.1 with heq | hne
   · have hfst : ¬WMLt LeT p.1 q.1 := fun hc => hc.2 (heq ▸ hT.1 q.1)
@@ -85,7 +86,7 @@ theorem wmLt_lexRel_iff (hT : IsLinOrd LeT) (p q : T × V) :
     exact ⟨fun hc => Or.inl hc, fun hc => hc.elim id fun hc' => absurd hc'.1 hne⟩
 
 /-- Inside one block, the order of the product is the order of the block. -/
-theorem wmLt_same_iff (hT : IsLinOrd LeT) (τ : T) (u w : V) :
+private theorem wmLt_same_iff (hT : IsLinOrd LeT) (τ : T) (u w : V) :
     WMLt (lexRel LeT LeV) (τ, u) (τ, w) ↔ WMLt LeV u w :=
   (wmLt_lexRel_iff (LeV := LeV) hT (τ, u) (τ, w)).trans
     ⟨fun hc => hc.elim (fun hc' => absurd (hT.1 τ) hc'.2) fun hc' => hc'.2,
@@ -93,7 +94,7 @@ theorem wmLt_same_iff (hT : IsLinOrd LeT) (τ : T) (u w : V) :
 
 /-- Two coordinates of the same block name the same element exactly when they are
 equal. -/
-theorem pair_eq_iff (τ : T) (u w : V) : ((τ, w) = (τ, u)) ↔ w = u :=
+private theorem pair_eq_iff (τ : T) (u w : V) : ((τ, w) = (τ, u)) ↔ w = u :=
   ⟨fun hc => congrArg Prod.snd hc, fun hc => by rw [hc]⟩
 
 /-- **The address order is lexicographic on blocks**: two addresses compare at the
@@ -132,10 +133,10 @@ empty. -/
 def wmAvoids (H : T → Prop) (s : T × V → Prop) : Prop := ∀ τ, H τ → ∀ v, ¬s (τ, v)
 
 /-- The greatest address avoiding a set of blocks: full everywhere else. -/
-def wmAvoidTop (H : T → Prop) : T × V → Prop := fun p => ¬H p.1
+private def wmAvoidTop (H : T → Prop) : T × V → Prop := fun p => ¬H p.1
 
 /-- **Every address avoiding a set of blocks is at or below its top.** -/
-theorem wmSetLe_wmAvoidTop [Finite T] [Finite V] (hT : IsLinOrd LeT) (hV : IsLinOrd LeV)
+private theorem wmSetLe_wmAvoidTop [Finite T] [Finite V] (hT : IsLinOrd LeT) (hV : IsLinOrd LeV)
     {H : T → Prop}
     {s : T × V → Prop} (hs : wmAvoids H s) :
     WMSetLe (lexRel LeT LeV) s (wmAvoidTop H) :=

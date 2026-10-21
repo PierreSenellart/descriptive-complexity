@@ -36,13 +36,13 @@ section SigmaOne
 
 /-- The first-order Horn condition, in the kernel's vocabulary: two variables
 occurring positively in the same clause coincide. -/
-noncomputable def hornCondKernel : satSOLang.Sentence :=
+private noncomputable def hornCondKernel : satSOLang.Sentence :=
   fo% ∀ c x y, (kIsClSym(c) ∧ kPosSym(c, x)) ∧ kPosSym(c, y) → x ≐ y
 
 /-- Realization of the Horn condition: it does not depend on the guessed truth
 assignment, and says exactly that every clause has at most one positive
 literal. -/
-theorem realize_hornCondKernel {A : Type} [Language.sat.Structure A]
+private theorem realize_hornCondKernel {A : Type} [Language.sat.Structure A]
     (ρ : satAssignBlock.Assignment A) :
     (@Sentence.Realize satSOLang A
         (@sumStructure _ _ A _ (satAssignBlock.structure ρ)) hornCondKernel) ↔

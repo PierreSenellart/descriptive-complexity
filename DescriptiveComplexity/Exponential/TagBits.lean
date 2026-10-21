@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.OrdExtend
+import all DescriptiveComplexity.Padding
 
 /-!
 # Guessing a point of an expanded universe
@@ -51,7 +52,7 @@ noncomputable def finEnum (T : Type) [Finite T] : List T :=
   (Finset.univ : Finset T).toList
 
 open Classical in
-theorem mem_finEnum {T : Type} [Finite T] (t : T) : t ∈ finEnum T := by
+private theorem mem_finEnum {T : Type} [Finite T] (t : T) : t ∈ finEnum T := by
   let : Fintype T := Fintype.ofFinite T
   exact Finset.mem_toList.mpr (Finset.mem_univ t)
 
@@ -115,7 +116,7 @@ noncomputable def tagGuardF : (L.sum (B.withTag T).lang).Sentence :=
 
 variable [L.Structure A]
 
-theorem realize_tagBitF (σ : (B.withTag T).Assignment A) (t : T) :
+private theorem realize_tagBitF (σ : (B.withTag T).Assignment A) (t : T) :
     (@Formula.Realize _ A ((B.withTag T).structure₁ (L := L) σ) _ (tagBitF B T t) default ↔
       σ (Sum.inl t) default) := by
   let := (B.withTag T).structure₁ (L := L) σ

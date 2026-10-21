@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OccurrenceOrder
+import all DescriptiveComplexity.OccurrenceOrder
 
 /-!
 # The 3-coloring gadget graph of a CNF structure
@@ -114,7 +115,7 @@ def Core : SatTag → A → A → SatTag → A → A → Prop
 open Classical in
 /-- The coloring of the gadget graph induced by an assignment `ν`:
 `0` is “true”, `1` is “false”, `2` is “base”. -/
-noncomputable def gadCol (ν : A → Prop) : SatTag → A → A → Fin 3
+private noncomputable def gadCol (ν : A → Prop) : SatTag → A → A → Fin 3
   | .palT, _, _ => 0
   | .palF, _, _ => 1
   | .palB, _, _ => 2
@@ -125,7 +126,7 @@ noncomputable def gadCol (ν : A → Prop) : SatTag → A → A → Fin 3
   | .spoil, _, _ => 2
 
 /-- The coloring induced by a satisfying assignment is proper. -/
-theorem gadCol_proper {ν : A → Prop}
+private theorem gadCol_proper {ν : A → Prop}
     (hν : ∀ c : A, IsCl c → ∃ x s, OccIn c x s ∧ LitTrue ν x s)
     {t₁ t₂ : SatTag} {a₁ b₁ a₂ b₂ : A} (h : Core t₁ a₁ b₁ t₂ a₂ b₂) :
     gadCol ν t₁ a₁ b₁ ≠ gadCol ν t₂ a₂ b₂ := by

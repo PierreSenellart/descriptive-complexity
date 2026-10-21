@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Problems.Epr.Defs
 import DescriptiveComplexity.Problems.Epr.Small
 public import DescriptiveComplexity.Problems.Epr.Membership
+import all DescriptiveComplexity.Problems.Epr.Membership
 
 /-!
 # EPR, the umbrella

@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Knapsack.Defs
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # Adding up binary weights along the item order
@@ -57,7 +58,7 @@ noncomputable def PartSum (Le : A → A → Prop) (S : A → Prop) (w : A → �
 omit [Finite A] in
 open Classical in
 /-- At the first item, the running total is that item's contribution. -/
-theorem partSum_min {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
+private theorem partSum_min {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
     (hS : ∀ i, S i → IItem i) {i : A} (hi : MinPos ILe IItem i) :
     PartSum ILe S w i = if S i then w i else 0 := by
   have hset : {j : A | S j ∧ ILe j i} = {j : A | j = i ∧ S j} := by
@@ -82,7 +83,7 @@ theorem partSum_min {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
 
 open Classical in
 /-- Each step of the walk adds one item's contribution. -/
-theorem partSum_succ {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
+private theorem partSum_succ {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
     (hS : ∀ i, S i → IItem i) {h i : A} (hsucc : SuccPos ILe IItem h i) :
     PartSum ILe S w i = PartSum ILe S w h + if S i then w i else 0 := by
   have hset : {j : A | S j ∧ ILe j i} =
@@ -122,7 +123,7 @@ theorem partSum_succ {S : A → Prop} {w : A → ℕ} (hlin : IsLinOrd (ILe))
     rfl
 
 /-- A running total never exceeds the total. -/
-theorem partSum_le {S : A → Prop} {w : A → ℕ} (i : A) :
+private theorem partSum_le {S : A → Prop} {w : A → ℕ} (i : A) :
     PartSum ILe S w i ≤ ∑ᶠ j ∈ {j : A | S j}, w j := by
   classical
   have hset : {j : A | S j} =
@@ -143,7 +144,7 @@ theorem partSum_le {S : A → Prop} {w : A → ℕ} (i : A) :
 
 omit [Finite A] in
 /-- At the last item, the running total is the total. -/
-theorem partSum_max {S : A → Prop} {w : A → ℕ} (hS : ∀ i, S i → IItem i) {i : A}
+private theorem partSum_max {S : A → Prop} {w : A → ℕ} (hS : ∀ i, S i → IItem i) {i : A}
     (hi : MaxPos ILe IItem i) : PartSum ILe S w i = ∑ᶠ j ∈ {j : A | S j}, w j := by
   have hset : {j : A | S j ∧ ILe j i} = {j : A | S j} := by
     ext j
@@ -151,7 +152,7 @@ theorem partSum_max {S : A → Prop} {w : A → ℕ} (hS : ∀ i, S i → IItem 
   rw [PartSum, hset]
 
 /-- The parity of three bits, as an iterated equivalence. -/
-theorem xor3_iff (x y z : Prop) : Xor x (Xor y z) ↔ (x ↔ (y ↔ z)) := by
+private theorem xor3_iff (x y z : Prop) : Xor x (Xor y z) ↔ (x ↔ (y ↔ z)) := by
   by_cases hx : x <;> by_cases hy : y <;> by_cases hz : z <;> simp [Xor, hx, hy, hz]
 
 /-! ### Walks along the item order -/
@@ -164,7 +165,7 @@ def ChainAdd (S : A → Prop) (wt : A → P → Prop) (i : A) (p : P) : Prop := 
 omit [Finite A] [Finite P] in
 open Classical in
 /-- An item contributes its weight, or nothing. -/
-theorem binNum_chainAdd (PLe : P → P → Prop) (PPosn : P → Prop) (S : A → Prop)
+private theorem binNum_chainAdd (PLe : P → P → Prop) (PPosn : P → Prop) (S : A → Prop)
     (wt : A → P → Prop) (i : A) :
     binNum PLe PPosn (ChainAdd S wt i) =
       if S i then binNum PLe PPosn (wt i) else 0 := by

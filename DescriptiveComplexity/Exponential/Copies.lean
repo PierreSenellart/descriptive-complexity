@@ -57,7 +57,7 @@ variable {A : Type} [L.Structure A]
 
 /-- **Correctness of the one-copy reading**: the replicated assignment holds
 the original assignment in its single copy. -/
-theorem realize_oneLHom (ρs : Fin 1 → B.Assignment A) (φ : (L.sum B.lang).Sentence) :
+private theorem realize_oneLHom (ρs : Fin 1 → B.Assignment A) (φ : (L.sum B.lang).Sentence) :
     @Sentence.Realize _ A ((B.replicate 1).structure₁ (L := L) (B.replicateAssign ρs))
         ((B.oneLHom L).onSentence φ) ↔
       @Sentence.Realize _ A (B.structure₁ (L := L) (ρs 0)) φ :=
@@ -85,7 +85,7 @@ def twoLHom : ((L.sum B.lang).sum B.lang) →ᴸ (L.sum (B.replicate 2).lang) wh
 replicated one. Stated at a *family* of two assignments rather than at a pair,
 since that is the shape a defining sentence of an expansion is realized
 against. -/
-theorem twoLHom_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
+private theorem twoLHom_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
     @LHom.IsExpansionOn _ _ (B.twoLHom L) A (B.structure₂ (L := L) (ρs 0) (ρs 1))
       ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs)) := by
   let := B.structure₂ (L := L) (ρs 0) (ρs 1)
@@ -102,7 +102,7 @@ theorem twoLHom_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
 
 /-- **Correctness of the two-copy reading**: the replicated assignment holds
 the current state in copy `0` and the next one in copy `1`. -/
-theorem realize_twoLHom (ρs : Fin 2 → B.Assignment A)
+private theorem realize_twoLHom (ρs : Fin 2 → B.Assignment A)
     (φ : ((L.sum B.lang).sum B.lang).Sentence) :
     @Sentence.Realize _ A ((B.replicate 2).structure₁ (L := L) (B.replicateAssign ρs))
         ((B.twoLHom L).onSentence φ) ↔
@@ -158,7 +158,7 @@ theorem twoLHom'_isExpansionOn (ρs : Fin 2 → B.Assignment A) :
 
 /-- **Correctness of the reversed reading**: the stacked structure holds copy
 `0` in its inner copy and copy `1` in its outer one. -/
-theorem realize_twoLHom' (ρs : Fin 2 → B.Assignment A)
+private theorem realize_twoLHom' (ρs : Fin 2 → B.Assignment A)
     (φ : (L.sum (B.replicate 2).lang).Sentence) :
     @Sentence.Realize _ A (B.structure₂ (L := L) (ρs 0) (ρs 1))
         ((B.twoLHom' L).onSentence φ) ↔

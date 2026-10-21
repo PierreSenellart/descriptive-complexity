@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Invariant.Pebble
+import all DescriptiveComplexity.Invariant.Pebble
 
 /-!
 # The canonical order on `≡ᵏ`-classes, as an inflationary refinement
@@ -118,12 +119,12 @@ def OrdK : PebbleRel A k :=
   fun u v => ∃ n, ordStage c₀ n u v
 
 /-- The chain grows: one round only ever adds pairs. -/
-theorem ordStage_le_succ (n : ℕ) {u v : Fin k → A} (h : ordStage c₀ n u v) :
+private theorem ordStage_le_succ (n : ℕ) {u v : Fin k → A} (h : ordStage c₀ n u v) :
     ordStage c₀ (n + 1) u v :=
   Or.inl h
 
 /-- The chain grows, monotonically. -/
-theorem ordStage_le_of_le {m n : ℕ} (hmn : m ≤ n) {u v : Fin k → A}
+private theorem ordStage_le_of_le {m n : ℕ} (hmn : m ≤ n) {u v : Fin k → A}
     (h : ordStage c₀ m u v) : ordStage c₀ n u v := by
   induction n with
   | zero => rwa [Nat.le_zero.mp hmn] at h
@@ -158,7 +159,7 @@ theorem IncompRel.congr_left {u v w : Fin k → A} (h : O u v)
 
 include htrans hinc in
 /-- Comparability is a congruence for incomparability, on the left. -/
-theorem IncompRel.congr_right {u v w : Fin k → A} (huv : IncompRel O u v)
+private theorem IncompRel.congr_right {u v w : Fin k → A} (huv : IncompRel O u v)
     (h : O v w) : O u w := by
   by_contra huw
   rcases Classical.em (O w u) with hwu | hwu
@@ -175,7 +176,7 @@ theorem InMoves.congr {j : Fin k} {u x y : Fin k → A}
 include hasymm htrans in
 /-- If the move sets differ, one compares below the other: the least
 separating class lands on one of the two sides. -/
-theorem setLess_or [Finite A] {j : Fin k} {u v : Fin k → A}
+private theorem setLess_or [Finite A] {j : Fin k} {u v : Fin k → A}
     (h : ¬MovesEq O j u v) : SetLess O j u v ∨ SetLess O j v u := by
   classical
   have hwf : WellFounded O := by
@@ -195,7 +196,7 @@ theorem setLess_or [Finite A] {j : Fin k} {u v : Fin k → A}
 include hinc in
 /-- Set comparison is asymmetric: the two candidate least separating classes
 would be incomparable, hence equal as classes, hence on the same side. -/
-theorem setLess_asymm {j : Fin k} {u v : Fin k → A} (h : SetLess O j u v) :
+private theorem setLess_asymm {j : Fin k} {u v : Fin k → A} (h : SetLess O j u v) :
     ¬SetLess O j v u := by
   rintro ⟨y, hyv, hyu, hymin⟩
   obtain ⟨x, hxu, hxv, hxmin⟩ := h
@@ -220,7 +221,7 @@ theorem SetLess.congr_right {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A
   exact fun hiff => hy (hiff.trans (hvw y))
 
 /-- Set comparison is invariant under move-set equality on the left. -/
-theorem SetLess.congr_left {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A}
+private theorem SetLess.congr_left {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A}
     (huv : MovesEq O j u v) (h : SetLess O j v w) : SetLess O j u w := by
   obtain ⟨x, hxv, hxw, hxmin⟩ := h
   refine ⟨x, (huv x).mpr hxv, hxw, fun y hy => hxmin y ?_⟩
@@ -229,7 +230,7 @@ theorem SetLess.congr_left {O : PebbleRel A k} {j : Fin k} {u v w : Fin k → A}
 include htrans hinc in
 /-- Set comparison is transitive: compare the two least separating classes,
 and reuse the smaller one. -/
-theorem setLess_trans {j : Fin k} {u v w : Fin k → A}
+private theorem setLess_trans {j : Fin k} {u v w : Fin k → A}
     (h₁ : SetLess O j u v) (h₂ : SetLess O j v w) : SetLess O j u w := by
   obtain ⟨a, hau, hav, hamin⟩ := h₁
   obtain ⟨b, hbv, hbw, hbmin⟩ := h₂
@@ -252,14 +253,14 @@ theorem setLess_trans {j : Fin k} {u v w : Fin k → A}
       exact absurd (InMoves.congr hinc hbv ⟨hba, hab⟩) hav
 
 /-- Move-set equality contradicts set comparison at the same pebble. -/
-theorem SetLess.not_movesEq {O : PebbleRel A k} {j : Fin k} {u v : Fin k → A}
+private theorem SetLess.not_movesEq {O : PebbleRel A k} {j : Fin k} {u v : Fin k → A}
     (h : SetLess O j u v) (heq : MovesEq O j u v) : False := by
   obtain ⟨x, hxu, hxv, -⟩ := h
   exact hxv ((heq x).mp hxu)
 
 include hinc in
 /-- Lexicographic move-set comparison is asymmetric. -/
-theorem movesLess_asymm {u v : Fin k → A} (h : MovesLess O u v) :
+private theorem movesLess_asymm {u v : Fin k → A} (h : MovesLess O u v) :
     ¬MovesLess O v u := by
   rintro ⟨j₂, hpre₂, hless₂⟩
   obtain ⟨j₁, hpre₁, hless₁⟩ := h
@@ -271,7 +272,7 @@ theorem movesLess_asymm {u v : Fin k → A} (h : MovesLess O u v) :
 
 include htrans hinc in
 /-- Lexicographic move-set comparison is transitive. -/
-theorem movesLess_trans {u v w : Fin k → A} (h₁ : MovesLess O u v)
+private theorem movesLess_trans {u v w : Fin k → A} (h₁ : MovesLess O u v)
     (h₂ : MovesLess O v w) : MovesLess O u w := by
   obtain ⟨j₁, hpre₁, hless₁⟩ := h₁
   obtain ⟨j₂, hpre₂, hless₂⟩ := h₂
@@ -287,7 +288,7 @@ theorem movesLess_trans {u v w : Fin k → A} (h₁ : MovesLess O u v)
 include hasymm htrans in
 /-- If the move sets differ at some pebble, the tuples compare one way or the
 other lexicographically: cut at the first differing pebble. -/
-theorem movesLess_or [Finite A] {u v : Fin k → A} (h : ¬∀ j, MovesEq O j u v) :
+private theorem movesLess_or [Finite A] {u v : Fin k → A} (h : ¬∀ j, MovesEq O j u v) :
     MovesLess O u v ∨ MovesLess O v u := by
   classical
   have hne : {j : Fin k | ¬MovesEq O j u v}.Nonempty := not_forall.mp h
@@ -481,7 +482,7 @@ theorem ordK_or_of_not_equivK {u v : Fin k → A}
   exact h hi
 
 /-- Incomparability in the canonical order is transitive. -/
-theorem incompRel_ordK_trans {u v w : Fin k → A}
+private theorem incompRel_ordK_trans {u v w : Fin k → A}
     (h₁ : IncompRel (OrdK c₀) u v) (h₂ : IncompRel (OrdK c₀) v w) :
     IncompRel (OrdK c₀) u w := by
   rw [incompRel_ordK_eq] at h₁ h₂ ⊢
@@ -498,7 +499,7 @@ theorem OrdK.congr_left {u v w : Fin k → A} (h : OrdK c₀ u v)
     (fun a b c h1 h2 => incompRel_ordK_trans c₀ h1 h2) h hvw'
 
 /-- The canonical order is a congruence for `≡ᵏ` on the left. -/
-theorem OrdK.congr_right {u v w : Fin k → A} (huv : EquivK (colorAgree c₀) u v)
+private theorem OrdK.congr_right {u v w : Fin k → A} (huv : EquivK (colorAgree c₀) u v)
     (h : OrdK c₀ v w) : OrdK c₀ u w := by
   have huv' : IncompRel (OrdK c₀) u v := by
     rw [incompRel_ordK_eq]

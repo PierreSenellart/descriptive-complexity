@@ -12,6 +12,8 @@ import Mathlib.Data.List.Chain
 public import Mathlib.Data.Finset.Sort
 import Mathlib.Data.Fintype.Lattice
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Problems.Hamilton.Cycle
+import all DescriptiveComplexity.Problems.Hamilton.Gadget
 
 /-!
 # A Hamilton circuit presented as a cyclic list
@@ -79,7 +81,7 @@ consecutive blocks connect (last of one to head of the next), and the whole
 wraps (last of the flattening to its head), presents a tour. This packages the
 `isChain_flatten` step for the forward construction, whose blocks are a selector
 followed by a cover vertex's chain. -/
-theorem tourOn_of_blocks [Finite H] (bs : List (List H)) (hbne : [] ∉ bs)
+private theorem tourOn_of_blocks [Finite H] (bs : List (List H)) (hbne : [] ∉ bs)
     (hflat : bs.flatten ≠ []) (nd : bs.flatten.Nodup) (hcov : ∀ x, x ∈ bs.flatten)
     (hchain : ∀ l ∈ bs, l.IsChain R)
     (hconn : bs.IsChain (fun l₁ l₂ => ∀ x ∈ l₁.getLast?, ∀ y ∈ l₂.head?, R x y))
@@ -105,7 +107,7 @@ abbrev gv (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub) {a b : A} (h : HEdge a b) 
 
 /-- Adjacency between two gadget vertices reduces to the intended adjacency of
 their (tag, tuple) pairs. -/
-theorem gv_adj {a b a' b' : A} (i j : HTag) (hi hj) (h : HEdge a b) (h' : HEdge a' b') :
+private theorem gv_adj {a b a' b' : A} (i j : HTag) (hi hj) (h : HEdge a b) (h' : HEdge a' b') :
     DGEdge (gPt i hi h) (gPt j hj h') ↔ IAdjRaw (i, ![a, b]) (j, ![a', b']) :=
   dgEdge_iff _ _
 
@@ -135,12 +137,13 @@ def snakeThrough {a b : A} (h : HEdge a b) : List (hamInterp.MapRel A) :=
    gv3 (hEdge_symm h), gv4 (hEdge_symm h), gv5 (hEdge_symm h),
    gv3 h, gv4 h, gv5 h]
 
-theorem snakeBoth_isChain {a b : A} (h : HEdge a b) : (snakeBoth h).IsChain DGEdge := by
+private theorem snakeBoth_isChain {a b : A} (h : HEdge a b) : (snakeBoth h).IsChain DGEdge := by
   simp only [snakeBoth, List.isChain_cons_cons, List.isChain_singleton, and_true]
   refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
     exact (gv_adj _ _ _ _ _ _).mpr (by simp [IAdjRaw])
 
-theorem snakeThrough_isChain {a b : A} (h : HEdge a b) : (snakeThrough h).IsChain DGEdge := by
+private theorem snakeThrough_isChain
+    {a b : A} (h : HEdge a b) : (snakeThrough h).IsChain DGEdge := by
   simp only [snakeThrough, List.isChain_cons_cons, List.isChain_singleton, and_true]
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     exact (gv_adj _ _ _ _ _ _).mpr (by simp [IAdjRaw])
@@ -154,18 +157,18 @@ theorem snakeThrough_isChain {a b : A} (h : HEdge a b) : (snakeThrough h).IsChai
 @[simp] theorem snakeThrough_getLast? {a b : A} (h : HEdge a b) :
     (snakeThrough h).getLast? = some (gv5 h) := rfl
 
-theorem snakeBoth_ne_nil {a b : A} (h : HEdge a b) : snakeBoth h ≠ [] := by simp [snakeBoth]
-theorem snakeThrough_ne_nil {a b : A} (h : HEdge a b) : snakeThrough h ≠ [] := by
+private theorem snakeBoth_ne_nil {a b : A} (h : HEdge a b) : snakeBoth h ≠ [] := by simp [snakeBoth]
+private theorem snakeThrough_ne_nil {a b : A} (h : HEdge a b) : snakeThrough h ≠ [] := by
   simp [snakeThrough]
 
 /-! #### Distinctness of gadget vertices -/
 
-theorem snakeBoth_nodup {a b : A} (h : HEdge a b) : (snakeBoth h).Nodup := by
+private theorem snakeBoth_nodup {a b : A} (h : HEdge a b) : (snakeBoth h).Nodup := by
   apply List.Nodup.of_map (fun p => p.1.1)
   simp only [snakeBoth, List.map_cons, List.map_nil, gPt_tag]
   decide
 
-theorem snakeThrough_nodup {a b : A} (h : HEdge a b) : (snakeThrough h).Nodup := by
+private theorem snakeThrough_nodup {a b : A} (h : HEdge a b) : (snakeThrough h).Nodup := by
   apply List.Nodup.of_map (fun p => (p.1.1, p.1.2 0))
   have hab : a ≠ b := h.2
   simp only [snakeThrough, List.map_cons, List.map_nil, gPt_tag, gPt_fst]
@@ -174,7 +177,8 @@ theorem snakeThrough_nodup {a b : A} (h : HEdge a b) : (snakeThrough h).Nodup :=
 /-! #### Which vertices a snake contains (for covering) -/
 
 /-- Every `a`-side gadget vertex is in the both-sides snake. -/
-theorem mem_snakeBoth_owner {a b : A} (h : HEdge a b) (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub) :
+private theorem mem_snakeBoth_owner
+    {a b : A} (h : HEdge a b) (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub) :
     gPt i hi h ∈ snakeBoth h := by
   cases i <;>
     first
@@ -183,7 +187,8 @@ theorem mem_snakeBoth_owner {a b : A} (h : HEdge a b) (i : HTag) (hi : i ≠ .se
       | (simp only [snakeBoth, List.mem_cons]; tauto)
 
 /-- Every `a`-side gadget vertex is in the through snake. -/
-theorem mem_snakeThrough_near {a b : A} (h : HEdge a b) (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub) :
+private theorem mem_snakeThrough_near
+    {a b : A} (h : HEdge a b) (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub) :
     gPt i hi h ∈ snakeThrough h := by
   cases i <;>
     first
@@ -194,7 +199,8 @@ theorem mem_snakeThrough_near {a b : A} (h : HEdge a b) (i : HTag) (hi : i ≠ .
 /-- Every `b`-side gadget vertex – a gadget vertex owned by the far endpoint – is
 in the through snake. This is why an uncovered endpoint's vertices are visited by
 the covered endpoint's chain. -/
-theorem mem_snakeThrough_far {a b : A} (hba : HEdge b a) (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub)
+private theorem mem_snakeThrough_far
+    {a b : A} (hba : HEdge b a) (i : HTag) (hi : i ≠ .sel ∧ i ≠ .hub)
     (hab : HEdge a b) : gPt i hi hab ∈ snakeThrough hba := by
   cases i <;>
     first
@@ -217,15 +223,15 @@ open Classical in
 noncomputable def nbrList (a : A) : List A :=
   (Finset.univ.filter (fun b => HEdge a b)).sort (· ≤ ·)
 
-theorem mem_nbrList {a b : A} : b ∈ nbrList a ↔ HEdge a b := by
+private theorem mem_nbrList {a b : A} : b ∈ nbrList a ↔ HEdge a b := by
   classical
   simp only [nbrList, Finset.mem_sort, Finset.mem_filter, Finset.mem_univ, true_and]
 
 /-- The neighbor list is strictly increasing. -/
-theorem nbrList_sortedLT (a : A) : (nbrList a).SortedLT := by
+private theorem nbrList_sortedLT (a : A) : (nbrList a).SortedLT := by
   simp only [nbrList]; exact Finset.sortedLT_sort _
 
-theorem nbrList_nodup (a : A) : (nbrList a).Nodup := by
+private theorem nbrList_nodup (a : A) : (nbrList a).Nodup := by
   simp only [nbrList]; exact Finset.sort_nodup _ _
 
 omit [Fintype A] in
@@ -233,7 +239,7 @@ omit [Fintype A] in
 the entrance `⟨g0,(a,c)⟩` of the next, given the neighbor-successor conditions
 (`DescriptiveComplexity.IAdjRaw`, the `.g5,.g0` case). This is what glues consecutive
 snakes into a vertex's chain. -/
-theorem chain_edge {a : A} {b c : A} (hb : HEdge a b) (hc : HEdge a c)
+private theorem chain_edge {a : A} {b c : A} (hb : HEdge a b) (hc : HEdge a c)
     (hbc : b < c) (hbtw : ∀ d, HEdge a d → d ≤ b ∨ c ≤ d) :
     DGEdge (gv5 hb) (gv0 hc) := by
   rw [gv_adj]
@@ -243,7 +249,7 @@ theorem chain_edge {a : A} {b c : A} (hb : HEdge a b) (hc : HEdge a c)
 /-- **The neighbor list is a connection-chain**: consecutive neighbors `b`, `c`
 of `a` satisfy the gadget chain edge, so the per-neighbor snakes concatenate
 into `a`'s chain. -/
-theorem nbrList_isChain (a : A) :
+private theorem nbrList_isChain (a : A) :
     (nbrList a).IsChain
       (fun b c => ∀ (hb : HEdge a b) (hc : HEdge a c), DGEdge (gv5 hb) (gv0 hc)) := by
   have hp : (nbrList a).Pairwise (· < ·) :=
@@ -322,7 +328,7 @@ noncomputable def chain (C : A → Prop) (a : A) : List (hamInterp.MapRel A) :=
 
 /-- **A chain is a `DGEdge`-chain**: the snakes are chains and consecutive ones
 connect via `DescriptiveComplexity.chain_edge`. -/
-theorem chain_isChain (C : A → Prop) (a : A) : (chain C a).IsChain DGEdge := by
+private theorem chain_isChain (C : A → Prop) (a : A) : (chain C a).IsChain DGEdge := by
   have hne : [] ∉ (nbrList a).map (snakeOf C a) := by
     rw [List.mem_map]; rintro ⟨b, hb, hnil⟩
     exact snakeOf_ne_nil (mem_nbrList.mp hb) hnil
@@ -343,7 +349,7 @@ theorem chain_isChain (C : A → Prop) (a : A) : (chain C a).IsChain DGEdge := b
 /-! #### Minima and maxima of the neighbor list -/
 
 /-- The head of the neighbor list is the least neighbor. -/
-theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
+private theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
     (nbrList a).head hne ≤ d := by
   have hmono : StrictMono (nbrList a).get := (nbrList_sortedLT a).strictMono_get
   have h0 : 0 < (nbrList a).length := List.length_pos_of_ne_nil hne
@@ -354,7 +360,7 @@ theorem head_nbrList_le {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d
   exact hmono.le_iff_le.mpr (by simp only [Fin.le_def]; omega)
 
 /-- The last of the neighbor list is the greatest neighbor. -/
-theorem le_getLast_nbrList {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
+private theorem le_getLast_nbrList {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge a d) :
     d ≤ (nbrList a).getLast hne := by
   have hmono : StrictMono (nbrList a).get := (nbrList_sortedLT a).strictMono_get
   have h0 : (nbrList a).length - 1 < (nbrList a).length := by
@@ -368,7 +374,7 @@ theorem le_getLast_nbrList {a : A} (hne : nbrList a ≠ []) {d : A} (hd : HEdge 
 omit [Fintype A] in
 /-- A selector is adjacent to a chain entrance `⟨g0,(a,b)⟩` when `b` is the least
 neighbor of `a`. -/
-theorem sel_entrance_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
+private theorem sel_entrance_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
     (hmin : ∀ d, HEdge a d → b ≤ d) : DGEdge (selPt hm) (gv0 h) := by
   rw [dgEdge_iff]
   simp only [IAdjRaw, selPt_tag, gPt_tag, gPt_fst]
@@ -377,7 +383,7 @@ theorem sel_entrance_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
 omit [Fintype A] in
 /-- A selector is adjacent to a chain exit `⟨g5,(a,b)⟩` when `b` is the greatest
 neighbor of `a`. -/
-theorem exit_sel_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
+private theorem exit_sel_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
     (hmax : ∀ d, HEdge a d → d ≤ b) : DGEdge (gv5 h) (selPt hm) := by
   rw [dgEdge_iff]
   simp only [IAdjRaw, selPt_tag, gPt_tag, gPt_fst]
@@ -385,7 +391,7 @@ theorem exit_sel_edge {m a b : A} (hm : MGMarked m) (h : HEdge a b)
 
 omit [Fintype A] in
 /-- Selectors are mutually adjacent (a self-looped clique). -/
-theorem sel_sel_edge {m m' : A} (hm : MGMarked m) (hm' : MGMarked m') :
+private theorem sel_sel_edge {m m' : A} (hm : MGMarked m) (hm' : MGMarked m') :
     DGEdge (selPt hm) (selPt hm') := by
   rw [dgEdge_iff]; trivial
 
@@ -394,7 +400,7 @@ theorem sel_sel_edge {m m' : A} (hm : MGMarked m) (hm' : MGMarked m') :
 open Classical in
 omit [Fintype A] in
 /-- Every `a`-side gadget vertex is in `a`'s snake for `b`, whichever snake it is. -/
-theorem mem_snakeOf_owner {C : A → Prop} {a b : A} (h : HEdge a b) (i : HTag)
+private theorem mem_snakeOf_owner {C : A → Prop} {a b : A} (h : HEdge a b) (i : HTag)
     (hi : i ≠ .sel ∧ i ≠ .hub) : gPt i hi h ∈ snakeOf C a b := by
   rw [snakeOf_eq h]; split
   · exact mem_snakeBoth_owner h i hi
@@ -402,14 +408,14 @@ theorem mem_snakeOf_owner {C : A → Prop} {a b : A} (h : HEdge a b) (i : HTag)
 
 /-- **A gadget vertex is in its owner's chain**: `⟨i,(a,b)⟩` is visited by `a`'s
 chain (for any cover `C`). -/
-theorem gadget_mem_chain {C : A → Prop} {a b : A} (h : HEdge a b) (i : HTag)
+private theorem gadget_mem_chain {C : A → Prop} {a b : A} (h : HEdge a b) (i : HTag)
     (hi : i ≠ .sel ∧ i ≠ .hub) : gPt i hi h ∈ chain C a := by
   rw [chain, List.mem_flatMap]
   exact ⟨b, mem_nbrList.mpr h, mem_snakeOf_owner h i hi⟩
 
 /-- **A gadget vertex is in the far endpoint's chain when its owner is uncovered**:
 if `a ∉ C`, the vertex `⟨i,(a,b)⟩` is visited by `b`'s through-traversal. -/
-theorem gadget_mem_chain_far {C : A → Prop} {a b : A} (hab : HEdge a b) (i : HTag)
+private theorem gadget_mem_chain_far {C : A → Prop} {a b : A} (hab : HEdge a b) (i : HTag)
     (hi : i ≠ .sel ∧ i ≠ .hub) (hnc : ¬C a) : gPt i hi hab ∈ chain C b := by
   rw [chain, List.mem_flatMap]
   refine ⟨a, mem_nbrList.mpr (hEdge_symm hab), ?_⟩
@@ -420,7 +426,7 @@ theorem gadget_mem_chain_far {C : A → Prop} {a b : A} (hab : HEdge a b) (i : H
 
 /-- **A chain's first vertex is the entrance `⟨g0,(a,b)⟩` of the least-neighbor
 gadget** – which a selector is adjacent to. -/
-theorem chain_head? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
+private theorem chain_head? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
     ∃ (b : A) (h : HEdge a b), (∀ d, HEdge a d → b ≤ d) ∧ (chain C a).head? = some (gv0 h) := by
   obtain ⟨b, t, hbt⟩ := List.exists_cons_of_ne_nil hne
   have hb : HEdge a b := mem_nbrList.mp (by rw [hbt]; exact List.mem_cons_self)
@@ -432,7 +438,7 @@ theorem chain_head? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
 
 /-- **A chain's last vertex is the exit `⟨g5,(a,b)⟩` of the greatest-neighbor
 gadget** – which a selector is adjacent to. -/
-theorem chain_getLast? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
+private theorem chain_getLast? (C : A → Prop) (a : A) (hne : nbrList a ≠ []) :
     ∃ (b : A) (h : HEdge a b), (∀ d, HEdge a d → d ≤ b) ∧ (chain C a).getLast? = some (gv5 h) := by
   set z := (nbrList a).getLast hne with hz
   have hzmem : z ∈ nbrList a := List.getLast_mem hne
@@ -462,7 +468,7 @@ theorem snakeThrough_tuple {a b : A} (h : HEdge a b) {p : hamInterp.MapRel A}
 /-- **The owner invariant of a chain**: a vertex of `w`'s chain is either owned
 by `w` (`w`-side) or owned by an *uncovered* neighbor of `w` (the far side of a
 through-traversal). -/
-theorem chain_tuple {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p ∈ chain C w) :
+private theorem chain_tuple {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p ∈ chain C w) :
     p.1.2 0 = w ∨ (p.1.2 1 = w ∧ ¬C (p.1.2 0)) := by
   rw [chain, List.mem_flatMap] at hp
   obtain ⟨b, hbmem, hp⟩ := hp
@@ -479,7 +485,7 @@ theorem chain_tuple {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p �
 /-- **Chains of distinct cover vertices are disjoint.** Their only possible
 overlap is a far-side vertex, which requires an *uncovered* owner – but both
 cover vertices are covered. -/
-theorem chain_disjoint {C : A → Prop} {w w' : A} (hw : C w) (hw' : C w') (hne : w ≠ w') :
+private theorem chain_disjoint {C : A → Prop} {w w' : A} (hw : C w) (hw' : C w') (hne : w ≠ w') :
     (chain C w).Disjoint (chain C w') := by
   intro p hpw hpw'
   rcases chain_tuple hpw with h1 | ⟨h1, h1c⟩ <;> rcases chain_tuple hpw' with h2 | ⟨h2, h2c⟩
@@ -498,7 +504,7 @@ theorem snakeOf_tuple {C : A → Prop} {w b : A} (hwb : HEdge w b) {p : hamInter
 
 omit [Fintype A] in
 /-- Snakes of distinct neighbors of `w` are disjoint. -/
-theorem snakeOf_disjoint {C : A → Prop} {w b b' : A} (hwb : HEdge w b) (hwb' : HEdge w b')
+private theorem snakeOf_disjoint {C : A → Prop} {w b b' : A} (hwb : HEdge w b) (hwb' : HEdge w b')
     (hbb : b ≠ b') : (snakeOf C w b).Disjoint (snakeOf C w b') := by
   intro p hp hp'
   rcases snakeOf_tuple hwb hp with ⟨e0, e1⟩ | ⟨e0, e1⟩ <;>
@@ -511,7 +517,7 @@ theorem snakeOf_disjoint {C : A → Prop} {w b b' : A} (hwb : HEdge w b) (hwb' :
 open Classical in
 /-- **A single chain is duplicate-free**: its snakes are internally nodup and
 pairwise disjoint (distinct neighbors ⇒ distinct gadgets). -/
-theorem chain_nodup (C : A → Prop) (w : A) : (chain C w).Nodup := by
+private theorem chain_nodup (C : A → Prop) (w : A) : (chain C w).Nodup := by
   rw [chain, List.nodup_flatMap]
   refine ⟨fun b hb => ?_,
     (nbrList_nodup w).pairwise_of_forall_ne fun b hb b' hb' hbb => ?_⟩
@@ -521,7 +527,7 @@ theorem chain_nodup (C : A → Prop) (w : A) : (chain C w).Nodup := by
   · exact snakeOf_disjoint (mem_nbrList.mp hb) (mem_nbrList.mp hb') hbb
 
 /-- Chain vertices are gadget vertices, never selectors. -/
-theorem chain_tag {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p ∈ chain C w) :
+private theorem chain_tag {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p ∈ chain C w) :
     p.1.1 ≠ HTag.sel := by
   rw [chain, List.mem_flatMap] at hp
   obtain ⟨b, hb, hp⟩ := hp
@@ -531,7 +537,7 @@ theorem chain_tag {C : A → Prop} {w : A} {p : hamInterp.MapRel A} (hp : p ∈ 
       rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
 
 /-- A selector is never a chain vertex. -/
-theorem selPt_not_mem_chain {C : A → Prop} {w m : A} (hm : MGMarked m) :
+private theorem selPt_not_mem_chain {C : A → Prop} {w m : A} (hm : MGMarked m) :
     selPt hm ∉ chain C w := fun hmem => chain_tag hmem rfl
 
 end Chain
@@ -545,7 +551,7 @@ open Language Structure
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] [Fintype A] {C : A → Prop}
 
 /-- A chain over a nonempty neighbor list is nonempty. -/
-theorem chain_ne_nil {w : A} (hne : nbrList w ≠ []) : chain C w ≠ [] := by
+private theorem chain_ne_nil {w : A} (hne : nbrList w ≠ []) : chain C w ≠ [] := by
   obtain ⟨b, _, _, hhead⟩ := chain_head? C w hne
   intro h; rw [h] at hhead; simp at hhead
 
@@ -563,7 +569,7 @@ theorem block_head? {m : A} (hm : MGMarked m) (cp) : (block hm cp).head? = some 
 
 /-- Every paired block is a `DGEdge`-chain: the selector connects to the chain's
 entrance and the chain is a chain. -/
-theorem block_isChain_paired {m w : A} (hm : MGMarked m) (hne : nbrList w ≠ []) :
+private theorem block_isChain_paired {m w : A} (hm : MGMarked m) (hne : nbrList w ≠ []) :
     (block hm (chain C w)).IsChain DGEdge := by
   rw [block, List.isChain_cons]
   refine ⟨fun y hy => ?_, chain_isChain C w⟩
@@ -580,7 +586,7 @@ theorem block_isChain_extra {m : A} (hm : MGMarked m) :
 
 /-- The last vertex of a paired block (a chain exit) is adjacent to any
 selector. -/
-theorem block_getLast_paired_adj {m m' w : A} (hm : MGMarked m) (hm' : MGMarked m')
+private theorem block_getLast_paired_adj {m m' w : A} (hm : MGMarked m) (hm' : MGMarked m')
     (hne : nbrList w ≠ []) {x : hamInterp.MapRel A}
     (hx : x ∈ (block hm (chain C w)).getLast?) : DGEdge x (selPt hm') := by
   rw [block, List.getLast?_cons_of_ne_nil (chain_ne_nil hne)] at hx
@@ -593,7 +599,7 @@ theorem block_getLast_paired_adj {m m' w : A} (hm : MGMarked m) (hm' : MGMarked 
 omit [Fintype A] in
 /-- The last vertex of an extra block (its selector) is adjacent to any
 selector. -/
-theorem block_getLast_extra_adj {m m' : A} (hm : MGMarked m) (hm' : MGMarked m')
+private theorem block_getLast_extra_adj {m m' : A} (hm : MGMarked m) (hm' : MGMarked m')
     {x : hamInterp.MapRel A} (hx : x ∈ (block hm ([] : List (hamInterp.MapRel A))).getLast?) :
     DGEdge x (selPt hm') := by
   rw [block] at hx
@@ -617,7 +623,7 @@ noncomputable def markedList : List A := (Finset.univ.filter fun m : A => MGMark
 
 open Classical in
 /-- The non-isolated cover vertices: those whose chain is nonempty. -/
-noncomputable def coverList : List A :=
+private noncomputable def coverList : List A :=
   (Finset.univ.filter fun w : A => C w ∧ nbrList w ≠ []).toList
 
 variable {C}
@@ -626,17 +632,17 @@ omit [LinearOrder A] in
 theorem mem_markedList {m : A} : m ∈ markedList ↔ MGMarked m := by
   simp [markedList]
 
-theorem mem_coverList {w : A} : w ∈ coverList C ↔ C w ∧ nbrList w ≠ [] := by
+private theorem mem_coverList {w : A} : w ∈ coverList C ↔ C w ∧ nbrList w ≠ [] := by
   simp [coverList]
 
 omit [LinearOrder A] in
 theorem markedList_nodup : (markedList (A := A)).Nodup := Finset.nodup_toList _
 
-theorem coverList_nodup : (coverList C).Nodup := Finset.nodup_toList _
+private theorem coverList_nodup : (coverList C).Nodup := Finset.nodup_toList _
 
 /-- There are at most as many cover vertices as selectors, from the vertex-cover
 threshold. -/
-theorem coverList_length_le (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard) :
+private theorem coverList_length_le (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard) :
     (coverList C).length ≤ (markedList (A := A)).length := by
   classical
   rw [markedList, coverList, Finset.length_toList, Finset.length_toList]
@@ -665,7 +671,7 @@ variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] [Fintype 
 open Classical in
 /-- The blocks of the cycle: the first `|coverList|` selectors each followed by
 their paired cover vertex's chain, then the leftover selectors alone. -/
-noncomputable def blockList (C : A → Prop) : List (List (hamInterp.MapRel A)) :=
+private noncomputable def blockList (C : A → Prop) : List (List (hamInterp.MapRel A)) :=
   ((coverList C).attach.zip ((markedList (A := A)).attach.take (coverList C).length)).map
       (fun p => block (mem_markedList.mp p.2.2) (chain C p.1.1)) ++
     ((markedList (A := A)).attach.drop (coverList C).length).map
@@ -673,7 +679,7 @@ noncomputable def blockList (C : A → Prop) : List (List (hamInterp.MapRel A)) 
 
 /-- Every block of the list is a selector followed by a chain, or a lone
 selector – both nonempty and starting with a selector. -/
-theorem block_of_mem_blockList {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blockList C) :
+private theorem block_of_mem_blockList {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blockList C) :
     (∃ (m w : A) (hm : MGMarked m), C w ∧ nbrList w ≠ [] ∧ bl = block hm (chain C w)) ∨
       (∃ (m : A) (hm : MGMarked m), bl = block hm []) := by
   rw [blockList, List.mem_append] at hbl
@@ -687,13 +693,13 @@ theorem block_of_mem_blockList {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ bl
     exact Or.inr ⟨s.1, mem_markedList.mp s.2, rfl⟩
 
 /-- No block is empty. -/
-theorem blockList_ne_nil_mem : [] ∉ blockList C := by
+private theorem blockList_ne_nil_mem : [] ∉ blockList C := by
   intro h
   rcases block_of_mem_blockList h with ⟨m, w, hm, -, -, he⟩ | ⟨m, hm, he⟩ <;>
     exact block_ne_nil hm _ he.symm
 
 /-- Every block is a `DGEdge`-chain. -/
-theorem blockList_isChain_mem {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blockList C) :
+private theorem blockList_isChain_mem {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blockList C) :
     bl.IsChain DGEdge := by
   rcases block_of_mem_blockList hbl with ⟨m, w, hm, -, hne, rfl⟩ | ⟨m, hm, rfl⟩
   · exact block_isChain_paired hm hne
@@ -702,7 +708,7 @@ theorem blockList_isChain_mem {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blo
 /-- **Consecutive blocks connect** – in fact every pair does, since every block
 starts with a selector and every block's last vertex is adjacent to every
 selector. -/
-theorem blockList_isChain_conn :
+private theorem blockList_isChain_conn :
     (blockList C).IsChain
       (fun l₁ l₂ => ∀ x ∈ l₁.getLast?, ∀ y ∈ l₂.head?, DGEdge x y) := by
   apply List.isChain_iff_forall_rel_of_append_cons_cons.mpr
@@ -720,7 +726,7 @@ theorem blockList_isChain_conn :
 omit [Fintype A] in
 /-- Two blocks with distinct selectors and appropriately disjoint chain parts are
 disjoint. -/
-theorem block_disjoint {m1 m2 : A} (hm1 : MGMarked m1) (hm2 : MGMarked m2)
+private theorem block_disjoint {m1 m2 : A} (hm1 : MGMarked m1) (hm2 : MGMarked m2)
     {cp1 cp2 : List (hamInterp.MapRel A)} (hmm : m1 ≠ m2) (hcp : cp1.Disjoint cp2)
     (h1 : selPt hm1 ∉ cp2) (h2 : selPt hm2 ∉ cp1) :
     (block hm1 cp1).Disjoint (block hm2 cp2) := by
@@ -741,7 +747,7 @@ variable {α β : Type}
 
 /-- Every element of the first list is paired by `zip` when it is no longer than
 the second. -/
-theorem mem_zip_left {l₁ : List α} {l₂ : List β} (hlen : l₁.length ≤ l₂.length) {x : α}
+private theorem mem_zip_left {l₁ : List α} {l₂ : List β} (hlen : l₁.length ≤ l₂.length) {x : α}
     (hx : x ∈ l₁) : ∃ y, (x, y) ∈ l₁.zip l₂ := by
   obtain ⟨i, hi, hix⟩ := List.mem_iff_getElem.mp hx
   have hiz : i < (l₁.zip l₂).length := by rw [List.length_zip]; omega
@@ -751,7 +757,7 @@ theorem mem_zip_left {l₁ : List α} {l₂ : List β} (hlen : l₁.length ≤ l
 
 /-- Every element of the second list is paired by `zip` when it is no longer than
 the first. -/
-theorem mem_zip_right {l₁ : List α} {l₂ : List β} (hlen : l₂.length ≤ l₁.length) {y : β}
+private theorem mem_zip_right {l₁ : List α} {l₂ : List β} (hlen : l₂.length ≤ l₁.length) {y : β}
     (hy : y ∈ l₂) : ∃ x, (x, y) ∈ l₁.zip l₂ := by
   obtain ⟨i, hi, hiy⟩ := List.mem_iff_getElem.mp hy
   have hiz : i < (l₁.zip l₂).length := by rw [List.length_zip]; omega
@@ -761,7 +767,7 @@ theorem mem_zip_right {l₁ : List α} {l₂ : List β} (hlen : l₂.length ≤ 
 
 /-- Zipping two duplicate-free lists gives a list whose pairs differ in **both**
 components. -/
-theorem zip_pairwise_both {l₁ : List α} {l₂ : List β} (h₁ : l₁.Nodup) (h₂ : l₂.Nodup) :
+private theorem zip_pairwise_both {l₁ : List α} {l₂ : List β} (h₁ : l₁.Nodup) (h₂ : l₂.Nodup) :
     (l₁.zip l₂).Pairwise (fun p q => p.1 ≠ q.1 ∧ p.2 ≠ q.2) := by
   rw [List.pairwise_iff_getElem]
   intro i j hi hj hij
@@ -780,7 +786,7 @@ variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] [Fintype 
 
 /-- **Every cover vertex's chain is in the cycle**: a cover vertex is paired with
 a selector, so its chain sits in a paired block. -/
-theorem chain_sub_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
+private theorem chain_sub_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     {w : A} (hw : w ∈ coverList C) : chain C w ⊆ (blockList C).flatten := by
   have hle : (coverList C).attach.length ≤
       ((markedList (A := A)).attach.take (coverList C).length).length := by
@@ -796,7 +802,7 @@ theorem chain_sub_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.
 
 /-- **Every selector is in the cycle**: it heads either a paired block (if among
 the first `|coverList|` selectors) or a leftover block. -/
-theorem selPt_mem_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
+private theorem selPt_mem_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     {m : A} (hm : MGMarked m) : selPt hm ∈ (blockList C).flatten := by
   have hmm : m ∈ markedList := mem_markedList.mpr hm
   rw [← List.take_append_drop (coverList C).length (markedList (A := A)), List.mem_append] at hmm
@@ -827,7 +833,7 @@ theorem selPt_mem_flatten (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.
 selector heads a block; a gadget vertex sits in a covered endpoint's chain (its
 owner's if covered, the neighbor's otherwise); the hub cannot occur, since
 there is a selector. -/
-theorem blockList_covers (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
+private theorem blockList_covers (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     (hcover : ∀ a b : A, HEdge a b → C a ∨ C b) (hmarks : ∃ m : A, MGMarked m)
     (v : hamInterp.MapRel A) : v ∈ (blockList C).flatten := by
   rcases point_cases v with ⟨t, ht, h, hv⟩ | ⟨hmk, -, hv⟩ | hhub
@@ -846,13 +852,13 @@ theorem blockList_covers (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.n
     exact absurd hmm (hnm m)
 
 /-- The cycle is nonempty when there is a selector. -/
-theorem blockList_flatten_ne_nil (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
+private theorem blockList_flatten_ne_nil (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     (hmarks : ∃ m : A, MGMarked m) : (blockList C).flatten ≠ [] := by
   obtain ⟨m, hm⟩ := hmarks
   exact List.ne_nil_of_mem (selPt_mem_flatten hcard hm)
 
 /-- Each block is duplicate-free. -/
-theorem blockList_block_nodup {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blockList C) :
+private theorem blockList_block_nodup {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blockList C) :
     bl.Nodup := by
   rcases block_of_mem_blockList hbl with ⟨m, w, hm, -, -, rfl⟩ | ⟨m, hm, rfl⟩
   · exact List.nodup_cons.mpr ⟨selPt_not_mem_chain hm, chain_nodup C w⟩
@@ -860,7 +866,7 @@ theorem blockList_block_nodup {bl : List (hamInterp.MapRel A)} (hbl : bl ∈ blo
 
 /-- The blocks are pairwise disjoint: distinct selectors, and distinct cover
 vertices give disjoint chains. -/
-theorem blockList_pairwise_disjoint : (blockList C).Pairwise List.Disjoint := by
+private theorem blockList_pairwise_disjoint : (blockList C).Pairwise List.Disjoint := by
   have hmn : (markedList (A := A)).attach.Nodup := List.nodup_attach.mpr markedList_nodup
   have hcn : (coverList C).attach.Nodup := List.nodup_attach.mpr coverList_nodup
   have htd : ∀ a ∈ (markedList (A := A)).attach.take (coverList C).length,
@@ -889,12 +895,12 @@ theorem blockList_pairwise_disjoint : (blockList C).Pairwise List.Disjoint := by
       (List.disjoint_nil_right _) List.not_mem_nil (selPt_not_mem_chain _)
 
 /-- **The cycle is duplicate-free.** -/
-theorem blockList_flatten_nodup : (blockList C).flatten.Nodup :=
+private theorem blockList_flatten_nodup : (blockList C).flatten.Nodup :=
   List.nodup_flatten.mpr ⟨fun _ => blockList_block_nodup, blockList_pairwise_disjoint⟩
 
 /-- **The wrap edge**: the last vertex of the cycle is adjacent to the first (a
 selector), since every block's last vertex is adjacent to every selector. -/
-theorem blockList_wrap : ∀ x ∈ (blockList C).flatten.getLast?,
+private theorem blockList_wrap : ∀ x ∈ (blockList C).flatten.getLast?,
     ∀ y ∈ (blockList C).flatten.head?, DGEdge x y := by
   intro x hx y hy
   have hfl : (blockList C).flatten ≠ [] := by rintro h; rw [h] at hx; simp at hx
@@ -924,7 +930,8 @@ omit [Fintype A] in
 /-- **The non-degenerate forward direction**: given a cover with at most as many
 vertices as the marked set, at least one marked vertex, and covering every edge,
 the gadget graph has a Hamilton circuit – the cycle of selectors and chains. -/
-theorem blockCycle_tourOn [Finite A] (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
+private theorem blockCycle_tourOn
+    [Finite A] (hcard : {x : A | C x}.ncard ≤ {x : A | MGMarked x}.ncard)
     (hcover : ∀ a b : A, HEdge a b → C a ∨ C b) (hmarks : ∃ m : A, MGMarked m) :
     TourOn (DGEdge (A := hamInterp.MapRel A)) := by
   have := Fintype.ofFinite A
@@ -938,7 +945,7 @@ omit [Fintype A] in
 /-- **The degenerate forward direction**: with no marked vertices and no edges,
 the interpreted graph is the single self-looped hub, a one-element Hamilton
 circuit. -/
-theorem degenerate_tourOn [Finite A] [Nonempty A] (hnm : ∀ y : A, ¬MGMarked y)
+private theorem degenerate_tourOn [Finite A] [Nonempty A] (hnm : ∀ y : A, ¬MGMarked y)
     (hne : ∀ y z : A, ¬HEdge y z) : TourOn (DGEdge (A := hamInterp.MapRel A)) := by
   have := Fintype.ofFinite A
   have : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A

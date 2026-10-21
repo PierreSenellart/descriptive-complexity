@@ -120,7 +120,7 @@ structure by `DescriptiveComplexity.SOBlock.structure`, and a packed record's
 output evaluation names it by `DescriptiveComplexity.SOBlock.structure₁`, which
 is that structure summed with the base's. This is what carries the source side
 across `DescriptiveComplexity.Draw.Data.exists_out_iff_gateMat`. -/
-theorem NexKernel.holds_iff_structure₁ (K : NexKernel L) {M : Type}
+private theorem NexKernel.holds_iff_structure₁ (K : NexKernel L) {M : Type}
     [K.X.E.Structure M] [LinearOrder M] :
     K.Holds M ↔ ∃ σ : K.B.Assignment M,
       @Sentence.Realize _ M

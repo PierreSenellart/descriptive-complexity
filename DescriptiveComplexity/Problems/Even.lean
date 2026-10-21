@@ -15,6 +15,11 @@ public import DescriptiveComplexity.FirstOrderPull
 public import DescriptiveComplexity.ArithmeticDefinable
 public import DescriptiveComplexity.LogTime
 public import Mathlib.Data.Set.Finite.Lemmas
+import all DescriptiveComplexity.Invariant.Bare
+import all DescriptiveComplexity.Invariant.Stages
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # EVEN: the parity of a bare set
@@ -88,7 +93,7 @@ def EVEN : DecisionProblem Language.empty where
   iso_invariant := fun e => by rw [Nat.card_congr e.toEquiv]
 
 /-- The value of EVEN at a bare set, unfolded. -/
-theorem even_holds_iff (A : Type) [Language.empty.Structure A] :
+private theorem even_holds_iff (A : Type) [Language.empty.Structure A] :
     EVEN A ↔ Even (Nat.card A) :=
   Iff.rfl
 
@@ -176,7 +181,7 @@ variable {A : Type} [Language.empty.Structure A] [LinearOrder A]
 
 /-- The parity mode carried at an element: `true` where the rank is even, that
 is, after an odd number of elements has been visited. -/
-noncomputable def parityMode [Finite A] (x : A) : Bool :=
+private noncomputable def parityMode [Finite A] (x : A) : Bool :=
   decide (Even (orank x))
 
 /-- The transition of the parity walk: step to the immediate successor,
@@ -205,7 +210,7 @@ noncomputable def evenSpec : TCSpec Language.empty where
   src := evenSrc
   tgt := evenTgt
 
-theorem realize_evenStep (m m' : Bool) (x y : Fin 1 → A) :
+private theorem realize_evenStep (m m' : Bool) (x y : Fin 1 → A) :
     (evenStep m m').Realize (Sum.elim x y) ↔ m' = !m ∧ x 0 ⋖ y 0 := by
   rw [evenStep]
   split_ifs with h
@@ -216,16 +221,16 @@ theorem realize_evenStep (m m' : Bool) (x y : Fin 1 → A) :
   · simp only [Formula.realize_bot, false_iff, not_and]
     exact fun h' => absurd h' h
 
-theorem step_evenSpec_iff (m m' : Bool) (x y : Fin 1 → A) :
+private theorem step_evenSpec_iff (m m' : Bool) (x y : Fin 1 → A) :
     evenSpec.Step (m, x) (m', y) ↔ m' = !m ∧ x 0 ⋖ y 0 :=
   realize_evenStep m m' x y
 
-theorem isSrc_evenSpec_iff (m : Bool) (x : Fin 1 → A) :
+private theorem isSrc_evenSpec_iff (m : Bool) (x : Fin 1 → A) :
     evenSpec.IsSrc (m, x) ↔ m = true ∧ ∀ a : A, x 0 ≤ a := by
   change (evenSrc m).Realize x ↔ _
   cases m <;> simp [evenSrc]
 
-theorem isTgt_evenSpec_iff (m : Bool) (x : Fin 1 → A) :
+private theorem isTgt_evenSpec_iff (m : Bool) (x : Fin 1 → A) :
     evenSpec.IsTgt (m, x) ↔ m = false ∧ ∀ a : A, a ≤ x 0 := by
   change (evenTgt m).Realize x ↔ _
   cases m <;> simp [evenTgt]
@@ -234,14 +239,14 @@ variable [Finite A]
 
 omit [Language.empty.Structure A] in
 /-- The mode flips along a cover, since the rank increases by one. -/
-theorem parityMode_covBy {w z : A} (h : w ⋖ z) : parityMode z = !parityMode w := by
+private theorem parityMode_covBy {w z : A} (h : w ⋖ z) : parityMode z = !parityMode w := by
   rw [parityMode, parityMode, orank_covBy h]
   cases Nat.even_or_odd (orank w) with
   | inl he => simp [he, Nat.even_add_one]
   | inr ho => simp [Nat.even_add_one, Nat.not_even_iff_odd.mpr ho]
 
 /-- **The walk reaches every element**, in the mode its rank prescribes. -/
-theorem reach_evenSpec {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) (x : A) :
+private theorem reach_evenSpec {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) (x : A) :
     evenSpec.Reach (true, fun _ => x₀) (parityMode x, fun _ => x) := by
   induction x using order_induction with
   | hmin z hz =>
@@ -258,7 +263,7 @@ theorem reach_evenSpec {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) (x : A) :
 
 /-- **The mode of a reachable node is the parity of its rank**: the invariant
 that reads the walk backwards. -/
-theorem parityMode_of_reach {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) :
+private theorem parityMode_of_reach {x₀ : A} (h₀ : ∀ a : A, x₀ ≤ a) :
     ∀ p : evenSpec.Node A, evenSpec.Reach (true, fun _ => x₀) p →
       p.1 = parityMode (p.2 (0 : Fin 1)) := by
   intro p h
@@ -278,7 +283,7 @@ variable [Nonempty A]
 /-- **The walk accepts exactly the sets of even size**: it visits every
 element once, from the minimum to the maximum, so the mode it ends in is the
 parity of the cardinality. -/
-theorem accepts_evenSpec_iff : evenSpec.Accepts A ↔ Even (Nat.card A) := by
+private theorem accepts_evenSpec_iff : evenSpec.Accepts A ↔ Even (Nat.card A) := by
   have hcard : 0 < Nat.card A := Nat.card_pos
   obtain ⟨x₀, -, h₀'⟩ := Set.exists_min_image (Set.univ : Set A) id (Set.toFinite _)
     ⟨Classical.arbitrary A, trivial⟩
@@ -471,7 +476,7 @@ section BitLevel
 /-- **The whole content of the bit-level reading**: `Nat.card A` is even exactly
 when the greatest element's rank has its lowest bit set, `orank` of it being
 `Nat.card A - 1`. -/
-theorem even_iff_bitIx (A : Type) [LinearOrder A] [Finite A] [Nonempty A] :
+private theorem even_iff_bitIx (A : Type) [LinearOrder A] [Finite A] [Nonempty A] :
     Even (Nat.card A) ↔ ∃ m z : A, (∀ k : A, k ≤ m) ∧ orank z = 0 ∧ BitIx z m := by
   have hcard : 0 < Nat.card A := Nat.card_pos
   constructor

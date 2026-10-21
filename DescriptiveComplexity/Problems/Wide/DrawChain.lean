@@ -134,7 +134,7 @@ every phase it can move to**: the checkpoints stay where they are, the
 dispatches go where their descriptors say, and the stages are the parameter.
 This is what a determinism-after-the-guess argument asks of a sequenced
 machinery (`DescriptiveComplexity.Draw.Data.nexProg_uniqueFrom`). -/
-theorem chainRule_dstIn {S : P → Prop} (hemb : ∀ p : ChainPh n PS, S (emb p))
+private theorem chainRule_dstIn {S : P → Prop} (hemb : ∀ p : ChainPh n PS, S (emb p))
     (hdsp : ∀ (k : Fin n) (b : Bool), S (dsp k b).dstPh)
     (hS : ∀ (s : SS) (ρ : ShS s), S (ruleS s ρ).dstPh)
     (i : ChainSite n SS) (ρ : ChainSh n SS ShS i) :
@@ -177,7 +177,7 @@ theorem chainSep
 
 /-- **Every chain rule fires from a phase its site owns**; the stages'
 obligation is the parameter. -/
-theorem chainHosrc {S' : Type} (site : ChainSite n SS → S')
+private theorem chainHosrc {S' : Type} (site : ChainSite n SS → S')
     (own : ChainPh n PS → S')
     (hownChk : ∀ k : Fin n, own (.chk k) = site (.chk k))
     (hosrcS : ∀ (s : SS) (ρ : ShS s),

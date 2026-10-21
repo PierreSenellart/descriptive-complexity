@@ -8,6 +8,7 @@ module
 import DescriptiveComplexity.Encoding
 public import DescriptiveComplexity.Decoding
 public import DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting
 
 /-!
 # Faithful encodings, for counting problems
@@ -43,7 +44,7 @@ def CountFaithful (e : Encoding L ι) (conc : ι → ℕ) (C : CountingProblem L
 
 /-- Counting faithfulness transports along equality of the counts on finite
 structures, the universe of an encoded instance being finite. -/
-theorem countFaithful_congr {e : Encoding L ι} {conc : ι → ℕ} {C D : CountingProblem L}
+private theorem countFaithful_congr {e : Encoding L ι} {conc : ι → ℕ} {C D : CountingProblem L}
     (hCD : ∀ (A : Type) [L.Structure A] [Finite A], C A = D A) :
     e.CountFaithful conc C ↔ e.CountFaithful conc D := by
   have hfin : ∀ i, Finite (e.Univ i) := fun i => @Finite.of_fintype _ (e.fintype i)

@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Problems.Wide.RegChannel
 public import DescriptiveComplexity.Problems.Wide.Membership
 import DescriptiveComplexity.Problems.Machine.Membership
+import all DescriptiveComplexity.Exponential.AddrExp
+import all DescriptiveComplexity.Problems.Wide.Expansion
+import all DescriptiveComplexity.Problems.Wide.Membership
 
 /-!
 # The register channel, as an expansion
@@ -73,7 +76,7 @@ section Realize
 
 variable {A : Type} [Language.wide.Structure A] [LinearOrder A]
 
-theorem realize_inpRegS (ρ σ : addrBlock.Assignment A) :
+private theorem realize_inpRegS (ρ σ : addrBlock.Assignment A) :
     (@Sentence.Realize wide2 A (addrBlock.structure₂ (L := wOrd) ρ σ) inpRegS ↔
       ∃ x y, WMRegSeg (wbits ρ) x ∧ wbits σ y ∧ WMInp x y) := by
   let := addrBlock.structure₂ (L := wOrd) ρ σ
@@ -135,7 +138,7 @@ noncomputable def wideRegStructure : Language.turing.Structure (wideExp.Map A) :
 variable {A}
 
 /-- Reading a binary symbol of the register-channel expansion at two points. -/
-theorem realize_twoReg (rt : Language.turing.Relations 2) (φ : WTag → WTag → wide2.Sentence)
+private theorem realize_twoReg (rt : Language.turing.Relations 2) (φ : WTag → WTag → wide2.Sentence)
     (h : ∀ τ : Fin 2 → wideRegExp.Tag, wideRegExp.relSentence rt τ = onS2 (φ (τ 0) (τ 1)))
     (x y : wideExp.Map A) :
     letI := wideRegStructure A
@@ -150,7 +153,7 @@ theorem realize_twoReg (rt : Language.turing.Relations 2) (φ : WTag → WTag �
 /-- **The initial tape of the expanded machine at the register channel**: the
 segment an element cuts among the elements that carry input holds that element's
 input symbol. -/
-theorem relMap_inpReg (p q : WPoint A) :
+private theorem relMap_inpReg (p q : WPoint A) :
     letI := wideRegStructure A
     (RelMap tmInp ![wideEmbed p, wideEmbed q] ↔ (wideRegData A).Inp p q) := by
   let := wideRegStructure A
@@ -169,7 +172,7 @@ variable (A)
 register-channel expansion**, fieldwise: eleven of the twelve symbols are
 defined by the same sentences as `wideExp`'s, so their readings are the same
 readings, and the twelfth is `relMap_inpReg`. -/
-theorem wideRegAgree :
+private theorem wideRegAgree :
     letI := wideRegStructure A
     TMData.Agree (wideEquiv (A := A)) (wideRegData A) (tmData (wideExp.Map A)) := by
   let := wideRegStructure A
@@ -197,7 +200,7 @@ open Wide
 
 /-- **The register-channel machine is the ordinary machine of its expansion**:
 acceptance of the one is acceptance of the other. -/
-theorem wideRegAccept_iff_expansion (A : Type) [Language.wide.Structure A]
+private theorem wideRegAccept_iff_expansion (A : Type) [Language.wide.Structure A]
     [LinearOrder A] :
     letI := wideRegStructure A
     (WideRegAccept A ↔ NTMAccept (wideExp.Map A)) := by

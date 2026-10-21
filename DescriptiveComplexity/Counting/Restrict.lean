@@ -43,7 +43,7 @@ theorem CountingProblem.restrict_of_realize (C : CountingProblem L) (P : L.Sente
     [L.Structure A] (h : A ⊨ P) : C.restrict P A = C A :=
   ite_eq_left h
 
-theorem CountingProblem.restrict_of_not_realize (C : CountingProblem L) (P : L.Sentence)
+private theorem CountingProblem.restrict_of_not_realize (C : CountingProblem L) (P : L.Sentence)
     (A : Type) [L.Structure A] (h : ¬A ⊨ P) : C.restrict P A = 0 :=
   ite_eq_right h
 

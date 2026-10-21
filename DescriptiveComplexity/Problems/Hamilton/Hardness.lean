@@ -11,6 +11,8 @@ import DescriptiveComplexity.Problems.Hamilton.Forward
 import DescriptiveComplexity.Problems.Hamilton.Reverse
 import DescriptiveComplexity.Problems.CliqueFamily
 import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Problems.Hamilton.Forward
+import all DescriptiveComplexity.Problems.Hamilton.Gadget
 
 /-!
 # Vertex Cover reduces to Hamilton Circuit
@@ -50,7 +52,7 @@ variable (A : Type) [Language.markedGraph.Structure A] [LinearOrder A] [Finite A
 /-- **The definable domain is inhabited.** A marked vertex gives a selector, an
 edge gives a gadget vertex, and the degenerate input with no marks and no edges
 gives the hub, at the minimum. -/
-theorem hamInterp_dom_nonempty :
+private theorem hamInterp_dom_nonempty :
     ∃ (t : HTag) (w : Fin 2 → A), (hamInterp.domFormula t).Realize w := by
   by_cases hm : ∃ m : A, MGMarked m
   · obtain ⟨m, hm⟩ := hm
@@ -74,7 +76,7 @@ a Hamilton circuit of the gadget graph. When there is a marked vertex it is the
 explicit cycle of `DescriptiveComplexity.blockCycle_tourOn` – selectors threaded with the
 cover vertices' chains; otherwise (no marks, hence no edges) it is the single
 self-looped hub (`DescriptiveComplexity.degenerate_tourOn`). -/
-theorem cover_to_tour (hcov : CoverOn (MGAdj (A := A)) (MGMarked (A := A))) :
+private theorem cover_to_tour (hcov : CoverOn (MGAdj (A := A)) (MGMarked (A := A))) :
     TourOn (DGEdge (A := hamInterp.MapRel A)) := by
   have : Fintype A := Fintype.ofFinite A
   obtain ⟨C, hcp, hcard⟩ := hcov
@@ -105,7 +107,7 @@ selectors.
 The counting injection `DescriptiveComplexity.active_ncard_le` bounds the active set by
 the marked set; the cover property `DescriptiveComplexity.cover_property` (the local
 traversal analysis) shows every edge has an active endpoint. -/
-theorem tour_to_cover (htour : TourOn (DGEdge (A := hamInterp.MapRel A))) :
+private theorem tour_to_cover (htour : TourOn (DGEdge (A := hamInterp.MapRel A))) :
     CoverOn (MGAdj (A := A)) (MGMarked (A := A)) := by
   have : Fintype A := Fintype.ofFinite A
   have : Finite (hamInterp.MapRel A) := hamInterp.mapRel_finite A
@@ -138,7 +140,7 @@ neighbor list, with the marked vertices as selectors and a degenerate-case
 hub. The domain formula cuts the target universe down to the real gadget,
 selector and hub vertices – Immerman's definable-subset reduction, needed
 because HAMILTON CIRCUIT is a spanning problem. -/
-noncomputable def vertexCover_rel_ordered_fo_reduction_hamCircuit :
+private noncomputable def vertexCover_rel_ordered_fo_reduction_hamCircuit :
     VertexCover ≤ʳᶠᵒ[≤] HamCircuit where
   Tag := HTag
   dim := 2

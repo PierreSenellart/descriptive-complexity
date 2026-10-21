@@ -97,7 +97,7 @@ theorem paletteColorableOn_iff [Finite A] (Cfl : A → A → Prop) (Kp : A → P
     exact hproper x y hxy (e.symm.injective (Subtype.ext hc))
 
 /-- `ColorableOn` only depends on the extension of the conflict relation. -/
-theorem colorableOn_congr {Cfl Cfl' : A → A → Prop} {k : ℕ}
+private theorem colorableOn_congr {Cfl Cfl' : A → A → Prop} {k : ℕ}
     (h : ∀ x y, Cfl x y ↔ Cfl' x y) : ColorableOn Cfl k ↔ ColorableOn Cfl' k :=
   exists_congr fun _ =>
     ⟨fun hc x y hxy => hc x y ((h x y).mpr hxy), fun hc x y hxy => hc x y ((h x y).mp hxy)⟩
@@ -114,7 +114,7 @@ theorem ColorableOn.of_equiv (u : B ≃ A) {CflB : B → B → Prop} {CflA : A �
   exact hc (u.symm x) (u.symm y) ((hcfl (u.symm x) (u.symm y)).mpr (by simpa using hxy))
 
 /-- `ColorableOn` transports along an equivalence, iff version. -/
-theorem ColorableOn.equiv_iff (u : B ≃ A) {CflB : B → B → Prop} {CflA : A → A → Prop}
+private theorem ColorableOn.equiv_iff (u : B ≃ A) {CflB : B → B → Prop} {CflA : A → A → Prop}
     {k : ℕ} (hcfl : ∀ b b', CflB b b' ↔ CflA (u b) (u b')) :
     ColorableOn CflB k ↔ ColorableOn CflA k :=
   ⟨ColorableOn.of_equiv u hcfl,

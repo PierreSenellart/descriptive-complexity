@@ -9,6 +9,7 @@ public import DescriptiveComplexity.Problems.Machine.AltTape
 public import DescriptiveComplexity.Problems.Qbf.Defs
 public import DescriptiveComplexity.MachinesAlt
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Problems.Machine.AltTape
 
 /-!
 # The machine of a quantified Boolean formula
@@ -339,7 +340,7 @@ Everything `DescriptiveComplexity.TMData.WellFormed` and
 `DescriptiveComplexity.ATMData.BlocksWellFormed` ask, discharged before any run
 is considered. -/
 
-theorem altMachine_wellFormed (cnf : Bool) :
+private theorem altMachine_wellFormed (cnf : Bool) :
     (altMachine k A cnf).toTMData.WellFormed :=
   ⟨isLinOrd_altTagTupleLe, exists_altPosn, fun _ _ _ ha hb => altInp_functional ha hb,
     exists_altBlank, fun _ _ ha hb => altBlank_unique ha hb⟩
@@ -357,7 +358,7 @@ theorem altBlockOf_lt (hk : 0 < k) (q : AltV k A) : altBlockOf q < k := by
 
 omit [(Language.qbf k).Structure A] in
 /-- A sweeping state's block is its sweep index. -/
-theorem altBlockOf_stG {i : Fin (k + 1)} (hi : (i : ℕ) < k) (d : Bool) :
+private theorem altBlockOf_stG {i : Fin (k + 1)} (hi : (i : ℕ) < k) (d : Bool) :
     altBlockOf (stG i d : AltV k A) = (i : ℕ) := by
   simp only [altBlockOf, acstI, stG]
   exact ite_eq_left hi
@@ -372,7 +373,7 @@ theorem altBlockOf_stAcc : altBlockOf (stAcc : AltV k A) = k - 1 := rfl
 /-- **The block structure is well formed**: every element has exactly one
 block, a transition stays in its block or moves to the next one, and a start
 state is in block `0`. -/
-theorem altMachine_blocksWellFormed (cnf : Bool) (hk : 0 < k) :
+private theorem altMachine_blocksWellFormed (cnf : Bool) (hk : 0 < k) :
     (altMachine k A cnf).BlocksWellFormed k := by
   refine ⟨fun q => ⟨altBlockOf q, altBlockOf_lt hk q, rfl, fun j' hj' => hj'⟩, ?_, ?_⟩
   · rintro τ q q' j j' hτ hsrc hdst rfl rfl

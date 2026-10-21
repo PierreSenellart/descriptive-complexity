@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Exponential.OrdFormula
 public import Mathlib.Basic.Finite.Sigma
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Exponential.OrdFormula
+import all DescriptiveComplexity.Exponential.Order
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Padding
 
 /-!
 # The binary increment on a block's atoms
@@ -86,14 +90,14 @@ def SetCovBy (S T : I → Prop) : Prop :=
 
 /-- Nothing is below the empty set: the order compares at the least differing
 index, where being out is being smaller. -/
-theorem setLinearOrder_bot_le (S : I → Prop) :
+private theorem setLinearOrder_bot_le (S : I → Prop) :
     (setLinearOrder I).le (fun _ => False) S := by
   refine (@not_lt _ (setLinearOrder I) _ _).mp fun h => ?_
   obtain ⟨-, -, -, hbot⟩ := (setLinearOrder_lt_iff S fun _ => False).mp h
   exact hbot
 
 /-- Nothing is above the full set. -/
-theorem setLinearOrder_le_top (S : I → Prop) :
+private theorem setLinearOrder_le_top (S : I → Prop) :
     (setLinearOrder I).le S (fun _ => True) := by
   refine (@not_lt _ (setLinearOrder I) _ _).mp fun h => ?_
   obtain ⟨-, -, htop, -⟩ := (setLinearOrder_lt_iff (fun _ => True) S).mp h
@@ -212,17 +216,17 @@ omit [LinearOrder A] [Finite A] [Nonempty A] in
 theorem realSet_surjective : Function.Surjective (B.realSet (A := A)) :=
   fun S => ⟨fun i u => S ⟨i, u⟩, rfl⟩
 
-theorem padMin_apply_of_lt (i : B.ι) (u : Fin (B.arity i) → A)
+private theorem padMin_apply_of_lt (i : B.ι) (u : Fin (B.arity i) → A)
     (k : Fin (blockArityBound B)) (hk : (k : ℕ) < B.arity i) :
     B.padMin i u k = u ⟨k, hk⟩ := by
   simp only [padMin, dite_eq_left hk]
 
-theorem padMin_apply_of_ge (i : B.ι) (u : Fin (B.arity i) → A)
+private theorem padMin_apply_of_ge (i : B.ι) (u : Fin (B.arity i) → A)
     (k : Fin (blockArityBound B)) (hk : ¬(k : ℕ) < B.arity i) :
     B.padMin i u k = minEl A := by
   simp only [padMin, dite_eq_right hk]
 
-theorem padMin_castLE (i : B.ι) (u : Fin (B.arity i) → A) (j : Fin (B.arity i)) :
+private theorem padMin_castLE (i : B.ι) (u : Fin (B.arity i) → A) (j : Fin (B.arity i)) :
     B.padMin i u (Fin.castLE (arity_le_blockArityBound B i) j) = u j := by
   rw [B.padMin_apply_of_lt i u _ j.isLt]
   exact congrArg u (Fin.val_injective rfl)
@@ -244,12 +248,12 @@ noncomputable def realIxLinearOrder : LinearOrder (B.RealIx A) :=
   letI := B.atomIxLinearOrder A
   LinearOrder.lift' B.keyIx B.keyIx_injective
 
-theorem realIx_lt_iff (P Q : B.RealIx A) :
+private theorem realIx_lt_iff (P Q : B.RealIx A) :
     ((B.realIxLinearOrder A).lt P Q ↔ B.atomLt (B.keyIx P) (B.keyIx Q)) :=
   B.atomIx_lt_iff _ _
 
 /-- Comparing least padded representatives is comparing the tuples they pad. -/
-theorem padMin_lt_iff (i : B.ι) (u v : Fin (B.arity i) → A) :
+private theorem padMin_lt_iff (i : B.ι) (u v : Fin (B.arity i) → A) :
     (toLex (B.padMin i u) < toLex (B.padMin i v) ↔ toLex u < toLex v) := by
   constructor
   · rintro ⟨k, hag, hlt⟩
@@ -283,7 +287,7 @@ theorem padMin_lt_iff (i : B.ι) (u v : Fin (B.arity i) → A) :
 
 /-- **The least padded representative is least**: no padded atom of the same
 real atom is below it. -/
-theorem keyIx_realOf_le (p : B.AtomIx A) :
+private theorem keyIx_realOf_le (p : B.AtomIx A) :
     (B.atomIxLinearOrder A).le (B.keyIx (B.realOf p)) p := by
   let : LinearOrder B.ι := finiteLinearOrder B.ι
   refine (@not_lt _ (B.atomIxLinearOrder A) _ _).mp fun h => ?_
@@ -363,7 +367,7 @@ noncomputable def ivarsAbove (i : B.ι) : List B.ι :=
   letI : LinearOrder B.ι := finiteLinearOrder B.ι
   B.ivars.filter fun j => decide (i < j)
 
-theorem mem_ivarsAbove (i j : B.ι) :
+private theorem mem_ivarsAbove (i j : B.ι) :
     letI : LinearOrder B.ι := finiteLinearOrder B.ι
     (j ∈ B.ivarsAbove i ↔ i < j) := by
   let : LinearOrder B.ι := finiteLinearOrder B.ι
@@ -409,7 +413,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A]
 /-- Quantifying a padded tuple is quantifying its truncation: every tuple of the
 arity of `i` is the truncation of one, namely of its least padded
 representative. -/
-theorem forall_trunc_iff (i : B.ι) (P : (Fin (B.arity i) → A) → Prop) :
+private theorem forall_trunc_iff (i : B.ι) (P : (Fin (B.arity i) → A) → Prop) :
     ((∀ y : Fin (blockArityBound B) → A,
         P fun j => y (Fin.castLE (arity_le_blockArityBound B i) j)) ↔ ∀ v, P v) := by
   constructor
@@ -421,7 +425,7 @@ theorem forall_trunc_iff (i : B.ι) (P : (Fin (B.arity i) → A) → Prop) :
 
 /-- The two agreement conjuncts say exactly “the copies agree at every real atom
 strictly below the witnessed one”. -/
-theorem agree_below_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B.arity i) → A) :
+private theorem agree_below_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B.arity i) → A) :
     (((∀ j ∈ B.ivarsBelow i, ∀ v : Fin (B.arity j) → A, (ρs 0 j v ↔ ρs 1 j v)) ∧
         ∀ v : Fin (B.arity i) → A, toLex v < toLex u → (ρs 0 i v ↔ ρs 1 i v)) ↔
       ∀ Q : B.RealIx A, B.atomLt (B.keyIx Q) (B.keyIx ⟨i, u⟩) →
@@ -439,7 +443,7 @@ theorem agree_below_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B
 
 /-- The two clearing conjuncts say exactly “the first copy holds and the second
 does not, at every real atom strictly above the witnessed one”. -/
-theorem clear_above_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B.arity i) → A) :
+private theorem clear_above_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B.arity i) → A) :
     (((∀ j ∈ B.ivarsAbove i, ∀ v : Fin (B.arity j) → A, (ρs 0 j v ∧ ¬ρs 1 j v)) ∧
         ∀ v : Fin (B.arity i) → A, toLex u < toLex v → (ρs 0 i v ∧ ¬ρs 1 i v)) ↔
       ∀ Q : B.RealIx A, B.atomLt (B.keyIx ⟨i, u⟩) (B.keyIx Q) →
@@ -456,7 +460,7 @@ theorem clear_above_real (ρs : Fin 2 → B.Assignment A) (i : B.ι) (u : Fin (B
     · exact Or.inr ⟨rfl, (B.padMin_lt_iff i u v).mpr hv⟩
 
 /-- **What the increment sentence says**, spelled out at real atoms. -/
-theorem realize_succAssignF_aux (ρs : Fin 2 → B.Assignment A) :
+private theorem realize_succAssignF_aux (ρs : Fin 2 → B.Assignment A) :
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
         (B.succAssignF L) ↔
@@ -545,7 +549,7 @@ two assignments exactly when the second is the increment of the first at their
 real atoms – which, by
 `DescriptiveComplexity.SOBlock.assignSucc_iff`, is exactly the immediate
 successor in the order the expanded universe carries. -/
-theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
+private theorem realize_succAssignF (ρs : Fin 2 → B.Assignment A) :
     letI := B.realIxLinearOrder A
     (@Sentence.Realize _ A
         ((B.replicate 2).structure₁ (L := L.sum Language.order) (B.replicateAssign ρs))
@@ -623,7 +627,7 @@ theorem realize_topAssignF (ρs : Fin 2 → B.Assignment A) (c : Fin 2) :
 
 variable (A) in
 /-- The assignment holding of everything – the greatest one. -/
-def topAssign : B.Assignment A := fun _ _ => True
+private def topAssign : B.Assignment A := fun _ _ => True
 
 end SOBlock
 
@@ -670,7 +674,7 @@ theorem pointLt_iff (p q : X.Point A) :
 
 omit [L.Structure A] in
 /-- **The least point**: the least tag, holding of nothing. -/
-theorem pointIsBot_iff (p : X.Point A) :
+private theorem pointIsBot_iff (p : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     ((∀ q : X.Point A, (X.pointLinearOrder A).le p q) ↔
       ((∀ t : X.Tag, p.1 ≤ t) ∧ X.B.atomSet p.2 = fun _ => False)) := by
@@ -696,7 +700,7 @@ theorem pointIsBot_iff (p : X.Point A) :
 
 omit [L.Structure A] in
 /-- **The greatest point**: the greatest tag, holding of everything. -/
-theorem pointIsTop_iff (p : X.Point A) :
+private theorem pointIsTop_iff (p : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     ((∀ q : X.Point A, (X.pointLinearOrder A).le q p) ↔
       ((∀ t : X.Tag, t ≤ p.1) ∧ X.B.atomSet p.2 = fun _ => True)) := by
@@ -724,7 +728,7 @@ omit [L.Structure A] in
 /-- **The successor of a point**: either the tag stays and the assignment is
 incremented, or the tag steps and the assignment rolls over from full to
 empty. -/
-theorem pointCovBy_iff (p q : X.Point A) :
+private theorem pointCovBy_iff (p q : X.Point A) :
     letI : LinearOrder X.Tag := finiteLinearOrder X.Tag
     letI := X.B.realIxLinearOrder A
     (((X.pointLinearOrder A).lt p q ∧

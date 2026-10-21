@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.HeadProgram
+import all DescriptiveComplexity.HeadProgram
 
 /-!
 # Evaluating a first-order formula with heads
@@ -97,7 +98,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- **Moving, seen from the interface**: a fragment that only moves heads below
 `m` runs a relation about those heads alone. -/
-theorem runs_moveP_local (mvs : Fin K → HeadMove K) (m : ℕ)
+private theorem runs_moveP_local (mvs : Fin K → HeadMove K) (m : ℕ)
     (hstay : ∀ j : Fin K, m ≤ (j : ℕ) → mvs j = .stay) :
     (moveP (L := L) mvs).Runs A m
       fun x b y => b = true ∧ ∀ j : Fin K, (j : ℕ) < m → (mvs j).Holds x j (y j) := by
@@ -159,7 +160,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 omit [LinearOrder A] in
 /-- The walk of a branch: from the test, one either has not moved, or has handed
 over to one of the two continuations. -/
-theorem iteWalk {R : IteNode → (Fin K → A) → Bool → (Fin K → A) → Prop} {x : Fin K → A}
+private theorem iteWalk {R : IteNode → (Fin K → A) → Bool → (Fin K → A) → Prop} {x : Fin K → A}
     {u : IteNode × (Fin K → A)}
     (h : Relation.ReflTransGen (wireStep R iteWire) ((.test : IteNode), x) u) :
     u = ((.test : IteNode), x) ∨ (∃ y, u = ((.thenB : IteNode), y) ∧ R .test x true y) ∨
@@ -178,7 +179,7 @@ theorem iteWalk {R : IteNode → (Fin K → A) → Bool → (Fin K → A) → Pr
     · exact absurd hw (by cases b <;> simp [iteWire])
 
 /-- The relations the fragments of a branch run. -/
-def iteRel (R S T : (Fin K → A) → Bool → (Fin K → A) → Prop) :
+private def iteRel (R S T : (Fin K → A) → Bool → (Fin K → A) → Prop) :
     IteNode → (Fin K → A) → Bool → (Fin K → A) → Prop
   | .test => R
   | .thenB => S
@@ -186,7 +187,7 @@ def iteRel (R S T : (Fin K → A) → Bool → (Fin K → A) → Prop) :
 
 /-- **What a branch runs**: the test, followed by whichever continuation its
 answer selects. -/
-theorem runs_iteP {m : ℕ} {F G H : HeadProgram L K}
+private theorem runs_iteP {m : ℕ} {F G H : HeadProgram L K}
     {R S T : (Fin K → A) → Bool → (Fin K → A) → Prop} (hF : F.Runs A m R) (hG : G.Runs A m S)
     (hH : H.Runs A m T) (hRl : HeadLocal2 m R) (hSl : HeadLocal2 m S) (hTl : HeadLocal2 m T) :
     (iteP F G H).Runs A m fun x b z => ∃ y, (R x true y ∧ S y b z) ∨ (R x false y ∧ T y b z) := by
@@ -212,7 +213,7 @@ theorem runs_iteP {m : ℕ} {F G H : HeadProgram L K}
 
 /-- **What a branch decides**: the test's property, with the continuations'
 properties under it. -/
-theorem decides_iteP {m : ℕ} {F G H : HeadProgram L K} {P Q₁ Q₂ : (Fin K → A) → Prop}
+private theorem decides_iteP {m : ℕ} {F G H : HeadProgram L K} {P Q₁ Q₂ : (Fin K → A) → Prop}
     (hF : F.Decides A m P) (hG : G.Decides A m Q₁) (hH : H.Decides A m Q₂)
     (hP : HeadLocal m P) (hQ₁ : HeadLocal m Q₁) (hQ₂ : HeadLocal m Q₂) :
     (iteP F G H).Decides A m fun x => (P x ∧ Q₁ x) ∨ (¬P x ∧ Q₂ x) := by
@@ -249,7 +250,7 @@ theorem decides_iteP {m : ℕ} {F G H : HeadProgram L K} {P Q₁ Q₂ : (Fin K �
         fun hq => Or.inr ⟨hp, hq⟩⟩
 
 /-- A branch is deterministic as soon as its three fragments are. -/
-theorem deterministic_iteP {F G H : HeadProgram L K} (hF : F.Deterministic A)
+private theorem deterministic_iteP {F G H : HeadProgram L K} (hF : F.Deterministic A)
     (hG : G.Deterministic A) (hH : H.Deterministic A) : (iteP F G H).Deterministic A := by
   refine deterministic_wireP (iteFam F G H) iteWire .test ?_
   rintro (_ | _ | _)
@@ -261,7 +262,7 @@ end Ite
 
 /-- Which heads a move looks at: the ones a fragment protecting `m` heads may
 mention. -/
-def MoveLocal (m : ℕ) : HeadMove K → Prop
+private def MoveLocal (m : ℕ) : HeadMove K → Prop
   | .stay => True
   | .toMin => True
   | .toMax => True
@@ -275,7 +276,7 @@ variable {A : Type} [LinearOrder A]
 
 /-- A move that looks only at the first `m` heads cannot tell two assignments
 agreeing there apart. -/
-theorem holds_congr {mv : HeadMove K} {m : ℕ} (hmv : MoveLocal m mv) {x x' : Fin K → A}
+private theorem holds_congr {mv : HeadMove K} {m : ℕ} (hmv : MoveLocal m mv) {x x' : Fin K → A}
     (hx : HeadAgree m x x') {j : Fin K} (hj : (j : ℕ) < m) (v : A) :
     mv.Holds x j v ↔ mv.Holds x' j v := by
   cases mv with
@@ -287,7 +288,7 @@ theorem holds_congr {mv : HeadMove K} {m : ℕ} (hmv : MoveLocal m mv) {x x' : F
   | pred i => rw [HeadMove.Holds, HeadMove.Holds, hx i hmv]
 
 /-- The relation a move fragment runs is local when its moves are. -/
-theorem headLocal2_moveP {mvs : Fin K → HeadMove K} {m : ℕ}
+private theorem headLocal2_moveP {mvs : Fin K → HeadMove K} {m : ℕ}
     (hloc : ∀ j : Fin K, (j : ℕ) < m → MoveLocal m (mvs j)) :
     HeadLocal2 m fun (x : Fin K → A) b y => b = true ∧
       ∀ j : Fin K, (j : ℕ) < m → (mvs j).Holds x j (y j) := by
@@ -353,7 +354,7 @@ section Scan
 variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The relations the fragments of a sweep run. -/
-def scanRel (d : ℕ) (h hm : Fin K) (P : (Fin K → A) → Prop) :
+private def scanRel (d : ℕ) (h hm : Fin K) (P : (Fin K → A) → Prop) :
     ScanNode → (Fin K → A) → Bool → (Fin K → A) → Prop
   | .reset => fun x b y => b = true ∧
       ∀ j : Fin K, (j : ℕ) < d + 2 → (resetMoves h hm j).Holds x j (y j)
@@ -727,7 +728,7 @@ theorem decides_scanP {d : ℕ} {h hm : Fin K} (hh : (h : ℕ) = d) (hhm : (hm :
 omit [Finite A] in
 /-- A sweep is deterministic as soon as its body is: it walks, it does not
 guess. -/
-theorem deterministic_scanP {h hm : Fin K} {F : HeadProgram L K} (hF : F.Deterministic A) :
+private theorem deterministic_scanP {h hm : Fin K} {F : HeadProgram L K} (hF : F.Deterministic A) :
     (scanP h hm F).Deterministic A := by
   refine deterministic_wireP (scanFam h hm F) scanWire .reset ?_
   rintro (_ | _ | _ | _)
@@ -749,7 +750,8 @@ def atomGuard {n : ℕ} (hv : α ⊕ Fin n → Fin K)
 
 /-- Turning the bound variables into free ones keeps a formula
 quantifier-free. -/
-theorem isQF_toFormula {n : ℕ} {ψ : (L.sum Language.order).BoundedFormula α n} (hψ : ψ.IsQF) :
+private theorem isQF_toFormula
+    {n : ℕ} {ψ : (L.sum Language.order).BoundedFormula α n} (hψ : ψ.IsQF) :
     ψ.toFormula.IsQF := by
   induction hψ with
   | falsum => exact BoundedFormula.isQF_bot
@@ -771,7 +773,7 @@ variable {A : Type} [L.Structure A] [LinearOrder A]
 
 /-- The guard holds exactly where the formula does, its variables read off the
 heads. -/
-theorem realize_atomGuard {n : ℕ} (hv : α ⊕ Fin n → Fin K)
+private theorem realize_atomGuard {n : ℕ} (hv : α ⊕ Fin n → Fin K)
     (ψ : (L.sum Language.order).BoundedFormula α n) (x : Fin K → A) :
     (atomGuard hv ψ).Realize x ↔
       ψ.Realize (fun a => x (hv (Sum.inl a))) (fun i => x (hv (Sum.inr i))) := by
@@ -780,7 +782,7 @@ theorem realize_atomGuard {n : ℕ} (hv : α ⊕ Fin n → Fin K)
 
 /-- What a formula says of the heads depends only on the heads its variables
 live in. -/
-theorem headLocal_realize {n d : ℕ} (hv : α ⊕ Fin n → Fin K)
+private theorem headLocal_realize {n d : ℕ} (hv : α ⊕ Fin n → Fin K)
     (ψ : (L.sum Language.order).BoundedFormula α n) (hlow : ∀ v, (hv v : ℕ) < d) :
     HeadLocal d fun x : Fin K → A =>
       ψ.Realize (fun a => x (hv (Sum.inl a))) (fun i => x (hv (Sum.inr i))) := by
@@ -794,7 +796,7 @@ theorem headLocal_realize {n d : ℕ} (hv : α ⊕ Fin n → Fin K)
   rw [h1, h2]
 
 /-- Exiting at once decides falsity. -/
-theorem decides_exitP_false (m : ℕ) :
+private theorem decides_exitP_false (m : ℕ) :
     (exitP (L := L) (K := K) false).Decides A m fun _ => False := by
   refine (runs_exitP false).mono
     (fun x b y hxy => ⟨by simp [hxy.1], fun j _ => (congrFun hxy.2 j).symm⟩) ?_
@@ -806,7 +808,7 @@ theorem decides_exitP_false (m : ℕ) :
   exact ⟨x, hag.symm, hbf, rfl⟩
 
 /-- Exiting at once decides truth. -/
-theorem decides_exitP_true (m : ℕ) :
+private theorem decides_exitP_true (m : ℕ) :
     (exitP (L := L) (K := K) true).Decides A m fun _ => True := by
   refine (runs_exitP true).mono
     (fun x b y hxy => ⟨by simp [hxy.1], fun j _ => (congrFun hxy.2 j).symm⟩) ?_

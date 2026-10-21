@@ -9,6 +9,16 @@ public import DescriptiveComplexity.Problems.Wide.DrawInstStage
 import DescriptiveComplexity.Problems.Wide.IxAddr
 import all DescriptiveComplexity.Problems.Wide.DrawRunStage
 import DescriptiveComplexity.Problems.Wide.DrawAddr
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
+import all DescriptiveComplexity.Problems.Wide.DrawInstCmp
+import all DescriptiveComplexity.Problems.Wide.DrawInstStage
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.DrawRunIter
+import all DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.RegFile
 
 /-!
 # The address a stage atom builds, at an arbitrary file
@@ -75,7 +85,7 @@ noncomputable def ixStageXD (ℓ : Fin (dt.d.B.arity iv)) (b : Lex (Fin dt.dd0 �
 omit [Finite A] [Finite R] [Finite P] [Nonempty A] in
 /-- **Distinct tuples name distinct registers**: a register carries its own
 name, and the name determines the tuple. -/
-theorem ixStageXD_injective {ℓ : Fin (dt.d.B.arity iv)}
+private theorem ixStageXD_injective {ℓ : Fin (dt.d.B.arity iv)}
     {b b' : Lex (Fin dt.dd0 → A)}
     (h : dt.ixStageXD F hhas ℓ b = dt.ixStageXD F hhas ℓ b') : b = b' := by
   have ha : F.toLayout.arg (dt.ixStageXD F hhas ℓ b) =
@@ -89,7 +99,7 @@ theorem ixStageXD_injective {ℓ : Fin (dt.d.B.arity iv)}
 omit [Finite A] [Finite R] [Finite P] [Nonempty A] in
 /-- **Distinct positions write distinct blocks**: a register carries its block,
 and the block names the position that wrote it. -/
-theorem ixStageXD_pos_eq {ℓ ℓ' : Fin (dt.d.B.arity iv)}
+private theorem ixStageXD_pos_eq {ℓ ℓ' : Fin (dt.d.B.arity iv)}
     {b b' : Lex (Fin dt.dd0 → A)}
     (h : dt.ixStageXD F hhas ℓ b = dt.ixStageXD F hhas ℓ' b') : ℓ = ℓ' := by
   have hblk : F.toLayout.blk (dt.ixStageXD F hhas ℓ b) =
@@ -119,7 +129,7 @@ omit [Finite R] [Finite P] in
 some position below `n` copied it there – the source block's bit at the same
 tuple. Distinct positions write distinct blocks, so the loops never collide and
 the disjunction is honest. -/
-theorem ixStageTgt_iff (st : TapeSt dt A R P I) (n : ℕ) (y : I) :
+private theorem ixStageTgt_iff (st : TapeSt dt A R P I) (n : ℕ) (y : I) :
     dt.ixStageTgt F hhas vi ts st n y ↔
       ∃ (ℓ : Fin (dt.d.B.arity iv)) (b : Lex (Fin dt.dd0 → A)),
         (ℓ : ℕ) < n ∧ y = dt.ixStageXD F hhas ℓ b ∧
@@ -214,7 +224,7 @@ noncomputable def ixStageRestF {I : Type} (F : LaidFile dt A R P I)
 omit [Fintype dt.SlotIx] [Finite A] [Finite R] [Finite P] [Nonempty A]
   [Finite dt.KIx] in
 /-- The destination-dependent background moves only at the TARGET slot. -/
-theorem ixStageRestF_off {I : Type} (F : LaidFile dt A R P I) (zero one : A)
+private theorem ixStageRestF_off {I : Type} (F : LaidFile dt A R P I) (zero one : A)
     (st : TapeSt dt A R P I) (m₁ m₂ : I → Prop)
     (r : Univ A R P dt.KIx dt.dd → Prop) (s : dt.SlotIx)
     (hs : s ≠ Slot.tgt) :
@@ -227,7 +237,7 @@ theorem ixStageRestF_off {I : Type} (F : LaidFile dt A R P I) (zero one : A)
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- The copy loop's generated round tuples: the pre-store control's loop
 element is the round's tuple. -/
-theorem ixReadLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
+private theorem ixReadLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
     dt.readLv (tupleIter0
       (dt.stageArgs zero one vi iv ts av).setBit
       (dt.stageArgs zero one vi iv ts av).initLv
@@ -305,7 +315,7 @@ theorem ixReadLv_stageIter0 (b : Lex (Fin dt.dd0 → A)) :
 
 omit [Fintype dt.SlotIx] [Finite R] [Finite P] [Finite dt.KIx] in
 /-- The post-store control's loop element is still the round's tuple. -/
-theorem ixReadLv_stageIter1 (b : Lex (Fin dt.dd0 → A)) :
+private theorem ixReadLv_stageIter1 (b : Lex (Fin dt.dd0 → A)) :
     dt.readLv (tupleIter1
       (dt.stageArgs zero one vi iv ts av).setBit
       (dt.stageArgs zero one vi iv ts av).initLv
@@ -358,7 +368,7 @@ include hrules hR hlin hix hsepP hhasP hbot hv hvi hwkSt in
 marker to the exit phase one cell to its right, the TARGET block of the
 position holding the source block's bits at every tuple's cell, a round's width
 paid once per tuple. -/
-theorem ixStageTuple_reachesIn (w : ℕ)
+private theorem ixStageTuple_reachesIn (w : ℕ)
     (hcost : ∀ a : Lex (Fin dt.dd0 → A),
       2 * (wideRank (F.cell (dt.ixStageXS F hhasP vi ts ℓ a)) - wideRank v) + 2 ≤ w ∧
         2 * (wideRank (F.cell (dt.ixStageXD F hhasP ℓ a)) - wideRank v) + 2 ≤ w) :
@@ -635,7 +645,7 @@ from the phase entering the first loop to the first reset's checkpoint, the
 TARGET holding the composed content of every position – exactly the `hLoopsIn`
 leg of `DescriptiveComplexity.Draw.Data.stage_reachesIn`, at one loop and one
 walk-back per position. -/
-theorem ixStageChain_reachesIn (w : ℕ)
+private theorem ixStageChain_reachesIn (w : ℕ)
     (hcost : ∀ (ℓ : Fin (dt.d.B.arity iv)) (a : Lex (Fin dt.dd0 → A)),
       2 * (wideRank (F.cell (dt.ixStageXS F hhasP vi ts ℓ a)) - wideRank v) + 2 ≤ w ∧
         2 * (wideRank (F.cell (dt.ixStageXD F hhasP ℓ a)) - wideRank v) + 2 ≤ w) :
@@ -823,7 +833,7 @@ omit [Finite R] [Finite P] in
 /-- **The target of a random access is an address of argument cells alone**:
 every register it holds was written by a copy round, at that round's
 destination – in an argument block – over the empty mark. -/
-theorem ixStageTgt_arg (st : TapeSt dt A R P I) (n : ℕ) {u : I}
+private theorem ixStageTgt_arg (st : TapeSt dt A R P I) (n : ℕ) {u : I}
     (hy : dt.ixStageTgt F hhas vi ts st n u) :
     ∃ i : dt.KIx, (elt u).1 = Tag.arg i := by
   classical
@@ -844,7 +854,7 @@ omit [Finite R] [Finite P] in
 /-- **The target of a random access is padded**: every register it holds is a
 destination register, and those carry the round's tuple in the name slots and
 `zero` beyond them. -/
-theorem ixStageTgt_isPad (st : TapeSt dt A R P I) (n : ℕ) {u : I}
+private theorem ixStageTgt_isPad (st : TapeSt dt A R P I) (n : ℕ) {u : I}
     (hy : dt.ixStageTgt F hhas vi ts st n u) : IsPad dt.dd0 zero (elt u).2 := by
   classical
   induction n generalizing u with
@@ -865,7 +875,7 @@ include helt in
 /-- **The address a stage atom reads lies in the logical interval**: it is
 built from padded destination registers in argument blocks alone, which is
 `wmSetLt_logicalTop_of_isPad`'s hypothesis. -/
-theorem wmSetLt_ixStageTgt_logicalTop {one : A} (hne : zero ≠ one)
+private theorem wmSetLt_ixStageTgt_logicalTop {one : A} (hne : zero ≠ one)
     (hV : IsLinOrd (tupLeLex (A := A) (d := dt.dd))) (hd : dt.dd0 < dt.dd)
     (i : dt.KIx) (st : TapeSt dt A R P I) (n : ℕ) :
     WMSetLt (lexRel (· ≤ · : Tag R P dt.KIx → Tag R P dt.KIx → Prop)
@@ -1062,7 +1072,7 @@ omit [Finite R] [Finite P] [L.Structure A] [Fintype dt.SlotIx] [Finite dt.KIx] i
 /-- **The TARGET a random access builds is blind to the two scratch
 registers**, at an arbitrary file: every copy round reads a level's register
 set, and the loop pins SAV at the home address itself. -/
-theorem ixStageTgt_congr_scratch {st' : TapeSt dt A R P I}
+private theorem ixStageTgt_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st') (n : ℕ) :
     dt.ixStageTgt F hhas vi ts { st with sav := ixMark elt v } n =
       dt.ixStageTgt F hhas vi ts { st' with sav := ixMark elt v } n := by
@@ -1083,7 +1093,7 @@ omit [Fintype dt.SlotIx] [Finite R] [Finite P] [L.Structure A] [Finite dt.KIx] i
 /-- **The control of the copy loops is blind to them too**, at an arbitrary
 file: the destination-dependent background overwrites TARGET, and the loop
 reads it at the home cell alone. -/
-theorem ixStageFAt_congr_scratch {st' : TapeSt dt A R P I}
+private theorem ixStageFAt_congr_scratch {st' : TapeSt dt A R P I}
     (h : dt.ScratchEq st st') (hreg : ¬∃ u : I, v = F.cell u)
     (f₀ : dt.CtlIx → A) (n : ℕ) :
     dt.ixStageFAt F hhas one vi ts av st elt v f₀ n =

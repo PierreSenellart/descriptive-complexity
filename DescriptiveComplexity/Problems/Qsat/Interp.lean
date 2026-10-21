@@ -9,6 +9,7 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Qsat.Tags
 public import DescriptiveComplexity.Problems.Qsat.Defs
 public import DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Padding
 
 /-!
 # The interpretation of the Savitch reduction
@@ -260,11 +261,11 @@ noncomputable def natLexF (a b : ℕ) (φ : transOrd.Formula α) : transOrd.Form
 
 variable {A : Type} [Language.transSys.Structure A] [LinearOrder A] {V : α → A}
 
-theorem realize_varF {v : QVarTag} {p q : α} :
+private theorem realize_varF {v : QVarTag} {p q : α} :
     (varF v p q).Realize V ↔ QVarOn v (V p) (V q) := by
   cases v <;> simp [varF, QVarOn]
 
-theorem realize_allF {v : QVarTag} {p q : α} :
+private theorem realize_allF {v : QVarTag} {p q : α} :
     (allF v p q).Realize V ↔ (v = .sB ∧ QVarOn v (V p) (V q)) := by
   rw [allF]
   split_ifs with h
@@ -272,11 +273,12 @@ theorem realize_allF {v : QVarTag} {p q : α} :
     simp [h]
   · simp [h]
 
-theorem realize_clF {c : QClTag} {p q : α} :
+private theorem realize_clF {c : QClTag} {p q : α} :
     (clF c p q).Realize V ↔ QClOn c (V p) (V q) := by
   cases c <;> simp [clF, QClOn]
 
-theorem realize_natLexF {a b : ℕ} {φ : transOrd.Formula α} {P : Prop} (h : φ.Realize V ↔ P) :
+private theorem realize_natLexF
+    {a b : ℕ} {φ : transOrd.Formula α} {P : Prop} (h : φ.Realize V ↔ P) :
     (natLexF a b φ).Realize V ↔ (a < b ∨ (a = b ∧ P)) := by
   rw [natLexF]
   split_ifs with h1 h2
@@ -315,7 +317,7 @@ noncomputable def linkF : QLink → transOrd.Formula (Fin 2 × Fin 2)
   | .occPos => posF x₀ x₁ ⊓ isBotF y₁
   | .occNeg => negF x₀ x₁ ⊓ isBotF y₁
 
-theorem realize_linkF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
+private theorem realize_linkF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
     {k : QLink} {V : Fin 2 × Fin 2 → A} :
     (linkF k).Realize V ↔ LinkOn k (V x₀) (V y₀) (V x₁) (V y₁) := by
   cases k <;> simp [linkF, LinkOn, and_assoc]
@@ -359,7 +361,7 @@ def KeyLtRaw {A : Type} [LinearOrder A] (g : ℕ) (l : A) (s : ℕ) (c : A) (o :
   g < g' ∨ (g = g' ∧ (l < l' ∨ (l = l' ∧
     (s < s' ∨ (s = s' ∧ (c < c' ∨ (c = c' ∧ o < o')))))))
 
-theorem keyLt_iff_raw {A : Type} [LinearOrder A] (v v' : QVarTag) (p q p' q' : A) :
+private theorem keyLt_iff_raw {A : Type} [LinearOrder A] (v v' : QVarTag) (p q p' q' : A) :
     KeyLt v p q v' p' q' ↔
       KeyLtRaw (keyGrp v) (keyLev v p q) (keySlot v) (keySec v p q) (keyOrd v)
         (keyGrp v') (keyLev v' p' q') (keySlot v') (keySec v' p' q') (keyOrd v') := by
@@ -374,7 +376,7 @@ noncomputable def keyBodyF (v v' : QVarTag) (lv sc lv' sc' : Fin 2 × Fin 2) :
       natLexF (keySlot v) (keySlot v')
         (ltF sc sc' ⊔ (eqF sc sc' ⊓ natLexF (keyOrd v) (keyOrd v') ⊥))))
 
-theorem realize_keyBodyF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
+private theorem realize_keyBodyF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
     {v v' : QVarTag} {lv sc lv' sc' : Fin 2 × Fin 2} {V : Fin 2 × Fin 2 → A} :
     (keyBodyF v v' lv sc lv' sc').Realize V ↔
       KeyLtRaw (keyGrp v) (V lv) (keySlot v) (V sc) (keyOrd v)
@@ -404,7 +406,7 @@ noncomputable def prefF (v v' : QVarTag) : transOrd.Formula (Fin 2 × Fin 2) :=
     keyBodyF v v' (if levFst v then x₀ else y₀) (if levFst v then y₀ else x₀)
       (if levFst v' then x₁ else y₁) (if levFst v' then y₁ else x₁)
 
-theorem realize_prefF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
+private theorem realize_prefF {A : Type} [Language.transSys.Structure A] [LinearOrder A]
     {v v' : QVarTag} {V : Fin 2 × Fin 2 → A} :
     (prefF v v').Realize V ↔
       QVarOn v (V x₀) (V y₀) ∧ QVarOn v' (V x₁) (V y₁) ∧
@@ -470,37 +472,37 @@ instance [Nonempty A] : Nonempty (QM A) :=
   inferInstanceAs (Nonempty (QTag × (Fin 2 → A)))
 
 /-- **The variables**: the marked tagged pairs. -/
-theorem qsat_isVar (v : QVarTag) (w : Fin 2 → A) :
+private theorem qsat_isVar (v : QVarTag) (w : Fin 2 → A) :
     IsQVar (A := QM A) (Sum.inl v, w) ↔ QVarOn v (w 0) (w 1) :=
   Iff.trans (FOInterpretation.relMap_map qsatInterp A qsIsVar ![(Sum.inl v, w)]) realize_varF
 
 /-- Elements carrying a clause tag are not variables. -/
-theorem qsat_not_isVar (c : QClTag) (w : Fin 2 → A) :
+private theorem qsat_not_isVar (c : QClTag) (w : Fin 2 → A) :
     ¬IsQVar (A := QM A) (Sum.inr c, w) :=
   id
 
 /-- **The universal variables**: only the bits `b_ℓ`. -/
-theorem qsat_isAll (v : QVarTag) (w : Fin 2 → A) :
+private theorem qsat_isAll (v : QVarTag) (w : Fin 2 → A) :
     IsQAll (A := QM A) (Sum.inl v, w) ↔ (v = .sB ∧ QVarOn v (w 0) (w 1)) :=
   Iff.trans (FOInterpretation.relMap_map qsatInterp A qsAllVar ![(Sum.inl v, w)]) realize_allF
 
 /-- Elements carrying a clause tag are not universal. -/
-theorem qsat_not_isAll_cl (c : QClTag) (w : Fin 2 → A) :
+private theorem qsat_not_isAll_cl (c : QClTag) (w : Fin 2 → A) :
     ¬IsQAll (A := QM A) (Sum.inr c, w) :=
   id
 
 /-- **The clauses**: the guarded tagged pairs. -/
-theorem qsat_isClause (c : QClTag) (w : Fin 2 → A) :
+private theorem qsat_isClause (c : QClTag) (w : Fin 2 → A) :
     RelMap (M := QM A) qsIsClause ![(Sum.inr c, w)] ↔ QClOn c (w 0) (w 1) :=
   Iff.trans (FOInterpretation.relMap_map qsatInterp A qsIsClause ![(Sum.inr c, w)]) realize_clF
 
 /-- Elements carrying a variable tag are not clauses. -/
-theorem qsat_not_isClause (v : QVarTag) (w : Fin 2 → A) :
+private theorem qsat_not_isClause (v : QVarTag) (w : Fin 2 → A) :
     ¬RelMap (M := QM A) qsIsClause ![(Sum.inl v, w)] :=
   id
 
 /-- **The prefix order** relates two variables exactly as their keys compare. -/
-theorem qsat_prec (v v' : QVarTag) (w w' : Fin 2 → A) :
+private theorem qsat_prec (v v' : QVarTag) (w w' : Fin 2 → A) :
     QPrec (A := QM A) (Sum.inl v, w) (Sum.inl v', w') ↔
       QVarOn v (w 0) (w 1) ∧ QVarOn v' (w' 0) (w' 1) ∧
         KeyLt v (w 0) (w 1) v' (w' 0) (w' 1) :=
@@ -508,13 +510,13 @@ theorem qsat_prec (v v' : QVarTag) (w w' : Fin 2 → A) :
     ![(Sum.inl v, w), (Sum.inl v', w')]) realize_prefF
 
 /-- The prefix order does not relate a clause on the left. -/
-theorem qsat_not_prec_left (c : QClTag) (x : QM A) (w : Fin 2 → A) :
+private theorem qsat_not_prec_left (c : QClTag) (x : QM A) (w : Fin 2 → A) :
     ¬QPrec (A := QM A) (Sum.inr c, w) x := by
   obtain ⟨t, u⟩ := x
   cases t <;> exact id
 
 /-- The prefix order does not relate a clause on the right. -/
-theorem qsat_not_prec_right (c : QClTag) (x : QM A) (w : Fin 2 → A) :
+private theorem qsat_not_prec_right (c : QClTag) (x : QM A) (w : Fin 2 → A) :
     ¬QPrec (A := QM A) x (Sum.inr c, w) := by
   obtain ⟨t, u⟩ := x
   cases t <;> exact id
@@ -522,7 +524,7 @@ theorem qsat_not_prec_right (c : QClTag) (x : QM A) (w : Fin 2 → A) :
 /-- **The positive literals** of a clause: the literals of its list that are on
 the given variable tag with a positive sign, and whose link pins that variable's
 coordinates. -/
-theorem qsat_posIn (c : QClTag) (v : QVarTag) (w y : Fin 2 → A) :
+private theorem qsat_posIn (c : QClTag) (v : QVarTag) (w y : Fin 2 → A) :
     RelMap (M := QM A) qsPosIn ![(Sum.inr c, w), (Sum.inl v, y)] ↔
       ∃ l ∈ qLits c, l.vt = v ∧ l.sign = true ∧
         QClOn c (w 0) (w 1) ∧ QVarOn v (y 0) (y 1) ∧
@@ -531,7 +533,7 @@ theorem qsat_posIn (c : QClTag) (v : QVarTag) (w y : Fin 2 → A) :
     ![(Sum.inr c, w), (Sum.inl v, y)]) realize_occF
 
 /-- **The negative literals** of a clause. -/
-theorem qsat_negIn (c : QClTag) (v : QVarTag) (w y : Fin 2 → A) :
+private theorem qsat_negIn (c : QClTag) (v : QVarTag) (w y : Fin 2 → A) :
     RelMap (M := QM A) qsNegIn ![(Sum.inr c, w), (Sum.inl v, y)] ↔
       ∃ l ∈ qLits c, l.vt = v ∧ l.sign = false ∧
         QClOn c (w 0) (w 1) ∧ QVarOn v (y 0) (y 1) ∧

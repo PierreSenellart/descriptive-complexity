@@ -11,6 +11,9 @@ import DescriptiveComplexity.Problems.CliqueFamily.Membership
 public import DescriptiveComplexity.Problems.CliqueFamily.FromSat
 import DescriptiveComplexity.Problems.Sat.Hardness
 import DescriptiveComplexity.Composition
+import all DescriptiveComplexity.Problems.CliqueFamily.FromSat
+import all DescriptiveComplexity.Problems.CliqueFamily.Reductions
+import all DescriptiveComplexity.Problems.Sat.Hardness
 
 /-!
 # The clique family is NP-complete
@@ -47,12 +50,12 @@ open FirstOrder
 
 /-- **Vertex Cover FO-reduces to Clique**, by composing the mark and edge
 complementations. -/
-noncomputable def vertexCover_fo_reduction_clique : VertexCover ≤ᶠᵒ Clique :=
+private noncomputable def vertexCover_fo_reduction_clique : VertexCover ≤ᶠᵒ Clique :=
   vertexCover_fo_reduction_indSet.trans indSet_fo_reduction_clique
 
 /-- **Clique FO-reduces to Vertex Cover**, by composing the edge and mark
 complementations. -/
-noncomputable def clique_fo_reduction_vertexCover : Clique ≤ᶠᵒ VertexCover :=
+private noncomputable def clique_fo_reduction_vertexCover : Clique ≤ᶠᵒ VertexCover :=
   clique_fo_reduction_indSet.trans indSet_fo_reduction_vertexCover
 
 /-! ### NP-completeness -/

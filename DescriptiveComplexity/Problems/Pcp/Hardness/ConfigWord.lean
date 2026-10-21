@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.MachinesUnbounded
 public import DescriptiveComplexity.Problems.Pcp.Hardness.History
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Pcp.Hardness.History
 
 /-!
 # Configurations as words: the rewriting system of a machine
@@ -143,7 +146,7 @@ variable {M : TMData A}
 
 /-- No side of a rule is empty – the promise the domino construction
 requires. -/
-theorem mRule_ne {l r : List (TapeLetter A)} (h : MRule M l r) : l ≠ [] ∧ r ≠ [] := by
+private theorem mRule_ne {l r : List (TapeLetter A)} (h : MRule M l r) : l ≠ [] ∧ r ≠ [] := by
   cases h <;> exact ⟨by simp, by simp⟩
 
 /-! ### The order of the cells
@@ -156,10 +159,10 @@ outside of it. -/
 
 variable (M) in
 /-- The strict lexicographic order on cells. -/
-def CellLt (x y : ℤ × A) : Prop :=
+private def CellLt (x y : ℤ × A) : Prop :=
   x.1 < y.1 ∨ (x.1 = y.1 ∧ M.Le x.2 y.2 ∧ x.2 ≠ y.2)
 
-theorem CellLt.trans (hlin : IsLinOrd M.Le) {x y z : ℤ × A}
+private theorem CellLt.trans (hlin : IsLinOrd M.Le) {x y z : ℤ × A}
     (hxy : CellLt M x y) (hyz : CellLt M y z) : CellLt M x z := by
   rcases hxy with h1 | ⟨h1, h2, h3⟩ <;> rcases hyz with h4 | ⟨h4, h5, h6⟩
   · exact Or.inl (h1.trans h4)
@@ -168,19 +171,19 @@ theorem CellLt.trans (hlin : IsLinOrd M.Le) {x y z : ℤ × A}
   · refine Or.inr ⟨h1.trans h4, hlin.2.1 _ _ _ h2 h5, fun hcon => ?_⟩
     exact h3 (hlin.2.2.1 _ _ h2 (hcon ▸ h5))
 
-theorem CellLt.ne {x y : ℤ × A} (h : CellLt M x y) : x ≠ y := by
+private theorem CellLt.ne {x y : ℤ × A} (h : CellLt M x y) : x ≠ y := by
   rintro rfl
   rcases h with h | ⟨-, -, h⟩
   · exact absurd h (lt_irrefl _)
   · exact h rfl
 
-theorem cellLt_of_succCell {x y : ℤ × A} (h : M.SuccCell x y) : CellLt M x y := by
+private theorem cellLt_of_succCell {x y : ℤ × A} (h : M.SuccCell x y) : CellLt M x y := by
   rcases h with ⟨hz, hp⟩ | ⟨hz, -, -⟩
   · exact Or.inr ⟨hz.symm, hp.2.2.1, hp.2.2.2.1⟩
   · exact Or.inl (by omega)
 
 /-- A chain of successive cells is duplicate-free and increasing. -/
-theorem pairwise_cellLt_of_isChain (hlin : IsLinOrd M.Le) :
+private theorem pairwise_cellLt_of_isChain (hlin : IsLinOrd M.Le) :
     ∀ {l : List (ℤ × A)}, l.IsChain M.SuccCell → l.Pairwise (CellLt M)
   | [], _ => List.Pairwise.nil
   | [_], _ => List.pairwise_singleton _ _
@@ -206,7 +209,7 @@ variable [Finite A]
 
 omit [Finite A] in
 /-- `SuccPos` mirrors along the reversed order. -/
-theorem succPos_reverse {Le : A → A → Prop} {Posn : A → Prop} {p q : A} :
+private theorem succPos_reverse {Le : A → A → Prop} {Posn : A → Prop} {p q : A} :
     SuccPos (fun a b => Le b a) Posn p q ↔ SuccPos Le Posn q p := by
   constructor
   · rintro ⟨hp, hq, hle, hne, hbet⟩
@@ -215,14 +218,14 @@ theorem succPos_reverse {Le : A → A → Prop} {Posn : A → Prop} {p q : A} :
     exact ⟨hq, hp, hle, hne.symm, fun r hr h1 h2 => (hbet r hr h2 h1).symm⟩
 
 /-- Every position that is not the highest has one immediately above it. -/
-theorem exists_succPos {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le) {p : A}
+private theorem exists_succPos {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le) {p : A}
     (hp : Posn p) (hmax : ¬MaxPos Le Posn p) : ∃ q, SuccPos Le Posn p q := by
   have hmin : ¬MinPos (fun a b => Le b a) Posn p := fun h => hmax ⟨h.1, h.2⟩
   obtain ⟨q, hq⟩ := exists_predPos hlin.reverse hp hmin
   exact ⟨q, succPos_reverse.mp hq⟩
 
 /-- Every cell over a position has a next cell. -/
-theorem exists_succCell (hwf : M.WellFormed) {x : ℤ × A} (hx : M.Posn x.2) :
+private theorem exists_succCell (hwf : M.WellFormed) {x : ℤ × A} (hx : M.Posn x.2) :
     ∃ y, M.SuccCell x y := by
   by_cases hmax : MaxPos M.Le M.Posn x.2
   · obtain ⟨p, hp⟩ := exists_minPos hwf.1 hwf.2.1
@@ -231,7 +234,7 @@ theorem exists_succCell (hwf : M.WellFormed) {x : ℤ × A} (hx : M.Posn x.2) :
     exact ⟨(x.1, q), Or.inl ⟨rfl, hq⟩⟩
 
 /-- Every cell over a position has a previous cell. -/
-theorem exists_predCell (hwf : M.WellFormed) {x : ℤ × A} (hx : M.Posn x.2) :
+private theorem exists_predCell (hwf : M.WellFormed) {x : ℤ × A} (hx : M.Posn x.2) :
     ∃ y, M.SuccCell y x := by
   by_cases hmin : MinPos M.Le M.Posn x.2
   · obtain ⟨p, hp⟩ := exists_maxPos hwf.1 hwf.2.1
@@ -241,40 +244,40 @@ theorem exists_predCell (hwf : M.WellFormed) {x : ℤ × A} (hx : M.Posn x.2) :
 
 omit [Finite A] in
 /-- Lowest positions are unique. -/
-theorem minPos_unique {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le) {p q : A}
+private theorem minPos_unique {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le) {p q : A}
     (hp : MinPos Le Posn p) (hq : MinPos Le Posn q) : p = q :=
   hlin.2.2.1 _ _ (hp.2 q hq.1) (hq.2 p hp.1)
 
 omit [Finite A] in
 /-- Highest positions are unique. -/
-theorem maxPos_unique {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le) {p q : A}
+private theorem maxPos_unique {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le) {p q : A}
     (hp : MaxPos Le Posn p) (hq : MaxPos Le Posn q) : p = q :=
   hlin.2.2.1 _ _ (hq.2 p hp.1) (hp.2 q hq.1)
 
 omit [Finite A] in
 /-- The element immediately above a given one is unique. -/
-theorem succPos_right_unique {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le)
+private theorem succPos_right_unique {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le)
     {p q q' : A} (h : SuccPos Le Posn p q) (h' : SuccPos Le Posn p q') : q = q' :=
   succPos_left_unique (Posn := Posn) hlin.reverse
     (succPos_reverse.mpr h) (succPos_reverse.mpr h')
 
 omit [Finite A] in
 /-- A position with a successor is not the highest. -/
-theorem succPos_not_maxPos {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le)
+private theorem succPos_not_maxPos {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le)
     {p q : A} (h : SuccPos Le Posn p q) : ¬MaxPos Le Posn p := by
   rintro ⟨-, hmax⟩
   exact h.2.2.2.1 (hlin.2.2.1 _ _ h.2.2.1 (hmax q h.2.1))
 
 omit [Finite A] in
 /-- A position with a predecessor is not the lowest. -/
-theorem succPos_not_minPos {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le)
+private theorem succPos_not_minPos {Le : A → A → Prop} {Posn : A → Prop} (hlin : IsLinOrd Le)
     {p q : A} (h : SuccPos Le Posn p q) : ¬MinPos Le Posn q := by
   rintro ⟨-, hmin⟩
   exact h.2.2.2.1 (hlin.2.2.1 _ _ h.2.2.1 (hmin p h.1))
 
 omit [Finite A] in
 /-- The cell after a given one is unique. -/
-theorem succCell_right_unique (hwf : M.WellFormed) {x y y' : ℤ × A}
+private theorem succCell_right_unique (hwf : M.WellFormed) {x y y' : ℤ × A}
     (h : M.SuccCell x y) (h' : M.SuccCell x y') : y = y' := by
   rcases h with ⟨hz, hp⟩ | ⟨hz, hmax, hmin⟩ <;>
     rcases h' with ⟨hz', hp'⟩ | ⟨hz', hmax', hmin'⟩
@@ -285,7 +288,7 @@ theorem succCell_right_unique (hwf : M.WellFormed) {x y y' : ℤ × A}
 
 omit [Finite A] in
 /-- The cell before a given one is unique. -/
-theorem succCell_left_unique (hwf : M.WellFormed) {x x' y : ℤ × A}
+private theorem succCell_left_unique (hwf : M.WellFormed) {x x' y : ℤ × A}
     (h : M.SuccCell x y) (h' : M.SuccCell x' y) : x = x' := by
   rcases h with ⟨hz, hp⟩ | ⟨hz, hmax, hmin⟩ <;>
     rcases h' with ⟨hz', hp'⟩ | ⟨hz', hmax', hmin'⟩
@@ -296,14 +299,14 @@ theorem succCell_left_unique (hwf : M.WellFormed) {x x' y : ℤ × A}
 
 omit [Finite A] in
 /-- The successor cell keeps to the positions. -/
-theorem posn_of_succCell {x y : ℤ × A} (h : M.SuccCell x y) : M.Posn y.2 := by
+private theorem posn_of_succCell {x y : ℤ × A} (h : M.SuccCell x y) : M.Posn y.2 := by
   rcases h with ⟨-, hp⟩ | ⟨-, -, hmin⟩
   · exact hp.2.1
   · exact hmin.1
 
 omit [Finite A] in
 /-- The previous cell keeps to the positions, too. -/
-theorem posn_of_succCell_left {x y : ℤ × A} (h : M.SuccCell x y) : M.Posn x.2 := by
+private theorem posn_of_succCell_left {x y : ℤ × A} (h : M.SuccCell x y) : M.Posn x.2 := by
   rcases h with ⟨-, hp⟩ | ⟨-, hmax, -⟩
   · exact hp.1
   · exact hmax.1
@@ -334,7 +337,7 @@ def cellSyms (c : ConfigU A) (l : List (ℤ × A)) : List (TapeLetter A) :=
   simp [cellSyms]
 
 /-- Two configurations agreeing on a window write it the same way. -/
-theorem cellSyms_congr {c c' : ConfigU A} {l : List (ℤ × A)}
+private theorem cellSyms_congr {c c' : ConfigU A} {l : List (ℤ × A)}
     (h : ∀ x ∈ l, c'.tape x = c.tape x) : cellSyms c' l = cellSyms c l :=
   List.map_congr_left fun x hx => by rw [h x hx]
 
@@ -343,7 +346,7 @@ variable (M) in
 consecutive cells between the two endmarkers, the state letter wedged before
 the head's cell. The window consists of cells over positions, contains the
 head, and every cell over a position outside it is blank. -/
-def Represents (w : List (TapeLetter A)) (c : ConfigU A) : Prop :=
+private def Represents (w : List (TapeLetter A)) (c : ConfigU A) : Prop :=
   ∃ ls rs : List (ℤ × A),
     w = (TapeLetter.lft :: cellSyms c ls) ++ TapeLetter.state c.state ::
         TapeLetter.sym (c.tape c.head) :: (cellSyms c rs ++ [TapeLetter.rgt]) ∧
@@ -373,11 +376,11 @@ def stateCount (l : List (TapeLetter A)) : ℕ := l.countP TapeLetter.isState
 
 @[simp] theorem stateCount_nil : stateCount ([] : List (TapeLetter A)) = 0 := rfl
 
-theorem stateCount_append (l l' : List (TapeLetter A)) :
+private theorem stateCount_append (l l' : List (TapeLetter A)) :
     stateCount (l ++ l') = stateCount l + stateCount l' :=
   List.countP_append
 
-theorem stateCount_cons (a : TapeLetter A) (l : List (TapeLetter A)) :
+private theorem stateCount_cons (a : TapeLetter A) (l : List (TapeLetter A)) :
     stateCount (a :: l) = stateCount l + if a.isState then 1 else 0 :=
   List.countP_cons
 
@@ -389,7 +392,7 @@ theorem stateCount_cons (a : TapeLetter A) (l : List (TapeLetter A)) :
 
 /-- A word without state letters is exactly a word of vanishing state
 count. -/
-theorem stateCount_eq_zero {l : List (TapeLetter A)} :
+private theorem stateCount_eq_zero {l : List (TapeLetter A)} :
     stateCount l = 0 ↔ ∀ x ∈ l, x.isState = false := by
   rw [stateCount, List.countP_eq_zero]
   exact ⟨fun h x hx => Bool.not_eq_true _ ▸ (by simpa using h x hx),
@@ -397,7 +400,7 @@ theorem stateCount_eq_zero {l : List (TapeLetter A)} :
 
 /-- **Alignment at the state letter**: two decompositions of one word around a
 state letter, neither prefix carrying one, agree. -/
-theorem state_align : ∀ {u₁ u₂ v₁ v₂ : List (TapeLetter A)} {q₁ q₂ : A},
+private theorem state_align : ∀ {u₁ u₂ v₁ v₂ : List (TapeLetter A)} {q₁ q₂ : A},
     u₁ ++ TapeLetter.state q₁ :: v₁ = u₂ ++ TapeLetter.state q₂ :: v₂ →
     (∀ x ∈ u₁, x.isState = false) → (∀ x ∈ u₂, x.isState = false) →
     u₁ = u₂ ∧ q₁ = q₂ ∧ v₁ = v₂
@@ -426,7 +429,7 @@ theorem state_align : ∀ {u₁ u₂ v₁ v₂ : List (TapeLetter A)} {q₁ q₂
     exact ⟨by rw [hab, hu], hq, hv⟩
 
 /-- The prefix of a configuration word carries no state letter. -/
-theorem prefix_state_free (c : ConfigU A) (ls : List (ℤ × A)) :
+private theorem prefix_state_free (c : ConfigU A) (ls : List (ℤ × A)) :
     ∀ x ∈ TapeLetter.lft :: cellSyms c ls, x.isState = false := by
   intro x hx
   rcases List.mem_cons.mp hx with rfl | hx
@@ -435,7 +438,7 @@ theorem prefix_state_free (c : ConfigU A) (ls : List (ℤ × A)) :
     rfl
 
 /-- No boot letter and no halting letter occurs in a configuration word. -/
-theorem boot_halt_notMem {w : List (TapeLetter A)} {c : ConfigU A}
+private theorem boot_halt_notMem {w : List (TapeLetter A)} {c : ConfigU A}
     (h : Represents M w c) :
     TapeLetter.boot ∉ w ∧ TapeLetter.halt ∉ w := by
   obtain ⟨ls, rs, hw, -, -, -⟩ := h
@@ -446,7 +449,7 @@ theorem boot_halt_notMem {w : List (TapeLetter A)} {c : ConfigU A}
 
 /-- The two halves of a window sit strictly below and strictly above the
 head. -/
-theorem window_lt {ls rs : List (ℤ × A)} {h : ℤ × A} (hlin : IsLinOrd M.Le)
+private theorem window_lt {ls rs : List (ℤ × A)} {h : ℤ × A} (hlin : IsLinOrd M.Le)
     (hchain : (ls ++ h :: rs).IsChain M.SuccCell) :
     (∀ z ∈ ls, CellLt M z h) ∧ ∀ z ∈ rs, CellLt M h z := by
   have hpw := pairwise_cellLt_of_isChain hlin hchain
@@ -456,7 +459,7 @@ theorem window_lt {ls rs : List (ℤ × A)} {h : ℤ × A} (hlin : IsLinOrd M.Le
   exact ⟨fun z hz => h3 z hz h List.mem_cons_self, fun z hz => h2.1 z hz⟩
 
 /-- A configuration word has exactly one state letter. -/
-theorem stateCount_word (c : ConfigU A) (ls rs : List (ℤ × A)) :
+private theorem stateCount_word (c : ConfigU A) (ls rs : List (ℤ × A)) :
     stateCount ((TapeLetter.lft :: cellSyms c ls) ++ TapeLetter.state c.state ::
       TapeLetter.sym (c.tape c.head) :: (cellSyms c rs ++ [TapeLetter.rgt])) = 1 := by
   simp [stateCount_append, stateCount_cons]
@@ -469,7 +472,7 @@ rule on the current – hence accepting – state. Each move rule carries exactl
 one state letter on its left-hand side, and a configuration word carries
 exactly one, so the rule can only apply at the head. -/
 
-theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLetter A)}
+private theorem step_inversion [Finite A] (hwf : M.WellFormed) {w w₁ : List (TapeLetter A)}
     {c : ConfigU A} (hrep : Represents M w c)
     (hstep : History.Step (MRule M) w w₁) :
     (∃ c', M.StepU c c' ∧ Represents M w₁ c') ∨ M.Acc c.state := by
@@ -805,7 +808,7 @@ The forward direction: one machine step is one rewriting step – the boundary
 variants of the moves extend the window in the same stroke, so no separate
 padding step is ever needed. -/
 
-theorem exists_step_of_stepU [Finite A] (hwf : M.WellFormed) {w : List (TapeLetter A)}
+private theorem exists_step_of_stepU [Finite A] (hwf : M.WellFormed) {w : List (TapeLetter A)}
     {c c' : ConfigU A} (hrep : Represents M w c) (h : M.StepU c c') :
     ∃ w', History.Step (MRule M) w w' ∧ Represents M w' c' := by
   classical
@@ -988,7 +991,7 @@ theorem exists_step_of_stepU [Finite A] (hwf : M.WellFormed) {w : List (TapeLett
 /-! ### Whole runs, and the halting phase -/
 
 /-- A run of the machine is a derivation between words of its endpoints. -/
-theorem derives_of_run [Finite A] (hwf : M.WellFormed) :
+private theorem derives_of_run [Finite A] (hwf : M.WellFormed) :
     ∀ {n : ℕ} {c c' : ConfigU A}, M.StepsInU n c c' →
       ∀ {w}, Represents M w c →
         ∃ w', History.Derives (MRule M) w w' ∧ Represents M w' c'
@@ -1000,7 +1003,7 @@ theorem derives_of_run [Finite A] (hwf : M.WellFormed) :
     exact ⟨w', Relation.ReflTransGen.head h1 hd, hrep'⟩
 
 /-- The halting letter melts a block of symbols to its left away. -/
-theorem derives_eraseL (u : List A) :
+private theorem derives_eraseL (u : List A) :
     History.Derives (MRule M) (u.map TapeLetter.sym ++ [TapeLetter.halt])
       [TapeLetter.halt] := by
   induction u with
@@ -1015,7 +1018,7 @@ theorem derives_eraseL (u : List A) :
     simpa using this
 
 /-- The halting letter melts a block of symbols to its right away. -/
-theorem derives_eraseR (u : List A) :
+private theorem derives_eraseR (u : List A) :
     History.Derives (MRule M) (TapeLetter.halt :: u.map TapeLetter.sym)
       [TapeLetter.halt] := by
   induction u with
@@ -1028,7 +1031,7 @@ theorem derives_eraseR (u : List A) :
 
 /-- **From an accepting configuration the derivation closes**: the state
 letter becomes the halting letter, which then swallows the whole word. -/
-theorem derives_halt_of_acc {w : List (TapeLetter A)} {c : ConfigU A}
+private theorem derives_halt_of_acc {w : List (TapeLetter A)} {c : ConfigU A}
     (hrep : Represents M w c) (hacc : M.Acc c.state) :
     History.Derives (MRule M) w [TapeLetter.halt] := by
   obtain ⟨ls, rs, hw, -, -, -⟩ := hrep
@@ -1104,7 +1107,7 @@ theorem IsPosEnum.ne_nil (hwf : M.WellFormed) {ps : List A} (hps : IsPosEnum M p
   exact absurd ((hps.2 p).mpr hp) (by simp)
 
 /-- Consecutive entries of an enumeration are consecutive positions. -/
-theorem IsPosEnum.isChain (hlin : IsLinOrd M.Le) {ps : List A} (hps : IsPosEnum M ps) :
+private theorem IsPosEnum.isChain (hlin : IsLinOrd M.Le) {ps : List A} (hps : IsPosEnum M ps) :
     ps.IsChain (SuccPos M.Le M.Posn) := by
   rw [List.isChain_iff_forall_rel_of_append_cons_cons]
   intro p q l₁ l₂ heq
@@ -1130,7 +1133,7 @@ theorem IsPosEnum.isChain (hlin : IsLinOrd M.Le) {ps : List A} (hps : IsPosEnum 
       exact absurd (hlin.2.2.1 q r h.1 hrq) h.2
 
 /-- The first entry of an enumeration is the lowest position. -/
-theorem IsPosEnum.head_minPos (hlin : IsLinOrd M.Le) {p : A} {pr : List A}
+private theorem IsPosEnum.head_minPos (hlin : IsLinOrd M.Le) {p : A} {pr : List A}
     (hps : IsPosEnum M (p :: pr)) : MinPos M.Le M.Posn p := by
   refine ⟨(hps.2 p).mp (by simp), fun q hq => ?_⟩
   rcases List.mem_cons.mp ((hps.2 q).mpr hq) with rfl | hq'
@@ -1139,7 +1142,7 @@ theorem IsPosEnum.head_minPos (hlin : IsLinOrd M.Le) {p : A} {pr : List A}
 
 /-- **A well-formed machine with a start state has an initial configuration on
 the unbounded tape**, its input page filled by choice and the rest blank. -/
-theorem exists_isInitU [Finite A] (hwf : M.WellFormed) {q₀ : A} (hq : M.Start q₀) :
+private theorem exists_isInitU [Finite A] (hwf : M.WellFormed) {q₀ : A} (hq : M.Start q₀) :
     ∃ c₀ : ConfigU A, M.IsInitU c₀ ∧ c₀.state = q₀ := by
   classical
   obtain ⟨p₀, hp₀⟩ := exists_minPos hwf.1 hwf.2.1
@@ -1156,7 +1159,7 @@ theorem exists_isInitU [Finite A] (hwf : M.WellFormed) {q₀ : A} (hq : M.Start 
 
 /-- **The word of an initial configuration**: the input page between the
 endmarkers, the state in front of its first cell. -/
-theorem represents_of_isInitU [Finite A] (hwf : M.WellFormed) {ps inp : List A}
+private theorem represents_of_isInitU [Finite A] (hwf : M.WellFormed) {ps inp : List A}
     (hps : IsPosEnum M ps) (hinp : List.Forall₂ M.InitTape ps inp)
     {c₀ : ConfigU A} (hinit : M.IsInitU c₀) :
     Represents M (TapeLetter.lft :: TapeLetter.state c₀.state ::
@@ -1210,7 +1213,7 @@ theorem represents_of_isInitU [Finite A] (hwf : M.WellFormed) {ps inp : List A}
 
 /-- No letter of a start word is a state or halting letter, and its only boot
 letter is the one in the state slot. -/
-theorem stateCount_startWord (inp : List A) : stateCount (startWord inp) = 0 := by
+private theorem stateCount_startWord (inp : List A) : stateCount (startWord inp) = 0 := by
   rw [stateCount_eq_zero]
   intro x hx
   rcases List.mem_cons.mp hx with rfl | hx
@@ -1227,7 +1230,7 @@ theorem stateCount_startWord (inp : List A) : stateCount (startWord inp) = 0 := 
 
 /-- The backward reading: a derivation from a configuration word to the
 halting word yields an accepting run from that configuration. -/
-theorem acceptsU_of_derives [Finite A] (hwf : M.WellFormed) {w : List (TapeLetter A)}
+private theorem acceptsU_of_derives [Finite A] (hwf : M.WellFormed) {w : List (TapeLetter A)}
     (hder : History.Derives (MRule M) w [TapeLetter.halt]) :
     ∀ c : ConfigU A, Represents M w c →
       ∃ (c' : ConfigU A) (n : ℕ), M.StepsInU n c c' ∧ M.Acc c'.state := by

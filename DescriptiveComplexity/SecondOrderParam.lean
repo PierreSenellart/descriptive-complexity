@@ -50,7 +50,7 @@ def SOBlock.atParam (B : SOBlock) (ρ : B.withParam.Assignment N) (c : N) : B.As
 /-- **Reading a parameterized relation variable**: the extended variable at a
 tuple whose first argument is the parameter is the original variable, read at
 the assignment taken at that parameter. -/
-theorem SOBlock.relMap_paramSym (B : SOBlock) (ρ : B.withParam.Assignment N) (c : N) {m : ℕ}
+private theorem SOBlock.relMap_paramSym (B : SOBlock) (ρ : B.withParam.Assignment N) (c : N) {m : ℕ}
     (b : B.lang.Relations m) (w : Fin (m + 1) → N) (hw : w 0 = c) :
     (@RelMap B.withParam.lang N (B.withParam.structure ρ) (m + 1) (B.paramSym b) w ↔
       @RelMap B.lang N (B.structure (B.atParam ρ c)) m b fun i => w i.succ) := by

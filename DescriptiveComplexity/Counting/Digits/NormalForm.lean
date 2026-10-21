@@ -11,6 +11,12 @@ public import DescriptiveComplexity.Counting.DigitDefinable
 import DescriptiveComplexity.FixedPointInflationaryLFP
 import Mathlib.Order.Interval.Finset.Fin
 import Mathlib.SetTheory.Cardinal.NatCard
+import all DescriptiveComplexity.Counting.Digits.Closure
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.Counting.Digits.Tower
+import all DescriptiveComplexity.FixedPointInflationary
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderBlockHom
 
 /-!
 # The normal form of FP: every problem of FP is digit-definable
@@ -52,17 +58,17 @@ open Language Structure
 namespace Digits
 
 /-- The rank of an element of `Fin c` is its value. -/
-theorem orank_fin {c : ℕ} (i : Fin c) : orank i = (i : ℕ) := by
+private theorem orank_fin {c : ℕ} (i : Fin c) : orank i = (i : ℕ) := by
   rw [orank, show {y : Fin c | y < i} = ↑(Finset.Iio i) from (Finset.coe_Iio i).symm,
     Set.ncard_coe_finset, Fin.card_Iio]
 
-theorem card_lex_tuple (A : Type) [Finite A] (ℓ : ℕ) :
+private theorem card_lex_tuple (A : Type) [Finite A] (ℓ : ℕ) :
     Nat.card (Lex (Fin ℓ → A)) = Nat.card A ^ ℓ := by
   rw [show Nat.card (Lex (Fin ℓ → A)) = Nat.card (Fin ℓ → A) from rfl, Nat.card_fun,
     Nat.card_fin]
 
 /-- The digit at a position, a group and a tuple. -/
-theorem bitsOf_pos {A : Type} [LinearOrder A] [Finite A] {c ℓ : ℕ} (V : ℕ) (τ : Fin c)
+private theorem bitsOf_pos {A : Type} [LinearOrder A] [Finite A] {c ℓ : ℕ} (V : ℕ) (τ : Fin c)
     (x : Fin ℓ → A) :
     bitsOf V (toLex (τ, toLex x) : Fin c ×ₗ Lex (Fin ℓ → A)) ↔
       V.testBit (τ * Nat.card (Lex (Fin ℓ → A)) + orank (toLex x)) = true := by
@@ -80,7 +86,8 @@ def baseOut (d : QLFPDef L) :
     QTerm ((L.sum Language.order).sum (baseStep d).B.lang) Empty :=
   d.out
 
-theorem value_eq (d : QLFPDef L) (A : Type) [L.Structure A] [LinearOrder A] (v : Empty → A) :
+private theorem value_eq
+    (d : QLFPDef L) (A : Type) [L.Structure A] [LinearOrder A] (v : Empty → A) :
     d.value A = @QTerm.eval _ A (ctxStr (baseStep d) A) Empty (baseOut d) v := by
   have h : (baseStep d).inflLimit A = lfpAssign d.rules :=
     inflLimit_toStepDef ⟨d.B, d.k, d.rules, ⊤⟩ A
@@ -111,7 +118,7 @@ noncomputable def finalF (x : (baseStep d).Ext e) (jD : e.B.lang.Relations (0 + 
     (∼singleF ⊓
       if (τ : ℕ) = 0 then ctxAt jD fun k => Fin.cast (Nat.zero_add ℓ) k else ⊥)
 
-theorem realize_singleF (A : Type) [L.Structure A] [LinearOrder A] (v : Fin ℓ → A) :
+private theorem realize_singleF (A : Type) [L.Structure A] [LinearOrder A] (v : Fin ℓ → A) :
     (@Formula.Realize _ A (ctxStr e A) _ singleF v) ↔ Subsingleton A := by
   let := e.B.structure (e.inflLimit A)
   rw [singleF, Formula.realize_iAlls]
@@ -124,7 +131,7 @@ theorem realize_singleF (A : Type) [L.Structure A] [LinearOrder A] (v : Fin ℓ 
     rw [Formula.realize_equal]
     exact Subsingleton.elim _ _
 
-theorem realize_finalF (x : (baseStep d).Ext e) {jD : e.B.lang.Relations (0 + ℓ)}
+private theorem realize_finalF (x : (baseStep d).Ext e) {jD : e.B.lang.Relations (0 + ℓ)}
     (hjD : e.Computes jD (digRel ℓ (termFam (baseStep d) (baseOut d) Empty.elim)))
     {χ : ℕ → ((L.sum Language.order).sum (baseStep d).B.lang).Formula Empty}
     (hℓ : ∀ (A : Type) [((L.sum Language.order).sum (baseStep d).B.lang).Structure A]

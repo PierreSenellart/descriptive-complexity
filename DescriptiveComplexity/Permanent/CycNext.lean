@@ -33,7 +33,7 @@ variable {α : Type} [LinearOrder α]
 def above (S : Finset α) (a : α) : Finset α :=
   S.filter (a < ·)
 
-theorem mem_above {S : Finset α} {a b : α} : b ∈ above S a ↔ b ∈ S ∧ a < b :=
+private theorem mem_above {S : Finset α} {a b : α} : b ∈ above S a ↔ b ∈ S ∧ a < b :=
   mem_filter
 
 /-- **The cyclic successor** of `a` along `S`: the least element of `S` above
@@ -42,11 +42,11 @@ noncomputable def cycNext (S : Finset α) (a : α) : α :=
   if h : (above S a).Nonempty then (above S a).min' h
   else if h' : S.Nonempty then S.min' h' else a
 
-theorem cycNext_of_nonempty {S : Finset α} {a : α} (h : (above S a).Nonempty) :
+private theorem cycNext_of_nonempty {S : Finset α} {a : α} (h : (above S a).Nonempty) :
     cycNext S a = (above S a).min' h := by
   rw [cycNext, dite_eq_left h]
 
-theorem cycNext_of_not_nonempty {S : Finset α} {a : α} (h : ¬(above S a).Nonempty)
+private theorem cycNext_of_not_nonempty {S : Finset α} {a : α} (h : ¬(above S a).Nonempty)
     (h' : S.Nonempty) : cycNext S a = S.min' h' := by
   rw [cycNext, dite_eq_right h, dite_eq_left h']
 
@@ -58,24 +58,24 @@ theorem cycNext_mem {S : Finset α} (hS : S.Nonempty) (a : α) : cycNext S a ∈
     exact min'_mem _ hS
 
 /-- Nothing of `S` lies strictly between `a` and its successor. -/
-theorem not_between_cycNext {S : Finset α} {a b : α} (hb : b ∈ S) (hab : a < b) :
+private theorem not_between_cycNext {S : Finset α} {a b : α} (hb : b ∈ S) (hab : a < b) :
     cycNext S a ≤ b := by
   have h : (above S a).Nonempty := ⟨b, mem_above.mpr ⟨hb, hab⟩⟩
   rw [cycNext_of_nonempty h]
   exact min'_le _ _ (mem_above.mpr ⟨hb, hab⟩)
 
-theorem lt_cycNext_of_above {S : Finset α} {a : α} (h : (above S a).Nonempty) :
+private theorem lt_cycNext_of_above {S : Finset α} {a : α} (h : (above S a).Nonempty) :
     a < cycNext S a := by
   rw [cycNext_of_nonempty h]
   exact (mem_above.mp (min'_mem _ h)).2
 
-theorem cycNext_le_of_not_above {S : Finset α} {a : α} (ha : a ∈ S)
+private theorem cycNext_le_of_not_above {S : Finset α} {a : α} (ha : a ∈ S)
     (h : ¬(above S a).Nonempty) : cycNext S a ≤ a := by
   rw [cycNext_of_not_nonempty h ⟨a, ha⟩]
   exact min'_le _ _ ha
 
 /-- An element is the greatest of `S` iff nothing of `S` is above it. -/
-theorem not_above_iff {S : Finset α} {a : α} :
+private theorem not_above_iff {S : Finset α} {a : α} :
     ¬(above S a).Nonempty ↔ ∀ b ∈ S, b ≤ a := by
   rw [Finset.not_nonempty_iff_eq_empty, Finset.eq_empty_iff_forall_notMem]
   exact ⟨fun h b hb => not_lt.mp fun hab => h b (mem_above.mpr ⟨hb, hab⟩),
@@ -99,7 +99,7 @@ theorem cycNext_injOn (S : Finset α) : Set.InjOn (cycNext S) S := by
 /-- A subset of `S` closed under the cyclic successor cannot start below its
 complement in `S`: the greatest element of `S` below the least element of the
 complement is in the subset, and its successor is that least element. -/
-theorem not_min_lt_of_cycNext_closed {S T : Finset α} (hTS : T ⊆ S)
+private theorem not_min_lt_of_cycNext_closed {S T : Finset α} (hTS : T ⊆ S)
     (hT : ∀ a ∈ T, cycNext S a ∈ T) (h₁ : T.Nonempty) (h₂ : (S \ T).Nonempty) :
     ¬T.min' h₁ < (S \ T).min' h₂ := by
   intro hlt

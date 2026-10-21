@@ -11,6 +11,9 @@ import DescriptiveComplexity.Counting.Subtractive
 import DescriptiveComplexity.Block
 import DescriptiveComplexity.Syntax
 import DescriptiveComplexity.Counting.Sized
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Problems.CliqueFamily.CountingReductions
+import all DescriptiveComplexity.Problems.SetFamily.FromGraphs
 
 /-!
 # #Set Packing
@@ -87,7 +90,7 @@ noncomputable def SharpSetPacking : CountingProblem Language.setSystem where
     have h := T.2.map e.symm
     exact h
 
-theorem sharpSetPacking_apply (A : Type) [Language.setSystem.Structure A] :
+private theorem sharpSetPacking_apply (A : Type) [Language.setSystem.Structure A] :
     SharpSetPacking A = Nat.card {G : A → Prop // PackingOfSize A G} :=
   rfl
 
@@ -95,7 +98,7 @@ theorem sharpSetPacking_apply (A : Type) [Language.setSystem.Structure A] :
 as the marked set contains one of exactly that size.
 Registered in the Lax archive as
 [`Lax280166.SetPackingComplete.sharpSetPacking_support_iff`](https://laxarchive.org/lax-280166/Lax280166.SetPackingComplete.html#s-Lax280166.SetPackingComplete.sharpSetPacking_support_iff). -/
-theorem sharpSetPacking_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
+private theorem sharpSetPacking_support_iff (A : Type) [Language.setSystem.Structure A] [Finite A] :
     SharpSetPacking.support A ↔ SetPacking A := by
   rw [CountingProblem.support_iff, sharpSetPacking_apply, Nat.card_pos_iff]
   constructor
@@ -119,13 +122,13 @@ instance : Subsingleton packSelBlock.ι :=
 
 /-- The order-free kernel of #Set Packing: the guessed subfamily consists of
 sets of the family, pairwise disjoint. -/
-noncomputable def packSelKernel : packSelLang.Sentence :=
+private noncomputable def packSelKernel : packSelLang.Sentence :=
   fo% (∀ s, psSelSym(s) → psFamSym(s)) ∧
     ∀ s t x, ((psSelSym(s) ∧ psSelSym(t)) ∧ ¬ s ≐ t) ∧ psElemSym(x) →
       ¬ (psMemSym(x, s) ∧ psMemSym(x, t))
 
 /-- Realization of the order-free kernel of #Set Packing. -/
-theorem realize_packSelKernel {A : Type} [Language.setSystem.Structure A]
+private theorem realize_packSelKernel {A : Type} [Language.setSystem.Structure A]
     (ρ : packSelBlock.Assignment A) :
     (@Sentence.Realize packSelLang A
         (@sumStructure _ _ A _ (packSelBlock.structure ρ)) packSelKernel) ↔
@@ -148,7 +151,7 @@ theorem realize_packSelKernel {A : Type} [Language.setSystem.Structure A]
       fun h i hi => h (i 0) (i 1) hi.1.1.1 hi.1.1.2 hi.1.2 (i 2) hi.2⟩
 
 /-- **#Set Packing is in `#P`.** -/
-theorem sharpSetPacking_mem_sharpP : SharpSetPacking ∈ SharpP :=
+private theorem sharpSetPacking_mem_sharpP : SharpSetPacking ∈ SharpP :=
   sharpPDefinable_of_sized_set SharpSetPacking packSelBlock ssMarked .sel rfl packSelKernel
     (fun A _ G => (∀ s : A, G s → SSFam s) ∧
       ∀ s s' : A, G s → G s' → s ≠ s' → ∀ x : A, SSElem x → ¬(SSMem x s ∧ SSMem x s'))
@@ -164,7 +167,7 @@ variable {A : Type} [Language.markedGraph.Structure A]
 
 /-- The vertex-sets of an independent set of the threshold size are a packing
 of the threshold size. -/
-theorem packingOfSize_vertexFamily {S : A → Prop} (h : IndepOfSize A S) :
+private theorem packingOfSize_vertexFamily {S : A → Prop} (h : IndepOfSize A S) :
     PackingOfSize (edgeIncidenceInterp.Map A) (vertexFamily S) := by
   obtain ⟨hfin, hS, hcard⟩ := h
   have := hfin
@@ -179,7 +182,7 @@ theorem packingOfSize_vertexFamily {S : A → Prop} (h : IndepOfSize A S) :
     · exact hS v u hv hu huv.symm h
 
 /-- A packing of the interpreted system consists of vertex-sets. -/
-theorem packing_diag {G : edgeIncidenceInterp.Map A → Prop}
+private theorem packing_diag {G : edgeIncidenceInterp.Map A → Prop}
     (h : PackingOfSize (edgeIncidenceInterp.Map A) G) :
     ∀ p : edgeIncidenceInterp.Map A, G p → ∃ v, p = diagPt v := by
   rintro ⟨⟨⟩, w⟩ hw
@@ -188,7 +191,7 @@ theorem packing_diag {G : edgeIncidenceInterp.Map A → Prop}
 
 /-- The vertices of a packing of the threshold size are an independent set of
 the threshold size. -/
-theorem indepOfSize_of_packing {G : edgeIncidenceInterp.Map A → Prop}
+private theorem indepOfSize_of_packing {G : edgeIncidenceInterp.Map A → Prop}
     (h : PackingOfSize (edgeIncidenceInterp.Map A) G) :
     IndepOfSize A fun v => G (diagPt v) := by
   have hdiag := packing_diag h
@@ -201,7 +204,7 @@ theorem indepOfSize_of_packing {G : edgeIncidenceInterp.Map A → Prop}
 variable (A) in
 /-- **The packings of the threshold size of the edge-incidence system are the
 independent sets of the threshold size**, bijectively. -/
-def packEquiv :
+private def packEquiv :
     {S : A → Prop // IndepOfSize A S} ≃
       {G : edgeIncidenceInterp.Map A → Prop //
         PackingOfSize (edgeIncidenceInterp.Map A) G} where
@@ -221,7 +224,7 @@ end Hardness
 
 /-- **#Independent Set reduces parsimoniously to #Set Packing**, by the
 edge-incidence interpretation. -/
-noncomputable def sharpIndependentSet_parsimonious_sharpSetPacking :
+private noncomputable def sharpIndependentSet_parsimonious_sharpSetPacking :
     SharpIndependentSet ≤ᵖ SharpSetPacking where
   Tag := Unit
   dim := 2

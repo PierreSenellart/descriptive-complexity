@@ -8,6 +8,9 @@ module
 public import DescriptiveComplexity.Counting.WeightedFacts
 public import DescriptiveComplexity.Counting.QuantitativeBinders
 import DescriptiveComplexity.Problems.CircuitNumber.Membership
+import all DescriptiveComplexity.Counting.QuantitativeBinders
+import all DescriptiveComplexity.Counting.WeightedWorlds
+import all DescriptiveComplexity.Problems.CircuitNumber.Membership
 
 /-!
 # The weights of a weighted instance, as quantitative terms
@@ -82,7 +85,7 @@ noncomputable def linGuardT : QTerm (wOrd L) δ :=
 variable {A : Type} [(weightedLang L).Structure A] [LinearOrder A]
 
 open Classical in
-theorem eval_wNum [Finite A] (S : WeightedRel L (n + 1)) (e : Fin n → δ) (v : δ → A) :
+private theorem eval_wNum [Finite A] (S : WeightedRel L (n + 1)) (e : Fin n → δ) (v : δ → A) :
     (wNum S e).eval v = binNum (WLe L A) (fun _ => True) (bitsOf S fun m => v (e m)) := by
   have hbit : ∀ a : A,
       (bitAtom (L' := wOrd L) (n := n) (Sum.inl S) (fun m => (Sum.inl (e m) : δ ⊕ Fin 1))
@@ -107,19 +110,19 @@ theorem eval_wNum [Finite A] (S : WeightedRel L (n + 1)) (e : Fin n → δ) (v :
   split_ifs <;> simp
 
 open Classical in
-theorem eval_fullPresT [Finite A] (R : L.Relations n) (e : Fin n → δ) (v : δ → A) :
+private theorem eval_fullPresT [Finite A] (R : L.Relations n) (e : Fin n → δ) (v : δ → A) :
     (fullPresT R e).eval v = fullPresWeight (⟨⟨n, R⟩, fun m => v (e m)⟩ : Fact L A) := by
   rw [fullPresT, QTerm.eval_cond, QTerm.eval_cond, eval_wNum, fullPresWeight]
   exact if_congr (realize_factAtom _ _ _) rfl (if_congr (realize_factAtom _ _ _) rfl rfl)
 
 open Classical in
-theorem eval_fullAbsT [Finite A] (R : L.Relations n) (e : Fin n → δ) (v : δ → A) :
+private theorem eval_fullAbsT [Finite A] (R : L.Relations n) (e : Fin n → δ) (v : δ → A) :
     (fullAbsT R e).eval v = fullAbsWeight (⟨⟨n, R⟩, fun m => v (e m)⟩ : Fact L A) := by
   rw [fullAbsT, QTerm.eval_cond, QTerm.eval_cond, eval_wNum, fullAbsWeight]
   exact if_congr (realize_factAtom _ _ _) rfl (if_congr (realize_factAtom _ _ _) rfl rfl)
 
 open Classical in
-theorem eval_linGuardT (v : δ → A) :
+private theorem eval_linGuardT (v : δ → A) :
     (linGuardT (L := L) : QTerm (wOrd L) δ).eval v = if IsLinOrd (WLe L A) then 1 else 0 := by
   rw [linGuardT, QTerm.eval_ind]
   refine if_congr (Formula.realize_relabel.trans ?_) rfl rfl

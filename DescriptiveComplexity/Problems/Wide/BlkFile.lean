@@ -9,6 +9,8 @@ public import DescriptiveComplexity.Problems.Wide.LowFile
 import DescriptiveComplexity.Problems.Wide.Key
 public import DescriptiveComplexity.Problems.Wide.DrawTable
 import DescriptiveComplexity.Problems.Wide.IxAddr
+import all DescriptiveComplexity.Problems.Wide.DrawTags
+import all DescriptiveComplexity.Problems.Wide.Key
 
 /-!
 # The file a clocked program lays out
@@ -92,7 +94,7 @@ noncomputable def blkNext (u : Wide.BlkIx K A dd) : Wide.BlkIx K A dd :=
 
 variable (A K) in
 /-- **The advance is the layout order's successor**, wherever there is one. -/
-theorem ixSucc_blkNext {u : Wide.BlkIx K A dd}
+private theorem ixSucc_blkNext {u : Wide.BlkIx K A dd}
     (hne : ∃ v : Wide.BlkIx K A dd, WMLt (Wide.blkLe K A dd) u v) :
     IxSucc (Wide.blkLe K A dd) u (blkNext A K dd u) := by
   classical
@@ -102,7 +104,7 @@ theorem ixSucc_blkNext {u : Wide.BlkIx K A dd}
 variable (A K) in
 /-- **The advance stops at the top**, which is what makes the sweep's last round
 recognizable without a second test. -/
-theorem blkNext_of_top {u : Wide.BlkIx K A dd}
+private theorem blkNext_of_top {u : Wide.BlkIx K A dd}
     (htop : ∀ v : Wide.BlkIx K A dd, Wide.blkLe K A dd v u) :
     blkNext A K dd u = u := by
   classical
@@ -125,14 +127,14 @@ noncomputable def blkTop [Nonempty A] : Wide.BlkIx K A dd :=
 
 variable (A K) in
 /-- The first register is below every register. -/
-theorem blkLe_blkBot [Nonempty A] (v : Wide.BlkIx K A dd) :
+private theorem blkLe_blkBot [Nonempty A] (v : Wide.BlkIx K A dd) :
     Wide.blkLe K A dd (blkBot A K dd) v :=
   (exists_least (Le := Wide.blkLe K A dd) (Wide.isLinOrd_blkLe K A dd)
     (P := fun _ => True) ⟨(none, fun _ => Classical.arbitrary A), trivial⟩).choose_spec.2 v trivial
 
 variable (A K) in
 /-- Every register is below the last. -/
-theorem blkLe_blkTop [Nonempty A] (v : Wide.BlkIx K A dd) :
+private theorem blkLe_blkTop [Nonempty A] (v : Wide.BlkIx K A dd) :
     Wide.blkLe K A dd v (blkTop A K dd) :=
   (exists_greatest (Le := Wide.blkLe K A dd) (Wide.isLinOrd_blkLe K A dd)
     (P := fun _ => True) ⟨(none, fun _ => Classical.arbitrary A), trivial⟩).choose_spec.2 v trivial
@@ -140,7 +142,7 @@ theorem blkLe_blkTop [Nonempty A] (v : Wide.BlkIx K A dd) :
 variable (A K) in
 /-- **The advance stops exactly at the last register**, so the walk's stop test
 is the pointer reaching `DescriptiveComplexity.blkTop`. -/
-theorem ixSucc_blkNext_of_ne [Nonempty A] {u : Wide.BlkIx K A dd}
+private theorem ixSucc_blkNext_of_ne [Nonempty A] {u : Wide.BlkIx K A dd}
     (hu : u ≠ blkTop A K dd) :
     IxSucc (Wide.blkLe K A dd) u (blkNext A K dd u) :=
   ixSucc_blkNext A K dd ⟨blkTop A K dd, blkLe_blkTop A K dd u, fun hc => hu
@@ -156,7 +158,7 @@ noncomputable def tupTop [Nonempty A] : Fin dd → A :=
 
 variable (A) in
 /-- Every tuple is below the last. -/
-theorem tupLeLex_tupTop [Nonempty A] (v : Fin dd → A) : tupLeLex v (tupTop A dd) :=
+private theorem tupLeLex_tupTop [Nonempty A] (v : Fin dd → A) : tupLeLex v (tupTop A dd) :=
   (exists_greatest (Le := tupLeLex (A := A) (d := dd)) Wide.isLinOrd_tupLeLex
     (P := fun _ => True) ⟨fun _ => Classical.arbitrary A, trivial⟩).choose_spec.2 v trivial
 
@@ -171,7 +173,7 @@ variable (A K) in
 /-- **Within a block the advance stays in it**: below the last tuple the next
 register is the same block's, so the stepping rule keeps its phase and only the
 roll-over changes it. -/
-theorem blkNext_fst_of_ne_tupTop [Nonempty A] {u : Wide.BlkIx K A dd}
+private theorem blkNext_fst_of_ne_tupTop [Nonempty A] {u : Wide.BlkIx K A dd}
     (hu : u.2 ≠ tupTop A dd) : (blkNext A K dd u).1 = u.1 := by
   classical
   have hlt : WMLt (Wide.blkLe K A dd) u (u.1, tupTop A dd) := by
@@ -194,7 +196,7 @@ variable (A K) in
 so the greatest index is the greatest tuple of the greatest block. This is what
 makes the sweep's stop test – the pointer holds the last tuple *and* the last
 register – fire at one place. -/
-theorem snd_blkTop [Nonempty A] : (blkTop A K dd).2 = tupTop A dd := by
+private theorem snd_blkTop [Nonempty A] : (blkTop A K dd).2 = tupTop A dd := by
   have hle := blkLe_blkTop A K dd ((blkTop A K dd).1, tupTop A dd)
   rcases hle with ⟨-, hb⟩ | ⟨-, hb⟩
   · exact absurd rfl hb
@@ -267,7 +269,7 @@ omit [Finite R] [Finite P] [Finite A] [Finite K]
 /-- **A block is below another exactly when its tag is**: the block order was
 built for this, the blockless registers taking the alphabet tag, which the
 argument tags all sit above. -/
-theorem blkTag_lt_iff {b b' : Option K} :
+private theorem blkTag_lt_iff {b b' : Option K} :
     (Wide.blkTagLe K b b' ∧ b ≠ b') ↔ blkTag R P K b < blkTag R P K b' := by
   match b, b' with
   | none, none => exact ⟨fun h => absurd rfl h.2, fun h => absurd h (lt_irrefl _)⟩
@@ -288,7 +290,7 @@ omit [Finite R] [Finite P] [Finite A] [Finite K]
   [Language.wide.Structure (Draw.Univ A R P K dd)] in
 /-- **The register order is the element order**: the block order was built
 for it. -/
-theorem blkLe_iff_tagTupleLe (u u' : Wide.BlkIx K A dd) :
+private theorem blkLe_iff_tagTupleLe (u u' : Wide.BlkIx K A dd) :
     Wide.blkLe K A dd u u' ↔ tagTupleLe (blkIxElt R P dd u) (blkIxElt R P dd u') := by
   rw [Wide.blkLe, lexRel, tagTupleLe]
   exact or_congr blkTag_lt_iff (and_congr_left fun _ =>

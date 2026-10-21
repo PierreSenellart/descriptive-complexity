@@ -32,21 +32,21 @@ open Language Structure
 variable {M : Type} [Language.sat.Structure M]
 
 /-- The clause `K` has exactly one true literal under `μ`. -/
-def OneInAt (μ : M → Prop) (K : M) : Prop :=
+private def OneInAt (μ : M → Prop) (K : M) : Prop :=
   ∃ x s, OccIn K x s ∧ LitTrue μ x s ∧ ∀ y t, OccIn K y t → LitTrue μ y t → y = x ∧ t = s
 
-theorem oneInProper_iff {μ : M → Prop} : OneInProper μ ↔ ∀ c : M, IsCl c → OneInAt μ c :=
+private theorem oneInProper_iff {μ : M → Prop} : OneInProper μ ↔ ∀ c : M, IsCl c → OneInAt μ c :=
   Iff.rfl
 
 variable {μ : M → Prop} {K e₁ e₂ e₃ e₄ : M} {s₁ s₂ s₃ s₄ : Bool}
 
 /-- A clause with no literal has no true one. -/
-theorem not_oneInAt_of_empty (hocc : ∀ e sg, ¬OccIn K e sg) : ¬OneInAt μ K := by
+private theorem not_oneInAt_of_empty (hocc : ∀ e sg, ¬OccIn K e sg) : ¬OneInAt μ K := by
   rintro ⟨x, s, hx, -⟩
   exact hocc x s hx
 
 /-- A clause with one literal. -/
-theorem oneInAt_one (hocc : ∀ e sg, OccIn K e sg ↔ e = e₁ ∧ sg = s₁) :
+private theorem oneInAt_one (hocc : ∀ e sg, OccIn K e sg ↔ e = e₁ ∧ sg = s₁) :
     OneInAt μ K ↔ LitTrue μ e₁ s₁ := by
   constructor
   · rintro ⟨x, s, hx, hT, -⟩
@@ -57,7 +57,7 @@ theorem oneInAt_one (hocc : ∀ e sg, OccIn K e sg ↔ e = e₁ ∧ sg = s₁) :
     refine ⟨e₁, s₁, (hocc _ _).mpr ⟨rfl, rfl⟩, h, fun y t hy _ => (hocc y t).mp hy⟩
 
 /-- A clause with two literals, on distinct elements. -/
-theorem oneInAt_two
+private theorem oneInAt_two
     (hocc : ∀ e sg, OccIn K e sg ↔ (e = e₁ ∧ sg = s₁) ∨ (e = e₂ ∧ sg = s₂))
     (h₁₂ : e₁ ≠ e₂) :
     OneInAt μ K ↔
@@ -82,7 +82,7 @@ theorem oneInAt_two
       · exact h
 
 /-- A clause with three literals, on distinct elements. -/
-theorem oneInAt_three
+private theorem oneInAt_three
     (hocc : ∀ e sg, OccIn K e sg ↔
       (e = e₁ ∧ sg = s₁) ∨ (e = e₂ ∧ sg = s₂) ∨ (e = e₃ ∧ sg = s₃))
     (h₁₂ : e₁ ≠ e₂) (h₁₃ : e₁ ≠ e₃) (h₂₃ : e₂ ≠ e₃) :
@@ -125,7 +125,7 @@ theorem oneInAt_three
       · exact h
 
 /-- A clause with four literals, on distinct elements. -/
-theorem oneInAt_four
+private theorem oneInAt_four
     (hocc : ∀ e sg, OccIn K e sg ↔
       (e = e₁ ∧ sg = s₁) ∨ (e = e₂ ∧ sg = s₂) ∨ (e = e₃ ∧ sg = s₃) ∨ (e = e₄ ∧ sg = s₄))
     (h₁₂ : e₁ ≠ e₂) (h₁₃ : e₁ ≠ e₃) (h₁₄ : e₁ ≠ e₄) (h₂₃ : e₂ ≠ e₃) (h₂₄ : e₂ ≠ e₄)

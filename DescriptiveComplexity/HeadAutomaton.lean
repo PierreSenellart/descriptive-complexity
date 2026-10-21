@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.DetLogSpace
 public import DescriptiveComplexity.OrderWalk
 import DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Padding
 
 /-!
 # Two-way multi-head automata over a structure
@@ -136,7 +137,7 @@ def Holds (mv : HeadMove k) (x : Fin k → A) (j : Fin k) (y : A) : Prop :=
   | .pred i => y < x i ∧ ∀ a : A, ¬(y < a ∧ a < x i)
 
 /-- A move determines the new position of its head. -/
-theorem holds_unique {mv : HeadMove k} {x : Fin k → A} {j : Fin k} {y y' : A}
+private theorem holds_unique {mv : HeadMove k} {x : Fin k → A} {j : Fin k} {y y' : A}
     (h : mv.Holds x j y) (h' : mv.Holds x j y') : y = y' := by
   cases mv with
   | stay => exact h.trans h'.symm
@@ -234,7 +235,7 @@ open Classical in
 noncomputable def reading (x : Fin k → A) : M.TestIx → Bool :=
   fun i => decide ((M.test i).Realize x)
 
-theorem reading_iff (x : Fin k → A) (i : M.TestIx) :
+private theorem reading_iff (x : Fin k → A) (i : M.TestIx) :
     M.reading x i = true ↔ (M.test i).Realize x := by
   classical
   rw [reading, decide_eq_true_iff]
@@ -265,7 +266,7 @@ noncomputable def allReadings (T : Type) [Finite T] : List (T → Bool) :=
   letI := Fintype.ofFinite T
   (Finset.univ : Finset (T → Bool)).toList
 
-theorem mem_allReadings {T : Type} [Finite T] (r : T → Bool) : r ∈ allReadings T := by
+private theorem mem_allReadings {T : Type} [Finite T] (r : T → Bool) : r ∈ allReadings T := by
   classical
   let := Fintype.ofFinite T
   exact Finset.mem_toList.mpr (Finset.mem_univ r)
@@ -276,7 +277,7 @@ noncomputable def allTests : List M.TestIx :=
   letI := Fintype.ofFinite M.TestIx
   (Finset.univ : Finset M.TestIx).toList
 
-theorem mem_allTests (i : M.TestIx) : i ∈ M.allTests := by
+private theorem mem_allTests (i : M.TestIx) : i ∈ M.allTests := by
   classical
   let := Fintype.ofFinite M.TestIx
   exact Finset.mem_toList.mpr (Finset.mem_univ i)
@@ -287,7 +288,7 @@ noncomputable def readingF (r : M.TestIx → Bool) :
   listInf (M.allTests.map fun i =>
     if r i then (M.test i).relabel Sum.inl else ∼((M.test i).relabel Sum.inl))
 
-theorem realize_readingF (r : M.TestIx → Bool) (x y : Fin k → A) :
+private theorem realize_readingF (r : M.TestIx → Bool) (x y : Fin k → A) :
     (M.readingF r).Realize (Sum.elim x y) ↔ M.reading x = r := by
   classical
   have hrel : ∀ i, ((M.test i).relabel Sum.inl).Realize (Sum.elim x y) ↔
@@ -316,7 +317,7 @@ noncomputable def movesF (mvs : Fin k → HeadMove k) :
     (L.sum Language.order).Formula (Fin k ⊕ Fin k) :=
   listInf ((List.finRange k).map fun j => (mvs j).toFormula L j)
 
-theorem realize_movesF (mvs : Fin k → HeadMove k) (x y : Fin k → A) :
+private theorem realize_movesF (mvs : Fin k → HeadMove k) (x y : Fin k → A) :
     (movesF (L := L) mvs).Realize (Sum.elim x y) ↔ ∀ j, (mvs j).Holds x j (y j) := by
   rw [movesF, realize_listInf]
   constructor
@@ -337,7 +338,7 @@ noncomputable def stepF (s s' : M.State) :
     M.readingF r ⊓
       listSup (((M.trans s r).filter fun p => p.1 = s').map fun p => movesF p.2))
 
-theorem realize_stepF (s s' : M.State) (x y : Fin k → A) :
+private theorem realize_stepF (s s' : M.State) (x y : Fin k → A) :
     (M.stepF s s').Realize (Sum.elim x y) ↔
       ∃ p ∈ M.trans s (M.reading x), p.1 = s' ∧ ∀ j, (p.2 j).Holds x j (y j) := by
   classical
@@ -373,7 +374,7 @@ noncomputable def toSpec : TCSpec L where
 theorem step_toSpec (a b : M.Config A) : M.toSpec.Step a b ↔ M.Step a b :=
   M.realize_stepF a.1 b.1 a.2 b.2
 
-theorem isSrc_toSpec (a : M.Config A) :
+private theorem isSrc_toSpec (a : M.Config A) :
     M.toSpec.IsSrc a ↔ a.1 = M.start ∧ ∀ j, ∀ b : A, a.2 j ≤ b := by
   classical
   change ((if a.1 = M.start then listInf ((List.finRange k).map fun j => minF j)
@@ -387,7 +388,7 @@ theorem isSrc_toSpec (a : M.Config A) :
   · rw [ite_eq_right hs, Formula.realize_bot]
     exact iff_of_false id fun h => hs h.1
 
-theorem isTgt_toSpec (a : M.Config A) : M.toSpec.IsTgt a ↔ M.accept a.1 = true := by
+private theorem isTgt_toSpec (a : M.Config A) : M.toSpec.IsTgt a ↔ M.accept a.1 = true := by
   classical
   change ((if M.accept a.1 then ⊤ else ⊥ : (L.sum Language.order).Formula (Fin k))).Realize
     a.2 ↔ _
@@ -398,7 +399,7 @@ theorem isTgt_toSpec (a : M.Config A) : M.toSpec.IsTgt a ↔ M.accept a.1 = true
     exact iff_of_false id hs
 
 /-- The walk of the specification is the run of the automaton. -/
-theorem reach_toSpec (a b : M.Config A) :
+private theorem reach_toSpec (a b : M.Config A) :
     M.toSpec.Reach a b ↔ Relation.ReflTransGen M.Step a b := by
   constructor
   · intro h
@@ -423,7 +424,7 @@ theorem accepts_toSpec : M.toSpec.Accepts A ↔ M.Accepts A := by
 
 /-- A deterministic automaton has a functional walk: its transition list holds
 at most one transition, and each move determines where its head lands. -/
-theorem functional_toSpec (hdet : M.IsDeterministic) : M.toSpec.Functional A := by
+private theorem functional_toSpec (hdet : M.IsDeterministic) : M.toSpec.Functional A := by
   intro a b c hb hc
   obtain ⟨p, hp, hps, hpm⟩ := (M.step_toSpec a b).mp hb
   obtain ⟨q, hq, hqs, hqm⟩ := (M.step_toSpec a c).mp hc

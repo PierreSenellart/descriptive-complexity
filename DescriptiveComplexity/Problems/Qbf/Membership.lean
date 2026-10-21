@@ -9,6 +9,7 @@ import DescriptiveComplexity.Syntax
 public import DescriptiveComplexity.Problems.Qbf.Defs
 public import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Padding
 
 /-!
 # QBF is second-order definable
@@ -79,7 +80,7 @@ def repAssign (A : Type) : ∀ (k : ℕ), (Fin k → A → Prop) → (qbfMergedB
 
 /-- Reading back the truth assignment of block `i` from the merged
 assignment. -/
-theorem repAssign_blockSym {A : Type} :
+private theorem repAssign_blockSym {A : Type} :
     ∀ (k : ℕ) (νs : Fin k → A → Prop) (i : Fin k) (x : A),
       @RelMap (qbfMergedBlock k).lang A ((qbfMergedBlock k).structure (repAssign A k νs)) 1
         (blockSym k i) ![x] ↔ νs i x := by
@@ -103,7 +104,7 @@ private theorem unaryBlock_ext {A : Type} (ρ : unaryBlock.Assignment A) :
 
 /-- Alternating quantification over the components of the merged assignment of
 a monadic prefix is alternating quantification over `k` truth assignments. -/
-theorem altAssign_qbfBlocks {A : Type} :
+private theorem altAssign_qbfBlocks {A : Type} :
     ∀ (k : ℕ) (P : (qbfMergedBlock k).Assignment A → Prop) (pol : Bool),
       altAssign A (qbfBlocks k) P pol ↔
         altQuant A k (fun νs => P (repAssign A k νs)) pol := by
@@ -177,12 +178,12 @@ variable {k : ℕ} {A : Type} [(Language.qbf k).Structure A] (νs : Fin k → A 
 /-- The interpretation of the kernel's vocabulary determined by `k` truth
 assignments. -/
 @[instance_reducible]
-def qbfSOStructure : (qbfSOLang k).Structure A :=
+private def qbfSOStructure : (qbfSOLang k).Structure A :=
   letI := (qbfMergedBlock k).structure (repAssign A k νs)
   inferInstance
 
 /-- The truth-assignment variables are read as the truth assignments. -/
-theorem relMap_qNuSym (i : Fin k) (w : Fin 1 → A) :
+private theorem relMap_qNuSym (i : Fin k) (w : Fin 1 → A) :
     @RelMap (qbfSOLang k) A (qbfSOStructure νs) 1 (qNuSym i) w ↔ νs i (w 0) := by
   let := (qbfMergedBlock k).structure (repAssign A k νs)
   have hw : w = ![w 0] := funext fun j => by rw [Subsingleton.elim j 0]; rfl
@@ -190,7 +191,7 @@ theorem relMap_qNuSym (i : Fin k) (w : Fin 1 → A) :
       ↔ @RelMap (qbfSOLang k) A (qbfSOStructure νs) 1 (qNuSym i) ![w 0] := by rw [← hw]
     _ ↔ νs i (w 0) := repAssign_blockSym k νs i (w 0)
 
-theorem realize_qbfValF {γ : Type} (x : γ) (v : γ → A) :
+private theorem realize_qbfValF {γ : Type} (x : γ) (v : γ → A) :
     @Formula.Realize (qbfSOLang k) A (qbfSOStructure νs) γ (qbfValF k x) v ↔
       qbfVal νs (v x) := by
   let := (qbfMergedBlock k).structure (repAssign A k νs)
@@ -203,19 +204,19 @@ end Realize
 
 /-- The kernel for a conjunctive matrix: every clause contains a true
 literal. -/
-noncomputable def qbfCnfKernel (k : ℕ) : (qbfSOLang k).Sentence :=
+private noncomputable def qbfCnfKernel (k : ℕ) : (qbfSOLang k).Sentence :=
   fo% ∀ c, (qIsClSym k)(c) → ∃ x,
     ((qPosSym k)(c, x) ∧ (qbfValF k)⟨x⟩) ∨ ((qNegSym k)(c, x) ∧ ¬ (qbfValF k)⟨x⟩)
 
 /-- The kernel for a disjunctive matrix: some term has all its literals
 true. -/
-noncomputable def qbfDnfKernel (k : ℕ) : (qbfSOLang k).Sentence :=
+private noncomputable def qbfDnfKernel (k : ℕ) : (qbfSOLang k).Sentence :=
   fo% ∃ c, (qIsClSym k)(c) ∧ ∀ x,
     ((qPosSym k)(c, x) → (qbfValF k)⟨x⟩) ∧ ((qNegSym k)(c, x) → ¬ (qbfValF k)⟨x⟩)
 
 /-- The kernel of the `Σₖ`/`Πₖ` definition of a quantified Boolean formula
 problem, for either shape of matrix. -/
-noncomputable def qbfKernel (k : ℕ) (cnf : Bool) : (qbfSOLang k).Sentence :=
+private noncomputable def qbfKernel (k : ℕ) (cnf : Bool) : (qbfSOLang k).Sentence :=
   match cnf with
   | true => qbfCnfKernel k
   | false => qbfDnfKernel k
@@ -223,7 +224,7 @@ noncomputable def qbfKernel (k : ℕ) (cnf : Bool) : (qbfSOLang k).Sentence :=
 /-- **The kernel defines the matrix**: under the interpretation of the
 relation variables by `k` truth assignments, the kernel says exactly that the
 matrix is satisfied. -/
-theorem realize_qbfKernel (k : ℕ) (cnf : Bool) {A : Type} [(Language.qbf k).Structure A]
+private theorem realize_qbfKernel (k : ℕ) (cnf : Bool) {A : Type} [(Language.qbf k).Structure A]
     (νs : Fin k → A → Prop) :
     @Sentence.Realize (qbfSOLang k) A (qbfSOStructure νs) (qbfKernel k cnf) ↔
       QbfMatrix cnf νs := by

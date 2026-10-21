@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Machines
 
 /-!
 # Runs of a deterministic machine, unbounded in time
@@ -98,7 +99,7 @@ theorem UniqueFrom.mono {c d : Config A} (h : M.UniqueFrom c)
 omit [Finite A] in
 /-- **A machine unique from `c` has one run out of `c`**: two configurations
 reachable from it are reachable from one another. -/
-theorem reach_total_of_uniqueFrom {c x y : Config A} (huniq : M.UniqueFrom c)
+private theorem reach_total_of_uniqueFrom {c x y : Config A} (huniq : M.UniqueFrom c)
     (hx : Relation.ReflTransGen M.Step c x) (hy : Relation.ReflTransGen M.Step c y) :
     Relation.ReflTransGen M.Step x y ∨ Relation.ReflTransGen M.Step y x := by
   induction hx with
@@ -120,7 +121,7 @@ theorem reach_total (hlin : IsLinOrd M.Le) (hdet : M.Deterministic) {c x y : Con
 
 omit [Finite A] in
 /-- Nothing is reachable from a stuck configuration but itself. -/
-theorem eq_of_reach_stuck {c d : Config A} (hstuck : ∀ e, ¬M.Step c e)
+private theorem eq_of_reach_stuck {c d : Config A} (hstuck : ∀ e, ¬M.Step c e)
     (h : Relation.ReflTransGen M.Step c d) : c = d := by
   rcases Relation.ReflTransGen.cases_head h with heq | ⟨e, he, -⟩
   · exact heq
@@ -135,7 +136,7 @@ is the only nondeterministic one, so what has to be ruled out is an accepting ru
 `DescriptiveComplexity.TMData.not_acceptsSpace_of_reaches_dead` is this with the
 uniqueness supplied by global determinism and the initial configuration matched
 up. -/
-theorem not_acc_of_reaches_dead_of_uniqueFrom {c₀ d : Config A} (huniq : M.UniqueFrom c₀)
+private theorem not_acc_of_reaches_dead_of_uniqueFrom {c₀ d : Config A} (huniq : M.UniqueFrom c₀)
     (hreach : Relation.ReflTransGen M.Step c₀ d)
     (hdead : ∀ e, ¬M.Step d e) (hnacc : ¬M.Acc d.state)
     (hsink : ∀ e : Config A, M.Acc e.state → ∀ e', ¬M.Step e e')
@@ -172,7 +173,7 @@ chain whose `n`-th link costs at least `n` of them reaches none. -/
 
 omit [Finite A] in
 /-- Reachability is a run of some length. -/
-theorem exists_stepsIn {c d : Config A}
+private theorem exists_stepsIn {c d : Config A}
     (h : Relation.ReflTransGen M.Step c d) : ∃ n, M.StepsIn n c d := by
   induction h with
   | refl => exact ⟨0, rfl⟩
@@ -180,7 +181,7 @@ theorem exists_stepsIn {c d : Config A}
 
 omit [Finite A] in
 /-- A *nonempty* reachability is a run of positive length. -/
-theorem exists_stepsIn_pos {c d : Config A}
+private theorem exists_stepsIn_pos {c d : Config A}
     (h : Relation.TransGen M.Step c d) : ∃ n, 1 ≤ n ∧ M.StepsIn n c d := by
   induction h with
   | single hstep => exact ⟨1, le_rfl, ⟨_, hstep, rfl⟩⟩
@@ -191,7 +192,7 @@ theorem exists_stepsIn_pos {c d : Config A}
 omit [Finite A] in
 /-- **A stuck configuration is reached in one number of steps**: the shorter
 run is a prefix of the longer one, and nothing leaves a dead end. -/
-theorem stepsIn_eq_of_stuck (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
+private theorem stepsIn_eq_of_stuck (hlin : IsLinOrd M.Le) (hdet : M.Deterministic)
     {i j : ℕ} {c d : Config A} (hi : M.StepsIn i c d) (hj : M.StepsIn j c d)
     (hdead : ∀ e, ¬M.Step d e) : i = j := by
   have key : ∀ {a b : ℕ}, a ≤ b → M.StepsIn a c d → M.StepsIn b c d → a = b := by
@@ -246,7 +247,7 @@ theorem not_acceptsSpace_of_chain (hwf : M.WellFormed) (hdet : M.Deterministic)
 omit [Finite A] in
 /-- **The positive half**, for symmetry: a run from the initial configuration
 to an accepting one is exactly what acceptance in bounded space asks for. -/
-theorem acceptsSpace_of_reaches_acc {c₀ d : Config A} (hinit : M.IsInit c₀)
+private theorem acceptsSpace_of_reaches_acc {c₀ d : Config A} (hinit : M.IsInit c₀)
     (hreach : Relation.ReflTransGen M.Step c₀ d) (hacc : M.Acc d.state) :
     M.AcceptsSpace :=
   ⟨c₀, d, hinit, hreach, hacc⟩

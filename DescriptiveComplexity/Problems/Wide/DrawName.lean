@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawBack
 import DescriptiveComplexity.Problems.Wide.DrawGate
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawEnc
+import all DescriptiveComplexity.Problems.Wide.DrawGeom
 
 /-!
 # The cell of an encoded tuple: what one leaf read reads
@@ -217,7 +220,7 @@ omit [LinearOrder A] [Language.wide.Structure (Univ A R' P' dt.KIx dt.dd)]
 /-- **The coordinates of an encoded tuple are the tuple, cut down**: what the
 control computes for a leaf read is the payload the layout stores, so padding it
 back gives the encoded tuple itself. -/
-theorem pad_encCoord {Q : Type} (c : PtCode dt.X)
+private theorem pad_encCoord {Q : Type} (c : PtCode dt.X)
     (pay : (Q → A) → Fin (blockArityBound dt.X.B) → A) (fc : Q → A) :
     pad zero (dt.encCoord zero one c pay fc) = encTup dt.ly zero one c (pay fc) :=
   pad_unpad dt.dd0Le fun j hj => encTup_isPad c (pay fc) j hj
@@ -252,7 +255,7 @@ omit [LinearOrder A] [LinearOrder R'] [LinearOrder P'] in
 /-- **A register's digit at the cell of a tuple is the block value's
 membership question**: the track holds a bit per element, and the elements of
 one argument block are that block's tuples. -/
-theorem regBit_blkElt (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
+private theorem regBit_blkElt (hlin : IsLinOrd (WMLe (A := Univ A R' P' dt.KIx dt.dd)))
     (m : Univ A R' P' dt.KIx dt.dd → Prop) (b : Fin dt.ko ⊕ Fin dt.ki)
     (v : Fin dt.dd → A) :
     regBit m (wmSeg (dt.blkElt b v)) ↔

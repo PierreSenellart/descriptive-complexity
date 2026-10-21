@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Numbers.BinRel
 
 /-!
 # A run is a walk along the positions
@@ -43,7 +45,7 @@ variable {A : Type} [Finite A] {Le : A → A → Prop} {Posn : A → Prop}
 
 omit [Finite A] in
 /-- The lowest position has rank `0`. -/
-theorem bitRank_eq_zero_of_minPos (hlin : IsLinOrd Le) {p : A} (h : MinPos Le Posn p) :
+private theorem bitRank_eq_zero_of_minPos (hlin : IsLinOrd Le) {p : A} (h : MinPos Le Posn p) :
     bitRank Le Posn p = 0 := by
   have hempty : {r : A | Posn r ∧ Le r p ∧ r ≠ p} = ∅ := by
     ext r
@@ -87,7 +89,7 @@ theorem bitRank_lt_card {p : A} (hp : Posn p) :
   exact absurd rfl (hsub hp).2.2
 
 /-- The highest position has the greatest rank. -/
-theorem bitRank_maxPos {p : A} (h : MaxPos Le Posn p) :
+private theorem bitRank_maxPos {p : A} (h : MaxPos Le Posn p) :
     bitRank Le Posn p + 1 = Nat.card {x : A // Posn x} := by
   have hcard : Nat.card {x : A // Posn x} = ({x : A | Posn x} : Set A).ncard :=
     (Nat.card_coe_set_eq _)
@@ -124,7 +126,7 @@ def IsWalk (conf : A → Config A) : Prop :=
 variable {M}
 
 /-- A run of `n` steps, presented as its sequence of configurations. -/
-theorem exists_run : ∀ (n : ℕ) (c d : Config A), M.StepsIn n c d →
+private theorem exists_run : ∀ (n : ℕ) (c d : Config A), M.StepsIn n c d →
     ∃ f : ℕ → Config A, f 0 = c ∧ f n = d ∧ ∀ i, i < n → M.Step (f i) (f (i + 1)) := by
   intro n
   induction n with
@@ -291,7 +293,7 @@ theorem RelWalk.isWalk (h : M.RelWalk Q H T) : M.IsWalk h.conf := by
     exact h.acc t ht _ (h.qex t).choose_spec
 
 /-- A walk is a relational walk, through the graphs of its configurations. -/
-theorem IsWalk.relWalk {conf : A → Config A} (h : M.IsWalk conf) :
+private theorem IsWalk.relWalk {conf : A → Config A} (h : M.IsWalk conf) :
     M.RelWalk (fun t q => q = (conf t).state) (fun t p => p = (conf t).head)
       (fun t p a => a = (conf t).tape p) := by
   obtain ⟨hinit, hstep, hacc⟩ := h

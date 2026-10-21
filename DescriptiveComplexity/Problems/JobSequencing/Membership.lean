@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.JobSequencing.Kernel
 public import DescriptiveComplexity.Problems.Knapsack.Chain
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Numbers.Wide
+import all DescriptiveComplexity.Problems.JobSequencing.Kernel
+import all DescriptiveComplexity.Problems.Knapsack.Chain
 
 /-!
 # Job sequencing is in NP
@@ -213,7 +217,7 @@ writes – two wide positions, the second strictly above the first written out
 coordinate by coordinate – is `DescriptiveComplexity.binNum_lt_iff` on the wide
 positions. Both comparisons of the kernel go through this, the deadline
 against a completion time and the bound against the penalty total. -/
-theorem binNum_wide_lt_iff (hlin : IsLinOrd (JSLe (A := A))) (b b' : A × A → Prop) :
+private theorem binNum_wide_lt_iff (hlin : IsLinOrd (JSLe (A := A))) (b b' : A × A → Prop) :
     binNum (wideLe JSLe) (WidePosn JSPosn) b <
         binNum (wideLe JSLe) (WidePosn JSPosn) b' ↔
       ∃ x p : A, JSPosn p ∧ ¬b (x, p) ∧ b' (x, p) ∧ ∀ y q : A, JSPosn q →

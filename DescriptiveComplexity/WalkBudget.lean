@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Budgets for deterministic walks
@@ -54,17 +55,17 @@ iteration. -/
 noncomputable def stepNext (R : N → N → Prop) (a : N) : N :=
   if h : ∃ b, R a b then h.choose else a
 
-theorem step_stepNext (h : ∃ b, R a b) : R a (stepNext R a) := by
+private theorem step_stepNext (h : ∃ b, R a b) : R a (stepNext R a) := by
   classical
   rw [stepNext, dite_eq_left h]
   exact h.choose_spec
 
-theorem stepNext_eq_self (h : ¬∃ b, R a b) : stepNext R a = a := by
+private theorem stepNext_eq_self (h : ¬∃ b, R a b) : stepNext R a = a := by
   classical
   rw [stepNext, dite_eq_right h]
 
 /-- On a functional relation the walk follows the only step there is. -/
-theorem stepNext_eq (hfun : ∀ u v w : N, R u v → R u w → v = w) (h : R a b) :
+private theorem stepNext_eq (hfun : ∀ u v w : N, R u v → R u w → v = w) (h : R a b) :
     stepNext R a = b :=
   hfun a _ _ (step_stepNext ⟨b, h⟩) h
 
@@ -133,7 +134,7 @@ def Ticks : ℕ → C → Prop
   | 0, _ => True
   | n + 1, z => ∃ z', z ⋖ z' ∧ Ticks n z'
 
-theorem ticks_succ {n : ℕ} {z z' : C} (h : z ⋖ z') (ht : Ticks n z') : Ticks (n + 1) z :=
+private theorem ticks_succ {n : ℕ} {z z' : C} (h : z ⋖ z') (ht : Ticks n z') : Ticks (n + 1) z :=
   ⟨z', h, ht⟩
 
 variable [Finite C]
@@ -157,7 +158,8 @@ theorem ticks_of_orank {z : C} {n : ℕ} (h : orank z + n < Nat.card C) : Ticks 
     omega
 
 /-- The bottom of the order can tick through all of it. -/
-theorem ticks_bot {z : C} {n : ℕ} (hz : ∀ a : C, z ≤ a) (h : n < Nat.card C) : Ticks n z := by
+private theorem ticks_bot
+    {z : C} {n : ℕ} (hz : ∀ a : C, z ≤ a) (h : n < Nat.card C) : Ticks n z := by
   refine ticks_of_orank ?_
   rw [orank_eq_zero hz]
   omega

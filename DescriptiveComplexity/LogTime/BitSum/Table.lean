@@ -7,6 +7,13 @@ module
 
 public import DescriptiveComplexity.LogTime.BitSum.Ones
 import DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.LogTime.BitLogic
+import all DescriptiveComplexity.LogTime.BitSum.Blocks
+import all DescriptiveComplexity.LogTime.BitSum.Counter
+import all DescriptiveComplexity.LogTime.BitSum.Ones
+import all DescriptiveComplexity.LogTime.Bits
+import all DescriptiveComplexity.LogTime.Fields
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Level 3: counting the ones of a short word, by a table indexed by its value
@@ -135,7 +142,7 @@ theorem table_sound {g B D l : A} (hgpos : 0 < orank g)
 /-- **The table exists**: its bit at the index `i` says that the value `i` names
 has the count `i` names, which is a statement about `i` alone – so the guess is a
 bit vector, and it fits by `DescriptiveComplexity.BitSum.table_lt`. -/
-theorem exists_tableOk [Nonempty A] {g B l : A} (hgpos : 0 < orank g)
+private theorem exists_tableOk [Nonempty A] {g B l : A} (hgpos : 0 < orank g)
     (hbits : orank g = 2 ^ orank l) (hB : IsBlockSet g B)
     (hfit : (orank l + 1) * orank g < posCount A - 1) : ∃ D : A, TableOk g B D := by
   classical
@@ -202,7 +209,7 @@ def PopShort (l x y : A) : Prop :=
 
 /-- **The certificate is sound**: whatever is guessed, the section it points at
 is the one holding the count of `x`. -/
-theorem popShort_sound {l x y : A} (hl : orank l < posCount A) (h : PopShort l x y) :
+private theorem popShort_sound {l x y : A} (hl : orank l < posCount A) (h : PopShort l x y) :
     orank y = onesBelow (orank x) (orank l) := by
   obtain ⟨g, B, C, D, b, b', i, hg, hB, hC, hT, hxg, hbB, hsum, hlow', hwin,
     hisum, hilow, hiD⟩ := h
@@ -215,7 +222,7 @@ theorem popShort_sound {l x y : A} (hl : orank l < posCount A) (h : PopShort l x
 /-- **The certificate exists**, once the table fits and the counter's fields are
 wide enough: this is the completeness half of level 3, and every element it
 guesses has already been built. -/
-theorem popShort_of_eq [Nonempty A] {l x y : A}
+private theorem popShort_of_eq [Nonempty A] {l x y : A}
     (hfit : (orank l + 1) * 2 ^ orank l < posCount A - 1)
     (hcap : posCount A ≤ 2 ^ orank l * 2 ^ 2 ^ orank l)
     (hxl : orank x < 2 ^ orank l) (hy : orank y = onesBelow (orank x) (orank l)) :
@@ -288,7 +295,7 @@ open Language
 variable {L : Language.{0, 0}} {α : Type}
 
 /-- **The table's conditions are first-order in the bit logic.** -/
-theorem bitDef_tableOk (g B D : α) :
+private theorem bitDef_tableOk (g B D : α) :
     BitDef (L := L) fun _ _ _ _ _ v => TableOk (v g) (v B) (v D) := by
   have h1 : BitDef (L := L) (α := α)
       (fun A _ _ _ _ v => ∀ w : A, w < v g → (BitIx w (v D) ↔ orank w = 0)) :=
@@ -320,7 +327,7 @@ theorem bitDef_tableOk (g B D : α) :
   exact (h1.and (h2.and h3)).congr fun _ _ _ _ _ _ => Iff.rfl
 
 /-- **Level 3 is a formula**: the whole certificate, guessed in one block. -/
-theorem bitDef_popShort (l x y : α) :
+private theorem bitDef_popShort (l x y : α) :
     BitDef (L := L) fun _ _ _ _ _ v => PopShort (v l) (v x) (v y) := by
   have hbody : BitDef (L := L) (α := α ⊕ Fin 7) (fun A _ _ _ _ u =>
       IsPowIx (u (Sum.inl l)) (u (Sum.inr 0)) ∧ IsBlockSet (u (Sum.inr 0)) (u (Sum.inr 1)) ∧

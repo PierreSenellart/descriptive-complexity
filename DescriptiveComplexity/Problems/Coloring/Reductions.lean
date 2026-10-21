@@ -10,6 +10,7 @@ public import DescriptiveComplexity.Problems.Coloring.Defs
 public import DescriptiveComplexity.Problems.CliqueFamily.Reductions
 public import DescriptiveComplexity.OrderWalk
 public import Mathlib.Data.Fintype.Lattice
+import all DescriptiveComplexity.Problems.Coloring.Defs
 
 /-!
 # Reductions of the coloring family
@@ -108,10 +109,10 @@ section Palette
 variable {m : ℕ}
 
 /-- One of the first three colors of a palette of `3 + m`. -/
-def origColor (i : Fin 3) : Fin (3 + m) := ⟨i.1, by have := i.isLt; omega⟩
+private def origColor (i : Fin 3) : Fin (3 + m) := ⟨i.1, by have := i.isLt; omega⟩
 
 /-- One of the last `m` colors of a palette of `3 + m`. -/
-def padColor (j : Fin m) : Fin (3 + m) := ⟨3 + j.1, by have := j.isLt; omega⟩
+private def padColor (j : Fin m) : Fin (3 + m) := ⟨3 + j.1, by have := j.isLt; omega⟩
 
 private theorem origColor_injective : Function.Injective (origColor (m := m)) := by
   intro i j h
@@ -144,13 +145,13 @@ variable {m : ℕ} {A : Type} [Language.graph.Structure A]
 /-- The `k`-coloring of the padded graph built from a 3-coloring of the
 input: the original copy keeps its three colors, and the `i`-th blown-up
 universal vertex takes the `i`-th spare color. -/
-def paddedColoring (c : A → Fin 3) :
+private def paddedColoring (c : A → Fin 3) :
     Option (Fin m) × (Fin 1 → A) → Fin (3 + m) :=
   fun p => p.1.elim (origColor (c (p.2 0))) padColor
 
 /-- A 3-coloring of a graph yields a `(3 + m)`-coloring of the padded
 graph. -/
-theorem kColorable_map_of_threeColorable (h : ThreeColorable A) :
+private theorem kColorable_map_of_threeColorable (h : ThreeColorable A) :
     KColorable (3 + m) ((padColorInterp m).Map A) := by
   obtain ⟨c, hc⟩ := h
   refine ⟨paddedColoring c, ?_⟩
@@ -166,7 +167,7 @@ input: each of the `m` blown-up universal vertices consumes a color of its
 own, all distinct from the colors of the original copy, which is therefore
 left with at most three of them. (The input structure must be nonempty: an
 empty class would consume no color.) -/
-theorem threeColorable_of_kColorable_map [Nonempty A]
+private theorem threeColorable_of_kColorable_map [Nonempty A]
     (h : KColorable (3 + m) ((padColorInterp m).Map A)) : ThreeColorable A := by
   classical
   obtain ⟨c, hc⟩ := h
@@ -202,7 +203,7 @@ theorem threeColorable_of_kColorable_map [Nonempty A]
   exact hne (congrArg Subtype.val (e.injective hcol))
 
 /-- Correctness of the padding interpretation. -/
-theorem threeColorable_iff_kColorable_map [Nonempty A] :
+private theorem threeColorable_iff_kColorable_map [Nonempty A] :
     ThreeColorable A ↔ KColorable (3 + m) ((padColorInterp m).Map A) :=
   ⟨kColorable_map_of_threeColorable, threeColorable_of_kColorable_map⟩
 
@@ -210,7 +211,7 @@ end Correctness
 
 /-- **3-colorability FO-reduces to `(3 + m)`-colorability**, by padding the
 graph with `m` blown-up universal vertices. -/
-def threeCol_fo_reduction_kCol (m : ℕ) : ThreeCol ≤ᶠᵒ KCol (3 + m) where
+private def threeCol_fo_reduction_kCol (m : ℕ) : ThreeCol ≤ᶠᵒ KCol (3 + m) where
   Tag := Option (Fin m)
   dim := 1
   toInterpretation := padColorInterp m
@@ -223,7 +224,7 @@ section Complement
 variable (A : Type) [Language.markedGraph.Structure A]
 
 omit [Language.markedGraph.Structure A] in
-private theorem complEdge_ne (w w' : Fin 1 → A) :
+theorem complEdge_ne (w w' : Fin 1 → A) :
     (((), w) : complEdgeInterp.Map A) ≠ ((), w') ↔ w 0 ≠ w' 0 := by
   constructor
   · exact fun h heq => h (Prod.ext rfl (funext fun i => by
@@ -268,7 +269,7 @@ private theorem complEdge_ncard_marked :
 
 /-- Correctness of the edge complementation, chromatic-number-to-clique-cover
 direction. -/
-theorem hasSmallChromaticNumber_iff_cliqueCover_map :
+private theorem hasSmallChromaticNumber_iff_cliqueCover_map :
     HasSmallChromaticNumber A ↔ HasSmallCliqueCover (complEdgeInterp.Map A) := by
   refine and_congr ((complEdgeInterp.mapEquivSelf A).finite_iff).symm ?_
   rw [complEdge_ncard_marked A]
@@ -276,7 +277,7 @@ theorem hasSmallChromaticNumber_iff_cliqueCover_map :
 
 /-- Correctness of the edge complementation, clique-cover-to-chromatic-number
 direction. -/
-theorem hasSmallCliqueCover_iff_chromaticNumber_map :
+private theorem hasSmallCliqueCover_iff_chromaticNumber_map :
     HasSmallCliqueCover A ↔ HasSmallChromaticNumber (complEdgeInterp.Map A) := by
   refine and_congr ((complEdgeInterp.mapEquivSelf A).finite_iff).symm ?_
   rw [complEdge_ncard_marked A]
@@ -286,7 +287,7 @@ end Complement
 
 /-- **Chromatic Number FO-reduces to Clique Cover**, by complementing the
 edges: covering by cliques is coloring the complement. -/
-def chromaticNumber_fo_reduction_cliqueCover : ChromaticNumber ≤ᶠᵒ CliqueCover where
+private def chromaticNumber_fo_reduction_cliqueCover : ChromaticNumber ≤ᶠᵒ CliqueCover where
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
@@ -294,7 +295,7 @@ def chromaticNumber_fo_reduction_cliqueCover : ChromaticNumber ≤ᶠᵒ CliqueC
 
 /-- **Clique Cover FO-reduces to Chromatic Number**, by the same
 complementation. -/
-def cliqueCover_fo_reduction_chromaticNumber : CliqueCover ≤ᶠᵒ ChromaticNumber where
+private def cliqueCover_fo_reduction_chromaticNumber : CliqueCover ≤ᶠᵒ ChromaticNumber where
   Tag := Unit
   dim := 1
   toInterpretation := complEdgeInterp
@@ -375,7 +376,7 @@ variable (A : Type) [Language.graph.Structure A] [LinearOrder A] [Finite A] [Non
 
 /-- The marked set of the interpreted structure has exactly three elements:
 the first three copies of the minimum. -/
-theorem chrom_ncard_marked : {p : chromInterp.Map A | MGMarked p}.ncard = 3 := by
+private theorem chrom_ncard_marked : {p : chromInterp.Map A | MGMarked p}.ncard = 3 := by
   obtain ⟨m, hm⟩ : ∃ m : A, ∀ a : A, m ≤ a := Finite.exists_min id
   have hinj : Function.Injective fun i : Fin 3 => cnPt (A := A) i.castSucc m := by
     intro i j h
@@ -409,7 +410,7 @@ theorem chrom_ncard_marked : {p : chromInterp.Map A | MGMarked p}.ncard = 3 := b
 /-- Correctness of the interpretation: the graph is 3-colorable iff the
 interpreted marked graph has chromatic number at most the size of its marked
 set, which is three. -/
-theorem threeColorable_iff_chromaticNumber_map :
+private theorem threeColorable_iff_chromaticNumber_map :
     ThreeColorable A ↔ HasSmallChromaticNumber (chromInterp.Map A) := by
   have hfin : Finite (chromInterp.Map A) := chromInterp.map_finite A
   rw [HasSmallChromaticNumber, chrom_ncard_marked A]
@@ -443,7 +444,7 @@ end ChromCorrectness
 /-- **3-colorability ordered-FO-reduces to Chromatic Number**: keep the graph,
 mark three copies of the minimum to carry the threshold, and turn each
 self-looped vertex into a `K₄`. -/
-noncomputable def threeCol_ordered_fo_reduction_chromaticNumber :
+private noncomputable def threeCol_ordered_fo_reduction_chromaticNumber :
     ThreeCol ≤ᶠᵒ[≤] ChromaticNumber where
   Tag := Fin 4
   dim := 1

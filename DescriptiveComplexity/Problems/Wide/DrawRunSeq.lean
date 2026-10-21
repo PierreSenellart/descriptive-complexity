@@ -7,6 +7,10 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawSeq
 import DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Wide.DrawPass
+import all DescriptiveComplexity.Problems.Wide.DrawRunElem
+import all DescriptiveComplexity.Problems.Wide.Increment
 
 /-!
 # The sequencer's run
@@ -132,7 +136,7 @@ include hrules RF hR hlin hix hbot hv hvi hwkOf hrgOf hmOf hwkt₀ hrgt₀ hStag
 stage at the marker to the exit phase one cell to its right after the last
 stage, at each stage's own width plus the dispatch and the walk back, and one
 step to leave. -/
-theorem seq_reachesIn :
+private theorem seq_reachesIn :
     (wideData (Univ A R P K dd)).ReachesIn ((w + 2) * n + 1)
       ⟨Sum.inr (PR.stElt (emb (.chk 0)) (fs 0)), Sum.inl v,
         wideTape (PR.trackTapeAt RF.cell t₀ (restOf 0) (mOf 0)) (PR.syElt PR.blank)⟩
@@ -291,7 +295,7 @@ include hrules RF hR hlin hix hbot hv hvi hwkOf hrgOf hmOf hwkt₀ hrgt₀ in
 /-- **The sequencer's prefix**: from the checkpoint before the first stage
 to any later checkpoint, given the stages strictly below it – what a run
 that leaves the sequence early (a failing gate block) composes with. -/
-theorem seq_run_prefix (j : Fin (n + 1))
+private theorem seq_run_prefix (j : Fin (n + 1))
     (hStageLt : ∀ a : Fin n, (a : ℕ) < (j : ℕ) →
       Relation.ReflTransGen (wideData (Univ A R P K dd)).Step
         ⟨Sum.inr (PR.stElt (emb (.sub a (entry a)))
@@ -412,7 +416,7 @@ include hrules RF hR hlin hix hbot hv hvi hwkOf hrgOf hmOf hwkt₀ hrgt₀ in
 `DescriptiveComplexity.Draw.seq_run_prefix` with the stages counted – a stage's
 own width, its dispatch and the step back, once per stage below the
 checkpoint. -/
-theorem seq_reachesIn_prefix (j : Fin (n + 1))
+private theorem seq_reachesIn_prefix (j : Fin (n + 1))
     (hStageLt : ∀ a : Fin n, (a : ℕ) < (j : ℕ) →
       (wideData (Univ A R P K dd)).ReachesIn w
         ⟨Sum.inr (PR.stElt (emb (.sub a (entry a)))

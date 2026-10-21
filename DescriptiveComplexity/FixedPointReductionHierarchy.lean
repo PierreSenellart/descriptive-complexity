@@ -8,6 +8,10 @@ module
 import DescriptiveComplexity.FixedPointExpandLevels
 public import DescriptiveComplexity.TransitiveClosureReductionDet
 import DescriptiveComplexity.SecondOrderRelPull
+import all DescriptiveComplexity.FixedPointReduction
+import all DescriptiveComplexity.FixedPointReductionClosure
+import all DescriptiveComplexity.TransitiveClosureReduction
+import all DescriptiveComplexity.TransitiveClosureReductionDet
 
 /-!
 # The whole polynomial hierarchy is closed under FO(LFP) reductions
@@ -53,7 +57,7 @@ the membership sentence is pulled back through the interpretation, the
 induction is eliminated from under the whole quantifier prefix
 (`DescriptiveComplexity.exists_expand_sorealize`), and the order the reduction
 uses is re-quantified inside the first block. -/
-theorem SigmaSODefinable.of_lfpReduction_succ (f : P ≤ˡᶠᵖ Q)
+private theorem SigmaSODefinable.of_lfpReduction_succ (f : P ≤ˡᶠᵖ Q)
     (h : SigmaSODefinable (k + 1) Q) : SigmaSODefinable (k + 1) P := by
   obtain ⟨Bs, hlen, φ, hφ⟩ := h
   let := f.tagFinite
@@ -104,7 +108,7 @@ theorem SigmaSODefinable.of_lfpReduction_succ (f : P ≤ˡᶠᵖ Q)
 
 /-- **`Πₖ₊₁`-definability is closed under FO(LFP) reductions**, by
 complementation. -/
-theorem PiSODefinable.of_lfpReduction_succ (f : P ≤ˡᶠᵖ Q)
+private theorem PiSODefinable.of_lfpReduction_succ (f : P ≤ˡᶠᵖ Q)
     (h : PiSODefinable (k + 1) Q) : PiSODefinable (k + 1) P :=
   (piSODefinable_iff_compl (k + 1) P).mpr
     (SigmaSODefinable.of_lfpReduction_succ f.compl
@@ -132,27 +136,27 @@ theorem mem_PH_of_lfpReduction (f : P ≤ˡᶠᵖ Q) (h : Q ∈ PH) : P ∈ PH :
 /-! ### The same, at the reduction notions below -/
 
 /-- **Every level `Σₖᵖ` is closed under FO(TC) reductions.** -/
-theorem mem_sigmaP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ SigmaP k) : P ∈ SigmaP k :=
+private theorem mem_sigmaP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ SigmaP k) : P ∈ SigmaP k :=
   mem_sigmaP_of_lfpReduction f.toLFP h
 
 /-- **Every level `Πₖᵖ` is closed under FO(TC) reductions.** -/
-theorem mem_piP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PiP k) : P ∈ PiP k :=
+private theorem mem_piP_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PiP k) : P ∈ PiP k :=
   mem_piP_of_lfpReduction f.toLFP h
 
 /-- **The polynomial hierarchy is closed under FO(TC) reductions.** -/
-theorem mem_PH_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PH) : P ∈ PH :=
+private theorem mem_PH_of_tcReduction (f : P ≤ᵗᶜ Q) (h : Q ∈ PH) : P ∈ PH :=
   mem_PH_of_lfpReduction f.toLFP h
 
 /-- **Every level `Σₖᵖ` is closed under FO(DTC) reductions.** -/
-theorem mem_sigmaP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ SigmaP k) : P ∈ SigmaP k :=
+private theorem mem_sigmaP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ SigmaP k) : P ∈ SigmaP k :=
   mem_sigmaP_of_tcReduction f.toTC h
 
 /-- **Every level `Πₖᵖ` is closed under FO(DTC) reductions.** -/
-theorem mem_piP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PiP k) : P ∈ PiP k :=
+private theorem mem_piP_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PiP k) : P ∈ PiP k :=
   mem_piP_of_tcReduction f.toTC h
 
 /-- **The polynomial hierarchy is closed under FO(DTC) reductions.** -/
-theorem mem_PH_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PH) : P ∈ PH :=
+private theorem mem_PH_of_dtcReduction (f : P ≤ᵈᵗᶜ Q) (h : Q ∈ PH) : P ∈ PH :=
   mem_PH_of_tcReduction f.toTC h
 
 end DescriptiveComplexity

@@ -9,6 +9,11 @@ public import DescriptiveComplexity.Exponential.Game
 import DescriptiveComplexity.Exponential.TagBits
 import DescriptiveComplexity.SecondOrderMerge
 public import DescriptiveComplexity.Exponential.PSpaceOn
+import all DescriptiveComplexity.Exponential.Game
+import all DescriptiveComplexity.Exponential.PSpaceOn
+import all DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # A second-order quantifier prefix, played as a game
@@ -157,7 +162,7 @@ def preTwoLHom :
 
 variable {L B M} [instL : L.Structure A] [LinearOrder A]
 
-theorem preOneLHom_isExpansionOn (p : Phase) (ρ : B.Assignment A) (σ : M.Assignment A) :
+private theorem preOneLHom_isExpansionOn (p : Phase) (ρ : B.Assignment A) (σ : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (preOneLHom L B M) A
       (@SOBlock.structure₁ ((L.sum B.lang).sum Language.order) M A
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ) _) σ)
@@ -180,7 +185,7 @@ theorem preOneLHom_isExpansionOn (p : Phase) (ρ : B.Assignment A) (σ : M.Assig
     | _, Sum.inl (Sum.inr s) => rfl
     | _, Sum.inr s => rfl
 
-theorem realize_preOne (p : Phase) (ρ : B.Assignment A) (σ : M.Assignment A)
+private theorem realize_preOne (p : Phase) (ρ : B.Assignment A) (σ : M.Assignment A)
     (ψ : (((L.sum B.lang).sum Language.order).sum M.lang).Sentence) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₁ (L.sum Language.order) (preBlock B M) A
@@ -197,7 +202,8 @@ theorem realize_preOne (p : Phase) (ρ : B.Assignment A) (σ : M.Assignment A)
   have := preOneLHom_isExpansionOn (L := L) (B := B) (M := M) p ρ σ
   exact LHom.realize_onSentence (M := A) (preOneLHom L B M) ψ
 
-theorem preSndLHom_isExpansionOn (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A) :
+private theorem preSndLHom_isExpansionOn
+    (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (preSndLHom L B M) A
       (@SOBlock.structure₁ ((L.sum B.lang).sum Language.order) M A
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ') _) σ')
@@ -220,7 +226,7 @@ theorem preSndLHom_isExpansionOn (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ'
     | _, Sum.inl (Sum.inr s) => rfl
     | _, Sum.inr s => rfl
 
-theorem realize_preSnd (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A)
+private theorem realize_preSnd (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A)
     (ψ : (((L.sum B.lang).sum Language.order).sum M.lang).Sentence) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -237,7 +243,8 @@ theorem realize_preSnd (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assig
   have := preSndLHom_isExpansionOn (L := L) (B := B) (M := M) p q ρ ρ' σ σ'
   exact LHom.realize_onSentence (M := A) (preSndLHom L B M) ψ
 
-theorem preTwoLHom_isExpansionOn (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A) :
+private theorem preTwoLHom_isExpansionOn
+    (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A) :
     @LHom.IsExpansionOn _ _ (preTwoLHom L B M) A
       (@SOBlock.structure₂ ((L.sum B.lang).sum Language.order) M A
         (@sumOrderStructure (L.sum B.lang) A (B.structure₁ (L := L) ρ) _) σ σ')
@@ -262,7 +269,7 @@ theorem preTwoLHom_isExpansionOn (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ'
     | _, Sum.inl (Sum.inr s) => rfl
     | _, Sum.inr s => rfl
 
-theorem realize_preTwo (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A)
+private theorem realize_preTwo (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A)
     (ψ : ((((L.sum B.lang).sum Language.order).sum M.lang).sum M.lang).Sentence) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -337,13 +344,13 @@ noncomputable def frozenS :
 
 variable {L B M}
 
-theorem realize_phaseF (p q : Phase) (ρ : B.Assignment A) (σ : M.Assignment A) :
+private theorem realize_phaseF (p q : Phase) (ρ : B.Assignment A) (σ : M.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (preBlock B M) A
         (@sumOrderStructure L A instL _) (preAssign q ρ σ)) (phaseF L B M p) ↔ p = q) :=
   SOBlock.realize_tagBitF (L := L.sum Language.order) (preAssign q ρ σ) p
 
-theorem realize_atPhaseF (p q : Phase) (ρ : B.Assignment A) (σ : M.Assignment A) :
+private theorem realize_atPhaseF (p q : Phase) (ρ : B.Assignment A) (σ : M.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (preBlock B M) A
         (@sumOrderStructure L A instL _) (preAssign q ρ σ)) (atPhaseF L B M p) ↔ p = q) := by
@@ -355,7 +362,7 @@ theorem realize_atPhaseF (p q : Phase) (ρ : B.Assignment A) (σ : M.Assignment 
     ⟨q, consAssign ρ σ, rfl⟩
 
 /-- **A well-formed state**: one whose tag bits name a phase. -/
-theorem exists_preAssign (τ : (preBlock B M).Assignment A)
+private theorem exists_preAssign (τ : (preBlock B M).Assignment A)
     (h : @Sentence.Realize _ A
       (@SOBlock.structure₁ (L.sum Language.order) (preBlock B M) A
         (@sumOrderStructure L A instL _) τ)
@@ -368,13 +375,13 @@ theorem exists_preAssign (τ : (preBlock B M).Assignment A)
 
 omit [LinearOrder A] in
 /-- The argument tuple of a tag variable is the empty one, whatever it is. -/
-theorem tagArg_subsingleton {r : Phase}
+private theorem tagArg_subsingleton {r : Phase}
     (y z : Fin ((preBlock B M).arity (Sum.inl r)) → A) : y = z := by
   have : IsEmpty (Fin ((preBlock B M).arity (Sum.inl r))) := inferInstanceAs (IsEmpty (Fin 0))
   exact funext fun i => isEmptyElim i
 
 /-- The tag bit of the second copy, read at an arbitrary state. -/
-theorem realize_phaseTwoF' (r : Phase) (τ τ' : (preBlock B M).Assignment A)
+private theorem realize_phaseTwoF' (r : Phase) (τ τ' : (preBlock B M).Assignment A)
     (x : Fin ((preBlock B M).arity (Sum.inl r)) → A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -383,7 +390,8 @@ theorem realize_phaseTwoF' (r : Phase) (τ τ' : (preBlock B M).Assignment A)
     (@sumOrderStructure L A instL _) τ τ'
   exact iff_of_eq (congrArg (τ' (Sum.inl r)) (tagArg_subsingleton _ x))
 
-theorem realize_phaseTwoF (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ' : B.Assignment A)
+private theorem realize_phaseTwoF
+    (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ' : B.Assignment A)
     (σ' : M.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -391,7 +399,8 @@ theorem realize_phaseTwoF (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ' 
   exact realize_phaseTwoF' p τ (preAssign q ρ' σ') (fun i => i.elim0)
 
 open Classical in
-theorem realize_atPhaseTwoF (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ' : B.Assignment A)
+private theorem realize_atPhaseTwoF
+    (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ' : B.Assignment A)
     (σ' : M.Assignment A) :
     (@Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -416,7 +425,7 @@ theorem realize_atPhaseTwoF (p q : Phase) (τ : (preBlock B M).Assignment A) (ρ
 open Classical in
 /-- **The guarded phase of the second copy pins its shape**: a move that asserts
 it lands on a well-formed state. -/
-theorem exists_preAssign_two (p : Phase) (τ τ' : (preBlock B M).Assignment A)
+private theorem exists_preAssign_two (p : Phase) (τ τ' : (preBlock B M).Assignment A)
     (h : @Sentence.Realize _ A
       (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
         (@sumOrderStructure L A instL _) τ τ') (atPhaseTwoF L B M p)) :
@@ -445,7 +454,7 @@ theorem exists_preAssign_two (p : Phase) (τ τ' : (preBlock B M).Assignment A)
 
 /-! ### Freezing, read -/
 
-theorem realize_frozenAtS (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A)
+private theorem realize_frozenAtS (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A)
     (i : B.ι) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -460,7 +469,7 @@ theorem realize_frozenAtS (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.As
   exact ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.1, h.2⟩⟩
 
 open Classical in
-theorem realize_frozenS (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A) :
+private theorem realize_frozenS (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assignment A) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
           (@sumOrderStructure L A instL _) (preAssign p ρ σ) (preAssign q ρ' σ'))
@@ -481,7 +490,7 @@ theorem realize_frozenS (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : M.Assi
 
 /-! ### The prefixed game -/
 
-theorem realize_sumInl_two (τ τ' : (preBlock B M).Assignment A)
+private theorem realize_sumInl_two (τ τ' : (preBlock B M).Assignment A)
     (ψ : ((L.sum Language.order).sum (preBlock B M).lang).Sentence) :
     (@Sentence.Realize _ A
         (@SOBlock.structure₂ (L.sum Language.order) (preBlock B M) A
@@ -516,11 +525,11 @@ noncomputable def exBlock (pol : Bool) (spec : SOGameSpec (L.sum B.lang)) : SOGa
 
 variable {L B} {pol : Bool} {spec : SOGameSpec (L.sum B.lang)}
 
-theorem exBlock_isStart (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
+private theorem exBlock_isStart (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
     ((exBlock L B pol spec).IsStart (preAssign p ρ σ) ↔ p = .pick) :=
   (realize_atPhaseF .pick p ρ σ).trans eq_comm
 
-theorem exBlock_isWon (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
+private theorem exBlock_isWon (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
     ((exBlock L B pol spec).IsWon (preAssign p ρ σ) ↔
       p = .play ∧ @SOGameSpec.IsWon (L.sum B.lang) spec A (B.structure₁ ρ) _ σ) := by
   let : ((L.sum Language.order).sum (exBlock L B pol spec).B.lang).Structure A :=
@@ -530,7 +539,7 @@ theorem exBlock_isWon (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
   · exact (realize_atPhaseF .play p ρ σ).trans eq_comm
   · exact realize_preOne p ρ σ spec.won
 
-theorem exBlock_isUniv (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
+private theorem exBlock_isUniv (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
     ((exBlock L B pol spec).IsUniv (preAssign p ρ σ) ↔
       (p = .pick ∧ pol = false) ∨
         (p = .play ∧ @SOGameSpec.IsUniv (L.sum B.lang) spec A (B.structure₁ ρ) _ σ)) := by
@@ -546,7 +555,7 @@ theorem exBlock_isUniv (p : Phase) (ρ : B.Assignment A) (σ : spec.State A) :
   · exact Iff.trans Formula.realize_inf
       (and_congr ((realize_atPhaseF .play p ρ σ).trans eq_comm) (realize_preOne p ρ σ spec.univ))
 
-theorem exBlock_move (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : spec.State A) :
+private theorem exBlock_move (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : spec.State A) :
     ((exBlock L B pol spec).Move (preAssign p ρ σ) (preAssign q ρ' σ') ↔
       (p = .pick ∧ q = .start) ∨
         ((p = .start ∧ q = .play) ∧ ρ = ρ' ∧
@@ -582,7 +591,7 @@ theorem exBlock_move (p q : Phase) (ρ ρ' : B.Assignment A) (σ σ' : spec.Stat
 
 /-- **Every move lands on a well-formed state**: each disjunct guards the tag
 bits of the state it enters. -/
-theorem exBlock_move_shape {τ τ' : (preBlock B spec.B).Assignment A}
+private theorem exBlock_move_shape {τ τ' : (preBlock B spec.B).Assignment A}
     (h : (exBlock L B pol spec).Move τ τ') :
     ∃ (q : Phase) (ρ' : B.Assignment A) (σ' : spec.State A), τ' = preAssign q ρ' σ' := by
   let : (((L.sum Language.order).sum (exBlock L B pol spec).B.lang).sum
@@ -604,7 +613,7 @@ theorem exBlock_move_shape {τ τ' : (preBlock B spec.B).Assignment A}
 
 /-- **The playing phase plays the inner game**, from a win of the prefixed game
 back to one of the inner one. -/
-theorem inner_wins_of_wins {τ : (exBlock L B pol spec).State A}
+private theorem inner_wins_of_wins {τ : (exBlock L B pol spec).State A}
     (h : (exBlock L B pol spec).Wins τ) {ρ : B.Assignment A} {σ : spec.State A}
     (hτ : τ = preAssign .play ρ σ) :
     @SOGameSpec.Wins (L.sum B.lang) spec A (B.structure₁ ρ) _ σ := by
@@ -645,7 +654,7 @@ theorem inner_wins_of_wins {τ : (exBlock L B pol spec).State A}
 
 /-- **The playing phase plays the inner game**, from a win of the inner game to
 one of the prefixed game. -/
-theorem wins_play_of_inner (ρ : B.Assignment A) {σ : spec.State A}
+private theorem wins_play_of_inner (ρ : B.Assignment A) {σ : spec.State A}
     (h : @SOGameSpec.Wins (L.sum B.lang) spec A (B.structure₁ ρ) _ σ) :
     (exBlock L B pol spec).Wins (preAssign .play ρ σ) := by
   induction h with
@@ -671,7 +680,7 @@ theorem wins_play_of_inner (ρ : B.Assignment A) {σ : spec.State A}
       · rw [hq, ← hρ]
         exact ih σ' hm
 
-theorem wins_play_iff (ρ : B.Assignment A) (σ : spec.State A) :
+private theorem wins_play_iff (ρ : B.Assignment A) (σ : spec.State A) :
     ((exBlock L B pol spec).Wins (preAssign .play ρ σ) ↔
       @SOGameSpec.Wins (L.sum B.lang) spec A (B.structure₁ ρ) _ σ) :=
   ⟨fun h => inner_wins_of_wins h rfl, fun h => wins_play_of_inner ρ h⟩
@@ -679,7 +688,7 @@ theorem wins_play_iff (ρ : B.Assignment A) (σ : spec.State A) :
 /-- **The starting phase chooses a starting state of the inner game**: it is
 existential, and it is stuck exactly when the inner game has no starting
 state. -/
-theorem accepts_of_wins_start {τ : (exBlock L B pol spec).State A}
+private theorem accepts_of_wins_start {τ : (exBlock L B pol spec).State A}
     (h : (exBlock L B pol spec).Wins τ) {ρ : B.Assignment A} {σ : spec.State A}
     (hτ : τ = preAssign .start ρ σ) :
     @SOGameSpec.Accepts (L.sum B.lang) spec A (B.structure₁ ρ) _ := by
@@ -703,7 +712,7 @@ theorem accepts_of_wins_start {τ : (exBlock L B pol spec).State A}
     rw [hτ] at hu
     rcases (exBlock_isUniv .start ρ σ).mp hu with ⟨h1, -⟩ | ⟨h1, -⟩ <;> exact absurd h1 (by simp)
 
-theorem wins_start_iff (ρ : B.Assignment A) (σ : spec.State A) :
+private theorem wins_start_iff (ρ : B.Assignment A) (σ : spec.State A) :
     ((exBlock L B pol spec).Wins (preAssign .start ρ σ) ↔
       @SOGameSpec.Accepts (L.sum B.lang) spec A (B.structure₁ ρ) _) := by
   let := B.structure₁ (L := L) ρ
@@ -715,7 +724,7 @@ theorem wins_start_iff (ρ : B.Assignment A) (σ : spec.State A) :
 
 /-- **The picking phase quantifies the block**, existentially or universally as
 the polarity says. -/
-theorem quantB_accepts_of_wins_pick {τ : (exBlock L B pol spec).State A}
+private theorem quantB_accepts_of_wins_pick {τ : (exBlock L B pol spec).State A}
     (h : (exBlock L B pol spec).Wins τ) {ρ : B.Assignment A} {σ : spec.State A}
     (hτ : τ = preAssign .pick ρ σ) :
     quantB pol fun ρ₀ : B.Assignment A =>
@@ -749,7 +758,7 @@ theorem quantB_accepts_of_wins_pick {τ : (exBlock L B pol spec).State A}
       refine accepts_of_wins_start (hall (preAssign .start ρ₀ σ) ?_) rfl
       exact (exBlock_move .pick .start ρ ρ₀ σ σ).mpr (Or.inl ⟨rfl, rfl⟩)
 
-theorem wins_pick_iff (ρ : B.Assignment A) (σ : spec.State A) :
+private theorem wins_pick_iff (ρ : B.Assignment A) (σ : spec.State A) :
     ((exBlock L B pol spec).Wins (preAssign .pick ρ σ) ↔
       quantB pol fun ρ₀ : B.Assignment A =>
         @SOGameSpec.Accepts (L.sum B.lang) spec A (B.structure₁ ρ₀) _) := by
@@ -778,7 +787,7 @@ theorem wins_pick_iff (ρ : B.Assignment A) (σ : spec.State A) :
 
 /-- **What a prefixed game accepts**: what the inner game accepts, under the
 quantified block. -/
-theorem exBlock_accepts_iff :
+private theorem exBlock_accepts_iff :
     ((exBlock L B pol spec).Accepts A ↔
       quantB pol fun ρ₀ : B.Assignment A =>
         @SOGameSpec.Accepts (L.sum B.lang) spec A (B.structure₁ ρ₀) _) := by
@@ -813,7 +822,7 @@ noncomputable def kernelGame (φ : L.Sentence) : SOGameSpec L where
 
 variable {L}
 
-theorem realize_kernel_won (φ : L.Sentence) (τ : SOBlock.trivial.Assignment A) :
+private theorem realize_kernel_won (φ : L.Sentence) (τ : SOBlock.trivial.Assignment A) :
     ((kernelGame L φ).IsWon τ ↔ @Sentence.Realize L A instL φ) := by
   let := SOBlock.trivial.structure τ
   let : ((L.sum Language.order).sum (kernelGame L φ).B.lang).Structure A :=
@@ -822,7 +831,7 @@ theorem realize_kernel_won (φ : L.Sentence) (τ : SOBlock.trivial.Assignment A)
   refine Iff.trans (LHom.realize_onSentence (M := A) LHom.sumInl _) ?_
   exact LHom.realize_onSentence (M := A) LHom.sumInl φ
 
-theorem wins_kernel_iff (φ : L.Sentence) (τ : (kernelGame L φ).State A) :
+private theorem wins_kernel_iff (φ : L.Sentence) (τ : (kernelGame L φ).State A) :
     ((kernelGame L φ).Wins τ ↔ @Sentence.Realize L A instL φ) := by
   let : ((L.sum Language.order).sum (kernelGame L φ).B.lang).Structure A :=
     @SOBlock.structure₁ (L.sum Language.order) SOBlock.trivial A
@@ -833,7 +842,7 @@ theorem wins_kernel_iff (φ : L.Sentence) (τ : (kernelGame L φ).State A) :
   | @ex τ τ' hnu hmove hwin => exact hmove.elim
   | @all τ hu hex hall => exact hu.elim
 
-theorem accepts_kernelGame (φ : L.Sentence) :
+private theorem accepts_kernelGame (φ : L.Sentence) :
     ((kernelGame L φ).Accepts A ↔ @Sentence.Realize L A instL φ) := by
   constructor
   · rintro ⟨τ, -, hwins⟩
@@ -899,7 +908,7 @@ theorem PiSODefinable.soGameDefinable {k : ℕ} (h : PiSODefinable k P) :
 game.** Level 0 goes through `PTIME ⊆ NP`, the other levels are the definition
 of `DescriptiveComplexity.SigmaP` read through
 `DescriptiveComplexity.SigmaSODefinable.soGameDefinable`. -/
-theorem SOGameDefinable.of_mem_sigmaP {k : ℕ} (h : P ∈ SigmaP k) : SOGameDefinable P := by
+private theorem SOGameDefinable.of_mem_sigmaP {k : ℕ} (h : P ∈ SigmaP k) : SOGameDefinable P := by
   cases k with
   | zero => exact SigmaSODefinable.soGameDefinable (k := 1) (PTIME_subset_NP h)
   | succ k => exact SigmaSODefinable.soGameDefinable (k := k + 1) h
@@ -924,7 +933,7 @@ alternating game**: its quantifiers become second-order blocks over the base
 moves. This is the game reading of
 `DescriptiveComplexity.ExpExpansion.mem_PH_of_fo_on_expansion`, and it is what a
 guard of a fixed-point rule over an expansion will be evaluated by. -/
-theorem soGameDefinable_of_fo_on_expansion
+private theorem soGameDefinable_of_fo_on_expansion
     (h : ∀ (A : Type) [L.Structure A] [LinearOrder A] [Finite A] [Nonempty A],
       letI := X.mapLinearOrder A
       (Q A ↔ @Sentence.Realize _ (X.Map A) _ φ)) :

@@ -8,6 +8,7 @@ module
 public import DescriptiveComplexity.TransitiveClosureParam
 public import DescriptiveComplexity.SecondOrderLift
 public import DescriptiveComplexity.FixedPointStratify
+import all DescriptiveComplexity.FixedPointStratify
 
 /-!
 # Towers of walks: reachability relations that may read earlier ones
@@ -114,7 +115,7 @@ theorem strat1Assign_stratAssign {B₁ B₂ : SOBlock} (ρ₁ : B₁.Assignment 
 theorem strat2Assign_stratAssign {B₁ B₂ : SOBlock} (ρ₁ : B₁.Assignment A) (g : Prop)
     (ρ₂ : B₂.Assignment A) : strat2Assign (stratAssign ρ₁ g ρ₂) = ρ₂ := rfl
 
-theorem stratGate_stratAssign {B₁ B₂ : SOBlock} (ρ₁ : B₁.Assignment A) (g : Prop)
+private theorem stratGate_stratAssign {B₁ B₂ : SOBlock} (ρ₁ : B₁.Assignment A) (g : Prop)
     (ρ₂ : B₂.Assignment A) : StratGate (stratAssign ρ₁ g ρ₂) ↔ g := Iff.rfl
 
 /-- **The relations a tower holds**: each family's reachability relations, read

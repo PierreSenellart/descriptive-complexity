@@ -44,7 +44,7 @@ def MonoBij [LE A] (K S : A → Prop) (F : A → A → Prop) : Prop :=
 
 /-- The graph of an order isomorphism between two sets is a monotone
 bijection. -/
-theorem monoBij_of_orderIso [LE A] {K S : A → Prop} (e : {x // K x} ≃o {y // S y}) :
+private theorem monoBij_of_orderIso [LE A] {K S : A → Prop} (e : {x // K x} ≃o {y // S y}) :
     MonoBij K S fun x y => ∃ hx : K x, (e ⟨x, hx⟩).1 = y := by
   refine ⟨?_, fun x hx => ⟨_, hx, rfl⟩, fun y hy => ?_, ?_⟩
   · rintro x y ⟨hx, rfl⟩
@@ -64,12 +64,12 @@ theorem MonoBij.functional (h : MonoBij K S F) {x y y' : A} (hy : F x y) (hy' : 
   le_antisymm ((h.2.2.2 x x y y' hy hy').mp le_rfl) ((h.2.2.2 x x y' y hy' hy).mp le_rfl)
 
 /-- A monotone bijection is injective. -/
-theorem MonoBij.injective (h : MonoBij K S F) {x x' y : A} (hx : F x y) (hx' : F x' y) :
+private theorem MonoBij.injective (h : MonoBij K S F) {x x' y : A} (hx : F x y) (hx' : F x' y) :
     x = x' :=
   le_antisymm ((h.2.2.2 x x' y y hx hx').mpr le_rfl) ((h.2.2.2 x' x y y hx' hx).mpr le_rfl)
 
 /-- The order isomorphism a monotone bijection is the graph of. -/
-noncomputable def MonoBij.orderIso (h : MonoBij K S F) : {x // K x} ≃o {y // S y} where
+private noncomputable def MonoBij.orderIso (h : MonoBij K S F) : {x // K x} ≃o {y // S y} where
   toFun x := ⟨(h.2.1 x.1 x.2).choose, (h.1 _ _ (h.2.1 x.1 x.2).choose_spec).2⟩
   invFun y := ⟨(h.2.2.1 y.1 y.2).choose, (h.1 _ _ (h.2.2.1 y.1 y.2).choose_spec).1⟩
   left_inv x := Subtype.ext
@@ -81,12 +81,12 @@ noncomputable def MonoBij.orderIso (h : MonoBij K S F) : {x // K x} ≃o {y // S
   map_rel_iff' {x x'} :=
     (h.2.2.2 _ _ _ _ (h.2.1 x.1 x.2).choose_spec (h.2.1 x'.1 x'.2).choose_spec).symm
 
-theorem MonoBij.rel_orderIso (h : MonoBij K S F) (x : {x // K x}) :
+private theorem MonoBij.rel_orderIso (h : MonoBij K S F) (x : {x // K x}) :
     F x.1 (h.orderIso x).1 :=
   (h.2.1 x.1 x.2).choose_spec
 
 /-- A monotone bijection is the graph of its order isomorphism. -/
-theorem MonoBij.iff_orderIso (h : MonoBij K S F) (x y : A) :
+private theorem MonoBij.iff_orderIso (h : MonoBij K S F) (x y : A) :
     F x y ↔ ∃ hx : K x, (h.orderIso ⟨x, hx⟩).1 = y := by
   constructor
   · intro hxy

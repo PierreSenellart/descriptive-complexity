@@ -8,6 +8,10 @@ module
 public import DescriptiveComplexity.Problems.Wide.TilingExp
 public import DescriptiveComplexity.Problems.Tiling.CorridorMem
 import DescriptiveComplexity.Exponential.Classes
+import all DescriptiveComplexity.Problems.Tiling.Corridor
+import all DescriptiveComplexity.Problems.Tiling.Defs
+import all DescriptiveComplexity.Problems.Wide.Tiling
+import all DescriptiveComplexity.Problems.Wide.TilingExp
 
 /-!
 # The wide corridor: a strip as wide as the addresses
@@ -66,7 +70,7 @@ open WideTile
 /-- **A wide corridor is an ordinary corridor of the expansion.** The tile
 system is the one `DescriptiveComplexity.WideTile.wtileAgree` matches field by
 field; only the question differs. -/
-theorem wideCorridor_iff_expansion (A : Type) [Language.wtile.Structure A] [LinearOrder A] :
+private theorem wideCorridor_iff_expansion (A : Type) [Language.wtile.Structure A] [LinearOrder A] :
     letI := wtileStructure A
     (WideCorridor A ↔ CORRIDOR (wtileExp.Map A)) := by
   let := wtileStructure A

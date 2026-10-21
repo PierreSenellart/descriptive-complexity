@@ -128,21 +128,21 @@ theorem realize_edgeF (s t : α) :
   rw [edgeF, Formula.realize_inf, Formula.realize_not, Formula.realize_equal, realize_adjOrF]
   rfl
 
-theorem realize_minNbrF (a b : α) :
+private theorem realize_minNbrF (a b : α) :
     (minNbrF a b).Realize v ↔ ∀ d : A, HEdge (v a) d → v b ≤ d := by
   rw [minNbrF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, realize_edgeF, realize_leF,
     Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h d => h (fun _ => d), fun h i => h (i 0)⟩
 
-theorem realize_maxNbrF (a b : α) :
+private theorem realize_maxNbrF (a b : α) :
     (maxNbrF a b).Realize v ↔ ∀ d : A, HEdge (v a) d → d ≤ v b := by
   rw [maxNbrF]
   simp only [Formula.realize_iAlls, Formula.realize_imp, realize_edgeF, realize_leF,
     Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h d => h (fun _ => d), fun h i => h (i 0)⟩
 
-theorem realize_succNbrF (a b c : α) :
+private theorem realize_succNbrF (a b c : α) :
     (succNbrF a b c).Realize v ↔ HEdge (v a) (v c) ∧ v b < v c ∧
       ∀ d : A, HEdge (v a) d → d ≤ v b ∨ v c ≤ d := by
   rw [succNbrF]
@@ -242,14 +242,14 @@ section DomRealize
 
 variable {A : Type} [Language.markedGraph.Structure A] [LinearOrder A] (w : Fin 2 → A)
 
-theorem realize_noMarksF : (noMarksF).Realize w ↔ ∀ y : A, ¬MGMarked y := by
+private theorem realize_noMarksF : (noMarksF).Realize w ↔ ∀ y : A, ¬MGMarked y := by
   rw [noMarksF]
   simp only [Formula.realize_iAlls, Formula.realize_not, Formula.realize_rel₁, Term.realize_var,
     Sum.elim_inr]
   exact ⟨fun h y => by have := h (fun _ => y); simpa [MGMarked] using this,
     fun h i => by simpa [MGMarked] using h (i 0)⟩
 
-theorem realize_noEdgesF : (noEdgesF).Realize w ↔ ∀ y z : A, ¬HEdge y z := by
+private theorem realize_noEdgesF : (noEdgesF).Realize w ↔ ∀ y z : A, ¬HEdge y z := by
   rw [noEdgesF]
   simp only [Formula.realize_iAlls, Formula.realize_not, realize_edgeF, Sum.elim_inr]
   exact ⟨fun h y z => h ![y, z], fun h i => h (i 0) (i 1)⟩
@@ -276,7 +276,7 @@ theorem dom_sel (w : Fin 2 → A) :
   rw [Formula.realize_inf, Formula.realize_equal, Formula.realize_rel₁]
   simp [MGMarked]
 
-theorem dom_hub (w : Fin 2 → A) :
+private theorem dom_hub (w : Fin 2 → A) :
     (hamInterp.domFormula .hub).Realize w ↔
       w 0 = w 1 ∧ (∀ a : A, w 0 ≤ a) ∧ (∀ y : A, ¬MGMarked y) ∧ ∀ y z : A, ¬HEdge y z := by
   change (Term.equal (Term.var 0) (Term.var 1) ⊓ minF 0 ⊓ noMarksF ⊓ noEdgesF).Realize w ↔ _
@@ -316,7 +316,7 @@ def IAdjRaw (p q : HTag × (Fin 2 → A)) : Prop :=
 
 /-- **The adjacency of the interpreted graph**: `DescriptiveComplexity.hamInterp`
 realizes exactly the intended edges `DescriptiveComplexity.IAdjRaw`. -/
-theorem dgArc_iff (p q : hamInterp.MapRel A) : DGArc p q ↔ IAdjRaw p.1 q.1 := by
+private theorem dgArc_iff (p q : hamInterp.MapRel A) : DGArc p q ↔ IAdjRaw p.1 q.1 := by
   obtain ⟨⟨t, w⟩, hp⟩ := p
   obtain ⟨⟨t', w'⟩, hq⟩ := q
   change RelMap (M := hamInterp.MapRel A) dgArc ![⟨(t, w), hp⟩, ⟨(t', w'), hq⟩] ↔ _
@@ -328,7 +328,7 @@ theorem dgArc_iff (p q : hamInterp.MapRel A) : DGArc p q ↔ IAdjRaw p.1 q.1 := 
 
 /-- The intended adjacency is symmetric: every gadget, chain, selector and hub
 edge appears in both directions. -/
-theorem iAdjRaw_symm (p q : HTag × (Fin 2 → A)) : IAdjRaw p q ↔ IAdjRaw q p := by
+private theorem iAdjRaw_symm (p q : HTag × (Fin 2 → A)) : IAdjRaw p q ↔ IAdjRaw q p := by
   obtain ⟨t, w⟩ := p
   obtain ⟨t', w'⟩ := q
   cases t <;> cases t' <;> simp only [IAdjRaw] <;>
@@ -360,7 +360,7 @@ def selPt {m : A} (h : MGMarked m) : hamInterp.MapRel A :=
   ⟨(.sel, ![m, m]), (dom_sel ![m, m]).mpr ⟨rfl, by simpa using h⟩⟩
 
 /-- The degenerate-case hub vertex. -/
-def hubPt {m : A} (hmin : ∀ a : A, m ≤ a) (hnm : ∀ y : A, ¬MGMarked y)
+private def hubPt {m : A} (hmin : ∀ a : A, m ≤ a) (hnm : ∀ y : A, ¬MGMarked y)
     (hne : ∀ y z : A, ¬HEdge y z) : hamInterp.MapRel A :=
   ⟨(.hub, ![m, m]), (dom_hub ![m, m]).mpr ⟨rfl, by simpa using hmin, hnm, hne⟩⟩
 
@@ -372,7 +372,7 @@ def hubPt {m : A} (hmin : ∀ a : A, m ≤ a) (hnm : ∀ y : A, ¬MGMarked y)
 
 /-- Every vertex of the interpreted graph is a gadget vertex, a selector, or the
 hub. -/
-theorem point_cases (p : hamInterp.MapRel A) :
+private theorem point_cases (p : hamInterp.MapRel A) :
     (∃ (t : HTag) (ht : t ≠ .sel ∧ t ≠ .hub) (h : HEdge (p.1.2 0) (p.1.2 1)),
         p = gPt t ht h) ∨
       (∃ h : MGMarked (p.1.2 0), p.1.2 0 = p.1.2 1 ∧ p = selPt h) ∨

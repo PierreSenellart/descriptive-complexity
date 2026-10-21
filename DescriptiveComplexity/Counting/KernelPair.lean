@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Counting.SharpP
 public import DescriptiveComplexity.SecondOrderMerge
+import all DescriptiveComplexity.SecondOrderMerge
 
 /-!
 # The sum of two witness counts, as one witness count
@@ -53,7 +54,7 @@ def boolBlock : SOBlock where
 def boolSel {A : Type} (ζ : boolBlock.Assignment A) : Prop :=
   ζ () finZeroElim
 
-theorem boolSel_iff {A : Type} (ζ : boolBlock.Assignment A) (x : Fin 0 → A) :
+private theorem boolSel_iff {A : Type} (ζ : boolBlock.Assignment A) (x : Fin 0 → A) :
     boolSel ζ ↔ ζ () x :=
   iff_of_eq (congrArg (ζ ()) (Subsingleton.elim _ _))
 
@@ -95,7 +96,7 @@ section Realize
 
 variable {A : Type} [L.Structure A]
 
-theorem realize_liftFst (B M : SOBlock) (φ : (L.sum B.lang).Sentence) (ρ : B.Assignment A)
+private theorem realize_liftFst (B M : SOBlock) (φ : (L.sum B.lang).Sentence) (ρ : B.Assignment A)
     (μ : M.Assignment A) :
     (@Sentence.Realize _ A (@sumStructure L _ A _ ((SOBlock.cons B M).structure (consAssign ρ μ)))
       (liftFst B M φ)) ↔
@@ -106,7 +107,7 @@ theorem realize_liftFst (B M : SOBlock) (φ : (L.sum B.lang).Sentence) (ρ : B.A
   have := mergeStep_isExpansionOn L (A := A) inferInstance B M ρ μ
   rw [liftFst, LHom.realize_onSentence, LHom.realize_onSentence]
 
-theorem realize_liftSnd (B M : SOBlock) (φ : (L.sum M.lang).Sentence) (ρ : B.Assignment A)
+private theorem realize_liftSnd (B M : SOBlock) (φ : (L.sum M.lang).Sentence) (ρ : B.Assignment A)
     (μ : M.Assignment A) :
     (@Sentence.Realize _ A (@sumStructure L _ A _ ((SOBlock.cons B M).structure (consAssign ρ μ)))
       (liftSnd B M φ)) ↔
@@ -119,7 +120,7 @@ theorem realize_liftSnd (B M : SOBlock) (φ : (L.sum M.lang).Sentence) (ρ : B.A
     ⟨fun f _ => by rcases f with f | f <;> rfl, fun r _ => by rcases r with r | r <;> rfl⟩
   rw [liftSnd, LHom.realize_onSentence, LHom.realize_onSentence]
 
-theorem realize_emptyBlockS (B : SOBlock) (ρ : B.Assignment A) :
+private theorem realize_emptyBlockS (B : SOBlock) (ρ : B.Assignment A) :
     (@Sentence.Realize _ A (@sumStructure L _ A _ (B.structure ρ)) (emptyBlockS B)) ↔
       ∀ (i : B.ι) (x : Fin (B.arity i) → A), ¬ρ i x := by
   let := B.structure ρ
@@ -129,7 +130,7 @@ theorem realize_emptyBlockS (B : SOBlock) (ρ : B.Assignment A) :
   change ρ i (fun j => x (Fin.cast rfl j)) = ρ i x
   rfl
 
-theorem realize_selectorS (B : SOBlock) (ρ : B.Assignment A) (ζ : boolBlock.Assignment A) :
+private theorem realize_selectorS (B : SOBlock) (ρ : B.Assignment A) (ζ : boolBlock.Assignment A) :
     (@Sentence.Realize _ A (@sumStructure L _ A _
       ((SOBlock.cons B boolBlock).structure (consAssign ρ ζ))) (selectorS B)) ↔ boolSel ζ := by
   let := (SOBlock.cons B boolBlock).structure (consAssign ρ ζ)
@@ -168,7 +169,7 @@ def SOBlock.emptyAssign (M : SOBlock) (A : Type) : M.Assignment A := fun _ _ => 
 
 variable {B B' φ φ'}
 
-theorem realize_pairKernel (ρ : B.Assignment A) (ρ' : B'.Assignment A)
+private theorem realize_pairKernel (ρ : B.Assignment A) (ρ' : B'.Assignment A)
     (ζ : boolBlock.Assignment A) :
     (@Sentence.Realize _ A (@sumStructure L _ A _
         ((pairBlock B B').structure (consAssign ρ (consAssign ρ' ζ)))) (pairKernel B B' φ φ')) ↔
@@ -199,12 +200,12 @@ abbrev pairSnd (ρ : (pairBlock B B').Assignment A) : B'.Assignment A :=
 abbrev pairSel (ρ : (pairBlock B B').Assignment A) : Prop :=
   boolSel fun i => ρ (Sum.inr (Sum.inr i))
 
-theorem pairAssign_eq (ρ : (pairBlock B B').Assignment A) :
+private theorem pairAssign_eq (ρ : (pairBlock B B').Assignment A) :
     ρ = consAssign (pairFst ρ) (consAssign (pairSnd ρ) fun i => ρ (Sum.inr (Sum.inr i))) := by
   funext i
   rcases i with i | i | i <;> rfl
 
-theorem realize_pairKernel' (ρ : (pairBlock B B').Assignment A) :
+private theorem realize_pairKernel' (ρ : (pairBlock B B').Assignment A) :
     (@Sentence.Realize _ A (@sumStructure L _ A _ ((pairBlock B B').structure ρ))
       (pairKernel B B' φ φ')) ↔
       (pairSel ρ ∧ (@Sentence.Realize _ A (@sumStructure L _ A _ (B.structure (pairFst ρ))) φ) ∧
@@ -219,7 +220,7 @@ theorem realize_pairKernel' (ρ : (pairBlock B B').Assignment A) :
 open Classical in
 /-- **The witnesses of the pair kernel are those of one kernel or the
 other**, told apart by the selector. -/
-noncomputable def pairWitnessEquiv :
+private noncomputable def pairWitnessEquiv :
     Witness (pairBlock B B') (pairKernel B B' φ φ') A ≃ Witness B φ A ⊕ Witness B' φ' A where
   toFun w :=
     if h : pairSel w.1 then
@@ -276,7 +277,7 @@ theorem witnessCount_pairKernel [Finite A] :
   rw [witnessCount, witnessCount, witnessCount, ← Nat.card_sum]
   exact Nat.card_congr pairWitnessEquiv
 
-theorem pairWitnessEquiv_isLeft (w : Witness (pairBlock B B') (pairKernel B B' φ φ') A) :
+private theorem pairWitnessEquiv_isLeft (w : Witness (pairBlock B B') (pairKernel B B' φ φ') A) :
     (pairWitnessEquiv w).isLeft = true ↔ pairSel w.1 := by
   simp only [pairWitnessEquiv, Equiv.coe_fn_mk]
   by_cases h : pairSel w.1

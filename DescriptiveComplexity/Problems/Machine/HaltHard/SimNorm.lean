@@ -6,6 +6,7 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Machine.HaltHard.Zip
+import all DescriptiveComplexity.Problems.Machine.HaltHard.Zip
 
 /-!
 # The dispatch phase of the simulation
@@ -86,7 +87,7 @@ def FrameSym (σ : SimSym c) : Prop :=
   σ = .bk ∨ σ = .one ∨ σ = .com ∨ σ = .hCons₂ ∨
     (∃ p, σ = .hCons₁ p) ∨ (∃ p, σ = .hComp p) ∨ (∃ p, σ = .hFix p)
 
-theorem mem_encVal {v : List ℕ} {σ : SimSym c} (h : σ ∈ encVal v) :
+private theorem mem_encVal {v : List ℕ} {σ : SimSym c} (h : σ ∈ encVal v) :
     σ = .one ∨ σ = .com := by
   induction v with
   | nil => simp [encVal] at h
@@ -152,46 +153,47 @@ section Pass
 
 variable {σ : SimSym c} {p : CPos c}
 
-theorem pass_retL (h : σ ≠ .endL) : simStep (c := c) .retL σ = some (σ, .retL, false) := by
+private theorem pass_retL (h : σ ≠ .endL) : simStep (c := c) .retL σ = some (σ, .retL, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_nSeekL (h : σ ≠ .mid) : simStep (.nSeekL p) σ = some (σ, .nSeekL p, false) := by
+private theorem pass_nSeekL
+    (h : σ ≠ .mid) : simStep (.nSeekL p) σ = some (σ, .nSeekL p, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_nSeekR (h : σ ≠ .mid) : simStep (.nSeekR p) σ = some (σ, .nSeekR p, true) := by
+private theorem pass_nSeekR (h : σ ≠ .mid) : simStep (.nSeekR p) σ = some (σ, .nSeekR p, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_zGo (h : σ ≠ .endR) : simStep (c := c) .zGo σ = some (σ, .zGo, true) := by
+private theorem pass_zGo (h : σ ≠ .endR) : simStep (c := c) .zGo σ = some (σ, .zGo, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_suGo (h : σ ≠ .endR) : simStep (c := c) .suGo σ = some (σ, .suGo, true) := by
+private theorem pass_suGo (h : σ ≠ .endR) : simStep (c := c) .suGo σ = some (σ, .suGo, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_tlGo (h : σ ≠ .endR) : simStep (c := c) .tlGo σ = some (σ, .tlGo, true) := by
+private theorem pass_tlGo (h : σ ≠ .endR) : simStep (c := c) .tlGo σ = some (σ, .tlGo, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_caGo (h : σ ≠ .endR) : simStep (.caGo p) σ = some (σ, .caGo p, true) := by
+private theorem pass_caGo (h : σ ≠ .endR) : simStep (.caGo p) σ = some (σ, .caGo p, true) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_coHdr (h : σ ≠ .endL) : simStep (.coHdr p) σ = some (σ, .coHdr p, false) := by
+private theorem pass_coHdr (h : σ ≠ .endL) : simStep (.coHdr p) σ = some (σ, .coHdr p, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_fiHdr (h : σ ≠ .endL) : simStep (.fiHdr p) σ = some (σ, .fiHdr p, false) := by
+private theorem pass_fiHdr (h : σ ≠ .endL) : simStep (.fiHdr p) σ = some (σ, .fiHdr p, false) := by
   cases σ <;> first | rfl | exact absurd rfl h
 
-theorem pass_suKill (h : σ = .one ∨ σ = .com ∨ σ = .bk) :
+private theorem pass_suKill (h : σ = .one ∨ σ = .com ∨ σ = .bk) :
     simStep (c := c) .suKill σ = some (.bk, .suKill, false) := by
   rcases h with rfl | rfl | rfl <;> rfl
 
 end Pass
 
 /-- Reachability transported along equalities of the two configurations. -/
-theorem Reach.cast {x x' y y' : LCfg c} (hx : x = x') (hy : y = y') (h : Reach x' y') :
+private theorem Reach.cast {x x' y y' : LCfg c} (hx : x = x') (hy : y = y') (h : Reach x' y') :
     Reach x y := hx ▸ hy ▸ h
 
 /-- Gluing the letter behind the head back onto a run of its own kind – the
 shape the region equalities take after a walk re-crosses a run it wrote. -/
-theorem replicate_glue (a : SimSym c) (n : ℕ) (R : List (SimSym c)) :
+private theorem replicate_glue (a : SimSym c) (n : ℕ) (R : List (SimSym c)) :
     List.replicate n a ++ a :: R = List.replicate (n + 1) a ++ R := by
   rw [List.replicate_succ']
   simp
@@ -208,7 +210,7 @@ section StepWalk
 variable {q q' : SimQ c} {P : SimSym c → Prop} {f : SimSym c → SimSym c} {s σ' : SimSym c}
 
 /-- A rightward hand-over step, then a rightward walk to the stop letter. -/
-theorem reach_step_walkR (hs : simStep q s = some (σ', q', true))
+private theorem reach_step_walkR (hs : simStep q s = some (σ', q', true))
     (hq : ∀ σ, P σ → simStep q' σ = some (σ, q', true)) (w : List (SimSym c))
     (hw : ∀ σ ∈ w, P σ) (L : List (SimSym c)) (t : SimSym c) (R : List (SimSym c)) :
     Reach ⟨q, L, s, w ++ t :: R⟩ ⟨q', w.reverse ++ σ' :: L, t, R⟩ := by
@@ -220,7 +222,7 @@ theorem reach_step_walkR (hs : simStep q s = some (σ', q', true))
 
 /-- A leftward hand-over step, then a leftward walk to the stop letter,
 rewriting each crossed letter by `f`. -/
-theorem reach_step_walkL_map (hs : simStep q s = some (σ', q', false))
+private theorem reach_step_walkL_map (hs : simStep q s = some (σ', q', false))
     (hq : ∀ σ, P σ → simStep q' σ = some (f σ, q', false)) (w : List (SimSym c))
     (hw : ∀ σ ∈ w, P σ) (t : SimSym c) (L R : List (SimSym c)) :
     Reach ⟨q, w ++ t :: L, s, R⟩ ⟨q', L, t, (w.map f).reverse ++ σ' :: R⟩ := by
@@ -231,7 +233,7 @@ theorem reach_step_walkL_map (hs : simStep q s = some (σ', q', false))
     exact Reach.cast rfl (by simp) h
 
 /-- A leftward hand-over step, then a leftward walk to the stop letter. -/
-theorem reach_step_walkL (hs : simStep q s = some (σ', q', false))
+private theorem reach_step_walkL (hs : simStep q s = some (σ', q', false))
     (hq : ∀ σ, P σ → simStep q' σ = some (σ, q', false)) (w : List (SimSym c))
     (hw : ∀ σ ∈ w, P σ) (t : SimSym c) (L R : List (SimSym c)) :
     Reach ⟨q, w ++ t :: L, s, R⟩ ⟨q', L, t, w.reverse ++ σ' :: R⟩ := by
@@ -300,7 +302,7 @@ theorem pStepNormal_toCont (p : CPos c) (k : PCont c) (v : List ℕ) :
 /-- **`zero'`**: walk to `endR`, append a separator, return to rest. The
 value gains a `0` in front – a separator at the right end of the mirrored
 region. -/
-theorem norm_zero' {p : CPos c} (h : codeAt p = .zero') {Q : SimQ c}
+private theorem norm_zero' {p : CPos c} (h : codeAt p = .zero') {Q : SimQ c}
     (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ) {fr : List (SimSym c)}
     (hfr : ∀ σ ∈ fr, FrameSym σ) (v : List ℕ) (j t : ℕ) :
     Reach (atMid Q g fr v j t) (restCfg g fr (0 :: v) j (t - 1)) := by
@@ -367,7 +369,7 @@ theorem norm_zero' {p : CPos c} (h : codeAt p = .zero') {Q : SimQ c}
 header over it, re-write `endL` one cell into the left blanks, and walk back
 to `mid` to dispatch the second child: the frame region gains a bare header,
 the left blanks lose a cell. -/
-theorem norm_comp {p : CPos c} {f g₂ : Code} (h : codeAt p = .comp f g₂)
+private theorem norm_comp {p : CPos c} {f g₂ : Code} (h : codeAt p = .comp f g₂)
     {Q : SimQ c} (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ)
     {fr : List (SimSym c)} (hfr : ∀ σ ∈ fr, FrameSym σ) (v : List ℕ) (j t : ℕ) :
     Reach (atMid Q g fr v j t)
@@ -400,7 +402,7 @@ theorem norm_comp {p : CPos c} {f g₂ : Code} (h : codeAt p = .comp f g₂)
 the value was empty – then walk back over the head block and erase every
 letter between it and `mid`: the value becomes the singleton successor of its
 head, the erased blocks joining the inner gap. -/
-theorem norm_succ {p : CPos c} (h : codeAt p = .succ) {Q : SimQ c}
+private theorem norm_succ {p : CPos c} (h : codeAt p = .succ) {Q : SimQ c}
     (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ) {fr : List (SimSym c)}
     (hfr : ∀ σ ∈ fr, FrameSym σ) (v : List ℕ) (j t : ℕ) :
     ∃ j' t', Reach (atMid Q g fr v j t) (restCfg g fr [v.headI.succ] j' t') := by
@@ -527,7 +529,7 @@ theorem norm_succ {p : CPos c} (h : codeAt p = .succ) {Q : SimQ c}
 value – a blank for an empty value, restored after a probe step to its right;
 a lone separator, consumed; a digit, starting an erasure of the head block
 down to its separator – then re-write `endR` and return to rest. -/
-theorem norm_tail {p : CPos c} (h : codeAt p = .tail) {Q : SimQ c}
+private theorem norm_tail {p : CPos c} (h : codeAt p = .tail) {Q : SimQ c}
     (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ) {fr : List (SimSym c)}
     (hfr : ∀ σ ∈ fr, FrameSym σ) (v : List ℕ) (j t : ℕ) :
     ∃ t', Reach (atMid Q g fr v j t) (restCfg g fr v.tail j t') := by
@@ -653,7 +655,7 @@ theorem norm_tail {p : CPos c} (h : codeAt p = .tail) {Q : SimQ c}
 for an empty value, restored after a probe step to its right, or the head
 block's separator, consumed – re-write `endR` and walk back to `mid` to
 dispatch the first child on the tail of the value. -/
-theorem norm_case_zero {p : CPos c} {f g₂ : Code} (h : codeAt p = .case f g₂)
+private theorem norm_case_zero {p : CPos c} {f g₂ : Code} (h : codeAt p = .case f g₂)
     {Q : SimQ c} (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ) {fr : List (SimSym c)}
     (_hfr : ∀ σ ∈ fr, FrameSym σ) {v : List ℕ} (hv : v.headI = 0) (j t : ℕ) :
     ∃ t', Reach (atMid Q g fr v j t) (atMid (.nSeekL (c₁ p)) g fr v.tail j t') := by
@@ -724,7 +726,7 @@ theorem norm_case_zero {p : CPos c} {f g₂ : Code} (h : codeAt p = .case f g₂
 /-- **`case`, positive head**: walk to `endR`, find a digit left of it – the
 head block is nonempty – consume it as `endR` and walk back to `mid` to
 dispatch the second child on the decremented head. -/
-theorem norm_case_succ {p : CPos c} {f g₂ : Code} (h : codeAt p = .case f g₂)
+private theorem norm_case_succ {p : CPos c} {f g₂ : Code} (h : codeAt p = .case f g₂)
     {Q : SimQ c} (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ) {fr : List (SimSym c)}
     (_hfr : ∀ σ ∈ fr, FrameSym σ) {v : List ℕ} {y : ℕ} (hv : v.headI = y + 1) (j t : ℕ) :
     ∃ t', Reach (atMid Q g fr v j t) (atMid (.nSeekL (c₂ p)) g fr (y :: v.tail) j t') := by
@@ -772,7 +774,7 @@ theorem norm_case_succ {p : CPos c} {f g₂ : Code} (h : codeAt p = .case f g₂
 header over it, re-write `endL` one cell into the left blanks, and walk back
 to `mid` to dispatch the body: the frame region gains a bare header, the left
 blanks lose a cell. -/
-theorem norm_fix {p : CPos c} {f : Code} (h : codeAt p = .fix f)
+private theorem norm_fix {p : CPos c} {f : Code} (h : codeAt p = .fix f)
     {Q : SimQ c} (hQ : simStep Q .mid = some (dispatch p)) (g : ℕ)
     {fr : List (SimSym c)} (hfr : ∀ σ ∈ fr, FrameSym σ) (v : List ℕ) (j t : ℕ) :
     Reach (atMid Q g fr v j t)

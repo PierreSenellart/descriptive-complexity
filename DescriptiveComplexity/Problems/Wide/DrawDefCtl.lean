@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawDefLoop
 public import DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawAccCtl
+import all DescriptiveComplexity.Problems.Wide.DrawCtl
+import all DescriptiveComplexity.Problems.Wide.DrawFactor
 
 /-!
 # The control's reads and writes are definable
@@ -40,7 +43,7 @@ variable {L : Language.{0, 0}} {dt : Data L} [Fintype dt.SlotIx]
 /-! ### Reading -/
 
 /-- **A control slot, read as a bit.** -/
-theorem uGDefinable_ctlBit (q : dt.CtlIx) :
+private theorem uGDefinable_ctlBit (q : dt.CtlIx) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.ctlBit e.one f q :=
   (uGDefinable_ctlOne (L := L) (W := dt.SlotIx) q).congr fun _ _ _ => Iff.rfl
@@ -57,13 +60,13 @@ theorem uGDefinable_readVec {m : ℕ} (accs : Fin m → dt.CtlIx) (j : ℕ) :
       fun _ _ _ => ⟨fun hc => hc.elim fun hp _ => hj hp, False.elim⟩
 
 /-- **The inner fold's accumulator, read at a level.** -/
-theorem uGDefinable_readAcc (j : ℕ) :
+private theorem uGDefinable_readAcc (j : ℕ) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.readAcc e.one f j :=
   uGDefinable_readVec dt.accC j
 
 /-- **A sub-fold's accumulator, read at a level.** -/
-theorem uGDefinable_readSac (j : ℕ) :
+private theorem uGDefinable_readSac (j : ℕ) :
     UGDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.readSac e.one f j :=
   uGDefinable_readVec dt.sacC j
@@ -73,7 +76,7 @@ theorem uGDefinable_readSac (j : ℕ) :
 /-- **A vector of control slots, written**: the named slots take the bits of
 the family, and every other slot rides along – so the whole write is definable
 as soon as each of the family's questions is. -/
-theorem uStDefinable_putVec {m : ℕ} {accs : Fin m → dt.CtlIx}
+private theorem uStDefinable_putVec {m : ℕ} {accs : Fin m → dt.CtlIx}
     (hinj : Function.Injective accs)
     {b : ∀ e : Env L, Fin m → (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Prop}
     (hb : ∀ j : Fin m, UGDefinable fun e f g => b e j f g) :
@@ -92,7 +95,7 @@ theorem uStDefinable_putVec {m : ℕ} {accs : Fin m → dt.CtlIx}
     exact putVec_of_not_mem fun j hc => hq ⟨j, hc⟩
 
 /-- **One control slot, written.** -/
-theorem uStDefinable_setCtl (q : dt.CtlIx)
+private theorem uStDefinable_setCtl (q : dt.CtlIx)
     {b : ∀ e : Env L, (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Prop}
     (hb : UGDefinable b) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e f g =>
@@ -100,7 +103,7 @@ theorem uStDefinable_setCtl (q : dt.CtlIx)
   uStDefinable_id.update q (uSlotDefinable_bitVal hb)
 
 /-- **The inner fold's accumulator vector, written.** -/
-theorem uStDefinable_putAcc
+private theorem uStDefinable_putAcc
     {b : ∀ e : Env L, Fin dt.naDim → (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Prop}
     (hb : ∀ j : Fin dt.naDim, UGDefinable fun e f g => b e j f g) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e f g =>
@@ -108,7 +111,7 @@ theorem uStDefinable_putAcc
   uStDefinable_putVec dt.accC_injective hb
 
 /-- **The leaf flag, stored.** -/
-theorem uStDefinable_setLeaf
+private theorem uStDefinable_setLeaf
     {b : ∀ e : Env L, (dt.CtlIx → e.α) → (dt.SlotIx → e.α) → Prop}
     (hb : UGDefinable b) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e f g =>
@@ -117,7 +120,7 @@ theorem uStDefinable_setLeaf
 
 /-- **The folds at the empty valuation**: every accumulator the polarity's
 unit, which is a question the formula is built from. -/
-theorem uStDefinable_initAcc (pol : ℕ → Bool) :
+private theorem uStDefinable_initAcc (pol : ℕ → Bool) :
     UStDefinable (L := L) (W := dt.SlotIx) fun e (f : dt.CtlIx → e.α) _ =>
       dt.initAcc e.zero e.one pol f :=
   uStDefinable_putAcc fun j => uGDefinable_const (pol (j : ℕ) = false)

@@ -8,6 +8,8 @@ module
 public import DescriptiveComplexity.Machines
 public import DescriptiveComplexity.OrderWalk
 import Mathlib.Logic.Relation
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.OrderWalk
 
 /-!
 # Loops in the control: runs indexed by a finite linear order
@@ -69,7 +71,7 @@ number of elements strictly below the target, so a whole loop costs
 This is `DescriptiveComplexity.Draw.reflTransGen_of_ordLoop` with the budget
 kept, and it is what turns every element and tag loop of the evaluation into a
 cost. -/
-theorem reachesIn_of_ordLoop {A : Type} [LinearOrder A] [Finite A]
+private theorem reachesIn_of_ordLoop {A : Type} [LinearOrder A] [Finite A]
     {S : Type} {M : TMData S} {conf : A → Config S} {w : ℕ}
     (hstep : ∀ x z : A, x < z → (∀ a : A, ¬(x < a ∧ a < z)) →
       M.ReachesIn w (conf x) (conf z))
@@ -122,7 +124,7 @@ theorem reflTransGen_of_tupLoop {A : Type} [LinearOrder A] [Finite A] {e : ℕ}
 /-- **A loop over tuples in the lexicographic order, on a clock**: one budgeted
 run per coordinatewise successor, and the whole enumeration costs that budget
 once per tuple. This is the cost of every coordinate loop of the evaluation. -/
-theorem reachesIn_of_tupLoop {A : Type} [LinearOrder A] [Finite A] {e : ℕ}
+private theorem reachesIn_of_tupLoop {A : Type} [LinearOrder A] [Finite A] {e : ℕ}
     {S : Type} {M : TMData S} {conf : (Fin e → A) → Config S} {w : ℕ}
     (hstep : ∀ v v' : Fin e → A, TupSucc v v' → M.ReachesIn w (conf v) (conf v'))
     {v₀ : Fin e → A} (hbot : ∀ (j : Fin e) (a : A), v₀ j ≤ a) (v : Fin e → A) :

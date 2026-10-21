@@ -9,6 +9,11 @@ public import DescriptiveComplexity.Problems.Machine.Membership
 public import DescriptiveComplexity.Problems.Sat.CountingHardness
 import DescriptiveComplexity.Syntax
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Counting
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Machine.Membership
+import all DescriptiveComplexity.Problems.Machine.Walk
 
 /-!
 # Counting the accepting runs of a machine
@@ -67,7 +72,7 @@ variable {M}
 
 /-- **Acceptance is a halting walk**: an accepting run, cut at the first
 accepting configuration it reaches, lays out along the positions. -/
-theorem accepts_iff_exists_haltWalk [Finite A] (hwf : M.WellFormed) :
+private theorem accepts_iff_exists_haltWalk [Finite A] (hwf : M.WellFormed) :
     M.Accepts ↔ ∃ conf : A → Config A, M.IsHaltWalk conf := by
   refine ⟨?_, fun ⟨conf, h⟩ => (accepts_iff_exists_walk hwf).mpr ⟨conf, h.1⟩⟩
   obtain ⟨hlin, hne, -⟩ := hwf
@@ -116,7 +121,7 @@ theorem accepts_iff_exists_haltWalk [Finite A] (hwf : M.WellFormed) :
 /-- **A run to an accepting configuration is a halting walk**, for a machine
 whose accepting configurations have no successor: the run lays out along the
 positions and ends on the configuration it reached. -/
-theorem exists_haltWalk_of_stepsIn [Finite A] (hwf : M.WellFormed) {c₀ c : Config A} {n : ℕ}
+private theorem exists_haltWalk_of_stepsIn [Finite A] (hwf : M.WellFormed) {c₀ c : Config A} {n : ℕ}
     (hinit : M.IsInit c₀) (hlt : n < Nat.card {p : A // M.Posn p}) (hrun : M.StepsIn n c₀ c)
     (hacc : M.Acc c.state) (hhalt : ∀ d e : Config A, M.Acc d.state → ¬ M.Step d e) :
     ∃ conf : A → Config A, M.IsHaltWalk conf ∧ ∀ p, MaxPos M.Le M.Posn p → conf p = c := by
@@ -170,7 +175,7 @@ section Agree
 variable {B : Type} {u : B ≃ A} {N : TMData B}
 
 /-- Agreement of machines is symmetric. -/
-theorem Agree.symm (h : Agree u N M) : Agree u.symm M N where
+private theorem Agree.symm (h : Agree u N M) : Agree u.symm M N where
   posn a := by rw [h.posn, Equiv.apply_symm_apply]
   le a a' := by rw [h.le, Equiv.apply_symm_apply, Equiv.apply_symm_apply]
   tr a := by rw [h.tr, Equiv.apply_symm_apply]
@@ -190,7 +195,7 @@ theorem _root_.DescriptiveComplexity.Config.map_symm_map (u : B ≃ A) (c : Conf
   refine Config.ext ?_ ?_ (funext fun p => ?_) <;> simp [Config.map]
 
 /-- **Halting walks transport along an agreement.** -/
-theorem Agree.isHaltWalk_map (h : Agree u N M) {conf : B → Config B}
+private theorem Agree.isHaltWalk_map (h : Agree u N M) {conf : B → Config B}
     (hw : N.IsHaltWalk conf) : M.IsHaltWalk fun a => (conf (u.symm a)).map u := by
   have hmin : ∀ {a}, MinPos M.Le M.Posn a → MinPos N.Le N.Posn (u.symm a) := fun ha =>
     h.minPos.mpr (by rwa [Equiv.apply_symm_apply])
@@ -218,7 +223,7 @@ theorem Agree.isHaltWalk_map (h : Agree u N M) {conf : B → Config B}
     rwa [Equiv.apply_symm_apply] at this
 
 /-- **Agreeing machines have as many halting walks.** -/
-theorem Agree.card_haltWalk (h : Agree u N M) :
+private theorem Agree.card_haltWalk (h : Agree u N M) :
     Nat.card {conf : B → Config B // N.IsHaltWalk conf} =
       Nat.card {conf : A → Config A // M.IsHaltWalk conf} :=
   Nat.card_congr
@@ -256,7 +261,7 @@ structure RelHaltWalk : Prop where
 variable {M Q H T}
 
 /-- Times at which the relations agree carry the same configuration. -/
-theorem RelWalk.conf_eq_of_relSame (h : M.RelWalk Q H T) {t t' : A}
+private theorem RelWalk.conf_eq_of_relSame (h : M.RelWalk Q H T) {t t' : A}
     (hs : RelSame Q H T t t') : h.conf t' = h.conf t := by
   obtain ⟨hq, hh, ht⟩ := hs
   refine Config.ext (h.quniq t _ _ ((hq _).mp (h.qex t').choose_spec) (h.qex t).choose_spec)
@@ -329,14 +334,14 @@ local notation "SOStruc" => @sumStructure Language.turing tmGuessBlock.lang A _
 
 variable {α : Type} (v : α → A)
 
-theorem realize_tqAccAtF (t : α) :
+private theorem realize_tqAccAtF (t : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqAccAtF t) v) ↔
       ∀ q, ρ .state ![v t, q] → TMAcc q := by
   simp only [tqAccAtF, Formula.realize_imp, Formula.realize_iAlls, realize_tqStateF,
     realize_tqAccF, Sum.elim_inl, Sum.elim_inr]
   exact ⟨fun h q hq => h (fun _ => q) hq, fun h i hi => h (i 0) hi⟩
 
-theorem realize_tqSameF (t t' : α) :
+private theorem realize_tqSameF (t t' : α) :
     (@Formula.Realize tqSOLang A SOStruc _ (tqSameF t t') v) ↔
       TMData.RelSame (fun t q => ρ .state ![t, q]) (fun t p => ρ .head ![t, p])
         (fun t p a => ρ .tape ![t, p, a]) (v t) (v t') := by
@@ -348,7 +353,7 @@ theorem realize_tqSameF (t t' : α) :
   · exact ⟨fun h p => h fun _ => p, fun h i => h (i 0)⟩
   · exact ⟨fun h p a => h ![p, a], fun h i => h (i 0) (i 1)⟩
 
-theorem realize_tqHaltClause :
+private theorem realize_tqHaltClause :
     (@Sentence.Realize tqSOLang A SOStruc tqHaltClause) ↔
       ∀ t t', SuccPos TMLe TMPosn t t' → (∀ q, ρ .state ![t, q] → TMAcc q) →
         TMData.RelSame (fun t q => ρ .state ![t, q]) (fun t p => ρ .head ![t, p])
@@ -357,7 +362,7 @@ theorem realize_tqHaltClause :
     Formula.realize_inf, realize_tqSuccPosF, realize_tqAccAtF, realize_tqSameF, Sum.elim_inr]
   exact ⟨fun h t t' h₁ h₂ => h ![t, t'] ⟨h₁, h₂⟩, fun h i hi => h (i 0) (i 1) hi.1 hi.2⟩
 
-theorem realize_tqOffClause :
+private theorem realize_tqOffClause :
     (@Sentence.Realize tqSOLang A SOStruc tqOffClause) ↔
       ∀ t t₀, ¬ TMPosn t → MinPos TMLe TMPosn t₀ →
         TMData.RelSame (fun t q => ρ .state ![t, q]) (fun t p => ρ .head ![t, p])
@@ -369,7 +374,7 @@ theorem realize_tqOffClause :
 
 /-- **The kernel says exactly what it should**: the instance is well formed and
 the guessed relations are a halting walk. -/
-theorem realize_sharpTqKernel :
+private theorem realize_sharpTqKernel :
     (@Sentence.Realize tqSOLang A SOStruc sharpTqKernel) ↔
       (tmData A).WellFormed ∧
         (tmData A).RelHaltWalk (fun t q => ρ .state ![t, q]) (fun t p => ρ .head ![t, p])
@@ -402,7 +407,7 @@ def confAssign {A : Type} (conf : A → Config A) : tmGuessBlock.Assignment A :=
 /-- **The halting walks of a machine are the witnesses of the kernel**,
 bijectively: the three guessed relations are functional, so they are the graphs
 of the configurations they describe. -/
-noncomputable def haltWalkEquiv :
+private noncomputable def haltWalkEquiv :
     {ρ : tmGuessBlock.Assignment A //
         @Sentence.Realize tqSOLang A
           (@sumStructure Language.turing tmGuessBlock.lang A _ (tmGuessBlock.structure ρ))
@@ -471,7 +476,7 @@ noncomputable def SharpNTMAccept : CountingProblem Language.turing where
     rw [card_haltWalk_eq_witnessCount A, card_haltWalk_eq_witnessCount B]
     exact witnessCount_iso tmGuessBlock sharpTqKernel e
 
-theorem sharpNtmAccept_apply (A : Type) [Language.turing.Structure A] :
+private theorem sharpNtmAccept_apply (A : Type) [Language.turing.Structure A] :
     SharpNTMAccept A =
       Nat.card {conf : A → Config A //
         (tmData A).WellFormed ∧ (tmData A).IsHaltWalk conf} :=

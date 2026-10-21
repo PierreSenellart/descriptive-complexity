@@ -7,6 +7,9 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.DrawTable
 import DescriptiveComplexity.Problems.Wide.Roam
+import all DescriptiveComplexity.Numbers.BinRel
+import all DescriptiveComplexity.Problems.Wide.DrawTags
+import all DescriptiveComplexity.Problems.Wide.Roam
 
 /-!
 # The region a clocked program works in, and its size
@@ -46,7 +49,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P] [LinearOrder K] [Finite A]
   [Finite R] [Finite P] [Finite K] [Language.wide.Structure (Univ A R P K dd)] in
 /-- **The argument blocks are as many as the fixed-point's own indices**: the
 `k` of the clock's arithmetic. -/
-theorem card_argTag :
+private theorem card_argTag :
     Nat.card {τ : Tag R P K // ∃ i : K, τ = Tag.arg i} = Nat.card K :=
   Nat.card_congr
     { toFun := fun τ => τ.2.choose
@@ -66,7 +69,7 @@ blocks**, so the universe is `(|R| + 1 + |P| + k) · m` points. The clock's own
 arithmetic reads that as `k` working blocks and `|R| + 1 + |P|` surplus ones –
 the surplus a clocked program has for free, since its rule names and its phases
 are tags whether it writes in them or not. -/
-theorem card_drawTag :
+private theorem card_drawTag :
     Nat.card (Tag R P K) = Nat.card R + 1 + Nat.card P + Nat.card K := by
   classical
   have e : Tag R P K ≃ R ⊕ (Unit ⊕ (P ⊕ K)) :=
@@ -91,7 +94,7 @@ is below that number, `k` being the argument blocks and `m` the tuples. This is
 the bound every phase of a clocked program run inside the region is charged
 against; the counting behind it is
 `DescriptiveComplexity.wideRank_lt_two_pow_avoids`. -/
-theorem wideRank_lt_two_pow_logical
+private theorem wideRank_lt_two_pow_logical
     (hord : ∀ x y : Univ A R P K dd, WMLe x y ↔ tagTupleLe x y)
     {s : Univ A R P K dd → Prop}
     (hjunk : ∀ τ : Tag R P K, (∀ i : K, τ ≠ Tag.arg i) →

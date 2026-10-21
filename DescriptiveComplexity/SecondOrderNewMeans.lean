@@ -152,19 +152,19 @@ noncomputable def meanStruc : (meanHost L a).Structure (A ⊕ Fin m) :=
   @sumStructure (newLang L) (meanBlock a).lang (A ⊕ Fin m) (extStructure L A m)
     ((meanBlock a).structure ρ)
 
-theorem realize_oldAtomM {α : Type} (x : α) (v : α → A ⊕ Fin m) :
+private theorem realize_oldAtomM {α : Type} (x : α) (v : α → A ⊕ Fin m) :
     letI := meanStruc (L := L) ρ
     (oldAtomM L a x).Realize v ↔ IsOld (v x) :=
   Iff.rfl
 
-theorem realize_meanAtom {α : Type} (x : α) (w : Fin a → α) (v : α → A ⊕ Fin m) :
+private theorem realize_meanAtom {α : Type} (x : α) (w : Fin a → α) (v : α → A ⊕ Fin m) :
     letI := meanStruc (L := L) ρ
     (meanAtom L a x w).Realize v ↔ meaningOf ρ (v x) fun i => v (w i) := by
   let := meanStruc (L := L) ρ
   refine iff_of_eq (congrArg (ρ ()) (funext fun j => ?_))
   induction j using Fin.cases <;> rfl
 
-theorem realize_meanShaped :
+private theorem realize_meanShaped :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanShaped L a) ↔
       ∀ (v : A ⊕ Fin m) (w : Fin a → A ⊕ Fin m),
@@ -188,7 +188,7 @@ theorem realize_meanShaped :
     exact ⟨fun hc => h2.1 ((realize_oldAtomM ρ (Sum.inr none) _).mp hc),
       fun i => (realize_oldAtomM ρ (Sum.inr (some i)) _).mpr (h2.2 i)⟩
 
-theorem realize_meanEmpty :
+private theorem realize_meanEmpty :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanEmpty L a) ↔
       ∃ v : A ⊕ Fin m, ¬IsOld v ∧ ∀ w : Fin a → A ⊕ Fin m, ¬meaningOf ρ v w := by
@@ -208,7 +208,7 @@ theorem realize_meanEmpty :
     rw [Formula.realize_not]
     exact fun hc => hw w ((realize_meanAtom ρ (Sum.inl (Sum.inr 0)) (fun i => Sum.inr i) _).mp hc)
 
-theorem realize_meanInj :
+private theorem realize_meanInj :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanInj L a) ↔
       ∀ v u : A ⊕ Fin m, ¬IsOld v → ¬IsOld u →
@@ -224,7 +224,7 @@ theorem realize_meanInj :
   · intro h i hg
     exact h (i 0) (i 1) hg.1.1 hg.1.2 hg.2
 
-theorem realize_meanFlip :
+private theorem realize_meanFlip :
     letI := meanStruc (L := L) ρ
     ((A ⊕ Fin m) ⊨ meanFlip L a) ↔
       ∀ (v : A ⊕ Fin m) (y : Fin a → A ⊕ Fin m), ¬IsOld v → (∀ i, IsOld (y i)) →
@@ -244,7 +244,7 @@ theorem realize_meanFlip :
     obtain ⟨u, hu, hw⟩ := h (i none) (fun j => i (some j)) hg.1 hg.2
     exact ⟨fun _ => u, hu, hw⟩
 
-theorem xor_iff_iff_not (p q : Prop) : Xor p q ↔ (p ↔ ¬q) := by
+private theorem xor_iff_iff_not (p q : Prop) : Xor p q ↔ (p ↔ ¬q) := by
   by_cases hq : q
   · simp [Xor, hq]
   · simp [Xor, hq]
@@ -253,7 +253,7 @@ theorem xor_iff_iff_not (p q : Prop) : Xor p q ↔ (p ↔ ¬q) := by
 invented values name every `a`-ary relation of the instance, each exactly once.
 This is where the counting of
 `DescriptiveComplexity.SecondOrderNewCount` is spent. -/
-theorem bijective_meanAt [Finite A]
+private theorem bijective_meanAt [Finite A]
     (hshaped : ∀ (v : A ⊕ Fin m) (w : Fin a → A ⊕ Fin m),
       meaningOf ρ v w → ¬IsOld v ∧ ∀ i, IsOld (w i))
     (hempty : ∃ v : A ⊕ Fin m, ¬IsOld v ∧ ∀ w, ¬meaningOf ρ v w)

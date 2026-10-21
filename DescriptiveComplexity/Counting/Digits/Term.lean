@@ -7,6 +7,11 @@ module
 
 public import DescriptiveComplexity.Counting.Digits.ProdSweep
 public import DescriptiveComplexity.Counting.Quantitative
+import all DescriptiveComplexity.Counting.Digits.Closure
+import all DescriptiveComplexity.Counting.Digits.Formulas
+import all DescriptiveComplexity.Counting.Digits.SetArith
+import all DescriptiveComplexity.OrderWalk
+import all DescriptiveComplexity.SecondOrderBlockHom
 
 /-!
 # The digits of a quantitative term
@@ -50,7 +55,7 @@ noncomputable def termFam {α : Type} (t : QTerm ((K.sum Language.order).sum e�
 variable {e₀}
 
 /-- The family constantly equal to a number. -/
-theorem Dig.const {ℓ a : ℕ} (s : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => s : Fam K a) := by
+private theorem Dig.const {ℓ a : ℕ} (s : ℕ) : Dig e₀ ℓ (fun _ _ _ _ => s : Fam K a) := by
   induction s with
   | zero => exact Dig.zero a
   | succ s ih => exact Dig.add ih (Dig.one a)

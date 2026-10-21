@@ -8,6 +8,14 @@ module
 public import DescriptiveComplexity.Problems.Machine.QsatStep
 public import DescriptiveComplexity.Problems.Machine.DetRun
 public import Mathlib.Data.Set.Finite.Lemmas
+import all DescriptiveComplexity.Machines
+import all DescriptiveComplexity.Problems.Machine.DetRun
+import all DescriptiveComplexity.Problems.Machine.Program
+import all DescriptiveComplexity.Problems.Machine.QsatGeom
+import all DescriptiveComplexity.Problems.Machine.QsatProgram
+import all DescriptiveComplexity.Problems.Machine.QsatStep
+import all DescriptiveComplexity.Problems.Machine.QsatTape
+import all DescriptiveComplexity.Problems.Qsat.Defs
 
 /-!
 # The run of the QBF machine
@@ -56,7 +64,7 @@ def TapeTrue (σ : QV A → QV A) (x : A) : Prop := ∃ f : Bool, σ (posCell x)
 
 omit [Language.qsat.Structure A] in
 /-- Reading the valuation off a cell whose contents are known. -/
-theorem tapeTrue_iff {x : A} {b f : Bool} (hσ : σ (posCell x) = symV b f x) :
+private theorem tapeTrue_iff {x : A} {b f : Bool} (hσ : σ (posCell x) = symV b f x) :
     TapeTrue σ x ↔ b = true := by
   constructor
   · rintro ⟨f', hf⟩
@@ -69,7 +77,7 @@ theorem tapeTrue_iff {x : A} {b f : Bool} (hσ : σ (posCell x) = symV b f x) :
 /-- **The transition table's literal test is the literal of the matrix.** The
 sweep asks `QLit c x b` of the symbol it reads; the game asks whether the
 valuation satisfies the literal. Under the dictionary they agree. -/
-theorem qLit_iff_tapeTrue {c x : A} {b f : Bool} (hσ : σ (posCell x) = symV b f x) :
+private theorem qLit_iff_tapeTrue {c x : A} {b f : Bool} (hσ : σ (posCell x) = symV b f x) :
     QLit c x b ↔ ((QPosIn c x ∧ TapeTrue σ x) ∨ (QNegIn c x ∧ ¬TapeTrue σ x)) := by
   rw [QLit, tapeTrue_iff hσ]
   constructor
@@ -124,12 +132,13 @@ theorem setCell_ne {x : A} {b f : Bool} {r : QV A} (h : r ≠ posCell x) :
 
 omit [Language.qsat.Structure A] in
 /-- Another variable's cell is untouched. -/
-theorem setCell_other {x y : A} {b f : Bool} (h : y ≠ x) :
+private theorem setCell_other {x y : A} {b f : Bool} (h : y ≠ x) :
     setCell σ x b f (posCell y) = σ (posCell y) :=
   setCell_ne fun he => h (qOne_eq_qOne_iff.mp he).2
 
 /-- Writing a cell keeps the tape laid out. -/
-theorem tapeOk_setCell (hok : TapeOk σ) (x : A) (b f : Bool) : TapeOk (setCell σ x b f) := by
+private theorem tapeOk_setCell
+    (hok : TapeOk σ) (x : A) (b f : Bool) : TapeOk (setCell σ x b f) := by
   intro y hy
   rcases eq_or_ne y x with rfl | hne
   · exact ⟨b, f, setCell_self y b f⟩
@@ -144,14 +153,14 @@ omit [Language.qsat.Structure A] in
 
 omit [Language.qsat.Structure A] in
 /-- Writing a cell leaves every other variable's value alone. -/
-theorem tapeTrue_setCell_other {x y : A} {b f : Bool} (h : y ≠ x) :
+private theorem tapeTrue_setCell_other {x y : A} {b f : Bool} (h : y ≠ x) :
     TapeTrue (setCell σ x b f) y ↔ TapeTrue σ y := by
   rw [TapeTrue, TapeTrue, setCell_other h]
 
 omit [Language.qsat.Structure A] in
 /-- The frame condition the step lemmas ask for, discharged for
 `DescriptiveComplexity.QsatTM.setCell`. -/
-theorem setCell_frame (x : A) (b f : Bool) :
+private theorem setCell_frame (x : A) (b f : Bool) :
     ∀ r : QV A, r ≠ posCell x → setCell σ x b f r = σ r :=
   fun _ h => setCell_ne h
 
@@ -166,26 +175,26 @@ half-open segment `[p₀, p)` reset. -/
 
 open Classical in
 /-- The tape `σ` with every variable cell of the segment `[p₀, p)` reset. -/
-noncomputable def resetSeg (σ : QV A → QV A) (p₀ p r : QV A) : QV A :=
+private noncomputable def resetSeg (σ : QV A → QV A) (p₀ p r : QV A) : QV A :=
   if QPosn r ∧ r.1 = QTag.pCell ∧ QLe p₀ r ∧ QLe r p ∧ r ≠ p then symV false false (r.2 0)
   else σ r
 
-theorem resetSeg_of_not {p₀ p r : QV A}
+private theorem resetSeg_of_not {p₀ p r : QV A}
     (h : ¬(QPosn r ∧ r.1 = QTag.pCell ∧ QLe p₀ r ∧ QLe r p ∧ r ≠ p)) :
     resetSeg σ p₀ p r = σ r := by
   rw [resetSeg, ite_eq_right h]
 
-theorem resetSeg_self (p₀ p : QV A) : resetSeg σ p₀ p p = σ p :=
+private theorem resetSeg_self (p₀ p : QV A) : resetSeg σ p₀ p p = σ p :=
   resetSeg_of_not fun h => h.2.2.2.2 rfl
 
 /-- An empty segment changes nothing. -/
-theorem resetSeg_bot (hwf : QsatWf A) (p₀ : QV A) : resetSeg σ p₀ p₀ = σ := by
+private theorem resetSeg_bot (hwf : QsatWf A) (p₀ : QV A) : resetSeg σ p₀ p₀ = σ := by
   funext r
   refine resetSeg_of_not fun h => h.2.2.2.2 ?_
   exact (isLinOrd_qLe A hwf).2.2.1 _ _ h.2.2.2.1 h.2.2.1
 
 /-- Extending the segment by one position changes only that position. -/
-theorem resetSeg_frame (hwf : QsatWf A) {p₀ p q : QV A}
+private theorem resetSeg_frame (hwf : QsatWf A) {p₀ p q : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn p q) (hle : QLe p₀ p) :
     ∀ r : QV A, r ≠ p → resetSeg σ p₀ q r = resetSeg σ p₀ p r := by
   obtain ⟨-, htrans, hanti, htotal⟩ := isLinOrd_qLe A hwf
@@ -209,7 +218,7 @@ theorem resetSeg_frame (hwf : QsatWf A) {p₀ p q : QV A}
   · rw [ite_eq_right (fun hh => h (hiff.mp hh)), ite_eq_right h]
 
 /-- Extending the segment past a variable's cell resets that cell. -/
-theorem resetSeg_at {p₀ p q : QV A} {x : A} (hs : SuccPos (QLe (A := A)) QPosn p q)
+private theorem resetSeg_at {p₀ p q : QV A} {x : A} (hs : SuccPos (QLe (A := A)) QPosn p q)
     (hle : QLe p₀ p) (hp : p = posCell x) :
     resetSeg σ p₀ q p = symV false false x := by
   rw [resetSeg, ite_eq_left ⟨hs.1, by rw [hp]; rfl, hle, hs.2.2.1, hs.2.2.2.1⟩, hp]
@@ -217,7 +226,7 @@ theorem resetSeg_at {p₀ p q : QV A} {x : A} (hs : SuccPos (QLe (A := A)) QPosn
 
 /-- **The descent runs to the right marker**, resetting every variable's cell
 from `p₀` on. -/
-theorem reach_descent (hwf : QsatWf A) (hok : TapeOk σ) (hstart : σ posStart = symStart)
+private theorem reach_descent (hwf : QsatWf A) (hok : TapeOk σ) (hstart : σ posStart = symStart)
     {p₀ : QV A} (hp₀ : QPosn p₀) :
     Relation.ReflTransGen (qsatMachine A).Step ⟨stDesc, p₀, σ⟩
       ⟨stDesc, posEnd, resetSeg σ p₀ posEnd⟩ := by
@@ -252,34 +261,34 @@ clause”; the pass therefore ends at the far marker with the flag set iff the
 clause holds of the tape. -/
 
 /-- A variable's cell satisfies the clause `c`. -/
-def CellSat (σ : QV A → QV A) (c x : A) : Prop :=
+private def CellSat (σ : QV A → QV A) (c x : A) : Prop :=
   ∃ b f : Bool, IsQVar x ∧ σ (posCell x) = symV b f x ∧ QLit c x b
 
 /-- Some cell strictly above `p` satisfies the clause: the flag of a leftward
 sweep that has reached `p`. -/
-def SatAbove (σ : QV A → QV A) (c : A) (p : QV A) : Prop :=
+private def SatAbove (σ : QV A → QV A) (c : A) (p : QV A) : Prop :=
   ∃ x : A, CellSat σ c x ∧ QLe p (posCell x) ∧ posCell x ≠ p
 
 /-- Some cell satisfies the clause: what a whole pass decides. -/
-def SatAll (σ : QV A → QV A) (c : A) : Prop := ∃ x : A, CellSat σ c x
+private def SatAll (σ : QV A → QV A) (c : A) : Prop := ∃ x : A, CellSat σ c x
 
 open Classical in
 /-- The flag of a leftward sweep that has reached `p`. -/
-noncomputable def flagAbove (σ : QV A → QV A) (c : A) (p : QV A) : Bool :=
+private noncomputable def flagAbove (σ : QV A → QV A) (c : A) (p : QV A) : Bool :=
   decide (SatAbove σ c p)
 
-theorem flagAbove_eq_true (σ : QV A → QV A) (c : A) (p : QV A) :
+private theorem flagAbove_eq_true (σ : QV A → QV A) (c : A) (p : QV A) :
     flagAbove σ c p = true ↔ SatAbove σ c p := by
   classical
   rw [flagAbove, decide_eq_true_iff]
 
-theorem flagAbove_eq_false (σ : QV A → QV A) (c : A) (p : QV A) :
+private theorem flagAbove_eq_false (σ : QV A → QV A) (c : A) (p : QV A) :
     flagAbove σ c p = false ↔ ¬SatAbove σ c p := by
   rw [← Bool.not_eq_true, flagAbove_eq_true]
 
 /-- **The flag accumulates**: sweeping one cell further adds that cell's
 verdict. -/
-theorem satAbove_succ (hwf : QsatWf A) {c x b f : _} {p q : QV A}
+private theorem satAbove_succ (hwf : QsatWf A) {c x b f : _} {p q : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn p q) (hq : q = posCell x) (hx : IsQVar x)
     (hσ : σ (posCell x) = symV b f x) :
     SatAbove σ c p ↔ (SatAbove σ c q ∨ QLit c x b) := by
@@ -306,7 +315,7 @@ theorem satAbove_succ (hwf : QsatWf A) {c x b f : _} {p q : QV A}
     · exact ⟨x, ⟨b, f, hx, hσ, hlit⟩, hs.2.2.1, fun he => hs.2.2.2.1 he.symm⟩
 
 /-- At the left marker the flag is the verdict on the whole tape. -/
-theorem satAbove_posStart (σ : QV A → QV A) (c : A) :
+private theorem satAbove_posStart (σ : QV A → QV A) (c : A) :
     SatAbove σ c posStart ↔ SatAll σ c := by
   constructor
   · rintro ⟨x, hx, -, -⟩
@@ -315,7 +324,7 @@ theorem satAbove_posStart (σ : QV A → QV A) (c : A) :
     exact ⟨x, hx, qLe_start_cell x, fun he => QTag.noConfusion (congrArg Prod.fst he)⟩
 
 /-- Just below the right marker nothing has been swept yet. -/
-theorem not_satAbove_top (σ : QV A → QV A) (c : A) {p₁ : QV A}
+private theorem not_satAbove_top (σ : QV A → QV A) (c : A) {p₁ : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn p₁ posEnd) : ¬SatAbove σ c p₁ := by
   rintro ⟨x, ⟨-, -, hx, -, -⟩, hle, hne⟩
   rcases hs.2.2.2.2 _ (qPosn_posCell hx) hle (qLe_cell_end x) with he | he
@@ -325,7 +334,7 @@ theorem not_satAbove_top (σ : QV A → QV A) (c : A) {p₁ : QV A}
 /-- **A leftward pass decides the clause.** From just below the right marker,
 with the flag down, the machine sweeps to the left marker and arrives with the
 flag set exactly when some cell satisfies the clause. -/
-theorem reach_sweepDown (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {p₁ : QV A}
+private theorem reach_sweepDown (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {p₁ : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn p₁ posEnd) :
     Relation.ReflTransGen (qsatMachine A).Step ⟨stEval false false c, p₁, σ⟩
       ⟨stEval (flagAbove σ c posStart) false c, posStart, σ⟩ := by
@@ -361,25 +370,25 @@ theorem reach_sweepDown (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) 
 
 /-- Some cell strictly below `p` satisfies the clause: the flag of a rightward
 sweep that has reached `p`. -/
-def SatBelow (σ : QV A → QV A) (c : A) (p : QV A) : Prop :=
+private def SatBelow (σ : QV A → QV A) (c : A) (p : QV A) : Prop :=
   ∃ x : A, CellSat σ c x ∧ QLe (posCell x) p ∧ posCell x ≠ p
 
 open Classical in
 /-- The flag of a rightward sweep that has reached `p`. -/
-noncomputable def flagBelow (σ : QV A → QV A) (c : A) (p : QV A) : Bool :=
+private noncomputable def flagBelow (σ : QV A → QV A) (c : A) (p : QV A) : Bool :=
   decide (SatBelow σ c p)
 
-theorem flagBelow_eq_true (σ : QV A → QV A) (c : A) (p : QV A) :
+private theorem flagBelow_eq_true (σ : QV A → QV A) (c : A) (p : QV A) :
     flagBelow σ c p = true ↔ SatBelow σ c p := by
   classical
   rw [flagBelow, decide_eq_true_iff]
 
-theorem flagBelow_eq_false (σ : QV A → QV A) (c : A) (p : QV A) :
+private theorem flagBelow_eq_false (σ : QV A → QV A) (c : A) (p : QV A) :
     flagBelow σ c p = false ↔ ¬SatBelow σ c p := by
   rw [← Bool.not_eq_true, flagBelow_eq_true]
 
 /-- **The flag accumulates**, rightwards. -/
-theorem satBelow_succ (hwf : QsatWf A) {c x b f : _} {p q : QV A}
+private theorem satBelow_succ (hwf : QsatWf A) {c x b f : _} {p q : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn p q) (hp : p = posCell x) (hx : IsQVar x)
     (hσ : σ (posCell x) = symV b f x) :
     SatBelow σ c q ↔ (SatBelow σ c p ∨ QLit c x b) := by
@@ -406,7 +415,7 @@ theorem satBelow_succ (hwf : QsatWf A) {c x b f : _} {p q : QV A}
     · exact ⟨x, ⟨b, f, hx, hσ, hlit⟩, hs.2.2.1, hs.2.2.2.1⟩
 
 /-- At the right marker the flag is the verdict on the whole tape. -/
-theorem satBelow_posEnd (σ : QV A → QV A) (c : A) :
+private theorem satBelow_posEnd (σ : QV A → QV A) (c : A) :
     SatBelow σ c posEnd ↔ SatAll σ c := by
   constructor
   · rintro ⟨x, hx, -, -⟩
@@ -415,7 +424,7 @@ theorem satBelow_posEnd (σ : QV A → QV A) (c : A) :
     exact ⟨x, hx, qLe_cell_end x, fun he => QTag.noConfusion (congrArg Prod.fst he)⟩
 
 /-- Just above the left marker nothing has been swept yet. -/
-theorem not_satBelow_bot (σ : QV A → QV A) (c : A) {p₀ : QV A}
+private theorem not_satBelow_bot (σ : QV A → QV A) (c : A) {p₀ : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn posStart p₀) : ¬SatBelow σ c p₀ := by
   rintro ⟨x, ⟨-, -, hx, -, -⟩, hle, hne⟩
   rcases hs.2.2.2.2 _ (qPosn_posCell hx) (qLe_start_cell x) hle with he | he
@@ -423,7 +432,7 @@ theorem not_satBelow_bot (σ : QV A → QV A) (c : A) {p₀ : QV A}
   · exact hne he
 
 /-- **A rightward pass decides the clause.** -/
-theorem reach_sweepUp (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {p₀ : QV A}
+private theorem reach_sweepUp (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {p₀ : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn posStart p₀) :
     Relation.ReflTransGen (qsatMachine A).Step ⟨stEval false true c, p₀, σ⟩
       ⟨stEval (flagBelow σ c posEnd) true c, posEnd, σ⟩ := by
@@ -465,21 +474,21 @@ well founded because the instance is finite. -/
 
 open Classical in
 /-- The verdict on one clause. -/
-noncomputable def satFlag (σ : QV A → QV A) (c : A) : Bool := decide (SatAll σ c)
+private noncomputable def satFlag (σ : QV A → QV A) (c : A) : Bool := decide (SatAll σ c)
 
 open Classical in
 /-- The verdict on every clause from `c` on: what the loop started at `c`
 returns. -/
-noncomputable def matrixFrom (σ : QV A → QV A) (c : A) : Bool :=
+private noncomputable def matrixFrom (σ : QV A → QV A) (c : A) : Bool :=
   decide (∀ e : A, QCl e → c ≤ e → SatAll σ e)
 
-theorem flagAbove_posStart (σ : QV A → QV A) (c : A) :
+private theorem flagAbove_posStart (σ : QV A → QV A) (c : A) :
     flagAbove σ c posStart = satFlag σ c := by
   classical
   rw [flagAbove, satFlag]
   exact decide_eq_decide.mpr (satAbove_posStart σ c)
 
-theorem flagBelow_posEnd (σ : QV A → QV A) (c : A) :
+private theorem flagBelow_posEnd (σ : QV A → QV A) (c : A) :
     flagBelow σ c posEnd = satFlag σ c := by
   classical
   rw [flagBelow, satFlag]
@@ -487,12 +496,12 @@ theorem flagBelow_posEnd (σ : QV A → QV A) (c : A) :
 
 /-- Where a sweep in direction `d` starts: one step in from the marker it will
 end at going the other way. -/
-def SweepStart (d : Bool) (p : QV A) : Prop :=
+private def SweepStart (d : Bool) (p : QV A) : Prop :=
   if d then SuccPos (QLe (A := A)) QPosn posStart p else SuccPos (QLe (A := A)) QPosn p posEnd
 
 /-- **One pass**: whatever the direction, the machine sweeps from its starting
 position to the far marker and arrives with the clause's verdict. -/
-theorem reach_pass (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {d : Bool}
+private theorem reach_pass (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {d : Bool}
     {p : QV A} (hp : SweepStart d p) :
     Relation.ReflTransGen (qsatMachine A).Step ⟨stEval false d c, p, σ⟩
       ⟨stEval (satFlag σ c) d c, markerPos d, σ⟩ := by
@@ -503,14 +512,14 @@ theorem reach_pass (hwf : QsatWf A) (hok : TapeOk σ) {c : A} (hc : QCl c) {d : 
     exact reach_sweepUp hwf hok hc hp
 
 /-- An unsatisfied clause is a counterexample to every clause from `c` on. -/
-theorem matrixFrom_eq_false {σ : QV A → QV A} {c : A} (hc : QCl c) (h : ¬SatAll σ c) :
+private theorem matrixFrom_eq_false {σ : QV A → QV A} {c : A} (hc : QCl c) (h : ¬SatAll σ c) :
     matrixFrom σ c = false := by
   classical
   rw [matrixFrom, decide_eq_false_iff_not]
   exact fun hall => h (hall c hc le_rfl)
 
 /-- The last clause satisfied settles the loop. -/
-theorem matrixFrom_eq_true_of_max {σ : QV A → QV A} {c : A} (hc : QMaxCl c)
+private theorem matrixFrom_eq_true_of_max {σ : QV A → QV A} {c : A} (hc : QMaxCl c)
     (h : SatAll σ c) : matrixFrom σ c = true := by
   classical
   rw [matrixFrom, decide_eq_true_iff]
@@ -518,7 +527,7 @@ theorem matrixFrom_eq_true_of_max {σ : QV A → QV A} {c : A} (hc : QMaxCl c)
   exact (le_antisymm (hc.2 e he) hle) ▸ h
 
 /-- Passing a satisfied clause leaves the rest of the loop to decide. -/
-theorem matrixFrom_succ {σ : QV A → QV A} {c c₂ : A} (hcc : QNextCl c c₂)
+private theorem matrixFrom_succ {σ : QV A → QV A} {c c₂ : A} (hcc : QNextCl c c₂)
     (h : SatAll σ c) : matrixFrom σ c = matrixFrom σ c₂ := by
   classical
   rw [matrixFrom, matrixFrom]
@@ -529,21 +538,21 @@ theorem matrixFrom_succ {σ : QV A → QV A} {c c₂ : A} (hcc : QNextCl c c₂)
   · exact hall e he (hcc.2.2.2 e he hlt)
 
 /-- The left marker has a neighbor: the right marker is above it. -/
-theorem exists_afterStart (hwf : QsatWf A) :
+private theorem exists_afterStart (hwf : QsatWf A) :
     ∃ p : QV A, SuccPos (QLe (A := A)) QPosn posStart p := by
   refine TMData.exists_succPos' (M := qsatMachine A) (isLinOrd_qLe A hwf) qPosn_posStart
     fun hmax => ?_
   exact not_qLe_end_start (hmax.2 posEnd qPosn_posEnd)
 
 /-- The right marker has a neighbor: the left marker is below it. -/
-theorem exists_beforeEnd (hwf : QsatWf A) :
+private theorem exists_beforeEnd (hwf : QsatWf A) :
     ∃ p : QV A, SuccPos (QLe (A := A)) QPosn p posEnd := by
   refine exists_predPos (isLinOrd_qLe A hwf) qPosn_posEnd fun hmin => ?_
   exact not_qLe_end_start (hmin.2 posStart qPosn_posStart)
 
 /-- **Where a turn lands**: one step in from the marker just reached, which is
 where the next sweep – in the opposite direction – starts. -/
-theorem turn_pos (hwf : QsatWf A) (d : Bool) :
+private theorem turn_pos (hwf : QsatWf A) (d : Bool) :
     ∃ p' : QV A, QPosn p' ∧ TurnMove d (markerPos (A := A) d) p' ∧ SweepStart (!d) p' := by
   cases d
   · obtain ⟨p', hp'⟩ := exists_afterStart hwf
@@ -553,7 +562,7 @@ theorem turn_pos (hwf : QsatWf A) (d : Bool) :
 
 omit [Nonempty A] in
 /-- **Every clause is the last one or has a successor.** -/
-theorem qMaxCl_or_next {c : A} (hc : QCl c) : QMaxCl c ∨ ∃ c₂ : A, QNextCl c c₂ := by
+private theorem qMaxCl_or_next {c : A} (hc : QCl c) : QMaxCl c ∨ ∃ c₂ : A, QNextCl c c₂ := by
   classical
   by_cases hmax : ∀ e : A, QCl e → e ≤ c
   · exact Or.inl ⟨hc, hmax⟩
@@ -574,7 +583,7 @@ theorem marker_tape {σ : QV A → QV A} (hS : σ posStart = symStart) (hE : σ 
   · exact hE
 
 /-- **An unsatisfied clause ends the loop**: the matrix is false. -/
-theorem turn_unsat (hwf : QsatWf A) (hok : TapeOk σ)
+private theorem turn_unsat (hwf : QsatWf A) (hok : TapeOk σ)
     (hM : ∀ d : Bool, σ (markerPos d) = markerSym d) {c : A} (hc : QCl c)
     (hunsat : ¬SatAll σ c) {d : Bool} {p : QV A} (hp : SweepStart d p) :
     ∃ q : QV A, QPosn q ∧ Relation.ReflTransGen (qsatMachine A).Step
@@ -587,7 +596,7 @@ theorem turn_unsat (hwf : QsatWf A) (hok : TapeOk σ)
   exact step_turnFalse hc (hM d) hmove
 
 /-- **The last clause ends the loop**, whichever way it goes. -/
-theorem turn_final (hwf : QsatWf A) (hok : TapeOk σ)
+private theorem turn_final (hwf : QsatWf A) (hok : TapeOk σ)
     (hM : ∀ d : Bool, σ (markerPos d) = markerSym d) {c : A} (hc : QCl c) (hmax : QMaxCl c)
     {d : Bool} {p : QV A} (hp : SweepStart d p) :
     ∃ q : QV A, QPosn q ∧ Relation.ReflTransGen (qsatMachine A).Step
@@ -605,7 +614,7 @@ theorem turn_final (hwf : QsatWf A) (hok : TapeOk σ)
 carries out one pass per clause from `c` on, alternating direction, and hands
 the verdict to the carry phase. The recursion is on the number of clauses left
 above `c`. -/
-theorem reach_evalLoop (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
+private theorem reach_evalLoop (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
     (hE : σ posEnd = symEnd) :
     ∀ (n : ℕ) (c : A), {e : A | c < e}.ncard ≤ n → QCl c → ∀ (d : Bool) (p : QV A),
       SweepStart d p → ∃ q : QV A, QPosn q ∧ Relation.ReflTransGen (qsatMachine A).Step
@@ -647,7 +656,7 @@ theorem reach_evalLoop (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = sy
 
 /-- **The carry phase** walks to the right marker and turns round, leaving the
 machine returning the verdict at the innermost variable. -/
-theorem reach_toEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
+private theorem reach_toEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
     (hE : σ posEnd = symEnd) (v : Bool) {q : QV A} (hq : QPosn q) {p' : QV A}
     (hp' : SuccPos (QLe (A := A)) QPosn p' posEnd) :
     Relation.ReflTransGen (qsatMachine A).Step ⟨stToEnd v, q, σ⟩ ⟨stProc v, p', σ⟩ := by
@@ -668,7 +677,7 @@ theorem reach_toEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symSt
 /-- **The whole evaluation phase**: from the right marker with the descent just
 finished, the machine decides the matrix and comes back returning it at the
 innermost variable. -/
-theorem reach_matrix (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
+private theorem reach_matrix (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
     (hE : σ posEnd = symEnd) {p' : QV A} (hp' : SuccPos (QLe (A := A)) QPosn p' posEnd) :
     ∃ b : Bool, (b = true ↔ QsatMatrix (TapeTrue σ)) ∧
       Relation.ReflTransGen (qsatMachine A).Step ⟨stDesc, posEnd, σ⟩ ⟨stProc b, p', σ⟩ := by
@@ -705,23 +714,23 @@ already quantified exactly the variables whose cells lie strictly below `p`. -/
 
 /-- The variables the prefix binds strictly before the position `p`: the `D` of
 the game position the machine is in when its head is at `p`. -/
-def Before (p : QV A) (x : A) : Prop := IsQVar x ∧ QLe (posCell x) p ∧ posCell x ≠ p
+private def Before (p : QV A) (x : A) : Prop := IsQVar x ∧ QLe (posCell x) p ∧ posCell x ≠ p
 
 /-- At the right marker every variable has been quantified, so the game is at a
 leaf. -/
-theorem before_posEnd (x : A) : Before (posEnd : QV A) x ↔ IsQVar x := by
+private theorem before_posEnd (x : A) : Before (posEnd : QV A) x ↔ IsQVar x := by
   refine ⟨fun h => h.1, fun h => ⟨h, qLe_cell_end x, ?_⟩⟩
   exact fun he => QTag.noConfusion (congrArg Prod.fst he)
 
 /-- **At a variable's cell, that variable is the one the prefix binds next.** -/
-theorem qLeast_before (hwf : QsatWf A) {v : A} (hv : IsQVar v) :
+private theorem qLeast_before (hwf : QsatWf A) {v : A} (hv : IsQVar v) :
     QLeast (Before (posCell v)) v := by
   refine ⟨hv, fun h => h.2.2 rfl, fun y hy hny hlt => hny ⟨hy, ?_, ?_⟩⟩
   · exact (qLe_posCell_iff hwf).mpr (Or.inl ⟨hy, hv, Or.inr hlt⟩)
   · exact fun he => hwf.irrefl v ((qOne_eq_qOne_iff.mp he).2 ▸ hlt)
 
 /-- **Stepping the head past a variable's cell quantifies that variable.** -/
-theorem before_succ (hwf : QsatWf A) {v : A} (hv : IsQVar v) {q : QV A}
+private theorem before_succ (hwf : QsatWf A) {v : A} (hv : IsQVar v) {q : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn (posCell v) q) :
     Before q = qAdd (Before (posCell v)) v := by
   obtain ⟨-, htrans, hanti, htotal⟩ := isLinOrd_qLe A hwf
@@ -748,7 +757,7 @@ are about `DescriptiveComplexity.QsatWins` alone – no machine. -/
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- **A short circuit settles the level.** An existential level reached by a
 winning branch is won; a universal level reached by a losing branch is lost. -/
-theorem qsatWins_of_short (hwf : QsatWf A) {D τ : A → Prop} {w : A} (hw : QLeast D w)
+private theorem qsatWins_of_short (hwf : QsatWf A) {D τ : A → Prop} {w : A} (hw : QLeast D w)
     {b bw : Bool} (hbr : b = true ↔ QsatWins (qAdd D w) (qUpd τ w bw)) (hsh : QShort b w) :
     b = true ↔ QsatWins D τ := by
   rcases hsh with ⟨hall, hb⟩ | ⟨hall, hb⟩
@@ -759,7 +768,7 @@ theorem qsatWins_of_short (hwf : QsatWf A) {D τ : A → Prop} {w : A} (hw : QLe
 
 omit [LinearOrder A] [Finite A] [Nonempty A] in
 /-- **Without a short circuit the second branch settles the level.** -/
-theorem qsatWins_of_second (hwf : QsatWf A) {D τ : A → Prop} {w : A} (hw : QLeast D w)
+private theorem qsatWins_of_second (hwf : QsatWf A) {D τ : A → Prop} {w : A} (hw : QLeast D w)
     {b₁ b₂ : Bool} (hns : ¬QShort b₁ w)
     (hb1 : b₁ = true ↔ QsatWins (qAdd D w) (qUpd τ w false))
     (hb2 : b₂ = true ↔ QsatWins (qAdd D w) (qUpd τ w true)) :
@@ -796,11 +805,11 @@ switch, and on strictly fewer variables – which is what makes the pair well
 founded. -/
 
 /-- The variables the prefix has still to bind when the head is at `p`. -/
-def RestCells (p : QV A) : Set A := {x : A | IsQVar x ∧ QLe p (posCell x)}
+private def RestCells (p : QV A) : Set A := {x : A | IsQVar x ∧ QLe p (posCell x)}
 
 omit [Language.qsat.Structure A] in
 /-- A cell holding its own value updates the valuation to itself. -/
-theorem qUpd_tapeTrue {w : A} {bw f : Bool} (hσ : σ (posCell w) = symV bw f w) :
+private theorem qUpd_tapeTrue {w : A} {bw f : Bool} (hσ : σ (posCell w) = symV bw f w) :
     qUpd (TapeTrue σ) w bw = TapeTrue σ := by
   funext y
   refine propext ⟨fun h => ?_, fun h => ?_⟩
@@ -813,7 +822,7 @@ theorem qUpd_tapeTrue {w : A} {bw f : Bool} (hσ : σ (posCell w) = symV bw f w)
 
 /-- The game position at `p` only reads the cells strictly below `p`, so two
 tapes agreeing there decide it alike. -/
-theorem qsatWins_before_congr {p : QV A} {σ τ : QV A → QV A}
+private theorem qsatWins_before_congr {p : QV A} {σ τ : QV A → QV A}
     (h : ∀ x : A, IsQVar x → QLe (posCell x) p → posCell x ≠ p →
       (TapeTrue σ x ↔ TapeTrue τ x)) :
     QsatWins (Before p) (TapeTrue σ) ↔ QsatWins (Before p) (TapeTrue τ) :=
@@ -821,7 +830,7 @@ theorem qsatWins_before_congr {p : QV A} {σ τ : QV A → QV A}
     fun hw => qsatWins_congr hw _ fun y hy => (h y hy.1 hy.2.1 hy.2.2).symm⟩
 
 /-- At the right marker the descent is over and the game is at a leaf. -/
-theorem reach_game_posEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
+private theorem reach_game_posEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart = symStart)
     (hE : σ posEnd = symEnd) {p' : QV A} (hp' : SuccPos (QLe (A := A)) QPosn p' posEnd) :
     ∃ b : Bool, (b = true ↔ QsatWins (Before (posEnd : QV A)) (TapeTrue σ)) ∧
       Relation.ReflTransGen (qsatMachine A).Step ⟨stDesc, posEnd, σ⟩ ⟨stProc b, p', σ⟩ := by
@@ -829,29 +838,30 @@ theorem reach_game_posEnd (hwf : QsatWf A) (hok : TapeOk σ) (hS : σ posStart =
   exact ⟨b, hb.trans (qsatWins_leaf_iff (fun x hx => (before_posEnd x).mpr hx)).symm, hrun⟩
 
 /-- The left marker has nothing below it. -/
-theorem not_succPos_posStart (hwf : QsatWf A) {p' : QV A}
+private theorem not_succPos_posStart (hwf : QsatWf A) {p' : QV A}
     (hp' : SuccPos (QLe (A := A)) QPosn p' posStart) : False :=
   hp'.2.2.2.1 ((isLinOrd_qLe A hwf).2.2.1 _ _ hp'.2.2.1 ((minPos_posStart hwf).2 p' hp'.1))
 
 /-! ### The tape after a descent -/
 
-theorem resetSeg_posEnd_cell {p₀ : QV A} {x : A} (hx : IsQVar x) (hle : QLe p₀ (posCell x)) :
+private theorem resetSeg_posEnd_cell
+    {p₀ : QV A} {x : A} (hx : IsQVar x) (hle : QLe p₀ (posCell x)) :
     resetSeg σ p₀ posEnd (posCell x) = symV false false x := by
   rw [resetSeg, ite_eq_left ⟨qPosn_posCell hx, rfl, hle, qLe_cell_end x,
     fun he => QTag.noConfusion (congrArg Prod.fst he)⟩]
   rfl
 
-theorem resetSeg_of_not_le {p₀ p r : QV A} (h : ¬QLe p₀ r) : resetSeg σ p₀ p r = σ r :=
+private theorem resetSeg_of_not_le {p₀ p r : QV A} (h : ¬QLe p₀ r) : resetSeg σ p₀ p r = σ r :=
   resetSeg_of_not fun hh => h hh.2.2.1
 
-theorem resetSeg_posStart {p₀ p : QV A} : resetSeg σ p₀ p posStart = σ posStart :=
+private theorem resetSeg_posStart {p₀ p : QV A} : resetSeg σ p₀ p posStart = σ posStart :=
   resetSeg_of_not fun h => QTag.noConfusion h.2.1
 
-theorem resetSeg_posEnd {p₀ p : QV A} : resetSeg σ p₀ p posEnd = σ posEnd :=
+private theorem resetSeg_posEnd {p₀ p : QV A} : resetSeg σ p₀ p posEnd = σ posEnd :=
   resetSeg_of_not fun h => QTag.noConfusion h.2.1
 
 /-- The tape after a descent is laid out. -/
-theorem tapeOk_resetSeg (hok : TapeOk σ) (p₀ p : QV A) :
+private theorem tapeOk_resetSeg (hok : TapeOk σ) (p₀ p : QV A) :
     TapeOk (resetSeg σ p₀ p) := by
   classical
   intro x hx
@@ -864,13 +874,13 @@ theorem tapeOk_resetSeg (hok : TapeOk σ) (p₀ p : QV A) :
     exact ⟨b, f, (resetSeg_of_not h).trans hbf⟩
 
 /-- Every variable's cell has a neighbor below it. -/
-theorem exists_beforeCell (hwf : QsatWf A) {w : A} (hw : IsQVar w) :
+private theorem exists_beforeCell (hwf : QsatWf A) {w : A} (hw : IsQVar w) :
     ∃ r : QV A, SuccPos (QLe (A := A)) QPosn r (posCell w) := by
   refine exists_predPos (isLinOrd_qLe A hwf) (qPosn_posCell hw) fun hmin => ?_
   exact not_qLe_cell_start w (hmin.2 posStart qPosn_posStart)
 
 /-- A position between two variables' cells is a variable's cell. -/
-theorem cell_of_between {v w : A} {r : QV A} (hr : QPosn r) (h1 : QLe (posCell v) r)
+private theorem cell_of_between {v w : A} {r : QV A} (hr : QPosn r) (h1 : QLe (posCell v) r)
     (h2 : QLe r (posCell w)) : ∃ u : A, IsQVar u ∧ r = posCell u := by
   rcases (qPosn_iff r).mp hr with rfl | ⟨u, hu, rfl⟩ | rfl
   · exact absurd h1 (not_qLe_cell_start v)
@@ -879,7 +889,7 @@ theorem cell_of_between {v w : A} {r : QV A} (hr : QPosn r) (h1 : QLe (posCell v
 
 /-- The cell of a variable at or after `p` is one of the variables `p` leaves
 to be quantified. -/
-theorem mem_restCells {p : QV A} {x : A} (hx : IsQVar x) (hle : QLe p (posCell x)) :
+private theorem mem_restCells {p : QV A} {x : A} (hx : IsQVar x) (hle : QLe p (posCell x)) :
     x ∈ RestCells p := ⟨hx, hle⟩
 
 /-- **The machine computes the game.** From the descent at `p` the machine
@@ -890,7 +900,7 @@ The outer recursion is on the variables still to be bound at `p`; the inner one
 – `walk` – follows the return phase leftwards from the innermost variable back
 to `p`, and calls the outer one once, at a switch, on strictly fewer
 variables. -/
-theorem reach_game (hwf : QsatWf A) :
+private theorem reach_game (hwf : QsatWf A) :
     ∀ (n : ℕ) (p : QV A), QPosn p → (RestCells p).ncard ≤ n →
       ∀ ρ : QV A → QV A, TapeOk ρ → ρ posStart = symStart → ρ posEnd = symEnd →
       ∀ p' : QV A, SuccPos (QLe (A := A)) QPosn p' p →
@@ -1124,23 +1134,23 @@ theorem reach_game (hwf : QsatWf A) :
 /-! ### The tape the machine starts on -/
 
 /-- The initial tape is laid out. -/
-theorem tapeOk_initTape : TapeOk (initTape : QV A → QV A) :=
+private theorem tapeOk_initTape : TapeOk (initTape : QV A → QV A) :=
   fun _ _ => ⟨false, false, rfl⟩
 
 omit [Language.qsat.Structure A] in
 /-- **The initial tape makes every variable false.** -/
-theorem not_tapeTrue_initTape (x : A) : ¬TapeTrue (initTape : QV A → QV A) x :=
+private theorem not_tapeTrue_initTape (x : A) : ¬TapeTrue (initTape : QV A → QV A) x :=
   fun h => Bool.false_ne_true ((tapeTrue_iff (b := false) (f := false) rfl).mp h)
 
 /-! ### The machine decides QSAT -/
 
 /-- **The machine is well formed** on a well-formed instance. -/
-theorem qsatMachine_wellFormed (hwf : QsatWf A) : (qsatMachine A).WellFormed :=
+private theorem qsatMachine_wellFormed (hwf : QsatWf A) : (qsatMachine A).WellFormed :=
   ⟨isLinOrd_qLe A hwf, exists_qPosn, fun _ _ _ ha hb => qInp_functional ha hb,
     exists_qBlank, fun _ _ ha hb => qBlank_unique ha hb⟩
 
 /-- Nothing is quantified when the head has only just left the left marker. -/
-theorem before_afterStart {p₀ : QV A}
+private theorem before_afterStart {p₀ : QV A}
     (hs : SuccPos (QLe (A := A)) QPosn posStart p₀) : Before p₀ = fun _ : A => False := by
   funext x
   refine propext ⟨fun h => ?_, fun h => h.elim⟩
@@ -1149,7 +1159,7 @@ theorem before_afterStart {p₀ : QV A}
   · exact h.2.2 he
 
 /-- **The machine accepts exactly the true formulas.** -/
-theorem qsatMachine_acceptsSpace_iff (hwf : QsatWf A) :
+private theorem qsatMachine_acceptsSpace_iff (hwf : QsatWf A) :
     (qsatMachine A).AcceptsSpace ↔ QsatWins (fun _ : A => False) (fun _ : A => False) := by
   obtain ⟨p₀, hp₀⟩ := exists_afterStart hwf
   obtain ⟨b, σ', hok', hS', hE', -, hval, hrun⟩ :=

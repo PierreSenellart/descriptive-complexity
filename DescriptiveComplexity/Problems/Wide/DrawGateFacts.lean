@@ -6,6 +6,12 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Problems.Wide.DrawInstRound
+import all DescriptiveComplexity.Problems.Wide.DrawArgs
+import all DescriptiveComplexity.Problems.Wide.DrawBack
+import all DescriptiveComplexity.Problems.Wide.DrawEnc
+import all DescriptiveComplexity.Problems.Wide.DrawGate
+import all DescriptiveComplexity.Problems.Wide.DrawInstIGate
+import all DescriptiveComplexity.Problems.Wide.DrawSlots
 
 /-!
 # The gates' facts, from the marks
@@ -67,7 +73,7 @@ omit [LinearOrder A] [Finite A] [Nonempty A] [L.IsRelational] [L.Structure A]
 /-- **An encoded tuple is canonically padded**: the layout inhabits the
 first `dd₀` coordinates, so everything above them is the designated
 zero. -/
-theorem encTup_pdd (d : PtCode dt.X)
+private theorem encTup_pdd (d : PtCode dt.X)
     (pay : Fin (blockArityBound dt.X.B) → A) {j : Fin dt.dd}
     (hj : dt.dd0 ≤ (j : ℕ)) :
     encTup dt.ly zero one d pay j = zero := by
@@ -81,7 +87,7 @@ omit [LinearOrder A] [Finite A] [Nonempty A] [L.IsRelational]
 /-- **A padded tuple whose name coordinates spell an encoded tuple is that
 tuple**: the coordinates above `dd₀` agree because both sides are zero
 there. -/
-theorem eq_encTup_of_marks {u2 : Fin dt.dd → A} {d : PtCode dt.X}
+private theorem eq_encTup_of_marks {u2 : Fin dt.dd → A} {d : PtCode dt.X}
     {pay : Fin (blockArityBound dt.X.B) → A}
     (hpdd : ∀ j : Fin dt.dd, dt.dd0 ≤ (j : ℕ) → u2 j = zero)
     (hname : ∀ j : Fin dt.dd0,
@@ -102,7 +108,7 @@ omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite
 /-- **The shape clause of the marks is the shape of the cell's tuple**:
 the padding mark together with a name-coordinate match is full equality
 with the encoded tuple. -/
-theorem shape_marks_iff (hzo : zero ≠ one)
+private theorem shape_marks_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (st : TapeStD dt A R P) (u : Univ A R P dt.KIx dt.dd) :
     (dt.back RF.cell zero one dt.dd0Le st (RF.cell u) .pdd = one ∧
@@ -144,7 +150,7 @@ omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite
 /-- **The outer file test's question, read off the marks**: if the cell is
 of the gated block and belongs to MIRROR, its tuple is a witness or a
 member shape. -/
-theorem wellShapedG_back_iff (hzo : zero ≠ one)
+private theorem wellShapedG_back_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (st : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
     (u : Univ A R P dt.KIx dt.dd) :
@@ -175,7 +181,7 @@ variable {zero one} in
 omit [Nonempty A] [L.IsRelational] [L.Structure A] [Finite A] [Finite R] [Finite P] in
 /-- **The inner file test's question, read off the marks**: the same at the
 VAL register. -/
-theorem igTest_iff (hzo : zero ≠ one)
+private theorem igTest_iff (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     (stV : TapeStD dt A R P) (b' : Fin dt.ko ⊕ Fin dt.ki)
     (u : Univ A R P dt.KIx dt.dd) :
@@ -211,7 +217,7 @@ omit [LinearOrder A] [LinearOrder R] [LinearOrder P]
 /-- **The per-cell questions of a block answer for its value**: every cell
 of block `b'` in the register is well-shaped exactly when every member of
 the block value is a witness or a member shape. -/
-theorem forall_shape_iff_of_cells
+private theorem forall_shape_iff_of_cells
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     (hcell : ∀ u : Univ A R P dt.KIx dt.dd,
       (u.1 = (Tag.arg (toLex b') : Tag R P dt.KIx) → m u →
@@ -231,7 +237,7 @@ theorem forall_shape_iff_of_cells
 variable {zero one} in
 omit [Nonempty A] [L.IsRelational] [Finite A] [Finite R] [Finite P] in
 /-- **At an encoding every cell passes the outer file test.** -/
-theorem testOf_of_encMap (hzo : zero ≠ one)
+private theorem testOf_of_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {st : TapeStD dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
     (hS : wmBlk st.mir (Tag.arg (toLex b') : Tag R P dt.KIx) =
@@ -254,7 +260,7 @@ omit [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
 /-- **At an encoding the witness is one-hot at the point's tag.** -/
-theorem wit_of_encMap (hzo : zero ≠ one)
+private theorem wit_of_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
     (hS : wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) =
@@ -270,7 +276,7 @@ omit [LinearOrder R] [LinearOrder P]
   [Language.wide.Structure (Univ A R P dt.KIx dt.dd)]
   [Finite R] [Finite P] [L.IsRelational] in
 /-- **At an encoding the dispatch is the point's tag.** -/
-theorem dspTagOf_encMap (hzo : zero ≠ one)
+private theorem dspTagOf_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
     (hS : wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) =
@@ -285,7 +291,7 @@ omit [LinearOrder R] [LinearOrder P]
   [Finite A] [Finite R] [Finite P] [Nonempty A] [L.IsRelational] in
 /-- **At an encoding the domain condition holds of the decoded
 assignment** – the point carries it. -/
-theorem domHolds_of_encMap (hzo : zero ≠ one)
+private theorem domHolds_of_encMap (hzo : zero ≠ one)
     {m : Univ A R P dt.KIx dt.dd → Prop} {b' : Fin dt.ko ⊕ Fin dt.ki}
     {p : dt.X.Map A}
     (hS : wmBlk m (Tag.arg (toLex b') : Tag R P dt.KIx) =
@@ -349,7 +355,7 @@ theorem gate_trichotomy (hzo : zero ≠ one)
 variable {zero one} in
 omit [Nonempty A] [L.IsRelational] [Finite A] [Finite R] [Finite P] in
 /-- **Every cell of an encoded VAL block passes the inner file test.** -/
-theorem igTest_of_encMap (hzo : zero ≠ one)
+private theorem igTest_of_encMap (hzo : zero ≠ one)
     (hlin : IsLinOrd (WMLe (A := Univ A R P dt.KIx dt.dd)))
     {stV : TapeStD dt A R P} {b' : Fin dt.ko ⊕ Fin dt.ki} {p : dt.X.Map A}
     (hS : wmBlk stV.val (Tag.arg (toLex b') : Tag R P dt.KIx) =

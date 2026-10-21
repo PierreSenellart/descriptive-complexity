@@ -8,6 +8,12 @@ module
 public import DescriptiveComplexity.Problems.FinSat.Interp
 import DescriptiveComplexity.Problems.FinSat.Fixpoint
 import Mathlib.Tactic.FinCases
+import all DescriptiveComplexity.Padding
+import all DescriptiveComplexity.Problems.FinSat.Defs
+import all DescriptiveComplexity.Problems.FinSat.Fixpoint
+import all DescriptiveComplexity.Problems.FinSat.Interp
+import all DescriptiveComplexity.Problems.FinSat.Kernel
+import all DescriptiveComplexity.Problems.Sat.Tseitin
 
 /-!
 # Reading the encoded sentence off the image
@@ -99,7 +105,7 @@ theorem ptOf_inj {t : FTag B φ} {w w' : Fin (tagDim B φ t) → A}
 omit [L.Structure A] [LinearOrder A] in
 /-- The first coordinate of a point, which is where a tag of dimension one – the
 prefix, its variable, a literal of a translated atom – holds its element. -/
-theorem ptOf_c0 {t : FTag B φ} (hd : 0 < tagDim B φ t) (w : Fin (tagDim B φ t) → A) :
+private theorem ptOf_c0 {t : FTag B φ} (hd : 0 < tagDim B φ t) (w : Fin (tagDim B φ t) → A) :
     (ptOf B φ a₀ t w).2 (c0 B φ) = w ⟨0, hd⟩ := by
   rw [ptOf_snd, pad,
     dite_eq_left (show ((c0 B φ : Fin (finsatDim B φ)) : ℕ) < tagDim B φ t from hd)]
@@ -108,7 +114,7 @@ theorem ptOf_c0 {t : FTag B φ} (hd : 0 < tagDim B φ t) (w : Fin (tagDim B φ t
 omit [L.Structure A] [LinearOrder A] in
 /-- The second coordinate of a point: where a distinctness literal of the
 diagram holds the second of its two elements. -/
-theorem ptOf_c1 {t : FTag B φ} (hd : 1 < tagDim B φ t) (w : Fin (tagDim B φ t) → A) :
+private theorem ptOf_c1 {t : FTag B φ} (hd : 1 < tagDim B φ t) (w : Fin (tagDim B φ t) → A) :
     (ptOf B φ a₀ t w).2 (c1 B φ) = w ⟨1, hd⟩ := by
   rw [ptOf_snd, pad,
     dite_eq_left (show ((c1 B φ : Fin (finsatDim B φ)) : ℕ) < tagDim B φ t from hd)]
@@ -120,22 +126,22 @@ The four kinds are decided by the tag alone
 (`DescriptiveComplexity.FinSat.andTag` and its companions), so at a point they
 are read off the tag and nothing else. -/
 
-theorem andG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
+private theorem andG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
     AndG (ptOf B φ a₀ t w) ↔ andTag B φ t :=
   ⟨fun h => ((andG_map_iff B φ _).mp h).2,
     fun h => (andG_map_iff B φ _).mpr ⟨canon_ptOf B φ ha₀ t w, h⟩⟩
 
-theorem orG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
+private theorem orG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
     OrG (ptOf B φ a₀ t w) ↔ orTag B φ t :=
   ⟨fun h => ((orG_map_iff B φ _).mp h).2,
     fun h => (orG_map_iff B φ _).mpr ⟨canon_ptOf B φ ha₀ t w, h⟩⟩
 
-theorem allG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
+private theorem allG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
     AllG (ptOf B φ a₀ t w) ↔ allTag B φ t :=
   ⟨fun h => ((allG_map_iff B φ _).mp h).2,
     fun h => (allG_map_iff B φ _).mpr ⟨canon_ptOf B φ ha₀ t w, h⟩⟩
 
-theorem exG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
+private theorem exG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
     ExG (ptOf B φ a₀ t w) ↔ exTag B φ t :=
   ⟨fun h => ((exG_map_iff B φ _).mp h).2,
     fun h => (exG_map_iff B φ _).mpr ⟨canon_ptOf B φ ha₀ t w, h⟩⟩
@@ -154,16 +160,16 @@ variable {a₀ : A}
 
 /-- The top conjunction of the sentence: the diagram and the translated
 kernel. -/
-def bodyPt (a₀ : A) : (finsatInterp B φ).Map A := ptOf B φ a₀ Tag.body fun _ => a₀
+private def bodyPt (a₀ : A) : (finsatInterp B φ).Map A := ptOf B φ a₀ Tag.body fun _ => a₀
 
 /-- The existential of the prefix binding the variable of `a`. -/
-def prePt (a₀ a : A) : (finsatInterp B φ).Map A := ptOf B φ a₀ Tag.pre fun _ => a
+private def prePt (a₀ a : A) : (finsatInterp B φ).Map A := ptOf B φ a₀ Tag.pre fun _ => a
 
 /-- The variable that existential binds. -/
 def pvarPt (a₀ a : A) : (finsatInterp B φ).Map A := ptOf B φ a₀ Tag.pvar fun _ => a
 
 /-- The distinctness literal `x_a ≠ x_b` of the diagram. -/
-def neqPt (a₀ a b : A) : (finsatInterp B φ).Map A :=
+private def neqPt (a₀ a b : A) : (finsatInterp B φ).Map A :=
   ptOf B φ a₀ Tag.neq fun j => if (j : ℕ) = 0 then a else b
 
 /-- The variable naming a de Bruijn level of the kernel. -/
@@ -188,7 +194,7 @@ def atupPt (a₀ : A) (p : Pos B φ) (pol : Bool)
   ptOf B φ a₀ (Tag.atup p pol) w
 
 /-- One equality literal inside such a tuple. -/
-def alitPt (a₀ : A) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ)) (a : A) :
+private def alitPt (a₀ : A) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ)) (a : A) :
     (finsatInterp B φ).Map A :=
   ptOf B φ a₀ (Tag.alit p pol j) fun _ => a
 
@@ -206,20 +212,20 @@ transparency `simp` matches at, so `childBodyF B φ g.1 c.1` would never reduce
 even with both tags known. At a point the tag is syntactically there. -/
 
 /-- The valuation a unary defining formula of the image is read at. -/
-def val₁ (x : (finsatInterp B φ).Map A) : Fin 1 × Fin (finsatDim B φ) → A :=
+private def val₁ (x : (finsatInterp B φ).Map A) : Fin 1 × Fin (finsatDim B φ) → A :=
   fun q => ((![x] : Fin 1 → (finsatInterp B φ).Map A) q.1).2 q.2
 
 /-- The valuation a binary defining formula of the image is read at. -/
-def val₂ (x y : (finsatInterp B φ).Map A) : Fin 2 × Fin (finsatDim B φ) → A :=
+private def val₂ (x y : (finsatInterp B φ).Map A) : Fin 2 × Fin (finsatDim B φ) → A :=
   fun q => ((![x, y] : Fin 2 → (finsatInterp B φ).Map A) q.1).2 q.2
 
 /-- The valuation a ternary defining formula of the image is read at. -/
-def val₃ (x y z : (finsatInterp B φ).Map A) : Fin 3 × Fin (finsatDim B φ) → A :=
+private def val₃ (x y z : (finsatInterp B φ).Map A) : Fin 3 × Fin (finsatDim B φ) → A :=
   fun q => ((![x, y, z] : Fin 3 → (finsatInterp B φ).Map A) q.1).2 q.2
 
 /-- The child relation at a pair of points: canonicity is automatic, so only the
 body is left. -/
-theorem childG_ptOf_iff (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem childG_ptOf_iff (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     ChildG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') ↔
       (childBodyF B φ t t').Realize (val₂ B φ (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w')) := by
@@ -243,7 +249,7 @@ theorem childG_ptOf_iff (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim
 
 /-- **The existential prefix is a chain**: the node of `a` has the node of the
 next element of the input order as its child. -/
-theorem childG_pre_pre (ha₀ : IsBot a₀) (a b : A) :
+private theorem childG_pre_pre (ha₀ : IsBot a₀) (a b : A) :
     ChildG (prePt B φ a₀ a) (prePt B φ a₀ b) ↔ a < b ∧ ∀ x : A, ¬(a < x ∧ x < b) := by
   have key := childG_ptOf_iff B φ ha₀ Tag.pre Tag.pre (fun _ => a) (fun _ => b)
   simp only [childBodyF, realize_succF] at key
@@ -256,7 +262,7 @@ theorem childG_pre_pre (ha₀ : IsBot a₀) (a b : A) :
 
 /-- **The last node of the prefix hands over the top conjunction**: the node of
 the greatest element of the input order. -/
-theorem childG_pre_body (ha₀ : IsBot a₀) (a : A) :
+private theorem childG_pre_body (ha₀ : IsBot a₀) (a : A) :
     ChildG (prePt B φ a₀ a) (bodyPt B φ a₀) ↔ ∀ x : A, x ≤ a := by
   have key := childG_ptOf_iff B φ ha₀ Tag.pre Tag.body (fun _ => a) (fun _ => a₀)
   simp only [childBodyF, realize_maxF] at key
@@ -268,7 +274,7 @@ theorem childG_pre_body (ha₀ : IsBot a₀) (a : A) :
 /-- **The top conjunction takes the distinctness literals of the diagram** – and
 only those of *distinct* pairs: the literal of `(a, a)` says `x_a ≠ x_a`, which
 no environment satisfies, so it must not be a conjunct. -/
-theorem childG_body_neq (ha₀ : IsBot a₀) (a b : A) :
+private theorem childG_body_neq (ha₀ : IsBot a₀) (a b : A) :
     ChildG (bodyPt B φ a₀) (neqPt B φ a₀ a b) ↔ a ≠ b := by
   have key := childG_ptOf_iff B φ ha₀ Tag.body Tag.neq (fun _ => a₀)
     (fun j => if (j : ℕ) = 0 then a else b)
@@ -284,7 +290,7 @@ theorem childG_body_neq (ha₀ : IsBot a₀) (a b : A) :
 
 /-- The top conjunction takes the root of the translated kernel, and nothing
 else of the kernel. -/
-theorem childG_body_nd (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) :
+private theorem childG_body_nd (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) :
     ChildG (bodyPt B φ a₀) (ndPt B φ a₀ p pol) ↔ pol = true ∧ p = rootPos B φ := by
   classical
   have key := childG_ptOf_iff B φ ha₀ Tag.body (Tag.nd p pol) (fun _ => a₀) (fun _ => a₀)
@@ -299,7 +305,7 @@ theorem childG_body_nd (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) :
 /-- **Inside the translated kernel the child relation follows
 `DescriptiveComplexity.FinSat.kidOf`**, the polarity flipping exactly at the
 premise of an implication. -/
-theorem childG_nd_nd (ha₀ : IsBot a₀) (p q : Pos B φ) (pol pol' : Bool) :
+private theorem childG_nd_nd (ha₀ : IsBot a₀) (p q : Pos B φ) (pol pol' : Bool) :
     ChildG (ndPt B φ a₀ p pol) (ndPt B φ a₀ q pol') ↔ kidOf φ p.2 q.2 = some (xor pol pol') := by
   classical
   have key := childG_ptOf_iff B φ ha₀ (Tag.nd p pol) (Tag.nd q pol') (fun _ => a₀) (fun _ => a₀)
@@ -314,7 +320,7 @@ theorem childG_nd_nd (ha₀ : IsBot a₀) (p q : Pos B φ) (pol pol' : Bool) :
 /-- A translated atom takes the tuple nodes where it holds: **the one place the
 reduction reads the input structure**, and the reason the encoded sentence never
 mentions a symbol of the input vocabulary. -/
-theorem childG_nd_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem childG_nd_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (w : Fin (tagDim B φ (Tag.atup p pol)) → A) :
     ChildG (ndPt B φ a₀ p pol) (atupPt B φ a₀ p pol w) ↔
       (inAtomF B φ p).Realize
@@ -327,7 +333,7 @@ theorem childG_nd_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
 
 /-- Each tuple node takes one equality literal per argument position, binding
 that argument to the variable of the corresponding element. -/
-theorem childG_atup_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem childG_atup_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (w : Fin (tagDim B φ (Tag.atup p pol)) → A) (j : Fin (finsatDim B φ)) (a : A) :
     ChildG (atupPt B φ a₀ p pol w) (alitPt B φ a₀ p pol j a) ↔
       (j : ℕ) < inArity B φ p ∧ pad a₀ w j = a := by
@@ -347,7 +353,7 @@ theorem childG_atup_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
 
 /-! ### The binders, the literals and the root -/
 
-theorem bindG_ptOf_iff (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem bindG_ptOf_iff (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     BindG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') ↔
       (bindBodyF B φ t t').Realize (val₂ B φ (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w')) := by
@@ -368,7 +374,7 @@ theorem bindG_ptOf_iff (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim 
     · exact canon_ptOf B φ ha₀ t' w'
 
 /-- Each node of the prefix binds its own variable. -/
-theorem bindG_pre_pvar (ha₀ : IsBot a₀) (a b : A) :
+private theorem bindG_pre_pvar (ha₀ : IsBot a₀) (a b : A) :
     BindG (prePt B φ a₀ a) (pvarPt B φ a₀ b) ↔ a = b := by
   have key := bindG_ptOf_iff B φ ha₀ Tag.pre Tag.pvar (fun _ => a) (fun _ => b)
   simp only [bindBodyF, Formula.realize_equal, Term.realize_var] at key
@@ -394,7 +400,7 @@ theorem bindG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
   · rw [ite_eq_right h, Formula.realize_bot]
     exact iff_of_false not_false h
 
-theorem neqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem neqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) (w'' : Fin (tagDim B φ t'') → A) :
     NeqG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') (ptOf B φ a₀ t'' w'') ↔
       (neqBodyF B φ t t' t'').Realize
@@ -418,7 +424,7 @@ theorem neqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagD
 
 /-- **The diagram**: the literal of the pair `(a, b)` says that the variables of
 `a` and of `b` are distinct, and it exists only for `a ≠ b`. -/
-theorem neqG_neq_pvar (ha₀ : IsBot a₀) (a b x y : A) :
+private theorem neqG_neq_pvar (ha₀ : IsBot a₀) (a b x y : A) :
     NeqG (neqPt B φ a₀ a b) (pvarPt B φ a₀ x) (pvarPt B φ a₀ y) ↔ a = x ∧ b = y ∧ a ≠ b := by
   have key := neqG_ptOf_iff B φ ha₀ Tag.neq Tag.pvar Tag.pvar
     (fun j => if (j : ℕ) = 0 then a else b) (fun _ => x) (fun _ => y)
@@ -439,7 +445,7 @@ theorem neqG_neq_pvar (ha₀ : IsBot a₀) (a b x y : A) :
   rw [h0, h0', h1, h2] at key
   exact key
 
-theorem rootG_ptOf_iff (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
+private theorem rootG_ptOf_iff (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A) :
     RootG (ptOf B φ a₀ t w) ↔
       (rootBodyF B φ t).Realize (val₁ B φ (ptOf B φ a₀ t w)) := by
   constructor
@@ -457,7 +463,7 @@ theorem rootG_ptOf_iff (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B �
 
 /-- **The root of the encoded sentence** is the node of the prefix binding the
 least element of the input order: the outermost existential. -/
-theorem rootG_pre (ha₀ : IsBot a₀) (a : A) :
+private theorem rootG_pre (ha₀ : IsBot a₀) (a : A) :
     RootG (prePt B φ a₀ a) ↔ ∀ x : A, a ≤ x := by
   have key := rootG_ptOf_iff B φ ha₀ Tag.pre (fun _ => a)
   simp only [rootBodyF, realize_minF] at key
@@ -477,24 +483,24 @@ the tag alone decides. -/
 
 omit [L.Structure A] in
 /-- Every canonically padded element is a point. -/
-theorem exists_ptOf (ha₀ : IsBot a₀) {x : (finsatInterp B φ).Map A}
+private theorem exists_ptOf (ha₀ : IsBot a₀) {x : (finsatInterp B φ).Map A}
     (h : Canon (tagDim B φ x.1) x.2) :
     ∃ (t : FTag B φ) (w : Fin (tagDim B φ t) → A), x = ptOf B φ a₀ t w :=
   ⟨x.1, _, eq_ptOf B φ ha₀ h⟩
 
-theorem canon_of_childG_right {g c : (finsatInterp B φ).Map A} (h : ChildG g c) :
+private theorem canon_of_childG_right {g c : (finsatInterp B φ).Map A} (h : ChildG g c) :
     Canon (tagDim B φ c.1) c.2 :=
   ((realize_childFml B φ (fun i => ((![g, c] : Fin 2 → (finsatInterp B φ).Map A) i).1)
     (val₂ B φ g c)).mp h).1 1
 
-theorem canon_of_bindG_right {g x : (finsatInterp B φ).Map A} (h : BindG g x) :
+private theorem canon_of_bindG_right {g x : (finsatInterp B φ).Map A} (h : BindG g x) :
     Canon (tagDim B φ x.1) x.2 :=
   ((realize_bindFml B φ (fun i => ((![g, x] : Fin 2 → (finsatInterp B φ).Map A) i).1)
     (val₂ B φ g x)).mp h).1 1
 
 /-- **A child is a point**: the child relation of the image never leaves the
 elements the sentence reads. -/
-theorem childG_iff_pt (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem childG_iff_pt (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (c : (finsatInterp B φ).Map A) :
     ChildG (ptOf B φ a₀ t w) c ↔ ∃ (t' : FTag B φ) (w' : Fin (tagDim B φ t') → A),
       c = ptOf B φ a₀ t' w' ∧ ChildG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') := by
@@ -506,7 +512,7 @@ theorem childG_iff_pt (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ
     exact h
 
 /-- A tag pair the child relation is not defined at has no edge. -/
-theorem not_childG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ)
+private theorem not_childG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ)
     (hb : childBodyF B φ t t' = ⊥) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     ¬ChildG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') := by
@@ -544,7 +550,7 @@ theorem tup_two_eq {t : FTag B φ} (h : tagDim B φ t = 2) (w : Fin (tagDim B φ
 
 /-- **The children of the top conjunction**: every distinctness literal of the
 diagram, and the root of the translated kernel at polarity `true`. -/
-theorem childG_body_iff (ha₀ : IsBot a₀) (c : (finsatInterp B φ).Map A) :
+private theorem childG_body_iff (ha₀ : IsBot a₀) (c : (finsatInterp B φ).Map A) :
     ChildG (bodyPt B φ a₀) c ↔
       (∃ a b : A, a ≠ b ∧ c = neqPt B φ a₀ a b) ∨ c = ndPt B φ a₀ (rootPos B φ) true := by
   constructor
@@ -568,7 +574,7 @@ theorem childG_body_iff (ha₀ : IsBot a₀) (c : (finsatInterp B φ).Map A) :
 /-- **The children of a node of the existential prefix**: the node of the next
 element of the input order, and – at the greatest element – the top
 conjunction. -/
-theorem childG_pre_iff (ha₀ : IsBot a₀) (a : A) (c : (finsatInterp B φ).Map A) :
+private theorem childG_pre_iff (ha₀ : IsBot a₀) (a : A) (c : (finsatInterp B φ).Map A) :
     ChildG (prePt B φ a₀ a) c ↔
       (∃ b : A, c = prePt B φ a₀ b ∧ a < b ∧ ∀ x : A, ¬(a < x ∧ x < b)) ∨
         (c = bodyPt B φ a₀ ∧ ∀ x : A, x ≤ a) := by
@@ -595,7 +601,7 @@ the only genuine atoms of the encoded sentence – with their symbols, their
 argument positions and their signature. All but the literals of a translated
 atom are decided by the tags. -/
 
-theorem eqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem eqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) (w'' : Fin (tagDim B φ t'') → A) :
     EqG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') (ptOf B φ a₀ t'' w'') ↔
       (eqBodyF B φ t t' t'').Realize
@@ -619,7 +625,7 @@ theorem eqG_ptOf_iff (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDi
 
 /-- A positive equality of the kernel, between the variables of two de Bruijn
 levels. -/
-theorem eqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem eqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (l₁ l₂ : Fin (Tseitin.maxCtx φ)) :
     EqG (ndPt B φ a₀ p pol) (dbvarPt B φ a₀ l₁) (dbvarPt B φ a₀ l₂) ↔
       pol = true ∧ eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ)) := by
@@ -635,7 +641,7 @@ theorem eqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     exact iff_of_false not_false h
 
 /-- A negated equality of the kernel. -/
-theorem neqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem neqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (l₁ l₂ : Fin (Tseitin.maxCtx φ)) :
     NeqG (ndPt B φ a₀ p pol) (dbvarPt B φ a₀ l₁) (dbvarPt B φ a₀ l₂) ↔
       pol = false ∧ eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ)) := by
@@ -652,7 +658,7 @@ theorem neqG_nd_dbvar (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
 
 /-- **A literal of a translated atom**: the argument of the atom at one position
 is the variable of the element that tuple holds there. -/
-theorem eqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
+private theorem eqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
     (a b : A) (l : Fin (Tseitin.maxCtx φ)) :
     EqG (alitPt B φ a₀ p pol j a) (dbvarPt B φ a₀ l) (pvarPt B φ a₀ b) ↔
       (pol = true ∧ inArg B φ p (j : ℕ) = some (l : ℕ)) ∧ a = b := by
@@ -674,7 +680,7 @@ theorem eqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (fins
     exact iff_of_false not_false fun hc => h hc.1
 
 /-- The same, negated: what a tuple of a *negatively* translated atom asks. -/
-theorem neqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
+private theorem neqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
     (a b : A) (l : Fin (Tseitin.maxCtx φ)) :
     NeqG (alitPt B φ a₀ p pol j a) (dbvarPt B φ a₀ l) (pvarPt B φ a₀ b) ↔
       (pol = false ∧ inArg B φ p (j : ℕ) = some (l : ℕ)) ∧ a = b := by
@@ -698,7 +704,7 @@ theorem neqG_alit (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (fin
 /-! The atoms of the relation variables, which the encoded sentence does name:
 all four relations are decided by the tags. -/
 
-theorem posG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem posG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     PosG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') ↔ atomTag B φ true t t' := by
   refine ⟨fun h => ((realize_posFml B φ (fun i => ((![ptOf B φ a₀ t w, ptOf B φ a₀ t' w'] :
@@ -712,7 +718,7 @@ theorem posG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ 
   · exact canon_ptOf B φ ha₀ t w
   · exact canon_ptOf B φ ha₀ t' w'
 
-theorem negG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem negG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     NegG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') ↔ atomTag B φ false t t' := by
   refine ⟨fun h => ((realize_negFml B φ (fun i => ((![ptOf B φ a₀ t w, ptOf B φ a₀ t' w'] :
@@ -726,7 +732,7 @@ theorem negG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ 
   · exact canon_ptOf B φ ha₀ t w
   · exact canon_ptOf B φ ha₀ t' w'
 
-theorem argG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem argG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) (w'' : Fin (tagDim B φ t'') → A) :
     ArgG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') (ptOf B φ a₀ t'' w'') ↔
       argTag B φ t t' t'' := by
@@ -745,7 +751,7 @@ theorem argG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (w : Fin (tagDim B
   · exact canon_ptOf B φ ha₀ t' w'
   · exact canon_ptOf B φ ha₀ t'' w''
 
-theorem sigG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem sigG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     SigG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') ↔ sigTag B φ t t' := by
   refine ⟨fun h => ((realize_sigFml B φ (fun i => ((![ptOf B φ a₀ t w, ptOf B φ a₀ t' w'] :
@@ -763,7 +769,7 @@ atom, each of which takes one equality literal per argument. A tuple node of
 atoms independent. -/
 
 /-- A kernel node only takes tuple nodes of its own position and polarity. -/
-theorem eq_of_childG_nd_atup (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' : Bool}
+private theorem eq_of_childG_nd_atup (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' : Bool}
     (w : Fin (tagDim B φ (Tag.atup q pol')) → A)
     (h : ChildG (ptOf B φ a₀ (Tag.nd p pol) (fun _ => a₀))
       (ptOf B φ a₀ (Tag.atup q pol') w)) : p = q ∧ pol = pol' := by
@@ -773,7 +779,7 @@ theorem eq_of_childG_nd_atup (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' : B
   exact h
 
 /-- A tuple node only takes literals of its own position and polarity. -/
-theorem eq_of_childG_atup_alit (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' : Bool}
+private theorem eq_of_childG_atup_alit (ha₀ : IsBot a₀) {p q : Pos B φ} {pol pol' : Bool}
     {j : Fin (finsatDim B φ)} (w : Fin (tagDim B φ (Tag.atup p pol)) → A)
     (w' : Fin (tagDim B φ (Tag.alit q pol' j)) → A)
     (h : ChildG (ptOf B φ a₀ (Tag.atup p pol) w) (ptOf B φ a₀ (Tag.alit q pol' j) w')) :
@@ -810,7 +816,7 @@ theorem childG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
 /-- **The children of a tuple node**: one equality literal per argument
 position, binding that argument to the variable of the element the tuple holds
 there. -/
-theorem childG_atup_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem childG_atup_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (w : Fin (tagDim B φ (Tag.atup p pol)) → A) (c : (finsatInterp B φ).Map A) :
     ChildG (atupPt B φ a₀ p pol w) c ↔
       ∃ j : Fin (finsatDim B φ), (j : ℕ) < inArity B φ p ∧
@@ -836,7 +842,7 @@ node binds, so they need the converse of
 the variable of the de Bruijn level it introduces, and nothing else. -/
 
 /-- **A binder is a point.** -/
-theorem bindG_iff_pt (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A)
+private theorem bindG_iff_pt (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ t) → A)
     (x : (finsatInterp B φ).Map A) :
     BindG (ptOf B φ a₀ t w) x ↔ ∃ (t' : FTag B φ) (w' : Fin (tagDim B φ t') → A),
       x = ptOf B φ a₀ t' w' ∧ BindG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') := by
@@ -848,7 +854,7 @@ theorem bindG_iff_pt (ha₀ : IsBot a₀) (t : FTag B φ) (w : Fin (tagDim B φ 
     exact h
 
 /-- A tag pair the binding relation is not defined at binds nothing. -/
-theorem not_bindG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ)
+private theorem not_bindG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ)
     (hb : bindBodyF B φ t t' = ⊥) (w : Fin (tagDim B φ t) → A)
     (w' : Fin (tagDim B φ t') → A) :
     ¬BindG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') := by
@@ -857,7 +863,7 @@ theorem not_bindG_ptOf (ha₀ : IsBot a₀) (t t' : FTag B φ)
 
 /-- **What a quantifier of the kernel binds**: the variable of the de Bruijn
 level it introduces, and nothing else. -/
-theorem bindG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem bindG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (x : (finsatInterp B φ).Map A) :
     BindG (ndPt B φ a₀ p pol) x ↔ ∃ l : Fin (Tseitin.maxCtx φ),
       qLevel B φ p = some (l : ℕ) ∧ x = dbvarPt B φ a₀ l := by
@@ -883,7 +889,7 @@ needs. -/
 
 omit [L.Structure A] [LinearOrder A] in
 /-- The variables of two distinct de Bruijn levels are distinct elements. -/
-theorem dbvarPt_inj {l l' : Fin (Tseitin.maxCtx φ)}
+private theorem dbvarPt_inj {l l' : Fin (Tseitin.maxCtx φ)}
     (h : dbvarPt B φ a₀ l = dbvarPt B φ a₀ l') : l = l' := by
   have := congrArg Prod.fst h
   exact Tag.dbvar.inj this
@@ -898,7 +904,8 @@ omit [L.Structure A] [LinearOrder A] in
 /-- **Passing under a quantifier is `Fin.snoc`**: updating the environment at
 the variable of level `n` extends the context tuple of length `n` by the value
 bound there. -/
-theorem pref_envOf_upd (v : (finsatInterp B φ).Map A → M) {n : ℕ} (hn : n < Tseitin.maxCtx φ)
+private theorem pref_envOf_upd
+    (v : (finsatInterp B φ).Map A → M) {n : ℕ} (hn : n < Tseitin.maxCtx φ)
     (d : M) :
     pref (Nat.succ_le_of_lt hn) (envOf B φ a₀ (upd v (dbvarPt B φ a₀ ⟨n, hn⟩) d)) =
       Fin.snoc (pref (le_of_lt hn) (envOf B φ a₀ v)) d := by
@@ -921,28 +928,29 @@ The truth definition's literal clauses quantify over the two elements an
 equality relates, so, as with the children, an arbitrary pair has to be put back
 into points and the tags then decide. -/
 
-theorem canon_of_eqG {g x y : (finsatInterp B φ).Map A} (h : EqG g x y) :
+private theorem canon_of_eqG {g x y : (finsatInterp B φ).Map A} (h : EqG g x y) :
     Canon (tagDim B φ x.1) x.2 ∧ Canon (tagDim B φ y.1) y.2 :=
   ⟨((realize_eqFml B φ (fun i => ((![g, x, y] : Fin 3 → (finsatInterp B φ).Map A) i).1)
       (val₃ B φ g x y)).mp h).1 1,
     ((realize_eqFml B φ (fun i => ((![g, x, y] : Fin 3 → (finsatInterp B φ).Map A) i).1)
       (val₃ B φ g x y)).mp h).1 2⟩
 
-theorem canon_of_neqG {g x y : (finsatInterp B φ).Map A} (h : NeqG g x y) :
+private theorem canon_of_neqG {g x y : (finsatInterp B φ).Map A} (h : NeqG g x y) :
     Canon (tagDim B φ x.1) x.2 ∧ Canon (tagDim B φ y.1) y.2 :=
   ⟨((realize_neqFml B φ (fun i => ((![g, x, y] : Fin 3 → (finsatInterp B φ).Map A) i).1)
       (val₃ B φ g x y)).mp h).1 1,
     ((realize_neqFml B φ (fun i => ((![g, x, y] : Fin 3 → (finsatInterp B φ).Map A) i).1)
       (val₃ B φ g x y)).mp h).1 2⟩
 
-theorem not_eqG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (hb : eqBodyF B φ t t' t'' = ⊥)
+private theorem not_eqG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (hb : eqBodyF B φ t t' t'' = ⊥)
     (w : Fin (tagDim B φ t) → A) (w' : Fin (tagDim B φ t') → A)
     (w'' : Fin (tagDim B φ t'') → A) :
     ¬EqG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') (ptOf B φ a₀ t'' w'') := by
   rw [eqG_ptOf_iff B φ ha₀, hb]
   exact not_false
 
-theorem not_neqG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (hb : neqBodyF B φ t t' t'' = ⊥)
+private theorem not_neqG_ptOf
+    (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (hb : neqBodyF B φ t t' t'' = ⊥)
     (w : Fin (tagDim B φ t) → A) (w' : Fin (tagDim B φ t') → A)
     (w'' : Fin (tagDim B φ t'') → A) :
     ¬NeqG (ptOf B φ a₀ t w) (ptOf B φ a₀ t' w') (ptOf B φ a₀ t'' w'') := by
@@ -951,7 +959,7 @@ theorem not_neqG_ptOf (ha₀ : IsBot a₀) (t t' t'' : FTag B φ) (hb : neqBodyF
 
 /-- **The positive equality literals of a kernel node**: the variables of the two
 de Bruijn levels the kernel compares there, at polarity `true`. -/
-theorem eqG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem eqG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (x y : (finsatInterp B φ).Map A) :
     EqG (ndPt B φ a₀ p pol) x y ↔ ∃ l₁ l₂ : Fin (Tseitin.maxCtx φ),
       (pol = true ∧ eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ))) ∧
@@ -973,7 +981,7 @@ theorem eqG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     exact (eqG_nd_dbvar B φ ha₀ p pol l₁ l₂).mpr hc
 
 /-- The same for the negated equalities. -/
-theorem neqG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem neqG_nd_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (x y : (finsatInterp B φ).Map A) :
     NeqG (ndPt B φ a₀ p pol) x y ↔ ∃ l₁ l₂ : Fin (Tseitin.maxCtx φ),
       (pol = false ∧ eqArgs B φ p = some ((l₁ : ℕ), (l₂ : ℕ))) ∧
@@ -1006,14 +1014,14 @@ to the least, which is the root of the sentence. -/
 omit [L.Structure A] [LinearOrder A] in
 /-- The variables of the prefix are pairwise distinct: they are the elements the
 sentence's diagram forces apart. -/
-theorem pvarPt_inj {b c : A} (h : pvarPt B φ a₀ b = pvarPt B φ a₀ c) : b = c :=
+private theorem pvarPt_inj {b c : A} (h : pvarPt B φ a₀ b = pvarPt B φ a₀ c) : b = c :=
   congrFun (ptOf_inj B φ h) ⟨0, (by norm_num : (0 : ℕ) < 1)⟩
 
 variable {M : Type}
 
 /-- **The prefix holds**: at every element of the input order, provided the top
 conjunction holds once every variable has been given its intended value. -/
-theorem gval_prePt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_prePt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop) (ι : A → M)
     (hbody : ∀ v : (finsatInterp B φ).Map A → M,
       (∀ b : A, v (pvarPt B φ a₀ b) = ι b) → Gval I v (bodyPt B φ a₀)) (a : A) :
@@ -1056,7 +1064,7 @@ theorem gval_prePt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
       · exact absurd ⟨h', hbz⟩ (hnb b)
 
 /-- A tag the root marker is not defined at marks nothing. -/
-theorem not_rootG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (hb : rootBodyF B φ t = ⊥)
+private theorem not_rootG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (hb : rootBodyF B φ t = ⊥)
     (w : Fin (tagDim B φ t) → A) : ¬RootG (ptOf B φ a₀ t w) := by
   rw [rootG_ptOf_iff B φ ha₀, hb]
   exact not_false
@@ -1064,7 +1072,7 @@ theorem not_rootG_ptOf (ha₀ : IsBot a₀) (t : FTag B φ) (hb : rootBodyF B φ
 /-- **The root of the encoded sentence holds**, which is what finite
 satisfiability asks: the root is the prefix node of the least element, and no
 variable is bound outside it. -/
-theorem gval_rootG [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_rootG [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop) (ι : A → M)
     (hbody : ∀ v : (finsatInterp B φ).Map A → M,
       (∀ b : A, v (pvarPt B φ a₀ b) = ι b) → Gval I v (bodyPt B φ a₀))
@@ -1091,7 +1099,7 @@ the kernel holds. -/
 
 /-- **The top conjunction holds** when the environment separates the variables
 of distinct elements and the root of the translated kernel holds. -/
-theorem gval_bodyPt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_bodyPt [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M)
     (hdiag : ∀ a b : A, a ≠ b → v (pvarPt B φ a₀ a) ≠ v (pvarPt B φ a₀ b))
@@ -1140,7 +1148,7 @@ clauses are stated against. -/
 
 omit [L.Structure A] [LinearOrder A] in
 /-- Distinct relation variables get distinct symbols. -/
-theorem symPt_inj {i i' : B.ι} (h : symPt B φ a₀ i = symPt B φ a₀ i') : i = i' :=
+private theorem symPt_inj {i i' : B.ι} (h : symPt B φ a₀ i = symPt B φ a₀ i') : i = i' :=
   Tag.sym.inj (congrArg Prod.fst h)
 
 /-- The arguments an assignment of the argument positions gives to a relation
@@ -1159,7 +1167,7 @@ noncomputable def blockI (a₀ : A) (μ : B.Assignment M) :
   fun s w => ∃ i : B.ι, s = symPt B φ a₀ i ∧ μ i (argTup B φ a₀ i w)
 
 /-- The arguments of a relation variable are read inside its signature. -/
-theorem argTup_congr (ha₀ : IsBot a₀) (i : B.ι) {w w' : (finsatInterp B φ).Map A → M}
+private theorem argTup_congr (ha₀ : IsBot a₀) (i : B.ι) {w w' : (finsatInterp B φ).Map A → M}
     (hag : ∀ p, SigG (symPt B φ a₀ i) p → w p = w' p) :
     argTup B φ a₀ i w = argTup B φ a₀ i w' := by
   classical
@@ -1179,7 +1187,7 @@ theorem argTup_congr (ha₀ : IsBot a₀) (i : B.ι) {w w' : (finsatInterp B φ)
 
 /-- **The interpretation is local**, so it is a genuine interpretation of the
 encoded sentence's vocabulary. -/
-theorem local_blockI (ha₀ : IsBot a₀) (μ : B.Assignment M) :
+private theorem local_blockI (ha₀ : IsBot a₀) (μ : B.Assignment M) :
     Local (blockI B φ a₀ μ) := by
   rintro s w w' hag
   constructor
@@ -1192,7 +1200,7 @@ omit [L.Structure A] [LinearOrder A] in
 /-- The atom of a relation variable, read on the image: at a node carrying a
 block atom of the kernel, the interpretation holds of an assignment exactly when
 the variable's relation holds of the arguments that assignment gives. -/
-theorem blockI_symPt (a₀ : A) (μ : B.Assignment M) (i : B.ι)
+private theorem blockI_symPt (a₀ : A) (μ : B.Assignment M) (i : B.ι)
     (w : (finsatInterp B φ).Map A → M) :
     blockI B φ a₀ μ (symPt B φ a₀ i) w ↔ μ i (argTup B φ a₀ i w) :=
   ⟨fun ⟨_, hs, hμ⟩ => symPt_inj B φ hs ▸ hμ, fun h => ⟨i, rfl, h⟩⟩
@@ -1210,13 +1218,13 @@ are used for something other than being proved. -/
 open Classical in
 /-- The canonical assignment of the argument positions of a node: the value of
 the argument sitting there, and anything at all elsewhere. -/
-noncomputable def argAssign (v : (finsatInterp B φ).Map A → M)
+private noncomputable def argAssign (v : (finsatInterp B φ).Map A → M)
     (g : (finsatInterp B φ).Map A) (junk : M) : (finsatInterp B φ).Map A → M :=
   fun q => if h : ∃ x, ArgG g q x then v h.choose else junk
 
 /-- It does match the environment on the arguments – the atom of the image has
 at most one argument at each position. -/
-theorem argAssign_spec (v : (finsatInterp B φ).Map A → M) (g : (finsatInterp B φ).Map A)
+private theorem argAssign_spec (v : (finsatInterp B φ).Map A → M) (g : (finsatInterp B φ).Map A)
     (junk : M) (q x : (finsatInterp B φ).Map A) (hx : ArgG g q x) :
     argAssign B φ v g junk q = v x := by
   classical
@@ -1226,7 +1234,7 @@ theorem argAssign_spec (v : (finsatInterp B φ).Map A → M) (g : (finsatInterp 
 /-- **Any matching assignment gives the atom the same value** as the canonical
 one: they agree on the signature of the symbol, and the interpretation is
 local. -/
-theorem interp_matching_iff [L.IsRelational] [Finite A] [Nonempty A]
+private theorem interp_matching_iff [L.IsRelational] [Finite A] [Nonempty A]
     {I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop} (hloc : Local I)
     (v : (finsatInterp B φ).Map A → M) (g s : (finsatInterp B φ).Map A)
     (hs : PosG g s ∨ NegG g s) (w : (finsatInterp B φ).Map A → M) (junk : M)
@@ -1246,14 +1254,14 @@ one clause of the kernel recursion that mentions the model at all. -/
 omit [L.Structure A] in
 /-- An element canonical at dimension zero carrying the tag of a symbol *is*
 that symbol. -/
-theorem eq_symPt (ha₀ : IsBot a₀) {x : (finsatInterp B φ).Map A} {i : B.ι}
+private theorem eq_symPt (ha₀ : IsBot a₀) {x : (finsatInterp B φ).Map A} {i : B.ι}
     (ht : x.1 = Tag.sym i) (h : Canon 0 x.2) : x = symPt B φ a₀ i :=
   Prod.ext_iff.mpr ⟨ht, eq_of_canon_zero B φ h (canon_ptOf B φ ha₀ (Tag.sym i) _)⟩
 
 /-- **The symbol of an atom of the image**: a node of the kernel carries a
 positive atom exactly when it sits at polarity `true` on a block atom, and then
 the symbol is that of its relation variable. -/
-theorem posG_ndPt_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem posG_ndPt_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (s : (finsatInterp B φ).Map A) :
     PosG (ndPt B φ a₀ p pol) s ↔
       ∃ i : B.ι, pol = true ∧ blockSym B φ p = some i ∧ s = symPt B φ a₀ i := by
@@ -1270,7 +1278,7 @@ theorem posG_ndPt_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     exact (posG_ptOf B φ ha₀ (Tag.nd p true) (Tag.sym i) _ _).mpr ⟨rfl, hsym⟩
 
 /-- The same at polarity `false`: a negated atom. -/
-theorem negG_ndPt_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem negG_ndPt_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (s : (finsatInterp B φ).Map A) :
     NegG (ndPt B φ a₀ p pol) s ↔
       ∃ i : B.ι, pol = false ∧ blockSym B φ p = some i ∧ s = symPt B φ a₀ i := by
@@ -1287,7 +1295,7 @@ theorem negG_ndPt_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     exact (negG_ptOf B φ ha₀ (Tag.nd p false) (Tag.sym i) _ _).mpr ⟨rfl, hsym⟩
 
 /-- **The positive-atom clause of the truth definition, evaluated.** -/
-theorem posAtom_clause_iff [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem posAtom_clause_iff [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (μ : B.Assignment M) (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (i : B.ι)
     (hi : blockSym B φ p = some i) (junk : M) :
     (∃ s, PosG (ndPt B φ a₀ p true) s ∧ ∃ w : (finsatInterp B φ).Map A → M,
@@ -1308,7 +1316,7 @@ theorem posAtom_clause_iff [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsB
       (blockI_symPt B φ a₀ μ i _).mpr h⟩
 
 /-- **The negated-atom clause**, the same at polarity `false`. -/
-theorem negAtom_clause_iff [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem negAtom_clause_iff [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (μ : B.Assignment M) (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (i : B.ι)
     (hi : blockSym B φ p = some i) (junk : M) :
     (∃ s, NegG (ndPt B φ a₀ p false) s ∧ ∃ w : (finsatInterp B φ).Map A → M,
@@ -1336,7 +1344,7 @@ prefix variable. Those two node kinds need the same treatment as the kernel's:
 which clause of the truth definition fires, and which elements it relates. -/
 
 /-- A node that is not a translation of a kernel position carries no atom. -/
-theorem not_posG_of_ne_nd (t : FTag B φ)
+private theorem not_posG_of_ne_nd (t : FTag B φ)
     (ht : ∀ (q : Pos B φ) (pol : Bool), t ≠ Tag.nd q pol) (w : Fin (tagDim B φ t) → A)
     (s : (finsatInterp B φ).Map A) : ¬PosG (ptOf B φ a₀ t w) s := by
   intro h
@@ -1344,7 +1352,7 @@ theorem not_posG_of_ne_nd (t : FTag B φ)
   obtain ⟨q, i, hq, -, -⟩ := atomTag_cases B φ ha
   exact ht q true hq
 
-theorem not_negG_of_ne_nd (t : FTag B φ)
+private theorem not_negG_of_ne_nd (t : FTag B φ)
     (ht : ∀ (q : Pos B φ) (pol : Bool), t ≠ Tag.nd q pol) (w : Fin (tagDim B φ t) → A)
     (s : (finsatInterp B φ).Map A) : ¬NegG (ptOf B φ a₀ t w) s := by
   intro h
@@ -1354,7 +1362,7 @@ theorem not_negG_of_ne_nd (t : FTag B φ)
 
 /-- A tuple node of a translated atom carries no equality literal: it is a
 conjunction of them, not one itself. -/
-theorem not_eqG_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem not_eqG_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (w : Fin (tagDim B φ (Tag.atup p pol)) → A) (x y : (finsatInterp B φ).Map A) :
     ¬EqG (atupPt B φ a₀ p pol w) x y := by
   intro h
@@ -1365,7 +1373,7 @@ theorem not_eqG_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     rcases t'' with _ | _ | _ | _ | l₂ | i' | j' | ⟨q', pol''⟩ | ⟨q', pol''⟩ | ⟨q', pol'', j'⟩ <;>
     exact absurd h (not_eqG_ptOf B φ ha₀ _ _ _ rfl _ _ _)
 
-theorem not_neqG_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
+private theorem not_neqG_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
     (w : Fin (tagDim B φ (Tag.atup p pol)) → A) (x y : (finsatInterp B φ).Map A) :
     ¬NeqG (atupPt B φ a₀ p pol w) x y := by
   intro h
@@ -1379,7 +1387,7 @@ theorem not_neqG_atup (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool)
 /-- **The equality literal of a translated atom, inverted**: it relates the
 variable of the argument's de Bruijn level to the prefix variable of the element
 its tuple holds there. -/
-theorem eqG_alit_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
+private theorem eqG_alit_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
     (a : A) (x y : (finsatInterp B φ).Map A) :
     EqG (alitPt B φ a₀ p pol j a) x y ↔ ∃ (l : Fin (Tseitin.maxCtx φ)) (b : A),
       (pol = true ∧ inArg B φ p (j : ℕ) = some (l : ℕ)) ∧ a = b ∧
@@ -1402,7 +1410,7 @@ theorem eqG_alit_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (
     exact (eqG_alit B φ ha₀ p pol j a a l).mpr ⟨hc, rfl⟩
 
 /-- The same for a negatively translated atom. -/
-theorem neqG_alit_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
+private theorem neqG_alit_iff (ha₀ : IsBot a₀) (p : Pos B φ) (pol : Bool) (j : Fin (finsatDim B φ))
     (a : A) (x y : (finsatInterp B φ).Map A) :
     NeqG (alitPt B φ a₀ p pol j a) x y ↔ ∃ (l : Fin (Tseitin.maxCtx φ)) (b : A),
       (pol = false ∧ inArg B φ p (j : ℕ) = some (l : ℕ)) ∧ a = b ∧
@@ -1433,7 +1441,7 @@ marker `old` it is `⊤`, since every original element is old. The `kernelNode`
 equation is a hypothesis to *rewrite with* – its arity is an implicit argument,
 so destructing it would land in `HEq`. -/
 
-theorem realize_inAtomF_input {p : Pos B φ} {k : ℕ} {r : L.Relations k}
+private theorem realize_inAtomF_input {p : Pos B φ} {k : ℕ} {r : L.Relations k}
     {args : Fin k → Option ℕ} (hk : kernelNode φ p.2 = .inputAtom r args)
     (h : k ≤ finsatDim B φ) (v : Fin 2 × Fin (finsatDim B φ) → A) :
     (inAtomF B φ p).Realize v ↔ RelMap r fun j => v (1, Fin.castLE h j) := by
@@ -1442,7 +1450,7 @@ theorem realize_inAtomF_input {p : Pos B φ} {k : ℕ} {r : L.Relations k}
   rw [dite_eq_left h]
   exact Formula.realize_rel.trans (relMap_sumInl r _)
 
-theorem realize_inAtomF_old {p : Pos B φ} {x : Option ℕ}
+private theorem realize_inAtomF_old {p : Pos B φ} {x : Option ℕ}
     (hk : kernelNode φ p.2 = .oldAtom x) (v : Fin 2 × Fin (finsatDim B φ) → A) :
     (inAtomF B φ p).Realize v := by
   rw [inAtomF, hk]
@@ -1457,7 +1465,7 @@ implication or an atom the sentence may not mention – the value is the
 disjunction of the children's at polarity `true` and their conjunction at
 polarity `false`. -/
 
-theorem gstep_conn_true (ha₀ : IsBot a₀)
+private theorem gstep_conn_true (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
@@ -1492,7 +1500,7 @@ theorem gstep_conn_true (ha₀ : IsBot a₀)
   · intro h
     exact Or.inr (Or.inl ⟨(orG_ptOf B φ ha₀ _ _).mpr ⟨rfl, hcn⟩, h⟩)
 
-theorem gstep_conn_false (ha₀ : IsBot a₀)
+private theorem gstep_conn_false (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
@@ -1531,7 +1539,7 @@ theorem gstep_conn_false (ha₀ : IsBot a₀)
 disjunction) over the model of the child's, the bound variable of the level the
 quantifier introduces taking each value in turn. -/
 
-theorem gstep_quant_true (ha₀ : IsBot a₀)
+private theorem gstep_quant_true (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (l : Fin (Tseitin.maxCtx φ))
@@ -1571,7 +1579,7 @@ theorem gstep_quant_true (ha₀ : IsBot a₀)
     subst this
     exact h
 
-theorem gstep_quant_false (ha₀ : IsBot a₀)
+private theorem gstep_quant_false (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (l : Fin (Tseitin.maxCtx φ))
@@ -1614,7 +1622,7 @@ theorem gstep_quant_false (ha₀ : IsBot a₀)
 /-! At a node translating an equality of the kernel the value is that
 equality, read at the variables of the two de Bruijn levels. -/
 
-theorem gstep_eqLit_true (ha₀ : IsBot a₀)
+private theorem gstep_eqLit_true (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (l₁ l₂ : Fin (Tseitin.maxCtx φ))
@@ -1654,7 +1662,7 @@ theorem gstep_eqLit_true (ha₀ : IsBot a₀)
       ⟨dbvarPt B φ a₀ l₁, dbvarPt B φ a₀ l₂,
         (eqG_nd_iff B φ ha₀ p true _ _).mpr ⟨l₁, l₂, ⟨rfl, he⟩, rfl, rfl⟩, h⟩))))
 
-theorem gstep_eqLit_false (ha₀ : IsBot a₀)
+private theorem gstep_eqLit_false (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (l₁ l₂ : Fin (Tseitin.maxCtx φ))
@@ -1698,7 +1706,7 @@ theorem gstep_eqLit_false (ha₀ : IsBot a₀)
 atoms of the encoded sentence – the value is that relation, read at the values
 of the atom's arguments. -/
 
-theorem gstep_blockAtom_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gstep_blockAtom_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (μ : B.Assignment M)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (i : B.ι) (junk : M)
@@ -1733,7 +1741,7 @@ theorem gstep_blockAtom_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : I
   · rintro ⟨s, hps, hw⟩
     exact Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl ⟨s, hps, hw⟩))))))
 
-theorem gstep_blockAtom_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gstep_blockAtom_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (μ : B.Assignment M)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (i : B.ι) (junk : M)
@@ -1779,7 +1787,7 @@ by a `DescriptiveComplexity.FinSat.SubEmb`: the shape facts come from
 /-- **A node translating falsity** has no children at all: at polarity `true` it
 is the empty disjunction, which is false, and at `false` the empty conjunction,
 which is true. -/
-theorem gval_nd_falsum [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_nd_falsum [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) {n : ℕ}
     (E : SubEmb φ (BoundedFormula.falsum : ((newLang L).sum B.lang).BoundedFormula Empty n)) :
@@ -1816,7 +1824,7 @@ theorem gval_nd_falsum [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
 disjunction of the negated premise and the conclusion, at `false` the
 conjunction of the premise and the negated conclusion – negation normal form,
 as a polarity flag on the premise. -/
-theorem gval_nd_impl [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_nd_impl [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p p₁ p₂ : Pos B φ)
     (hk : kernelNode φ p.2 = .impl)
@@ -1875,7 +1883,7 @@ theorem gval_nd_impl [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a�
 conjunction over the model of the body's values, at `false` the disjunction –
 the variable of the de Bruijn level the quantifier introduces taking each value
 of the model in turn. -/
-theorem gval_nd_quant [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_nd_quant [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p p' : Pos B φ) (l : Fin (Tseitin.maxCtx φ))
     (hk : kernelNode φ p.2 = .quant (l : ℕ))
@@ -1918,7 +1926,7 @@ theorem gval_nd_quant [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a�
 
 /-- **A node translating an equality of the kernel**: the equality of the values
 of the two variables, negated at polarity `false`. -/
-theorem gval_nd_eqLit [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_nd_eqLit [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (l₁ l₂ : Fin (Tseitin.maxCtx φ))
     (hk : kernelNode φ p.2 = .eqLit (some (l₁ : ℕ)) (some (l₂ : ℕ))) :
@@ -1937,7 +1945,7 @@ theorem gval_nd_eqLit [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a�
 
 /-- **A node translating an atom of a relation variable**: the relation the
 assignment gives that variable, read at the values of the atom's arguments. -/
-theorem gval_nd_blockAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_nd_blockAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (μ : B.Assignment M) (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (i : B.ι)
     (junk : M) (hq : qLevel B φ p = none) (he : eqArgs B φ p = none)
     (hs : blockSym B φ p = some i) (hcn : ¬isConn B φ p) :
@@ -1956,7 +1964,7 @@ theorem gval_nd_blockAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBo
 node is the conjunction of its literals (the disjunction, at a negatively
 translated atom), and a literal is the equality it carries. -/
 
-theorem gstep_atup_true (ha₀ : IsBot a₀)
+private theorem gstep_atup_true (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
@@ -1979,7 +1987,7 @@ theorem gstep_atup_true (ha₀ : IsBot a₀)
   · intro h
     exact Or.inl ⟨(andG_ptOf B φ ha₀ _ _).mpr ⟨rfl, hin⟩, h⟩
 
-theorem gstep_atup_false (ha₀ : IsBot a₀)
+private theorem gstep_atup_false (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
@@ -2002,7 +2010,7 @@ theorem gstep_atup_false (ha₀ : IsBot a₀)
   · intro h
     exact Or.inr (Or.inl ⟨(orG_ptOf B φ ha₀ _ _).mpr ⟨rfl, hin⟩, h⟩)
 
-theorem gstep_alit_true (ha₀ : IsBot a₀)
+private theorem gstep_alit_true (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (j : Fin (finsatDim B φ)) (a : A)
@@ -2030,7 +2038,7 @@ theorem gstep_alit_true (ha₀ : IsBot a₀)
       ⟨dbvarPt B φ a₀ l, pvarPt B φ a₀ a,
         (eqG_alit_iff B φ ha₀ p true j a _ _).mpr ⟨l, a, ⟨rfl, hl⟩, rfl, rfl, rfl⟩, h⟩))))
 
-theorem gstep_alit_false (ha₀ : IsBot a₀)
+private theorem gstep_alit_false (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (rec : ((finsatInterp B φ).Map A → M) → (finsatInterp B φ).Map A → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (j : Fin (finsatDim B φ)) (a : A)
@@ -2060,7 +2068,7 @@ theorem gstep_alit_false (ha₀ : IsBot a₀)
 
 /-- **A tuple node of a translated atom** is the conjunction of its literals, one
 per argument position. -/
-theorem gval_atup_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_atup_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
     (w : Fin (tagDim B φ (Tag.atup p true)) → A) (hin : isInAtom B φ p) :
@@ -2079,7 +2087,7 @@ theorem gval_atup_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
 
 /-- At a negatively translated atom the tuple node is the disjunction of its
 literals: negation normal form has pushed the negation to the leaves. -/
-theorem gval_atup_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_atup_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
     (w : Fin (tagDim B φ (Tag.atup p false)) → A) (hin : isInAtom B φ p) :
@@ -2101,7 +2109,7 @@ over the tuples where the atom holds, of the conjunctions of its literals – an
 dually at polarity `false`. This is the Tseitin trick: the tuples are selected by
 a *defining formula*, so the input structure is read by the interpretation and
 never by the encoded sentence. -/
-theorem gval_nd_inAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_nd_inAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ)
     (hq : qLevel B φ p = none) (he : eqArgs B φ p = none) (hs : blockSym B φ p = none)
@@ -2153,7 +2161,7 @@ theorem gval_nd_inAtom [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
 
 /-- **A literal of a translated atom, evaluated**: it pins the argument at its
 position to the prefix variable of the element the tuple holds there. -/
-theorem gval_alit_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_alit_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (j : Fin (finsatDim B φ)) (a : A)
     (l : Fin (Tseitin.maxCtx φ)) (hl : inArg B φ p (j : ℕ) = some (l : ℕ)) :
@@ -2163,7 +2171,7 @@ theorem gval_alit_true [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a
   have hwf := image_isWF B φ (A := A)
   exact (Gval_isEval hwf I v _).trans (gstep_alit_true B φ ha₀ I (Gval I) v p j a l hl)
 
-theorem gval_alit_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem gval_alit_false [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (p : Pos B φ) (j : Fin (finsatDim B φ)) (a : A)
     (l : Fin (Tseitin.maxCtx φ)) (hl : inArg B φ p (j : ℕ) = some (l : ℕ)) :
@@ -2195,7 +2203,7 @@ the only thing about it the translation uses. -/
 /-- **The arguments of an atom of a relation variable**: the canonical
 assignment of the argument positions gives, at each of them, the value of the
 variable of that argument's de Bruijn level. -/
-theorem argTup_argAssign (ha₀ : IsBot a₀) (v : (finsatInterp B φ).Map A → M)
+private theorem argTup_argAssign (ha₀ : IsBot a₀) (v : (finsatInterp B φ).Map A → M)
     (p : Pos B φ) (pol : Bool) (i : B.ι) (hs : blockSym B φ p = some i) (junk : M)
     (j : Fin (B.arity i)) (l : Fin (Tseitin.maxCtx φ))
     (hl : blockArg B φ p (j : ℕ) = some (l : ℕ)) :
@@ -2214,7 +2222,7 @@ omit [L.Structure A] [LinearOrder A] in
 /-- **The de Bruijn levels of the arguments of a translated atom**, and the
 values its terms take: in a relational vocabulary every argument is a variable,
 so it has a level, and the value of the term is the context tuple there. -/
-theorem inAtom_levels [L.IsRelational] [(newLang L).Structure M] {n k : ℕ}
+private theorem inAtom_levels [L.IsRelational] [(newLang L).Structure M] {n k : ℕ}
     (hn : n ≤ Tseitin.maxCtx φ) (v : (finsatInterp B φ).Map A → M)
     (ts : Fin k → ((newLang L).sum B.lang).Term (Empty ⊕ Fin n)) {p : Pos B φ}
     (hia : ∀ (j : ℕ) (h : j < k), inArg B φ p j = termLevel (ts ⟨j, h⟩)) :
@@ -2245,7 +2253,7 @@ intended assignment `ι` of the prefix variables.
 
 Stated once for the two shapes it serves: an atom of the input vocabulary, where
 the filter `Filt` is the atom itself, and the marker `old`, where it is `⊤`. -/
-theorem atom_translation [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
+private theorem atom_translation [L.IsRelational] [Finite A] [Nonempty A] (ha₀ : IsBot a₀)
     (I : (finsatInterp B φ).Map A → ((finsatInterp B φ).Map A → M) → Prop)
     (v : (finsatInterp B φ).Map A → M) (ι : A → M)
     (hv : ∀ b : A, v (pvarPt B φ a₀ b) = ι b) (p : Pos B φ)

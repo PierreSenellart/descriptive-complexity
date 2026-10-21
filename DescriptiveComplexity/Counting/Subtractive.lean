@@ -6,6 +6,8 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Counting.RelClosure
+import all DescriptiveComplexity.Counting.SharpP
+import all DescriptiveComplexity.SecondOrderPull
 
 /-!
 # Subtractive reductions
@@ -108,7 +110,7 @@ theorem FOInterpretation.witAt_iff_pull (ρ : B.Assignment (Tag × (Fin dim → 
 omit [Finite Tag] in
 /-- The witness count of the kernel at the interpreted instance, ordered
 lexicographically, is the number of witnesses there. -/
-theorem FOInterpretation.witnessCount_map_eq_card :
+private theorem FOInterpretation.witnessCount_map_eq_card :
     @witnessCount (L'.sum Language.order) B φ (I.Map A)
         (letI := I.mapLinearOrder A; sumOrderStructure L' (I.Map A)) =
       Nat.card {ρ : B.Assignment (Tag × (Fin dim → A)) // I.WitAt B φ A ρ} := by
@@ -118,7 +120,7 @@ theorem FOInterpretation.witnessCount_map_eq_card :
 omit [Finite Tag] in
 /-- A witness of an order-free kernel at an interpreted instance: the order of
 the instance plays no part. -/
-theorem FOInterpretation.witAt_orderFreeKernel (ψ : (L'.sum B.lang).Sentence)
+private theorem FOInterpretation.witAt_orderFreeKernel (ψ : (L'.sum B.lang).Sentence)
     (ρ : B.Assignment (Tag × (Fin dim → A))) :
     I.WitAt B (orderFreeKernel B ψ) A ρ ↔
       @Sentence.Realize (L'.sum B.lang) (I.Map A)
@@ -139,7 +141,7 @@ end WitAt
 
 /-- The witness count of an order-free kernel, lifted to the ordered expansion,
 is its witness count. -/
-theorem witnessCount_orderFreeKernel (B : SOBlock) (φ : (L.sum B.lang).Sentence) (A : Type)
+private theorem witnessCount_orderFreeKernel (B : SOBlock) (φ : (L.sum B.lang).Sentence) (A : Type)
     [L.Structure A] [LinearOrder A] :
     witnessCount B (orderFreeKernel B φ) A = witnessCount B φ A := by
   refine Nat.card_congr (Equiv.subtypeEquiv (Equiv.refl _) fun ρ => ?_)
@@ -196,7 +198,7 @@ variable [L.IsRelational] [L'.IsRelational] {C : CountingProblem L} {D : Countin
 
 /-- With the witnesses of one predicate among those of another, the witnesses
 of the second that are not witnesses of the first make up the difference. -/
-theorem card_diff_add_card {α : Type} [Finite α] {P Q : α → Prop} (h : ∀ a, P a → Q a) :
+private theorem card_diff_add_card {α : Type} [Finite α] {P Q : α → Prop} (h : ∀ a, P a → Q a) :
     Nat.card {a // Q a ∧ ¬P a} + Nat.card {a // P a} = Nat.card {a // Q a} := by
   classical
   have e : {a // Q a ∧ ¬P a} ⊕ {a // P a} ≃ {a // Q a} :=
@@ -213,7 +215,7 @@ theorem card_diff_add_card {α : Type} [Finite α] {P Q : α → Prop} (h : ∀ 
 /-- **The source of a strong subtractive reduction is in `#P`**: it counts the
 witnesses at the minuend that are not witnesses at the subtrahend, and those
 are the witnesses of one kernel. -/
-theorem SharpPDefinable.of_strongSubtractive (f : StrongSubtractiveReduction C D) :
+private theorem SharpPDefinable.of_strongSubtractive (f : StrongSubtractiveReduction C D) :
     SharpPDefinable C := by
   let := f.tagFinite
   let := f.tagNonempty
@@ -273,20 +275,21 @@ variable {L₁ L₂ L₃ : Language.{0, 0}} [L₁.IsRelational] [L₂.IsRelation
 variable {C : CountingProblem L₁} {D : CountingProblem L₂} {E : CountingProblem L₃}
 
 /-- A strong subtractive reduction is a subtractive reduction. -/
-theorem StrongSubtractiveReduction.subtractiveReducible (f : StrongSubtractiveReduction C D) :
+theorem StrongSubtractiveReduction.subtractiveReducible
+    (f : StrongSubtractiveReduction C D) :
     C ≤ˢ D :=
   .strong f (.refl D)
 
 /-- A relativized parsimonious reduction is a subtractive reduction. -/
-theorem RelOrderedParsimoniousReduction.subtractiveReducible (f : C ≤ʳᵖ[≤] D) : C ≤ˢ D :=
+private theorem RelOrderedParsimoniousReduction.subtractiveReducible (f : C ≤ʳᵖ[≤] D) : C ≤ˢ D :=
   .parsimonious f (.refl D)
 
 /-- An ordered parsimonious reduction is a subtractive reduction. -/
-theorem OrderedParsimoniousReduction.subtractiveReducible (f : C ≤ᵖ[≤] D) : C ≤ˢ D :=
+private theorem OrderedParsimoniousReduction.subtractiveReducible (f : C ≤ᵖ[≤] D) : C ≤ˢ D :=
   f.toRel.subtractiveReducible
 
 /-- A parsimonious reduction is a subtractive reduction. -/
-theorem ParsimoniousReduction.subtractiveReducible (f : C ≤ᵖ D) : C ≤ˢ D :=
+private theorem ParsimoniousReduction.subtractiveReducible (f : C ≤ᵖ D) : C ≤ˢ D :=
   f.toOrdered.subtractiveReducible
 
 /-- **Subtractive reducibility is transitive** (Proposition 3.2 of the paper):
@@ -328,7 +331,7 @@ variable {K}
 
 theorem Complete.mem {C : CountingProblem L} (h : K.Complete C) : C ∈ K := h.1
 
-theorem Complete.hard {C : CountingProblem L} (h : K.Complete C) : K.Hard C := h.2
+private theorem Complete.hard {C : CountingProblem L} (h : K.Complete C) : K.Hard C := h.2
 
 /-- Hardness travels forward along subtractive reductions. -/
 theorem Hard.of_subtractive {C : CountingProblem L} {D : CountingProblem L'}
@@ -338,7 +341,7 @@ theorem Hard.of_subtractive {C : CountingProblem L} {D : CountingProblem L'}
 end CountingClass
 
 /-- **Membership in `#P` travels backward along subtractive reductions.** -/
-theorem mem_sharpP_of_subtractive [L.IsRelational] [L'.IsRelational] {C : CountingProblem L}
+private theorem mem_sharpP_of_subtractive [L.IsRelational] [L'.IsRelational] {C : CountingProblem L}
     {D : CountingProblem L'} (h : C ≤ˢ D) (hD : D ∈ SharpP) : C ∈ SharpP :=
   SharpPDefinable.of_subtractive h hD
 

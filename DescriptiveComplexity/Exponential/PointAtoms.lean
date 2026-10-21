@@ -6,6 +6,13 @@ Authors: Pierre Senellart
 module
 
 public import DescriptiveComplexity.Exponential.Rounds
+import all DescriptiveComplexity.Exponential.Expansion
+import all DescriptiveComplexity.Exponential.OrdExtend
+import all DescriptiveComplexity.Exponential.OrdFormula
+import all DescriptiveComplexity.Exponential.PointGuard
+import all DescriptiveComplexity.Exponential.Rounds
+import all DescriptiveComplexity.Exponential.TagBits
+import all DescriptiveComplexity.Padding
 
 /-!
 # The atoms of the translation
@@ -178,7 +185,7 @@ noncomputable def pointLeF (i₀ i₁ : Fin m) :
     (roundTagBitF X m i₀ p.1 ⊓ roundTagBitF X m i₁ p.2) ⊓
       (roundLHom ![i₀, i₁] X).onSentence (X.ordSentence p.1 p.2))
 
-theorem realize_pointLeF (pts : Fin m → X.Map A) (i₀ i₁ : Fin m) :
+private theorem realize_pointLeF (pts : Fin m → X.Map A) (i₀ i₁ : Fin m) :
     (@Sentence.Realize _ A (prefixStructure pts) (pointLeF X m i₀ i₁) ↔
       (X.mapLinearOrder A).le (pts i₀) (pts i₁)) := by
   let := prefixStructure pts

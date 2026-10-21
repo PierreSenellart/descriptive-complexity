@@ -97,7 +97,7 @@ variable (hbase : base + Nat.card (Wide.BlkIx dt.KIx A dt.dd) ≤
 
 omit [Finite R'] [Finite P'] in
 /-- **A register's rank is its index's, above the base.** -/
-theorem wideRank_blkLaid_cell (u : Wide.BlkIx dt.KIx A dt.dd) :
+private theorem wideRank_blkLaid_cell (u : Wide.BlkIx dt.KIx A dt.dd) :
     wideRank ((dt.blkLaid h hpos hbase).cell u) =
       base + ixRank (Wide.blkLe dt.KIx A dt.dd) u :=
   wideRank_ixSegCell (Wide.blkLe dt.KIx A dt.dd) h hbase u

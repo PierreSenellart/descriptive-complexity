@@ -77,13 +77,13 @@ section Congr
 
 variable {cls : St → T} {R : St → St → Prop}
 
-theorem savStep_congr (h : SavInv cls R) {X X' Y Y' : St} (hX : cls X = cls X')
+private theorem savStep_congr (h : SavInv cls R) {X X' Y Y' : St} (hX : cls X = cls X')
     (hY : cls Y = cls Y') (hs : SavStep cls R X Y) : SavStep cls R X' Y' := by
   rcases hs with he | hr
   · exact Or.inl (hX ▸ hY ▸ he)
   · exact Or.inr (h X X' Y Y' hX hY hr)
 
-theorem savLe_congr (h : SavInv cls R) :
+private theorem savLe_congr (h : SavInv cls R) :
     ∀ (n : ℕ) {X X' Y Y' : St}, cls X = cls X' → cls Y = cls Y' →
       SavLe cls R n X Y → SavLe cls R n X' Y' := by
   intro n
@@ -93,7 +93,7 @@ theorem savLe_congr (h : SavInv cls R) :
     rintro X X' Y Y' hX hY ⟨Z, hZ, hs⟩
     exact ⟨Z, ih hX rfl hZ, savStep_congr h rfl hY hs⟩
 
-theorem savPow_congr (h : SavInv cls R) :
+private theorem savPow_congr (h : SavInv cls R) :
     ∀ (k : ℕ) {X X' Y Y' : St}, cls X = cls X' → cls Y = cls Y' →
       SavPow cls R k X Y → SavPow cls R k X' Y' := by
   intro k
@@ -111,10 +111,10 @@ section Linear
 
 variable {cls : St → T} {R : St → St → Prop}
 
-theorem savLe_succ {n : ℕ} {X Y : St} (hs : SavLe cls R n X Y) : SavLe cls R (n + 1) X Y :=
+private theorem savLe_succ {n : ℕ} {X Y : St} (hs : SavLe cls R n X Y) : SavLe cls R (n + 1) X Y :=
   ⟨Y, hs, Or.inl rfl⟩
 
-theorem savLe_of_le {m n : ℕ} (hmn : m ≤ n) {X Y : St} (hs : SavLe cls R m X Y) :
+private theorem savLe_of_le {m n : ℕ} (hmn : m ≤ n) {X Y : St} (hs : SavLe cls R m X Y) :
     SavLe cls R n X Y := by
   induction n with
   | zero => exact Nat.le_zero.mp hmn ▸ hs
@@ -123,12 +123,12 @@ theorem savLe_of_le {m n : ℕ} (hmn : m ≤ n) {X Y : St} (hs : SavLe cls R m X
     · exact savLe_succ (ih (Nat.lt_succ_iff.mp hlt))
     · exact heq ▸ hs
 
-theorem savLe_of_savStep {X Y : St} (hs : SavStep cls R X Y) : SavLe cls R 1 X Y :=
+private theorem savLe_of_savStep {X Y : St} (hs : SavStep cls R X Y) : SavLe cls R 1 X Y :=
   ⟨X, rfl, hs⟩
 
 /-- **The linear staging composes**: walking `a + b` moves is walking `a` and
 then `b`. -/
-theorem savLe_add (h : SavInv cls R) :
+private theorem savLe_add (h : SavInv cls R) :
     ∀ (a b : ℕ) {X Y : St},
       SavLe cls R (a + b) X Y ↔ ∃ Z, SavLe cls R a X Z ∧ SavLe cls R b Z Y := by
   intro a b
@@ -177,7 +177,7 @@ section Reach
 
 variable {cls : St → T} {R : St → St → Prop}
 
-theorem exists_savLe_of_reflTransGen {X Y : St} (hr : Relation.ReflTransGen R X Y) :
+private theorem exists_savLe_of_reflTransGen {X Y : St} (hr : Relation.ReflTransGen R X Y) :
     ∃ n : ℕ, SavLe cls R n X Y := by
   induction hr with
   | refl => exact ⟨0, rfl⟩
@@ -186,7 +186,7 @@ theorem exists_savLe_of_reflTransGen {X Y : St} (hr : Relation.ReflTransGen R X 
     exact ⟨n + 1, c, hn, Or.inr hcd⟩
 
 /-- A bounded walk is a genuine walk, up to the class of its endpoint. -/
-theorem reflTransGen_of_savLe (h : SavInv cls R) :
+private theorem reflTransGen_of_savLe (h : SavInv cls R) :
     ∀ (n : ℕ) {X Y : St}, SavLe cls R n X Y →
       ∃ Y' : St, cls Y' = cls Y ∧ Relation.ReflTransGen R X Y' := by
   intro n

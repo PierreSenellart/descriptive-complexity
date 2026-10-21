@@ -7,6 +7,7 @@ module
 
 public import DescriptiveComplexity.Problems.Wide.Increment
 public import DescriptiveComplexity.Exponential.AltQuant
+import all DescriptiveComplexity.Exponential.AltQuant
 
 /-!
 # Evaluating a quantifier prefix by one monotone sweep
@@ -89,7 +90,7 @@ def foldFrom (pol : ℕ → Bool) (P : (Fin n → A) → Prop) (le : A → A →
 variable {pol : ℕ → Bool} {P : (Fin n → A) → Prop} {le : A → A → Prop}
 
 /-- Past the last level the accumulator is the matrix. -/
-theorem foldFrom_of_le {j : ℕ} (h : n ≤ j) (v : Fin n → A) :
+private theorem foldFrom_of_le {j : ℕ} (h : n ≤ j) (v : Fin n → A) :
     foldFrom pol P le j v = P v := by
   rw [foldFrom, show n - j = 0 from Nat.sub_eq_zero_of_le h]
   rfl
@@ -111,7 +112,7 @@ private theorem foldAux_succ {r j : ℕ} (h : j < n) (v : Fin n → A) :
   rw [foldAux, dite_eq_left h]
 
 /-- **One existential level of the accumulator.** -/
-theorem foldFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
+private theorem foldFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) :
     foldFrom pol P le j v ↔
       ((∃ a : A, WMLt le a (v ⟨j, h⟩) ∧
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a)) ∨
@@ -120,7 +121,7 @@ theorem foldFrom_ex {j : ℕ} (h : j < n) (hp : pol j = true) (v : Fin n → A) 
   rfl
 
 /-- **One universal level of the accumulator.** -/
-theorem foldFrom_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
+private theorem foldFrom_all {j : ℕ} (h : j < n) (hp : pol j = false) (v : Fin n → A) :
     foldFrom pol P le j v ↔
       ((∀ a : A, WMLt le a (v ⟨j, h⟩) →
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, h⟩ a)) ∧
@@ -212,7 +213,7 @@ The three rules a program's step obligation splits into, by comparison with the
 
 /-- The contribution of a level to its accumulator depends only on the
 coordinates up to that level, so above the carry it does not change. -/
-theorem levelEx_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
+private theorem levelEx_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
     (hagree : ∀ i : Fin n, (i : ℕ) ≤ j → v i = v' i) :
     ((∃ a : A, WMLt le a (v ⟨j, hj⟩) ∧
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, hj⟩ a)) ↔
@@ -231,7 +232,7 @@ theorem levelEx_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
   exact exists_congr fun a => and_congr Iff.rfl (iff_of_eq (hupd a))
 
 /-- The universal reading of `DescriptiveComplexity.levelEx_congr`. -/
-theorem levelAll_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
+private theorem levelAll_congr {v v' : Fin n → A} {j : ℕ} (hj : j < n)
     (hagree : ∀ i : Fin n, (i : ℕ) ≤ j → v i = v' i) :
     ((∀ a : A, WMLt le a (v ⟨j, hj⟩) →
         altQuantFrom pol P (j + 1) (Function.update v ⟨j, hj⟩ a)) ↔
