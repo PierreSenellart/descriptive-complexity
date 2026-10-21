@@ -47,9 +47,12 @@ in unary they are solvable in polynomial time.
   `DescriptiveComplexity.selection_ofIndex` turn a *selection of items* on any
   structure into a `Finset` of indices and back, along any injective indexing
   of the items, preserving both the total weight and whether the selection is
-  empty. They are the reusable half: any problem on `binWeights` that
-  quantifies over selections of items – Knapsack here, and variants that
-  constrain the selection further – gets both directions from these two.
+  empty. `DescriptiveComplexity.exists_selection_iff_index` packages the two
+  for any condition on emptiness and total, and
+  `BinarySubsetSum.exists_selection_iff` states it on an encoded instance: a
+  problem on `binWeights` that quantifies over selections of items – Knapsack
+  here, and variants that constrain the selection further – reads back to sets
+  of list positions through that one lemma.
 * `DescriptiveComplexity.binarySubsetSumEncoding_faithful` closes the loop for
   Knapsack: `DescriptiveComplexity.ConcreteSubsetSum`, the textbook predicate
   on a list and a target, is exactly what `DescriptiveComplexity.Knapsack`
@@ -379,22 +382,49 @@ theorem selection_ofIndex (hf : Function.Injective f) (hitem : ∀ j, BWItem (f 
     · rintro ⟨j, hj⟩
       exact ⟨f j, j, hj, rfl⟩
 
+/-- **Any selection problem, read along an indexing of the items.** A condition
+`P` on whether a selection is empty and on its total weight holds of some
+selection of items exactly when it holds of some `Finset` of indices. Knapsack
+is the case `P _ s := s = BWTarget A`; a problem that constrains the selection
+further (non-empty, bounded) instantiates `P` instead of repeating the
+argument. -/
+theorem exists_selection_iff_index (hf : Function.Injective f)
+    (hrange : ∀ a, BWItem a ↔ ∃ j, f j = a) (P : Prop → ℕ → Prop) :
+    (∃ S : A → Prop, (∀ a, S a → BWItem a) ∧ P (∃ a, S a) (∑ᶠ a ∈ {a | S a}, BWWeight a))
+      ↔ ∃ J : Finset (Fin n), P J.Nonempty (∑ j ∈ J, BWWeight (f j)) := by
+  constructor
+  · rintro ⟨S, hSi, hP⟩
+    obtain ⟨J, hsum, hne⟩ := selection_toIndex f hf hrange S hSi
+    exact ⟨J, by rwa [propext hne, hsum] at hP⟩
+  · rintro ⟨J, hP⟩
+    obtain ⟨S, hSi, hsum, hne⟩ := selection_ofIndex f hf (fun j => (hrange _).mpr ⟨j, rfl⟩) J
+    exact ⟨S, hSi, by rwa [propext hne, hsum]⟩
+
 /-- **Knapsack, read along an indexing of the items**: the abstract problem is
 the concrete subset-sum question about the indexed weights. -/
 theorem hasSubsetSum_iff_index [Finite A] (hf : Function.Injective f)
     (hrange : ∀ a, BWItem a ↔ ∃ j, f j = a) (hlin : IsLinOrd (BWLe (A := A))) :
     HasSubsetSum A ↔ ∃ J : Finset (Fin n), ∑ j ∈ J, BWWeight (f j) = BWTarget A := by
-  constructor
-  · rintro ⟨-, -, S, hSi, hsum⟩
-    obtain ⟨J, hJ, -⟩ := selection_toIndex f hf hrange S hSi
-    exact ⟨J, by rw [← hJ, hsum]⟩
-  · rintro ⟨J, hJ⟩
-    obtain ⟨S, hSi, hsum, -⟩ := selection_ofIndex f hf (fun j => (hrange _).mpr ⟨j, rfl⟩) J
-    exact ⟨inferInstance, hlin, S, hSi, by rw [hsum, hJ]⟩
+  rw [HasSubsetSum, and_iff_right ‹Finite A›, and_iff_right hlin]
+  exact exists_selection_iff_index f hf hrange fun _ s => s = BWTarget A
 
 end Selections
 
-/-! ### Faithfulness for Knapsack -/
+/-! ### The concrete-instance bridge, and faithfulness for Knapsack -/
+
+/-- **The concrete-instance bridge.** On an encoded instance, a selection
+problem – any condition `P` on whether the selection is empty and on its total
+weight – is the same question about sets of list positions, the weights being
+the list entries. Faithfulness for Knapsack is the case `P _ s := s = i.2`;
+a client problem on `binWeights` that constrains the selection further gets
+its own faithfulness from this lemma and nothing else of the encoding. -/
+theorem BinarySubsetSum.exists_selection_iff (i : SubsetSumInstance) (P : Prop → ℕ → Prop) :
+    (∃ S : binarySubsetSumEncoding.Univ i → Prop, (∀ a, S a → BWItem a) ∧
+        P (∃ a, S a) (∑ᶠ a ∈ {a | S a}, BWWeight a))
+      ↔ ∃ J : Finset (Fin i.1.length), P J.Nonempty (∑ j ∈ J, i.1.get j) := by
+  rw [exists_selection_iff_index (BinarySubsetSum.itemPt i) BinarySubsetSum.itemPt_injective
+    BinarySubsetSum.item_iff_range]
+  simp only [BinarySubsetSum.weight_itemPt]
 
 /-- The textbook subset-sum predicate on a concrete instance: some set of list
 positions has weights summing to the target. Nothing here mentions model
