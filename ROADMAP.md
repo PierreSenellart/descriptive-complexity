@@ -704,39 +704,120 @@ Mathlib's `IsQF`, already tracked for interpretations
 threshold glued on, and most unary-threshold entries of the catalog are the
 threshold version of a MaxSNP or MaxNP problem.
 
-- **Optimization problems and their levels** [L, with the next item]: an
-  optimization problem is a block, a cost function on its assignments at every
-  structure, isomorphism invariance of the cost, a goal (max or min) and – see
-  the promise point below – an iso-invariant validity predicate. The optimum
-  exists because assignments over a finite structure form a finite type, and
-  polynomial boundedness is automatic when the cost counts tuples (the unary
-  convention again). The optimum *value* is an iso-invariant number, i.e., a
-  `CountingProblem`, so the counting layer's reductions apply to values as they
-  stand; L-reductions below are about solutions, which is what makes them
-  approximation-preserving. MaxSNP is a quantifier-free kernel, MaxNP an
-  existential one, and the Kolaitis–Thakur levels add the universal and Π₂
-  kernels: all
-  “kernel as data”, like a `HornProgram`. A generic theorem – the threshold
-  version of an optimization problem is in NP, by the injection certificate
-  `nonempty_embedding_iff_ncard_le` – recovers the existing membership proofs,
-  and `MaxCut` should be shown equal to the threshold version of its
-  optimization problem by `DecisionProblem.ext`.
-- **L-reductions**: an interpretation (plain or ordered) plus a *solution
-  reader*, formulas defining the source's relation variables from the target's
-  solution. That solution lives on tagged tuples, and `SOBlock.pull` /
-  `pullAssign` / `mergeAssign` (`SecondOrderPull.lean`) are exactly the
-  bijection between such solutions and tuples of relations over the base, so
-  the reader is a formula over `L.sum (B.pull Tag d).lang`. The two
-  inequalities are stated in ℕ, where truncated subtraction is exact because
-  the optimum bounds every cost. Transitivity composes readers through
-  `FOInterpretation.extendSO` and multiplies the two constants. Asking for a
-  first-order reader is stronger than the literature's polynomial-time one, in
-  the way `≤ᶠᵒ` is stronger than Karp, and every textbook L-reduction has one.
-- **The class** [S once the two above exist]: a sibling of `ComplexityClass`,
-  not an instance of it – its fields are over `DecisionProblem`, and its
-  membership closure is a requirement the theory does not make: a kernel
-  pulled back through an interpretation with quantified formulas is not
-  quantifier-free, the phenomenon §3's quantifier-free tracking is about.
+The first consumers need not be MaxSNP problems. A minimization problem such
+as Set Cover, whose approximability is logarithmic rather than constant, or
+the crawling problem of `Examples/GraphCrawling.lean` with a budget counting
+only the non-target pages, already exercises everything below except the
+syntactic classes. So the framework – problems, reductions, composition and
+the transfer theorem – is written first and stands without any class; MaxSNP
+and the Kolaitis–Thakur levels are a layer on top of it.
+
+- **Optimization problems** [L, with the next item]: a block, a cost, a goal
+  (max or min), and two iso-invariant predicates that must not be merged:
+  * *feasibility* of a solution, a predicate on a structure and an assignment.
+    MaxSNP problems have none – every assignment is a solution – but every
+    minimization problem does: a cover must cover, a crawl must reach every
+    target;
+  * *validity* of an instance, the promise: at least “some feasible solution
+    exists” for a minimization problem (a set system with an uncovered element
+    has no cover), plus whatever the problem promises on top (a degree bound,
+    see below).
+  Neither is required to be first-order. Feasibility of a crawl is a
+  reachability condition, and so is the existence of a feasible crawl; a
+  problem is semantic and iso-invariant, and definability is something proved
+  about it, as for `DecisionProblem`. Where a semantic condition has a
+  certificate, the certificate enters the block as further relation variables
+  (the order of `crawlOn_iff_certificate`), and the cost counts only the
+  variable that matters. The cost is the number of tuples satisfying a kernel
+  over the expanded structure: |S \ targets| is a quantifier-free kernel, and
+  weighted costs stay out under the unary convention. The optimum exists on
+  valid instances because assignments over a finite structure form a finite
+  type, and polynomial boundedness is automatic when the cost counts tuples.
+  The optimum *value* is an iso-invariant number, i.e., a `CountingProblem`,
+  so the counting layer's reductions apply to values as they stand. A generic
+  theorem – the threshold version of an optimization problem with an
+  NP-checkable feasibility is in NP, by the injection certificate
+  `nonempty_embedding_iff_ncard_le` – recovers the existing membership proofs.
+  The tests of fit are the threshold versions, each shown equal to the
+  existing decision problem by `DecisionProblem.ext`: Max Cut for a
+  maximization problem without feasibility (`MaxCutOn` *is* “some `S` has at
+  least `k` pairs in `CutRel`”), minimum Set Cover and minimum total-budget
+  crawling (`SetCover`, `GraphCrawling`) for minimization problems with
+  feasibility and validity.
+- **L-reductions with an additive constant**: an interpretation (plain or
+  ordered) plus a *solution reader*, formulas defining the source's relation
+  variables from the target's solution. That solution lives on tagged tuples,
+  and `SOBlock.pull` / `pullAssign` / `mergeAssign` (`SecondOrderPull.lean`)
+  are exactly the bijection between such solutions and tuples of relations
+  over the base, so the reader is a formula over `L.sum (B.pull Tag d).lang`.
+  The reduction sends valid instances to valid ones, the reader sends feasible
+  solutions to feasible ones, and on valid instances two inequalities hold,
+  with constants `α β c : ℕ`:
+  * `OPT_B ≤ α · OPT_A + c` – *affine*, not linear;
+  * `err_A (read y) ≤ β · err_B y`, the error being cost minus optimum for a
+    minimization problem and optimum minus cost for a maximization one, stated
+    in ℕ, where truncated subtraction is exact because the optimum bounds
+    every cost.
+  On instances with `OPT_A ≥ 1` this is an L-reduction with constant `α + c`,
+  so hardness under L-reductions is unchanged: the constant refines the
+  numbers, not the class. It matters for the transfer theorem below. Set
+  Cover reduces to non-target-budget crawling with `α = β = c = 1` (the root
+  is the `+ 1`), which gives a ratio `ρ + (ρ − 1) / OPT_A` for Set Cover from
+  a ratio `ρ` for crawling; folding `c` into `α = 2` gives `2ρ − 1` and loses
+  the factor in front of `ln n` that a logarithmic hardness result needs.
+  Avoiding `c` altogether would mean padding each set page into a path,
+  dimension at least 2 and a definable successor, for the same theorem. The
+  record is ordered from the start, the first consumer needing a canonical
+  singleton as `crawlInterp` does: the reader may use the order, and the
+  inequalities hold under every linear order. Junk points of the interpreted
+  universe may occur in a target solution; the reader ignores them and the
+  cost counts them, which the inequalities absorb. Transitivity composes
+  readers through `FOInterpretation.extendSO`; the `α`s and `β`s multiply,
+  and the constant becomes `α' · c + c'`. Asking for a first-order reader is
+  stronger than the literature's polynomial-time one, in the way `≤ᶠᵒ` is
+  stronger than Karp, and every textbook L-reduction has one. No separate
+  record for AP-, PTAS- or strict reductions: every reduction in view proves
+  these two inequalities, and the ratio-transfer form is a lemma about them.
+  Add a second record when a reduction appears that cannot be stated this
+  way.
+- **The transfer theorem** [M–L]: for a minimization problem, a feasible `y`
+  within ratio `ρ` of `OPT_B` reads back to a source solution of cost at most
+  `OPT_A + β (ρ − 1) (α · OPT_A + c)` – stated additively, with the ratio
+  `1 + β (ρ − 1) (α + c / OPT_A)` as a corollary under `OPT_A ≥ 1` (at
+  `OPT_A = 0` a ratio means nothing, and such instances occur); the
+  maximization case is the classical one. Ratios that grow with the instance,
+  as for Set Cover, are functions of an iso-invariant *measure*, a
+  `CountingProblem`, not of the universe size, and the theorem takes as a
+  hypothesis how the target's measure relates to the source's. On the
+  crawling reduction the number of target pages is `|U|` exactly, whereas
+  the total number of pages, `|U| + m + 1`, would change the constant in
+  front of `ln |U|`; stating ratios against the universe would build that
+  mistake into the theorem.
+- **Definable approximation** [L, the one approximation statement
+  available]: for every linear order, a fixed FO(≤, LFP) formula defines a
+  feasible solution within the ratio. This is polynomial-time approximation
+  read through Immerman–Vardi for queries, so a hardness result the library
+  cannot prove – a PCP-based one, say – can enter as a *hypothesis*, and the
+  transfer theorem turns it into a conditional inapproximability statement
+  for the target, machine-free, with the unformalized part named as such.
+  Two things are new and are the cost. The formula defines a *relation*, not
+  a sentence, and its value may depend on the order (an approximation
+  algorithm sees an encoding), whereas `LFPDefinable` is sentence-level and
+  order-invariant. And it must be pulled back through an interpretation and
+  composed with the reader: PTIME's closure under `≤ᶠᵒ` does this for
+  sentences, and the parameters-as-constants device of
+  `TransitiveClosureDecideReach.lean` is the known route from sentences to
+  relations. The machine reading would need a relation-level version of the
+  bridge `mem_PTIME_iff_le_dtmAccept`; until then, the README states it as
+  Immerman–Vardi's, not as a theorem here.
+- **The class** [S once the two first items exist]: a sibling of
+  `ComplexityClass`, not an instance of it – its fields are over
+  `DecisionProblem`, and its membership closure is a requirement the theory
+  does not make: a kernel pulled back through an interpretation with
+  quantified formulas is not quantifier-free, the phenomenon §3's
+  quantifier-free tracking is about. MaxSNP is a quantifier-free kernel with
+  no feasibility, MaxNP an existential one, and the Kolaitis–Thakur levels add
+  the universal and Π₂ kernels: all “kernel as data”, like a `HornProgram`.
   Membership is syntactic, hardness is cofinal under L-reductions, and only
   hardness needs a closure proof.
 - **Memberships** [S each]: Max Cut (its kernel is `CutRel`), MAX-2SAT and
@@ -754,14 +835,11 @@ threshold version of a MaxSNP or MaxNP problem.
   the starting point). A fixed kernel arity means no padding, so this is
   probably order-free, and cheaper than the Cook–Levin discharge.
 - **The L-reduction catalog** [M–L each]: MAX-2SAT, bounded-degree Independent
-  Set and Vertex Cover, Max Cut. Two quantitative bounds and a reader replace
-  the one equivalence of a decision reduction; the charging map of
+  Set and Vertex Cover, Max Cut; outside MaxSNP, minimum Set Cover to
+  non-target-budget crawling, the first consumer of the additive constant and
+  of the measure-based transfer theorem. Two quantitative bounds and a reader
+  replace the one equivalence of a decision reduction; the charging map of
   `Problems/MaxCut/Reduction.lean` is about half of one such proof.
-- **Definable approximation** [M–L, the one approximation statement
-  available]: a solution relation definable in FO(LFP) whose cost is within a
-  given factor of the optimum. L-reductions preserve it because the reader is
-  first-order, so “if MAX-3SAT has a definable approximation at every ratio,
-  every MaxSNP problem has one” is provable here, machine-free.
 - **MaxSNP ⊊ MaxNP, and the strictness of the hierarchy** [R]:
   inexpressibility results; they belong with §5.
 
@@ -774,12 +852,15 @@ Two design decisions to take before the first file:
   pattern; a new vocabulary with a reduction to the existing 3SAT is needed,
   and counting each clause once per tuple rules out working around this with
   an order.
-- **Promise instances need a domain.** Bounded-degree Independent Set is
-  MaxSNP-complete on bounded-degree instances only, and an L-reduction's first
-  inequality fails where junk instances have optimum zero. Hence the validity
-  predicate above, with reductions required to send valid instances to valid
-  ones. Decision problems fold promises into yes-instances (3SAT's width
-  bound); that trick does not transfer.
+- **Promise instances need a domain, and it is not feasibility.**
+  Bounded-degree Independent Set is MaxSNP-complete on bounded-degree
+  instances only, and an L-reduction's first inequality fails where junk
+  instances have optimum zero. Hence the validity predicate above, with
+  reductions required to send valid instances to valid ones. Decision
+  problems fold promises into yes-instances (3SAT's width bound); that trick
+  does not transfer. Keep it apart from feasibility: validity is about the
+  instance and is the reductions' business, feasibility is about a solution
+  and is the reader's.
 
 ## Suggested ordering (value vs. prerequisite chains)
 
@@ -805,13 +886,18 @@ provable rather than merely reasonable.
 
 **Alongside, or after:**
 
-- **The optimization track of §9**, framework and memberships first: MaxSNP
-  reuses the block, pullback and counting machinery almost unchanged, Max Cut
-  is already in the MaxSNP shape, and the two design decisions it needs (a
-  tuple vocabulary for MAX-3SAT, a validity predicate for promise instances)
-  are cheaper taken before the first file than after. MAX-3SAT's completeness
-  is the one large item and can wait; the strictness of the hierarchy is
-  research.
+- **The optimization track of §9**, framework first and classes after:
+  problems with feasibility and validity, L-reductions with an additive
+  constant, and the measure-based transfer theorem, tested on Max Cut and on
+  minimum Set Cover to non-target-budget crawling before any syntactic class
+  is defined. MaxSNP then reuses the block, pullback and counting machinery
+  almost unchanged, Max Cut being already in its shape, and the two design
+  decisions it needs (a tuple vocabulary for MAX-3SAT, a validity predicate
+  kept apart from feasibility) are cheaper taken before the first file than
+  after. Definable approximation is the costly part of the framework – a
+  relation-level, order-dependent FO(LFP) notion and its pullback – and can
+  follow the reductions. MAX-3SAT's completeness is the one large item and
+  can wait; the strictness of the hierarchy is research.
 - **The W-hierarchy of §8**, right after the GI degree: the same degree
   machinery, problems the catalog already has, one medium-large generic
   reduction (slicewise Σ₁ to Clique) and then an entry per gadget. It needs
