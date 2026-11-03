@@ -76,7 +76,9 @@ theorem definable_imp_ifpDefinable (V : FinVocab L) {P : DecisionProblem L}
   exact (sentenceDef_holds V S hS φ).symm.trans h₂.symm
 
 /-- **`PTIME`, logically**: a problem is in `PTIME` exactly when it reads as a query
-defined by a formula of the archive's FO(LFP). -/
+defined by a formula of the archive's FO(LFP).
+Registered in the Lax archive as
+[`Lax832283.LogicalBridge.mem_PTIME_iff_definable`](https://laxarchive.org/lax-832283/Lax832283.LogicalBridge.html#s-Lax832283.LogicalBridge.mem_PTIME_iff_definable). -/
 theorem mem_PTIME_iff_definable (V : FinVocab L) (P : DecisionProblem L) :
     P ∈ PTIME ↔ Definable (toQuery V P) :=
   ⟨fun h => lfpDefinable_imp_definable V ((lfpDefinable_iff_mem_PTIME P).mpr h),
@@ -84,7 +86,9 @@ theorem mem_PTIME_iff_definable (V : FinVocab L) (P : DecisionProblem L) :
 
 /-- **`PTIME` is the textbook class**: from the Immerman–Vardi theorem, a problem is in
 `PTIME` exactly when a polynomial-time machine decides the language of the binary encodings
-of its yes-instances. -/
+of its yes-instances.
+Registered in the Lax archive as
+[`Lax832283.MachineBridge.mem_PTIME_iff_inP`](https://laxarchive.org/lax-832283/Lax832283.MachineBridge.html#s-Lax832283.MachineBridge.mem_PTIME_iff_inP). -/
 theorem mem_PTIME_iff_inP (h : Lax.ImmermanVardiCaptures) (V : FinVocab L)
     (P : DecisionProblem L) :
     P ∈ PTIME ↔ InP (toQuery V P) :=

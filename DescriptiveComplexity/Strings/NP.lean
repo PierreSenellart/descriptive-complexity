@@ -34,20 +34,26 @@ open Lax.FiniteStructures Lax.NondeterministicPolynomialTime
 variable {L : Language.{0, 0}} [L.IsRelational]
 
 /-- A problem is in `NP` exactly when it reads as a property of the archive's structures
-defined by an existential second-order sentence of the archive. -/
+defined by an existential second-order sentence of the archive.
+Registered in the Lax archive as
+[`Lax832283.LogicalBridge.mem_NP_iff_definable`](https://laxarchive.org/lax-832283/Lax832283.LogicalBridge.html#s-Lax832283.LogicalBridge.mem_NP_iff_definable). -/
 theorem mem_NP_iff_definable (V : FinVocab L) (P : DecisionProblem L) :
     P ∈ NP ↔ Lax.ExistentialSecondOrder.Definable (toProperty V P) :=
   sigmaSODefinable_one_iff V P
 
 /-- **`NP` is the textbook class**: from Fagin's theorem, a problem is in `NP` exactly
-when the property it reads as is in NP as the archive defines it. -/
+when the property it reads as is in NP as the archive defines it.
+Registered in the Lax archive as
+[`Lax832283.MachineBridge.mem_NP_iff_inNP`](https://laxarchive.org/lax-832283/Lax832283.MachineBridge.html#s-Lax832283.MachineBridge.mem_NP_iff_inNP). -/
 theorem mem_NP_iff_inNP (h : Lax.FaginCaptures) (V : FinVocab L) (P : DecisionProblem L) :
     P ∈ NP ↔ InNP (toProperty V P) :=
   (mem_NP_iff_definable V P).trans (h _ (toProperty_isoInvariant V P))
 
 /-- **`NP`, on bit strings**: from Fagin's theorem, a problem is in `NP` exactly when the
 language of the binary encodings of its yes-instances has polynomially bounded
-certificates that a machine checks in polynomial time. -/
+certificates that a machine checks in polynomial time.
+Registered in the Lax archive as
+[`Lax832283.MachineBridge.mem_NP_iff_languageInNP`](https://laxarchive.org/lax-832283/Lax832283.MachineBridge.html#s-Lax832283.MachineBridge.mem_NP_iff_languageInNP). -/
 theorem mem_NP_iff_languageInNP (h : Lax.FaginCaptures) (V : FinVocab L)
     (P : DecisionProblem L) :
     P ∈ NP ↔ LanguageInNP (language (toProperty V P)) :=
