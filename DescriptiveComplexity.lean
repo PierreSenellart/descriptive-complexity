@@ -232,6 +232,7 @@ import DescriptiveComplexity.FixedPointReductionHierarchy
 import DescriptiveComplexity.FixedPointStratifyPartial
 import DescriptiveComplexity.FixedPointReductionSpace
 import DescriptiveComplexity.Computability
+import DescriptiveComplexity.Strings
 import DescriptiveComplexity.Examples
 
 -- The rows of the catalog table below cannot be broken across lines.
