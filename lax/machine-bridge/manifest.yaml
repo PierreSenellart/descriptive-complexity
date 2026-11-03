@@ -1,0 +1,74 @@
+specVersion: "1"
+id: "lax-832283"
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "NP and PTIME on bit strings: the descriptive-complexity library against Fagin and Immerman–Vardi"
+authors:
+  - name: "Pierre Senellart"
+    orcid: "0000-0002-7909-5369"
+    github: "PierreSenellart"
+  - name: "Claude (Anthropic)"
+bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @incollection{fagin1974generalized,
+      author       = {Ronald Fagin},
+      editor       = {Richard M. Karp},
+      title        = {Generalized first-order spectra and polynomial-time recognizable sets},
+      booktitle    = {Complexity of Computation},
+      series       = {SIAM-AMS Proceedings},
+      volume       = {7},
+      pages        = {43--73},
+      publisher    = {American Mathematical Society},
+      year         = {1974}
+    }
+  - |
+    @inproceedings{vardi1982complexity,
+      author       = {Moshe Y. Vardi},
+      editor       = {Harry R. Lewis and
+                      Barbara B. Simons and
+                      Walter A. Burkhard and
+                      Lawrence H. Landweber},
+      title        = {The Complexity of Relational Query Languages (Extended Abstract)},
+      booktitle    = {Proceedings of the 14th Annual {ACM} Symposium on Theory of Computing,
+                      May 5-7, 1982, San Francisco, California, {USA}},
+      pages        = {137--146},
+      publisher    = {{ACM}},
+      year         = {1982},
+      doi          = {10.1145/800070.802186},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{immerman1986relational,
+      author       = {Neil Immerman},
+      title        = {Relational Queries Computable in Polynomial Time},
+      journal      = {Inf. Control.},
+      volume       = {68},
+      number       = {1-3},
+      pages        = {86--104},
+      year         = {1986},
+      doi          = {10.1016/S0019-9958(86)80029-8},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @incollection{bekic1984definable,
+      author       = {Hans Beki{\'{c}}},
+      editor       = {Cliff B. Jones},
+      title        = {Definable Operations in General Algebras, and the Theory of Automata
+                      and Flowcharts},
+      booktitle    = {Programming Languages and Their Definition -- Hans Beki{\'{c}} (1936-1982)},
+      series       = {Lecture Notes in Computer Science},
+      volume       = {177},
+      pages        = {30--55},
+      publisher    = {Springer},
+      year         = {1984},
+      doi          = {10.1007/BFb0048939},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }

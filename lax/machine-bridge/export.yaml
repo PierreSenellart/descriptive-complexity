@@ -1,0 +1,151 @@
+library: https://github.com/PierreSenellart/descriptive-complexity
+ref: backport-lean-4.33
+prefix: DescriptiveComplexity
+targets:
+- DescriptiveComplexity.Strings.mem_NP_iff_definable
+- DescriptiveComplexity.Strings.mem_PTIME_iff_definable
+- DescriptiveComplexity.Strings.toProperty_isoInvariant
+- DescriptiveComplexity.Strings.Lax.FaginCaptures
+- DescriptiveComplexity.Strings.Lax.ImmermanVardiCaptures
+copyright: 2026 Pierre Senellart
+manifest:
+  title: 'NP and PTIME on bit strings: the descriptive-complexity library against Fagin and Immerman–Vardi'
+  authors:
+  - name: Pierre Senellart
+    orcid: 0000-0002-7909-5369
+    github: PierreSenellart
+  - name: Claude (Anthropic)
+  bibEntries:
+  - |
+    @misc{senellart2026descriptive,
+      author = {Pierre Senellart and Anton Gnatenko},
+      title = {Descriptive Complexity in {Lean}: Completeness by First-Order Reductions},
+      year = {2026},
+      eprint = {2609.18261},
+      archivePrefix = {arXiv}
+    }
+  - |
+    @incollection{fagin1974generalized,
+      author       = {Ronald Fagin},
+      editor       = {Richard M. Karp},
+      title        = {Generalized first-order spectra and polynomial-time recognizable sets},
+      booktitle    = {Complexity of Computation},
+      series       = {SIAM-AMS Proceedings},
+      volume       = {7},
+      pages        = {43--73},
+      publisher    = {American Mathematical Society},
+      year         = {1974}
+    }
+  - |
+    @inproceedings{vardi1982complexity,
+      author       = {Moshe Y. Vardi},
+      editor       = {Harry R. Lewis and
+                      Barbara B. Simons and
+                      Walter A. Burkhard and
+                      Lawrence H. Landweber},
+      title        = {The Complexity of Relational Query Languages (Extended Abstract)},
+      booktitle    = {Proceedings of the 14th Annual {ACM} Symposium on Theory of Computing,
+                      May 5-7, 1982, San Francisco, California, {USA}},
+      pages        = {137--146},
+      publisher    = {{ACM}},
+      year         = {1982},
+      doi          = {10.1145/800070.802186},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @article{immerman1986relational,
+      author       = {Neil Immerman},
+      title        = {Relational Queries Computable in Polynomial Time},
+      journal      = {Inf. Control.},
+      volume       = {68},
+      number       = {1-3},
+      pages        = {86--104},
+      year         = {1986},
+      doi          = {10.1016/S0019-9958(86)80029-8},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+  - |
+    @incollection{bekic1984definable,
+      author       = {Hans Beki{\'{c}}},
+      editor       = {Cliff B. Jones},
+      title        = {Definable Operations in General Algebras, and the Theory of Automata
+                      and Flowcharts},
+      booktitle    = {Programming Languages and Their Definition -- Hans Beki{\'{c}} (1936-1982)},
+      series       = {Lecture Notes in Computer Science},
+      volume       = {177},
+      pages        = {30--55},
+      publisher    = {Springer},
+      year         = {1984},
+      doi          = {10.1007/BFb0048939},
+      bibsource    = {dblp computer science bibliography, https://dblp.org}
+    }
+requires:
+- package: Lax751879
+  repository: https://github.com/szymtor/immerman-vardi
+  commit: 9fa09900c827396420a8bcfd22bc624e5c980a53
+  folder: ''
+- package: Lax988886
+  repository: https://github.com/szymtor/fagin
+  commit: 333e9cbdbd8a389561da30908cabf36051048a13
+  folder: ''
+- package: Lax904597
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 5aef71b6365249121f68485b77de5e25e26f41bf
+  folder: lax/np-core
+  restated_from: ../np-core/export.yaml
+- package: Lax485149
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: eee50ee7b4c7bbf5f3d7efadda7518899cca280b
+  folder: lax/logspace
+  restated_from: ../logspace/export.yaml
+- package: Lax535992
+  repository: https://github.com/PierreSenellart/descriptive-complexity
+  commit: 89e95257ba3b6f37dae8a18b6fee583e62ecb749
+  folder: lax/ptime
+  restated_from: ../ptime/export.yaml
+restated:
+  DescriptiveComplexity.Strings.Lax.OrderedStructures.Vocabulary: Lax751879.OrderedStructures.Vocabulary
+  DescriptiveComplexity.Strings.Lax.OrderedStructures.Symbol: Lax751879.OrderedStructures.Symbol
+  DescriptiveComplexity.Strings.Lax.OrderedStructures.OrderedStructure: Lax751879.OrderedStructures.OrderedStructure
+  DescriptiveComplexity.Strings.Lax.OrderedStructures.PointedStructure: Lax751879.OrderedStructures.PointedStructure
+  DescriptiveComplexity.Strings.Lax.OrderedStructures.Query: Lax751879.OrderedStructures.Query
+  DescriptiveComplexity.Strings.Lax.StructureEncoding.tuples: Lax751879.StructureEncoding.tuples
+  DescriptiveComplexity.Strings.Lax.StructureEncoding.unary: Lax751879.StructureEncoding.unary
+  DescriptiveComplexity.Strings.Lax.StructureEncoding.encode: Lax751879.StructureEncoding.encode
+  DescriptiveComplexity.Strings.Lax.LeastFixedPoints.leastFixedPoint: Lax751879.LeastFixedPoints.leastFixedPoint
+  DescriptiveComplexity.Strings.Lax.LeastFixedPoints.stage: Lax751879.LeastFixedPoints.stage
+  DescriptiveComplexity.Strings.Lax.FixedPointSyntax.RawFormula: Lax751879.FixedPointSyntax.RawFormula
+  DescriptiveComplexity.Strings.Lax.FixedPointSyntax.RawFormula.positiveAt: Lax751879.FixedPointSyntax.RawFormula.positiveAt
+  DescriptiveComplexity.Strings.Lax.FixedPointSyntax.RawFormula.Admissible: Lax751879.FixedPointSyntax.RawFormula.Admissible
+  DescriptiveComplexity.Strings.Lax.FixedPointSyntax.Formula: Lax751879.FixedPointSyntax.Formula
+  DescriptiveComplexity.Strings.Lax.FixedPointSyntax.Sentence: Lax751879.FixedPointSyntax.Sentence
+  DescriptiveComplexity.Strings.Lax.FixedPointSemantics.RelationEnv: Lax751879.FixedPointSemantics.RelationEnv
+  DescriptiveComplexity.Strings.Lax.FixedPointSemantics.extend: Lax751879.FixedPointSemantics.extend
+  DescriptiveComplexity.Strings.Lax.FixedPointSemantics.eval: Lax751879.FixedPointSemantics.eval
+  DescriptiveComplexity.Strings.Lax.FixedPointSemantics.bodyOperator: Lax751879.FixedPointSemantics.bodyOperator
+  DescriptiveComplexity.Strings.Lax.FixedPointSemantics.Satisfies: Lax751879.FixedPointSemantics.Satisfies
+  DescriptiveComplexity.Strings.Lax.FixedPointSemantics.Definable: Lax751879.FixedPointSemantics.Definable
+  DescriptiveComplexity.Strings.Lax.PolynomialTime.language: Lax751879.PolynomialTime.language
+  DescriptiveComplexity.Strings.Lax.PolynomialTime.InP: Lax751879.PolynomialTime.InP
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.Vocabulary: Lax988886.FiniteStructures.Vocabulary
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.Symbol: Lax988886.FiniteStructures.Symbol
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.Structure: Lax988886.FiniteStructures.Structure
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.Interpretation: Lax988886.FiniteStructures.Interpretation
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.Property: Lax988886.FiniteStructures.Property
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.Isomorphism: Lax988886.FiniteStructures.Isomorphism
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.IsomorphismInvariant: Lax988886.FiniteStructures.IsomorphismInvariant
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.encode: Lax988886.FiniteStructures.encode
+  DescriptiveComplexity.Strings.Lax.FiniteStructures.language: Lax988886.FiniteStructures.language
+  DescriptiveComplexity.Strings.Lax.ExistentialSecondOrder.FirstOrder: Lax988886.ExistentialSecondOrder.FirstOrder
+  DescriptiveComplexity.Strings.Lax.ExistentialSecondOrder.FirstOrder.eval: Lax988886.ExistentialSecondOrder.FirstOrder.eval
+  DescriptiveComplexity.Strings.Lax.ExistentialSecondOrder.Sentence: Lax988886.ExistentialSecondOrder.Sentence
+  DescriptiveComplexity.Strings.Lax.ExistentialSecondOrder.Satisfies: Lax988886.ExistentialSecondOrder.Satisfies
+  DescriptiveComplexity.Strings.Lax.ExistentialSecondOrder.Definable: Lax988886.ExistentialSecondOrder.Definable
+  DescriptiveComplexity.Strings.Lax.NondeterministicPolynomialTime.encodePair: Lax988886.NondeterministicPolynomialTime.encodePair
+  DescriptiveComplexity.Strings.Lax.NondeterministicPolynomialTime.LanguageInNP: Lax988886.NondeterministicPolynomialTime.LanguageInNP
+  DescriptiveComplexity.Strings.Lax.NondeterministicPolynomialTime.InNP: Lax988886.NondeterministicPolynomialTime.InNP
+  DescriptiveComplexity.Strings.FinVocab: StringProblems.FinVocab
+  DescriptiveComplexity.Strings.FinVocab.toSym: StringProblems.FinVocab.toSym
+  DescriptiveComplexity.Strings.ofOrdered: StringProblems.ofOrdered
+  DescriptiveComplexity.Strings.toProperty: StringProblems.toProperty
+  DescriptiveComplexity.Strings.toQuery: StringProblems.toQuery
