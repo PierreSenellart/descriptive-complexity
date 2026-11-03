@@ -3,7 +3,7 @@ defined by logics on finite structures, are the textbook classes on bit strings.
 Over a vocabulary with finitely many relation symbols, a decision problem is in
 NP exactly when the language of the binary encodings of its yes-instances has
 polynomially bounded certificates checked in polynomial time by a Mathlib
-`Turing.FinTM2`; it is in PTIME exactly when such a machine decides that
+Turing machine (FinTM2); it is in PTIME exactly when such a machine decides that
 language in polynomial time. The encodings and the machine classes are those of
 Szymon Toruńczyk's lax-988886 (Fagin's theorem) and lax-751879 (the
 Immerman–Vardi theorem), required here, and each machine statement is one

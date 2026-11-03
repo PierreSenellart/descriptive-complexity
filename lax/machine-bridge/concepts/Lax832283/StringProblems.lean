@@ -20,11 +20,11 @@ title: Decision problems of the core on bit strings
 type: definition
 ---
 A vocabulary of the NP core, with finitely many relation symbols, is numbered by a
-list of arities: a `FinVocab`. A table of the Immerman–Vardi entry, of that list of
-arities, then reads as a structure on `Fin n`, and a decision problem of the core reads
-as a property of tables and as a Boolean query. The empty table is a no-instance, the
-classes of the core being about nonempty structures. A word that encodes no table is in
-no language of the two entries, so nothing else needs care.
+list of arities. A table of the Immerman–Vardi entry, of that list of arities, then reads
+as a structure on an initial segment of the natural numbers, and a decision problem of
+the core reads as a property of tables and as a Boolean query. The empty table is a
+no-instance, the classes of the core being about nonempty structures. A word that encodes
+no table is in no language of the two entries, so nothing else needs care.
 -/
 
 namespace Lax832283.StringProblems
