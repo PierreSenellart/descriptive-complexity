@@ -234,6 +234,7 @@ public import DescriptiveComplexity.FixedPointReductionHierarchy
 public import DescriptiveComplexity.FixedPointStratifyPartial
 public import DescriptiveComplexity.FixedPointReductionSpace
 public import DescriptiveComplexity.Computability
+public import DescriptiveComplexity.Strings
 public import DescriptiveComplexity.Examples
 
 -- The rows of the catalog table below cannot be broken across lines.
@@ -2788,6 +2789,37 @@ once for the catalog rather than once per problem.
   a machine target would need. Whence
   `DescriptiveComplexity.codehalt_RE_complete` and, by Post's theorem applied
   to the undecidability above, `DescriptiveComplexity.RE_ne_coRE`.
+
+## The bridge to machine classes on bit strings
+
+`DescriptiveComplexity.Strings` compares `NP` and `PTIME` with the textbook classes over
+binary encodings of structures, for a vocabulary whose symbols have been numbered
+(`DescriptiveComplexity.Strings.FinVocab`). The target definitions are those of Szymon
+Toruńczyk's entries of the Lax archive, for Fagin's theorem and for the Immerman–Vardi
+theorem, mirrored in `DescriptiveComplexity/Strings/Lax/`.
+
+* `DescriptiveComplexity.Strings.mem_NP_iff_definable` and
+  `DescriptiveComplexity.Strings.mem_PTIME_iff_definable` – **the logical side, proved
+  outright**: `NP` is what the entry's existential second-order sentences define, and
+  `PTIME` what the entry's FO(LFP) formulas define. That formula language has nested,
+  negated, and parameterized fixed points, while the library's definitions have one
+  simultaneous fixed point: one direction is Bekić's principle ([Bekić 1984][bekic1984definable])
+  (`DescriptiveComplexity.Strings.Bekic.solve_spec`), and the other compiles a formula into
+  one inflationary induction (`DescriptiveComplexity.Strings.compile`), whose essential
+  operation iterates a program in a relation it reads, the rounds being tuples of the
+  universe (`DescriptiveComplexity.Strings.Prog.iter`).
+* `DescriptiveComplexity.Strings.mem_NP_iff_languageInNP`,
+  `DescriptiveComplexity.Strings.mem_coNP_iff_inNP_compl`, and
+  `DescriptiveComplexity.Strings.mem_PTIME_iff_inP` – **the machine side**: certificates
+  checked, or a language decided, by a polynomial-time Mathlib `Turing.FinTM2`. These take
+  the two capture theorems as hypotheses
+  (`DescriptiveComplexity.Strings.Lax.FaginCaptures`,
+  `DescriptiveComplexity.Strings.Lax.ImmermanVardiCaptures`); the library builds no machine
+  and declares no axiom.
+* `DescriptiveComplexity.Strings.SAT_languageInNP`,
+  `DescriptiveComplexity.Strings.threeCol_languageInNP`,
+  `DescriptiveComplexity.Strings.clique_languageInNP`, and
+  `DescriptiveComplexity.Strings.HORNSAT_inP` – some problems of the catalog, on bit strings.
 
 ## The problem catalog
 

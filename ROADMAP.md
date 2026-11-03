@@ -459,16 +459,18 @@ and `Problems/MachineAlt.lean` docstrings, and the exponential ones in
 `Problems/Wide.lean`; that is where their shape should be read off before
 building another.
 
-**Standing scope limit.** Textbook `NP = NTIME(nᵏ)` over string encodings
-needs the converse compilation – that an FO interpretation or a `Σ₁` kernel is
-*evaluated* by a polynomial-time machine: a verified compiler with a step
-count, plus string encodings of structures [R]. Nothing in the bridge claims
-it; the residual gap – two classical facts taken by inspection: that FO
-reductions are AC⁰-computable, and that a definability witness is evaluated
-within its class's bound – is documented in the README. Instances carry their
-own transition table, so reduction-built machines have polynomially many
-states – standard for an acceptance problem; the constant-alphabet simulation
-is never needed.
+**Standing scope limit.** For classes other than NP and PTIME, the textbook
+presentations over string encodings need the converse compilation – that an FO
+interpretation or a kernel is *evaluated* by a machine within the class's bound:
+a verified compiler with a step count [R]. For NP and PTIME that compiler is
+taken as a hypothesis (`DescriptiveComplexity.Strings`, against the Lax entries
+for Fagin's theorem and the Immerman–Vardi theorem); for any other class, a Lax
+entry stating a string-side capture theorem would extend that design. The
+residual gap – two classical facts taken by inspection: that FO reductions are
+AC⁰-computable, and that a definability witness is evaluated within its class's
+bound – is documented in the README. Instances carry their own transition table,
+so reduction-built machines have polynomially many states – standard for an
+acceptance problem; the constant-alphabet simulation is never needed.
 
 **And it is an interface obligation, not a soundness debt** – which is what
 sets its priority. The classes here are defined logically and the bridges
@@ -483,16 +485,14 @@ buy is legibility to a reader arriving with the textbook definition, plus the
 inherited robustness of a model whose invariance results have been accumulating
 for decades – worth having, worth not confusing with a hole in the foundations.
 
-A further application of the same machinery, once step-counted machines can
-run over string encodings: bounding the *encoders and decoders* of the
+What remains at P and NP is bounding the *encoders and decoders* of the
 concrete-instance layer. The `Encoding`/`Decoding` bundles enforce that
 `relBool` and `dec` are computations, but not that they are cheap (a decoder
 may brute-force the answer; see the “what this does not buy” notes in
 `DescriptiveComplexity/Encoding.lean` and `DescriptiveComplexity/Decoding.lean`).
-With the bridge, “computed by a polynomial-time machine” becomes a statable
-side condition on both, closing the last gap in reading completeness theorems
-as statements about concrete data. [R], and only worthwhile after the
-compilation direction above exists.
+“Computed by a polynomial-time machine” is a statable side condition on both,
+through Mathlib's `Turing.TM2ComputableInPolyTime`, which would close the last
+gap in reading completeness theorems as statements about concrete data. [R]
 
 Four rules price a bridge, and with it any machine problem added later:
 

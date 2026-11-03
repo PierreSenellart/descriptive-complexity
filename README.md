@@ -76,6 +76,15 @@ first-order logic, which Mathlib already has.
   deterministic) polynomial-time Turing machine (`mem_NP_iff_le_ntmAccept`,
   `mem_PTIME_iff_le_dtmAccept`); the other classes are matched against their
   machines in the table below.
+* String encodings, for NP and PTIME: over a vocabulary with finitely many
+  symbols, a problem is in the library's NP (resp. PTIME) exactly when the
+  language of the binary encodings of its yes-instances has certificates checked
+  (resp. is decided) by a polynomial-time Mathlib `Turing.FinTM2`
+  (`Strings.mem_NP_iff_languageInNP`, `Strings.mem_PTIME_iff_inP`). The logical
+  half is proved here outright (`Strings.mem_NP_iff_definable`,
+  `Strings.mem_PTIME_iff_definable`), against the definitions of Szymon
+  Toruńczyk's Lax entries for Fagin's theorem and the Immerman–Vardi theorem,
+  whose capture theorems are hypotheses of the machine half.
 * Counting: `#P` as the number of witnesses of an ∃SO sentence, with #SAT
   *parsimoniously* complete for it (`sharpSat_sharpP_parsimoniousComplete`), a
   stronger statement than the Turing completeness of the literature; under
@@ -171,9 +180,11 @@ merely not built yet, see `ROADMAP.md`.
   framework: from PTIME up by acceptance problems whose instances carry the
   machine, at L, NL and AC⁰ by a single machine, fixed once, deciding every
   instance. Their agreement with the usual presentations over string encodings
-  is classical (Fagin; Immerman–Vardi) and is not formalized here – except for
-  RE, where `mem_RE_iff_rePred` identifies the class with Mathlib's `REPred` on
-  an encoding of finite structures.
+  is formalized for NP and PTIME, from the capture theorems of the Lax entries
+  lax-988886 (Fagin) and lax-751879 (Immerman–Vardi) taken as hypotheses
+  (`DescriptiveComplexity.Strings`), and for RE, where `mem_RE_iff_rePred`
+  identifies the class with Mathlib's `REPred` on an encoding of finite
+  structures. For the other classes it is classical and not formalized.
 * **The reduction must be expressible in logic.** A poly-time reduction that is
   not FO-expressible cannot be used; gadgets often need a linear order, tags or
   extra dimensions, and arithmetic inside formulas is limited (addition and

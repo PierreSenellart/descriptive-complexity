@@ -134,6 +134,15 @@ it is added both to the table in [README.md](README.md) and to the catalog in
 the `DescriptiveComplexity` module docstring. A completeness result that
 appears in neither is invisible.
 
+**Mirrored modules.** The files of `DescriptiveComplexity/Strings/Lax/`, apart from
+`Captures.lean`, mirror concept modules of two entries of the Lax archive, which a
+submission restates onto the entries: the header of each names the entry, the commit, and
+the author. A declaration of an entry keeps its name, its signature binder for binder, and
+its body up to definitional equality; prefer a local `set_option` to a rewrite. A lemma an
+entry states as an axiom is a theorem here, proved in the mirror, with private helpers. A
+capture theorem stays a `Prop`-valued definition in `Captures.lean`, never an axiom. Nothing
+else belongs in these files; what the library proves about them lives one level up.
+
 **Visibility.** Every file is a `module` opening an `@[expose] public
 section`, so a declaration is public unless marked `private`. Public is the
 interface: vocabularies, semantics, classes, interpretations, reduction terms,
