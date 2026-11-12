@@ -279,7 +279,7 @@ cmd_notes() {
   # No previous tag (or none but this one) is not an error: the first release
   # simply has nothing to list. `|| true` keeps `pipefail` from treating the
   # empty grep as a failure.
-  prev="$(git tag --sort=-creatordate | grep -v "^$tag\$" | head -1 || true)"
+  prev="$(git tag --sort=-creatordate | grep -E '^v[0-9]' | grep -v "^$tag\$" | head -1 || true)"
 
   printf 'Requires Mathlib `%s` and toolchain `leanprover/lean4:%s`.\n\n' "$pin" "$pin"
   if [[ -n "$prev" ]]; then
