@@ -247,6 +247,7 @@ pin is the *same* as your project's, not merely a compatible one.
 
 | DescriptiveComplexity | Mathlib | Toolchain |
 | --- | --- | --- |
+| `v1.4.1` | `v4.35.0` | `leanprover/lean4:v4.35.0` |
 | `v1.4.0` | `v4.35.0` | `leanprover/lean4:v4.35.0` |
 | `v1.3.0` | `v4.34.0` | `leanprover/lean4:v4.34.0` |
 | `v1.2.2` | `v4.33.0` | `leanprover/lean4:v4.33.0` |
@@ -270,13 +271,13 @@ so it can be required by name. In a `lakefile.toml`:
 [[require]]
 name = "descriptive-complexity"
 scope = "PierreSenellart"
-version = "~1.4.0"
+version = "~1.4.1"
 ```
 
 or, in a `lakefile.lean`:
 
 ```lean
-require "PierreSenellart" / "descriptive-complexity" @ "~1.4.0"
+require "PierreSenellart" / "descriptive-complexity" @ "~1.4.1"
 ```
 
 What follows `@` is a version *range*, not a version: Lake rejects a bare
@@ -288,12 +289,12 @@ To pin a commit, or to follow `master`, require it from git instead:
 [[require]]
 name = "descriptive-complexity"
 git = "https://github.com/PierreSenellart/descriptive-complexity"
-rev = "v1.4.0"
+rev = "v1.4.1"
 ```
 
 ```lean
 require "descriptive-complexity" from git
-  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.4.0"
+  "https://github.com/PierreSenellart/descriptive-complexity" @ "v1.4.1"
 ```
 
 Pin a version tag or a commit hash rather than `master`, for reproducible
