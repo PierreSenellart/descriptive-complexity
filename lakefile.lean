@@ -2,7 +2,7 @@ import Lake
 open Lake DSL
 
 package "descriptive-complexity" where
-  version := v!"1.4.1"
+  version := v!"1.5.0"
   description := "Descriptive complexity in Lean 4: machine-model-free NP-completeness via first-order reductions, and the polynomial hierarchy via second-order alternation"
   keywords := #["complexity", "descriptive complexity", "model theory",
     "NP-completeness", "reductions"]
@@ -19,7 +19,7 @@ package "descriptive-complexity" where
     ⟨`weak.linter.privateModule, false⟩,
   ]
 
-require "leanprover-community" / "mathlib" @ git "v4.35.0"
+require "leanprover-community" / "mathlib" @ git "v4.36.0"
 
 @[default_target]
 lean_lib «DescriptiveComplexity» where

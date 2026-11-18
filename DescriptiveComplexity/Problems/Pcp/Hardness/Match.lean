@@ -330,7 +330,9 @@ theorem startBotAt_iff_zip (hwf : (tmData A).WellFormed) {ps inp : List A}
         ([cstE .hi0, cstE .hi1, cstE .hi2, cstE .hi3].zip
           [cstE .ltRgt, cstE .ltStar, cstE .ltSep, cstE .ltStar]) := by
     rw [startPos, startBot, List.zip_append, List.zip_append] <;>
-      (simp [length_posPrefix, hinp.length_eq]; try omega)
+      first
+      | (simp [length_posPrefix, hinp.length_eq]; omega)
+      | simp [length_posPrefix]
   rw [hsplit, posPrefix_seven]
   simp only [List.zip_cons_cons, List.zip_nil_right, List.mem_append, List.mem_cons,
     List.not_mem_nil, or_false, Prod.mk.injEq]

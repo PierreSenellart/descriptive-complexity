@@ -147,7 +147,7 @@ omit [LinearOrder V] in
 private theorem ncard_inter_insert_of_mem {Q P : Set V} {uu : V} (huP : uu ∉ P) (h : uu ∈ Q) :
     (Q ∩ insert uu P).ncard = (Q ∩ P).ncard + 1 := by
   rw [Set.inter_insert_of_mem h,
-    Set.ncard_insert_of_notMem (fun hm => huP hm.2) (Set.toFinite _)]
+    Set.ncard_insert_of_notMem (fun hm => huP (Set.mem_of_mem_inter_right hm)) (Set.toFinite _)]
 
 omit [LinearOrder V] in
 /-- Scanning one more node can only grow the scanned part of a set. -/
@@ -159,7 +159,8 @@ private theorem ncard_inter_insert_le {Q P : Set V} {uu : V} :
 private theorem ncard_inter_predSet_covBy_of_mem {x : V} {r : WithBot V} (h : (↑x : WithBot V) ⋖ r)
     (hx : x ∈ P) : (P ∩ predSet r).ncard = (P ∩ predSet (↑x : WithBot V)).ncard + 1 := by
   rw [predSet_of_covBy h, Set.inter_insert_of_mem hx,
-    Set.ncard_insert_of_notMem (fun hmem => notMem_predSet_self x hmem.2) (Set.toFinite _)]
+    Set.ncard_insert_of_notMem
+      (fun hmem => notMem_predSet_self x (Set.mem_of_mem_inter_right hmem)) (Set.toFinite _)]
 
 omit [Finite V] in
 /-- Scanning past a node outside the set leaves its scanned count alone. -/
@@ -176,7 +177,8 @@ private theorem ncard_inter_predSet_isMax_of_mem {x : V} (h : ∀ z : V, z ≤ x
     conv_lhs => rw [← Set.inter_univ P, ← insert_predSet_of_isMax h]
     rw [Set.inter_insert_of_mem hx]
   conv_rhs => rw [hP]
-  rw [Set.ncard_insert_of_notMem (fun hmem => notMem_predSet_self x hmem.2) (Set.toFinite _)]
+  rw [Set.ncard_insert_of_notMem
+    (fun hmem => notMem_predSet_self x (Set.mem_of_mem_inter_right hmem)) (Set.toFinite _)]
 
 omit [Finite V] in
 /-- At the greatest node, the scanned count of the set is its total, if the

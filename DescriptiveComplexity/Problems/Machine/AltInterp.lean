@@ -584,7 +584,7 @@ theorem relMap_right (p : AltV k A) :
   have key : ∀ (t : AltBase) (v : Fin 1 × Fin 2 → A),
       ((rightF ((t, j) : AltTag k)).Realize v ↔ AltRight (((t, j), w) : AltV k A)) := by
     intro t v
-    cases t <;> try (rename_i d; cases d <;> simp [rightF, AltRight])
+    cases t <;> (rename_i d; cases d <;> simp [rightF, AltRight])
   exact key t _
 
 omit [Finite A] [Nonempty A] in

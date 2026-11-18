@@ -586,17 +586,17 @@ variable [Finite M]
 variable (p) in
 /-- The operator a program defines on the relation it reads. -/
 def gOp (W : Set (Fin a → M)) : Set (Fin a → M) :=
-  {u | @Prog.Val _ _ p M (xStr fun _ => W) _ u}
+  {u | @Prog.Val _ _ p M (xStr fun _ u => u ∈ W) _ u}
 
 variable (p) in
 /-- A stage of a program, at a value of the relation it reads. -/
 private def pStage (W : Set (Fin a → M)) (j : ℕ) : p.B.Assignment M :=
-  @StepDef.inflStage _ p.sd M (xOrd fun _ => W) j
+  @StepDef.inflStage _ p.sd M (xOrd fun _ u => u ∈ W) j
 
 variable (p) in
 /-- The limit of a program, at a value of the relation it reads. -/
 private def pLim (W : Set (Fin a → M)) : p.B.Assignment M :=
-  @StepDef.inflLimit _ p.sd M (xOrd fun _ => W)
+  @StepDef.inflLimit _ p.sd M (xOrd fun _ u => u ∈ W)
 
 /-- The value of `X` at a round, as a set. -/
 def xSet (τ : (iterB p D).Assignment M) (t : Fin D → M) : Set (Fin a → M) :=
@@ -604,7 +604,7 @@ def xSet (τ : (iterB p D).Assignment M) (t : Fin D → M) : Set (Fin a → M) :
 
 omit [K.IsRelational] [K.Structure M] [LinearOrder M] [Finite M] in
 theorem xAt_eq (τ : (iterB p D).Assignment M) (t : Fin D → M) :
-    xAt τ t = fun _ => xSet τ t := rfl
+    xAt τ t = fun _ u => u ∈ xSet τ t := rfl
 
 /-- The rank of a round. -/
 noncomputable def rd (t : Fin D → M) : ℕ := orank (toLex t)
@@ -628,7 +628,7 @@ private theorem read_out_of_conv {τ : (iterB p D).Assignment M} (hI : Inv p τ)
   obtain ⟨hx, -, j, hj⟩ := hI t
   have hxt := hx hg
   have hlim : sAt τ t = pLim p (stage (gOp p) (rd t)) := by
-    let := xOrd (K := K) (M := M) (a := a) fun _ => stage (gOp p) (rd t)
+    let := xOrd (K := K) (M := M) (a := a) fun _ u => u ∈ stage (gOp p) (rd t)
     have hfix : Function.IsFixedPt p.sd.inflStep (p.sd.inflStage M j) := by
       funext i y
       refine propext ⟨?_, Or.inl⟩
@@ -724,7 +724,7 @@ private theorem inv_step {τ : (iterB p D).Assignment M} (hI : Inv p τ) :
       refine propext ((hs i u).trans ?_)
       have hxt := hx hg
       rw [xAt_eq, hxt, hj]
-      let := xOrd (K := K) (M := M) (a := a) fun _ => stage (gOp p) (rd t)
+      let := xOrd (K := K) (M := M) (a := a) fun _ u => u ∈ stage (gOp p) (rd t)
       have hst : pStage (M := M) p (stage (gOp p) (rd t)) (j + 1) =
           p.sd.inflStep (pStage (M := M) p (stage (gOp p) (rd t)) j) :=
         p.sd.inflStage_succ j

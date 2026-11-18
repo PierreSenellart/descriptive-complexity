@@ -180,10 +180,11 @@ theorem val_compile (hS : 0 < S.size) {m : ℕ} {ρ : List ℕ} (φ : RawFormula
         (v : Fin m → Fin S.size), Fin.append a v ∈ Prog.gOp p W ↔
         eval body S (Fin.append a v) (extend {a' | Fin.append a' v ∈ W} (η v)) := by
       intro W a v
-      let := Prog.xStr (K := K) (fun _ => W)
+      let := Prog.xStr (K := K) (fun _ u => u ∈ W)
       have hval := ih hφ.1 (K := Prog.KX K (k + m)) (fun r m' a => liftOF (Δ r m' a)) (Γ.bind k)
         (fun u => extend {a' | Fin.append a' (u ∘ Fin.natAdd k) ∈ W} (η (u ∘ Fin.natAdd k)))
-        (fun r m' a' w' => (realize_liftOF S (fun _ => W) (Δ r m' a') w').trans (hΔ r m' a' w'))
+        (fun r m' a' w' =>
+          (realize_liftOF S (fun _ u => u ∈ W) (Δ r m' a') w').trans (hΔ r m' a' w'))
         ?_ (Fin.append a v)
       · have hv : Fin.append a v ∘ Fin.natAdd k = v := funext fun q => Fin.append_right a v q
         rw [hv] at hval
@@ -191,14 +192,14 @@ theorem val_compile (hS : 0 < S.size) {m : ℕ} {ρ : List ℕ} (φ : RawFormula
       · intro r
         refine Fin.cases ?_ (fun r' => ?_) r
         · intro m' a' q w'
-          change W _ ↔ W _
-          refine iff_of_eq (congrArg W ?_)
+          change _ ∈ W ↔ _ ∈ W
+          refine iff_of_eq (congrArg (· ∈ W) ?_)
           funext j
           refine Fin.addCases (fun i => ?_) (fun i => ?_) j
           · simp [Function.comp]
           · simp [Function.comp]
         · intro m' a' q w'
-          exact (realize_liftOF S (fun _ => W) _ w').trans (hΓ r' m' a' _ w')
+          exact (realize_liftOF S (fun _ u => u ∈ W) _ w').trans (hΓ r' m' a' _ w')
     have hx : w ∘ Fin.append args id = Fin.append (w ∘ args) w := by
       funext j
       refine Fin.addCases (fun i => ?_) (fun i => ?_) j <;> simp

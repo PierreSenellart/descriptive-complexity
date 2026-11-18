@@ -625,7 +625,7 @@ private theorem relMap_inp (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
     refine ⟨c, u, rfl, rfl, h1, h2, ?_⟩
     revert h3
     rcases c with - | i | i | - | - | - | - | - | - | - <;>
-      simp only [inpBodyF, InpOn] <;> (try split_ifs) <;>
+      simp only [inpBodyF, InpOn] <;> split_ifs <;>
       intro h3 <;>
       simp_all [Formula.realize_not, realize_relAtF, posBit_true_ne_false,
         posBit_false_ne_true]
@@ -639,7 +639,7 @@ private theorem relMap_inp (t t' : HTag V cF cP) (w w' : Fin (dimOf V) → A) :
     · exact h2
     revert h3
     rcases c with - | i | i | - | - | - | - | - | - | - <;>
-      simp only [inpBodyF, InpOn] <;> (try split_ifs) <;>
+      simp only [inpBodyF, InpOn] <;> split_ifs <;>
       intro h3 <;>
       simp_all [Formula.realize_not, realize_relAtF, posBit_true_ne_false,
         posBit_false_ne_true]

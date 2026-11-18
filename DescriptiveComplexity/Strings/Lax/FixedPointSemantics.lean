@@ -46,13 +46,13 @@ def eval {σ : Vocabulary} {m : Nat} {ρ : List Nat}
   | .equal x y => v x = v y
   | .less x y => v x < v y
   | .relation r args => A.relation r (v ∘ args) = true
-  | .variable r args => η r (v ∘ args)
+  | .variable r args => (v ∘ args) ∈ η r
   | .neg ψ => ¬ eval ψ A v η
   | .conj ψ χ => eval ψ A v η ∧ eval χ A v η
   | .exists' ψ => ∃ a, eval ψ A (Fin.cons a v) η
   | .lfp _ body args =>
-      leastFixedPoint (fun R => {a | eval body A (Fin.append a v) (extend R η)})
-        (v ∘ args)
+      (v ∘ args) ∈
+        leastFixedPoint (fun R => {a | eval body A (Fin.append a v) (extend R η)})
 
 /-- The operator a fixed-point body defines, its parameters held fixed. -/
 def bodyOperator {σ : Vocabulary} {m k : Nat} {ρ : List Nat}

@@ -1395,7 +1395,8 @@ private theorem ncard_clauses_next {c c' : A} (hnext : SatNextCl c c') :
       · exact ⟨hc, le_refl _⟩
       · exact ⟨he, le_trans hlt.le hce⟩
   rw [hset,
-    Set.ncard_insert_of_notMem (fun hmem => absurd hmem.2 (not_le.mpr hlt)) (Set.toFinite _)]
+    Set.ncard_insert_of_notMem (fun hmem => absurd (Set.mem_ofPred_eq ▸ hmem).2 (not_le.mpr hlt))
+      (Set.toFinite _)]
 
 /-- **The machine checks every remaining clause and accepts**, in at most one
 sweep's worth of steps per clause. Induction along the clauses from `c`

@@ -285,7 +285,7 @@ private theorem add_mod_iff_bits (a b c : ℕ) :
       · rw [ite_eq_left hcin]
         cases ha : a.testBit i <;> cases hb : b.testBit i <;> cases hc : c.testBit i <;>
           simp_all
-        all_goals omega
+        omega
       · rw [ite_eq_right hcin]
         cases ha : a.testBit i <;> cases hb : b.testBit i <;> cases hc : c.testBit i <;>
           simp_all

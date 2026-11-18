@@ -196,7 +196,7 @@ theorem hasGoodSchedule_iff_exists_subset (hlin : IsLinOrd (JSLe (A := A)))
       exact and_congr_right fun hj => ⟨fun h => h hj, fun h _ => h⟩
     rw [hset]
     refine le_trans (le_of_eq ?_) hpen
-    exact (finsum_mem_congr rfl fun j hj => hpt j hj.1).symm
+    exact (finsum_mem_congr rfl fun j hj => hpt j (Set.mem_ofPred_eq ▸ hj).1).symm
   · rintro ⟨S, hSj, hSsum, hrest⟩
     obtain ⟨sched, hslin, honTime⟩ := exists_schedule_onTime hSsum hdl
     refine ⟨‹Finite A›, hlin, sched, hslin, ?_⟩

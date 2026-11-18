@@ -629,7 +629,7 @@ variable (S : OrderedStructure V.σ)
 def ruleOp : (∀ i : B.ι, Set (Fin (B.arity i) → Fin S.size)) →
     ∀ j : B.ι, Set (Fin (B.arity j) → Fin S.size) :=
   letI := ordStr V S
-  fun W j x => stepDerives rules (fun q => W q.1 q.2) ⟨j, x⟩
+  fun W j => {x | stepDerives rules (fun q => q.2 ∈ W q.1) ⟨j, x⟩}
 
 private theorem ruleOp_mono : Monotone (ruleOp V rules S) := by
   let := ordStr V S
@@ -640,7 +640,7 @@ private theorem ruleOp_mono : Monotone (ruleOp V rules S) := by
 def EnvMatch {ρ : List ℕ} (look : Look B ρ) (η : RelationEnv S.size ρ)
     (E : ∀ i : B.ι, Set (Fin (B.arity i) → Fin S.size)) : Prop :=
   ∀ (j : B.ι) (r : {r : Fin ρ.length // ρ.get r = B.arity j}), look j = some r →
-    ∀ a : Fin (B.arity j) → Fin S.size, η r.1 (a ∘ Fin.cast r.2) ↔ a ∈ E j
+    ∀ a : Fin (B.arity j) → Fin S.size, (a ∘ Fin.cast r.2) ∈ η r.1 ↔ a ∈ E j
 
 /-- The variables bound by a list of positions. -/
 def boundOf {ρ : List ℕ} (look : Look B ρ) : Set B.ι := {j | (look j).isSome}
@@ -700,7 +700,7 @@ theorem eval_atF (n : ℕ) {ρ : List ℕ} (look : Look B ρ) (η : RelationEnv 
     | none =>
       have hm : j ∉ boundOf look := by simp [boundOf, hl]
       simp only [atF, hl, Bekic.solve, hm, ite_false]
-      change leastFixedPoint _ (v ∘ args) ↔ _
+      change (v ∘ args) ∈ leastFixedPoint _ ↔ _
       have hF : (fun R => {a | eval (bodyF V rules j (Fin.castAdd m)
             fun k a => atF V rules n (look.push j) k a) S (Fin.append a v) (extend R η)}) =
           fun R => ruleOp V rules S (Bekic.solve (ruleOp V rules S) n (insert j (boundOf look))
@@ -722,7 +722,6 @@ theorem eval_atF (n : ℕ) {ρ : List ℕ} (look : Look B ρ) (η : RelationEnv 
         rw [this]
         exact Iff.rfl
       rw [hF]
-      exact Iff.rfl
 
 /-- **Bekić's principle, for rules**: the nested formula evaluates to the least fixed
 point of the rules. -/
@@ -742,7 +741,7 @@ theorem eval_atF_top {B : SOBlock} [Finite B.ι]
   rw [hb]
   obtain ⟨hpre, hleast⟩ := Bekic.solve_spec (ruleOp_mono V rules S) (Nat.card B.ι) ∅ E
     (by rw [Set.compl_empty, Set.ncard_univ])
-  have h₁ : Bekic.Pre (ruleOp V rules S) ∅ E (fun i x => lfpAssign rules i x) := by
+  have h₁ : Bekic.Pre (ruleOp V rules S) ∅ E (fun i => {x | lfpAssign rules i x}) := by
     refine ⟨fun i hi => hi.elim, fun k _ x hx => ?_⟩
     obtain ⟨c, hc, a, ha, y, heq, hg, hb⟩ := hx
     change Derives rules ⟨k, x⟩

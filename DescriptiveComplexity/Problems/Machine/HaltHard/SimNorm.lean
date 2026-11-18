@@ -261,9 +261,9 @@ def pStepNormal (p : CPos c) (k : PCont c) (v : List ℕ) : PCont c × List ℕ 
   | .fix _ => pStepNormal (c₁ p) (.fix (c₁ p) k) v
   termination_by sizeOf (codeAt p)
   decreasing_by
-  · rw [codeAt_c₁_cons _h, _h]; simp; try omega
+  · rw [codeAt_c₁_cons _h, _h]; simp; omega
   · rw [codeAt_c₂_comp _h, _h]; simp
-  · rw [codeAt_c₁_case _h, _h]; simp; try omega
+  · rw [codeAt_c₁_case _h, _h]; simp; omega
   · rw [codeAt_c₂_case _h, _h]; simp
   · rw [codeAt_c₁_fix _h, _h]; simp
 

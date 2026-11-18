@@ -630,7 +630,7 @@ private theorem relMap_twrite (p q : HV A) :
       have hq1 : (oneHF .sM (0, 2) q.1).Realize v ↔ q = symCell true (w 2) := by
         refine (realize_oneHF e0 e1 e2).trans ?_
         simp only [h2]
-        try exact Iff.rfl
+        exact Iff.rfl
       have hq2 : (oneHF (if m then .sM else .sU) (0, 2) q.1).Realize v ↔
           q = symCell m (w 2) := by
         refine (realize_oneHF e0 e1 e2).trans ?_

@@ -301,7 +301,9 @@ theorem pfpHolds_stratifyPFP [Finite A] :
       (d₁.stratGate_partStage_succ d₂ _).mpr (Or.inr (d₁.isFixedPt_inflStep_card A))⟩
   obtain ⟨G, hG, hGmin⟩ : ∃ G, StratGate ((d₁.stratifyPFP d₂).partStage A G) ∧
       ∀ m, m < G → ¬StratGate ((d₁.stratifyPFP d₂).partStage A m) :=
-    ⟨sInf _, Nat.sInf_mem hex, fun m hm hmem => absurd (Nat.sInf_le hmem) (Nat.not_le_of_lt hm)⟩
+    ⟨sInf {n | StratGate ((d₁.stratifyPFP d₂).partStage A n)},
+      Nat.sInf_mem (s := {n | StratGate ((d₁.stratifyPFP d₂).partStage A n)}) hex,
+      fun m hm hmem => absurd (Nat.sInf_le hmem) (Nat.not_le_of_lt hm)⟩
   obtain ⟨G', rfl⟩ : ∃ G', G = G' + 1 := by
     cases G with
     | zero => exact absurd hG (d₁.not_stratGate_partStage_zero d₂)

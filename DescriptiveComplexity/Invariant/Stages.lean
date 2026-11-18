@@ -81,10 +81,10 @@ private theorem botAssign_invariant (B : SOBlock) :
 family on the base symbols, everything on the block symbols. -/
 def blockRelsExtend (S : Set (Σ n, L.Relations n)) (B : SOBlock) :
     Set (Σ n, (L.sum B.lang).Relations n) :=
-  fun x =>
+  {x |
     match x with
     | ⟨n, Sum.inl r⟩ => ⟨n, r⟩ ∈ S
-    | ⟨_, Sum.inr _⟩ => True
+    | ⟨_, Sum.inr _⟩ => True}
 
 /-- **Expanding the structure by an invariant assignment does not change
 `≡ᵏ`**: the expansion lemma `DescriptiveComplexity.equivK_inf_eq`, read at the
